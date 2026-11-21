@@ -20,7 +20,6 @@ internal sealed partial class MainWindow
 
     private void DrawFates()
     {
-        Heading(localization.Get("Fates.Title"),localization.Get("Fates.Subtitle"));
         if(fateZones is null && !fatesFailed && fatesTask is null && FatesLoad is { } load)fatesTask=Task.Run(load);
         if(fatesTask is { IsCompleted:true } done)
         {
@@ -64,7 +63,9 @@ internal sealed partial class MainWindow
         ImGui.TableNextRow();
         ImGui.TableNextColumn();
         if(ImGui.Selectable($"{row.Name}##Fate{zone.Territory}{row.Id}") && map is not null && coordinate is { } target)OpenMapPointFromPage(map,target.X,target.Y);
-        if(ImGui.IsItemHovered() && row.Description.Length>0)WrappedTooltip(row.Description);
+        // X-684 (0.1676): the one FATE tooltip.
+        if(ImGui.IsItemHovered())DrawFateTooltip(FateTips.Build(row.Name,0,row.Level,localization.Get("FieldContent.KindFate"),
+            coordinate is { } fatePlace ? $"{zone.Name} · {Maps.MapProjection.CoordinateText(fatePlace)}":zone.Name,null,row.Description,row.Participants));
         if(map is not null && coordinate is { } place)PlaceMenu($"FatePlace{zone.Territory}{row.Id}",map,place,row.Name);
         ImGui.TableNextColumn();
         if(row.Level is { } level)ImGui.TextUnformatted(level.ToString());else ImGui.TextDisabled("—");

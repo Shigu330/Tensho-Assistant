@@ -19,6 +19,8 @@ public sealed partial class Plugin
         // converted at its first load and kept aside.
         var voyageHistory=new FreeCompany.VoyageHistoryStore(Path.Combine(pluginInterface.GetPluginConfigDirectory(),"VoyageHistory.json"),(error,message)=>log.Warning(error,message),tenshoData);
         registrations.Register(()=>voyages=new FreeCompany.VoyageWatcher(framework,data,configuration,saveVoyages,log){Observed=voyageHistory.Observe,
+            // X-718 (0.1722): the vessels' stats and parts as read, in the developer-mode log.
+            Developer=()=>configuration.DeveloperMode,
             // X-73.8 (0.862): each submersible voyage's loot by sector and the sectors it unlocked, for the discoveries base.
             AirshipLoot=(item,sector,count)=>{if(configuration.Discovery.Enabled && configuration.Discovery.ItemSources)mainWindow.DiscoveryStore?.SeeSource(Discoveries.DiscoveryKind.AirshipDrop,item%1_000_000,sector,count,DateTimeOffset.UtcNow,hq:item>=1_000_000);},
             SectorLoot=(item,sector,count,hq)=>{if(configuration.Discovery.Enabled && configuration.Discovery.ItemSources)mainWindow.DiscoveryStore?.SeeSource(Discoveries.DiscoveryKind.VoyageDrop,item,sector,count,DateTimeOffset.UtcNow,hq:hq);},

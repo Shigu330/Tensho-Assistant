@@ -22,7 +22,7 @@ internal static class GardenBell1153Tests
             var later = new GardenBed { Place = "Bed 4",Seed = "Future",PlantedAt = Now.AddHours(1),GrowHours = 1 };
             var bell = new GardenBell();
             var due = bell.Due([ripe,tend,said,growing,later],Now);
-            Check(due.Count == 2 && due.Any(item => item.Bed == ripe && item.State == GardenState.Ripe) && due.Any(item => item.Bed == tend && item.State == GardenState.ToTend),
+            Check(due.Count == 2 && due.Any(item => item.Bed == ripe && item.State == GardenState.Expected) && due.Any(item => item.Bed == tend && item.State == GardenState.ToTend),
                 "the ripe bed and the pot to tend: " + due.Count);
             Check(!ripe.RipeSaid && tend.TendSaidFor is null,"the beds are not changed (the application never writes the plugin's settings)");
             Check(bell.Due([ripe,tend,said,growing,later],Now.AddMinutes(1)).Count == 0,"once each");
@@ -39,7 +39,7 @@ internal static class GardenBell1153Tests
             var data = Read("src/TenshoAssistant/MainWindow.DesktopData.cs");
             Check(data.Contains("var garden=configuration.GardenAlerts ? (desktopGarden??=new()).Due(configuration.GardenBeds,now):[];",StringComparison.Ordinal)
                 && data.Contains("if(due.Count+garden.Count==0 || options.DesktopOnlyGameBehind && gameInFront)return ([],false);",StringComparison.Ordinal)
-                && data.Contains(".. garden.Select(item=>localization.Format(item.State==Reminders.GardenState.Ripe ? \"Garden.RipeNotice\":\"Garden.TendNotice\",item.Bed.Seed,item.Bed.Place))",StringComparison.Ordinal),
+                && data.Contains(".. garden.Select(item=>localization.Format(Reminders.GardenJournal.NoticeKey(item.State),item.Bed.Seed,item.Bed.Place))",StringComparison.Ordinal),
                 "wired in DesktopDueAlarms");
         }),
     ];

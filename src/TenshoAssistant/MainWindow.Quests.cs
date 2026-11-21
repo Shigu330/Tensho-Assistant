@@ -46,7 +46,6 @@ internal sealed partial class MainWindow
 
     private void DrawQuests()
     {
-        Heading(localization.Get("QuestsBrowser.Title"),localization.Get("QuestsBrowser.Description"));
         var state = quests.State;
         if (!ReferenceEquals(questMetadataEntries,state.Entries))
         {
@@ -198,9 +197,8 @@ internal sealed partial class MainWindow
                 if (ImGui.IsItemClicked()) SelectQuest(entry.Id);
                 ImGui.SameLine();
                 if (ImGui.Selectable($"{entry.Name}##quest{entry.Id}", selectedQuestId == entry.Id)) SelectQuest(entry.Id);
-                // X-89 (0.970): the quest's expansion (game data) in its tooltip.
-                if (ImGui.IsItemHovered()) WrappedTooltip($"{entry.Name}\n{entry.Section} › {entry.Category}"
-                    +(entry.Expansion is { Length:>0 } questExpansion ? "\n"+localization.Format("QuestDetails.Expansion",questExpansion):"")+(developerMode ? $"\nID: {entry.Id}":""));
+                // X-89 (0.970): the quest's expansion (game data) in its tooltip. X-684 (0.1670): the one quest tooltip.
+                if (ImGui.IsItemHovered()) DrawQuestTooltip(entry);
                 QuestMenu($"QuestMenu{entry.Id}", entry.Id, entry.Name);
                 ImGui.TableNextColumn(); if (entry.Level > 0) ImGui.TextUnformatted(entry.Level.ToString(CultureInfo.CurrentCulture)); else ImGui.TextDisabled("?");
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(entry.Zone ?? "");
@@ -256,22 +254,15 @@ internal sealed partial class MainWindow
         if(entry.AdditionalLevel!=0)ImGui.TextUnformatted(localization.Format("QuestDetails.OtherLevel",entry.AdditionalLevel));
         if (!string.IsNullOrWhiteSpace(entry.Zone)) ImGui.TextUnformatted(localization.Format("QuestDetails.Zone",entry.Zone));
         if (!string.IsNullOrWhiteSpace(entry.Expansion)) ImGui.TextUnformatted(localization.Format("QuestDetails.Expansion",entry.Expansion));
+        // X-606 (0.1710): what the sheets say beyond the kind and level (docs/evidence/0.1708-quest-info.md): the jobs it asks, an allied
+        // society or grand company, the giver and its place, the NPC it ends with; an accepted quest's current step (X-57).
+        if (entry.Jobs.Length > 0) ImGui.TextUnformatted(localization.Format("QuestDetails.Jobs",entry.Jobs));
+        if (entry.Society.Length > 0) ImGui.TextUnformatted(localization.Format("QuestDetails.Society",Capitalized(entry.Society)));
+        if (entry.Company.Length > 0) ImGui.TextUnformatted(localization.Format("QuestDetails.Company",entry.Company));
         if (developerMode && entry.IssuerId != 0) ImGui.TextDisabled(localization.Format("DevMode.IssuerId",entry.IssuerId));
-        if (entry.IssuerMapId != 0 && entry.IssuerTerritoryId != 0)
-        {
-            var issuerMap = maps.State.Catalog?.Find(entry.IssuerMapId);
-            if (issuerMap is not null && issuerMap.TerritoryId == entry.IssuerTerritoryId)
-            {
-                // Tensho map (0.118): centred on the quest giver with the flag (cached position index), else the whole map.
-                if (ImGui.SmallButton(localization.Get("QuestDetails.Map")+"###QuestMap"))
-                {
-                    if (mapLocal?.State.Index?.Quest(entry.Id) is { } giver && giver.MapId == issuerMap.MapId) ShowOnTenshoMap(issuerMap, new Vector3(giver.X, 0, giver.Z));
-                    else ShowMapOnTenshoMap(issuerMap.MapId);
-                }
-                Tip("QuestDetails.MapHelp");
-            }
-            else ImGui.TextDisabled(localization.Get("QuestDetails.NoMap"));
-        }
+        DrawQuestGiver(entry);
+        if (entry.EndName.Length > 0) ImGui.TextUnformatted(localization.Format("QuestDetails.End",Capitalized(entry.EndName)));
+        if (entry.Progress == QuestProgress.Active) DrawQuestStep(entry);
         if (ImGui.TreeNodeEx(localization.Get("QuestDetails.Previous")+"###QuestPrevious", ImGuiTreeNodeFlags.DefaultOpen))
         {
             try
@@ -297,6 +288,54 @@ internal sealed partial class MainWindow
         }
         if (entry.IsRepeatable) ImGui.TextWrapped(localization.Get("QuestDetails.RepeatHelp"));
         ImGui.Separator();
+    }
+
+    /// <summary>
+    /// X-606 (0.1710): the giver's name and place (the Level row of Quest.IssuerLocation, as map coordinates), and a button that puts the flag on it
+    /// on Tensho's map (before: only when the local index knew the giver, else the whole map). The giver's place is fixed; an accepted quest's
+    /// step is elsewhere (DrawQuestStep, X-57).
+    /// </summary>
+    private void DrawQuestGiver(QuestEntry entry)
+    {
+        var name = entry.IssuerName.Length > 0 ? Capitalized(entry.IssuerName) : "";
+        var placed = QuestPlaces.HasGiverPlace(entry);
+        var issuerMap = placed ? maps.State.Catalog?.Find(entry.IssuerMapId) : null;
+        if (issuerMap is null || issuerMap.TerritoryId != entry.IssuerTerritoryId)
+        {
+            if (name.Length > 0) ImGui.TextUnformatted(localization.Format("QuestDetails.GiverName",name));
+            if (placed) ImGui.TextDisabled(localization.Get("QuestDetails.NoMap"));
+            return;
+        }
+        var world = new Vector3(entry.IssuerX, 0, entry.IssuerZ);
+        var coordinate = TenshoAssistant.Maps.MapProjection.CoordinateFromWorld(world, issuerMap);
+        var where = $"{MapName(issuerMap)} {TenshoAssistant.Maps.MapProjection.CoordinateText(coordinate)}";
+        ImGui.TextUnformatted(name.Length > 0 ? localization.Format("QuestDetails.Giver",name,where) : localization.Format("QuestDetails.GiverPlace",where));
+        // X-111: the common place menu on a position (flag, nearest aetheryte, map, weather), on a right click.
+        PlaceMenu($"QuestGiverPlace{entry.Id}", issuerMap, coordinate, name.Length > 0 ? name : entry.Name);
+        Tip("EntityMenu.RightClickPlace");
+        if (ImGui.SmallButton(localization.Get("QuestDetails.Map")+"###QuestMap")) ShowOnTenshoMap(issuerMap, world);
+        Tip("QuestDetails.MapHelp");
+    }
+
+    /// <summary>
+    /// X-606 (0.1710, X-57): an accepted quest's current step, from the game's own quest markers (the live map reader's quest points, read with
+    /// or without the game's map open), with a button that puts the flag on it; none shown by the game: said.
+    /// </summary>
+    private void DrawQuestStep(QuestEntry entry)
+    {
+        var points = mapLive?.State?.QuestPoints?.Select(point => (point.Quest, point.MapId, point.X, point.Z));
+        if (QuestPlaces.Step(points, entry.Id) is not { } step || maps.State.Catalog?.Find(step.MapId) is not { } map)
+        {
+            ImGui.TextDisabled(localization.Get("QuestDetails.StepNone"));
+            return;
+        }
+        var world = new Vector3(step.X, 0, step.Z);
+        var coordinate = TenshoAssistant.Maps.MapProjection.CoordinateFromWorld(world, map);
+        ImGui.TextUnformatted(localization.Format("QuestDetails.CurrentStep",$"{MapName(map)} {TenshoAssistant.Maps.MapProjection.CoordinateText(coordinate)}"));
+        PlaceMenu($"QuestStepPlace{entry.Id}", map, coordinate, entry.Name);
+        Tip("EntityMenu.RightClickPlace");
+        if (ImGui.SmallButton(localization.Get("QuestDetails.StepMap")+"###QuestStepMap")) ShowOnTenshoMap(map, world);
+        Tip("QuestDetails.StepMapTip");
     }
 
     private void DrawQuestLink(uint id, string direction)
@@ -414,5 +453,31 @@ internal sealed partial class MainWindow
             }
         }
         if (questFollowError is { } errorText) ImGui.TextWrapped(localization.Get(errorText));
+    }
+
+    /// <summary>
+    /// X-684 (0.1670, the user's request of 20/11: « every tooltip gives everything Tensho knows »): the one tooltip of a quest, wherever it is
+    /// named (the Quests page, the items' quest sources, a quest link of the chat): icon, name, journal section and genre, level, zone,
+    /// expansion, progress, repeatable, then what the caller adds (a click's effect). Everything read from the quest's entry (QuestEntry,
+    /// built off the frame), nothing worked out under the mouse.
+    /// </summary>
+    private void DrawQuestTooltip(QuestEntry entry,string? after=null)
+    {
+        using(TooltipScope.Begin())
+        {
+            if(entry.Icon>0){DrawGameIcon(entry.Icon,new Vector2(32));ImGui.SameLine();}
+            ImGui.BeginGroup();
+            ImGui.TextColored(Accent,entry.Name);
+            if(TipPart("Quest.Category"))ImGui.TextDisabled(entry.Section.Length>0 ? $"{entry.Section} › {entry.Category}":entry.Category);
+            ImGui.EndGroup();
+            if(TipPart("Quest.Level") && entry.Level>0)ImGui.TextUnformatted(localization.Format("QuestDetails.Level",entry.Level));
+            if(TipPart("Quest.Level") && entry.AdditionalLevel>0)ImGui.TextUnformatted(localization.Format("QuestDetails.OtherLevel",entry.AdditionalLevel));
+            if(TipPart("Quest.Zone") && entry.Zone.Length>0)ImGui.TextUnformatted(localization.Format("QuestDetails.Zone",entry.Zone));
+            if(TipPart("Quest.Expansion") && entry.Expansion.Length>0)ImGui.TextDisabled(localization.Format("QuestDetails.Expansion",entry.Expansion));
+            if(TipPart("Quest.Progress"))ImGui.TextColored(entry.Progress==QuestProgress.Complete ? Success:Muted,QuestProgressLabel(entry));
+            if(TipPart("Quest.Progress") && entry.IsRepeatable)ImGui.TextDisabled(localization.Get("QuestDetails.Repeatable"));
+            if(developerMode)ImGui.TextDisabled($"ID: {entry.Id}");
+            if(after is { Length:>0 }){ImGui.Separator();ImGui.TextDisabled(after);}
+        }
     }
 }

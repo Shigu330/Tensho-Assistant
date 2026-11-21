@@ -255,6 +255,19 @@ public sealed partial class Plugin : IDalamudPlugin
             mainWindow.InCutsceneNow=()=>condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.WatchingCutscene]
                 || condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.WatchingCutscene78] || condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.OccupiedInCutSceneEvent];
             mainWindow.InDutyNow=()=>condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty];
+            // X-447 B13 (0.1655): the chat window's contexts: crafting (the game's crafting states), a city (the zone's TerritoryIntendedUse 0,
+            // the game's 19 cities: docs/evidence/0.1655-chat-context-cities.md), read once per zone; a row not read is no city (R08).
+            mainWindow.InCraftingNow=()=>condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.Crafting] || condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.PreparingToCraft];
+            uint townTerritory=uint.MaxValue;var inTown=false;
+            mainWindow.InTownNow=()=>
+            {
+                uint territory=client.TerritoryType;
+                if(territory==townTerritory)return inTown;
+                townTerritory=territory;
+                try{inTown=territory!=0 && data.GetExcelSheet<Lumina.Excel.Sheets.TerritoryType>().GetRowOrDefault(territory) is { } row && row.TerritoryIntendedUse.RowId==Chat.ChatContexts.TownUse;}
+                catch(Exception){inTown=false;}
+                return inTown;
+            };
             // X-474 (0.1477): a link of Dalamud or of a plugin in Tensho's chat window: the handler Dalamud keeps for it (RegisteredLinkHandlers,
             // the same one a click in the game's chat calls), run on the game's thread on the player's click. X-496 M1 (0.1478): its message
             // is the link's own string (from the link to its end), as Dalamud passes it (docs/evidence/0.1478-dalamud-link-handler.md); a
@@ -514,6 +527,12 @@ public sealed partial class Plugin : IDalamudPlugin
             mainWindow.RetainerSalesSource=()=>retainerSales?.State ?? new(Market.RetainerSalesStatus.Closed,[],new HashSet<string>(),"",false);
             Market.RetainerCompareService? retainerCompare=null;
             registrations.Register(()=>mainWindow.RetainerCompare=retainerCompare=new Market.RetainerCompareService{Enabled=()=>CommunitySources.Allowed(configuration,SourceUse.UniversalisRetainerCompare)},()=>retainerCompare?.Dispose());
+            // X-698 M1 (0.1671): the sale list's own requests (its answers added up), apart from the panel's; M4: the market tax rates the game sends.
+            Market.RetainerCompareService? retainerSaleListCompare=null;
+            registrations.Register(()=>mainWindow.RetainerSaleListCompare=retainerSaleListCompare=new Market.RetainerCompareService{Accumulate=true,Enabled=()=>CommunitySources.Allowed(configuration,SourceUse.UniversalisRetainerCompare)},()=>retainerSaleListCompare?.Dispose());
+            Market.MarketTaxReader? marketTaxes=null;
+            registrations.Register(()=>marketTaxes=new Market.MarketTaxReader(marketBoardEvents,log),()=>marketTaxes?.Dispose());
+            mainWindow.MarketTaxRatesSource=()=>marketTaxes?.Rates;
             Help.CommunityHelpIndex? communityHelp=null;
             registrations.Register(()=>mainWindow.CommunityHelp=communityHelp=new Help.CommunityHelpIndex(),()=>communityHelp?.Dispose());
             registrations.Register(()=>boardReader=new Beastmaster.BeastBoardReader(framework,gameGui,log,()=>mainWindow.Beasts?.State.Catalog?.Beasts,mainWindow.BeastRanksRead,mainWindow.BeastResultRead,mainWindow.BeastBookRead),()=>boardReader?.Dispose());
@@ -828,10 +847,18 @@ public sealed partial class Plugin : IDalamudPlugin
             // X-654 (0.1602): the senders of the chat window's messages (in memory) and the game's entries of a player's menu.
             var chatSenders=new Chat.ChatSources();
             mainWindow.ChatSenders=chatSenders;
+            // X-679 (0.1658): the senders follow their lines when the chat history put back numbers them again.
+            registrations.Register(()=>mainWindow.ChatMessages.Renumbered+=chatSenders.Renumber,()=>mainWindow.ChatMessages.Renumbered-=chatSenders.Renumber);
             RegisterChat(configuration,client,addonLifecycle,framework,player,pluginInterface.GetPluginConfigDirectory(),chatSenders);
             Chat.ChatPlayerActions? chatPlayers=null;
-            registrations.Register(()=>mainWindow.ChatPlayers=chatPlayers=new Chat.ChatPlayerActions(interop,framework,client,objects,targets,partyList,data,log,chatSenders),
+            registrations.Register(()=>mainWindow.ChatPlayers=chatPlayers=new Chat.ChatPlayerActions(interop,framework,client,objects,targets,partyList,data,log,chatSenders,gameConfig),
                 ()=>{mainWindow.ChatPlayers=null;chatPlayers?.Dispose();chatSenders.Clear();});
+            // X-715 (0.1718, D-202 b): developer mode, what the game's chat sends on a click on a player's name, read only.
+            Chat.ChatLinkWatch? chatLinkWatch=null;
+            registrations.Register(()=>chatLinkWatch=new Chat.ChatLinkWatch(interop,framework,contextMenus,log,()=>configuration.DeveloperMode),()=>chatLinkWatch?.Dispose());
+            // X-225 (0.1719): the aetherial wheels of the company's stand, read in its window (the Reminders page and the automatic alarms follow).
+            FreeCompany.AetherialWheelReader? wheelReader=null;
+            registrations.Register(()=>wheelReader=new FreeCompany.AetherialWheelReader(framework,gameGui,data,log,configuration,()=>SaveTimed("aetherial wheels"),()=>configuration.DeveloperMode),()=>wheelReader?.Dispose());
             Alarms.AutoAlarmWatcher? autoAlarms=null;
             registrations.Register(()=>autoAlarms=new Alarms.AutoAlarmWatcher(framework,client,log,configuration,()=>SaveTimed("automatic alarms"),localization.Get),
                 ()=>autoAlarms?.Dispose());
@@ -1485,6 +1512,8 @@ public sealed partial class Plugin : IDalamudPlugin
         if (arguments.Trim().ToLowerInvariant() is "peche" or "pêche" or "fish" or "fishing") { mainWindow?.ToggleFishingPanel(); return; }
         // X-403 (0.1434, D-166): « /tensho chat » shows or hides the Tensho chat window.
         if (arguments.Trim().ToLowerInvariant() is "chat") { mainWindow?.ToggleChatWindow(); return; }
+        // X-447 B12 (0.1714): « /tensho chat hide » hides every Tensho chat window for a moment, or shows them back.
+        if (string.Join(' ', arguments.Split(' ', StringSplitOptions.RemoveEmptyEntries)).ToLowerInvariant() is "chat hide") { mainWindow?.ToggleChatWindowsHidden(); return; }
         // 0.349 (g, X-07): « /tensho wiki <item> » and « /tensho lodestone <item> » open the item's page in the browser.
         var parts = arguments.Trim().Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
         // 0.494: « /tensho selftest » writes the self-check to the log.

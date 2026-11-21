@@ -933,6 +933,12 @@ internal sealed partial class MainWindow
         changed|=AreaSetting("MapView.AreaEvents",settings.ShowEventAreas,value=>settings.ShowEventAreas=value,settings.EventAreaColor,value=>settings.EventAreaColor=value,MapDefaults.ShowEventAreas,MapDefaults.EventAreaColor);
         changed|=AreaSetting("MapView.AreaFates",settings.ShowFateAreas,value=>settings.ShowFateAreas=value,settings.FateAreaColor,value=>settings.FateAreaColor=value,MapDefaults.ShowFateAreas,MapDefaults.FateAreaColor);
         changed|=AreaSetting("MapView.AreaGathering",settings.ShowGatheringAreas,value=>settings.ShowGatheringAreas=value,settings.GatheringAreaColor,value=>settings.GatheringAreaColor=value,MapDefaults.ShowGatheringAreas,MapDefaults.GatheringAreaColor);
+        // X-516 (0.1711): the timed gathering points' areas, their own switch and colour; X-714 (0.1713): under « Gathering areas », greyed
+        // while it is off (as the gatherers under « Gathering points », X-80).
+        ImGui.Indent();
+        using(ImRaii.Disabled(!settings.ShowGatheringAreas))
+            changed|=AreaSetting("MapView.AreaGatheringTimed",settings.ShowTimedGatheringAreas,value=>settings.ShowTimedGatheringAreas=value,settings.TimedGatheringAreaColor,value=>settings.TimedGatheringAreaColor=value,MapDefaults.ShowTimedGatheringAreas,MapDefaults.TimedGatheringAreaColor);
+        ImGui.Unindent();
         FinishMapSettings(changed);
     }
 
@@ -1077,7 +1083,13 @@ internal sealed partial class MainWindow
                 if(ImGui.Checkbox("##Visible",ref visible)){settings.SetSize(icon,scope,visible ? 1:0);changed=true;}
                 Tip("MapView.IconVisibleHelp");
                 ImGui.SameLine();
-                if(TenshoGlyph(icon) is { } glyph)
+                // X-516 (0.1711): the present gathering points' row is their legend: the botanist's icon, and the four icons and two colours on hover.
+                if(icon==GlyphNearbyGathering)
+                {
+                    DrawGameIcon(GatheringNodeIcons.Botanist,new Vector2(ImGui.GetFrameHeight()));
+                    if(ImGui.IsItemHovered())DrawNearbyGatheringLegend();
+                }
+                else if(TenshoGlyph(icon) is { } glyph)
                 {
                     // Same square as the game icons (0.212: the narrower glyph shifted the slider of these rows).
                     var square=ImGui.GetFrameHeight();
@@ -1416,10 +1428,12 @@ internal sealed partial class MainWindow
                 }
                 DrawArea(draw,origin+mapPan+MapProjection.PixelFromWorld(marker.Position,map)*mapZoom,marker.Radius*Math.Max(1,map.SizeFactor)/100f*mapZoom,quest ? settings.QuestAreaColor:marker.IsLeve ? settings.LeveAreaColor:settings.EventAreaColor);
             }
+            // X-516 (0.1711): a timed point's area has its own colour; X-714 (0.1713): its switch sits under « Gathering areas ».
             if(settings.ShowGatheringAreas)
                 foreach(var point in gathering)
-                    if(point.Position is { Radius:>0 } area)
-                        DrawArea(draw,origin+mapPan+MapProjection.PixelFromWorld(new Vector3(area.X,0,area.Z),map)*mapZoom,area.Radius*Math.Max(1,map.SizeFactor)/100f*mapZoom,settings.GatheringAreaColor);
+                    if(point.Position is { Radius:>0 } area && GatheringNodeIcons.AreaShown(point.Timed,settings.ShowGatheringAreas,settings.ShowTimedGatheringAreas))
+                        DrawArea(draw,origin+mapPan+MapProjection.PixelFromWorld(new Vector3(area.X,0,area.Z),map)*mapZoom,area.Radius*Math.Max(1,map.SizeFactor)/100f*mapZoom,
+                            GatheringNodeIcons.AreaColour(point.Timed,settings.GatheringAreaColor,settings.TimedGatheringAreaColor));
             // N-07 (0.667): the Island Sanctuary's resources; world coordinates, to compare with the game's map.
             IReadOnlyList<IslandPoint> islandPoints=map.TerritoryId==IslandResources.Territory ? (IslandPoints ?? []).Where(point=>settings.ShowsIslandKind(point.Kind)).ToArray():[];
             if(settings.ShowGatheringAreas)
@@ -1470,7 +1484,7 @@ internal sealed partial class MainWindow
             // 0.328 (map audit #7): hovering inside an area lists its icon only while that kind of area is drawn.
             foreach(var point in gathering)
                 if(point.Position is { } spot && point.Icon!=0)Add(point.Icon,1,MapProjection.PixelFromWorld(new Vector3(spot.X,0,spot.Z),map),GatheringLabelOf(point),point:point,
-                    worldRadius:settings.ShowGatheringAreas ? spot.Radius:0);
+                    worldRadius:GatheringNodeIcons.AreaShown(point.Timed,settings.ShowGatheringAreas,settings.ShowTimedGatheringAreas) ? spot.Radius:0);
             // NPC vendors (0.139): the game's shop map icon (MapSymbol 60412, docs/evidence/0.139.0-symbols-probe.log), in the
             // same list, sizes and priorities as the game icons; click = flag.
             foreach(var vendor in vendorLayout.Lonely)Add(vendor.Icon,1,vendor.Pixel,vendor.Label,flag:vendor.Flag);
@@ -1584,13 +1598,20 @@ internal sealed partial class MainWindow
                         draw.AddImage(chest.Handle,at-new Vector2(half),at+new Vector2(half));
                         glyph=half*2;
                     }
-                    // 0.901 (X-83): an island animal with its own icon (MJIAnimals.Icon).
-                    else if(item.Kind==MapObjectKind.IslandAnimal && item.Icon!=0 && textures.TryGetFromGameIcon(new GameIconLookup(item.Icon),out var animalShared) && animalShared.TryGetWrap(out var animalImage,out _) && animalImage is not null)
+                    // 0.901 (X-83): an island animal with its own icon (MJIAnimals.Icon). X-516 (0.1711): a present gathering point too, its job's and
+                    // timing's game icon (GatheringNodeIcons), with Tensho's clock badge when timed (green: present, so open now).
+                    else if(item.Kind is MapObjectKind.IslandAnimal or MapObjectKind.Gathering && item.Icon!=0 && textures.TryGetFromGameIcon(new GameIconLookup(item.Icon),out var animalShared) && animalShared.TryGetWrap(out var animalImage,out _) && animalImage is not null)
                     {
                         var half=Math.Max(4,baseIcon*kindSize)/2;
                         draw.AddCircleFilled(at,half*1.05f,ImGui.GetColorU32(new Vector4(0,0,0,0.55f)),20);
                         draw.AddImage(animalImage.Handle,at-new Vector2(half),at+new Vector2(half));
                         glyph=half*2;
+                        if(item.Kind==MapObjectKind.Gathering && GatheringNodeIcons.Timed(item.Icon))
+                        {
+                            var badge=Math.Max(6,glyph*0.45f);var corner=at+new Vector2(glyph*0.2f,-glyph*0.6f);
+                            draw.AddCircleFilled(corner+new Vector2(badge/2),badge*0.62f,ImGui.GetColorU32(new Vector4(0,0,0,0.75f)),16);
+                            draw.AddText(UiBuilder.IconFont,badge,corner,ImGui.GetColorU32(UI.FfxivTheme.Success),FontAwesomeIcon.Clock.ToIconString());
+                        }
                     }
                     else
                     {
@@ -1602,10 +1623,15 @@ internal sealed partial class MainWindow
                         draw.AddCircleFilled(at,glyph*0.7f,ImGui.GetColorU32(new Vector4(0,0,0,0.55f)),20);
                         draw.AddText(UiBuilder.IconFont,glyph,at-new Vector2(glyph/2),ImGui.GetColorU32(colour),symbol);
                     }
-                    var label=item.Kind==MapObjectKind.Gathering && item.Level>0 ? localization.Format("MapView.GatheringLabel",item.Name,item.Level)
+                    var label=item.Kind==MapObjectKind.Gathering && item.Level>0 ? localization.Format(GatheringNodeIcons.Timed(item.Icon) ? "MapView.GatheringTimedLabel":"MapView.GatheringLabel",item.Name,item.Level)
                         :item.Kind==MapObjectKind.HuntMark ? localization.Format("MapView.HuntMarkLabel",item.Name,item.Level switch{3=>"S",2=>"A",_=>"B"})
                         :item.Kind==MapObjectKind.IslandAnimal ? IslandAnimalLabel(item):item.Name;
-                    if(hovered && Vector2.Distance(io.MousePos,at)<=glyph){tooltip=label;tooltipPoint=null;}
+                    // X-684 (0.1673): a hunt mark is a monster: the one monster tooltip (its rank).
+                    if(hovered && Vector2.Distance(io.MousePos,at)<=glyph)
+                    {
+                        tooltip=item.Kind==MapObjectKind.HuntMark ? MapMonsterTip(MonsterTips.Build(item.Name,localization.Format("MapView.MonsterTipRank",item.Level switch{3=>"S",2=>"A",_=>"B"}),null,[])):label;
+                        tooltipPoint=null;
+                    }
                 }
             MapMark("canvas nearby objects");
             // 0.795 (X-35, user request): nearby monsters that drop an item the tracking lists still need.
@@ -1636,7 +1662,8 @@ internal sealed partial class MainWindow
                     }
                     if(hovered && Vector2.Distance(io.MousePos,at)<=glyph)
                     {
-                        tooltip=localization.Format("MapView.MonsterLabel",monster.Name,monster.Level)+"\n"+string.Join("\n",notes.Where(note=>MonsterNoteShown(note,settings)).Select(note=>note.Text));
+                        // X-684 (0.1673): the one monster tooltip (name, level, every reason shown).
+                        tooltip=MapMonsterTip(MonsterTips.Build(monster.Name,localization.Format("MapView.MonsterTipLevel",monster.Level),null,notes.Where(note=>MonsterNoteShown(note,settings)).Select(note=>note.Text)));
                         tooltipPoint=null;
                     }
                 }
@@ -1657,7 +1684,8 @@ internal sealed partial class MainWindow
                     if(monster.EventId==0 || (monster.EventId & 0xFFFF)!=leve.Objective)continue;
                     var at=origin+mapPan+MapProjection.PixelFromWorld(monster.Position,map)*mapZoom;
                     draw.AddImage(leveIcon.Handle,at-new Vector2(leveSize/2),at+new Vector2(leveSize/2));
-                    if(hovered && Vector2.Distance(io.MousePos,at)<=leveSize/2){tooltip=localization.Format("MapView.LeveTarget",monster.Name,monster.Level);tooltipPoint=null;}
+                    if(hovered && Vector2.Distance(io.MousePos,at)<=leveSize/2)
+                    {tooltip=MapMonsterTip(MonsterTips.Build(monster.Name,localization.Format("MapView.MonsterTipLevel",monster.Level),null,[localization.Get("MapView.MonsterTipLeveTarget")]));tooltipPoint=null;}
                 }
             }
             MapMark("canvas monsters");
@@ -1704,7 +1732,7 @@ internal sealed partial class MainWindow
                     draw.AddCircleFilled(at,badge*0.6f,ImGui.GetColorU32(new Vector4(0.15f,0.45f,0.95f,0.85f)),20);
                     if(member.Job!=0 && textures.TryGetFromGameIcon(new GameIconLookup(62100+member.Job),out var shared) && shared.TryGetWrap(out var image,out _) && image is not null)
                         draw.AddImage(image.Handle,at-new Vector2(badge/2),at+new Vector2(badge/2));
-                    if(hovered && Vector2.Distance(io.MousePos,at)<=badge/2){tooltip=localization.Format("MapView.PartyMember",member.Name,member.Level);sightseeingTip=null;tooltipPoint=null;}
+                    if(hovered && Vector2.Distance(io.MousePos,at)<=badge/2){tooltip=PartyMemberTip(member);sightseeingTip=null;tooltipPoint=null;}
                 }
             // 0.378 (g, M-08): the player's bookmarks of this map (star); a click on one places the flag there.
             MapBookmark? hoveredBookmark=null;
@@ -1748,7 +1776,7 @@ internal sealed partial class MainWindow
                         draw.AddImage(wildIcon.Handle,at-new Vector2(tameSize/2),at+new Vector2(tameSize/2),Vector2.Zero,Vector2.One,ImGui.GetColorU32(new Vector4(1,1,1,0.85f)));
                         if(!hovered || Vector2.Distance(io.MousePos,at)>tameSize/2)continue;
                         sightseeingTip=null;tooltipPoint=null;
-                        tooltip=localization.Format("MapView.BeastToTame",wild.Name)+"\n"+localization.Get("MapView.BookmarkClick");
+                        tooltip=MapMonsterTip(MonsterTips.Build(wild.Name,null,null,[localization.Get("MapView.MonsterTipToTame")]),localization.Get("MapView.BookmarkClick"));
                         if(top is null && ImGui.IsMouseReleased(ImGuiMouseButton.Left) && !mapDragged)FlagFromMap(map,place.X,place.Y);
                     }
                 }
@@ -1818,7 +1846,12 @@ internal sealed partial class MainWindow
             mapHoveredVista=sightseeingTip?.Vista;
             if(tooltipPoint is { } gatheringTip)DrawGatheringTooltip(gatheringTip);
             else if(sightseeingTip is { } vistaTip)DrawSightseeingTooltip(vistaTip.Vista,vistaTip.Done);
-            else if(tooltip is not null)WrappedTooltip(tooltip);
+            else if(tooltip is not null)
+            {
+                // X-684 (0.1673): a monster's tooltip set last is drawn with the one monster tooltip.
+                if(mapMonsterTip is { } monsterTip && ReferenceEquals(monsterTip.Text,tooltip))DrawMonsterTooltip(monsterTip.Facts,monsterTip.After);
+                else WrappedTooltip(tooltip);
+            }
             else if(hits.Count>0)DrawIconListTooltip(hits,top,settings);
             // 0.640 (user capture): a quest icon on top of a door hid its link.
             if(linkUnderMouse is null && edgeLabel is null && top is not { Flag:not null } && top is not { Point:not null } && top is not { Fixed:{ AetheryteId:not 0 } })
@@ -1995,9 +2028,10 @@ internal sealed partial class MainWindow
         return shown;
     }
     // Gil shop = the shop icon; only special exchanges = the exchange icon.
-    private uint VendorIconOf(Npcs.NpcVendor vendor)
+    // X-684 (0.1689): the shops given by the NPC tooltip outside the map (the catalogue's); the map's own otherwise.
+    private uint VendorIconOf(Npcs.NpcVendor vendor,IReadOnlyDictionary<uint,(string Name,Npcs.NpcShopKind Kind,int Items)>? shops=null)
     {
-        var kinds=vendor.ShopIds.Select(id=>mapVendorCache.Shops.TryGetValue(id,out var shop) ? shop.Kind:(Npcs.NpcShopKind?)null).OfType<Npcs.NpcShopKind>().ToArray();
+        var kinds=vendor.ShopIds.Select(id=>(shops ?? mapVendorCache.Shops).TryGetValue(id,out var shop) ? shop.Kind:(Npcs.NpcShopKind?)null).OfType<Npcs.NpcShopKind>().ToArray();
         return kinds.Length>0 && kinds.All(kind=>kind==Npcs.NpcShopKind.Special) ? ExchangeIcon:VendorIcon;
     }
     // One tooltip for every icon under the cursor: game icon, first line as title, the rest muted; gathering points list their
@@ -2016,25 +2050,19 @@ internal sealed partial class MainWindow
                 ImGui.BeginGroup();
                 try
                 {
-                    var lines=(hit.Label ?? (mapMarkers?.SymbolName(hit.Icon) is { Length:>0 } symbol ? symbol:localization.Format("MapView.IconUnnamed",hit.Icon))).Split('\n');
-                    ImGui.TextColored(Accent,lines[0]);
-                    foreach(var line in lines.Skip(hit.Point is null ? 1:2))ImGui.TextDisabled(line);
+                    // X-684 (0.1694): a gathering point through the one gathering body (title, job and kind, place, opening, items), no longer a copy by hand.
+                    if(hit.Point is { } point)DrawGatheringBody(point,GatheringTips.MaxListItems);
+                    else
+                    {
+                        var lines=(hit.Label ?? (mapMarkers?.SymbolName(hit.Icon) is { Length:>0 } symbol ? symbol:localization.Format("MapView.IconUnnamed",hit.Icon))).Split('\n');
+                        ImGui.TextColored(Accent,lines[0]);
+                        foreach(var line in lines.Skip(1))ImGui.TextDisabled(line);
+                    }
                     // 0.645 (P7): the cost on hover, or that it is not attuned.
                     if(hit.Fixed is { AetheryteId:not 0 } crystal && mapLive?.TeleportCostsFailed!=true && mapLive?.TeleportCosts is { Count:>0 } teleportCosts)
                     {
                         if(teleportCosts.TryGetValue(crystal.AetheryteId,out var gilCost))ImGui.TextDisabled(localization.Format("MapView.TeleportCost",gilCost.ToString("N0",Numbers)));
                         else ImGui.TextColored(UI.FfxivTheme.Warning,localization.Get("MapView.AetheryteNotAttuned"));
-                    }
-                    if(hit.Point is { } point)
-                    {
-                        DrawPointAvailability(point);
-                        var items=itemCatalog.State.Catalog;
-                        foreach(var id in point.Items.Take(8))
-                        {
-                            var item=items?.Find(id);
-                            DrawItemIcon(item,new Vector2(ImGui.GetTextLineHeight()));ImGui.SameLine();
-                            ImGui.TextUnformatted(item?.Name ?? $"#{id}");
-                        }
                     }
                     if(top is { } clicked && clicked.Order==hit.Order && clicked.Layer==hit.Layer)
                     {
@@ -2089,11 +2117,16 @@ internal sealed partial class MainWindow
     private static bool IsGatheringPointBase(MapLocalGatheringPoint point)=>point.TypeId!=100;
     private TenshoAssistant.Gathering.GatherPointAccess? PointAccess(MapLocalGatheringPoint point)=>IsGatheringPointBase(point) ? GatherAccess?.Invoke(point.BaseId):null;
     private Vector4 TimedPointColor(MapLocalGatheringPoint point)=>PointAccess(point)?.TomeMissing is not null ? Muted:point.ActiveAt(EorzeaMinutes()) ? UI.FfxivTheme.Success:UI.FfxivTheme.Warning;
+    // 0.647 (C27): the kind of the point. X-684 (0.1694): a part of the gathering body's detail line (built once per point, MainWindow.GatheringTooltip.cs).
+    private string? PointKindText(MapLocalGatheringPoint point)
+    {
+        if(IsGatheringPointBase(point) && GatherKind?.Invoke(point.BaseId) is { } kind and not TenshoAssistant.Gathering.GatherPointKind.Normal)return localization.Get("MapView.PointKind"+kind);
+        return null;
+    }
+    // Whether a point is open now and for how long, and what it asks of the player (read live in the gathering body).
     private void DrawPointAvailability(MapLocalGatheringPoint point)
     {
         var access=PointAccess(point);
-        // 0.647 (C27): the kind of the point.
-        if(IsGatheringPointBase(point) && GatherKind?.Invoke(point.BaseId) is { } kind and not TenshoAssistant.Gathering.GatherPointKind.Normal)ImGui.TextDisabled(localization.Get("MapView.PointKind"+kind));
         if(point.Timed)
         {
             var open=point.ActiveAt(EorzeaMinutes());
@@ -2122,6 +2155,26 @@ internal sealed partial class MainWindow
     // Keys of Tensho's own map layers in the icon size/priority tables (outside the game's icon id range).
     private const uint GlyphVista=MapViewSettings.VistaGlyph,GlyphCurrent=0xFFFF0002,GlyphNearbyGathering=0xFFFF0003,GlyphParty=0xFFFF0004,GlyphBookmark=0xFFFF0005,GlyphTreasureMap=0xFFFF0006,
         GlyphIslandAnimal=0xFFFF0007,GlyphMonster=MapViewSettings.MonsterGlyph;
+    /// <summary>X-516 (0.1711): the legend of the present gathering points: the four icons (GatheringNodeIcons) and the two area colours.</summary>
+    private void DrawNearbyGatheringLegend()
+    {
+        using(TooltipScope.Begin())
+        {
+            ImGui.TextColored(UI.FfxivTheme.Gold,localization.Get("MapView.NearbyGatheringLegend"));
+            var line=new Vector2(ImGui.GetTextLineHeight());
+            foreach(var (icon,job,timed) in new[]{(GatheringNodeIcons.Botanist,"GatheringPanel.Botanist",false),(GatheringNodeIcons.Miner,"GatheringPanel.Miner",false),
+                (GatheringNodeIcons.TimedBotanist,"GatheringPanel.Botanist",true),(GatheringNodeIcons.TimedMiner,"GatheringPanel.Miner",true)})
+            {
+                DrawGameIcon(icon,line);ImGui.SameLine();
+                ImGui.TextUnformatted(timed ? localization.Format("MapView.TimedNode",localization.Get(job)):localization.Get(job));
+            }
+            var settings=configuration.MapView;
+            ImGui.ColorButton("##LegendGatheringArea",settings.GatheringAreaColor with{W=1},ImGuiColorEditFlags.NoTooltip,line);ImGui.SameLine();
+            ImGui.TextUnformatted(localization.Get("MapView.AreaGathering"));
+            ImGui.ColorButton("##LegendTimedGatheringArea",settings.TimedGatheringAreaColor with{W=1},ImGuiColorEditFlags.NoTooltip,line);ImGui.SameLine();
+            ImGui.TextUnformatted(localization.Get("MapView.AreaGatheringTimed"));
+        }
+    }
     private static (FontAwesomeIcon Symbol,Vector4 Colour)? TenshoGlyph(uint icon)=>icon switch
     {
         GlyphVista=>(FontAwesomeIcon.Binoculars,new Vector4(0.98f,0.82f,0.30f,1)),
@@ -2255,24 +2308,6 @@ internal sealed partial class MainWindow
             if(done==true && vista.Data!=0)DrawGameIcon(vista.Data,new Vector2(160,90),false);
         }
     }
-    private void DrawGatheringTooltip(MapLocalGatheringPoint point)
-    {
-        using(TooltipScope.Begin())
-        {
-            if(point.Icon!=0){DrawSmallGameIcon(point.Icon);}
-            ImGui.TextColored(Accent,$"{point.Type} · {localization.Format("MapLocal.Level",point.Level)}{(point.Hidden ? " "+localization.Get("MapLocal.Hidden"):"")}");
-            if(point.Place.Length>0)ImGui.TextDisabled(point.Place);
-            DrawPointAvailability(point);
-            var items=itemCatalog.State.Catalog;
-            foreach(var id in point.Items.Take(16))
-            {
-                var item=items?.Find(id);
-                DrawItemIcon(item,new Vector2(ImGui.GetTextLineHeight()));ImGui.SameLine();
-                ImGui.TextUnformatted(item?.Name ?? $"#{id}");
-            }
-            ImGui.TextDisabled(localization.Get("MapLocal.ClickFlag"));
-        }
-    }
     // Vendors standing on a map, with the shop names of each, rebuilt only when the map or the catalogue changes.
     private (uint MapId,object? Catalog,IReadOnlyList<(Npcs.NpcVendor Vendor,Npcs.NpcLocation Spot)> Rows,IReadOnlyDictionary<uint,(string Name,Npcs.NpcShopKind Kind,int Items)> Shops,string Festivals) mapVendorCache=(0,null,[],new Dictionary<uint,(string,Npcs.NpcShopKind,int)>(),"");
     /// <summary>X-266 (0.1307): whether a quest is under way or done (read in the game); a vendor placed only by a quest's layer shows then.</summary>
@@ -2370,26 +2405,10 @@ internal sealed partial class MainWindow
         return mapVendorLayout=new(map.MapId,rows,shown,showFixed,localization.Revision,merged,lonely);
     }
     // Each shop: its name (or its kind when the game gives none, or only an untranslated Japanese placeholder such as
-    // « アイテムの購入 », seen 0.137) and how many items it sells; shops without sales in the catalogue are counted apart.
-    private string VendorLabel(Npcs.NpcVendor vendor)
-    {
-        var name=vendor.Name.Length>0 ? vendor.Name:localization.Get("MapLocal.UnnamedVendor");
-        // 0.679: an NPC of a service whose shop no sheet gives: its name and title say what it does.
-        if(vendor.ShopIds.Count==0)return name;
-        var lines=new List<string>();var unknown=0;
-        foreach(var id in vendor.ShopIds.Distinct())
-        {
-            if(!mapVendorCache.Shops.TryGetValue(id,out var shop)){unknown++;continue;}
-            var shopName=string.IsNullOrWhiteSpace(shop.Name) || localization.CurrentCode!="ja" && shop.Name.Any(c=>c is >= '\u3040' and <= '\u30FF' or >= '\u4E00' and <= '\u9FFF')
-                ? localization.Get("MapLocal.ShopKind"+shop.Kind):shop.Name;
-            lines.Add(localization.Format("MapLocal.ShopLine",shopName,shop.Items));
-        }
-        var shown=lines.Distinct().Take(6).ToList();
-        if(lines.Distinct().Count()>6)shown.Add(localization.Format("MapView.HoverMore",lines.Distinct().Count()-6));
-        if(unknown>0)shown.Add(localization.Format("MapLocal.ShopsUnknown",unknown));
-        if(shown.Count==0)shown.Add(localization.Get("MapLocal.ShopsNone"));
-        return name+"\n"+string.Join("\n",shown);
-    }
+    // « アイテムの購入 », seen 0.137) and how many items it sells; shops without sales in the catalogue are counted apart. X-684 (0.1689): the
+    // NPC tooltip's facts as text (one body for the label and the tooltip; an NPC of a service with no shop: its name only, as since 0.679).
+    // X-707 (0.1693): the name and the shop lines only (VendorShopLines), the label's whole text; the tooltip's places and icon are not built here.
+    private string VendorLabel(Npcs.NpcVendor vendor)=>Npcs.NpcTips.Text(Npcs.NpcTips.Build(NpcName(vendor),0,[],VendorShopLines(vendor,npcVendors?.State.Catalog?.ShopSummaries),[]));
     private string GatheringPointLabel(MapLocalGatheringPoint point)
     {
         var items=itemCatalog.State.Catalog;
@@ -2439,7 +2458,7 @@ internal sealed partial class MainWindow
                 targets.Add((MapProjection.PixelFromWorld(new Vector3(point.Position!.X,0,point.Position.Z),map),point.Icon,GatheringLabelOf(point),false,0));
         }
         if(settings.EdgeParty && settings.ShowParty && settings.SizeOf(GlyphParty,map.MapId)>0 && live?.Party is { } members && live.MapId==map.MapId)
-            foreach(var member in members)targets.Add((MapProjection.PixelFromWorld(member.Position,map),0,localization.Format("MapView.PartyMember",member.Name,member.Level),false,member.Job));
+            foreach(var member in members)targets.Add((MapProjection.PixelFromWorld(member.Position,map),0,PartyMemberTip(member),false,member.Job));
         const float margin=20,badge=26;
         var centre=origin+size/2;var low=origin+new Vector2(margin);var high=origin+size-new Vector2(margin);
         string? label=null;

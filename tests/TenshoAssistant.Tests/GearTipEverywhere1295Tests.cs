@@ -36,7 +36,9 @@ internal static class GearTipEverywhere1295Tests
             Check(stats == 1, "a piece's stats for a tooltip are listed in one place: " + stats);
             // Every item tooltip goes through DrawItemInfoTooltip: the common body is drawn by it, the panel under the game's tooltip and the item sheet only.
             var bodies = Sources().Sum(source => Regex.Matches(source.Text, @"\bDrawItemInfoBody\(item,").Count);
-            Check(bodies == 3, "DrawItemInfoBody called by the item tooltip, the hover panel and the item sheet only: " + bodies);
+            // X-683 (0.1664, the user's request of 20/11): the tooltip of an item linked in the chat window draws the same body (4 callers, was 3).
+            // X-684 (0.1695): and the garden's two seed tooltips, under their own lines (6 callers, was 4).
+            Check(bodies == 6, "DrawItemInfoBody called by the item tooltip, the hover panel, the item sheet, the chat's item link and the garden's two seed tooltips only: " + bodies);
             Check(!Read("MainWindow.Gear.cs").Contains("DrawGearPickTooltip"), "the Gear list no longer has its own tooltip");
         }),
         ("X-294: the worn piece of a Gear slot shows its stats with its own HQ state", () =>

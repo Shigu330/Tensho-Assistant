@@ -534,8 +534,24 @@ if(Environment.GetEnvironmentVariable("PROBE_OCEANLIVE") is { Length:>0 })
 if(Environment.GetEnvironmentVariable("PROBE_GATHERTYPE") is { Length:>0 })
 {
     var bases=data.Excel.GetSheet<GatheringPointBase>().GroupBy(row=>row.GatheringType.RowId).ToDictionary(group=>group.Key,group=>group.Count());
-    foreach(var type in data.Excel.GetSheet<GatheringType>(Language.English))Console.WriteLine($"TYPE {type.RowId} '{type.Name.ExtractText()}' bases {bases.GetValueOrDefault(type.RowId)}");
+    // X-516 (0.1711): each type's map icons (IconMain, IconOff) and how many of its physical points are timed (GatheringPointTransient: a rare
+    // pop table, or an ephemeral window other than 65535), to choose the icons of the present resources on Tensho's map.
+    var transient=data.Excel.GetSheet<GatheringPointTransient>();
+    bool TimedPoint(GatheringPoint point)=>transient.GetRowOrDefault(point.RowId) is { } timing
+        && (timing.GatheringRarePopTimeTable.RowId!=0 || timing.EphemeralStartTime!=65535 && timing.EphemeralEndTime!=65535);
+    var points=data.Excel.GetSheet<GatheringPoint>().Where(point=>point.GatheringPointBase.RowId!=0 && point.GatheringPointBase.IsValid).ToArray();
+    foreach(var type in data.Excel.GetSheet<GatheringType>(Language.English))
+        Console.WriteLine($"TYPE {type.RowId} '{type.Name.ExtractText()}' bases {bases.GetValueOrDefault(type.RowId)} iconMain {type.IconMain} iconOff {type.IconOff}"
+            +$" points {points.Count(point=>point.GatheringPointBase.Value.GatheringType.RowId==type.RowId)} timed {points.Count(point=>point.GatheringPointBase.Value.GatheringType.RowId==type.RowId && TimedPoint(point))}"
+            +$" pointTypes {string.Join(",",points.Where(point=>point.GatheringPointBase.Value.GatheringType.RowId==type.RowId).GroupBy(point=>point.Type).OrderBy(group=>group.Key).Select(group=>$"{group.Key}:{group.Count()}/{group.Count(TimedPoint)}"))}");
     foreach(var job in data.Excel.GetSheet<ClassJob>(Language.English).Where(row=>row.RowId is 16 or 17 or 18))Console.WriteLine($"JOB {job.RowId} '{job.Name.ExtractText()}'");
+    // X-714 (0.1713): the edge cases of the review: an ephemeral window whose start equals its end (no restriction for the catalogue) and a
+    // single bound at 65535 (an invalid schedule for the catalogue), on points without a rare pop table.
+    var plain=points.Select(point=>(point,timing:transient.GetRowOrDefault(point.RowId))).Where(pair=>pair.timing is { } row && row.GatheringRarePopTimeTable.RowId==0).ToArray();
+    Console.WriteLine($"EDGE startEqualsEnd {plain.Count(pair=>pair.timing!.Value.EphemeralStartTime!=65535 && pair.timing.Value.EphemeralStartTime==pair.timing.Value.EphemeralEndTime)}"
+        +$" oneBound65535 {plain.Count(pair=>pair.timing!.Value.EphemeralStartTime==65535 ^ pair.timing.Value.EphemeralEndTime==65535)}"
+        +$" rareTableMissing {points.Count(point=>transient.GetRowOrDefault(point.RowId) is { } row && row.GatheringRarePopTimeTable.RowId!=0 && !row.GatheringRarePopTimeTable.IsValid)}"
+        +$" type8 {points.Count(point=>point.Type==8)} type8Timed {points.Count(point=>point.Type==8 && TimedPoint(point))}");
     return;
 }
 // PROBE_GPACTIONS (0.410, R-09): every miner and botanist action (ClassJob 16/17): level, GP cost, English and French names, description.
@@ -944,6 +960,57 @@ if(Environment.GetEnvironmentVariable("PROBE_STARTCITY") is { Length:>0 })
     }
     foreach(var group in msq.Keys.GroupBy(id=>string.Join("+",RootsOf(id).OrderBy(root=>root))).OrderBy(group=>group.Key))
         Console.WriteLine($"ROOTSET [{group.Key}] quests {group.Count()} e.g. {string.Join(" | ",group.Take(3).Select(id=>msq[id].Name.ExtractText()))}");
+    return;
+}
+// PROBE_QUESTINFO (X-606, 0.1708): what the Quests page can show of a quest, from the game sheets only: its giver (IssuerStart → ENpcResident)
+// and where (IssuerLocation → Level: map, territory, x, z, as map coordinates), the NPC it ends with (TargetEnd), levels and jobs
+// (ClassJobLevel, ClassJobCategory0), kind (JournalGenre → JournalCategory → JournalSection; EventIconType), place, expansion, grand company and
+// allied society, the quests before it (PreviousQuest) and after it (PreviousQuest read backwards), gil; how many quests have each.
+// PROBE_QUESTINFO=1: the counts and three samples; PROBE_QUESTINFO=<id,id,…>: those quests.
+if(Environment.GetEnvironmentVariable("PROBE_QUESTINFO") is { Length:>0 } questInfo)
+{
+    var quests=data.Excel.GetSheet<Quest>();
+    var questNpcs=data.Excel.GetSheet<ENpcResident>();
+    var named=quests.Where(row=>row.RowId!=0 && row.Name.ExtractText().Length>0).ToList();
+    var after=new Dictionary<uint,List<uint>>();
+    foreach(var row in named)
+        foreach(var before in row.PreviousQuest.Where(link=>link.RowId!=0))
+        {
+            if(!after.TryGetValue(before.RowId,out var list))after[before.RowId]=list=[];
+            list.Add(row.RowId);
+        }
+    string Resident(uint id)=>id!=0 && questNpcs.GetRowOrDefault(id) is { } resident ? resident.Singular.ExtractText():"";
+    Console.WriteLine($"QUESTS named={named.Count} giver={named.Count(row=>row.IssuerStart.RowId!=0)} giverNamed={named.Count(row=>Resident(row.IssuerStart.RowId).Length>0)}"
+        +$" giverPlace={named.Count(row=>row.IssuerLocation.RowId!=0 && row.IssuerLocation.IsValid && row.IssuerLocation.Value.Map.RowId!=0)}"
+        +$" endNpc={named.Count(row=>row.TargetEnd.RowId!=0)} endNamed={named.Count(row=>Resident(row.TargetEnd.RowId).Length>0)}"
+        +$" level={named.Count(row=>row.ClassJobLevel[0]!=0)} jobs={named.Count(row=>row.ClassJobCategory0.RowId!=0)} genre={named.Count(row=>row.JournalGenre.RowId!=0)}"
+        +$" place={named.Count(row=>row.PlaceName.RowId!=0)} expansion={named.Count(row=>row.Expansion.IsValid)} grandCompany={named.Count(row=>row.GrandCompany.RowId!=0)}"
+        +$" alliedSociety={named.Count(row=>row.BeastTribe.RowId!=0)} before={named.Count(row=>row.PreviousQuest.Any(link=>link.RowId!=0))} after={named.Count(row=>after.ContainsKey(row.RowId))}"
+        +$" gil={named.Count(row=>row.GilReward>0)} eventIcon={named.Count(row=>row.EventIconType.RowId!=0)}");
+    uint[] samples=questInfo=="1"
+        ? [68142,.. named.Where(row=>row.JournalGenre.RowId==1 && row.IssuerLocation.RowId!=0 && after.ContainsKey(row.RowId)).Take(1).Select(row=>row.RowId),
+            .. named.Where(row=>row.BeastTribe.RowId!=0 && row.IssuerLocation.RowId!=0).Take(1).Select(row=>row.RowId)]
+        : [.. questInfo.Split(',').Select(uint.Parse)];
+    foreach(var id in samples)
+    {
+        if(quests.GetRowOrDefault(id) is not { } quest){Console.WriteLine($"QUEST {id} missing");continue;}
+        var where="none";
+        if(quest.IssuerLocation.IsValid && quest.IssuerLocation.Value is var level && level.Map.IsValid)
+        {
+            var map=level.Map.Value;
+            double Coordinate(float position,short offset)=>41.0/(map.SizeFactor/100.0)*((position+offset)*(map.SizeFactor/100.0)+1024.0)/2048.0+1.0;
+            where=$"level={quest.IssuerLocation.RowId} map={level.Map.RowId} territory={level.Territory.RowId} place='{(map.PlaceName.IsValid ? map.PlaceName.Value.Name.ExtractText():"")}'"
+                +$" x={Coordinate(level.X,map.OffsetX):0.0} y={Coordinate(level.Z,map.OffsetY):0.0}";
+        }
+        var genre=quest.JournalGenre.IsValid ? quest.JournalGenre.Value : default;
+        var section=quest.JournalGenre.IsValid && genre.JournalCategory.IsValid && genre.JournalCategory.Value.JournalSection.IsValid ? genre.JournalCategory.Value.JournalSection.Value.Name.ExtractText():"";
+        Console.WriteLine($"QUEST {id} '{quest.Name.ExtractText()}' giver={quest.IssuerStart.RowId} '{Resident(quest.IssuerStart.RowId)}' {where}"
+            +$" end={quest.TargetEnd.RowId} '{Resident(quest.TargetEnd.RowId)}' levels={string.Join("/",quest.ClassJobLevel)} jobs={quest.ClassJobCategory0.RowId} '{(quest.ClassJobCategory0.IsValid ? quest.ClassJobCategory0.Value.Name.ExtractText():"")}'"
+            +$" genre={quest.JournalGenre.RowId} '{(quest.JournalGenre.IsValid ? genre.Name.ExtractText():"")}' section='{section}' eventIcon={quest.EventIconType.RowId}"
+            +$" place='{(quest.PlaceName.IsValid ? quest.PlaceName.Value.Name.ExtractText():"")}' expansion='{(quest.Expansion.IsValid ? quest.Expansion.Value.Name.ExtractText():"")}'"
+            +$" grandCompany={quest.GrandCompany.RowId} alliedSociety={quest.BeastTribe.RowId} before={string.Join(",",quest.PreviousQuest.Where(link=>link.RowId!=0).Select(link=>link.RowId))}"
+            +$" after={string.Join(",",after.GetValueOrDefault(id) ?? [])} gil={quest.GilReward} icon={quest.Icon}");
+    }
     return;
 }
 // PROBE_QUESTODD (0.284): « Accident de la route »… listed in genre 1 (ARR main scenario) but not main scenario quests; compare

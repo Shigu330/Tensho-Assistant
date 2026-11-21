@@ -13,6 +13,8 @@ public static class ConfigurationReset
         "TripleTriadDecks", "FollowedQuests", "Observations", "InventorySortProfiles", "InventorySortTemplates", "LanguageCode",
         // 0.315: saved data added since 0.258 (vessels, gear and materia plans).
         "Voyages", "OceanSightings", "WeatherStoryZones", "GearPlans", "SRankKills", "DutyNotes", "GearPlanSets", "CollectionMemories", "LastCraftStats", "FashionOutfit", "WeatherFavorites", "GearMateria", "SubmarineUnlocked", "VesselPlans",
+        // X-225 (0.1719): the aetherial wheels on the company's stand, as last read.
+        "AetherialWheels",
         // 0.321: interface state, not a setting (which navigation groups are folded).
         "NavigationCollapsed",
         // X-521 M2 (D-180): interface state, not a setting (the category chosen in each tab of the Settings page).
@@ -53,6 +55,10 @@ public static class ConfigurationReset
         "HoverShowCollection", "HoverShowStock", "HoverShowUsages", "HoverShowSources",
         // 0.377 (g, M-07): comparison with the worn piece under the item tooltip.
         "HoverShowCompare",
+        // X-684 (0.1696): the parts of Tensho's own tooltips turned off.
+        "TooltipPartsHidden",
+        // X-605 (0.1697): the order of the families' tabs, dragged with the mouse.
+        "TabOrders",
         "Cache", "OpenOnLoad", "AutoBankCapture", "ShowCharacterPanel", "RemindersFromGame", "ShowEnglishItemName", "CostDataCenter", "CostUseVendors", "HidePanelsBehindGame", "DesktopLink", "DesktopInstallFolder", "PagePlaces", "ShowBeastBoardPanel", "HighlightBeastCombos", "OccultPanel", "OccultAlerts", "MapReplaceNoticeSaid", "HideBarsBehindGame", "ShowDutyFinderLoot", "MacroCopy", "AlarmServerBar", "ReminderServerBar", "ReminderFinishedServerBar", "ReminderBarHidden", "AlarmBarTooltip", "ServerBarTooltipAbove",
         // 0.344 (g, I-02): currency alerts, their server bar entry and the thresholds.
         "CurrencyAlerts", "CurrencyServerBar", "GilServerBar", "BagsServerBar", "WearServerBar", "PlaceServerBar", "StateServerBar", "StateServerBarOnlyProblems", "StatePanel", "WishlistSaleAlert", "CurrencyThresholds", "CurrencyWeeklyCapAlert",
@@ -323,6 +329,9 @@ public sealed class MapViewSettings
     public System.Numerics.Vector4 LeveAreaColor { get; set; } = new(0.15f,0.55f,0.20f,0.40f);
     public System.Numerics.Vector4 FateAreaColor { get; set; } = new(0.75f,0.45f,0.95f,0.25f);
     public System.Numerics.Vector4 GatheringAreaColor { get; set; } = new(0.55f,0.90f,0.55f,0.20f);
+    /// <summary>X-516 (0.1711, the user's request of 16/11): the areas of timed gathering points, their own switch and colour (pink: no other area uses it).</summary>
+    public bool ShowTimedGatheringAreas { get; set; } = true;
+    public System.Numerics.Vector4 TimedGatheringAreaColor { get; set; } = new(0.95f,0.40f,0.75f,0.28f);
     // 0.111: size of each game icon (key = icon id) on top of IconScale; 0 hides that icon, absent keeps 100 %.
     // 0.289 (user request): the user's tuned values become the defaults — party members at 50 %; aetherytes (60453, 60430, 60959)
     // drawn above other icons (+1), 60442 and the side-quest icon 71021 below (−1). Icon ids read from the user's saved settings.
@@ -483,6 +492,8 @@ public sealed partial class Configuration
     public DateTimeOffset? TreasureMapAt { get; set; }
     // 0.307 (R-07): free company submarines and airships as last read in the workshop.
     public List<TenshoAssistant.FreeCompany.VoyageVessel>? Voyages { get; set; }
+    // X-225 (0.1719): the aetherial wheels on the company's stand as last read in its window, per house.
+    public List<TenshoAssistant.FreeCompany.AetherialWheelSlot>? AetherialWheels { get; set; }
     // 0.315 (R-11): unlocked submarine sectors per workshop (house id) and planned vessel builds (key → rank, four part rows).
     public Dictionary<string,List<uint>>? SubmarineUnlocked { get; set; }
     public Dictionary<string,List<uint>>? VesselPlans { get; set; }
@@ -780,6 +791,12 @@ public sealed partial class Configuration
     public List<string>? WorldClocks { get; set; }
     // 0.377 (g, M-07): under the game's item tooltip, the hovered gear against the worn piece of its slot (on by default).
     public bool HoverShowCompare { get; set; } = true;
+    // X-684 (0.1696, M3 of X-700): the parts of Tensho's own tooltips turned off (« Kind.Part », UI/TooltipParts.All); none by default.
+    // Replaced whole at each change (MainWindow.SetTipPart).
+    public List<string> TooltipPartsHidden { get; set; } = [];
+    // X-605 (0.1697, the user's request of 18/11): the order of each family's tabs the player dragged (« PageTabs.<family> » → the pages'
+    // names, left to right); none by default (the list's order). Replaced whole at each change.
+    public Dictionary<string,List<string>> TabOrders { get; set; } = new();
     // 0.376 (g, M-06): wear and spiritbond alert (on), on-screen bar (off) and thresholds; null = defaults.
     public Gear.GearWearSettings? GearWear { get; set; }
     // 0.370 (g, X-02): favourite orchestrion rolls (Orchestrion rows), 300 at most.

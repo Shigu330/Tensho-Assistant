@@ -66,6 +66,27 @@ public static class ChatLook
         return (alpha ?? 1f)*left;
     }
 
+    /// <summary>X-447 B14 (0.1641): the room an item's icon takes before its link: a square as high as the line, and a gap of a sixth of it.</summary>
+    public static float IconWidth(float lineHeight)=>lineHeight+MathF.Round(lineHeight/6f);
+
+    /// <summary>X-447 B9 (0.1642): <paramref name="text"/> on one line within <paramref name="width"/>: as it is when it fits, else its start and
+    /// « … » (just « … » when nothing more fits). The line breaks become spaces.</summary>
+    public static string Shorten(string text,float width,Func<string,float> measure)
+    {
+        text=text.ReplaceLineEndings(" ");
+        if(measure(text)<=width)return text;
+        int low=0,high=text.Length;
+        while(low<high)
+        {
+            var middle=(low+high+1)/2;
+            if(measure(text[..middle].TrimEnd()+"…")<=width)low=middle;else high=middle-1;
+        }
+        return text[..low].TrimEnd()+"…";
+    }
+
+    /// <summary>X-447 B7 (0.1643): a blinking tab is lit for half a second, then not for the next half (<paramref name="seconds"/>: ImGui's time).</summary>
+    public static bool Blink(double seconds)=>!double.IsNaN(seconds) && (long)Math.Floor(seconds*2)%2==0;
+
     /// <summary>X-447 D6 (0.1618): whether the mouse is on the window drawn last at <paramref name="at"/> with <paramref name="size"/>.</summary>
     public static bool Under((float X,float Y) mouse,(float X,float Y) at,(float X,float Y) size)
         =>mouse.X>=at.X && mouse.Y>=at.Y && mouse.X<at.X+size.X && mouse.Y<at.Y+size.Y;
@@ -76,12 +97,13 @@ public static class ChatLook
     public static bool Through(bool setting,bool locked,bool menuOpen,(float X,float Y) mouse,IReadOnlyList<(float X,float Y,float Width,float Height)> zones)
         =>setting && locked && !menuOpen && !zones.Any(zone=>Under(mouse,(zone.X,zone.Y),(zone.Width,zone.Height)));
 
-    /// <summary>X-447 B5 (0.1621): a player's name's own colour, taken from the name alone (case and spaces aside): a hue from a stable hash
-    /// (FNV-1a, the same on every PC and at every start), light enough to read on the window's dark background. Nothing is kept.</summary>
     /// <summary>X-669 M1 (review of 0.1627, R25): the colour of a sender's name; in capture mode, taken from its stand-in (made with the secret of
     /// this start), not from the name: a colour from the name alone let a guessed name be checked against a picture, one hue in 360.</summary>
     public static (float R,float G,float B) SenderColour(string? sender,bool capture)=>NameColour(capture ? ChatFormat.StandIn(sender):sender);
 
+    /// <summary>X-447 B5 (0.1621): a player's name's own colour, taken from the name alone (case and spaces aside): a hue from a stable hash
+    /// (FNV-1a, the same on every PC and at every start), light enough to read on the window's dark background. Nothing is kept.
+    /// X-670 M2 (review of 0.1638): this summary stood above SenderColour, which then had two.</summary>
     public static (float R,float G,float B) NameColour(string? name)
     {
         var key=(name ?? "").Trim().ToLowerInvariant();

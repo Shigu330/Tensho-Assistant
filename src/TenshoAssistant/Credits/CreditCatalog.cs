@@ -66,6 +66,7 @@ public static class CreditCatalog
         // 0.336 (DEC-023, point 3): two Generated CSVs copied as published, with the GPL-3.0 notice in their header.
         new("LuminaSupplementalAirships", CreditKind.Embedded, "LuminaSupplemental", "Critical-Impact", "GPL-3.0", "https://github.com/Critical-Impact/LuminaSupplemental", "https://github.com/Critical-Impact/LuminaSupplemental/blob/main/LICENSE",
             ["FreeCompany/Data/airship-unlock.csv", "FreeCompany/Data/airship-drop.csv", "FreeCompany/AirshipSectors.cs", "FreeCompany/VoyageWatcher.Dalamud.cs", "MainWindow.AirshipSectors.cs", "TenshoAssistant.csproj",
+             "FreeCompany/Data/submarine-unlock.csv", "FreeCompany/SubmarineUnlocks.cs", "MainWindow.RoutePlanner.cs",
              "Events/Data/festival-names.csv", "Events/Festivals.cs", "Events/FestivalReader.Dalamud.cs", "MainWindow.Events.cs"], [], "", true),
         // 0.449 (DEC-027, point 3): seed growing and wilting hours, built by tools/garden-data.py with the GPL-3.0 notice in the header.
         new("LotlabGardening", CreditKind.Embedded, "FFXIV Gardening Tracker", "Lotlab", "GPL-3.0", "https://github.com/Lotlab/FFXIV-Gardening-Tracker", "https://github.com/Lotlab/FFXIV-Gardening-Tracker/blob/master/LICENSE.txt",

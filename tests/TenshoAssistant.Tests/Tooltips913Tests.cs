@@ -41,7 +41,7 @@ internal static class Tooltips913Tests
             Check(Regex.IsMatch(Source("MainWindow.Gathering.cs"),@"finally \{ ImGui\.EndDisabled\(\); \}\r?\n\s*Tip\(""GatheringDetails\.MapHelp""\);"),"gathering: zone map button");
             Check(Regex.IsMatch(Source("MainWindow.MyTools.cs"),@"finally\{ImGui\.EndDisabled\(\);\}\r?\n\s*Tip\(""MyToolsUi\.GalleryOpenTip""\);"),"my tools: gallery open button");
             var simulation=Source("MainWindow.CraftSimulation.cs");
-            Check(simulation.Contains("TipText(action.Description);",StringComparison.Ordinal) && !simulation.Contains("WrappedTooltip(action.Description)",StringComparison.Ordinal),"craft simulation: action icon");
+            Check(simulation.Contains("if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled)) DrawCraftActionTooltip(action,",StringComparison.Ordinal) && !simulation.Contains("WrappedTooltip(action.Description)",StringComparison.Ordinal),"craft simulation: action icon");
         }),
         ("Tooltips: the helpers live in UI/Components/Tooltip.cs; hand-drawn tooltips and help markers go through them",() =>
         {

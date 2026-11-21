@@ -66,7 +66,7 @@ internal static class ChatLinks1463Tests
         ("Chat links 1463: the window names a link without text, and developer mode says the kinds of pieces, never the words", () =>
         {
             var window = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.ChatWindow.cs")).Replace("\r\n", "\n");
-            Check(window.Contains("ChatFormat.Runs(view.RecordAt(index),options,ChatChannelShort,ChatLinkName)", StringComparison.Ordinal)
+            Check(window.Contains("ChatFormat.Runs(view.RecordAt(index),options,ChatChannelShort,ChatLinkName,ChatLinkIcon)", StringComparison.Ordinal)
                   && window.Contains("private string ChatLinkName(ChatLink link)=>link.Kind switch", StringComparison.Ordinal), "the window's names");
             var reader = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Chat/ChatReader.Dalamud.cs")).Replace("\r\n", "\n");
             // 0.1468 (X-479): the line is written by ChatPayloads.Describe (pure; ChatLinkPieces1468Tests reads it back), two per kind of message.

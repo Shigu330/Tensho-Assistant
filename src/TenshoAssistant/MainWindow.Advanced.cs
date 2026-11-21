@@ -138,7 +138,8 @@ internal sealed partial class MainWindow
                 (Desktop.PagePlace.Both,localization.Get("Advanced.PagePlaceBoth")),(Desktop.PagePlace.Game,localization.Get("Advanced.PagePlaceGame")),
                 (Desktop.PagePlace.App,localization.Get("Advanced.PagePlaceApp")),
             };
-            foreach(var entry in PageEntries.Where(entry=>entry.Label is not null && entry.Parent is null && entry.Visible?.Invoke()!=false))
+            // X-601 (0.1677): every page, the tabs of a family too (named as the quick search names them).
+            foreach(var entry in PageEntries.Where(entry=>(entry.Label is not null || entry.Tab is not null) && entry.Visible?.Invoke()!=false))
             {
                 var name=entry.Page.ToString();
                 if(!Desktop.DesktopPages.Choosable(name))continue;
@@ -149,7 +150,7 @@ internal sealed partial class MainWindow
                         value=>{configuration.PagePlaces??=[];if(value==Desktop.PagePlace.Both)configuration.PagePlaces.Remove(name);else configuration.PagePlaces[name]=value.ToString();},
                         options,Desktop.PagePlace.Both,showLabel:false);
                     ImGui.SameLine();
-                    ImGui.TextUnformatted(entry.Label!());
+                    ImGui.TextUnformatted(QuickPageLabel(entry));
                 }
                 finally{ImGui.PopID();}
             }

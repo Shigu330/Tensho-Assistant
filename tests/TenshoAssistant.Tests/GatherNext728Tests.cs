@@ -94,7 +94,8 @@ internal static class GatherNext728Tests
             Check(panel.Contains("configuration.GatheringNextHighlight && BarLocator is { } located") && panel.Contains("located.Want(action.Spec.Id)") && panel.Contains("DrawGatheringBarHighlight(located)"),"setting, asked and drawn inside the panel");
             Check(!panel.Contains("located.Wanted=0"),"0.733: nothing clears the request after the panel asked");
             Check(!Read("Gathering/GpNextAction.cs").Contains("Dalamud"),"pure");
-            Check(panel.IndexOf("DrawGatheringNext(shown")<panel.IndexOf("if(next is { Kind:not GpNextKind.Done })ImGui.Separator();"),"a line between the next action and the plan");
+            // X-710 (0.1704): « DrawGatheringNext(shown » is gone since 0.731 (IndexOf -1, before everything): the call as it is.
+            Check(SourceOrder.Before(panel,"DrawGatheringNext(plan,slot,","if(next is { Kind:not GpNextKind.Done })ImGui.Separator();"),"a line between the next action and the plan");
         }),
         ("The help follows what is unlocked: an action the window does not offer or the job has not learned is never advised",() =>
         {

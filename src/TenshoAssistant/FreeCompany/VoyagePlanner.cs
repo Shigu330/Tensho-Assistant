@@ -15,7 +15,8 @@ public sealed record SectorLoot(uint SectorId,int Records,IReadOnlyList<(uint It
 /// </summary>
 public sealed record SectorTier(int Records,int Low,int Mid,int High,IReadOnlyList<(uint ItemId,long Total)> Items);
 
-public enum RouteGoal { ValuePerVoyage, ValuePerDay, Experience }
+// X-604 (0.1707): the airships' goals too (experience per voyage, shortest, an item's loot, a sector to unlock), at the end.
+public enum RouteGoal { ValuePerVoyage, ValuePerDay, Experience, ExperiencePerVoyage, Shortest, Loot, Unlock }
 
 /// <summary>Surveillance band of the records the value is taken from: all records, or those below tier 2, between tiers 2 and 3, at tier 3.</summary>
 public enum SurveillanceBand { All, Low, Mid, High }
@@ -38,6 +39,8 @@ public sealed class SubmarineCatalog
     public IReadOnlySet<uint> Marketable { get; init; }=new HashSet<uint>();
     public required string LootSource { get; init; }
     public required string LootBuilt { get; init; }
+    /// <summary>X-200 (0.1703): the unlock tree (LuminaSupplemental SubmarineUnlock), by sector.</summary>
+    public IReadOnlyDictionary<uint,SubmarineUnlock> Unlocks { get; init; }=new Dictionary<uint,SubmarineUnlock>();
 
     public IEnumerable<SubmarineSector> SectorsOf(uint map)=>Sectors.Values.Where(sector=>sector.Map==map).OrderBy(sector=>sector.Id);
 }
@@ -142,9 +145,10 @@ public static class VoyagePlanner
     /// <summary>
     /// Every set of 1 to 5 sectors of one map the vessel may reach (rank, range), each in its best order, sorted by the goal.
     /// A set over the range is not extended (distance only grows; a small slack covers the per-leg rounding).
+    /// X-604 (0.1707): with targets, only the routes visiting at least one of them are kept (Loot, Unlock; none given: no route); null: no filter.
     /// </summary>
     public static IReadOnlyList<PlannedRoute> Plan(IEnumerable<SubmarineSector> mapSectors,int rank,int speed,int range,RouteGoal goal,
-        Func<uint,double> sectorValue,int take,CancellationToken token=default,ISet<uint>? excluded=null)
+        Func<uint,double> sectorValue,int take,CancellationToken token=default,ISet<uint>? excluded=null,IReadOnlyCollection<uint>? targets=null)
     {
         var all=mapSectors.ToArray();
         var start=all.FirstOrDefault(sector=>sector.Start);
@@ -167,10 +171,13 @@ public static class VoyagePlanner
             }
         }
         Extend(0);
+        if(targets is not null)found.RemoveAll(route=>!route.Sectors.Any(targets.Contains));
         IOrderedEnumerable<PlannedRoute> sorted=goal switch
         {
             RouteGoal.ValuePerDay=>found.OrderByDescending(route=>route.ValuePerDay),
             RouteGoal.Experience=>found.OrderByDescending(route=>route.Exp*86400.0/route.Seconds),
+            RouteGoal.ExperiencePerVoyage=>found.OrderByDescending(route=>route.Exp),
+            RouteGoal.Shortest or RouteGoal.Loot or RouteGoal.Unlock=>found.OrderBy(route=>route.Seconds).ThenByDescending(route=>route.Value),
             _=>found.OrderByDescending(route=>route.Value),
         };
         return sorted.ThenBy(route=>route.Seconds).Take(take).ToArray();

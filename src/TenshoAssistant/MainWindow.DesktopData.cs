@@ -59,6 +59,15 @@ internal sealed partial class MainWindow
         else if(!on && sortTrial is not null){developerMode=sortTrialDeveloper;sortTrial=null;}
         sortingViewResult=null;sortingViewError=null;sortingViewSnapshot=null;
     }
+    // X-606 (0.1710, R37): the « Quests-details » picture: the trial quests (Quests/QuestTrial) published to the quest list, the first one's
+    // details open; taken back after the picture (the list emptied, nothing chosen). Never in the game.
+    private void DesktopQuestTrial(bool on)
+    {
+        if(!inDesktopApp)return;
+        questNavigation.Clear();
+        if(on){quests.Publish(TenshoAssistant.Quests.QuestTrial.Character,TenshoAssistant.Quests.QuestTrial.Entries(),TenshoAssistant.Quests.QuestTrial.ObservedAt);selectedQuestId=TenshoAssistant.Quests.QuestTrial.Shown;questShowDetails=true;}
+        else{quests.Clear();selectedQuestId=0;questShowDetails=false;}
+    }
     /// <summary>X-520 (0.1537): the first chat tab's channels are unfolded at the next draw (the desktop application's pictures only).</summary>
     private bool desktopChatChannelsOpen;
 
@@ -301,6 +310,6 @@ internal sealed partial class MainWindow
         var garden=configuration.GardenAlerts ? (desktopGarden??=new()).Due(configuration.GardenBeds,now):[];
         if(due.Count+garden.Count==0 || options.DesktopOnlyGameBehind && gameInFront)return ([],false);
         return ([.. due.Select(item=>localization.Format("Desktop.AlarmLine",item.Alarm.Label,item.Occurrence.ToLocalTime().ToString("t"),TimeLeftUp(item.Occurrence-now))),
-            .. garden.Select(item=>localization.Format(item.State==Reminders.GardenState.Ripe ? "Garden.RipeNotice":"Garden.TendNotice",item.Bed.Seed,item.Bed.Place))],options.DesktopSound);
+            .. garden.Select(item=>localization.Format(Reminders.GardenJournal.NoticeKey(item.State),item.Bed.Seed,item.Bed.Place))],options.DesktopSound);
     }
 }

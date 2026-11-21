@@ -85,7 +85,11 @@ internal static class ItemHoverTests
         {
             var calls=0;using var http=new HttpClient(new MarketTestHandler((_,_)=>{calls++;return Task.FromResult(Response());}));
             // 0.1202: the market's pause at 1.5 s instead of 3 (the same waits, half the time; the 3 s is checked by VerifySpeed1202Tests).
-            using var market=new MarketService(http){RequestPause=TimeSpan.FromSeconds(1.5)};market.SetWorld(7,71,"World");using var context=new ItemHoverService();using var coordinator=new ItemHoverCoordinator(context,market);
+            using var market=new MarketService(http){RequestPause=TimeSpan.FromSeconds(1.5)};market.SetWorld(7,71,"World");using var context=new ItemHoverService();
+            // X-671 (0.1639): the press met with the market's pause is kept by a continuation on the pool, before RefreshDone: waited for below
+            // (on a busy pool it was not kept yet 1.6 s after the request's task ended: « then answered » failed under load).
+            var kept=0;
+            using var coordinator=new ItemHoverCoordinator(context,market){RefreshDone=(_,status)=>{if(status==MarketFetchStatus.Cooldown)Interlocked.Increment(ref kept);}};
             var now=DateTimeOffset.UtcNow;
             coordinator.Observe(true,true,7,71,42,Catalog(),now);
             coordinator.Observe(true,true,7,71,42,Catalog(),now.AddMilliseconds(600))!.GetAwaiter().GetResult();
@@ -96,6 +100,7 @@ internal static class ItemHoverTests
             Check(pressed is not null,"the press of one tick is answered");
             // The market's own pause (real time) is not the end of the press: it waits for the next slot, with no new press.
             Check(pressed!.GetAwaiter().GetResult().Status==MarketFetchStatus.Cooldown && calls==1,"inside the market's pause");
+            Check(SpinWait.SpinUntil(()=>Volatile.Read(ref kept)==1,TimeSpan.FromSeconds(30)),"the press kept for the next slot");
             Thread.Sleep(1600);
             Check(coordinator.Observe(true,true,7,71,42,Catalog(),now.AddMilliseconds(9000)) is null && calls==1,"inside the 5 s bound");
             var waited=coordinator.Observe(true,true,7,71,42,Catalog(),now.AddMilliseconds(12400));

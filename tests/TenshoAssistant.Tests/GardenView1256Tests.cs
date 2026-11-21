@@ -42,7 +42,7 @@ internal static class GardenView1256Tests
             Check(GardenView.Badge(Bed(30,48,24),Now)==GardenBadge.Due,"tending due");
             Check(GardenView.Badge(Bed(30,48,24,10),Now)==GardenBadge.Later,"tended since: later again");
             Check(GardenView.Badge(Bed(30,48,24,2),Now)==GardenBadge.None,"tended, the next tending would come after the harvest: none");
-            Check(GardenView.Badge(Bed(50,48,24),Now)==GardenBadge.Ripe,"ripe wins");
+            Check(GardenView.Badge(Bed(50,48,24),Now)==GardenBadge.Expected,"ripe by the calculation wins, with its own mark (X-720)");
         }),
         ("Garden view 1256: a crossbreed is never « not owned » without a reading of the inventories",() =>
         {

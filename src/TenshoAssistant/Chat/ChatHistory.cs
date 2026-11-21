@@ -41,6 +41,8 @@ public static class ChatHistory
     public const long MaximumReadBytes=64L*1024*1024;
     // A hand-edited line is bounded too.
     private const int MaximumText=4096,MaximumPieces=256,MaximumSender=256;
+    /// <summary>X-723 (0.1724): a job read back above this is no ClassJob row (the sheet has about 45): not kept.</summary>
+    private const uint MaximumJob=255;
 
     public static int BoundedMessages(int messages)=>Math.Clamp(messages,MinimumMessages,MaximumMessages);
     public static int BoundedDays(int days)=>Math.Clamp(days,MinimumDays,MaximumDays);
@@ -69,6 +71,8 @@ public static class ChatHistory
         [JsonPropertyName("sender")] public string? Sender{get;set;}
         [JsonPropertyName("source")] public byte Source{get;set;}
         [JsonPropertyName("target")] public byte Target{get;set;}
+        // X-723 (0.1724): the sender's job when the line arrived (0, not written: not known).
+        [JsonPropertyName("job")] public uint Job{get;set;}
         [JsonPropertyName("body")] public List<PieceLine>? Body{get;set;}
     }
 
@@ -109,9 +113,11 @@ public static class ChatHistory
     /// <summary>One message as one line (no line break).</summary>
     public static string Encode(ChatRecord record)=>JsonSerializer.Serialize(new MessageLine
     {
-        Time=record.Time.ToUnixTimeMilliseconds(),Kind=record.Kind,Sender=Empty(record.Sender),Source=record.Source,Target=record.Target,
-        // X-514: a link of Dalamud or of a plugin is kept as its text (its command is valid in this session only).
-        Body=record.Body.Select(segment=>new PieceLine{Text=Empty(segment.Text),Link=segment.Link is { Kind:not ChatSegmentKind.DalamudLink } link ? Link(link):null}).ToList(),
+        Time=record.Time.ToUnixTimeMilliseconds(),Kind=record.Kind,Sender=Empty(record.Sender),Source=record.Source,Target=record.Target,Job=record.Job,
+        // X-514: a link of Dalamud or of a plugin is kept as its text (its command is valid in this session only). X-473 (0.1715): a status
+        // link too (its row is not in the format; its name stays).
+        // X-473 (0.1720): an action's name too (it is no link of the game).
+        Body=record.Body.Select(segment=>new PieceLine{Text=Empty(segment.Text),Link=segment.Link is { Kind:not (ChatSegmentKind.DalamudLink or ChatSegmentKind.StatusLink or ChatSegmentKind.ActionName) } link ? Link(link):null}).ToList(),
     },Json);
 
     private static string? Empty(string? text)=>string.IsNullOrEmpty(text) ? null:text;
@@ -138,7 +144,7 @@ public static class ChatHistory
                 var link=piece?.Link is { } stored ? Link(stored):null;
                 pieces.Add(link is null ? new ChatSegment(text):new ChatSegment(text,link.Kind,link));
             }
-            return new ChatRecord(id,time,read.Kind,ChatChannels.From(read.Kind),Cut(read.Sender,MaximumSender),pieces,read.Source,read.Target);
+            return new ChatRecord(id,time,read.Kind,ChatChannels.From(read.Kind),Cut(read.Sender,MaximumSender),pieces,read.Source,read.Target,read.Job is >0 and <=MaximumJob ? read.Job:0);
         }
         catch(Exception error) when(error is JsonException or ArgumentOutOfRangeException or NotSupportedException or InvalidOperationException)
         {
@@ -151,7 +157,7 @@ public static class ChatHistory
     // A link of a type this version does not know stays plain text; X-514: so does a link of Dalamud or of a plugin (0.1492 wrote them),
     // so that a click never runs a command number of an older session.
     private static ChatLink? Link(LinkLine link)
-        =>Enum.TryParse<ChatSegmentKind>(link.Type,false,out var kind) && kind is not (ChatSegmentKind.Text or ChatSegmentKind.DalamudLink) && Enum.IsDefined(kind)
+        =>Enum.TryParse<ChatSegmentKind>(link.Type,false,out var kind) && kind is not (ChatSegmentKind.Text or ChatSegmentKind.DalamudLink or ChatSegmentKind.StatusLink or ChatSegmentKind.ActionName) && Enum.IsDefined(kind)
             ? new ChatLink(kind,link.Territory,link.Map,link.X,link.Y,Cut(link.Place,MaximumSender),link.Item,link.Hq,link.Quest,Cut(link.Url,MaximumText),
                 Cut(link.Plugin,MaximumSender),link.Command,link.Data is { Length:>0 and <=MaximumText } data ? data:null)
             : null;
@@ -175,12 +181,6 @@ public static class ChatHistory
         catch(JsonException){return null;}
     }
 
-    /// <summary>Reads a character's file back for the window: the messages within the bounds, numbered from 1, in their order: none older
-    /// than <paramref name="days"/> days, and the last <paramref name="messages"/> of the combat lines and the last of the others (as the
-    /// window keeps them: a raid's lines never push a conversation out). X-513: read from the file's end only (at most
-    /// <see cref="MaximumReadBytes"/>, and no further back than both kinds need), so a big history is read back at once; with
-    /// <see cref="NoLimit"/>, the last <see cref="MaximumMessages"/> of each kind. <c>Trim</c> says the file holds more than its bounds (or
-    /// lines that cannot be read, or a damaged first line): <see cref="Trim"/> then goes through it whole. No file: nothing, ours.</summary>
     /// <summary>X-518 M4: this many messages older than the days in a row end the reading from the end (the rest is older still).</summary>
     public const int OldRunEnd=256;
     /// <summary>X-644 M1 (review of 0.1586): the time and the kind of a line as <see cref="Encode"/> writes it (« {"time":…,"kind":…, »),
@@ -202,6 +202,14 @@ public static class ChatHistory
         try{return (DateTimeOffset.FromUnixTimeMilliseconds(milliseconds),kind);}
         catch(ArgumentOutOfRangeException){return null;}
     }
+
+    /// <summary>Reads a character's file back for the window: the messages within the bounds, numbered from 1, in their order: none older
+    /// than <paramref name="days"/> days, and the last <paramref name="messages"/> of the combat lines and the last of the others (as the
+    /// window keeps them: a raid's lines never push a conversation out). X-513: read from the file's end only (at most
+    /// <see cref="MaximumReadBytes"/>, and no further back than both kinds need), so a big history is read back at once; with
+    /// <see cref="NoLimit"/>, the last <see cref="MaximumMessages"/> of each kind. <c>Trim</c> says the file holds more than its bounds (or
+    /// lines that cannot be read, or a damaged first line): <see cref="Trim"/> then goes through it whole. No file: nothing, ours.
+    /// X-670 M2 (review of 0.1638): this summary stood above OldRunEnd, which has its own.</summary>
     public static Loaded Read(string path,ulong character,DateTimeOffset now,int messages,int days)=>Read(path,character,now,messages,days,MaximumReadBytes);
 
     /// <summary><see cref="Read(string,ulong,DateTimeOffset,int,int)"/> with the most of the end read (a test makes it small).</summary>

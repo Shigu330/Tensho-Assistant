@@ -1,6 +1,6 @@
 <Project Sdk="Dalamud.NET.Sdk">
   <PropertyGroup>
-    <Version>0.1638.0</Version>
+    <Version>0.1726.0</Version>
     <AssemblyName>TenshoAssistant</AssemblyName>
     <RootNamespace>TenshoAssistant</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -37,6 +37,7 @@
     <EmbeddedResource Include="FreeCompany\Data\submarine-loot.json" />
     <EmbeddedResource Include="FreeCompany\Data\submarine-breakpoints.csv" />
     <EmbeddedResource Include="FreeCompany\Data\airship-unlock.csv" />
+    <EmbeddedResource Include="FreeCompany\Data\submarine-unlock.csv" />
     <EmbeddedResource Include="FreeCompany\Data\airship-drop.csv" />
     <EmbeddedResource Include="Events\Data\festival-names.csv" />
     <EmbeddedResource Include="Reminders\Data\garden-seeds.csv" />

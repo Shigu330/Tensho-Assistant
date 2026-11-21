@@ -21,7 +21,6 @@ internal sealed partial class MainWindow
 
     private void DrawLexicon()
     {
-        Heading(localization.Get("Lexicon.Title"),localization.Get("Lexicon.Subtitle"));
         if(lexiconWords is null && !lexiconFailed && lexiconLoad is null && LexiconLoad is { } load)lexiconLoad=Task.Run(load);
         if(lexiconLoad is { IsCompleted:true } done)
         {

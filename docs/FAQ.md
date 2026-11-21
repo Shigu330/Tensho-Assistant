@@ -58,11 +58,15 @@ Tensho adds small panels next to some game windows (character sheet, Duty Finder
 
 ## What is the Tensho chat window?
 
-An extra window, off by default, that shows the game's chat beside it: tabs by channel, colours, time and unread counts. It only reads, and nothing is sent from it. The game's chat stays where it is, unless you turn on « Hide the game chat's messages » in its settings (off by default): this window then takes the place of the game chat's messages, and you keep typing in the game's own typing box. Messages stay in memory and are cleared when you turn the window off or log out; only if you turn on « Keep the chat history on this PC » in its settings (off by default, asked first) are they also kept on this PC, per character, within the bounds you set, never sent anywhere, until you erase them. Like the rest of Tensho it stops in PvP and ranked play (Triple Triad tournaments, Mahjong). Turn it on in Settings › Panels beside the game › « Show the Tensho chat window », or type « /tensho chat ».
+An extra window, off by default, that shows the game's chat beside it: tabs by channel, colours, time and unread counts. It only reads, and nothing is sent from it. The game's chat stays where it is, unless you turn on « Hide the game chat's messages » in its settings (off by default): this window then takes the place of the game chat's messages, and you keep typing in the game's own typing box. Messages stay in memory and are cleared when you turn the window off or log out; only if you turn on « Keep the chat history on this PC » in its settings (off by default, asked first) are they also kept on this PC, per character, within the bounds you set, never sent anywhere, until you erase them. Like the rest of Tensho it stops in PvP and ranked play (Triple Triad tournaments, Mahjong). Turn it on in Settings › Panels beside the game › « Show the Tensho chat window », or type « /tensho chat ». A right click on one of its tabs can detach it into a window of its own; « /tensho chat hide » hides every chat window for a moment.
 
 ## Does Tensho keep my chat messages?
 
 Not by default. Only if you tick « Keep the chat history on this PC » in the Tensho chat window's settings, and say yes to the question that follows, is every message the chat window reads kept on this PC (also those of channels no tab shows and those of the hidden players: the tabs and the hidden players only choose what is shown): one file per character in Tensho's folder (ChatHistory), the last messages and days you set (2,000 messages and 30 days by default; each can also be set to « No limit » to keep everything, and the place it takes on this PC is shown in the same settings), other players' names and words included, so that they show again after Tensho reloads or the game restarts. Tensho never sends them anywhere and does not read the chat in PvP or ranked play. « Erase the history », in the same settings, deletes every file; unticking the setting keeps nothing more.
+
+## Why are friend request, blacklist and report greyed in the Tensho chat window?
+
+The game does them only from its own player menu, and opens that menu only for a character near you or from a line of its own chat; its library offers Tensho no function to open it otherwise. For a player near you, these entries open the game's menu of that character; for a player far away, right-click their name in the game's chat.
 
 ## Why does Tensho stop in PvP, and why does its map give way in a deep dungeon?
 
@@ -94,7 +98,7 @@ In « Report a problem or help » on the Help page, choose « A translation »: 
 
 ## Where is my wishlist?
 
-In the side bar, ITEMS › Wishlist (it used to be a tab of Collections). Add an item by right-clicking it anywhere in Tensho › « Add to my wishlist »; the line « added to your wishlist » at the bottom of the window opens the list.
+In the side bar, « Wishlist » (it used to be a tab of Collections). Add an item by right-clicking it anywhere in Tensho › « Add to my wishlist »; the line « added to your wishlist » at the bottom of the window opens the list.
 
 ## Hover prices still say « old » after Ctrl+Alt: why?
 
@@ -102,7 +106,7 @@ Ctrl+Alt asks Universalis again: « Fetched » shows the time of that request. U
 
 ## The garden is shown as icons: how do I get the text back?
 
-Tracking › Garden › Garden tab › « Detailed view » shows each bed as text again (seed, dates, crossbreeds). The icons say the same: hover a seed for its dates; the round mark shows the tending state (drop: later, « ! »: due, check: ripe).
+Timers › Gardening › Garden tab › « Detailed view » shows each bed as text again (seed, dates, crossbreeds). The icons say the same: hover a seed for its dates; the round mark shows the tending state (drop: later, « ! »: due, check: ripe).
 
 ## How do I install Tensho?
 
@@ -184,11 +188,15 @@ Tensho ajoute de petits panneaux à côté de certaines fenêtres du jeu (fiche 
 
 ## Qu'est-ce que la fenêtre de chat Tensho ?
 
-Une fenêtre en plus, désactivée par défaut, qui affiche le chat du jeu à côté de lui : onglets par canal, couleurs, heure et messages non lus. Elle ne fait que lire, et rien n'est envoyé depuis elle. Le chat du jeu reste à sa place, sauf si vous activez « Cacher les messages du chat du jeu » dans ses réglages (désactivé par défaut) : cette fenêtre prend alors la place des messages du chat du jeu, et vous tapez toujours dans la zone de saisie du jeu. Les messages restent en mémoire et sont effacés quand vous désactivez la fenêtre ou vous déconnectez ; c'est seulement si vous activez « Garder l'historique du chat sur ce PC » dans ses réglages (désactivé par défaut, avec votre accord demandé d'abord) qu'ils sont aussi gardés sur ce PC, par personnage, dans les limites que vous fixez, jamais envoyés, jusqu'à ce que vous les effaciez. Comme le reste de Tensho, elle s'arrête en JcJ et dans les parties classées (tournois de Triple Triade, Mahjong). Activez-la dans Paramètres › Panneaux à côté du jeu › « Afficher la fenêtre de chat Tensho », ou tapez « /tensho chat ».
+Une fenêtre en plus, désactivée par défaut, qui affiche le chat du jeu à côté de lui : onglets par canal, couleurs, heure et messages non lus. Elle ne fait que lire, et rien n'est envoyé depuis elle. Le chat du jeu reste à sa place, sauf si vous activez « Cacher les messages du chat du jeu » dans ses réglages (désactivé par défaut) : cette fenêtre prend alors la place des messages du chat du jeu, et vous tapez toujours dans la zone de saisie du jeu. Les messages restent en mémoire et sont effacés quand vous désactivez la fenêtre ou vous déconnectez ; c'est seulement si vous activez « Garder l'historique du chat sur ce PC » dans ses réglages (désactivé par défaut, avec votre accord demandé d'abord) qu'ils sont aussi gardés sur ce PC, par personnage, dans les limites que vous fixez, jamais envoyés, jusqu'à ce que vous les effaciez. Comme le reste de Tensho, elle s'arrête en JcJ et dans les parties classées (tournois de Triple Triade, Mahjong). Activez-la dans Paramètres › Panneaux à côté du jeu › « Afficher la fenêtre de chat Tensho », ou tapez « /tensho chat ». Un clic droit sur l'un de ses onglets peut le détacher dans sa propre fenêtre ; « /tensho chat hide » masque un moment toutes les fenêtres de chat.
 
 ## Tensho garde-t-il mes messages du chat ?
 
 Pas par défaut. C'est seulement si vous cochez « Garder l'historique du chat sur ce PC » dans les réglages de la fenêtre de chat Tensho, et répondez oui à la question qui suit, que chaque message lu par la fenêtre de chat est gardé sur ce PC (aussi ceux des canaux qu'aucun onglet ne montre et ceux des joueurs cachés : les onglets et les joueurs cachés ne choisissent que ce qui est affiché) : un fichier par personnage dans le dossier de Tensho (ChatHistory), les derniers messages et jours que vous fixez (2 000 messages et 30 jours par défaut ; chacun peut aussi être réglé sur « Sans limite » pour tout garder, et la place prise sur ce PC s'affiche dans les mêmes réglages), noms et mots des autres joueurs compris, pour les réafficher après un rechargement de Tensho ou une relance du jeu. Tensho ne les envoie jamais nulle part et ne lit pas le chat en JcJ ni dans les parties classées. « Effacer l'historique », dans les mêmes réglages, supprime tous les fichiers ; décocher le réglage ne garde plus rien.
+
+## Pourquoi requête d'ami, liste noire et signalement sont-ils grisés dans la fenêtre de chat de Tensho ?
+
+Le jeu ne les fait que depuis son propre menu de joueur, et n'ouvre ce menu que pour un personnage près de vous ou depuis une ligne de son propre chat ; sa bibliothèque n'offre à Tensho aucune fonction pour l'ouvrir autrement. Pour un joueur près de vous, ces entrées ouvrent le menu du jeu de ce personnage ; pour un joueur loin, faites un clic droit sur son nom dans le chat du jeu.
 
 ## Pourquoi Tensho s'arrête-t-il en JcJ, et pourquoi sa carte s'efface-t-elle en donjon sans fond ?
 
@@ -220,7 +228,7 @@ Dans « Signaler un problème ou aider » de la page Aide, choisissez « Une tra
 
 ## Où est ma liste de souhaits ?
 
-Dans la barre latérale, OBJETS › Souhaits (c'était un onglet de Collections). Ajoutez un objet par un clic droit dessus n'importe où dans Tensho › « Ajouter à mes souhaits » ; la ligne « ajouté à vos souhaits » en bas de la fenêtre ouvre la liste.
+Dans la barre latérale, « Souhaits » (c'était un onglet de Collections). Ajoutez un objet par un clic droit dessus n'importe où dans Tensho › « Ajouter à mes souhaits » ; la ligne « ajouté à vos souhaits » en bas de la fenêtre ouvre la liste.
 
 ## Les prix au survol disent encore « ancien » après Ctrl+Alt : pourquoi ?
 
@@ -228,7 +236,7 @@ Ctrl+Alt redemande les prix à Universalis : « Consulté » donne l'heure de ce
 
 ## Le jardin est en icônes : comment retrouver le texte ?
 
-Suivi › Jardinage › onglet Jardin › « Vue détaillée » remet chaque emplacement en texte (graine, dates, croisements). En icônes, tout y est aussi : survolez une graine pour ses dates ; la pastille dit l'entretien (goutte : à venir, « ! » : à faire, coche : mûr).
+Calendrier › Jardinage › onglet Jardin › « Vue détaillée » remet chaque emplacement en texte (graine, dates, croisements). En icônes, tout y est aussi : survolez une graine pour ses dates ; la pastille dit l'entretien (goutte : à venir, « ! » : à faire, coche : mûr).
 
 ## Comment installer Tensho ?
 

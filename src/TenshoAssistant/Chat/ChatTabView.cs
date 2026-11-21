@@ -20,12 +20,20 @@ public sealed class ChatTabView
     // not looked yet), not at each frame by the drawing.
     private readonly List<bool?> alertMarks=[];
     private string? alertKey;
+    // X-447 B7 (0.1646): your name when the setting is on (read at each refresh from the store), and the one the marks were made with.
+    private string? alertName,alertKeyName;
+    // X-447 B7 (0.1647): the messages counted in Alerts, by number (the server bar counts a message shown by two tabs once).
+    private readonly HashSet<long> alertIds=[];
+    /// <summary>X-447 B7 (0.1647): the numbers of the messages with an alert not seen in this tab.</summary>
+    public IReadOnlyCollection<long> AlertIds=>alertIds;
     private IReadOnlyList<string> alertWords=[];
     private DateTimeOffset lastSeen;
     private int rows;
     private bool rowsDirty;
     private long lastId;
     private bool started;
+    // X-447 B10 (0.1654): from this number on, the messages count even at the view's first refresh (0: none).
+    private long countFrom;
     private int layoutCursor=-1;
     public int Unread{get;private set;}
     /// <summary>X-484 (0.1520): the messages holding an alert word not seen yet (cleared with <see cref="Unread"/>).</summary>
@@ -47,6 +55,7 @@ public sealed class ChatTabView
         var changed=false;
         ChatTabFilter? filter=null;
         IReadOnlyList<string>? alerts=null;
+        alertName=settings?.AlertOwnName==true ? store.OwnName:null;
         foreach(var record in store.After(lastId))
         {
             lastId=record.Id;
@@ -71,8 +80,9 @@ public sealed class ChatTabView
         started=true;
         void Count(ChatRecord record)
         {
-            if(started && ChatChannels.CountsAsUnread(record.Channel) && !ChatAlert.Sent(record))Unread++;
-            if(started && ChatAlert.Holds(record,alerts??=ChatTextFilter.Words(settings?.AlertWords)))Alerts++;
+            var counted=started || countFrom>0 && record.Id>=countFrom;
+            if(counted && ChatChannels.CountsAsUnread(record.Channel) && !ChatAlert.Sent(record))Unread++;
+            if(counted && ChatAlert.Holds(record,alerts??=ChatTextFilter.Words(settings?.AlertWords),alertName)){Alerts++;alertIds.Add(record.Id);}
         }
         var excess=records.Count-ChatStore.Bounded(cap);
         if(excess>0)
@@ -83,10 +93,28 @@ public sealed class ChatTabView
         return changed;
     }
 
+    /// <summary>X-447 B10 (0.1654): before the view's first refresh, the messages numbered <paramref name="id"/> and after count as new (the tell
+    /// that opened a conversation's tab is not seen yet); the older ones are taken as read, as in any new view. After it: nothing changes.</summary>
+    public void CountFrom(long id){if(!started)countFrom=id;}
+
     /// <summary>The tab is shown at its bottom: nothing unread any more.</summary>
-    public void MarkSeen(){Unread=0;Alerts=0;}
+    public void MarkSeen(){Unread=0;Alerts=0;alertIds.Clear();}
 
     public ChatRecord RecordAt(int index)=>records[index];
+
+    /// <summary>X-447 B9 (0.1642): the place of the message numbered <paramref name="id"/>, or of the one it was folded into (the last one not
+    /// after it); -1 when every message of the tab is newer (it has left the tab).</summary>
+    public int IndexOfId(long id)
+    {
+        int low=0,high=records.Count-1,found=-1;
+        while(low<=high)
+        {
+            var middle=(low+high)/2;
+            if(records[middle].Id<=id){found=middle;low=middle+1;}
+            else high=middle-1;
+        }
+        return found;
+    }
     /// <summary>X-484 (0.1519): how many times the message at this place came again right after itself (0: never, or the tab does not fold).</summary>
     public int RepeatsAt(int index)=>repeats[index];
 
@@ -94,12 +122,12 @@ public sealed class ChatTabView
     /// one word per line): looked once per message, again for all only when the words change.</summary>
     public bool AlertAt(int index,string? words)
     {
-        if(!string.Equals(words,alertKey,StringComparison.Ordinal))
+        if(!string.Equals(words,alertKey,StringComparison.Ordinal) || !string.Equals(alertName,alertKeyName,StringComparison.Ordinal))
         {
-            alertKey=words;alertWords=ChatTextFilter.Words(words);
+            alertKey=words;alertWords=ChatTextFilter.Words(words);alertKeyName=alertName;
             for(var at=0;at<alertMarks.Count;at++)alertMarks[at]=null;
         }
-        return alertMarks[index]??=ChatAlert.Holds(records[index],alertWords);
+        return alertMarks[index]??=ChatAlert.Holds(records[index],alertWords,alertKeyName);
     }
     public IReadOnlyList<IReadOnlyList<ChatRun>>? LinesAt(int index)=>lines[index];
 

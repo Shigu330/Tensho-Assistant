@@ -20,7 +20,7 @@ internal static class GardenJournalTests
             GardenJournal.Tend(bed,start.AddHours(12));
             Check(GardenJournal.TendAt(bed)==start.AddHours(22) && GardenJournal.State(bed,start.AddHours(13))==GardenState.Growing,"tending moves the next one");
             Check(GardenJournal.TendAt(bed) is not null && GardenJournal.Due([bed],start.AddHours(23)) is [(_, GardenState.ToTend)],"next tending said");
-            Check(GardenJournal.Due([bed],start.AddHours(31)) is [(_, GardenState.Ripe)] && GardenJournal.Due([bed],start.AddHours(40)).Count==0,"ripe said once");
+            Check(GardenJournal.Due([bed],start.AddHours(31)) is [(_, GardenState.Expected)] && GardenJournal.Due([bed],start.AddHours(40)).Count==0,"ripe by the calculation said once (X-720: to confirm in game)");
             GardenJournal.Tend(bed,start.AddHours(24));
             Check(GardenJournal.TendAt(bed) is null,"no tending once the next one would come after the harvest");
         }),

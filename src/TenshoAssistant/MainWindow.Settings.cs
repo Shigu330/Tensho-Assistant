@@ -12,7 +12,6 @@ internal sealed partial class MainWindow
     private string? requestedSettingsTab;
     private void DrawSettings()
     {
-        Heading(localization.Get("Settings.Title"),localization.Get("Settings.Description"));
         DrawSettingsSearch();
         settingFocus.Tick();
         // X-507: while the setting a search chose is looked for, the headers and tree nodes around it are not folded; X-521 M1: given back
@@ -24,22 +23,19 @@ internal sealed partial class MainWindow
 
     private void DrawSettingsTabs()
     {
-        if(ImGui.BeginTabBar("SettingsSections"))
-        {
-            try
-            {
-                // X-100 (0.999, DEC-048): General, Panels beside the game, Map, Tracking and notifications, Data and sources, Advanced, Debug.
-                // X-449: each tab lists its categories on the left and shows the chosen one on the right (MainWindow.SettingsCategories.cs).
-                SettingsTab("General");
-                SettingsTab("Panels");
-                SettingsTab("Map",()=>{if(ImGui.Button(localization.Get("MapView.OpenMap")))OpenMapView(0);ImGui.TextDisabled(localization.Get("MapView.SettingsHelp"));});
-                SettingsTab("Tracking");
-                SettingsTab("Data");
-                SettingsTab("Advanced");
-                if(developerMode)SettingsTab("Debug");
-            }
-            finally{ImGui.EndTabBar();}
-        }
+        // X-100 (0.999, DEC-048): General, Panels beside the game, Map, Tracking and notifications, Data and sources, Advanced, Debug.
+        // X-449: each tab lists its categories on the left and shows the chosen one on the right (MainWindow.SettingsCategories.cs).
+        // X-605 (0.1701): the tabs arranged with the mouse (OrderedTabs).
+        OrderedTabs("SettingsSections",
+        [
+            SettingsTab("General"),
+            SettingsTab("Panels"),
+            SettingsTab("Map",()=>{if(ImGui.Button(localization.Get("MapView.OpenMap")))OpenMapView(0);ImGui.TextDisabled(localization.Get("MapView.SettingsHelp"));}),
+            SettingsTab("Tracking"),
+            SettingsTab("Data"),
+            SettingsTab("Advanced"),
+            ..(developerMode ? [SettingsTab("Debug")]:Array.Empty<OrderedTab>()),
+        ]);
     }
 
     // X-76 H4 (0.914): the macro copy settings as saved before the edit not written yet; they come back when saving it fails.
@@ -50,15 +46,16 @@ internal sealed partial class MainWindow
         TrySave("Macro copy settings",()=>configuration.MacroCopy=previous);
     }
 
-    private void SettingsTab(string key,Action? above=null)
+    private OrderedTab SettingsTab(string key,Action? above=null)
     {
         var selected=requestedSettingsTab==key;
-        if(!ImGui.BeginTabItem(localization.Get("SettingsSections."+key)+"###Settings"+key,selected ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None))return;
-        if(selected)requestedSettingsTab=null;
-        // X-01 C5 (0.1206, analysis of 12/11: « page Settings 2 099 ms », no tab timed): each tab timed in developer mode (Slow frame line).
-        void draw(){above?.Invoke();DrawSettingsCategories(key);}
-        try{if(DeveloperMode)MeasureMap("settings "+key,draw);else draw();}
-        finally{ImGui.EndTabItem();}
+        return new(key,localization.Get("SettingsSections."+key),()=>
+        {
+            if(requestedSettingsTab==key)requestedSettingsTab=null;
+            // X-01 C5 (0.1206, analysis of 12/11: « page Settings 2 099 ms », no tab timed): each tab timed in developer mode (Slow frame line).
+            void draw(){above?.Invoke();DrawSettingsCategories(key);}
+            if(DeveloperMode)MeasureMap("settings "+key,draw);else draw();
+        },selected);
     }
 
     private void DrawWindowOpeningSettings()
@@ -107,6 +104,10 @@ internal sealed partial class MainWindow
         ComboSetting("Settings.NavigationMode","Settings.NavigationModeTip",()=>Math.Clamp(configuration.NavigationMode,0,2),value=>configuration.NavigationMode=value,
             [(TenshoAssistant.UI.NavigationLayout.Auto,localization.Get("Settings.NavigationModeAuto")),(TenshoAssistant.UI.NavigationLayout.AlwaysShown,localization.Get("Settings.NavigationModeShown")),
              (TenshoAssistant.UI.NavigationLayout.AlwaysFolded,localization.Get("Settings.NavigationModeFolded"))],DefaultConfiguration.NavigationMode,220);
+        // X-605 (0.1697): the families' tabs, dragged with the mouse, back in the list's order (greyed while none was moved).
+        ImGui.BeginDisabled(configuration.TabOrders.Count==0);
+        try{if(SettingButton("Settings.TabOrderReset","Settings.TabOrderResetTip"))ResetTabOrders();}
+        finally{ImGui.EndDisabled();}
         // X-157 (0.1272): the standard controls in Dalamud's active style, Tensho's identity kept in titles and accent.
         BoolSetting("Settings.FollowDalamud","Settings.FollowDalamudTip",()=>configuration.FollowDalamudStyle,value=>configuration.FollowDalamudStyle=value,c=>c.FollowDalamudStyle);
     }

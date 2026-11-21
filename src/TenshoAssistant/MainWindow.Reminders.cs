@@ -119,6 +119,11 @@ internal sealed partial class MainWindow
             {
                 if(ImGui.SmallButton(localization.Get("Reminders.VoyagesOpen")+"##VoyagesOpen"))page=Page.FreeCompany;
             });
+            // X-225 (0.1719): the aetherial wheels on the company's stand, as last read in its window: when each one is primed.
+            var wheels=configuration.AetherialWheels;
+            Row("AetherialWheels",FontAwesomeIcon.Cog,wheels is not { Count:>0 } ? localization.Get("Reminders.AetherialWheelsUnknown")
+                :localization.Format("Reminders.AetherialWheelsState",wheels.Count(wheel=>!FreeCompany.AetherialWheels.IsPrimed(wheel,now)),wheels.Count(wheel=>FreeCompany.AetherialWheels.IsPrimed(wheel,now))),
+                FreeCompany.AetherialWheels.NextPrimed(wheels,now),null,()=>DrawAetherialWheels(wheels,now));
             // Retainer ventures: known once the retainer list was opened at a summoning bell.
             var ventures=timers?.Ventures;
             var nextVenture=ventures?.Where(venture=>venture.Done>now).Select(venture=>venture.Done).Min();
@@ -244,6 +249,25 @@ internal sealed partial class MainWindow
                     ()=>[new TenshoAlarm{ReminderRow=key,Label=localization.Get("Reminders."+key),Group=localization.Get("Reminders.Title"),Source=key=="Voyages" ? AlarmSource.Voyage:AlarmSource.Reminder,Repeat=AlarmRepeat.Once,At=alarmAt,
                         LeadMinutes=AlarmSchedule.ClampLead(AlarmRepeat.Once,DefaultAlarmLead)}]);
         }
+    }
+
+    /// <summary>X-225 (0.1719): the wheels one by one: primed, or when, as far as the reading tells (an estimate says its bounds, R06).</summary>
+    private void DrawAetherialWheels(IReadOnlyList<FreeCompany.AetherialWheelSlot>? wheels,DateTimeOffset now)
+    {
+        if(wheels is not { Count:>0 } || !ImGui.TreeNode(localization.Get("Reminders.AetherialWheelsDetail")+"##AetherialWheels"))return;
+        try
+        {
+            foreach(var wheel in wheels)
+            {
+                if(wheel.Primed)ImGui.TextColored(Success,localization.Format("Reminders.AetherialWheelPrimed",wheel.Name,wheel.Slot));
+                else if(wheel.FullBy is { } by && by<=now)ImGui.TextColored(Success,localization.Format("Reminders.AetherialWheelPrimedBy",wheel.Name,wheel.Slot,Clock(by)));
+                else if(wheel.FullFrom is { } from && wheel.FullBy is { } latest)
+                    ImGui.TextUnformatted(from==latest ? localization.Format("Reminders.AetherialWheelAt",wheel.Name,wheel.Slot,wheel.Percent,Clock(wheel.ReadAt),Clock(latest))
+                        :localization.Format("Reminders.AetherialWheelBetween",wheel.Name,wheel.Slot,wheel.Percent,Clock(wheel.ReadAt),Clock(from),Clock(latest)));
+            }
+        }
+        finally{ImGui.TreePop();}
+        static string Clock(DateTimeOffset at)=>at.ToLocalTime().ToString("g");
     }
 
     // Names of squadron missions and trainings from the game data (set by Plugin.cs), kept by id; « #id » when the row is unknown.

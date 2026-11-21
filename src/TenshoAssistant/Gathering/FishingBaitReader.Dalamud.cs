@@ -23,9 +23,14 @@ public sealed unsafe class FishingBaitReader : IDisposable
     /// C10 (0.1011): when the last cast started, for the stopwatch of the fishing help. The line's state (FishingEventHandler, through
     /// EventFramework.EventHandlerModule) turns to CastingOut (1) at each cast, mooch included; lures do not change it (docs/evidence/0.887-fishing-bite.md).
     /// Read every frame (one field), only the change is kept; null before the first cast.
+    /// X-701 (0.1685): the whole last cast from the same state (FishingLine): its bite (state 5) and strength (animation slot 7), and Chum
+    /// (status 763) at the cast, for the stopwatch frozen at the bite and the bite times under Chum (X-702).
     /// </summary>
-    private long castAt=-1;private int lineState=-1;private bool lineWarned;
-    public DateTimeOffset? CastAt=>Volatile.Read(ref castAt) is >= 0 and var ticks ? new DateTimeOffset(ticks,TimeSpan.Zero):null;
+    private int lineState=-1;private bool lineWarned;
+    private readonly FishingLine line=new();
+    private const uint ChumStatus=763;
+    public FishingCast? LastCast=>line.Last;
+    public DateTimeOffset? CastAt=>line.Last?.Cast;
 
     public FishingBaitReader(IFramework framework,IObjectTable objects,IPluginLog log)
     {
@@ -66,9 +71,12 @@ public sealed unsafe class FishingBaitReader : IDisposable
             var events=FFXIVClientStructs.FFXIV.Client.Game.Event.EventFramework.Instance();
             var handler=events==null ? null:events->EventHandlerModule.FishingEventHandler;
             var state=handler==null ? -1:(int)handler->State;
-            if(state==lineState)return;
+            // While the line bites, read again on each frame until the strength is known (FishingLine.See); otherwise only a change.
+            if(state==lineState && state!=FishingLine.Bite)return;
             lineState=state;
-            if(state==1)Volatile.Write(ref castAt,DateTimeOffset.UtcNow.UtcTicks);
+            var local=objects.LocalPlayer;
+            line.See(state,DateTimeOffset.UtcNow,()=>local?.StatusList.Any(status=>status.StatusId==ChumStatus),
+                ()=>local is null || local.Address==nint.Zero ? (ushort)0:((FFXIVClientStructs.FFXIV.Client.Game.Character.Character*)local.Address)->Timeline.TimelineSequencer.TimelineIds[7]);
         }
         catch(Exception error)
         {

@@ -16,14 +16,14 @@ internal static class FirstScreen1222Tests
         ("First screen 1222: secondary groups folded until the player chooses",() =>
         {
             var folded = FirstScreen.Folded(null);
-            Check(folded.SetEquals(new[] { "Progression","Content","GoldSaucer","References" }),"the defaults");
+            Check(folded.Count == 0,"X-601 (0.1681): the side bar is short and has one category left, nothing starts folded");
             Check(!folded.Contains("Objects") && !folded.Contains("Preferences"),"the main groups stay open");
             var saved = new HashSet<string> { "Objects" };
             Check(ReferenceEquals(FirstScreen.Folded(saved),saved) && ReferenceEquals(FirstScreen.ToSave(saved),saved),"the player's choice wins");
             var first = FirstScreen.ToSave(null);
             Check(first.SetEquals(FirstScreen.FoldedGroups) && !ReferenceEquals(first,FirstScreen.FoldedGroups),"the first click starts from a copy of what was shown");
-            first.Remove("Content");
-            Check(FirstScreen.FoldedGroups.Contains("Content"),"the defaults never change");
+            first.Add("Tracking");
+            Check(!FirstScreen.FoldedGroups.Contains("Tracking"),"the defaults never change");
             var navigation = Read("src/TenshoAssistant/UI/Navigation/MainWindow.CategoryNavigation.cs");
             Check(navigation.Contains("FirstScreen.Folded(configuration.NavigationCollapsed).Contains(key)",StringComparison.Ordinal)
                   && navigation.Contains("configuration.NavigationCollapsed=TenshoAssistant.Guide.FirstScreen.ToSave(configuration.NavigationCollapsed)",StringComparison.Ordinal),"side bar wired");

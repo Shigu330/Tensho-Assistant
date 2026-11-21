@@ -64,6 +64,22 @@ public static class Voyages
             .OrderBy(vessel=>vessel.HouseId).ThenBy(vessel=>vessel.Kind).ThenBy(vessel=>vessel.Slot).ToList();
     }
 
+    /// <summary>
+    /// X-718 (0.1722): a vessel read with no stat and no part (the game had not given them: the user's airship on 21/11, read at rank 14 with
+    /// its stats and parts at 0) keeps the stats and parts saved for it (same house, kind, slot and name): 0 is not a value read (R06).
+    /// </summary>
+    public static List<VoyageVessel> KeepKnownStats(IEnumerable<VoyageVessel>? saved,IEnumerable<VoyageVessel> read)
+    {
+        var known=(saved ?? []).Where(vessel=>!NoStats(vessel)).ToList();
+        return read.Select(vessel=>NoStats(vessel)
+            && known.FirstOrDefault(old=>old.HouseId==vessel.HouseId && old.Kind==vessel.Kind && old.Slot==vessel.Slot && old.Name==vessel.Name) is { } old
+                ? vessel with{Surveillance=old.Surveillance,Retrieval=old.Retrieval,Speed=old.Speed,Range=old.Range,Favor=old.Favor,Parts=[.. old.Parts]}:vessel).ToList();
+    }
+
+    /// <summary>X-718 (0.1722): no stat and no part read (all 0).</summary>
+    public static bool NoStats(VoyageVessel vessel)
+        =>vessel.Surveillance==0 && vessel.Retrieval==0 && vessel.Speed==0 && vessel.Range==0 && vessel.Favor==0 && vessel.Parts.All(part=>part==0);
+
     /// <summary>X-288 (0.1286): kinds of that house saved but absent from the read (kept by <see cref="Merge"/>; logged once per visit).</summary>
     public static IReadOnlyList<VesselKind> KeptKinds(IEnumerable<VoyageVessel>? saved,ulong houseId,IEnumerable<VoyageVessel> read)
     {

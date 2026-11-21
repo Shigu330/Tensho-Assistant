@@ -51,7 +51,7 @@ internal static class ChatAlertsOwn1521Tests
         {
             var reader = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Chat/ChatReader.Dalamud.cs"));
             Check(reader.Contains("var source=ChatAlert.Source(ChatChannels.From((int)message.LogKind),(byte)message.SourceKind,sender,ownName?.Invoke());")
-                  && reader.Contains("current.BoundedMaxLines,source,(byte)message.TargetKind);"), "the reader keeps the subject it marked");
+                  && reader.Contains("current.BoundedMaxLines,source,(byte)message.TargetKind,job);"), "the reader keeps the subject it marked");
             var plugin = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Chat.cs"));
             Check(plugin.Contains("history,()=>player.CharacterName);"), "the plugin passes the character's name");
             var en = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Localization/Languages/en.json"));

@@ -23,7 +23,6 @@ internal sealed partial class MainWindow
 
     private void DrawMaps()
     {
-        Heading(localization.Get("MapsUi.Title"), localization.Get("MapsUi.Description"));
         var state = maps.State;
         if (state.Catalog is not { } catalog)
         {
@@ -32,39 +31,29 @@ internal sealed partial class MainWindow
             return;
         }
         if (ImGui.Button(localization.Get("MapView.OpenCurrent"))) OpenMapView(0);
-        if(!ImGui.BeginTabBar("MapsTabs"))return;
-        try
-        {
-            ImGuiTabItemFlags Request(int tab)=>mapsTabRequest==tab ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None;
-            var request=mapsTabRequest;
-            if(ImGui.BeginTabItem(localization.Get("MapsUi.TabMaps")+"###MapsTabMaps",Request(0))){try{DrawMapsPicker(catalog);}finally{ImGui.EndTabItem();}}
-            if(ImGui.BeginTabItem(localization.Get("MapsUi.TabMarkers")+"###MapsTabMarkers",Request(1)))
+        // X-605 (0.1701): the tabs arranged with the mouse (OrderedTabs).
+        var request=mapsTabRequest;
+        var drawn=OrderedTabs("MapsTabs",
+        [
+            new("Maps",localization.Get("MapsUi.TabMaps"),()=>DrawMapsPicker(catalog),request==0),
+            new("Markers",localization.Get("MapsUi.TabMarkers"),()=>
             {
-                try
-                {
-                    DrawMapBookmarks(catalog);
-                    DrawChatMapLinks(catalog);
-                    // X-09 (0.444): place directory.
-                    DrawPlaceDirectory();
-                }
-                finally{ImGui.EndTabItem();}
-            }
-            if(ImGui.BeginTabItem(localization.Get("MapsUi.TabHunt")+"###MapsTabHunt"))
+                DrawMapBookmarks(catalog);
+                DrawChatMapLinks(catalog);
+                // X-09 (0.444): place directory.
+                DrawPlaceDirectory();
+            },request==1),
+            new("Hunt",localization.Get("MapsUi.TabHunt"),()=>
             {
-                try
-                {
-                    // N-15 (0.442): hunt train recorder.
-                    DrawHuntTrain(catalog);
-                    // N-12 (0.670): spawn conditions of the S ranks.
-                    DrawSRankConditions(catalog);
-                }
-                finally{ImGui.EndTabItem();}
-            }
+                // N-15 (0.442): hunt train recorder.
+                DrawHuntTrain(catalog);
+                // N-12 (0.670): spawn conditions of the S ranks.
+                DrawSRankConditions(catalog);
+            }),
             // N-05 (0.445): plots for sale (PaissaDB).
-            if(Paissa is not null && ImGui.BeginTabItem(localization.Get("Plots.Title")+"###MapsTabPlots")){try{DrawPlots();}finally{ImGui.EndTabItem();}}
-            if(request>=0 && mapsTabRequest==request)mapsTabRequest=-1;
-        }
-        finally{ImGui.EndTabBar();}
+            ..(Paissa is not null ? [new OrderedTab("Plots",localization.Get("Plots.Title"),DrawPlots)]:Array.Empty<OrderedTab>()),
+        ]);
+        if(drawn && request>=0 && mapsTabRequest==request)mapsTabRequest=-1;
     }
 
     private void DrawMapsPicker(MapCatalog catalog)

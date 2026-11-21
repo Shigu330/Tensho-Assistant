@@ -27,6 +27,7 @@ internal sealed unsafe class QuestReader : IDisposable
     private readonly IPluginLog log;
     private readonly List<QuestEntry> entries = [];
     private ExcelSheet<Quest>? quests;
+    private ExcelSheet<ENpcResident>? npcs;
     private SubrowExcelSheet<QuestClassJobReward>? rewardJobs;
     private ExcelSheet<BeastRankBonus>? rewardBonuses;
     private IReadOnlyDictionary<uint,uint?>? rewardTomestones;
@@ -40,8 +41,8 @@ internal sealed unsafe class QuestReader : IDisposable
     private readonly Func<TimeSpan> cacheLifetime;
     private readonly DataCache? disk;
     private string? cacheVersion;
-    // 0.283: entries carry the journal section; older cached quest lists are read again.
-    private const string QuestCacheShape="|quest-locks-286";
+    // 0.283: entries carry the journal section; older cached quest lists are read again. X-606 (0.1710): and the giver, the end NPC, the jobs.
+    private const string QuestCacheShape="|quest-giver-1710";
     private Task<CachedValue<QuestCacheData>?>? restore;
     public QuestReader(QuestService service, IDataManager data, IFramework framework,
         IPlayerState player, IClientState client, IUnlockState unlocks, IPluginLog log,Func<TimeSpan>? cacheLifetime=null,DataCache? disk=null)
@@ -96,6 +97,8 @@ internal sealed unsafe class QuestReader : IDisposable
             try
             {
                 quests ??= data.GetExcelSheet<Quest>();
+                npcs ??= data.GetExcelSheet<ENpcResident>();
+                string Resident(uint id) => id != 0 && npcs.GetRowOrDefault(id) is { } resident ? resident.Singular.ExtractText() : "";
                 var end = Math.Min(position + 32, quests.Count);
                 var start = Stopwatch.GetTimestamp();
                 while (position < end)
@@ -137,7 +140,15 @@ internal sealed unsafe class QuestReader : IDisposable
                             Expansion = row.Expansion.IsValid ? row.Expansion.Value.Name.ExtractText() : "",
                             IssuerId = row.IssuerStart.RowId,
                             IssuerMapId = row.IssuerLocation.RowId == 0 || !row.IssuerLocation.IsValid ? 0 : row.IssuerLocation.Value.Map.RowId,
-                            IssuerTerritoryId = row.IssuerLocation.RowId == 0 || !row.IssuerLocation.IsValid ? 0 : row.IssuerLocation.Value.Territory.RowId
+                            IssuerTerritoryId = row.IssuerLocation.RowId == 0 || !row.IssuerLocation.IsValid ? 0 : row.IssuerLocation.Value.Territory.RowId,
+                            // X-606 (0.1710): the giver's name and place, the end NPC, the jobs, the allied society and grand company (probe of 0.1708).
+                            IssuerName = Resident(row.IssuerStart.RowId),
+                            IssuerX = row.IssuerLocation.RowId == 0 || !row.IssuerLocation.IsValid ? 0 : row.IssuerLocation.Value.X,
+                            IssuerZ = row.IssuerLocation.RowId == 0 || !row.IssuerLocation.IsValid ? 0 : row.IssuerLocation.Value.Z,
+                            EndName = Resident(row.TargetEnd.RowId),
+                            Jobs = row.ClassJobCategory0.RowId == 0 || !row.ClassJobCategory0.IsValid ? "" : row.ClassJobCategory0.Value.Name.ExtractText(),
+                            Society = row.BeastTribe.RowId == 0 || !row.BeastTribe.IsValid ? "" : row.BeastTribe.Value.Name.ExtractText(),
+                            Company = row.GrandCompany.RowId == 0 || !row.GrandCompany.IsValid ? "" : row.GrandCompany.Value.Name.ExtractText()
                             ,Rewards=rewards,RewardsError=rewardError
                         });
                     }
@@ -192,7 +203,7 @@ internal sealed unsafe class QuestReader : IDisposable
             disposed = true;
             TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
             client.Logout-=OnLogout;
-            service.Dispose(); entries.Clear(); quests = null;
+            service.Dispose(); entries.Clear(); quests = null; npcs = null;
             rewardJobs=null;rewardBonuses=null;rewardTomestones=null;rewardDataVersion=null;
         }
     }

@@ -32,7 +32,6 @@ internal sealed partial class MainWindow
       (EquipmentSlots.Ears,"Ears"),(EquipmentSlots.Neck,"Neck"),(EquipmentSlots.Wrists,"Wrists"),(EquipmentSlots.Ring,"Ring") ];
     private void DrawFashion()
     {
-        Heading(localization.Get("FashionUi.Title"),localization.Get("FashionUi.Description"));
         var native=fashionHints.State;
         // 0.213: the week first (theme, 11 slots of the game window, gear per slot), then every category.
         if(native.Catalog is not null && TenshoAssistant.UI.UiComponents.Header(localization.Get("FashionWeek.Title")+"###FashionWeek",ImGuiTreeNodeFlags.DefaultOpen))DrawFashionWeek();
@@ -154,7 +153,9 @@ internal sealed partial class MainWindow
                     // 0.255: common item tooltip first (the fashion details follow it) and the tools menu.
                     if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled) && item is not null) DrawItemInfoTooltip(id);
                     ItemLinksMenu($"FashionLinks{id}",item);
-                    if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled)) WrappedTooltip(localization.Format("UiFragments.Equipment",item?.Name ?? localization.Get("FashionUi.Unresolved"),item is null ? localization.Get("UiFragments.Unknown"):FashionSlotNames(item.Equipment))+(developerMode ? $"\nID {id}":""));
+                    // X-684 (0.1695): under the common item tooltip, the slots only (the name was written twice); an item not found keeps its name line.
+                    if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled)) WrappedTooltip((item is null ? localization.Format("UiFragments.Equipment",localization.Get("FashionUi.Unresolved"),localization.Get("UiFragments.Unknown"))
+                        :localization.Format("FashionUi.ItemSlots",FashionSlotNames(item.Equipment)))+(developerMode ? $"\nID {id}":""));
                     ImGui.TableNextColumn(); ImGui.TextUnformatted(entry.Match.Reports.ToString("N0",Numbers));
                     ImGui.TableNextColumn();
                     var stock=GetRecipeHoldings(id);

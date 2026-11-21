@@ -197,13 +197,20 @@ def language(code):
 
 
 def navigation():
-    """(group key or None, page, developer mode only) of every page with a navigation entry, in the order of the navigation."""
-    groups = {}
+    """(group key or None, page, developer mode only) of every page, in the order of the navigation. X-601 (0.1677): a page that is a
+    tab of a family is listed too, in the group of its family's navigation entry (its parent), so that no page leaves the table when
+    the side bar groups them."""
+    rows = []
     for line in PAGES.read_text(encoding="utf-8").splitlines():
         found = re.match(r'\s*new\(Page\.(\w+),(null|"(\w+)"),(.*)$', line)
-        if not found or found.group(4).startswith("null,"):
-            continue  # not a page line, or a page reached from the tabs of its parent
-        groups.setdefault(found.group(3), []).append((found.group(1), "Visible:" in found.group(4)))
+        if not found:
+            continue  # not a page line
+        parent = re.search(r'",Page\.(\w+)[,)]', found.group(4))
+        rows.append((found.group(1), found.group(3), parent.group(1) if parent else None, "Visible:" in found.group(4)))
+    group_of = {page: group for page, group, parent, dev in rows if parent is None}
+    groups = {}
+    for page, group, parent, dev in rows:
+        groups.setdefault(group_of[parent] if parent else group, []).append((page, dev))
     if not groups:
         raise SystemExit(f"docgen: no page found in {PAGES.relative_to(ROOT)}")
     return [(group, page, dev) for group, pages in groups.items() for page, dev in pages]

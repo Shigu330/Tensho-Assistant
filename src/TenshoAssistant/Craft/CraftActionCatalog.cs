@@ -8,6 +8,13 @@ public enum CraftActionKind { BasicSynthesis,CarefulSynthesis,Groundwork,BasicTo
     FinalAppraisal,CarefulObservation,HeartAndSoul,QuickInnovation,IntensiveSynthesis,PreciseTouch,TricksOfTheTrade,RapidSynthesis,HastyTouch }
 public sealed record CraftActionSpec(CraftActionKind Kind,uint CanonicalId,int Level,int Cp,int Durability);
 public sealed record CraftActionMetadata(CraftActionSpec Spec,uint JobId,uint NativeId,string Name,uint Icon,string Description);
+
+/// <summary>X-684 (0.1674): the detail line of a crafting action's tooltip: level and CP, then the durability it costs when it costs any.</summary>
+public static class CraftActionTips
+{
+    public static string Detail(CraftActionSpec spec,string levelAndCp,string durability)
+        =>string.Format(levelAndCp,spec.Level,spec.Cp)+(spec.Durability>0 ? string.Format(durability,spec.Durability):"");
+}
 public sealed class CraftActionCatalog
 {
     private static readonly IReadOnlyList<CraftActionSpec> specs=Array.AsReadOnly(new CraftActionSpec[]

@@ -40,7 +40,6 @@ internal sealed partial class MainWindow
 
     private void DrawDutyLoot()
     {
-        Heading(localization.Get("DutyUi.Title"), localization.Get("DutyUi.Description"));
         var catalogState = duties.State;
         if (catalogState.Catalog is not { } catalog)
         { if(catalogState.Error is { } error)DrawDataError(error,"ServiceErrors.Duty");else ImGui.TextWrapped(localization.Format("ServiceErrors.DutyLoading",catalogState.Copied,catalogState.Total)); return; }
@@ -126,7 +125,8 @@ internal sealed partial class MainWindow
                     var clicked = ImGui.IsItemClicked(); ImGui.SameLine();
                     if (ImGui.Selectable($"{duty.Name}##Duty{duty.DutyId}",dutyLoot.State.Duty?.DutyId == duty.DutyId,ImGuiSelectableFlags.None,new Vector2(0,24)) || clicked)
                     { dutyLoot.Select(duty); showDutyDetails = true; dutyItemQuery = ""; }
-                    if (developerMode && ImGui.IsItemHovered()) WrappedTooltip($"Duty {duty.DutyId} · instance {duty.InstanceId} · territory {duty.TerritoryId}");
+                    // X-684 (0.1691): the one duty tooltip (before: the ids only, in developer mode; they are in it then).
+                    if (ImGui.IsItemHovered()) DrawDutyTooltip(DutyTipOf(duty),localization.Get("DutyUi.TipClick"));
                     ImGui.TableNextColumn(); ImGui.TextUnformatted(duty.Category);
                     ImGui.TableNextColumn(); ImGui.TextUnformatted(duty.Level.ToString(CultureInfo.InvariantCulture));
                     ImGui.TableNextColumn(); DrawDutyStatus(progress?.Of(duty.InstanceId));

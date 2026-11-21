@@ -8,6 +8,8 @@ namespace TenshoAssistant;
 // read in the workshop (or manual input) gives rank, speed and range; the game computes the legs for that speed on the framework thread
 // (FreeCompany/AirshipVoyageTable.Dalamud.cs); the routes are searched on a worker, the previous search cancelled. Loot value unknown:
 // ranked by experience or duration only. The assembly of a voyage (legs + surveys + 12 h, no return leg, seconds) is not confirmed in game.
+// X-604 (0.1706): the airship part of the one route planner of both kinds (MainWindow.Planner.cs: the kind, the vessel, rank, speed, range),
+// in the Routes tab; the Airship sectors tab keeps the table whose « Choose » column ticks the sectors measured here.
 internal sealed partial class MainWindow
 {
     internal Func<AirshipTableState?>? AirshipTable { get; set; }
@@ -15,50 +17,27 @@ internal sealed partial class MainWindow
     /// <summary>X-201 (0.1248): the other speeds whose tables the fleet list needs (an empty list asks none), and a table by speed once computed.</summary>
     internal Action<IEnumerable<int>>? RequestAirshipSpeeds { get; set; }
     internal Func<int,AirshipLegTable?>? AirshipTableFor { get; set; }
-    private string? airshipFleetKey;
-    private Task<IReadOnlyList<(string Key,string Name,int Rank,int Speed,int Range,bool Ready,AirshipRoute? Route)>>? airshipFleetTask;
-    private CancellationTokenSource? airshipFleetCancel;
+    // X-604 (0.1706): the fleet's and the best routes' searches on a worker (FreeCompany/PlannerSearch.cs, as the submarines').
+    private readonly PlannerSearch<IReadOnlyList<(string Key,string Name,int Rank,int Speed,int Range,bool Ready,AirshipRoute? Route)>> airshipFleetSearch=new();
     private IReadOnlyList<(string Key,string Name,int Rank,int Speed,int Range,bool Ready,AirshipRoute? Route)> airshipFleet=[];
-    private string? airshipVesselKey;
-    private int airshipSpeed=1,airshipRange=1;
     private AirshipGoal airshipGoal=AirshipGoal.ExpPerDay;
     private readonly List<uint> airshipChosen=[];
-    private string? airshipPlanKey;
-    private Task<IReadOnlyList<AirshipRoute>>? airshipPlanTask;
-    private CancellationTokenSource? airshipPlanCancel;
+    private readonly PlannerSearch<IReadOnlyList<AirshipRoute>> airshipSearch=new();
     private IReadOnlyList<AirshipRoute> airshipRoutes=[];
     private (AirshipLegTable Table,string Chosen)? airshipChosenKey;
     private AirshipRoute? airshipChosenRoute;
     private (AirshipCatalog Catalog,uint[] Ids)? airshipPointIds;
     // X-201 (0.1243): the item (loot goal) or the sector (unlock goal) the routes must serve; 0: none chosen yet.
     private uint airshipLootItem,airshipUnlockSector;
-    private string airshipTargetSearch="";
 
     private void DrawAirshipPlanner(AirshipCatalog catalog)
     {
-        // Vessel: fills rank, speed and range (still editable). A key no longer read = manual input.
-        var ships=(configuration.Voyages ?? []).Where(vessel=>vessel.Kind==VesselKind.Airship).ToArray();
-        var chosen=airshipVesselKey is null ? null:ships.FirstOrDefault(vessel=>VesselKey(vessel)==airshipVesselKey);
-        if(chosen is null)airshipVesselKey=null;
-        ImGui.SetNextItemWidth(220);
-        if(ImGui.BeginCombo(localization.Get("AirshipPlanner.Vessel")+"##AirshipVessel",chosen?.Name ?? localization.Get("RoutePlanner.Manual")))
-        {
-            try
-            {
-                if(ImGui.Selectable(localization.Get("RoutePlanner.Manual"),chosen is null))airshipVesselKey=null;
-                for(var index=0;index<ships.Length;index++)
-                    if(ImGui.Selectable($"{ships[index].Name} · {localization.Format("FreeCompany.Rank",ships[index].Rank)}##AirshipVessel{index}",VesselKey(ships[index])==airshipVesselKey))
-                    {
-                        var vessel=ships[index];airshipVesselKey=VesselKey(vessel);
-                        airshipRank=vessel.Rank;airshipSpeed=Math.Max(1,vessel.Speed);airshipRange=Math.Max(1,vessel.Range);
-                    }
-            }
-            finally{ImGui.EndCombo();}
-        }
-        Tip("AirshipPlanner.VesselTip");
-        ImGui.SameLine();ImGui.SetNextItemWidth(90);ImGui.InputInt(localization.Get("RoutePlanner.Speed")+"##AirshipSpeed",ref airshipSpeed);Tip("AirshipPlanner.SpeedTip");
-        ImGui.SameLine();ImGui.SetNextItemWidth(90);ImGui.InputInt(localization.Get("RoutePlanner.Range")+"##AirshipRange",ref airshipRange);Tip("AirshipPlanner.RangeTip");
-        airshipSpeed=Math.Clamp(airshipSpeed,1,1000);airshipRange=Math.Clamp(airshipRange,1,1000);
+        // X-604 (0.1706): the vessel, its planned build, rank, speed and range: the planner's common part (MainWindow.Planner.cs).
+        DrawPlannerVessel(VesselKind.Airship);
+        DrawPlannerStats(VesselKind.Airship);
+        var inputs=airshipInputs;
+        // X-718 (0.1722): speed and range unknown (said above): nothing to search with.
+        if(inputs.StatsFrom==VesselStatsSource.Unknown)return;
         ImGui.SetNextItemWidth(220);
         if(ImGui.BeginCombo(localization.Get("RoutePlanner.Goal")+"##AirshipGoal",localization.Get("AirshipPlanner.Goal"+airshipGoal)))
         {
@@ -70,9 +49,9 @@ internal sealed partial class MainWindow
 
         // The game computes the legs for this speed on the framework thread; until then, or when it cannot, say why.
         if(airshipPointIds?.Catalog!=catalog)airshipPointIds=(catalog,catalog.Sectors.Select(sector=>sector.Id).ToArray());
-        RequestAirshipTable?.Invoke(airshipSpeed,airshipPointIds.Value.Ids);
+        RequestAirshipTable?.Invoke(inputs.Speed,airshipPointIds.Value.Ids);
         var state=AirshipTable?.Invoke();
-        if(state?.Table is not { } table || table.Speed!=airshipSpeed)
+        if(state?.Table is not { } table || table.Speed!=inputs.Speed)
         {
             ImGui.TextDisabled(localization.Get(state?.Unavailable==true ? "AirshipPlanner.Unavailable":state?.NotLoggedIn==true ? "AirshipPlanner.NotLoggedIn":"AirshipPlanner.Computing"));
             return;
@@ -90,9 +69,9 @@ internal sealed partial class MainWindow
         if(airshipChosen.Count==0)ImGui.TextDisabled(localization.Get("AirshipPlanner.ChooseHint"));
         else if(airshipChosenRoute is { } mine)
         {
-            ImGui.TextUnformatted(localization.Format("AirshipPlanner.Chosen",AirshipRouteNames(catalog,mine),mine.Distance,airshipRange,HoursMinutes(TimeSpan.FromSeconds(mine.Seconds)),AirshipExp(mine),mine.Tanks));
+            ImGui.TextUnformatted(localization.Format("AirshipPlanner.Chosen",AirshipRouteNames(catalog,mine),mine.Distance,inputs.Range,HoursMinutes(TimeSpan.FromSeconds(mine.Seconds)),AirshipExp(mine),mine.Tanks));
             if(mine.UnknownExp>0)Tip("AirshipPlanner.ExpUnknownTip");
-            if(mine.Distance>airshipRange)ImGui.TextColored(UI.FfxivTheme.Gold,localization.Get("AirshipPlanner.OverRange"));
+            if(mine.Distance>inputs.Range)ImGui.TextColored(UI.FfxivTheme.Gold,localization.Get("AirshipPlanner.OverRange"));
             ImGui.SameLine();
             if(ImGui.SmallButton(localization.Get("AirshipPlanner.Clear")))airshipChosen.Clear();
             Tip("AirshipPlanner.ClearTip");
@@ -105,22 +84,17 @@ internal sealed partial class MainWindow
         DrawAirshipFleet(catalog,targets);
 
         // Best routes: searched on a worker when an input changed; the running search is cancelled.
-        var rank=airshipRank==0 ? int.MaxValue:airshipRank;
-        var key=$"{table.Speed}|{rank}|{airshipRange}|{airshipGoal}|{RuntimeHelpers.GetHashCode(table)}|{(targets is null ? "-":string.Join(",",targets))}";
-        if(key!=airshipPlanKey)
+        var rank=inputs.Rank==0 ? int.MaxValue:inputs.Rank;
+        var key=$"{table.Speed}|{rank}|{inputs.Range}|{airshipGoal}|{RuntimeHelpers.GetHashCode(table)}|{(targets is null ? "-":string.Join(",",targets))}";
+        if(airshipSearch.Needs(key))
         {
-            airshipPlanKey=key;airshipPlanCancel?.Cancel();airshipPlanCancel?.Dispose();airshipPlanCancel=new CancellationTokenSource();
-            var token=airshipPlanCancel.Token;var (range,goal,sectors)=(airshipRange,airshipGoal,catalog.Sectors);
-            airshipPlanTask=Task.Run(()=>AirshipPlanner.Plan(sectors,table,rank,range,goal,15,token,targets),token);
+            var (range,goal,sectors)=(inputs.Range,airshipGoal,catalog.Sectors);
+            airshipSearch.Start(key,token=>AirshipPlanner.Plan(sectors,table,rank,range,goal,15,token,targets));
         }
-        if(airshipPlanTask is { IsCompleted:true } done)
-        {
-            if(done.IsCompletedSuccessfully)airshipRoutes=done.Result;
-            else if(done.Exception is { } error)log.Warning(error,"Airship routes could not be planned.");
-            airshipPlanTask=null;
-        }
+        if(airshipSearch.Take(out var found,out var failure))airshipRoutes=found;
+        else if(failure is not null)log.Warning(failure,"Airship routes could not be planned.");
         if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("AirshipPlanner.Best")))return;
-        if(airshipPlanTask is not null){ImGui.TextDisabled(localization.Get("RoutePlanner.Searching"));return;}
+        if(airshipSearch.Searching){ImGui.TextDisabled(localization.Get("RoutePlanner.Searching"));return;}
         if(airshipGoal!=AirshipGoal.Shortest)ImGui.TextDisabled(localization.Get("AirshipPlanner.ExpUnknownNote"));
         if(airshipRoutes.Count==0){ImGui.TextDisabled(localization.Get("RoutePlanner.None"));return;}
         if(!ImGui.BeginTable("AirshipRoutes",6,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))return;
@@ -135,7 +109,7 @@ internal sealed partial class MainWindow
                 index++;
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();ImGui.TextUnformatted($"{index}. {AirshipRouteNames(catalog,route)}");
-                ImGui.TableNextColumn();ImGui.TextUnformatted($"{route.Distance} / {airshipRange}");
+                ImGui.TableNextColumn();ImGui.TextUnformatted($"{route.Distance} / {inputs.Range}");
                 ImGui.TableNextColumn();ImGui.TextUnformatted(HoursMinutes(TimeSpan.FromSeconds(route.Seconds)));
                 ImGui.TableNextColumn();ImGui.TextUnformatted(AirshipExp(route));
                 if(route.UnknownExp>0)Tip("AirshipPlanner.ExpUnknownTip");
@@ -159,23 +133,12 @@ internal sealed partial class MainWindow
         string SectorName(uint id)=>catalog.Find(id)?.ShortName ?? id.ToString();
         var chosen=loot ? airshipLootItem:airshipUnlockSector;
         var unlockable=loot ? []:catalog.Sectors.Where(sector=>AirshipSectors.Unlocker(catalog,sector.Id) is not null).ToArray();
-        ImGui.SetNextItemWidth(260);
-        var label=localization.Get(loot ? "AirshipPlanner.LootItem":"AirshipPlanner.UnlockSector");
-        if(ImGui.BeginCombo(label+"##AirshipTarget",chosen==0 ? "—":loot ? ItemName(chosen):SectorName(chosen)))
-        {
-            try
-            {
-                ImGui.SetNextItemWidth(220);ImGui.InputTextWithHint("##AirshipTargetSearch",localization.Get("AirshipPlanner.TargetSearch"),ref airshipTargetSearch,60);Tip("AirshipPlanner.TargetSearchTip");
-                var search=airshipTargetSearch.Trim();
-                var rows=loot ? AirshipSectors.LootItems(catalog).Select(id=>(Id:id,Name:ItemName(id)))
-                    :unlockable.Select(sector=>(sector.Id,Name:$"{sector.ShortName} · {sector.Name}"));
-                foreach(var (id,name) in rows.Where(row=>search.Length==0 || SearchText.Contains(row.Name,search,StringComparison.CurrentCultureIgnoreCase))
-                            .OrderBy(row=>row.Name,StringComparer.CurrentCultureIgnoreCase))
-                    if(ImGui.Selectable($"{name}##AirshipTarget{id}",id==chosen)){if(loot)airshipLootItem=id;else airshipUnlockSector=id;}
-            }
-            finally{ImGui.EndCombo();}
-        }
-        Tip(loot ? "AirshipPlanner.LootItemTip":"AirshipPlanner.UnlockSectorTip");
+        var rows=loot ? AirshipSectors.LootItems(catalog).Select(id=>(Id:id,Name:ItemName(id)))
+            :unlockable.Select(sector=>(sector.Id,Name:$"{sector.ShortName} · {sector.Name}"));
+        // X-604 (0.1707): the list with a search box is the planner's, for both kinds (DrawPlannerTarget).
+        chosen=DrawPlannerTarget(loot ? "AirshipPlanner.LootItem":"AirshipPlanner.UnlockSector",loot ? "AirshipPlanner.LootItemTip":"AirshipPlanner.UnlockSectorTip",chosen,
+            chosen==0 ? "—":loot ? ItemName(chosen):SectorName(chosen),rows);
+        if(loot)airshipLootItem=chosen;else airshipUnlockSector=chosen;
         if(chosen==0){ImGui.TextDisabled(localization.Get(loot ? "AirshipPlanner.LootChoose":"AirshipPlanner.UnlockChoose"));return [];}
         if(loot)
         {
@@ -184,8 +147,10 @@ internal sealed partial class MainWindow
             return where;
         }
         if(AirshipSectors.Unlocker(catalog,chosen) is not { } unlocker){ImGui.TextDisabled(localization.Get("AirshipPlanner.UnlockChoose"));return [];}
+        // X-713 (0.1712): a chain cut by an unknown link or a loop is said unknown, never shown as whole.
+        var path=AirshipSectors.UnlockPath(catalog,chosen);
         ImGui.TextWrapped(localization.Format("AirshipPlanner.UnlockBy",SectorName(unlocker.By),unlocker.Rank,unlocker.Surveillance,
-            string.Join(" › ",AirshipSectors.UnlockPath(catalog,chosen).Select(SectorName))));
+            AirshipSectors.Whole(catalog,path) ? string.Join(" › ",path.Select(SectorName)):localization.Get("AirshipSectors.PathUnknown")));
         return [unlocker.By];
     }
 
@@ -204,20 +169,15 @@ internal sealed partial class MainWindow
         var inputs=ships.Select(ship=>(Key:VesselKey(ship),ship.Name,Rank:ship.Rank,Speed:Math.Max(1,ship.Speed),Range:Math.Max(1,ship.Range),
             Table:AirshipTableFor?.Invoke(Math.Max(1,ship.Speed)))).ToArray();
         var key=$"{airshipGoal}|{(targets is null ? "-":string.Join(",",targets))}|"+string.Join(";",inputs.Select(ship=>$"{ship.Key},{ship.Rank},{ship.Speed},{ship.Range},{(ship.Table is null ? 0:RuntimeHelpers.GetHashCode(ship.Table))}"));
-        if(key!=airshipFleetKey)
+        if(airshipFleetSearch.Needs(key))
         {
-            airshipFleetKey=key;airshipFleetCancel?.Cancel();airshipFleetCancel?.Dispose();airshipFleetCancel=new CancellationTokenSource();
-            var token=airshipFleetCancel.Token;var (goal,sectors)=(airshipGoal,catalog.Sectors);
-            airshipFleetTask=Task.Run(()=>(IReadOnlyList<(string,string,int,int,int,bool,AirshipRoute?)>)[.. inputs.Select(ship=>(ship.Key,ship.Name,ship.Rank,ship.Speed,ship.Range,ship.Table is not null,
-                ship.Table is { } table ? AirshipPlanner.Plan(sectors,table,ship.Rank==0 ? int.MaxValue:ship.Rank,ship.Range,goal,1,token,targets).FirstOrDefault():null))],token);
+            var (goal,sectors)=(airshipGoal,catalog.Sectors);
+            airshipFleetSearch.Start(key,token=>(IReadOnlyList<(string,string,int,int,int,bool,AirshipRoute?)>)[.. inputs.Select(ship=>(ship.Key,ship.Name,ship.Rank,ship.Speed,ship.Range,ship.Table is not null,
+                ship.Table is { } table ? AirshipPlanner.Plan(sectors,table,ship.Rank==0 ? int.MaxValue:ship.Rank,ship.Range,goal,1,token,targets).FirstOrDefault():null))]);
         }
-        if(airshipFleetTask is { IsCompleted:true } done)
-        {
-            if(done.IsCompletedSuccessfully)airshipFleet=done.Result;
-            else if(done.Exception is { } error)log.Warning(error,"Airship fleet routes could not be planned.");
-            airshipFleetTask=null;
-        }
-        if(airshipFleetTask is not null && airshipFleet.Count==0){ImGui.TextDisabled(localization.Get("RoutePlanner.Searching"));return;}
+        if(airshipFleetSearch.Take(out var fleet,out var failure))airshipFleet=fleet;
+        else if(failure is not null)log.Warning(failure,"Airship fleet routes could not be planned.");
+        if(airshipFleetSearch.Searching && airshipFleet.Count==0){ImGui.TextDisabled(localization.Get("RoutePlanner.Searching"));return;}
         var index=0;
         foreach(var (shipKey,name,shipRank,speed,range,ready,route) in airshipFleet)
         {
@@ -231,7 +191,7 @@ internal sealed partial class MainWindow
             ImGui.SameLine();
             if(ImGui.SmallButton(localization.Get("AirshipPlanner.Use")+$"##AirshipFleetUse{index}"))
             {
-                airshipVesselKey=shipKey;airshipRank=shipRank;airshipSpeed=speed;airshipRange=range;
+                airshipInputs.VesselKey=shipKey;airshipInputs.Rank=shipRank;airshipInputs.Speed=speed;airshipInputs.Range=range;
                 airshipChosen.Clear();airshipChosen.AddRange(route.Sectors);
             }
             Tip("AirshipPlanner.FleetUseTip");
@@ -249,16 +209,19 @@ internal sealed partial class MainWindow
         =>string.Join(" › ",route.Sectors.Select(id=>catalog.Find(id)?.ShortName ?? id.ToString()));
 
     // Ticking a sector in the table adds it to the chosen route (5 at most).
-    private void DrawAirshipChoice(AirshipSector sector)
+    private void DrawAirshipChoice(AirshipSector sector)=>DrawSectorChoice(airshipChosen,sector.Id,AirshipPlanner.MaxSectors);
+
+    /// <summary>X-604 (0.1707): a sector ticked into the route measured by hand (<paramref name="max"/> at most), for both kinds.</summary>
+    private void DrawSectorChoice(List<uint> chosen,uint sector,int max)
     {
-        var ticked=airshipChosen.Contains(sector.Id);
-        ImGui.BeginDisabled(!ticked && airshipChosen.Count>=AirshipPlanner.MaxSectors);
+        var ticked=chosen.Contains(sector);
+        ImGui.BeginDisabled(!ticked && chosen.Count>=max);
         try
         {
-            if(ImGui.Checkbox($"##AirshipChoose{sector.Id}",ref ticked))
+            if(ImGui.Checkbox($"##SectorChoose{sector}",ref ticked))
             {
-                if(ticked && !airshipChosen.Contains(sector.Id))airshipChosen.Add(sector.Id);
-                else if(!ticked)airshipChosen.Remove(sector.Id);
+                if(ticked && !chosen.Contains(sector))chosen.Add(sector);
+                else if(!ticked)chosen.Remove(sector);
             }
         }
         finally{ImGui.EndDisabled();}

@@ -38,6 +38,8 @@ internal sealed class BeastBoardReader : IDisposable
     private string? resultSeen;
     private uint contentSaid;
     private string? stageSaid;
+    private int teamSaid = -1;
+    private bool teamWarned;
     private BoardWindows state;
     public BoardWindows State => state;
 
@@ -75,6 +77,18 @@ internal sealed class BeastBoardReader : IDisposable
                 ranks = BeastTeams.ParseRanks(texts, known);
                 // X-550 (0.1526): the team taken, with each beast's HP, read each time the window is open (after each fight).
                 team = BeastTeams.ParseTeam(texts, known);
+                // X-692 (0.1661): said when it changes (how many, never a name), and once when the window names beasts but none is read
+                // (the rank's glyph of 20/11 was such a case, silent).
+                if (team.Count != teamSaid)
+                {
+                    teamSaid = team.Count;
+                    if (team.Count > 0) log.Information("Beastmaster team window read: {0} beasts, {1} down, {2} low.", team.Count, team.Count(member => member.Down), team.Count(member => member.Low));
+                }
+                if (!teamWarned && BeastTeams.NamesWithoutTeam(texts, known, team))
+                {
+                    teamWarned = true;
+                    log.Warning("The Beastmaster team window could not be read (unavailable, maybe after a game update): the panel shows the advised beasts.");
+                }
             }
             state = new(true, boardUnit->X, boardUnit->Y, boardUnit->RootNode->Width * boardUnit->Scale, boardUnit->RootNode->Height * boardUnit->Scale,
                 hasParty, hasParty ? partyUnit->X : 0, hasParty ? partyUnit->RootNode->Width * partyUnit->Scale : 0, content, team, shown);

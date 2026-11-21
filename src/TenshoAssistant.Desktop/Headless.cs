@@ -390,6 +390,24 @@ internal static class Headless
         return read.GetValue(host.Window) is System.Collections.IEnumerable list && list.GetEnumerator().MoveNext();
     }
 
+    /// <summary>X-604 (0.1706): the Free Company page opens this tab once (the « FreeCompany-routes » picture: 1, Best routes). False when the field cannot be reached.</summary>
+    public static bool FreeCompanyTab(Host host,int tab)
+    {
+        var field=host.Window.GetType().GetField("freeCompanyTabRequest",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic);
+        if(field is null)return false;
+        field.SetValue(host.Window,tab);
+        return true;
+    }
+
+    /// <summary>X-606 (0.1710): the trial quests of the « Quests-details » picture on (true) or taken back (false). False when the method cannot be reached.</summary>
+    public static bool QuestTrial(Host host,bool on)
+    {
+        var method=host.Window.GetType().GetMethod("DesktopQuestTrial",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic);
+        if(method is null)return false;
+        method.Invoke(host.Window,[on]);
+        return true;
+    }
+
     /// <summary>X-430 (0.1415): the trial retainers taken back (no character in the application, as before the picture).</summary>
     public static void RetainerTrialEnd(Host host)
         =>host.Window.GetType().GetField("desktopCharacters",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic)?.SetValue(host.Window,null);

@@ -54,22 +54,23 @@ internal static class MapViewTests
         ("Map menu lists: width from the tab names, scrolling tabs, same tabs in the width list and in the bar",() =>
         {
             var code = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.MapLocalLists.cs"));
-            Check(code.Contains("ImGui.BeginTabBar(\"MapLocalTabs\",ImGuiTabBarFlags.FittingPolicyScroll)",StringComparison.Ordinal),"scrolling tabs");
-            var drawn = Regex.Matches(code,@"BeginTabItem\(localization\.Get\(""([^""]+)""\)\)").Select(match=>match.Groups[1].Value).ToArray();
-            var listed = Regex.Match(code,@"var tabs=new\[\]\{([^}]*)\}").Groups[1].Value.Split(',').Select(key=>key.Trim().Trim('"')).ToArray();
-            Check(drawn.Length==9 && drawn.SequenceEqual(listed) && !drawn.Contains("MapLocal.Sightseeing"),"width list = tabs drawn");
+            // X-605 (0.1701): one list of tabs, drawn by OrderedTabs and measured for the width (the same tabs by construction).
+            Check(code.Contains("OrderedTabs(\"MapLocalTabs\",tabs,ImGuiTabBarFlags.FittingPolicyScroll)",StringComparison.Ordinal),"scrolling tabs");
+            var drawn = Regex.Matches(code,@"new\(""\w+"",localization\.Get\(""([^""]+)""\)").Select(match=>match.Groups[1].Value).ToArray();
+            Check(code.Contains("var needed=tabs.Sum(tab=>ImGui.CalcTextSize(tab.Label).X",StringComparison.Ordinal),"width list = tabs drawn");
+            Check(drawn.Length==9 && !drawn.Contains("MapLocal.Sightseeing"),"nine tabs: "+drawn.Length);
         }),
         // From MapTabs677Tests: 0.677 (user request): the Maps page in tabs, and what fills a field of another tab brings that tab forward.
         ("Maps page: every section sits in its tab",() =>
         {
             var page=Read("MainWindow.Maps.cs");
             int At(string text){var at=page.IndexOf(text,StringComparison.Ordinal);Check(at>=0,text);return at;}
-            var maps=At("###MapsTabMaps");var markers=At("###MapsTabMarkers");var hunt=At("###MapsTabHunt");var plots=At("###MapsTabPlots");
+            var maps=At("new(\"Maps\",");var markers=At("new(\"Markers\",");var hunt=At("new(\"Hunt\",");var plots=At("new OrderedTab(\"Plots\",");
             Check(maps<markers && markers<hunt && hunt<plots,"tab order");
             foreach(var section in new[]{"DrawMapBookmarks(catalog);","DrawChatMapLinks(catalog);","DrawPlaceDirectory();"})Check(At(section)>markers && At(section)<hunt,section);
             foreach(var section in new[]{"DrawHuntTrain(catalog);","DrawSRankConditions(catalog);"})Check(At(section)>hunt && At(section)<plots,section);
-            Check(At("DrawPlots();")>plots,"plots");
-            Check(At("private void DrawMapsPicker")>At("EndTabBar"),"the maps list is its own method");
+            Check(At("DrawPlots)")>plots,"plots");
+            Check(At("private void DrawMapsPicker")>At("OrderedTabs(\"MapsTabs\","),"the maps list is its own method");
         }),
         ("Maps page: a click that fills the coordinates brings the Maps tab forward",() =>
         {

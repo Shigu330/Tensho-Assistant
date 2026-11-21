@@ -72,7 +72,8 @@ internal static class GroupFilter
 
 internal sealed record TestResult(string Group, string Name, bool Passed, string? Error, double Seconds, string? Note, bool Skipped = false);
 
-internal sealed record TestRun(TestResult[] Results, string[] Notes, double Whole, int Threads)
+/// <param name="Hung">X-671: a test was left behind, still running (the process is ended by Program.cs, a stuck thread keeping it alive).</param>
+internal sealed record TestRun(TestResult[] Results, string[] Notes, double Whole, int Threads, bool Hung = false)
 {
     /// <summary>The tests that ran (X-591 A25: the skipped ones apart).</summary>
     public int Total => Results.Count(result => !result.Skipped);
@@ -84,12 +85,56 @@ internal sealed record TestRun(TestResult[] Results, string[] Notes, double Whol
 
 internal static class ParallelTests
 {
+    /// <summary>X-671 (relay 146: a run under load stopped for good, every thread of the test process waiting with no processor, as Verify
+    /// once in 0.1637): a test still running after this long is said hung (FAIL, with its name); the tests after it in its class are said not
+    /// run, and the run goes on without its thread.</summary>
+    public static readonly TimeSpan HangAfter = TimeSpan.FromMinutes(5);
+
+    // X-671: what one thread runs now (its group and test, and since when), read by the watch.
+    // X-673 M2 (review of 0.1643): and whether the watch left it behind, decided under the same lock as the start of a test: a thread left
+    // behind, once its test comes back, begins nothing more (neither the next test of its class nor a class still in the queue), so it never
+    // runs unwatched, beside the serial classes, or with its results read half way.
+    private sealed class Slot
+    {
+        private readonly object gate = new();
+        private int group = -1, test = -1;
+        private long started;
+        private bool left;
+        public bool Begin(int group, int test)
+        {
+            lock (gate)
+            {
+                if (left) return false;
+                this.group = group; this.test = test; started = Stopwatch.GetTimestamp();
+                return true;
+            }
+        }
+        public void Idle() { lock (gate) { group = -1; test = -1; } }
+        public bool Left { get { lock (gate) return left; } }
+        /// <summary>The test running past <paramref name="limit"/>: the thread marked left behind, its group and test given; else null.</summary>
+        public (int Group, int Test, TimeSpan For)? Leave(TimeSpan limit)
+        {
+            lock (gate)
+            {
+                if (test < 0) return null;
+                var running = Stopwatch.GetElapsedTime(started);
+                if (running <= limit) return null;
+                left = true;
+                return (group, test, running);
+            }
+        }
+    }
+
     /// <summary>Runs <paramref name="groups"/>: the parallel ones on <paramref name="threads"/> threads (largest first), then the serial
-    /// ones alone. Results come back in the order of the groups and of their tests, whatever order they ran in.</summary>
+    /// ones alone, each on a thread of its own. Results come back in the order of the groups and of their tests, whatever order they ran in.
+    /// X-671: a test running past <paramref name="hangAfter"/> (<see cref="HangAfter"/> by default) is said hung and left behind.
+    /// X-673 M2: <paramref name="onLeft"/>, called by the watch each time a thread is left behind (the tests' own signal, never a delay).</summary>
     public static TestRun Run(IReadOnlyList<TestGroup> groups, int threads,
-        IReadOnlyList<(string Test, DateOnly Until, string Reason)> quarantine, DateOnly today, bool fullRun = true)
+        IReadOnlyList<(string Test, DateOnly Until, string Reason)> quarantine, DateOnly today, bool fullRun = true, TimeSpan? hangAfter = null,
+        Action? onLeft = null)
     {
         threads = Math.Max(1, threads);
+        var limit = hangAfter ?? HangAfter;
         var notes = new List<string>();
         var known = groups.SelectMany(group => group.Tests).Select(test => test.Name).ToHashSet(StringComparer.Ordinal);
         var held = new Dictionary<string, (DateOnly Until, string Reason)>(StringComparer.Ordinal);
@@ -100,31 +145,92 @@ internal static class ParallelTests
             else if (fullRun && !known.Contains(test)) notes.Add($"FAIL quarantine names no test: {test}");
             else held[test] = (until, reason);
         }
-        var results = new TestResult[groups.Count][];
+        var results = groups.Select(group => new TestResult?[group.Tests.Length]).ToArray();
+        var abandoned = new bool[groups.Count];
+        var hung = new List<(int Group, int Test, TimeSpan For)>();
+        var stop = false;
         var whole = Stopwatch.StartNew();
         // The pool keeps enough threads for the tasks the tests wait on (a test waiting on Task.Run would otherwise wait for the pool to grow).
         ThreadPool.GetMinThreads(out var workers, out var ports);
         ThreadPool.SetMinThreads(Math.Max(workers, threads * 2), ports);
         var queue = new ConcurrentQueue<int>(Enumerable.Range(0, groups.Count).Where(index => !groups[index].Serial)
             .OrderByDescending(index => groups[index].Tests.Length).ThenBy(index => index));
-        var runners = Enumerable.Range(0, Math.Min(threads, Math.Max(1, queue.Count))).Select(_ => new Thread(() =>
+        var runners = Enumerable.Range(0, Math.Min(threads, Math.Max(1, queue.Count))).Select(_ =>
         {
-            while (queue.TryDequeue(out var index)) results[index] = RunGroup(groups[index], held);
-        }, 16 * 1024 * 1024) { IsBackground = true, Name = "tests" }).ToList();
-        foreach (var runner in runners) runner.Start();
-        foreach (var runner in runners) runner.Join();
+            var slot = new Slot();
+            var thread = new Thread(() =>
+            {
+                while (!Volatile.Read(ref stop) && !slot.Left && queue.TryDequeue(out var index)) RunGroup(groups, index, held, results, abandoned, slot);
+            }, 16 * 1024 * 1024) { IsBackground = true, Name = "tests" };
+            return (Thread: thread, Slot: slot);
+        }).ToList();
+        foreach (var runner in runners) runner.Thread.Start();
+        Watch(runners, limit, abandoned, hung, onLeft);
+        // X-671: what no thread took (every one left behind on a hung test) is never run by a thread that comes back later.
+        Volatile.Write(ref stop, true);
         for (var index = 0; index < groups.Count; index++)
-            if (groups[index].Serial) results[index] = RunGroup(groups[index], held);
+        {
+            if (!groups[index].Serial) continue;
+            var slot = new Slot();
+            var serial = index;
+            var thread = new Thread(() => RunGroup(groups, serial, held, results, abandoned, slot), 16 * 1024 * 1024) { IsBackground = true, Name = "tests alone" };
+            thread.Start();
+            Watch([(thread, slot)], limit, abandoned, hung, onLeft);
+        }
         whole.Stop();
-        return new TestRun(results.SelectMany(group => group).ToArray(), notes.ToArray(), whole.Elapsed.TotalSeconds, threads);
+        var all = new List<TestResult>();
+        for (var group = 0; group < groups.Count; group++)
+            for (var test = 0; test < groups[group].Tests.Length; test++)
+                all.Add(Left(groups, group, test, hung) ?? Volatile.Read(ref results[group][test]) ?? NotRun(groups, group, test, hung));
+        return new TestRun(all.ToArray(), notes.ToArray(), whole.Elapsed.TotalSeconds, threads, hung.Count > 0);
     }
 
-    private static TestResult[] RunGroup(TestGroup group, IReadOnlyDictionary<string, (DateOnly Until, string Reason)> held)
+    // X-671: waits for the threads; one whose test runs past the limit is no longer waited for (its group marked, so that thread, if its test
+    // ever ends, runs nothing more of it).
+    private static void Watch(List<(Thread Thread, Slot Slot)> runners, TimeSpan limit, bool[] abandoned, List<(int Group, int Test, TimeSpan For)> hung,
+        Action? onLeft)
     {
-        var results = new TestResult[group.Tests.Length];
-        for (var index = 0; index < group.Tests.Length; index++)
+        var alive = new List<(Thread Thread, Slot Slot)>(runners);
+        while (alive.Count > 0)
         {
-            var (name, run) = group.Tests[index];
+            alive[0].Thread.Join(100);
+            for (var at = alive.Count - 1; at >= 0; at--)
+            {
+                if (!alive[at].Thread.IsAlive) { alive.RemoveAt(at); continue; }
+                if (alive[at].Slot.Leave(limit) is not { } stuck) continue;
+                Volatile.Write(ref abandoned[stuck.Group], true);
+                hung.Add(stuck);
+                alive.RemoveAt(at);
+                onLeft?.Invoke();
+            }
+        }
+    }
+
+    private static TestResult? Left(IReadOnlyList<TestGroup> groups, int group, int test, List<(int Group, int Test, TimeSpan For)> hung)
+    {
+        foreach (var (hungGroup, hungTest, running) in hung)
+            if (hungGroup == group && hungTest == test)
+                return new(groups[group].Name, groups[group].Tests[test].Name, false,
+                    $"hung: still running after {running.TotalSeconds.ToString("0", System.Globalization.CultureInfo.InvariantCulture)} s, its thread left behind (X-671); the tests after it in « {groups[group].Name} » not run",
+                    running.TotalSeconds, null);
+        return null;
+    }
+
+    private static TestResult NotRun(IReadOnlyList<TestGroup> groups, int group, int test, List<(int Group, int Test, TimeSpan For)> hung)
+    {
+        var before = hung.Where(entry => entry.Group == group).Select(entry => groups[group].Tests[entry.Test].Name).FirstOrDefault();
+        return new(groups[group].Name, groups[group].Tests[test].Name, false,
+            before is not null ? $"not run: « {before} » hung before it (X-671)" : "not run: every thread was left behind on a hung test (X-671)", 0, null);
+    }
+
+    private static void RunGroup(IReadOnlyList<TestGroup> groups, int index, IReadOnlyDictionary<string, (DateOnly Until, string Reason)> held,
+        TestResult?[][] results, bool[] abandoned, Slot slot)
+    {
+        var group = groups[index];
+        for (var at = 0; at < group.Tests.Length; at++)
+        {
+            if (Volatile.Read(ref abandoned[index]) || !slot.Begin(index, at)) break;
+            var (name, run) = group.Tests[at];
             var started = Stopwatch.GetTimestamp();
             string? error = null;
             string? skipped = null;
@@ -132,13 +238,15 @@ internal static class ParallelTests
             catch (SkipTestException skip) { skipped = skip.Message; }
             catch (Exception failure) { error = failure.ToString(); }
             var seconds = Stopwatch.GetElapsedTime(started).TotalSeconds;
-            if (skipped is not null) { results[index] = new(group.Name, name, false, null, seconds, $"SKIP {name}: {skipped}", true); continue; }
-            if (error is not null && held.TryGetValue(name, out var quarantine))
-                results[index] = new(group.Name, name, true, error, seconds,
+            TestResult result;
+            if (skipped is not null) result = new(group.Name, name, false, null, seconds, $"SKIP {name}: {skipped}", true);
+            else if (error is not null && held.TryGetValue(name, out var quarantine))
+                result = new(group.Name, name, true, error, seconds,
                     $"QUARANTINE {name} (until {quarantine.Until:yyyy-MM-dd}: {quarantine.Reason}) failed this run, not counted as a failure: {FirstLine(error)}");
-            else results[index] = new(group.Name, name, error is null, error, seconds, null);
+            else result = new(group.Name, name, error is null, error, seconds, null);
+            Volatile.Write(ref results[index][at], result);
         }
-        return results;
+        slot.Idle();
     }
 
     private static string FirstLine(string text) => text.Split('\n')[0].TrimEnd('\r');

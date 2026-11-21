@@ -27,7 +27,13 @@ internal sealed partial class MainWindow
             {
                 var text=PlaceDirectory.Text(place,District(place.District),localization.Get("Places.Ward"),localization.Get("Places.Plot"),localization.Get("Places.ApartmentRoom"));
                 ImGui.TextUnformatted(text);
-                if(place.Note.Length>0 && ImGui.IsItemHovered())WrappedTooltip(place.Note);
+                // X-684 (0.1672): the district's place tooltip (zone, region, weather now), the address's name and note with it.
+                if(ImGui.IsItemHovered())
+                {
+                    if(maps.State.Catalog is { } catalog && catalog.Find(catalog.MapOf(place.District)) is { } districtMap)
+                        DrawPlaceTooltip(districtMap,null,place.Name.Length>0 ? place.Name:null,place.Note.Length>0 ? place.Note:null);
+                    else if(place.Note.Length>0)WrappedTooltip(place.Note);
+                }
                 ImGui.SameLine();
                 CopyButton(localization.Get("Places.Copy"),()=>text+(place.Note.Length>0 ? " ("+place.Note+")":""));
                 ImGui.SameLine();

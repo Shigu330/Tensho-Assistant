@@ -9,6 +9,8 @@ namespace TenshoAssistant;
 // (LuminaSupplemental, GPL-3.0, embedded with its notice). No quantity and no rate are published for airships: the loot is a list,
 // the value of a voyage stays unknown. Filtering is rebuilt only when the filter, the rank or the catalog changes, not every frame.
 // 0.337: the route planner (MainWindow.AirshipPlanner.cs) above the table; a « Choose » column ticks the sectors of a route.
+// X-604 (0.1706): the planner is the Routes tab's, one for both kinds; a button opens it on airships, the « Choose » column still ticks
+// the sectors it measures.
 internal sealed partial class MainWindow
 {
     internal Func<AirshipCatalog?>? AirshipCatalog { get; set; }
@@ -23,7 +25,9 @@ internal sealed partial class MainWindow
         var catalog=AirshipCatalog?.Invoke();
         if(catalog is null){ImGui.TextDisabled(localization.Get(AirshipCatalogFailed?.Invoke()==true ? "AirshipSectors.Unavailable":"AirshipSectors.Loading"));return;}
         ImGui.TextWrapped(localization.Get("AirshipSectors.Help"));
-        DrawAirshipPlanner(catalog);
+        if(ImGui.SmallButton(localization.Get("AirshipSectors.PlanRoutes"))){plannerKind=VesselKind.Airship;freeCompanyTabRequest=1;}
+        Tip("AirshipSectors.PlanRoutesTip");
+        if(airshipChosen.Count>0){ImGui.SameLine();ImGui.TextDisabled(localization.Format("AirshipSectors.ChosenCount",airshipChosen.Count));}
         ImGui.Separator();
         ImGui.SetNextItemWidth(220);
         ImGui.InputTextWithHint("##AirshipFilter",localization.Get("AirshipSectors.Filter"),ref airshipFilter,64);
@@ -70,8 +74,10 @@ internal sealed partial class MainWindow
                         ? unlock.Surveillance>0 ? localization.Format("AirshipSectors.UnlockSurveillance",by.ShortName,unlock.Surveillance):by.ShortName
                         :localization.Get("AirshipSectors.UnlockUnknown");
                 ImGui.TextUnformatted(unlockText);
-                if(unlock is not null && ImGui.IsItemHovered())
-                    WrappedTooltip(localization.Format("AirshipSectors.UnlockTip",string.Join(" › ",AirshipSectors.UnlockPath(catalog,sector.Id).Select(id=>catalog.Find(id)?.ShortName ?? id.ToString()))));
+                // X-713 (0.1712): a chain cut by an unknown link or a loop is said unknown, never shown as whole.
+                if(unlock is not null && ImGui.IsItemHovered() && AirshipSectors.UnlockPath(catalog,sector.Id) is var unlockPath)
+                    WrappedTooltip(localization.Format("AirshipSectors.UnlockTip",AirshipSectors.Whole(catalog,unlockPath)
+                        ? string.Join(" › ",unlockPath.Select(id=>catalog.Find(id)?.ShortName ?? id.ToString())):localization.Get("AirshipSectors.PathUnknown")));
                 ImGui.TableNextColumn();
                 var drops=catalog.Drops.GetValueOrDefault(sector.Id);
                 if(drops is not { Count:>0 }){ImGui.TextDisabled(localization.Get("AirshipSectors.LootNone"));continue;}

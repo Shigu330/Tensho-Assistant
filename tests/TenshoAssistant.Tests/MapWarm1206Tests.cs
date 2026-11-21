@@ -45,8 +45,8 @@ internal static class MapWarm1206Tests
                 && maps.Contains("catch(OperationCanceledException){}") && plugin.Contains("gameDataCancel.Cancel();"), "off the frame, after the loading, stopped with the plugin");
             var storage = Read("src/TenshoAssistant/MainWindow.Storage.cs");
             foreach (var method in new[] { "DrawBankBrowser", "DrawCrystalsTab", "DrawCurrenciesTab", "DrawCurrencyValueTab", "DrawImportManager", "DrawCharactersTab", "DrawStorageReport", "DrawGilJournal" })
-                Check(storage.Contains(", " + method + "); } finally", StringComparison.Ordinal) && storage.Contains("{ try { MeasureMap(\"storage ", StringComparison.Ordinal), "timed: " + method);
-            Check(Read("src/TenshoAssistant/MainWindow.Settings.cs").Contains("try{if(DeveloperMode)MeasureMap(\"settings \"+key,draw);else draw();}"), "settings tabs timed");
+                Check(storage.Contains(", " + method + ")", StringComparison.Ordinal) && storage.Contains("() => MeasureMap(\"storage ", StringComparison.Ordinal), "timed: " + method);
+            Check(Read("src/TenshoAssistant/MainWindow.Settings.cs").Contains("if(DeveloperMode)MeasureMap(\"settings \"+key,draw);else draw();"), "settings tabs timed");
         }),
     ];
 

@@ -1,6 +1,8 @@
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Hooking;
 using Dalamud.Plugin.Services;
+using Dalamud.Game.Config;
+using FFXIVClientStructs.FFXIV.Client.Game.Group;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI.Info;
@@ -24,13 +26,18 @@ internal sealed unsafe class ChatPlayerActions : IDisposable
 {
     private readonly IFramework framework;private readonly IClientState client;private readonly IObjectTable objects;private readonly ITargetManager targets;
     private readonly IPartyList party;private readonly IDataManager data;private readonly IPluginLog log;private readonly ChatSources sources;
+    private readonly IGameConfig? config;
     private Hook<RaptureLogModule.Delegates.AddMsgSourceEntry>? hook;
     private bool failed;
 
-    public ChatPlayerActions(IGameInteropProvider interop,IFramework framework,IClientState client,IObjectTable objects,ITargetManager targets,IPartyList party,IDataManager data,IPluginLog log,ChatSources sources)
+    public ChatPlayerActions(IGameInteropProvider interop,IFramework framework,IClientState client,IObjectTable objects,ITargetManager targets,IPartyList party,IDataManager data,IPluginLog log,ChatSources sources,IGameConfig? config=null)
     {
-        this.framework=framework;this.client=client;this.objects=objects;this.targets=targets;this.party=party;this.data=data;this.log=log;this.sources=sources;
+        this.framework=framework;this.client=client;this.objects=objects;this.targets=targets;this.party=party;this.data=data;this.log=log;this.sources=sources;this.config=config;
         client.Logout+=OnLogout;
+        // X-690 (0.1666): each job's role, read once from the ClassJob sheet; the jobs the game shows, once a second.
+        try{sources.Jobs.SetRoles(data.GetExcelSheet<Lumina.Excel.Sheets.ClassJob>().Select(row=>(row.RowId,row.Role)));}
+        catch(Exception error){log.Warning(error,"Chat window: the jobs' roles could not be read (maybe after a game update): no role colour.");}
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnJobsTick);
         try
         {
             if((nint)RaptureLogModule.MemberFunctionPointers.AddMsgSourceEntry==0)throw new InvalidOperationException("RaptureLogModule.AddMsgSourceEntry not resolved");
@@ -48,9 +55,18 @@ internal sealed unsafe class ChatPlayerActions : IDisposable
         // X-662 M2 (0.1606, review of 0.1605): while Tensho is cut (PvP, ranked contents, R03.2) nothing is read; else the game's log line
         // only for the message that waits for its identifiers (ResolveRead calls Line at most once, after the cheap checks).
         if(TenshoAssistant.Competitive.CompetitiveGate.Cut){sources.Skip();return;}
+        // X-679 (0.1658): the first call after the load is said once, with its delay (a measure in the log); a failure is said once, no longer
+        // swallowed without a word.
+        if(!firstSaid){firstSaid=true;log.Information("Chat window, the game's sender identifiers: first call {0:0.0} s after the load.",loaded.Elapsed.TotalSeconds);}
         try{Said(sources.ResolveRead(contentId,accountId,worldId,chatType,()=>Line(module,messageIndex),module->LocalPlayerContentId),chatType);}
-        catch(Exception){}
+        catch(Exception error)
+        {
+            if(!errorSaid){errorSaid=true;log.Warning(error,"Chat window, a sender's identifiers could not be read (said once).");}
+        }
     }
+
+    private readonly System.Diagnostics.Stopwatch loaded=System.Diagnostics.Stopwatch.StartNew();
+    private bool firstSaid,errorSaid;
 
     /// <summary>
     /// X-660 (0.1603): the game's own log line at the index the game gives with the identifiers (RaptureLogModule.GetLogMessageDetail of
@@ -64,14 +80,36 @@ internal sealed unsafe class ChatPlayerActions : IDisposable
     }
 
     // X-660 (0.1603): each outcome said once per session (outcome and kind only, never a name nor an identifier), so a game test shows
-    // whether the identifiers reach the messages or why not.
+    // whether the identifiers reach the messages or why not. X-679 (0.1658): « NotWaiting » too (no message waited for them).
     private readonly bool[] matchSaid=new bool[Enum.GetValues<ChatSourceMatch>().Length];
     private void Said(ChatSourceMatch match,ushort chatType)
     {
-        if(match==ChatSourceMatch.NotWaiting || matchSaid[(int)match])return;
+        if(matchSaid[(int)match])return;
         matchSaid[(int)match]=true;
         log.Information("Chat window, a sender's identifiers: {0} (kind {1}).",match,chatType&ChatSources.KindMask);
     }
+
+    // X-679 (0.1660): where a menu found its sender, said once each per session (how and kind only, never a name): « Named » for a new
+    // message means the chat event gave no player link to note (the message was never waiting for its identifiers).
+    private readonly bool[] foundSaid=new bool[Enum.GetValues<ChatSourceFound>().Length];
+    public void SaidFound(ChatSourceFound how,int kind)
+    {
+        if(foundSaid[(int)how])return;
+        foundSaid[(int)how]=true;
+        log.Information("Chat window, a player's menu found its sender: {0} (kind {1}).",how,kind);
+    }
+
+    // X-679 (0.1660): a world's number from its name (the World sheet, read once); 0 when unknown.
+    private Dictionary<string,ushort>? worldIds;
+    public ushort WorldId(string name)
+    {
+        if(name.Length==0)return 0;
+        worldIds??=data.GetExcelSheet<Lumina.Excel.Sheets.World>().Where(row=>!row.Name.IsEmpty)
+            .GroupBy(row=>row.Name.ExtractText(),StringComparer.OrdinalIgnoreCase).ToDictionary(group=>group.Key,group=>(ushort)group.First().RowId,StringComparer.OrdinalIgnoreCase);
+        return worldIds.GetValueOrDefault(name.Trim());
+    }
+    /// <summary>X-679 (0.1660): the world you are on (the game writes no world for a player of this world).</summary>
+    public ushort CurrentWorldId()=>CurrentWorld();
 
     /// <summary>The client's text of an Addon row (empty: not found).</summary>
     public string Text(uint row)=>data.GetExcelSheet<Lumina.Excel.Sheets.Addon>().GetRowOrDefault(row)?.Text.ExtractText() ?? "";
@@ -99,6 +137,49 @@ internal sealed unsafe class ChatPlayerActions : IDisposable
         return text;
     }
 
+    // X-473 (0.1715): the statuses' tooltips read once each, on hover (the Status sheet, the client's language).
+    private readonly Dictionary<uint,ChatStatusTip?> statuses=[];
+    /// <summary>X-473 (0.1715): a status the game linked in a message: its icon, name and description as the game's tooltip gives them (texts
+    /// without the game's formatting); null for row 0 or a row without a name (never a tooltip made up).</summary>
+    public ChatStatusTip? Status(uint id)
+    {
+        if(id==0)return null;
+        if(statuses.TryGetValue(id,out var known))return known;
+        var tip=data.GetExcelSheet<Lumina.Excel.Sheets.Status>().GetRowOrDefault(id) is { } status && status.Name.ExtractText().Trim() is { Length:>0 } name
+            ? new ChatStatusTip(status.Icon,name,status.Description.ExtractText().Trim()):null;
+        if(statuses.Count<2000)statuses[id]=tip;
+        return tip;
+    }
+
+    // X-473 (0.1720): the actions by name (Action and ActionTransient sheets, the client's language), made once on a thread of their own at the
+    // first hover: no tooltip until they are ready, none at all if they could not be read.
+    private Task<(Dictionary<string,ChatStatusTip> Players,Dictionary<string,ChatStatusTip> All)>? actionTips;
+    /// <summary>X-473 (0.1720): an action a combat line names, as the game's tooltip shows it; null when the name is not one action for sure
+    /// (ChatActionTips) or the actions are not read yet.</summary>
+    public ChatStatusTip? Action(string name,bool byPlayer)
+    {
+        actionTips??=Task.Run(ActionTips);
+        return actionTips.IsCompletedSuccessfully ? ChatActionTips.Find(actionTips.Result,name,byPlayer):null;
+    }
+
+    private (Dictionary<string,ChatStatusTip>,Dictionary<string,ChatStatusTip>) ActionTips()
+    {
+        try
+        {
+            var transient=data.GetExcelSheet<Lumina.Excel.Sheets.ActionTransient>();
+            var rows=data.GetExcelSheet<Lumina.Excel.Sheets.Action>().Where(row=>!row.Name.IsEmpty)
+                .Select(row=>new ChatActionRow(row.RowId,row.Name.ExtractText(),row.Icon,row.IsPlayerAction,row.IsPvP,transient.GetRowOrDefault(row.RowId)?.Description.ExtractText().Trim() ?? "")).ToList();
+            var tips=ChatActionTips.Build(rows);
+            log.Information("Chat window, the actions' names read for their tooltips: {0} rows, {1} names of the player's actions, {2} names in all.",rows.Count,tips.Players.Count,tips.All.Count);
+            return tips;
+        }
+        catch(Exception error)
+        {
+            log.Warning(error,"Chat window, the actions could not be read (maybe after a game update): no action tooltip.");
+            return (new Dictionary<string,ChatStatusTip>(),new Dictionary<string,ChatStatusTip>());
+        }
+    }
+
     /// <summary>The character of that player in range (name and home world), or null.</summary>
     public IPlayerCharacter? InRange(ChatSource source)
         =>objects.OfType<IPlayerCharacter>().FirstOrDefault(character=>character.Name.TextValue==source.Name && character.HomeWorld.RowId==source.World);
@@ -118,10 +199,11 @@ internal sealed unsafe class ChatPlayerActions : IDisposable
     /// <summary>The entry the player clicked, done at the next framework tick with the character loaded; nothing otherwise.</summary>
     public void Run(ChatPlayerAction action,ChatSource source,ChatChannel channel)
     {
-        if(failed)return;
+        // X-681 (0.1660): never during a cut (PvP, ranked contents: R03.2), checked at the click and at the tick.
+        if(failed || TenshoAssistant.Competitive.CompetitiveGate.Cut)return;
         framework.RunOnTick(()=>
         {
-            if(!client.IsLoggedIn || objects.LocalPlayer is null)return;
+            if(!client.IsLoggedIn || objects.LocalPlayer is null || TenshoAssistant.Competitive.CompetitiveGate.Cut)return;
             try{Do(action,source,channel);}
             catch(Exception error){failed=true;log.Warning(error,"A game entry of a player's menu (chat window) failed (maybe after a game update): those entries are off until the plugin reloads.");}
         });
@@ -131,16 +213,18 @@ internal sealed unsafe class ChatPlayerActions : IDisposable
     {
         switch(action)
         {
+            // X-681 (0.1660, the user's request of 20/11): by name and home world too, without the game's identifiers (0, as for a tell
+            // typed « /tell Name@World »: docs/evidence/0.1660-tell-by-name.md); only the typing box is set, nothing is sent (R03.3).
             case ChatPlayerAction.Tell:
             case ChatPlayerAction.Reply when channel is ChatChannel.TellIn or ChatChannel.TellOut:
-                if(source.ContentId==0)return;
+                if(source.Name.Length==0 || source.World==0)return;
                 var world=data.GetExcelSheet<Lumina.Excel.Sheets.World>().GetRowOrDefault(source.World)?.Name.ExtractText() ?? "";
                 var name=Utf8String.FromString(source.Name);var worldName=Utf8String.FromString(world);
                 try{RaptureShellModule.Instance()->SetContextTellTarget(name,worldName,source.World,source.AccountId,source.ContentId,0,true);}
                 finally{name->Dtor(true);worldName->Dtor(true);}
                 break;
             case ChatPlayerAction.Reply:
-                if(ChatPlayerMenu.ReplyChannel(channel) is { } mode)RaptureShellModule.Instance()->ChangeChatChannel(mode,0,null,true);
+                if(ChatPlayerMenu.ReplyChannel(channel) is { } mode)RaptureShellModule.Instance()->ChangeChatChannel(mode,ChatPlayerMenu.ReplyLinkshell(channel),null,true);
                 break;
             case ChatPlayerAction.Invite:
                 var invite=InfoProxyPartyInvite.Instance();
@@ -156,8 +240,18 @@ internal sealed unsafe class ChatPlayerActions : IDisposable
             case ChatPlayerAction.Target:
                 if(InRange(source) is { } character)targets.Target=character;
                 break;
+            // X-699 (0.1688): friend request, blacklist and report near you open the game's own menu of that character, where they are
+            // (docs/evidence/0.1688-chat-player-menu-far.md); far away they are greyed, so never run.
             case ChatPlayerAction.GameMenu:
+            case ChatPlayerAction.Friend:
+            case ChatPlayerAction.Blacklist:
+            case ChatPlayerAction.Report:
                 if(InRange(source) is { } shown)AgentHUD.Instance()->OpenContextMenuFromTarget((FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)shown.Address);
+                break;
+            // X-680 (0.1662): the player's party finder listing, as the game's menu opens it (AgentLookingForGroup.OpenListingByContentId of
+            // FFXIVClientStructs); a player recruiting nothing: the game says so.
+            case ChatPlayerAction.PartyFinder:
+                if(source.ContentId!=0)AgentLookingForGroup.Instance()->OpenListingByContentId(source.ContentId);
                 break;
         }
     }
@@ -165,5 +259,55 @@ internal sealed unsafe class ChatPlayerActions : IDisposable
     /// <summary>The senders are another character's business at logout: dropped, as the messages are.</summary>
     private void OnLogout(int type,int code)=>sources.Clear();
 
-    public void Dispose(){client.Logout-=OnLogout;hook?.Dispose();hook=null;sources.Clear();}
+    // X-690 (0.1666): the jobs the game shows now (party, alliance, nearby), once a second, memory only; nothing during a cut (R03.2).
+    private long jobsAt=-100_000;
+    private bool jobsSaid,allianceSaid;
+    private void OnJobsTick(IFramework _)
+    {
+        var now=Environment.TickCount64;
+        if(now-jobsAt<1000)return;
+        jobsAt=now;
+        if(TenshoAssistant.Competitive.CompetitiveGate.Cut || !client.IsLoggedIn || objects.LocalPlayer is null){sources.Jobs.Clear();return;}
+        try
+        {
+            var players=new List<(string,ushort,uint)>();
+            foreach(var member in party)players.Add((member.Name.TextValue,(ushort)member.World.RowId,member.ClassJob.RowId));
+            players.AddRange(AllianceJobs());
+            foreach(var character in objects.OfType<IPlayerCharacter>())players.Add((character.Name.TextValue,(ushort)character.HomeWorld.RowId,character.ClassJob.RowId));
+            sources.Jobs.Replace(players);
+            sources.Jobs.SetColours(Colour(UiConfigOption.LogColorRoleTank),Colour(UiConfigOption.LogColorRoleHealer),Colour(UiConfigOption.LogColorRoleDPS));
+            if(!jobsSaid){jobsSaid=true;log.Information("Chat window, the jobs the game shows: {0} players, first read (memory only).",sources.Jobs.Count);}
+        }
+        catch(Exception error)
+        {
+            sources.Jobs.Clear();
+            if(!jobsSaid){jobsSaid=true;log.Warning(error,"Chat window, the players' jobs could not be read (said once): no job icon nor role colour.");}
+        }
+    }
+
+    private uint? Colour(UiConfigOption option)
+    {
+        try{return config is not null && config.TryGet(option,out uint value) ? value:null;}
+        catch(InvalidOperationException){return null;}
+    }
+
+    /// <summary>X-690 (0.1666): the alliance's other members (GroupManager, the game's own list: name, home world, job); none outside an alliance.</summary>
+    private List<(string,ushort,uint)> AllianceJobs()
+    {
+        var found=new List<(string,ushort,uint)>();
+        try
+        {
+            var manager=GroupManager.Instance();
+            if(manager==null || !manager->MainGroup.IsAlliance)return found;
+            foreach(ref readonly var member in manager->MainGroup.AllianceMembers)
+                if(member.ClassJob!=0 && member.HomeWorld!=0 && member.NameString is { Length:>0 } name)found.Add((name,member.HomeWorld,member.ClassJob));
+        }
+        catch(Exception error)
+        {
+            if(!allianceSaid){allianceSaid=true;log.Warning(error,"Chat window, the alliance's jobs could not be read (maybe after a game update; said once).");}
+        }
+        return found;
+    }
+
+    public void Dispose(){TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnJobsTick);client.Logout-=OnLogout;hook?.Dispose();hook=null;sources.Clear();}
 }

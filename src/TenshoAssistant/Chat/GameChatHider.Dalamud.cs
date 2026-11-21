@@ -88,6 +88,17 @@ internal sealed unsafe class GameChatHider : IDisposable
         };
     }
 
+    /// <summary>X-694 (0.1657, the user's report of 20/11 around 22:50, capture « Coal »): a panel hidden by its window flag alone (IsVisible) still
+    /// answered the mouse: the game's own item tooltip (ItemDetail) opened from a link of the hidden panel, under Tensho's window
+    /// (dalamud.log of 20/11 22:58:54.786: ItemDetail over Tensho's window while the panels were hidden; they came back only 9 ms later,
+    /// docs/evidence/0.1657-game-chat-stays-hidden.md). Its root node is hidden too, the way the game hides its own parts (the tab bar's nodes
+    /// are hidden so since 0.1508); both are given back together, the flag last.</summary>
+    private static void PanelRoot(AtkUnitBase* unit,bool shown)
+    {
+        var root=unit->RootNode;
+        if(root!=null && root->IsVisible()!=shown)root->ToggleVisibility(shown);
+    }
+
     /// <summary>A node and all its parents shown (bounded: no recursion on the game's data, R07).</summary>
     private static bool Shown(AtkResNode* node)
     {
@@ -117,8 +128,10 @@ internal sealed unsafe class GameChatHider : IDisposable
                 if(unit!=null)boxes.Add(new(index,unit->IsVisible,box));
             }
             var (toHide,toShow)=hide.Step(now,states);
-            foreach(var index in toHide){var unit=Panel(index);if(unit!=null)unit->IsVisible=false;}
-            foreach(var index in toShow){var unit=Panel(index);if(unit!=null)unit->IsVisible=true;}
+            foreach(var index in toHide){var unit=Panel(index);if(unit!=null){unit->IsVisible=false;PanelRoot(unit,false);}}
+            foreach(var index in toShow){var unit=Panel(index);if(unit!=null){PanelRoot(unit,true);unit->IsVisible=true;}}
+            // X-694 (0.1657): a panel Tensho hid keeps its root node hidden while hidden (the game may show it again with its tab).
+            if(now==ChatHideWant.Hide)foreach(var index in hide.Hidden){var unit=Panel(index);if(unit!=null)PanelRoot(unit,false);}
             if(!said && toHide.Count>0){said=true;log.Information("Game chat: its message panels hidden ({0}); the typing box stays the game's.",string.Join(", ",toHide));}
             if(toShow.Count>0)log.Information("Game chat: its message panels shown again ({0}).",string.Join(", ",toShow));
             StepTabs(now);
@@ -211,7 +224,7 @@ internal sealed unsafe class GameChatHider : IDisposable
     {
         try
         {
-            foreach(var index in hide.GiveBack()){var unit=Panel(index);if(unit!=null)unit->IsVisible=true;}
+            foreach(var index in hide.GiveBack()){var unit=Panel(index);if(unit!=null){PanelRoot(unit,true);unit->IsVisible=true;}}
         }
         catch(Exception error){log.Warning(error,"The game chat's message panels could not be shown again; reopen the chat tab or reload the interface.");}
         try

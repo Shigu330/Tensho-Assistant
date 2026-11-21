@@ -11,7 +11,6 @@ internal sealed partial class MainWindow
 {
     private void DrawDiagnostics()
     {
-        Heading(localization.Get("DiagnosticsUi.Title"), localization.Get("DiagnosticsUi.Help"));
         ImGui.TextUnformatted(localization.Format("DiagnosticsUi.Build",BuildVersion,configuration.Version));
         DrawContributorHelp();
         // X-165 (0.1244): the dashboard first (MainWindow.Dashboard.cs).

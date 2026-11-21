@@ -59,22 +59,24 @@ internal sealed partial class MainWindow
         if(!blueMagic)DrawCollectionRecent(state);
         // 0.360 (g, C-09): the Outfits tab, set again by its tab on every frame it is shown. X-127 (0.1106): the wishlist has its own page.
         collectionOutfitTab=false;
-        if (!blueMagic && ImGui.BeginTabBar("CollectionKinds"))
+        // X-605 (0.1701): the tabs arranged with the mouse (OrderedTabs); each tab notes the kind shown, the page below draws it. A jump
+        // selects its tab until it is open (focus kept until then).
+        if (!blueMagic)
         {
-            try
-            {
-                if (ImGui.BeginTabItem(localization.Get("CollectionsBrowser.Mounts")+"###CollectionMounts",focusCollectionKind==CollectionKind.Mount ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None)) { collectionKind = CollectionKind.Mount; if(focusCollectionKind==CollectionKind.Mount)focusCollectionKind=null; ImGui.EndTabItem(); }
-                if (ImGui.BeginTabItem(localization.Get("CollectionsBrowser.Companions")+"###CollectionMinions",focusCollectionKind==CollectionKind.Companion ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None)) { collectionKind = CollectionKind.Companion; if(focusCollectionKind==CollectionKind.Companion)focusCollectionKind=null; ImGui.EndTabItem(); }
-                if (ImGui.BeginTabItem(localization.Get("CollectionsBrowser.Emotes")+"###CollectionEmotes",focusCollectionKind==CollectionKind.Emote ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None)) { collectionKind = CollectionKind.Emote; if(focusCollectionKind==CollectionKind.Emote)focusCollectionKind=null; ImGui.EndTabItem(); }
-                if (ImGui.BeginTabItem(localization.Get("CollectionsBrowser.Orchestrion")+"###CollectionMusic",focusOrchestrionTab ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None)) { focusOrchestrionTab=false;collectionKind = CollectionKind.Orchestrion; ImGui.EndTabItem(); }
-                if (ImGui.BeginTabItem(localization.Get("CollectionsBrowser.Titles")+"###CollectionTitles",focusTitleTab ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None)) { focusTitleTab=false;collectionKind=CollectionKind.Title;ImGui.EndTabItem(); }
-                if (ImGui.BeginTabItem(localization.Get("CollectionsBrowser.Achievements")+"###CollectionAchievements",focusAchievementTab ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None)) { focusAchievementTab=false;collectionKind=CollectionKind.Achievement;ImGui.EndTabItem(); }
+            OrderedTab Kind(string key, CollectionKind kind, string label) => new(key, localization.Get(label),
+                () => { collectionKind = kind; if (focusCollectionKind == kind) focusCollectionKind = null; }, focusCollectionKind == kind);
+            OrderedTabs("CollectionKinds",
+            [
+                Kind("Mounts", CollectionKind.Mount, "CollectionsBrowser.Mounts"),
+                Kind("Minions", CollectionKind.Companion, "CollectionsBrowser.Companions"),
+                Kind("Emotes", CollectionKind.Emote, "CollectionsBrowser.Emotes"),
+                new("Music", localization.Get("CollectionsBrowser.Orchestrion"), () => { focusOrchestrionTab = false; collectionKind = CollectionKind.Orchestrion; }, focusOrchestrionTab),
+                new("Titles", localization.Get("CollectionsBrowser.Titles"), () => { focusTitleTab = false; collectionKind = CollectionKind.Title; }, focusTitleTab),
+                new("Achievements", localization.Get("CollectionsBrowser.Achievements"), () => { focusAchievementTab = false; collectionKind = CollectionKind.Achievement; }, focusAchievementTab),
                 // X-190 (0.1178): these tabs follow a jump too (a jump to one of them stayed on the tab shown before).
-                foreach(var extraKind in ExtraKinds)
-                    if (ImGui.BeginTabItem(localization.Get("ExtraCollections."+extraKind)+"###Collection"+extraKind,focusCollectionKind==extraKind ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None)) { collectionKind=extraKind; if(focusCollectionKind==extraKind)focusCollectionKind=null; ImGui.EndTabItem(); }
-                if (ImGui.BeginTabItem(localization.Get("Outfits.Title")+"###CollectionOutfits")) { collectionOutfitTab=true; ImGui.EndTabItem(); }
-            }
-            finally { ImGui.EndTabBar(); }
+                ..ExtraKinds.Select(extraKind => Kind(extraKind.ToString(), extraKind, "ExtraCollections." + extraKind)),
+                new("Outfits", localization.Get("Outfits.Title"), () => collectionOutfitTab = true),
+            ]);
         }
         if(collectionOutfitTab){DrawOutfits();return;}
         var kind = blueMagic ? CollectionKind.BlueMagic : collectionKind;

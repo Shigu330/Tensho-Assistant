@@ -104,7 +104,8 @@ internal sealed partial class MainWindow
             var action=miner ?? botanist;
             if(action is null)continue;
             DrawGameIcon(action.Icon,new Vector2(24));
-            if(ImGui.IsItemHovered())WrappedTooltip(action.Description);
+            // X-684 (0.1675): the one action tooltip (the botanist's name under it when it differs).
+            if(ImGui.IsItemHovered())DrawGatheringActionTooltip(action,miner is not null && botanist is not null && miner.Name!=botanist.Name ? botanist.Name:null);
             ImGui.SameLine();
             var name=miner is not null && botanist is not null && miner.Name!=botanist.Name ? $"{miner.Name} / {botanist.Name}":action.Name;
             var on=forbidden.Contains(key);

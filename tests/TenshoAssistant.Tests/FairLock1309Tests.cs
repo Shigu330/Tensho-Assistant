@@ -21,6 +21,17 @@ internal static class FairLock1309Tests
 
     private static string[] Marks(string root) => Directory.GetFiles(root,"*.wait-*");
 
+    // X-708 (0.1699): a live waiting mark, its owner still holding it. A mark closed by its owner (delete on close) stays listed while another
+    // handle is open on it (another client reading its creation time, an antivirus scan): « delete pending », it cannot be opened any more.
+    // Counting such a ghost as a queued client failed the fairness test once under load (relay 156).
+    private static bool Live(string mark)
+    {
+        try { using (new FileStream(mark,FileMode.Open,FileAccess.Read,FileShare.ReadWrite | FileShare.Delete)) return true; }
+        catch (IOException) { return false; }
+        catch (UnauthorizedAccessException) { return false; }
+    }
+    private static int LiveMarks(string root) => Marks(root).Count(Live);
+
     // A client that takes the lock again as soon as it released it, for `seconds` (or until stopped); `held` counts the times it held it.
     // Its own thread (not the pool's, which Verify keeps busy with the other tests): it starts at once.
     private static Thread Greedy(Func<IDisposable> hold,int holdMs,int seconds,CancellationToken stop,StrongBox<int> held)
@@ -88,8 +99,10 @@ internal static class FairLock1309Tests
                         else Check(took >= 1_000,"fair, not a hand-over: the greedy client, queued at the release of round " + (round - 1)
                             + ", went first (" + string.Join("; ",rounds) + ")");
                     }
-                    // This client's own mark is gone once it holds the lock: a mark now is the greedy client's, waiting behind this turn.
-                    Check(Until(() => Marks(root).Length > 0,5_000),"the greedy client queued during round " + round + " (" + string.Join("; ",rounds) + ")");
+                    // This client's own mark is closed once it holds the lock: a live mark now is the greedy client's, waiting behind this turn.
+                    // X-708: live only; the closed mark of this client can stay listed a moment (a ghost, see Live) while the greedy client is
+                    // not queued yet, and the next turn then finds nobody in line.
+                    Check(Until(() => LiveMarks(root) > 0,5_000),"the greedy client queued during round " + round + " (" + string.Join("; ",rounds) + ")");
                     released = Volatile.Read(ref held.Value);
                 }
             }
@@ -166,6 +179,21 @@ internal static class FairLock1309Tests
             var stale = System.Diagnostics.Stopwatch.StartNew();
             using (FairFileLock.Hold(path,10_000,error => error)) { }
             Check(stale.ElapsedMilliseconds < 1_000,"no wait for a stale mark: " + stale.ElapsedMilliseconds + " ms");
+        })),
+        // X-708 (0.1699): the ghost that failed the fairness test, made on purpose: a mark closed by its owner while another handle is open on it.
+        ("Fair lock 1699: a waiting mark closed by its owner while another handle is open stays listed (a ghost), but it is not live; once the last handle closes it is gone",() => InTemp(root =>
+        {
+            var path = Path.Combine(root,"Profile.lock");
+            var mark = Path.Combine(root,FairFileLock.MarkName(path,DateTime.UtcNow,Guid.NewGuid()));
+            var owner = new FileStream(mark,FileMode.CreateNew,FileAccess.Write,FileShare.ReadWrite | FileShare.Delete,1,FileOptions.DeleteOnClose);
+            Check(Marks(root).Length == 1 && LiveMarks(root) == 1,"held by its owner: listed and live");
+            using (new FileStream(mark,FileMode.Open,FileAccess.Read,FileShare.ReadWrite | FileShare.Delete))
+            {
+                owner.Dispose();
+                Check(Marks(root).Length == 1,"closed by its owner, another handle open: still listed");
+                Check(LiveMarks(root) == 0,"but not live: not a queued client");
+            }
+            Check(Marks(root).Length == 0,"the last handle closed: gone");
         })),
         ("Fair lock 1310: first come, first served: the marks sort in arrival order; a client waits only for the marks older than its own",() => InTemp(root =>
         {

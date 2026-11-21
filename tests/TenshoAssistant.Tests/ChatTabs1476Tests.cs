@@ -43,7 +43,7 @@ internal static class ChatTabs1476Tests
             Check(new ChatTabSettings().NameColor is null, "default: none");
             var window = Window();
             Check(window.Contains("var coloured=PushChatTabColor(tab);", StringComparison.Ordinal)
-                  && window.Contains("finally{if(coloured)ImGui.PopStyleColor();}", StringComparison.Ordinal), "the name's colour pushed around the tab only");
+                  && window.Contains("finally{if(coloured)ImGui.PopStyleColor();if(blink)ImGui.PopStyleColor();}", StringComparison.Ordinal), "the name's colour pushed around the tab only");
             Check(window.Contains("Tip(\"ChatWindow.TabColorTip\");", StringComparison.Ordinal)
                   && window.Contains("if(DefaultButton(\"ChatTabColor\",tab.NameColor is not null)){tab.NameColor=null;chatSettingsPending=true;}", StringComparison.Ordinal), "tooltip and reset");
         }),

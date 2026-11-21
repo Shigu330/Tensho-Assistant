@@ -37,7 +37,7 @@ internal static class GardenRipe1572Tests
             var beds = Capture();
             var now = Utc(17, 23, 35);
             foreach (var number in new[] { 2, 4, 6, 8 })
-                Check(GardenJournal.State(Bed(beds, number), now) == GardenState.Ripe, "without the game's word, bed " + number + " is ripe by its times (the old rule)");
+                Check(GardenJournal.State(Bed(beds, number), now) == GardenState.Expected, "without the game's word, bed " + number + " is ripe by the calculation only, to confirm in game (X-720)");
             foreach (var number in new[] { 2, 4, 6, 8 })
                 Check(GardenJournal.Examined(beds, "Home 2-17", 1, number, GardenGameState.Growing, Utc(17, 23, 13)) == Bed(beds, number), "the line goes to bed " + number);
             foreach (var number in new[] { 2, 4, 6, 8 })
@@ -58,7 +58,7 @@ internal static class GardenRipe1572Tests
             var beds = Capture();
             var apple = Bed(beds, 1);
             Check(GardenJournal.Examined(beds, "Home 2-17", 1, 1, GardenGameState.Growing, Utc(18, 0, 0)) == apple, "said growing before the expected time");
-            Check(GardenJournal.State(apple, Utc(21, 23, 0)) == GardenState.Ripe, "said growing before the expected time: ripe once the time has passed");
+            Check(GardenJournal.State(apple, Utc(21, 23, 0)) == GardenState.Expected, "said growing before the expected time: ripe by the calculation once the time has passed, to confirm (X-720)");
             GardenJournal.Examined(beds, "Home 2-17", 1, 1, GardenGameState.Ripe, Utc(20, 12, 0));
             Check(GardenJournal.State(apple, Utc(20, 12, 1)) == GardenState.Ripe && GardenView.Growth(apple, Utc(20, 12, 1)) == 1 && GardenView.Left(apple, Utc(20, 12, 1)) is null, "the game says ripe: ripe at once");
             Check(!GardenJournal.Alarms(beds, Utc(20, 12, 1)).Any(alarm => alarm.Bed == apple && alarm.Kind == GardenState.Ripe), "no harvest alarm to come for a bed already ripe");

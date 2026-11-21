@@ -31,7 +31,7 @@ internal static class DeliveryRewards730Tests
         ("Delivery rewards: on their own tab, without waiting for the character, read in the self-check",() =>
         {
             var page=Read("MainWindow.CustomDeliveries.cs");
-            Check(page.Contains("DrawDeliveryStatus(clients)") && page.Contains("DrawDeliveryRewards(clients)") && page.IndexOf("BeginTabBar")<page.IndexOf("deliverySnapshot is not"),"tabs before the reading");
+            Check(page.Contains("DrawDeliveryStatus(clients)") && page.Contains("DrawDeliveryRewards(clients)") && page.IndexOf("OrderedTabs(\"CustomDeliveriesTabs\",") is var tabs and > 0 && tabs<page.IndexOf("deliverySnapshot is not"),"tabs before the reading");
             Check(Read("MainWindow.SelfCheckPages.cs").Contains("reward lines"),"self-check");
             Check(Read("Deliveries/CustomDeliveries.Dalamud.cs").Contains("GetSubrowExcelSheet<SatisfactionSupply>"),"sheet");
         }),

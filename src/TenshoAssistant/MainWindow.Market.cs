@@ -10,22 +10,20 @@ internal sealed partial class MainWindow
 {
     private void DrawMarket()
     {
-        Heading(localization.Get("MarketUi.Title"), localization.Get("MarketUi.Description"));
         var state = market.State;
         UI.UiComponents.SubTitle(state.WorldId == 0 ? localization.Get("MarketUi.World") : state.WorldName);
         if (itemId <= 0) { ImGui.TextWrapped(localization.Get("MarketUi.Select")); return; }
         DrawItemIcon(SelectedItem, new Vector2(40));
         ImGui.SameLine(); ImGui.TextUnformatted(SelectedItem?.Name ?? $"ID {itemId}");
         // 0.270: summary (lowest price and last sale on the world), every listing with filters, recent sales; only the open tab works.
-        if (!ImGui.BeginTabBar("MarketTabs")) return;
-        try
-        {
-            var summaryFlags = marketFocusSummary ? ImGuiTabItemFlags.SetSelected : ImGuiTabItemFlags.None; marketFocusSummary = false;
-            if (ImGui.BeginTabItem(localization.Get("MarketBoard.TabSummary"), summaryFlags)) { try { DrawMarketSummary(state); } finally { ImGui.EndTabItem(); } }
-            if (ImGui.BeginTabItem(localization.Get("MarketBoard.TabListings"))) { try { DrawMarketListings(); } finally { ImGui.EndTabItem(); } }
-            if (ImGui.BeginTabItem(localization.Get("MarketBoard.TabHistory"))) { try { DrawMarketHistory(); } finally { ImGui.EndTabItem(); } }
-        }
-        finally { ImGui.EndTabBar(); }
+        // X-605 (0.1701): the tabs arranged with the mouse (OrderedTabs).
+        var summary = marketFocusSummary; marketFocusSummary = false;
+        OrderedTabs("MarketTabs",
+        [
+            new("Summary", localization.Get("MarketBoard.TabSummary"), () => DrawMarketSummary(state), summary),
+            new("Listings", localization.Get("MarketBoard.TabListings"), DrawMarketListings),
+            new("History", localization.Get("MarketBoard.TabHistory"), DrawMarketHistory),
+        ]);
     }
 
     private void DrawMarketSummary(TenshoAssistant.Market.MarketState state)

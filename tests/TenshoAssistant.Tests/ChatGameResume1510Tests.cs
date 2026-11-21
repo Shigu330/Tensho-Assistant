@@ -13,14 +13,10 @@ internal static class ChatGameResume1510Tests
     [
         ("Chat game resume 1510: behaviour: after a game window over it goes, the place is there in the same frame (M1)",() =>
         {
-            // Frame 1: a game window covers Tensho's window set to « Hide »: the messages are given back, and the place is still read.
-            var covered=ChatHideWants.InFrame(ChatHideWants.Of(true,false,false,false,true),false,true);
-            Check(covered==ChatHideWant.Release && ChatHideWants.ReadsPlace(covered),"covered: given back, the place still read");
-            // Frame 2: the game window goes: hidden again, and the place read in frame 1 is there for the window (no frame at its own place).
-            var back=ChatHideWants.InFrame(ChatHideWants.Of(true,false,false,false,false),false,true);
-            Check(back==ChatHideWant.Hide && ChatHideWants.ReadsPlace(back),"uncovered: hidden, place read");
-            // The same after a fight with « Hide in combat », and with the option off (cheap reading, never used by the window then).
-            Check(ChatHideWants.ReadsPlace(ChatHideWants.InFrame(ChatHideWants.Of(true,false,false,true),false,true)),"combat: place read");
+            // X-689 (0.1657): a game window over Tensho's window, or a fight, no longer gives the messages back: hidden, and the place read in
+            // every frame, so it is there when the window shows again (no frame at its own place).
+            var covered=ChatHideWants.InFrame(ChatHideWants.Of(true,false,false),false,true);
+            Check(covered==ChatHideWant.Hide && ChatHideWants.ReadsPlace(covered),"covered or in combat: hidden, the place read");
             Check(ChatHideWants.ReadsPlace(ChatHideWant.Release),"given back: place read");
             // The game's chat not shown: nothing read (Hold), as before.
             Check(!ChatHideWants.ReadsPlace(ChatHideWants.InFrame(ChatHideWant.Hide,false,false)),"chat not shown: no place");
@@ -32,7 +28,7 @@ internal static class ChatGameResume1510Tests
             Check(ChatHideWants.InFrame(ChatHideWant.Release,true,false)==ChatHideWant.Hold,"whatever was wished");
             Check(ChatHideWants.InFrame(ChatHideWant.Hide,false,true)==ChatHideWant.Hide && ChatHideWants.InFrame(ChatHideWant.Release,false,true)==ChatHideWant.Release,"otherwise the wish");
             // Of keeps its own contract (competitive gives back even with the interface hidden); InFrame states what the hider then does.
-            Check(ChatHideWants.Of(true,true,true,false)==ChatHideWant.Release && ChatHideWants.InFrame(ChatHideWants.Of(true,true,true,false),true,false)==ChatHideWant.Hold,"the two agree");
+            Check(ChatHideWants.Of(true,true,true)==ChatHideWant.Release && ChatHideWants.InFrame(ChatHideWants.Of(true,true,true),true,false)==ChatHideWant.Hold,"the two agree");
             var source=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Chat/ChatGameHide.cs"));
             Check(!source.Contains("always given back",StringComparison.Ordinal) && source.Contains("holds first (InFrame)",StringComparison.Ordinal),"the contract no longer says « always »");
             var hider=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Chat/GameChatHider.Dalamud.cs"));

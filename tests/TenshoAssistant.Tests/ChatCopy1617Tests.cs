@@ -47,7 +47,7 @@ internal static class ChatCopy1617Tests
             Check(chat.Contains("if(!chatLinesBlocked && ImGui.IsItemHovered())chatHoveredRecord=record;"),"E2 the hovered message");
             Check(chat.Contains("localization.Format(\"ChatWindow.MenuCopyPlayer\",shown)") && chat.Contains("players.World(source.World)"),"E3");
             Check(chat.Contains("localization.Get(\"ChatWindow.CopyPlace\")") && chat.Contains("ItemLinksMenu(\"##ChatItem\"+id,item,copyName:true);") && chat.Contains("localization.Get(\"ChatWindow.CopyQuest\")"),"E4");
-            Check(chat.Contains("ImGui.BeginPopupContextItem(\"###ChatTabMenu\"+index)") && chat.Contains("tab.ClearedAt=clear ? DateTimeOffset.Now:null;ChatTabChanged(tab);"),"E7 saved with the settings");
+            Check(chat.Contains("ImGui.BeginPopupContextItem(\"###ChatTabMenu\"+index)") && chat.Contains("tab.ClearedAt=clear ? DateTimeOffset.Now:null;if(clear)ChatMessages.Unpin(tab);ChatTabChanged(tab);"),"E7 saved with the settings");
             foreach(var language in new[]{"en","fr"})
             {
                 using var document=System.Text.Json.JsonDocument.Parse(File.ReadAllText(Path.GetFullPath($"src/TenshoAssistant/Localization/Languages/{language}.json")));

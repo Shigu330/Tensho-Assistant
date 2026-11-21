@@ -30,19 +30,17 @@ internal static class ChatGameHold1506Tests
             var (_,none)=hide.Step(ChatHideWant.Hold,Panels((0,true,false)));
             Check(none.Count==0,"held with nothing hidden: nothing");
         }),
-        ("Chat game hold 1506: behaviour: the choice of each frame (cutscene and GPose hold; competitive, combat and untick give back)",() =>
+        ("Chat game hold 1506: behaviour: the choice of each frame (cutscene and GPose hold; competitive and untick give back; X-689: combat no longer)",() =>
         {
-            Check(ChatHideWants.Of(true,false,false,false)==ChatHideWant.Hide,"wanted, nothing else: hidden");
-            Check(ChatHideWants.Of(true,false,true,false)==ChatHideWant.Hold,"interface hidden by the game (cutscene, GPose): held");
-            Check(ChatHideWants.Of(true,false,true,true)==ChatHideWant.Hold,"a cutscene in combat: held as well");
-            Check(ChatHideWants.Of(true,true,true,false)==ChatHideWant.Release,"competitive content: given back, even with the interface hidden (DEC-038)");
-            Check(ChatHideWants.Of(true,false,false,true)==ChatHideWant.Release,"« Hide in combat » in combat: the game's messages are the chat of the fight");
-            Check(ChatHideWants.Of(false,false,true,false)==ChatHideWant.Release && ChatHideWants.Of(false,false,false,false)==ChatHideWant.Release,"no longer wanted: given back");
+            Check(ChatHideWants.Of(true,false,false)==ChatHideWant.Hide,"wanted, nothing else: hidden");
+            Check(ChatHideWants.Of(true,false,true)==ChatHideWant.Hold,"interface hidden by the game (cutscene, GPose): held");
+            Check(ChatHideWants.Of(true,true,true)==ChatHideWant.Release,"competitive content: given back, even with the interface hidden (DEC-038)");
+            Check(ChatHideWants.Of(false,false,true)==ChatHideWant.Release && ChatHideWants.Of(false,false,false)==ChatHideWant.Release,"no longer wanted: given back");
         }),
         ("Chat game hold 1506: wiring: the window passes the game's interface state, the hider holds while ChatLog is not shown",() =>
         {
             var window=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.ChatWindow.cs"));
-            Check(window.Contains("TenshoAssistant.Competitive.CompetitiveGate.Cut,gameGui.GameUiHidden,ChatHiddenNow(),",StringComparison.Ordinal),"the four states passed");
+            Check(window.Contains("TenshoAssistant.Competitive.CompetitiveGate.Cut,gameGui.GameUiHidden);",StringComparison.Ordinal),"the three states passed (X-689: no longer Tensho's own hiding)");
             Check(window.Contains("internal bool ChatHidesGameMessages()=>ChatGameMessagesWant()==ChatHideWant.Hide;",StringComparison.Ordinal),"followed only while hidden");
             var hider=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Chat/GameChatHider.Dalamud.cs"));
             Check(hider.Contains("ChatHideWants.InFrame(wanted(),chatLogShown:ChatLogShown(),competitiveCut:TenshoAssistant.Competitive.CompetitiveGate.Cut)",StringComparison.Ordinal)

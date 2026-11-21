@@ -11,14 +11,12 @@ internal static class ChatGameHideMinor1507Tests
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
-        ("Chat game hide minor 1507: behaviour: covered by a game window with « Hide », the game's messages come back (M1)",() =>
+        ("Chat game hide minor 1507: behaviour: covered by a game window with « Hide », the game's messages stay hidden (M1 reversed by X-689, the user's report of 20/11)",() =>
         {
-            Check(ChatHideWants.Of(true,false,false,false,true)==ChatHideWant.Release,"covered and hidden: given back");
-            Check(ChatHideWants.Of(true,false,false,false,false)==ChatHideWant.Hide,"uncovered: hidden again");
-            Check(ChatHideWants.Of(true,false,true,false,true)==ChatHideWant.Hold,"a cutscene still holds");
-            Check(ChatHideWants.Of(true,false,false,false)==ChatHideWants.Of(true,false,false,false,false),"the four-state call is the same as « not covered »");
+            Check(ChatHideWants.Of(true,false,false)==ChatHideWant.Hide,"Tensho's window hidden or not: the game's messages stay hidden");
+            Check(ChatHideWants.Of(true,false,true)==ChatHideWant.Hold,"a cutscene still holds");
             var window=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.ChatWindow.cs"));
-            Check(window.Contains("ChatCover.Hidden(ChatOptions.WhenCovered,chatCovered));",StringComparison.Ordinal),"the window passes its covered state");
+            Check(window.Contains("return !ChatCover.Hidden(ChatOptions.WhenCovered,covered);",StringComparison.Ordinal),"the covered state only hides Tensho's window");
             // « Fade » keeps the messages hidden (the window stays there, faded): only « Hide » gives them back.
             Check(!ChatCover.Hidden(ChatCovered.Fade,true) && ChatCover.Hidden(ChatCovered.Hide,true) && !ChatCover.Hidden(ChatCovered.Hide,false),"only « Hide » under a window");
         }),

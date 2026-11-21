@@ -112,7 +112,7 @@ public sealed record MapLocalGatheringPoint(uint BaseId,string Type,int Level,st
 {
     /// <summary>X-80 (0.895): the job of the point: GatheringType 0–1 miner (16), 2–3 botanist (17), spearfishing (4–5) and fishing spots (100) fisher (18).</summary>
     public uint Job=>TypeId switch{0 or 1=>16,2 or 3=>17,_=>18};
-    public bool Timed=>Schedule is { Kind:GatheringScheduleKind.Limited, Windows.Count:>0 };
+    public bool Timed=>Schedule?.Timed==true;
     /// <summary>True when an Eorzea minute of the day falls in one of the windows (windows may cross midnight).</summary>
     public bool ActiveAt(int eorzeaMinutes)=>Timed && Schedule!.Windows.Any(window=>
     {

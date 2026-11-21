@@ -1,7 +1,7 @@
 namespace TenshoAssistant.Reminders;
 
 /// <summary>X-178: the small round mark on a seed's icon: nothing (no tending interval), tending later, tending due, or ripe.</summary>
-public enum GardenBadge { None, Later, Due, Ripe, Unknown }
+public enum GardenBadge { None, Later, Due, Ripe, Unknown, Expected }
 
 /// <summary>X-178: the mark on a possible crossbreed's icon. Unknown = the inventories were not read: never « not owned » without a reading (R06).</summary>
 public enum GardenCrossMark { None, Wished, NotOwned, WishedNotOwned, Unknown }
@@ -39,6 +39,8 @@ public static class GardenView
         var state=GardenJournal.State(bed,now);
         if(state==GardenState.Ripe)return GardenBadge.Ripe;
         if(state==GardenState.Unknown)return GardenBadge.Unknown;
+        // X-720 (0.1723): past the calculated time, not said ripe by the game: its own mark, never the ripe one.
+        if(state==GardenState.Expected)return GardenBadge.Expected;
         if(GardenJournal.TendAt(bed) is not { } due)return GardenBadge.None;
         return now>=due ? GardenBadge.Due:GardenBadge.Later;
     }

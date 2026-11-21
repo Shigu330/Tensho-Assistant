@@ -132,7 +132,7 @@ internal static class AirshipTests
             Check(table.IndexOf("client.IsLoggedIn",StringComparison.Ordinal) is > 0 and var logged && logged < call,"only while logged in");
             Check(table.Contains("catch(Exception error)",StringComparison.Ordinal) && table.Contains("failed=true",StringComparison.Ordinal),"a failure leaves it unavailable");
             var page = Read("MainWindow.AirshipPlanner.cs");
-            Check(page.Contains("Task.Run(()=>AirshipPlanner.Plan(",StringComparison.Ordinal) && page.Contains("AirshipPlanner.Unconfirmed",StringComparison.Ordinal),"searched on a worker, shown as not confirmed");
+            Check(page.Contains("airshipSearch.Start(key,token=>AirshipPlanner.Plan(",StringComparison.Ordinal) && page.Contains("AirshipPlanner.Unconfirmed",StringComparison.Ordinal),"searched on a worker (PlannerSearch, X-604), shown as not confirmed");
             Check(!page.Contains("HousingManager",StringComparison.Ordinal),"the page never calls the game");
             Check(Read("Plugin.Voyages.cs").Contains("new FreeCompany.AirshipVoyageTable(framework,client,log),()=>airshipTable?.Dispose());",StringComparison.Ordinal),"owned and disposed");
         }),
@@ -150,10 +150,10 @@ internal static class AirshipTests
             var routes = Read("MainWindow.RoutePlanner.cs");
             Check(routes.Contains("routeQuotes[(fetching.WorldId,id)]=quote;",StringComparison.Ordinal) && routes.Contains("noListing.Add(item)",StringComparison.Ordinal),"quotes kept, no listing is not missing");
             Check(routes.Contains("RouteMissing(catalog,counted,route,plannerBand)",StringComparison.Ordinal),"missing count follows the band");
-            Check(routes.Contains("!ReferenceEquals(prices.Items,routeQuotesList)",StringComparison.Ordinal) && routes.Contains("if(!prices.Loading)plannerKey=null;",StringComparison.Ordinal),"a list ended between two frames still re-runs the search");
+            Check(routes.Contains("!ReferenceEquals(prices.Items,routeQuotesList)",StringComparison.Ordinal) && routes.Contains("if(!prices.Loading)submarineSearch.Again();",StringComparison.Ordinal),"a list ended between two frames still re-runs the search");
             var table = Read("FreeCompany/AirshipVoyageTable.Dalamud.cs");
             Check(table.Contains("if(duration!=0)survey[to]=duration;",StringComparison.Ordinal),"a 0 survey stays unknown");
-            Check(Read("MainWindow.Lifetime.cs").Contains("airshipPlanCancel?.Cancel();",StringComparison.Ordinal),"airship search stops with the window");
+            Check(Read("MainWindow.Lifetime.cs").Contains("airshipSearch.Cancel();airshipFleetSearch.Cancel();",StringComparison.Ordinal),"airship searches stop with the window (X-604: the fleet's too)");
             var page = Read("MainWindow.AirshipPlanner.cs");
             Check(page.Contains("Tip(\"AirshipPlanner.ClearTip\");",StringComparison.Ordinal) && page.Contains("Tip(\"AirshipPlanner.ChooseTip\");",StringComparison.Ordinal),"tooltips, also when disabled");
         }),

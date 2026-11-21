@@ -34,7 +34,6 @@ internal sealed partial class MainWindow
 
     private void DrawFieldContent()
     {
-        Heading(localization.Get("FieldContent.Title"),localization.Get("FieldContent.Subtitle"));
         FieldCatalogReady();
         if(fieldFailed){ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("FieldContent.Unavailable"));return;}
         if(fieldCatalog is not { } catalog){ImGui.TextDisabled(localization.Get("FieldContent.Loading"));return;}
@@ -243,7 +242,10 @@ internal sealed partial class MainWindow
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();
                 if(ImGui.Selectable($"{row.Name}##FieldEvent{row.Kind}{row.Id}") && map is not null && coordinate is { } target)OpenMapPointFromPage(map,target.X,target.Y);
-                if(ImGui.IsItemHovered())WrappedTooltip(FieldEventTip(row));
+                // X-684 (0.1676): the one FATE tooltip (a FATE, a skirmish or a critical engagement).
+                if(ImGui.IsItemHovered())DrawFateTooltip(FateTips.Build(row.Name,0,row.Level,
+                    localization.Get(row.Kind==FieldEventKind.Fate ? (zone.Use==FieldBoard.BozjaUse ? "FieldContent.KindSkirmish":"FieldContent.KindFate"):"FieldContent.KindEngagement"),
+                    coordinate is { } eventPlace ? $"{zone.Name} · {MapProjection.CoordinateText(eventPlace)}":zone.Name,null,row.Description.Length>0 ? row.Description:localization.Get("FieldContent.NoDescription"),row.Participants));
                 if(map is not null && coordinate is { } place)PlaceMenu($"FieldPlace{row.Kind}{row.Id}",map,place,row.Name);
                 ImGui.TableNextColumn();ImGui.TextUnformatted(localization.Get(row.Kind==FieldEventKind.Fate ? (zone.Use==FieldBoard.BozjaUse ? "FieldContent.KindSkirmish":"FieldContent.KindFate"):"FieldContent.KindEngagement"));
                 ImGui.TableNextColumn();
@@ -253,12 +255,6 @@ internal sealed partial class MainWindow
             }
         }
         finally{ImGui.EndTable();}
-    }
-
-    private string FieldEventTip(FieldEvent row)
-    {
-        var text=row.Description.Length>0 ? row.Description:localization.Get("FieldContent.NoDescription");
-        return row.Participants>0 ? text+"\n\n"+localization.Format("FieldContent.Participants",row.Participants):text;
     }
 
     private void DrawFieldRecords(FieldCatalog catalog)
@@ -298,7 +294,8 @@ internal sealed partial class MainWindow
             {
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();DrawSmallGameIcon(row.Icon);ImGui.TextUnformatted(row.Name);
-                if(ImGui.IsItemHovered() && row.Description.Length>0)WrappedTooltip(row.Description);
+                // X-684 (0.1695): the one action tooltip (icon, name, category and most held, the game's description); before, the description alone.
+                if(ImGui.IsItemHovered())DrawActionTooltip(row.Icon,row.Name,row.Description,localization.Format("FieldContent.ActionTipDetail",row.Category,row.Most));
                 ImGui.TableNextColumn();ImGui.TextUnformatted(row.Category);
                 ImGui.TableNextColumn();ImGui.TextUnformatted(row.Most.ToString());
             }

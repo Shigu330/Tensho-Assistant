@@ -24,7 +24,6 @@ internal sealed partial class MainWindow
 
     private void DrawEventsPage()
     {
-        Heading(localization.Get("Events.Title"),localization.Get("Events.Description"));
         // X-04 (0.447, decided 2026-11-03): player events stay on partake.gg, opened on click only; Tensho reads nothing from the site.
         if(ImGui.SmallButton(localization.Get("Events.Partake")))Dalamud.Utility.Util.OpenLink(PartakeAddress);
         Tip("Events.PartakeTip");
@@ -141,8 +140,9 @@ internal sealed partial class MainWindow
                 foreach(var reward in rewards.Items.Take(4))
                 {
                     var definition=items?.Find(reward.ItemId);
+                    // X-684 (0.1669): the icon carries the common item tooltip; its name is no longer written again under it.
                     ImGui.SameLine();DrawItemIcon(definition,new Vector2(ImGui.GetTextLineHeight()));
-                    if(ImGui.IsItemHovered())WrappedTooltip(definition?.Name ?? $"#{reward.ItemId}");
+                    if(definition is null && ImGui.IsItemHovered())WrappedTooltip($"#{reward.ItemId}");
                 }
             }
             ImGui.SameLine();

@@ -124,8 +124,13 @@ internal sealed partial class MainWindow
                         var place=map is null ? link.Place:string.IsNullOrWhiteSpace(map.Subzone) ? map.Zone:$"{map.Zone} · {map.Subzone}";
                         ImGui.TextUnformatted($"{link.At.ToLocalTime():t} · {place} ({MapProjection.CoordinateNumber(link.X)}, {MapProjection.CoordinateNumber(link.Y)})");
                         if(map is not null && MapCatalog.CoordinatesValid(link.X,link.Y))PlaceMenu($"ChatLinkPlace{link.At.Ticks}",map,new(link.X,link.Y),place);
-                        if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("ChatLinks.Line",ChannelName(link.Channel),
-                            link.Sender.Length>0 ? link.Sender:localization.Get("ChatLinks.NoSender")));
+                        // X-684 (0.1672): the one place tooltip, the channel and who sent it under it.
+                        if(ImGui.IsItemHovered())
+                        {
+                            var line=localization.Format("ChatLinks.Line",ChannelName(link.Channel),link.Sender.Length>0 ? link.Sender:localization.Get("ChatLinks.NoSender"));
+                            if(map is not null && MapCatalog.CoordinatesValid(link.X,link.Y))DrawPlaceTooltip(map,new Vector2(link.X,link.Y),link.Place.Length>0 ? link.Place:null,line);
+                            else WrappedTooltip(line);
+                        }
                     }
                     finally{ImGui.PopID();}
                 }

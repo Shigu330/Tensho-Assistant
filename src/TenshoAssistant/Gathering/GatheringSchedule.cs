@@ -58,6 +58,16 @@ public sealed class GatheringSchedule
         return Normalize([new(first, first + duration)]);
     }
 
+    /// <summary>
+    /// X-714 (0.1713): one rule for a physical point's GatheringPointTransient row, read by the gathering catalogue and by the map's present
+    /// points: no rare pop table, the ephemeral window; a rare pop table, its slots (null: its row is missing, unknown). Point type 8: unknown.
+    /// </summary>
+    public static GatheringSchedule FromTransient(byte pointType, uint rarePopTable, ushort ephemeralStart, ushort ephemeralEnd, IEnumerable<(ushort Start, ushort Duration)>? rareSlots)
+        => pointType == 8 ? Unknown : rarePopTable == 0 ? FromEphemeral(ephemeralStart, ephemeralEnd) : rareSlots is null ? Unknown : FromRare(rareSlots);
+
+    /// <summary>X-714 (0.1713): limited with at least one window; what the map calls a timed point (its icon, its area's colour).</summary>
+    public bool Timed => Kind == GatheringScheduleKind.Limited && Windows.Count > 0;
+
     public static GatheringSchedule FromRare(IEnumerable<(ushort Start, ushort Duration)> slots)
     {
         ArgumentNullException.ThrowIfNull(slots);

@@ -172,6 +172,8 @@ internal sealed partial class MainWindow : Window, IDisposable
         this.textures = textures;
         this.gameGui = gameGui;
         // 0.327 (queue step e): Home as before, or the last page used when that setting is on (developerMode is known here).
+        // X-601 (0.1681, R02.3): the folded categories saved by an older version: those that are still categories keep their fold.
+        configuration.NavigationCollapsed = TenshoAssistant.UI.PageFamilies.KeepFolded(configuration.NavigationCollapsed, TenshoAssistant.UI.PageFamilies.SideBarCategories);
         page = InitialPage();
         Size = new Vector2(1040, 700);
         SizeCondition = ImGuiCond.FirstUseEver;
@@ -407,11 +409,31 @@ internal sealed partial class MainWindow : Window, IDisposable
         // and the Gold Saucer are now direct entries, the sub-pages of crafting, gathering and collections stay in their own tab bar.
         // 0.470 (TEMPLATES-001): the pages and their order come from one list, MainWindow.Pages.cs.
         // X-220 (0.1230): one search over pages, items, quests and maps, above the list.
+        var afterCategory=false;var groupIndex=0;
         DrawQuickSearch();
         foreach(var group in PageGroups)
+        {
+            var index=groupIndex++;
+            // X-601 (0.1681): the flat entries that follow a category are set apart from its pages.
+            if(group.Category is null && afterCategory){ImGui.Spacing();ImGui.Separator();}
+            afterCategory=group.Category is not null;
             if(group.Category is null || NavigationCategory(group.Category,group.Pages))
-                foreach(var entry in group.Entries)
-                    if(entry.Visible?.Invoke()!=false && ListedHere(entry.Page))Navigation(entry.Label!(),entry.Page);
+            {
+                // X-605 (0.1702): the entries arranged with the mouse inside their group (ListDrag, told each row by Navigation), in the
+                // order kept (« SideBar.<group> »).
+                var key="SideBar."+(group.Category ?? "Group"+index);
+                if(!sideBarDrags.TryGetValue(key,out var drag))sideBarDrags[key]=drag=new();
+                drag.Frame(ImGui.GetFrameCount());
+                sideBarRows=drag;
+                try
+                {
+                    foreach(var entry in TenshoAssistant.UI.TabOrder.Arrange(group.Entries,configuration.TabOrders.GetValueOrDefault(key),entry=>entry.Page.ToString()))
+                        if(FamilyTarget(entry.Page) is { } target)Navigation(entry.Label!(),entry.Page,target);
+                }
+                finally{sideBarRows=null;}
+                SideBarAfter(key,drag);
+            }
+        }
         ImGui.Spacing();
         ImGui.Separator();
         // 0.1038 (T-0.912-1): the theme's text colour, readable in the light theme too.
@@ -434,10 +456,47 @@ internal sealed partial class MainWindow : Window, IDisposable
 
     private Page NavigationPage(Page current)=>PageEntryFor(current)?.Parent ?? current;
 
-    private void Navigation(string label, Page destination)
+    // X-601 (0.1677): a side bar entry stands for its family (UI/PageFamilies.cs): it is drawn while one of its pages can be reached here,
+    // and a click opens the tab last shown in it during this session, else its first page that can be reached.
+    private readonly Dictionary<Page,Page> familyLastTab=[];
+    private TenshoAssistant.UI.PageFamilies.Member<Page>[]? familyMembers;
+    private TenshoAssistant.UI.PageFamilies.Member<Page>[] FamilyMembers=>familyMembers??=
+        [.. PageEntries.Select(entry=>new TenshoAssistant.UI.PageFamilies.Member<Page>(entry.Page,entry.Parent,entry.Label is not null,entry.Tab is not null))];
+    private bool Reachable(Page shown)=>PageEntryFor(shown) is { } entry && entry.Visible?.Invoke()!=false && ListedHere(shown);
+    private Page? FamilyTarget(Page root)
+        =>TenshoAssistant.UI.PageFamilies.Target(FamilyMembers,root,familyLastTab.TryGetValue(root,out var last) ? last:null,Reachable);
+
+    private void Navigation(string label, Page root, Page target)
     {
-        if (UiComponents.NavigationItem(label, NavigationPage(page) == destination))
-            page = destination;
+        var clicked = UiComponents.NavigationItem(label, NavigationPage(page) == root);
+        // X-605 (0.1702): the row told to its group's drag; no page opened by the mouse released at the end of a drag.
+        if (sideBarRows is { } rows)
+        {
+            var (min, max) = (ImGui.GetItemRectMin(), ImGui.GetItemRectMax());
+            rows.Row(root.ToString(), min.X, min.Y, max.X, max.Y, ImGui.IsItemActive() && ImGui.IsMouseDragging(ImGuiMouseButton.Left));
+            // X-711 (0.1705, review M1): released over itself after a small move, the row dragged is still a click.
+            if (!rows.KeepsClick(root.ToString())) clicked = false;
+        }
+        if (clicked && NavigationPage(page) != root)
+            page = target;
+    }
+
+    // X-605 (0.1702): each group of the side bar's drag, by group key; the group being drawn (Navigation tells it its rows).
+    private readonly Dictionary<string,TenshoAssistant.UI.ListDrag> sideBarDrags=[];
+    private TenshoAssistant.UI.ListDrag? sideBarRows;
+
+    /// <summary>X-605 (0.1702): after a group of the side bar: while an entry is dragged, a line where it would go; released, the order kept.</summary>
+    private void SideBarAfter(string key,TenshoAssistant.UI.ListDrag drag)
+    {
+        if(drag.Dragged is null)return;
+        var mouse=ImGui.GetMousePos().Y;
+        if(ImGui.IsMouseDown(ImGuiMouseButton.Left))
+        {
+            if(drag.Line(mouse) is { } line)
+                ImGui.GetWindowDrawList().AddLine(new Vector2(line.Left,line.Y),new Vector2(line.Right,line.Y),ImGui.GetColorU32(Accent),2*Dalamud.Interface.Utility.ImGuiHelpers.GlobalScale);
+            return;
+        }
+        if(drag.Drop(mouse) is { } order)KeepOrder(key,TenshoAssistant.UI.TabOrder.Keep(order,configuration.TabOrders.GetValueOrDefault(key)));
     }
 
     private ItemDefinition? SelectedItem => itemId > 0 ? itemCatalog.State.Catalog?.Find((uint)itemId) : null;

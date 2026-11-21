@@ -116,7 +116,8 @@ internal static class MapBookmarkTests
         ("Map right-click menu: a Favorites tab first, to go to a favorite or remove it",() =>
         {
             var lists=ReadLf("MainWindow.MapLocalLists.cs");
-            Check(lists.Contains("new[]{\"MapLocal.Favorites\",\"MapLocal.Quests\",") && lists.IndexOf("DrawLocalFavorites(map);",StringComparison.Ordinal)<lists.IndexOf("DrawLocalQuests(map);",StringComparison.Ordinal),"before Quests and FATEs");
+            Check(lists.IndexOf("new(\"Favorites\",localization.Get(\"MapLocal.Favorites\")",StringComparison.Ordinal) is var favorites and > 0 && favorites<lists.IndexOf("new(\"Quests\",",StringComparison.Ordinal)
+                && lists.IndexOf("DrawLocalFavorites(map)",StringComparison.Ordinal)<lists.IndexOf("DrawLocalQuests(map)",StringComparison.Ordinal),"before Quests and FATEs");
             Check(lists.Contains("MapBookmarks.RemoveAt(items,remove)") && lists.Contains("FlagFromMap(map,point.X,point.Y)") && lists.Contains("OpenMapPointFromPage(target!,point.X,point.Y)"),"removed, flagged here, opened elsewhere");
         }),
     ];

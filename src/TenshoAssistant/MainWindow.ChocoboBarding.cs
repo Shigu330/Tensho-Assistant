@@ -52,7 +52,8 @@ internal sealed partial class MainWindow
         {
             var ability=RaceChocoboAbility?.Invoke(id);
             ImGui.TextUnformatted(localization.Format(key,ability?.Name ?? localization.Get("RaceChocobo.NoAbility")));
-            if(ability is { Description.Length:>0 })TipText(ability.Description);
+            // X-684 (0.1695): the one action tooltip (the ability's name, the game's description); before, the description alone.
+            if(ability is { Description.Length:>0 } && ImGui.IsItemHovered())DrawActionTooltip(0,ability.Name,ability.Description);
         }
         ImGui.TextDisabled(localization.Format("RaceChocobo.ReadAt",race.ReadAt.ToLocalTime().ToString("g")));
         ImGui.Separator();
@@ -60,7 +61,6 @@ internal sealed partial class MainWindow
 
     private void DrawChocoboPage()
     {
-        Heading(localization.Get("ChocoboBarding.Title"),localization.Get("ChocoboBarding.Help"));
         if(characterStats.State.CharacterId==0){ImGui.TextWrapped(localization.Get("CharacterUi.Offline"));return;}
         DrawRaceChocobo();
         if(GearCatalog?.Invoke() is not { } catalog){ImGui.TextDisabled(GearNotReady);return;}

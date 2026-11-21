@@ -30,6 +30,10 @@ public static class ReferencePlan
         foreach(var page in ErrorPages.Where(shown.Contains))plan.Add(new($"{page}-error",page,0,1280,860,"error"));
         // X-394 (review of 0.1361): the sort preview with a sample inventory: bags 1, 3, 2, 4 and the sort's line once (developer mode).
         if(shown.Contains("SortPreview"))plan.Add(new("SortPreview-trial","SortPreview",0,1280,860,"sort-trial"));
+        // X-604 (0.1706): Free Company › Best routes, the one route planner of both kinds (its kind chosen at its top).
+        if(shown.Contains("FreeCompany"))plan.Add(new("FreeCompany-routes","FreeCompany",0,1280,860,"fc-routes"));
+        // X-606 (0.1710): Quests with a trial quest's details open (giver and place, end NPC, jobs, the two map buttons).
+        if(shown.Contains("Quests"))plan.Add(new("Quests-details","Quests",0,1280,860,"quest-trial"));
         // X-520 (0.1536): every other tab of the Settings page (« Settings » shows General), last: the tab and category they open stay chosen.
         if(shown.Contains("Settings"))
             foreach(var (id,tab,category,width) in SettingsShots)plan.Add(new($"Settings-{id}","Settings",0,width,860,$"{SettingsPrefix}{tab}:{category}"));

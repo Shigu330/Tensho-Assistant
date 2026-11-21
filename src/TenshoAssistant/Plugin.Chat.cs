@@ -22,6 +22,8 @@ public sealed partial class Plugin
             try{chatReader=new Chat.ChatReader(chatGui,client,log,()=>configuration.Chat,mainWindow.ChatMessages,()=>mainWindow.DeveloperMode,history,()=>player.CharacterName);}
             catch{history.Dispose();throw;}
             chatReader.Sources=senders;
+            // X-447 B7 (0.1646): the alerts' and channels' sounds, the game's own (as the macros' <se.N>).
+            chatReader.PlaySound=sound=>Alarms.AlarmService.PlayChatSound(sound,log);
             mainWindow.ChatHistoryFolder=history.Folder;
             mainWindow.EraseChatHistory=history.Erase;
             mainWindow.ChatHistoryBytes=()=>history.Bytes;

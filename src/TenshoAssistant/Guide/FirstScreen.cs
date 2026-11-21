@@ -7,7 +7,8 @@ namespace TenshoAssistant.Guide;
 public static class FirstScreen
 {
     /// <summary>The navigation groups folded while the player has never folded or unfolded one.</summary>
-    public static readonly IReadOnlySet<string> FoldedGroups = new HashSet<string>(StringComparer.Ordinal) { "Progression", "Content", "GoldSaucer", "References" };
+    // X-601 (0.1681): the side bar is down to some twenty entries and one category (« Tracking »): nothing starts folded any more.
+    public static readonly IReadOnlySet<string> FoldedGroups = new HashSet<string>(StringComparer.Ordinal);
 
     /// <summary>The folded groups: the saved choice, else the defaults.</summary>
     public static IReadOnlySet<string> Folded(HashSet<string>? saved) => saved ?? FoldedGroups;

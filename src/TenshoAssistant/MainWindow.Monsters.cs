@@ -78,7 +78,6 @@ internal sealed partial class MainWindow
     }
     private void DrawMonsterLoot()
     {
-        Heading(localization.Get("MonsterUi.Title"),localization.Get("MonsterUi.Subtitle"));
         if (TenshoAssistant.UI.UiComponents.Header(localization.Get("MonsterUi.Choose")+"##Monster",itemId <= 0 ? ImGuiTreeNodeFlags.DefaultOpen : ImGuiTreeNodeFlags.None))
             DrawItemSearch(160);
         monsterLoot.SelectItem(itemId > 0 ? (uint)itemId : 0);
@@ -126,7 +125,10 @@ internal sealed partial class MainWindow
                             ImGui.TableNextRow(); ImGui.TableNextColumn();
                             if (ImGui.Selectable($"{(monster.Name.Length == 0 ? localization.Format("MonsterUi.UnnamedMonster",monster.Id) : monster.Name)}##Mob{monster.Id}",state.MonsterId == monster.Id))
                             { monsterLoot.SelectMonster(monster.Id); selectedMonsterMap=0; }
-                            if (developerMode && ImGui.IsItemHovered()) WrappedTooltip(localization.Format("Developer.SourceReference",monster.Id));
+                            // X-684 (0.1673): the one monster tooltip (name, level, zone), the source's number under it in developer mode.
+                            if (ImGui.IsItemHovered()) DrawMonsterTooltip(MonsterTips.Build(monster.Name.Length == 0 ? localization.Format("MonsterUi.UnnamedMonster",monster.Id) : monster.Name,
+                                monster.Level.Length == 0 ? null : localization.Format("MapView.MonsterTipLevel",monster.Level),MonsterZone(monster.PlaceNameId),[]),
+                                developerMode ? localization.Format("Developer.SourceReference",monster.Id) : null);
                             MonsterMenu($"MonsterMenu{monster.Id}",monster.Id,monster.Name.Length == 0 ? localization.Format("MonsterUi.UnnamedMonster",monster.Id) : monster.Name);
                             ImGui.TableNextColumn(); ImGui.TextUnformatted(monster.Level.Length == 0 ? localization.Get("MonsterUi.Missing") : monster.Level);
                             ImGui.TableNextColumn(); ImGui.TextUnformatted(MonsterZone(monster.PlaceNameId));
@@ -166,6 +168,7 @@ internal sealed partial class MainWindow
             if (duty is not null && ImGui.SmallButton(localization.Format("MonsterUi.Duty",duty.Name)))
             { dutyLoot.Select(duty); showDutyDetails=true; page=Page.DutyLoot; }
             else if (duty is null) ImGui.TextDisabled(localization.Format("MonsterUi.Instance",detail.InstanceId));
+            if (duty is not null && ImGui.IsItemHovered()) DrawDutyTooltip(DutyTipOf(duty),localization.Get("DutyUi.TipClick"));
         }
         if (TenshoAssistant.UI.UiComponents.Header(localization.Format("MonsterUi.OtherItems",detail.DropItemIds.Count)+"##Monster"))
         {

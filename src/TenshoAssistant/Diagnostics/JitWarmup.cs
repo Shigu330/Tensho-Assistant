@@ -186,7 +186,7 @@ public sealed class JitWarmup : IDisposable
     /// labels, edge markers, glyphs, the player's arrow, the beasts' places, the quest index), compiled early with the map's; their lambdas
     /// and local functions carry the outer name in angle brackets. A test checks that each name is still declared in the sources.
     /// </summary>
-    public static readonly IReadOnlyList<string> MapPathMethods=["VendorLayout","VendorLabel","VendorIconOf","VendorCandidates","VendorMarker","EventLabel","FateLabel",
+    public static readonly IReadOnlyList<string> MapPathMethods=["VendorLayout","VendorLabel","BuildVendorTip","VendorShopLines","VendorIconOf","VendorCandidates","VendorMarker","EventLabel","FateLabel",
         "DrawEdgeMarkers","DrawGlyph","DrawPlayerArrow","BeastPlacesOf","RefreshQuestIndex"];
     private static readonly string[] MapPathBracketed=Bracketed(MapPathMethods);
     /// <summary>X-01 C3.3 (0.1188): the settings' methods the canvas calls for each icon (size and priority, per map).</summary>
@@ -530,19 +530,27 @@ public sealed class JitWarmup : IDisposable
             // shows its lines then, no longer after the map's and the overlays' code too.
             if(chatPart is not null)
             {
-                // X-564 (D-196 a, 20/11: the whole chat part, 1343 methods, took about 3 s idle, on one thread as on three): with a first
-                // frame given, only its code first (ChatFirstFrame, about 450 methods), on this thread; the window shows its lines then.
-                var frame=chatFrame is not null && types.Count>0
-                    ? ChatFirstFrame(methods.Where(chatFrame),chatPart,types[0].Assembly,()=>token.IsCancellationRequested):methods.Where(chatPart).ToArray();
-                var part=frame.Where(compiled.Add).ToArray();
-                var (prepared,skipped)=Compile(part,token);
-                if(token.IsCancellationRequested)return;
-                Prepared+=prepared;ChatPrepared+=prepared;Skipped+=skipped;
-                // X-564 (0.1637): then what the window reads before its first frame, on this thread (nothing beside the warm-up).
-                try{chatThen?.Invoke();}
-                catch(Exception){}
-                ChatReadyAfter=System.Diagnostics.Stopwatch.GetElapsedTime(created).TotalMilliseconds;
-                chatDone=true;
+                // X-564 (0.1650, docs/evidence/0.1650-chat-part-priority.md): the chat window's first frame at normal priority (about 730
+                // methods, a second or so of processor), the rest below normal again. Below normal, under load (a build beside the game, on
+                // 20/11), it waited for the processor: ready 4.7 to 7.9 s after the load, lines drawn 3.5 to 9.7 s after it.
+                Thread.CurrentThread.Priority=ThreadPriority.Normal;
+                try
+                {
+                    // X-564 (D-196 a, 20/11: the whole chat part, 1343 methods, took about 3 s idle, on one thread as on three): with a first
+                    // frame given, only its code first (ChatFirstFrame, about 450 methods), on this thread; the window shows its lines then.
+                    var frame=chatFrame is not null && types.Count>0
+                        ? ChatFirstFrame(methods.Where(chatFrame),chatPart,types[0].Assembly,()=>token.IsCancellationRequested):methods.Where(chatPart).ToArray();
+                    var part=frame.Where(compiled.Add).ToArray();
+                    var (prepared,skipped)=Compile(part,token);
+                    if(token.IsCancellationRequested)return;
+                    Prepared+=prepared;ChatPrepared+=prepared;Skipped+=skipped;
+                    // X-564 (0.1637): then what the window reads before its first frame, on this thread (nothing beside the warm-up).
+                    try{chatThen?.Invoke();}
+                    catch(Exception){}
+                    ChatReadyAfter=System.Diagnostics.Stopwatch.GetElapsedTime(created).TotalMilliseconds;
+                    chatDone=true;
+                }
+                finally{Thread.CurrentThread.Priority=ThreadPriority.BelowNormal;}
                 // Then the rest of the chat part (its settings, menus: drawn after a click), before the map's and the overlays' code.
                 var (more,moreSkipped)=Compile(methods.Where(chatPart).Where(compiled.Add).ToArray(),token);
                 if(token.IsCancellationRequested)return;

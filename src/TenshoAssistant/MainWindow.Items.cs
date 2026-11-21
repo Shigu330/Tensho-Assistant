@@ -31,7 +31,6 @@ internal sealed partial class MainWindow
     private void DrawItems()
     {
         DrawAnnotatedItems();
-        Heading(localization.Get("ItemsUi.Title"), localization.Get("ItemsUi.Description"));
         // 0.272 (R-06 step 3): the item sheet holds Stocks, Craft, Usages and Gathering; requests for those tabs (focus flags set
         // by menus and other tools) open the sheet on the matching tab.
         string? sheetTab = focusStocksTab ? "Stocks" : focusCraftTab ? "Craft" : focusUsesTab ? "Uses" : focusGatherTab ? "Gathering" : null;
@@ -193,17 +192,14 @@ internal sealed partial class MainWindow
         }
         finally { ImGui.EndGroup(); }
         ImGui.Spacing();
-        if (ImGui.BeginTabBar("StorageScope"))
-        {
-            try
-            {
-                StorageTab(localization.Get("HoldingsUi.All"), StorageFilter.All);
-                StorageTab(localization.Get("HoldingsUi.Player"), StorageFilter.PlayerBags);
-                StorageTab(localization.Get("HoldingsUi.Chocobo"), StorageFilter.Chocobo);
-                StorageTab(localization.Get("HoldingsUi.Retainers"), StorageFilter.Retainers);
-            }
-            finally { ImGui.EndTabBar(); }
-        }
+        // X-605 (0.1701): the storages arranged with the mouse too (OrderedTabs); the open one is the filter.
+        OrderedTabs("StorageScope",
+        [
+            StorageTab(localization.Get("HoldingsUi.All"), StorageFilter.All),
+            StorageTab(localization.Get("HoldingsUi.Player"), StorageFilter.PlayerBags),
+            StorageTab(localization.Get("HoldingsUi.Chocobo"), StorageFilter.Chocobo),
+            StorageTab(localization.Get("HoldingsUi.Retainers"), StorageFilter.Retainers),
+        ]);
 
         // 0.741 (user report): the last reading of the bags while a change is being read, so that counts do not fall to 0 for a moment.
         var live = inventory.Shown;
@@ -284,15 +280,12 @@ internal sealed partial class MainWindow
         var openUsedIn = recipeTabsItem != itemId && producedBy.Count == 0 && usedIn.Count > 0;
         var openProduced = recipeTabsItem != itemId && !openUsedIn;
         recipeTabsItem = itemId;
-        if (!ImGui.BeginTabBar("RecipeDirections")) return;
-        try
-        {
-            if (ImGui.BeginTabItem($"{localization.Get("RecipeUi.ProducedBy")} ({producedBy.Count})###RecipeProduced", openProduced ? ImGuiTabItemFlags.SetSelected : ImGuiTabItemFlags.None))
-            { try { DrawRecipeSection(localization.Get("RecipeUi.ProducedBy"), producedBy, catalog.Source, false, false); } finally { ImGui.EndTabItem(); } }
-            if (ImGui.BeginTabItem($"{localization.Get("RecipeUi.UsedIn")} ({usedIn.Count})###RecipeUsedIn", openUsedIn ? ImGuiTabItemFlags.SetSelected : ImGuiTabItemFlags.None))
-            { try { DrawRecipeSection(localization.Get("RecipeUi.UsedIn"), usedIn, catalog.Source, true, false); } finally { ImGui.EndTabItem(); } }
-        }
-        finally { ImGui.EndTabBar(); }
+        // X-605 (0.1701): the two directions arranged with the mouse too (OrderedTabs).
+        OrderedTabs("RecipeDirections",
+        [
+            new("Produced", $"{localization.Get("RecipeUi.ProducedBy")} ({producedBy.Count})", () => DrawRecipeSection(localization.Get("RecipeUi.ProducedBy"), producedBy, catalog.Source, false, false), openProduced),
+            new("UsedIn", $"{localization.Get("RecipeUi.UsedIn")} ({usedIn.Count})", () => DrawRecipeSection(localization.Get("RecipeUi.UsedIn"), usedIn, catalog.Source, true, false), openUsedIn),
+        ]);
     }
 
     // 0.329: the history keeps the last CraftHistoryLimit items (every item click in the plugin lands here); the breadcrumb shows
@@ -552,7 +545,8 @@ internal sealed partial class MainWindow
                                 if (ImGui.Selectable($"{result?.Name ?? recipe.ResultItemId.ToString()}##Recipe", craftBookRecipe == recipe.RecipeId,
                                         ImGuiSelectableFlags.None, new Vector2(0, 30)) || clickedIcon)
                                     craftBookRecipe = recipe.RecipeId;
-                                if (ImGui.IsItemHovered()) WrappedTooltip(localization.Format("RecipeUi.JobLevel",recipe.CraftType,recipe.Level));
+                                // X-684 (0.1692): the one recipe tooltip (before: the crafter and the level only).
+                                if (ImGui.IsItemHovered()) DrawRecipeTooltip(RecipeTipOf(recipe));
                             }
                             finally { ImGui.PopID(); }
                         }
@@ -720,12 +714,7 @@ internal sealed partial class MainWindow
         searchResults = catalog.Search(itemQuery, searchedLimit);
     }
 
-    private void StorageTab(string label, StorageFilter filter)
-    {
-        if (!ImGui.BeginTabItem(label)) return;
-        try { storageFilter = filter; }
-        finally { ImGui.EndTabItem(); }
-    }
+    private OrderedTab StorageTab(string label, StorageFilter filter) => new(filter.ToString(), label, () => storageFilter = filter);
 
     private void DrawHoldingsSummary(ItemHoldingsSummary summary)
     {

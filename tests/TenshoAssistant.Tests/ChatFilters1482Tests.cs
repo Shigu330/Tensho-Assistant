@@ -82,7 +82,7 @@ internal static class ChatFilters1482Tests
         }),
         ("Chat filters 1482: wiring (reader, plugin, window); a change of filters builds the tab again", () =>
         {
-            Check(Read("src/TenshoAssistant/Chat/ChatReader.Dalamud.cs").Contains("(byte)message.SourceKind,sender,ownName?.Invoke());", StringComparison.Ordinal) && Read("src/TenshoAssistant/Chat/ChatReader.Dalamud.cs").Contains("current.BoundedMaxLines,source,(byte)message.TargetKind);", StringComparison.Ordinal), "the reader keeps who and to whom");
+            Check(Read("src/TenshoAssistant/Chat/ChatReader.Dalamud.cs").Contains("(byte)message.SourceKind,sender,ownName?.Invoke());", StringComparison.Ordinal) && Read("src/TenshoAssistant/Chat/ChatReader.Dalamud.cs").Contains("current.BoundedMaxLines,source,(byte)message.TargetKind,job);", StringComparison.Ordinal), "the reader keeps who and to whom");
             Check(Read("src/TenshoAssistant/Plugin.cs").Contains("data.GetExcelSheet<Lumina.Excel.Sheets.LogFilter>()", StringComparison.Ordinal), "the game's sheet, client language");
             var window = Read("src/TenshoAssistant/MainWindow.ChatWindow.cs");
             Check(window.Contains("Refresh(ChatMessages,tab,options.BoundedMaxLines,table,options)", StringComparison.Ordinal), "views refreshed with the filters");

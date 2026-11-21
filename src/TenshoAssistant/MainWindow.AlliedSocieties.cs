@@ -19,7 +19,6 @@ internal sealed partial class MainWindow
 
     private void DrawAlliedSocieties()
     {
-        Heading(localization.Get("Allied.Title"),localization.Get("Allied.Subtitle"));
         if(!alliedTried && alliedLoad is null && AlliedCatalogLoad is { } load)alliedLoad=Task.Run(load);
         if(alliedLoad is { IsCompleted:true } loaded)
         {

@@ -27,29 +27,28 @@ internal sealed partial class MainWindow
     {
         // 0.400 (user report « framing »): wide enough for every tab name (8 since 0.401), at most 90 % of the screen; when the screen is
         // narrower the tabs scroll with arrows instead of being cut.
+        // X-605 (0.1701): the tabs arranged with the mouse (OrderedTabs); the width counts the same tabs (one list).
         var style=ImGui.GetStyle();
-        var tabs=new[]{"MapLocal.Favorites","MapLocal.Quests","MapLocal.Fates","MapLocal.Gathering","MapLocal.Aetherytes","MapLocal.Vendors","MapLocal.TripleTriad","MapLocal.Currents","VistaLog.Tab"};
-        var needed=tabs.Sum(key=>ImGui.CalcTextSize(localization.Get(key)).X+style.FramePadding.X*2+style.ItemInnerSpacing.X)+style.WindowPadding.X*2+8;
+        OrderedTab[] tabs=
+        [
+            new("Favorites",localization.Get("MapLocal.Favorites"),()=>DrawLocalFavorites(map)),
+            new("Quests",localization.Get("MapLocal.Quests"),()=>DrawLocalQuests(map)),
+            new("Fates",localization.Get("MapLocal.Fates"),()=>DrawLocalFates(map,live)),
+            new("Gathering",localization.Get("MapLocal.Gathering"),()=>DrawLocalGathering(map)),
+            new("Aetherytes",localization.Get("MapLocal.Aetherytes"),()=>DrawLocalAetherytes(map)),
+            new("Vendors",localization.Get("MapLocal.Vendors"),()=>DrawLocalVendors(map)),
+            new("TripleTriad",localization.Get("MapLocal.TripleTriad"),()=>DrawLocalTriad(map)),
+            new("Currents",localization.Get("MapLocal.Currents"),()=>DrawLocalCollectibles(map,live,MapLocalKind.AetherCurrent)),
+            // 0.361 (g, C-11): the whole sightseeing log, every zone. 0.401 (user report): the zone-only « Sightseeing » tab is gone, this
+            // log covers it.
+            new("Vistas",localization.Get("VistaLog.Tab"),()=>DrawVistaLog(live)),
+        ];
+        var needed=tabs.Sum(tab=>ImGui.CalcTextSize(tab.Label).X+style.FramePadding.X*2+style.ItemInnerSpacing.X)+style.WindowPadding.X*2+8;
         var width=Math.Clamp(needed,640,Math.Max(640,ImGui.GetMainViewport().WorkSize.X*0.9f));
         var open=ImGui.BeginChild("MapLocalLists",new Vector2(width,360),true);
         try
         {
-            if(!open || !ImGui.BeginTabBar("MapLocalTabs",ImGuiTabBarFlags.FittingPolicyScroll))return;
-            try
-            {
-                if(ImGui.BeginTabItem(localization.Get("MapLocal.Favorites"))){try{DrawLocalFavorites(map);}finally{ImGui.EndTabItem();}}
-                if(ImGui.BeginTabItem(localization.Get("MapLocal.Quests"))){try{DrawLocalQuests(map);}finally{ImGui.EndTabItem();}}
-                if(ImGui.BeginTabItem(localization.Get("MapLocal.Fates"))){try{DrawLocalFates(map,live);}finally{ImGui.EndTabItem();}}
-                if(ImGui.BeginTabItem(localization.Get("MapLocal.Gathering"))){try{DrawLocalGathering(map);}finally{ImGui.EndTabItem();}}
-                if(ImGui.BeginTabItem(localization.Get("MapLocal.Aetherytes"))){try{DrawLocalAetherytes(map);}finally{ImGui.EndTabItem();}}
-                if(ImGui.BeginTabItem(localization.Get("MapLocal.Vendors"))){try{DrawLocalVendors(map);}finally{ImGui.EndTabItem();}}
-                if(ImGui.BeginTabItem(localization.Get("MapLocal.TripleTriad"))){try{DrawLocalTriad(map);}finally{ImGui.EndTabItem();}}
-                if(ImGui.BeginTabItem(localization.Get("MapLocal.Currents"))){try{DrawLocalCollectibles(map,live,MapLocalKind.AetherCurrent);}finally{ImGui.EndTabItem();}}
-                // 0.361 (g, C-11): the whole sightseeing log, every zone. 0.401 (user report): the zone-only « Sightseeing » tab is gone, this
-                // log covers it.
-                if(ImGui.BeginTabItem(localization.Get("VistaLog.Tab"))){try{DrawVistaLog(live);}finally{ImGui.EndTabItem();}}
-            }
-            finally{ImGui.EndTabBar();}
+            if(open)OrderedTabs("MapLocalTabs",tabs,ImGuiTabBarFlags.FittingPolicyScroll);
         }
         finally{ImGui.EndChild();}
     }
@@ -127,7 +126,10 @@ internal sealed partial class MainWindow
             DrawSmallGameIcon(fate.Icon);
             if(ImGui.Selectable($"{FateLabel(fate)}##Fate{fate.Id}"))FlagAt(map,fate.Position);
             PlaceMenu($"FatePlace{fate.Id}",map,CoordinateOf(map,fate.Position),FateLabel(fate));
-            if(ImGui.IsItemHovered())WrappedTooltip(CoordinateText(map,fate.Position)+"\n"+localization.Get("MapLocal.ClickFlag"));
+            // X-684 (0.1676): the one FATE tooltip (its state now), the click's effect under it.
+            if(ImGui.IsItemHovered())DrawFateTooltip(Fields.FateTips.Build(fate.Name,fate.Icon,fate.Level,localization.Get("FieldContent.KindFate"),$"{map.Zone} · {CoordinateText(map,fate.Position)}",
+                localization.Format("MapLocal.FateTipProgress",fate.Progress)+(fate.SecondsLeft>0 ? localization.Format("MapLocal.FateTime",fate.SecondsLeft/60,(fate.SecondsLeft%60).ToString("00")):"")
+                +(fate.HasBonus ? localization.Get("MapLocal.FateBonus"):""),null,0),localization.Get("MapLocal.ClickFlag"));
         }
     }
     private string FateLabel(MapFateMarker fate)
@@ -144,7 +146,6 @@ internal sealed partial class MainWindow
             mapLocalGatheringCache=(map.MapId,catalog,index,MapLocalLists.Gathering(catalog.Sources,index,map.MapId));
         var groups=mapLocalGatheringCache.Groups;
         if(groups.Count==0){ImGui.TextDisabled(localization.Get("MapLocal.Empty"));return;}
-        var items=itemCatalog.State.Catalog;
         DrawSplitView("Gathering",groups,ref mapLocalGatheringType,point=>
         {
             var label=$"{localization.Format("MapLocal.Level",point.Level)}  {point.Place}{(point.Hidden ? " "+localization.Get("MapLocal.Hidden"):"")}";
@@ -160,7 +161,8 @@ internal sealed partial class MainWindow
             {
                 ImGui.TextDisabled(label);
                 GatheringToolMenu($"GatheringTool{point.BaseId}",point.Items);
-                if(ImGui.IsItemHovered())WrappedTooltip(string.Join(", ",point.Items.Select(id=>items?.Find(id)?.Name ?? $"#{id}"))+"\n"+localization.Get("MapLocal.NoPosition"));
+                // X-684 (0.1694): the one gathering tooltip (before: the item names alone), saying that the game gives no position.
+                if(ImGui.IsItemHovered())DrawGatheringTooltip(point);
             }
         });
     }
@@ -263,7 +265,7 @@ internal sealed partial class MainWindow
             DrawSmallGameIcon(VendorMarker(vendorMarkers,MapProjection.PixelFromWorld(new Vector3(spot.WorldX,0,spot.WorldZ),map),VendorIconOf(vendor))?.Icon ?? VendorIconOf(vendor));
             if(ImGui.Selectable($"{name}  ({MapProjection.CoordinateText(new(spot.X,spot.Y))})##Vendor{vendor.NpcId}/{spot.X}/{spot.Y}")){PlaceFlagFromMapView(map,spot.X,spot.Y);ImGui.CloseCurrentPopup();}
             NpcMenu($"VendorTool{vendor.NpcId}/{spot.X}/{spot.Y}",name,vendor.NpcId,vendor.Locations);
-            if(ImGui.IsItemHovered())WrappedTooltip(VendorLabel(vendor)+"\n"+localization.Get("MapLocal.ClickFlag")+"\n"+localization.Get("MapLocal.RightClickTool"));
+            if(ImGui.IsItemHovered())DrawNpcTooltip(VendorTipFacts(vendor),localization.Get("MapLocal.ClickFlag")+"\n"+localization.Get("MapLocal.RightClickTool"));
         }
     }
 
@@ -289,10 +291,8 @@ internal sealed partial class MainWindow
             try{if(ImGui.Selectable($"{mark}  {npc.Name}  ({MapProjection.CoordinateText(new(npc.X,npc.Y))}){lacking}##LocalTriad{npc.MatchId}")){PlaceFlagFromMapView(map,npc.X,npc.Y);ImGui.CloseCurrentPopup();}}
             finally{ImGui.PopStyleColor();}
             NpcMenu($"TriadTool{npc.MatchId}",npc.Name,0,[new(map.TerritoryId,map.MapId,map.Zone,npc.X,npc.Y,0,0,0)],("MapLocal.OpenTriadTool",()=>OpenTriadTab("Npcs")));
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("TriadNpcs.Tooltip",npc.Fee,npc.RewardCards.Count==0 ? "—"
-                :string.Join(", ",npc.RewardCards.Select(id=>entries.TryGetValue(id,out var entry) ? entry.Name:id.ToString())))
-                +"\n"+localization.Get("TriadNpcs.Beaten")+" : "+localization.Get(beaten==true ? "TriadNpcs.Yes":beaten==false ? "TriadNpcs.No":"TriadNpcs.Unknown")
-                +TriadQuestLines(npc,questsDone)+"\n"+localization.Get("MapLocal.ClickFlag")+"\n"+localization.Get("MapLocal.RightClickTool"));
+            if(ImGui.IsItemHovered())DrawNpcTooltip(TriadTipFacts(npc,beaten,missing.Count,questsDone,id=>entries.TryGetValue(id,out var entry) ? entry.Name:id.ToString()),
+                localization.Get("MapLocal.ClickFlag")+"\n"+localization.Get("MapLocal.RightClickTool"));
         }
     }
 
@@ -327,7 +327,8 @@ internal sealed partial class MainWindow
                         ImGui.CloseCurrentPopup();
                     }
                     if(known)PlaceMenu("FavoritePlace",here ? map:target!,new(point.X,point.Y),name);
-                    if(point.Note is { } note && ImGui.IsItemHovered())WrappedTooltip(note);
+                    // X-684 (0.1672): the one place tooltip, the note under it.
+                    if(ImGui.IsItemHovered()){if(known)DrawPlaceTooltip(here ? map:target!,new Vector2(point.X,point.Y),name,point.Note);else if(point.Note is { } note)WrappedTooltip(note);}
                 }
                 finally{ImGui.PopID();}
             }

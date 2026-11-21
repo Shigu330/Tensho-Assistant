@@ -17,16 +17,22 @@ public static class ChatHideWants
     /// (0.1509): in the frame, a game chat window that is not shown holds first (InFrame): never shown again over a hidden chat, given back as
     /// soon as it shows again.</param>
     /// <param name="gameUiHidden">The game hides its interface (cutscene, GPose, interface hidden): the messages stay as they are.</param>
-    /// <param name="combatHidden">« Hide in combat » on and in combat: Tensho's window goes, the game's messages come back as the chat of the fight.</param>
-    public static ChatHideWant Of(bool wanted,bool competitive,bool gameUiHidden,bool combatHidden)=>Of(wanted,competitive,gameUiHidden,combatHidden,false);
-
-    /// <param name="coveredHidden">X-528 M1 (0.1507): a game window covers Tensho's chat window and « Under a game window » hides it: the game's
-    /// messages come back, drawn by the game under its own window, so the part it does not cover stays readable.</param>
-    public static ChatHideWant Of(bool wanted,bool competitive,bool gameUiHidden,bool combatHidden,bool coveredHidden)
+    /// <remarks>X-689 (0.1657, the user's report of 20/11: « each time, the official chat comes back »): while Tensho's chat replaces the game's,
+    /// Tensho's window hiding itself (« Hide in combat », in a duty, in a cutscene; a game window over it with « Under a game window » set to
+    /// « Hide »; faded) no longer gives the game's messages back, as 0.1506 and 0.1507 M1 did: they come back only when the option is off, Tensho's
+    /// window closed or failed, « both chats », in a competitive cut that gives the hand back to the game (R03.2, DEC-038), or at unload. The
+    /// journal of 20/11 22:58 showed why it mattered: the game's own item tooltip (ItemDetail), opened over Tensho's window, hid it and brought
+    /// the game's chat back, again and again (docs/evidence/0.1657-game-chat-stays-hidden.md).</remarks>
+    public static ChatHideWant Of(bool wanted,bool competitive,bool gameUiHidden)
         =>!wanted || competitive ? ChatHideWant.Release
             : gameUiHidden ? ChatHideWant.Hold
-            : combatHidden || coveredHidden ? ChatHideWant.Release
             : ChatHideWant.Hide;
+
+    /// <summary>X-696 M2 (review of 0.1658): since X-689 the game's messages stay hidden while Tensho's window hides, so « Hide in combat » or
+    /// « Hide in duties » with « Hide the game chat's messages » (not both chats) leaves no chat shown there: said under those settings, the
+    /// user's choice kept.</summary>
+    public static bool LeavesNoChat(bool hideGameMessages,bool bothChats,bool hideInCombat,bool hideInDuty)
+        =>hideGameMessages && !bothChats && (hideInCombat || hideInDuty);
 
     /// <summary>X-534 M2 (0.1509, review of 0.1507): the choice the hider applies in a frame, the one place where it is written. A competitive
     /// cut gives back (DEC-038), whatever Tensho wished; but while the game's chat window itself is not shown (cutscene, opening scene of a
@@ -51,7 +57,8 @@ public static class ChatHideWants
 /// <summary>
 /// X-467 (0.1504, D-181 of 16/11, DEC-053 completed): « Hide the game chat's messages », off by default. Only the messages (the four panels,
 /// ChatLogPanel_0 to _3) are hidden, never the game's typing box (ChatLog). What is hidden is given back as soon as it is no longer wanted
-/// (the option off, the Tensho chat window closed or not shown, « both chats », competitive content, Tensho unloaded). Pure: it decides which
+/// (the option off, the Tensho chat window closed, « both chats », competitive content, Tensho unloaded; X-689, 0.1657: no longer when Tensho's
+/// window hides itself). Pure: it decides which
 /// panels to hide and which to show again in a frame; the native side (GameChatHider) does it. It only ever shows again a panel it hid itself.
 /// </summary>
 public sealed class ChatGameHide

@@ -92,8 +92,9 @@ internal sealed partial class MainWindow
                                 ImGui.TextUnformatted((point?.Group is { } group ? $"[{group}] " : "") + (string.IsNullOrWhiteSpace(point?.Name) ? localization.Get("MapsUi.Unnamed") : point.Name));
                                 if (point is not null && ImGui.IsItemHovered())
                                 {
-                                    WrappedTooltip(valid ? $"{map!.Zone} · {map.Subzone}\nX {MapProjection.CoordinateNumber(point.X)} · Y {MapProjection.CoordinateNumber(point.Y)}" + (point.Note is { } note ? "\n" + note : "")
-                                        : localization.Get("MapsUi.MissingBookmark"));
+                                    // X-684 (0.1672): the one place tooltip (zone, region, coordinates, nearest aetheryte, weather), the note under it.
+                                    if (valid) DrawPlaceTooltip(map!, new Vector2(point.X, point.Y), string.IsNullOrWhiteSpace(point.Name) ? null : point.Name, point.Note);
+                                    else WrappedTooltip(localization.Get("MapsUi.MissingBookmark"));
                                 }
                             }
                             finally { ImGui.PopID(); }

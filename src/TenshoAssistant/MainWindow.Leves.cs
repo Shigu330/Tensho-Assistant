@@ -66,7 +66,6 @@ internal sealed partial class MainWindow
 
     private void DrawLeves()
     {
-        Heading(localization.Get("Leves.Title"),localization.Get("Leves.Description"));
         var all=LeveDefinitions?.Invoke() ?? [];
         var progress=LeveProgress?.Invoke();
         if(!ReferenceEquals(leveListsFor,all))

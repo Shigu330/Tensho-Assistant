@@ -82,7 +82,7 @@ internal static class ChatBench1580Tests
             var window = Read("MainWindow.ChatWindow.cs");
             var link = window[window.IndexOf("private void DrawChatLink(", StringComparison.Ordinal)..];
             link = link[..link.IndexOf("\n    }\n", StringComparison.Ordinal)];
-            Check(!link.Contains("TipText(localization.Format(") && link.Contains("TipText(()=>localization.Format(\"ChatWindow.MapLinkTip\",Place()));"), "built inside the hover");
+            Check(!link.Contains("TipText(localization.Format(") && link.Contains("if(ImGui.IsItemHovered())DrawPlaceTooltip(map,coordinate,"), "built inside the hover");
             Check(link.Contains("link.Hq ? \"ChatWindow.ItemLinkTipHq\":\"ChatWindow.ItemLinkTip\""), "HQ chosen by the link");
             foreach (var lang in new[] { "en", "fr" })
             {

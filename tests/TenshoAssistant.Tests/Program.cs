@@ -946,6 +946,8 @@ Console.WriteLine(ParallelTests.Line(run, groups));
 // Measure 7 (0.1201): the slowest tests are said in one line, before the count (which stays the last line: the scripts read it there).
 Console.WriteLine(SlowestTests.Line(run.Times, run.Whole));
 Console.WriteLine(ParallelTests.CountLine(run));
+// X-671: a test left behind, still running, might keep the process alive (a thread of its own not in the background): ended here.
+if (run.Hung) { Console.Out.Flush(); Console.Error.Flush(); Environment.Exit(1); }
 return run.Failed == 0 ? 0 : 1;
 
 static void Check(bool condition, string message)

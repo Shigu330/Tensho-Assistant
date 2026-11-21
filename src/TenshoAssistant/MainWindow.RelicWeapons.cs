@@ -28,7 +28,6 @@ internal sealed partial class MainWindow
     }
     private void DrawRelicWeapons()
     {
-        Heading(localization.Get("Relics.Title"),localization.Get("Relics.Subtitle"));
         // W-13 (0.716): every weapon of the sheet is looked at: off the frame.
         if(!relicCatalogTried && RelicCatalogLoad is { } load)
         {
@@ -135,7 +134,8 @@ internal sealed partial class MainWindow
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();ImGui.TextUnformatted(set.Name);
                 ImGui.TableNextColumn();ImGui.TextUnformatted(Name(pieces[0]));
-                if(ImGui.IsItemHovered())WrappedTooltip(string.Join("\n",pieces.Select(piece=>Name(piece)+" : "+(Held(piece)?.ToString("N0",Numbers) ?? "?"))));
+                // X-684 (0.1695): the common item tooltip of the piece named here, then every piece of the stage with how many are held (the same tooltip).
+                if(ImGui.IsItemHovered()){DrawItemInfoTooltip(pieces[0]);WrappedTooltip(string.Join("\n",pieces.Select(piece=>Name(piece)+" : "+(Held(piece)?.ToString("N0",Numbers) ?? "?"))));}
                 ImGui.TableNextColumn();
                 var (held,known)=RelicBoard.PiecesHeld(pieces,Held);
                 if(known==0)ImGui.TextDisabled("?");
@@ -178,7 +178,8 @@ internal sealed partial class MainWindow
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();ImGui.TextUnformatted((index+1).ToString());
                 ImGui.TableNextColumn();ImGui.TextUnformatted(Name(pieces[0]));
-                if(ImGui.IsItemHovered())WrappedTooltip(string.Join("\n",pieces.Select(piece=>Name(piece)+" : "+(Held(piece)?.ToString("N0",Numbers) ?? "?"))));
+                // X-684 (0.1695): the common item tooltip of the piece named here, then every piece of the stage with how many are held (the same tooltip).
+                if(ImGui.IsItemHovered()){DrawItemInfoTooltip(pieces[0]);WrappedTooltip(string.Join("\n",pieces.Select(piece=>Name(piece)+" : "+(Held(piece)?.ToString("N0",Numbers) ?? "?"))));}
                 ImGui.TableNextColumn();
                 var (held,known)=RelicBoard.PiecesHeld(pieces,Held);
                 if(known==0)ImGui.TextDisabled("?");

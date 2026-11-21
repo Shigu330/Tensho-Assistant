@@ -28,7 +28,7 @@ internal sealed partial class MainWindow
         var due=GardenJournal.Due(beds,now);
         if(due.Count==0)return;
         foreach(var (bed,state) in due)
-            ChatNotice?.Invoke(localization.Format(state==GardenState.Ripe ? "Garden.RipeNotice":"Garden.TendNotice",bed.Seed,bed.Place));
+            ChatNotice?.Invoke(localization.Format(GardenJournal.NoticeKey(state),bed.Seed,bed.Place));
         if(configuration.AlarmOptions.PlaySound)Alarms.AlarmService.PlaySound(configuration.AlarmOptions.Sound,log);
         SaveReminders();
     }
@@ -48,6 +48,8 @@ internal sealed partial class MainWindow
         var beds=GardenJournal.Detected(configuration.GardenBeds,place,known.Name,GardenSeeds.GrowHours(known.Seed),GardenSeeds.TendHours(known.Seed),DateTimeOffset.UtcNow,known.Seed.SeedId);
         if(beds is null){ChatNotice?.Invoke(localization.Get("Garden.Full"));return;}
         configuration.GardenBeds=beds;
+        // X-720 (0.1723, the probe): the planting as noted, in the developer's log.
+        if(developerMode)log.Information("Garden planting noted: {0}.",GardenJournal.Describe(beds[^1],DateTimeOffset.UtcNow,GardenGrowSource(beds[^1])));
         ChatNotice?.Invoke(localization.Format("Garden.DetectedNotice",known.Name,place));
         SaveReminders();
     }
@@ -55,9 +57,18 @@ internal sealed partial class MainWindow
     /// <summary>X-581 (0.1572): the game's state line of a bed (read when its menu opened): kept on that bed; « Ripe » then follows the game.</summary>
     internal void GardenExamined(string? zone,int patch,int bed,GardenGameState state,string? line)
     {
-        if(GardenJournal.Examined(configuration.GardenBeds,zone,patch,bed,state,DateTimeOffset.UtcNow,line) is null)return;
+        var now=DateTimeOffset.UtcNow;
+        if(GardenJournal.Examined(configuration.GardenBeds,zone,patch,bed,state,now,line) is not { } kept)return;
+        // X-720 (0.1723, the probe): the bed's planting, growing time and its source, expected harvest and the game's state, in the developer's log.
+        if(developerMode)log.Information("Garden bed state kept: {0}.",GardenJournal.Describe(kept,now,GardenGrowSource(kept)));
         SaveReminders();
     }
+
+    /// <summary>X-720 (0.1723): where a bed's growing time comes from, for the developer's log: the embedded data (Lotlab, not the game) when it
+    /// is the seed's, else typed or changed by hand.</summary>
+    private string GardenGrowSource(GardenBed bed)
+        =>bed.SeedId!=0 && (GardenSeedCatalog?.Invoke() ?? []).FirstOrDefault(row=>row.Seed.SeedId==bed.SeedId).Seed is { } seed && GardenSeeds.GrowHours(seed)==GardenJournal.ClampGrow(bed.GrowHours)
+            ? "embedded data, Lotlab, not the game":"typed or changed by hand";
 
     /// <summary>
     /// 0.616: tending or uprooting read from the chat. The line does not say which bed: with one bed noted here it is that one, with several nothing is guessed.
@@ -256,7 +267,8 @@ internal sealed partial class MainWindow
         var state=GardenJournal.State(bed,now);
         var ripe=GardenJournal.RipeAt(bed).ToLocalTime().ToString("g");
         var tend=GardenJournal.TendAt(bed) is { } due ? " · "+localization.Format(state==GardenState.ToTend ? "Garden.TendNow":"Garden.TendAt",due.ToLocalTime().ToString("g")):"";
-        return (state switch{GardenState.Ripe=>localization.Get("Garden.Ripe"),GardenState.Unknown=>localization.Get("Garden.StateUnknown"),_=>localization.Format("Garden.RipeAt",ripe)})+tend;
+        return (state switch{GardenState.Ripe=>localization.Get("Garden.Ripe"),GardenState.Unknown=>localization.Get("Garden.StateUnknown"),
+            GardenState.Expected=>localization.Format("Garden.Expected",ripe),_=>localization.Format("Garden.RipeAt",ripe)})+tend;
     }
 
     private void DrawBedButtons(GardenBed bed,DateTimeOffset now,ref bool changed,ref GardenBed? removed)

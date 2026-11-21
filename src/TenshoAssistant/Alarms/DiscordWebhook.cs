@@ -129,6 +129,7 @@ public static class DiscordWebhook
         if (alarm.AutoKey == "squadron:training") return "SquadronTraining";
         if (alarm.AutoKey.StartsWith("venture:", StringComparison.Ordinal)) return "Ventures";
         if (alarm.AutoKey.StartsWith("vessel:", StringComparison.Ordinal)) return "Voyages";
+        if (alarm.AutoKey.StartsWith("wheel:", StringComparison.Ordinal)) return "AetherialWheels";
         return "";
     }
     public static bool ReminderRowOn(DiscordSettings settings, TenshoAlarm alarm) => settings.ReminderRowsOff?.Contains(ReminderRowOf(alarm)) != true;

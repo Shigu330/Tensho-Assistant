@@ -46,8 +46,9 @@ public sealed record MapLiveState(uint TerritoryId,uint MapId,Vector3 Position,f
     public (uint Objective,uint Icon)? ActiveLeve { get; init; }
 }
 
-// Party member in the same territory as the player (not the player): job icon = 62100 + ClassJob row.
-public sealed record MapPartyMarker(string Name,uint Job,int Level,Vector3 Position);
+// Party member in the same territory as the player (not the player): job icon = 62100 + ClassJob row. X-684 (0.1690): its home world too,
+// for the player's tooltip (name and world, job and level, as in the chat).
+public sealed record MapPartyMarker(string Name,uint Job,int Level,Vector3 Position,ushort World=0);
 
 internal sealed class MapLiveReader : IDisposable
 {
@@ -103,6 +104,8 @@ internal sealed class MapLiveReader : IDisposable
     private readonly uint[] allCurrents;private readonly uint[] adventureRows;private int loggedVistas=-1,loggedNative=-1;private int logUnlock=-1,logUnlockEx=-1;
     private IReadOnlyList<MapFateMarker> fates=[];
     private readonly Dictionary<uint,int> gatheringLevels=[];
+    // X-516 (0.1711): the icon of each gathering point (GatheringPoint row) when present: its job and timing (GatheringNodeIcons).
+    private readonly Dictionary<uint,uint> gatheringIcons=[];
     // 0.621: where the player stands, as the game's map writes it. Names read again only when the place changes.
     private readonly IDataManager placeData;
     private uint areaId,subAreaId;private string areaName="",subAreaName="";
@@ -176,10 +179,20 @@ internal sealed class MapLiveReader : IDisposable
         catch(Exception error){log.Warning(error,"Aether current data unavailable; flight state stays unknown.");}
         try
         {
+            var transient=data.GetExcelSheet<GatheringPointTransient>();
             foreach(var point in data.GetExcelSheet<GatheringPoint>())
-                if(point.GatheringPointBase.RowId!=0 && point.GatheringPointBase.IsValid)gatheringLevels[point.RowId]=point.GatheringPointBase.Value.GatheringLevel;
+                if(point.GatheringPointBase.RowId!=0 && point.GatheringPointBase.IsValid)
+                {
+                    gatheringLevels[point.RowId]=point.GatheringPointBase.Value.GatheringLevel;
+                    // X-714 (0.1713): timed by the gathering catalogue's own rule (GatheringSchedule.FromTransient).
+                    var timed=transient.GetRowOrDefault(point.RowId) is { } timing
+                        && TenshoAssistant.Gathering.GatheringSchedule.FromTransient(point.Type,timing.GatheringRarePopTimeTable.RowId,timing.EphemeralStartTime,timing.EphemeralEndTime,
+                            timing.GatheringRarePopTimeTable.ValueNullable is { } rare ? RareSlots(rare):null).Timed;
+                    if(GatheringNodeIcons.For(point.GatheringPointBase.Value.GatheringType.RowId,timed) is var icon and not 0)gatheringIcons[point.RowId]=icon;
+                }
         }
         catch(Exception error){log.Warning(error,"Gathering point levels unavailable.");}
+        static (ushort,ushort)[] RareSlots(GatheringRarePopTimeTable rare)=>[.. Enumerable.Range(0,rare.StartTime.Count).Select(index=>(rare.StartTime[index],rare.Duration[index]))];
         try
         {
             foreach(var mark in data.GetExcelSheet<NotoriousMonster>())
@@ -419,7 +432,7 @@ internal sealed class MapLiveReader : IDisposable
             result.Add(new(kind.Value,item.Name.TextValue,item.Position,kind==MapObjectKind.Gathering ? gatheringLevels.GetValueOrDefault(item.BaseId)
                 :kind==MapObjectKind.HuntMark ? huntMarks.GetValueOrDefault(item.BaseId):0,
                 kind==MapObjectKind.HuntMark && item is Dalamud.Game.ClientState.Objects.Types.IBattleNpc mark ? mark.NameId:0,kind==MapObjectKind.HuntMark ? item.BaseId:0,
-                kind==MapObjectKind.IslandAnimal ? islandAnimals.GetValueOrDefault(item.BaseId):0));
+                kind==MapObjectKind.IslandAnimal ? islandAnimals.GetValueOrDefault(item.BaseId):kind==MapObjectKind.Gathering ? gatheringIcons.GetValueOrDefault(item.BaseId):0));
         }
         return result.AsReadOnly();
     }
@@ -459,7 +472,7 @@ internal sealed class MapLiveReader : IDisposable
         {
             if(member is null || member.EntityId==self || member.Territory.RowId!=client.TerritoryType || !float.IsFinite(member.Position.X))continue;
             // A member in view has an exact position; the party list's comes from the server, from time to time.
-            result.Add(new(member.Name.TextValue,member.ClassJob.RowId,member.Level,member.GameObject?.Position ?? member.Position));
+            result.Add(new(member.Name.TextValue,member.ClassJob.RowId,member.Level,member.GameObject?.Position ?? member.Position,(ushort)member.World.RowId));
             if(result.Count>=8)break;
         }
         return result.AsReadOnly();

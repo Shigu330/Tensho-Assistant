@@ -59,7 +59,7 @@ internal static class SettingsPaths1181Tests
         {
             var settings = Read("src/TenshoAssistant/MainWindow.Settings.cs");
             // X-449: the Data tab lists its categories; the sources are one of them.
-            Check(settings.Contains("SettingsTab(\"Data\");", StringComparison.Ordinal) && Read("src/TenshoAssistant/MainWindow.SettingsCategories.cs").Contains("new(\"Data\",\"Sources\",DrawSourceSettings)", StringComparison.Ordinal), "sources in the Data tab");
+            Check(settings.Contains("SettingsTab(\"Data\"),", StringComparison.Ordinal) && Read("src/TenshoAssistant/MainWindow.SettingsCategories.cs").Contains("new(\"Data\",\"Sources\",DrawSourceSettings)", StringComparison.Ordinal), "sources in the Data tab");
             Check(!Read("src/TenshoAssistant/Localization/Languages/en.json").Contains("Settings › Advanced › Community sources", StringComparison.Ordinal), "no community sources under Advanced");
         }),
     ];

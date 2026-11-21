@@ -22,7 +22,6 @@ internal sealed partial class MainWindow
 
     private void DrawHuntingLog()
     {
-        Heading(localization.Get("HuntingLog.Title"),localization.Get("HuntingLog.Description"));
         var entries=HuntEntries?.Invoke() ?? [];
         if(entries.Count==0){ImGui.TextDisabled(localization.Get("HuntingLog.NoData"));return;}
         var company=HuntGrandCompany?.Invoke();

@@ -2,7 +2,9 @@ namespace TenshoAssistant.Chat;
 
 /// <summary>X-479 (0.1468): the kinds of a message's payloads as the reader tells them apart.</summary>
 /// <remarks>X-474 (0.1477): Dalamud, a link of Dalamud or of a plugin (DalamudLinkPayload).</remarks>
-public enum ChatPayloadKind { Text,Item,Quest,Map,LinkEnd,Icon,Raw,Other,Dalamud }
+/// <remarks>X-473 (0.1715): Status, a status the game links (StatusPayload). X-473 (0.1720): Colour, a text colour of the game on (its key in
+/// Size) or off (Size 0) (UIForegroundPayload).</remarks>
+public enum ChatPayloadKind { Text,Item,Quest,Map,LinkEnd,Icon,Raw,Other,Dalamud,Status,Colour }
 
 /// <summary>
 /// X-479 (0.1468): one payload of a message, without Dalamud's types: what ChatReader.Dalamud makes of each of the game's payloads (an item,
@@ -17,21 +19,50 @@ public readonly record struct ChatPayload(ChatPayloadKind Kind,string Name,strin
 /// <summary>X-479 (0.1468): a message's payloads made into its pieces and into the developer-mode line (kinds and lengths, never the words). Pure.</summary>
 public static class ChatPayloads
 {
-    /// <summary>The pieces of a message, in order: a link's start (item, quest, map), its end (the game's link terminator), the texts; the other payloads are left out.</summary>
-    public static IEnumerable<ChatPiece> Pieces(IEnumerable<ChatPayload> payloads)
+    /// <summary>The pieces of a message, in order: a link's start (item, quest, map), its end (the game's link terminator), the texts; the other payloads are left out.
+    /// X-473 (0.1720): in a combat line (<paramref name="combat"/>), outside a link, a coloured text alone (<see cref="ColouredName"/>) is an
+    /// action's name (ChatSegmentKind.ActionName): the game links no action (docs/evidence/0.1720-chat-action-names.md).</summary>
+    public static IEnumerable<ChatPiece> Pieces(IEnumerable<ChatPayload> payloads,bool combat=false)
     {
-        foreach(var payload in payloads)
+        var list=payloads as IReadOnlyList<ChatPayload> ?? payloads.ToList();
+        var inLink=false;
+        for(var index=0;index<list.Count;index++)
+        {
+            var payload=list[index];
             switch(payload.Kind)
             {
-                case ChatPayloadKind.Item or ChatPayloadKind.Quest or ChatPayloadKind.Map or ChatPayloadKind.Dalamud when payload.Link is { } link:yield return new(null,link);break;
+                case ChatPayloadKind.Item or ChatPayloadKind.Quest or ChatPayloadKind.Map or ChatPayloadKind.Dalamud or ChatPayloadKind.Status when payload.Link is { } link:inLink=true;yield return new(null,link);break;
                 // X-635 (bench X-631, review of 0.1441, M1): a link whose target could not be read (MapLink null) ends a link still open: its
                 // text stays plain, never joined to the link before.
-                case ChatPayloadKind.Item or ChatPayloadKind.Quest or ChatPayloadKind.Map or ChatPayloadKind.Dalamud:yield return new(null,End:true);break;
-                case ChatPayloadKind.LinkEnd:yield return new(null,End:true);break;
+                case ChatPayloadKind.Item or ChatPayloadKind.Quest or ChatPayloadKind.Map or ChatPayloadKind.Dalamud or ChatPayloadKind.Status:inLink=false;yield return new(null,End:true);break;
+                case ChatPayloadKind.LinkEnd:inLink=false;yield return new(null,End:true);break;
                 case ChatPayloadKind.Text:yield return new(payload.Text);break;
                 // X-472 (0.1471): an icon of the game's font keeps its place, written readably (the world icon « @ »).
                 case ChatPayloadKind.Icon:yield return new(ChatGlyphs.Icon(payload.Icon));break;
+                case ChatPayloadKind.Colour when combat && !inLink && payload.Size!=0 && ColouredName(list,index) is { } coloured:
+                    yield return new(null,new ChatLink(ChatSegmentKind.ActionName,Action:coloured.Name));
+                    for(var at=index+1;at<coloured.End;at++)if(list[at].Kind==ChatPayloadKind.Text)yield return new(list[at].Text);
+                    yield return new(null,End:true);
+                    index=coloured.End;
+                    break;
             }
+        }
+    }
+
+    /// <summary>X-473 (0.1720): the coloured text that starts at <paramref name="start"/> (a colour on): its texts, a glow of the game around them
+    /// allowed, up to the colour off (its index); null when anything else comes first (an icon, a link, another colour) or the colour never
+    /// ends, or when it holds no letter.</summary>
+    public static (string Name,int End)? ColouredName(IReadOnlyList<ChatPayload> payloads,int start)
+    {
+        var name=new System.Text.StringBuilder();
+        for(var index=start+1;index<payloads.Count;index++)
+        {
+            var payload=payloads[index];
+            if(payload.Kind==ChatPayloadKind.Colour)return payload.Size==0 && name.ToString().Trim() is { Length:>0 } text && text.Any(char.IsLetter) ? (text,index):null;
+            if(payload.Kind==ChatPayloadKind.Text)name.Append(payload.Text);
+            else if(payload.Kind!=ChatPayloadKind.Other || payload.Name!="UIGlowPayload")return null;
+        }
+        return null;
     }
 
     /// <summary>X-472 (0.1471): the plain text of payloads (a sender's name): the texts, and each icon of the game's font written readably
@@ -40,13 +71,33 @@ public static class ChatPayloads
     public static string Text(IEnumerable<ChatPayload> payloads)
         =>string.Concat(payloads.Select(payload=>payload.Kind switch{ChatPayloadKind.Text=>payload.Text ?? "",ChatPayloadKind.Icon=>ChatGlyphs.SenderIcon(payload.Icon),_=>""}));
 
+    /// <summary>X-722 (0.1724, the probe): a sender's pieces for the developer's log, never a name: icons by number, the game's glyphs by code,
+    /// a word of two to four capitals as it is (a job's abbreviation), any other word by its length, a player's link said as such.</summary>
+    public static string DescribeSender(IEnumerable<ChatPayload> payloads)
+        =>string.Join(" | ",payloads.Select(payload=>payload.Kind switch
+        {
+            ChatPayloadKind.Icon=>"icon "+payload.Icon.ToString(System.Globalization.CultureInfo.InvariantCulture),
+            ChatPayloadKind.Text=>(payload.Name=="PlayerPayload" ? "player link: ":"text: ")+Masked(payload.Text),
+            _=>payload.Name,
+        }));
+
+    private static string Masked(string? text)=>string.Join(" ",(text ?? "").Split(' ').Select(word=>
+    {
+        var glyphs=0;
+        while(glyphs<word.Length && ChatGlyphs.IsGlyph(word[glyphs]))glyphs++;
+        var codes=string.Concat(word[..glyphs].Select(letter=>string.Create(System.Globalization.CultureInfo.InvariantCulture,$"U+{(int)letter:X4}")));
+        var rest=word[glyphs..];
+        var said=rest.Length==0 ? "":rest.Length is >= 2 and <= 4 && rest.All(char.IsUpper) ? "'"+rest+"'":string.Create(System.Globalization.CultureInfo.InvariantCulture,$"({rest.Length} letters)");
+        return codes+said;
+    }));
+
     /// <summary>X-525 M3 (0.1503): the icon codes in a sender's name, in order (codes only, never a letter of the name), with what the
     /// window does with each: « 88 kept », « 128 left out » (ChatGlyphs.IsSenderDecoration). Empty when the name has no icon.</summary>
     public static IReadOnlyList<string> SenderIcons(IEnumerable<ChatPayload> payloads)
         =>payloads.Where(payload=>payload.Kind==ChatPayloadKind.Icon).Select(payload=>$"{payload.Icon} {(ChatGlyphs.IsSenderDecoration(payload.Icon) ? "left out" : "kept")}").ToList();
 
     /// <summary>The segments the store keeps for these payloads (ChatPieces.Segments of their pieces).</summary>
-    public static IReadOnlyList<ChatSegment> Segments(IEnumerable<ChatPayload> payloads)=>ChatPieces.Segments(Pieces(payloads));
+    public static IReadOnlyList<ChatSegment> Segments(IEnumerable<ChatPayload> payloads,bool combat=false)=>ChatPieces.Segments(Pieces(payloads,combat));
 
     /// <summary>X-496 M1 (0.1478): the last payload of the link that starts at <paramref name="start"/>: its end (the link terminator, kept as
     /// Dalamud keeps it), or the message's last payload when the link is not closed. The payloads Dalamud passes to a link's handler.</summary>
@@ -67,7 +118,7 @@ public static class ChatPayloads
         {
             var payload=payloads[index];
             if(payload.Kind==ChatPayloadKind.LinkEnd)return (shown.ToString().Trim(),true);
-            if(payload.Kind is ChatPayloadKind.Item or ChatPayloadKind.Quest or ChatPayloadKind.Map or ChatPayloadKind.Dalamud)break;
+            if(payload.Kind is ChatPayloadKind.Item or ChatPayloadKind.Quest or ChatPayloadKind.Map or ChatPayloadKind.Dalamud or ChatPayloadKind.Status)break;
             if(payload.Kind==ChatPayloadKind.Text)shown.Append(ChatFormat.Clean(payload.Text));
         }
         return (shown.ToString().Trim(),false);
@@ -85,8 +136,8 @@ public static class ChatPayloads
         return closed ? null:"the place link has no end";
     }
 
-    /// <summary>Whether a message holds a link of the game (item, quest or map).</summary>
-    public static bool HasLink(IEnumerable<ChatPayload> payloads)=>payloads.Any(payload=>payload.Kind is ChatPayloadKind.Item or ChatPayloadKind.Quest or ChatPayloadKind.Map or ChatPayloadKind.Dalamud);
+    /// <summary>Whether a message holds a link of the game (item, quest, map, status) or of Dalamud.</summary>
+    public static bool HasLink(IEnumerable<ChatPayload> payloads)=>payloads.Any(payload=>payload.Kind is ChatPayloadKind.Item or ChatPayloadKind.Quest or ChatPayloadKind.Map or ChatPayloadKind.Dalamud or ChatPayloadKind.Status);
 
     /// <summary>The links of a body that show no text of their own (ChatPieces kept their place empty; the window writes the name of their target).</summary>
     public static int Bare(IReadOnlyList<ChatSegment> body)=>body.Count(segment=>segment.Text.Length==0 && segment.Link is not null);
@@ -100,6 +151,7 @@ public static class ChatPayloads
         ChatPayloadKind.Quest=>"Quest",
         ChatPayloadKind.Map=>"MapLink",
         ChatPayloadKind.Dalamud=>"DalamudLink",
+        ChatPayloadKind.Status=>$"Status {payload.Link?.StatusId ?? 0}",
         ChatPayloadKind.LinkEnd=>"LinkEnd",
         ChatPayloadKind.Text=>$"{payload.Name} ({payload.Text?.Length ?? 0} characters{(Glyph(payload.Text) ? ", game glyph":"")})",
         ChatPayloadKind.Raw=>$"Raw ({payload.Size} bytes)",

@@ -16,6 +16,10 @@ internal static class AfterError1551Tests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
     private static readonly DateTimeOffset At=DateTimeOffset.UtcNow.AddHours(-1);
+    // X-672 (0.1645): the writes are waited for on their own signal (the writer's queue done, the exchange no longer busy); this guard only
+    // stops a test that really hangs. A bound of 5 s failed A14 once in CI under load: the writer's tasks run on the thread pool, which a
+    // loaded machine starts seconds late.
+    private static readonly TimeSpan Guard=TimeSpan.FromMinutes(2);
 
     private static void InTemp(Action<string> run)
     {
@@ -43,7 +47,7 @@ internal static class AfterError1551Tests
     private static ExchangeMessage Run(GitHubExchange exchange,DiscoveryStore store)
     {
         Check(exchange.Exchange(store,true),"the exchange starts");
-        for(var wait=0;exchange.Busy && wait<1500;wait++)Thread.Sleep(10);
+        SpinWait.SpinUntil(()=>!exchange.Busy,Guard);
         Check(!exchange.Busy && exchange.Message is { Key:"ExchangeDone" },$"the exchange ends ({exchange.Message?.Key} {string.Join(", ",exchange.Message?.Args ?? [])})");
         return exchange.Message!;
     }
@@ -110,7 +114,7 @@ internal static class AfterError1551Tests
             Check(reader.SetAside is { } aside && aside==said && File.ReadAllText(aside)=="{ damaged" && !File.Exists(file),"the damaged file kept aside, whole");
             var writer=new BackgroundWriter((error,message)=>throw new Exception(message,error));
             BeastTeams.SaveLater(writer,file,new BeastTeams.SavedPlans([],[]));
-            Check(writer.Flush(TimeSpan.FromSeconds(5)) && BeastTeams.Read(File.ReadAllText(file)) is not null && File.ReadAllText(reader.SetAside!)=="{ damaged","the new file beside the one set aside");
+            Check(writer.Flush(Guard) && BeastTeams.Read(File.ReadAllText(file)) is not null && File.ReadAllText(reader.SetAside!)=="{ damaged","the new file beside the one set aside");
             var wiring=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Beastmaster.cs"));
             Check(wiring.Contains("if (!beastFile.MayWrite) return;",StringComparison.Ordinal) && wiring.Contains("if (!beastPlansLoaded || beastFile.Blocked)",StringComparison.Ordinal),"the window saves only once the file may be written");
         })),
@@ -126,13 +130,13 @@ internal static class AfterError1551Tests
             saves.Changed();
             store.DuringSave=()=>throw new IOException("disk full");
             writer.Enqueue("save",saves.Done(1,copy,saves.Stamp,()=>store.Save(1,copy)));
-            Check(writer.Flush(TimeSpan.FromSeconds(5)) && saves.Due && saves.Failed(1)==copy,"failed: still to save, its copy kept");
+            Check(writer.Flush(Guard) && saves.Due && saves.Failed(1)==copy,"failed: still to save, its copy kept");
             Check(store.Load(1,DateTimeOffset.UtcNow).Count==1,"the data file keeps its last whole save");
             // The character changes before any new gil change: the old code had marked the journal clean, the entry was lost.
             store.DuringSave=null;
             saves.Switch();
             foreach(var (id,kept) in saves.Again(2,false))writer.Enqueue("again",saves.Done(id,kept,null,()=>store.Save(id,kept)));
-            Check(writer.Flush(TimeSpan.FromSeconds(5)) && saves.FailedCount==0 && store.Load(1,DateTimeOffset.UtcNow).Count==2,"written again after the change of character");
+            Check(writer.Flush(Guard) && saves.FailedCount==0 && store.Load(1,DateTimeOffset.UtcNow).Count==2,"written again after the change of character");
         })),
         ("After error 1551: A14, acknowledged only once written; a change during the write stays to save; the failed copy is the journal given back",() =>
         {
@@ -141,24 +145,24 @@ internal static class AfterError1551Tests
             saves.Switch();saves.Changed();
             var stamp=saves.Stamp;
             var gate=new ManualResetEventSlim();
-            writer.Enqueue("save",saves.Done(1,[Gil(5,1,1)],stamp,()=>gate.Wait(5000)));
+            writer.Enqueue("save",saves.Done(1,[Gil(5,1,1)],stamp,()=>gate.Wait(Guard)));
             Check(saves.Due,"queued, not yet written: still to save");
             saves.Changed();
             gate.Set();
-            Check(writer.Flush(TimeSpan.FromSeconds(5)) && saves.Due,"a change during the write stays to save");
+            Check(writer.Flush(Guard) && saves.Due,"a change during the write stays to save");
             writer.Enqueue("save",saves.Done(1,[Gil(5,1,1),Gil(4,1,2)],saves.Stamp,()=>{}));
-            Check(writer.Flush(TimeSpan.FromSeconds(5)) && !saves.Due,"written whole: clean");
+            Check(writer.Flush(Guard) && !saves.Due,"written whole: clean");
             GilEntry[] lost=[Gil(3,7,9)];
             saves.Changed();
             writer.Enqueue("save",saves.Done(1,lost,saves.Stamp,()=>throw new IOException("held")));
-            writer.Flush(TimeSpan.FromSeconds(5));
+            Check(writer.Flush(Guard),"the failed write done");
             // A write of this character made before the switch and ending after it acknowledges nothing for the next character.
             var late=saves.Done(1,lost,saves.Stamp,()=>{});
             saves.Switch();
             Check(saves.Failed(1)==lost && saves.Again(1,true).Length==0 && saves.Again(1,false).Length==1,"the failed copy given back to its character; not written again while a newer copy goes");
             saves.Changed();
             writer.Enqueue("late",late);
-            Check(writer.Flush(TimeSpan.FromSeconds(5)) && saves.Due && saves.FailedCount==0,"a late write of the character before: written, nothing acknowledged for the next one");
+            Check(writer.Flush(Guard) && saves.Due && saves.FailedCount==0,"a late write of the character before: written, nothing acknowledged for the next one");
             var watcher=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Inventory/GilWatcher.Dalamud.cs"));
             Check(!watcher.Contains("dirty=false;",StringComparison.Ordinal) && watcher.Contains("pending.Done(id,copy,pending.Stamp,()=>store.Save(id,copy))",StringComparison.Ordinal)
                 && watcher.Contains("Saves.Changed();",StringComparison.Ordinal),"the watcher marks its journal written only through GilSaves");

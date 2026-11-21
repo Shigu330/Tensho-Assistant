@@ -188,36 +188,17 @@ internal sealed partial class MainWindow
             bankEntriesSource=bankSnapshot;bankEntriesCharacter=characterId;
         }
         var entries=bankEntriesView;
-        if (ImGui.BeginTabBar("BankOriginTabs"))
+        // X-605 (0.1701): the origins arranged with the mouse too (OrderedTabs); each storage's tab is known by its kind and number (not its
+        // place in the list, as before), so the order kept and the tab open follow it.
+        var origins = new List<OrderedTab>(entries.Length + 2)
         {
-            try
-            {
-                if (ImGui.BeginTabItem(localization.Get("BankUi.Global")))
-                {
-                    bankPersonalFilter = false;
-                    bankOriginFilter = null;
-                    ImGui.EndTabItem();
-                }
-                if (live && ImGui.BeginTabItem(localization.Get("BankUi.Character")))
-                {
-                    bankPersonalFilter = true;
-                    bankOriginFilter = null;
-                    ImGui.EndTabItem();
-                }
-                for (var index = 0; index < entries.Length; index++)
-                {
-                    var entry = entries[index];
-                    var label = BankEntryName(entry);
-                    if (ImGui.BeginTabItem($"{label}##BankOrigin{index}"))
-                    {
-                        bankPersonalFilter = false;
-                        bankOriginFilter = entry.Key;
-                        ImGui.EndTabItem();
-                    }
-                }
-            }
-            finally { ImGui.EndTabBar(); }
-        }
+            new("Global", localization.Get("BankUi.Global"), () => { bankPersonalFilter = false; bankOriginFilter = null; }),
+        };
+        if (live) origins.Add(new("Character", localization.Get("BankUi.Character"), () => { bankPersonalFilter = true; bankOriginFilter = null; }));
+        foreach (var entry in entries)
+            origins.Add(new(entry.Key.Kind + "." + entry.Key.StorageId.ToString(System.Globalization.CultureInfo.InvariantCulture), BankEntryName(entry),
+                () => { bankPersonalFilter = false; bankOriginFilter = entry.Key; }));
+        OrderedTabs("BankOriginTabs", origins);
         var selectedEntries = bankOriginFilter is { } origin
             ? entries.Where(entry => entry.Key == origin).ToArray()
             : entries;

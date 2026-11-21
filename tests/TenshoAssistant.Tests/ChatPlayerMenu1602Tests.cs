@@ -38,18 +38,25 @@ internal static class ChatPlayerMenu1602Tests
         }),
         ("Chat player menu 1602: the entries, greyed without the identifiers; the game's menu only in range; reply only where the mode is known",()=>
         {
-            Check(ChatPlayerMenu.Entries(null,ChatChannel.Say,true,true).Count==0,"no sender: no entry");
+            // X-679 (0.1660): no sender, every entry greyed with its reason (before: no entry at all, the user's report of 20/11).
+            Check(ChatPlayerMenu.Entries(null,ChatChannel.Say,true,true) is { Count:>0 } none && none.All(e=>!e.Enabled && e.Why==ChatPlayerWhy.NoSender),"no sender: every entry greyed, with why");
             var bare=new ChatSource("Aya Lune",73);
             var entries=ChatPlayerMenu.Entries(bare,ChatChannel.Say,false,true);
-            Check(entries.Single(e=>e.Action==ChatPlayerAction.Tell) is {Enabled:false,AddonRow:50} && entries.Single(e=>e.Action==ChatPlayerAction.Plate) is {Enabled:false,AddonRow:15083}
-                && entries.Single(e=>e.Action==ChatPlayerAction.Mute) is {Enabled:false,AddonRow:14833},"tell, plate, mute greyed without identifiers");
+            // X-681 (0.1660): the tell by name and home world, without the identifiers (before: greyed).
+            Check(entries.Single(e=>e.Action==ChatPlayerAction.Tell) is {Enabled:true,AddonRow:50} && entries.Single(e=>e.Action==ChatPlayerAction.Plate) is {Enabled:false,AddonRow:15083}
+                && entries.Single(e=>e.Action==ChatPlayerAction.Mute) is {Enabled:false,AddonRow:14833},"tell by name; plate, mute greyed without identifiers");
             Check(entries.Single(e=>e.Action==ChatPlayerAction.Reply) is {Enabled:true,AddonRow:368} && entries.Single(e=>e.Action==ChatPlayerAction.Invite) is {Enabled:true,AddonRow:54},"reply in say, invite");
             Check(entries.Single(e=>e.Action==ChatPlayerAction.Target) is {Enabled:false,AddonRow:8320} && entries.All(e=>e.Action!=ChatPlayerAction.GameMenu),"not in range: no target, no game menu");
             var known=bare with{ContentId=1001,AccountId=2001};
             var near=ChatPlayerMenu.Entries(known,ChatChannel.Ls1,true,false);
-            Check(near.All(e=>e.Enabled) && near.Any(e=>e.Action==ChatPlayerAction.GameMenu) && near.All(e=>e.Action is not (ChatPlayerAction.Reply or ChatPlayerAction.Invite)),"in range, known: all on; linkshell: no reply; cannot invite: none");
-            Check(ChatPlayerMenu.Entries(bare,ChatChannel.TellIn,false,false).Single(e=>e.Action==ChatPlayerAction.Reply).Enabled==false,"reply to a tell needs the identifiers");
-            Check(ChatPlayerMenu.ReplyChannel(ChatChannel.Say)==1 && ChatPlayerMenu.ReplyChannel(ChatChannel.Party)==2 && ChatPlayerMenu.ReplyChannel(ChatChannel.Alliance)==3 && ChatPlayerMenu.ReplyChannel(ChatChannel.FreeCompany) is null,"modes of FFXIVClientStructs' ChatChannel");
+            // X-680 (0.1662): the game's own entries are all listed, those its library cannot do greyed (GameOnly); a linkshell's reply is
+            // listed as the game offers it (before: no friend request, blacklist, report, nor linkshell reply). X-697 M3 (0.1665): the linkshell's
+            // reply is on (before: greyed, NoReplyMode).
+            Check(near.Where(e=>e.Why is not ChatPlayerWhy.GameOnly).All(e=>e.Enabled) && near.Any(e=>e.Action==ChatPlayerAction.GameMenu)
+                  && near.Single(e=>e.Action==ChatPlayerAction.Reply) is {Enabled:true,Why:ChatPlayerWhy.None} && near.All(e=>e.Action!=ChatPlayerAction.Invite),"in range, known: all on but what the game alone does; linkshell: reply on; cannot invite: none");
+            // X-681 (0.1660): the reply to a tell by name too (before: it needed the identifiers).
+            Check(ChatPlayerMenu.Entries(bare,ChatChannel.TellIn,false,false).Single(e=>e.Action==ChatPlayerAction.Reply).Enabled,"reply to a tell by name");
+            Check(ChatPlayerMenu.ReplyChannel(ChatChannel.Say)==1 && ChatPlayerMenu.ReplyChannel(ChatChannel.Party)==2 && ChatPlayerMenu.ReplyChannel(ChatChannel.Alliance)==3 && ChatPlayerMenu.ReplyChannel(ChatChannel.Emote) is null,"modes of FFXIVClientStructs' ChatChannel; none for emotes");
         }),
         ("Chat player menu 1602: identifiers in memory only; the hook calls the game first; each entry on the click, at the next tick, nothing automatic",()=>
         {

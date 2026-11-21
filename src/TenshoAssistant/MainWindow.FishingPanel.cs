@@ -83,14 +83,9 @@ internal sealed partial class MainWindow
             if(!now.Fishing)fishingSince=null;
             else fishingSince=FromCast(fishingSince,FishingCastAt?.Invoke());
             fishingBefore=now.Fishing;
-            var elapsed=fishingSince is { } since ? (int)(DateTimeOffset.UtcNow-since).TotalSeconds:(int?)null;
-            if(elapsed is { } seconds)
-            {
-                ImGui.TextColored(Accent,localization.Format("FishingPanel.Elapsed",seconds));
-                ImGui.SameLine();
-                if(ImGui.SmallButton(localization.Get("FishingPanel.Restart")))fishingSince=DateTimeOffset.UtcNow;
-                Tip("FishingPanel.RestartHelp");
-            }
+            // X-701 (0.1685): frozen at the bite read in the game, Chum said (MainWindow.FishingClock.cs, one way with ocean fishing).
+            var clock=ReadFishingClock(fishingSince);
+            if(clock is { } shownClock)DrawFishingClock(shownClock,ref fishingSince,"");
             // C28 (0.663): the time left of the intuition, from the character's status.
             if(FishingIntuitionLeft?.Invoke() is { } intuitionLeft)
                 ImGui.TextColored(Accent,localization.Format("FishingPanel.IntuitionLeft",(int)intuitionLeft/60,(int)intuitionLeft%60));
@@ -143,7 +138,8 @@ internal sealed partial class MainWindow
                                 // 0.398: green frame around the first bait when it is the one in hand.
                                 if(step==0 && inHand==row.Route[0])
                                     ImGui.GetWindowDrawList().AddRect(ImGui.GetItemRectMin()-new Vector2(1),ImGui.GetItemRectMax()+new Vector2(1),ImGui.GetColorU32(Success),3,ImDrawFlags.None,2);
-                                if(ImGui.IsItemHovered())WrappedTooltip((bait?.Name ?? row.Route[step].ToString())+(step==0 ? "":"\n"+localization.Get("FishingSources.Mooch"))+"\n"+localization.Get("FishingPanel.RightClick"));
+                                // X-684 (0.1669): the bait's icon carries the common item tooltip; only what it does not say is added under it.
+                                if(ImGui.IsItemHovered())WrappedTooltip((bait is null ? row.Route[step]+"\n":"")+(step==0 ? "":localization.Get("FishingSources.Mooch")+"\n")+localization.Get("FishingPanel.RightClick"));
                             }
                             if(row.Route.Count==0)ImGui.TextDisabled("?");
                             ImGui.TableNextColumn();
@@ -158,14 +154,7 @@ internal sealed partial class MainWindow
                             }
                             else ImGui.TextDisabled("—");
                             ImGui.TableNextColumn();
-                            if(bites?.Times?.GetValueOrDefault(row.FishId) is { } time)
-                            {
-                                var inside=elapsed is { } spent && spent>=time.Minimum && spent<=time.Maximum;
-                                var text=localization.Format("FishingPanel.BiteShort",time.Minimum,time.Maximum,time.Usual);
-                                // X-98 (0.958, user request): green while the bite time runs, red once the stopwatch has passed it.
-                        if(inside)ImGui.TextColored(Success,text);else if(elapsed is { } passed && passed>time.Maximum)ImGui.TextColored(Error,text);else ImGui.TextUnformatted(text);
-                                if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("FishingPanel.BiteTime",time.Minimum,time.Maximum,time.Usual)+"\n"+localization.Format("FishingPanel.BiteTimeHelp",time.Reports));
-                            }
+                            if(bites?.Times?.GetValueOrDefault(row.FishId) is { } time)DrawBiteTimeCell(time,clock);
                             else ImGui.TextDisabled(bites is { Loading:true } ? "…":"—");
                             if(withConditions)
                             {

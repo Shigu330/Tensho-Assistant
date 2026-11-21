@@ -15,7 +15,6 @@ internal sealed partial class MainWindow
 
     private void DrawNpcVendors()
     {
-        Heading(localization.Get("NpcUi.Title"),localization.Get("NpcUi.Subtitle"));
         if(TenshoAssistant.UI.UiComponents.Header(localization.Get("NpcUi.Choose")+"##Npc",itemId<=0 ? ImGuiTreeNodeFlags.DefaultOpen:ImGuiTreeNodeFlags.None))DrawItemSearch(160);
         if(npcVendors?.State is not { } state)return;
         if(state.Catalog is not { } catalog)
@@ -56,6 +55,8 @@ internal sealed partial class MainWindow
                     ImGui.Selectable(NpcName(offer.Vendor)+"##Offer",false,ImGuiSelectableFlags.SpanAllColumns);
                     var places=VendorLocations(offer.Vendor);
                     NpcMenu("NpcFlag",NpcName(offer.Vendor),offer.Vendor.NpcId,places);
+                    // X-684 (0.1689): the NPC's tooltip (its places, every shop), as on the map.
+                    if(ImGui.IsItemHovered())DrawNpcTooltip(VendorTipFacts(offer.Vendor));
                     ImGui.TableNextColumn();ImGui.TextUnformatted(places.Count==0 ? localization.Get("NpcUi.NoLocation")
                         :string.Join(" · ",places.Take(2).Select(NpcPlace))+(places.Count>2 ? localization.Format("HoverUi.More",places.Count-2):""));
                     ImGui.TableNextColumn();DrawNpcCosts(offer.Sale,18,true);
