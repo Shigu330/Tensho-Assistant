@@ -933,6 +933,8 @@ internal sealed partial class MainWindow
         changed|=AreaSetting("MapView.AreaEvents",settings.ShowEventAreas,value=>settings.ShowEventAreas=value,settings.EventAreaColor,value=>settings.EventAreaColor=value,MapDefaults.ShowEventAreas,MapDefaults.EventAreaColor);
         changed|=AreaSetting("MapView.AreaFates",settings.ShowFateAreas,value=>settings.ShowFateAreas=value,settings.FateAreaColor,value=>settings.FateAreaColor=value,MapDefaults.ShowFateAreas,MapDefaults.FateAreaColor);
         changed|=AreaSetting("MapView.AreaGathering",settings.ShowGatheringAreas,value=>settings.ShowGatheringAreas=value,settings.GatheringAreaColor,value=>settings.GatheringAreaColor=value,MapDefaults.ShowGatheringAreas,MapDefaults.GatheringAreaColor);
+        // X-516 (0.1711): the timed gathering points' areas, their own switch and colour.
+        changed|=AreaSetting("MapView.AreaGatheringTimed",settings.ShowTimedGatheringAreas,value=>settings.ShowTimedGatheringAreas=value,settings.TimedGatheringAreaColor,value=>settings.TimedGatheringAreaColor=value,MapDefaults.ShowTimedGatheringAreas,MapDefaults.TimedGatheringAreaColor);
         FinishMapSettings(changed);
     }
 
@@ -1077,7 +1079,13 @@ internal sealed partial class MainWindow
                 if(ImGui.Checkbox("##Visible",ref visible)){settings.SetSize(icon,scope,visible ? 1:0);changed=true;}
                 Tip("MapView.IconVisibleHelp");
                 ImGui.SameLine();
-                if(TenshoGlyph(icon) is { } glyph)
+                // X-516 (0.1711): the present gathering points' row is their legend: the botanist's icon, and the four icons and two colours on hover.
+                if(icon==GlyphNearbyGathering)
+                {
+                    DrawGameIcon(GatheringNodeIcons.Botanist,new Vector2(ImGui.GetFrameHeight()));
+                    if(ImGui.IsItemHovered())DrawNearbyGatheringLegend();
+                }
+                else if(TenshoGlyph(icon) is { } glyph)
                 {
                     // Same square as the game icons (0.212: the narrower glyph shifted the slider of these rows).
                     var square=ImGui.GetFrameHeight();
@@ -1416,10 +1424,12 @@ internal sealed partial class MainWindow
                 }
                 DrawArea(draw,origin+mapPan+MapProjection.PixelFromWorld(marker.Position,map)*mapZoom,marker.Radius*Math.Max(1,map.SizeFactor)/100f*mapZoom,quest ? settings.QuestAreaColor:marker.IsLeve ? settings.LeveAreaColor:settings.EventAreaColor);
             }
-            if(settings.ShowGatheringAreas)
+            // X-516 (0.1711): a timed point's area has its own switch and colour.
+            if(settings.ShowGatheringAreas || settings.ShowTimedGatheringAreas)
                 foreach(var point in gathering)
-                    if(point.Position is { Radius:>0 } area)
-                        DrawArea(draw,origin+mapPan+MapProjection.PixelFromWorld(new Vector3(area.X,0,area.Z),map)*mapZoom,area.Radius*Math.Max(1,map.SizeFactor)/100f*mapZoom,settings.GatheringAreaColor);
+                    if(point.Position is { Radius:>0 } area && (point.Timed ? settings.ShowTimedGatheringAreas:settings.ShowGatheringAreas))
+                        DrawArea(draw,origin+mapPan+MapProjection.PixelFromWorld(new Vector3(area.X,0,area.Z),map)*mapZoom,area.Radius*Math.Max(1,map.SizeFactor)/100f*mapZoom,
+                            GatheringNodeIcons.AreaColour(point.Timed,settings.GatheringAreaColor,settings.TimedGatheringAreaColor));
             // N-07 (0.667): the Island Sanctuary's resources; world coordinates, to compare with the game's map.
             IReadOnlyList<IslandPoint> islandPoints=map.TerritoryId==IslandResources.Territory ? (IslandPoints ?? []).Where(point=>settings.ShowsIslandKind(point.Kind)).ToArray():[];
             if(settings.ShowGatheringAreas)
@@ -1470,7 +1480,7 @@ internal sealed partial class MainWindow
             // 0.328 (map audit #7): hovering inside an area lists its icon only while that kind of area is drawn.
             foreach(var point in gathering)
                 if(point.Position is { } spot && point.Icon!=0)Add(point.Icon,1,MapProjection.PixelFromWorld(new Vector3(spot.X,0,spot.Z),map),GatheringLabelOf(point),point:point,
-                    worldRadius:settings.ShowGatheringAreas ? spot.Radius:0);
+                    worldRadius:(point.Timed ? settings.ShowTimedGatheringAreas:settings.ShowGatheringAreas) ? spot.Radius:0);
             // NPC vendors (0.139): the game's shop map icon (MapSymbol 60412, docs/evidence/0.139.0-symbols-probe.log), in the
             // same list, sizes and priorities as the game icons; click = flag.
             foreach(var vendor in vendorLayout.Lonely)Add(vendor.Icon,1,vendor.Pixel,vendor.Label,flag:vendor.Flag);
@@ -1584,13 +1594,20 @@ internal sealed partial class MainWindow
                         draw.AddImage(chest.Handle,at-new Vector2(half),at+new Vector2(half));
                         glyph=half*2;
                     }
-                    // 0.901 (X-83): an island animal with its own icon (MJIAnimals.Icon).
-                    else if(item.Kind==MapObjectKind.IslandAnimal && item.Icon!=0 && textures.TryGetFromGameIcon(new GameIconLookup(item.Icon),out var animalShared) && animalShared.TryGetWrap(out var animalImage,out _) && animalImage is not null)
+                    // 0.901 (X-83): an island animal with its own icon (MJIAnimals.Icon). X-516 (0.1711): a present gathering point too, its job's and
+                    // timing's game icon (GatheringNodeIcons), with Tensho's clock badge when timed (green: present, so open now).
+                    else if(item.Kind is MapObjectKind.IslandAnimal or MapObjectKind.Gathering && item.Icon!=0 && textures.TryGetFromGameIcon(new GameIconLookup(item.Icon),out var animalShared) && animalShared.TryGetWrap(out var animalImage,out _) && animalImage is not null)
                     {
                         var half=Math.Max(4,baseIcon*kindSize)/2;
                         draw.AddCircleFilled(at,half*1.05f,ImGui.GetColorU32(new Vector4(0,0,0,0.55f)),20);
                         draw.AddImage(animalImage.Handle,at-new Vector2(half),at+new Vector2(half));
                         glyph=half*2;
+                        if(item.Kind==MapObjectKind.Gathering && GatheringNodeIcons.Timed(item.Icon))
+                        {
+                            var badge=Math.Max(6,glyph*0.45f);var corner=at+new Vector2(glyph*0.2f,-glyph*0.6f);
+                            draw.AddCircleFilled(corner+new Vector2(badge/2),badge*0.62f,ImGui.GetColorU32(new Vector4(0,0,0,0.75f)),16);
+                            draw.AddText(UiBuilder.IconFont,badge,corner,ImGui.GetColorU32(UI.FfxivTheme.Success),FontAwesomeIcon.Clock.ToIconString());
+                        }
                     }
                     else
                     {
@@ -1602,7 +1619,7 @@ internal sealed partial class MainWindow
                         draw.AddCircleFilled(at,glyph*0.7f,ImGui.GetColorU32(new Vector4(0,0,0,0.55f)),20);
                         draw.AddText(UiBuilder.IconFont,glyph,at-new Vector2(glyph/2),ImGui.GetColorU32(colour),symbol);
                     }
-                    var label=item.Kind==MapObjectKind.Gathering && item.Level>0 ? localization.Format("MapView.GatheringLabel",item.Name,item.Level)
+                    var label=item.Kind==MapObjectKind.Gathering && item.Level>0 ? localization.Format(GatheringNodeIcons.Timed(item.Icon) ? "MapView.GatheringTimedLabel":"MapView.GatheringLabel",item.Name,item.Level)
                         :item.Kind==MapObjectKind.HuntMark ? localization.Format("MapView.HuntMarkLabel",item.Name,item.Level switch{3=>"S",2=>"A",_=>"B"})
                         :item.Kind==MapObjectKind.IslandAnimal ? IslandAnimalLabel(item):item.Name;
                     // X-684 (0.1673): a hunt mark is a monster: the one monster tooltip (its rank).
@@ -2134,6 +2151,26 @@ internal sealed partial class MainWindow
     // Keys of Tensho's own map layers in the icon size/priority tables (outside the game's icon id range).
     private const uint GlyphVista=MapViewSettings.VistaGlyph,GlyphCurrent=0xFFFF0002,GlyphNearbyGathering=0xFFFF0003,GlyphParty=0xFFFF0004,GlyphBookmark=0xFFFF0005,GlyphTreasureMap=0xFFFF0006,
         GlyphIslandAnimal=0xFFFF0007,GlyphMonster=MapViewSettings.MonsterGlyph;
+    /// <summary>X-516 (0.1711): the legend of the present gathering points: the four icons (GatheringNodeIcons) and the two area colours.</summary>
+    private void DrawNearbyGatheringLegend()
+    {
+        using(TooltipScope.Begin())
+        {
+            ImGui.TextColored(UI.FfxivTheme.Gold,localization.Get("MapView.NearbyGatheringLegend"));
+            var line=new Vector2(ImGui.GetTextLineHeight());
+            foreach(var (icon,job,timed) in new[]{(GatheringNodeIcons.Botanist,"GatheringPanel.Botanist",false),(GatheringNodeIcons.Miner,"GatheringPanel.Miner",false),
+                (GatheringNodeIcons.TimedBotanist,"GatheringPanel.Botanist",true),(GatheringNodeIcons.TimedMiner,"GatheringPanel.Miner",true)})
+            {
+                DrawGameIcon(icon,line);ImGui.SameLine();
+                ImGui.TextUnformatted(timed ? localization.Format("MapView.TimedNode",localization.Get(job)):localization.Get(job));
+            }
+            var settings=configuration.MapView;
+            ImGui.ColorButton("##LegendGatheringArea",settings.GatheringAreaColor with{W=1},ImGuiColorEditFlags.NoTooltip,line);ImGui.SameLine();
+            ImGui.TextUnformatted(localization.Get("MapView.AreaGathering"));
+            ImGui.ColorButton("##LegendTimedGatheringArea",settings.TimedGatheringAreaColor with{W=1},ImGuiColorEditFlags.NoTooltip,line);ImGui.SameLine();
+            ImGui.TextUnformatted(localization.Get("MapView.AreaGatheringTimed"));
+        }
+    }
     private static (FontAwesomeIcon Symbol,Vector4 Colour)? TenshoGlyph(uint icon)=>icon switch
     {
         GlyphVista=>(FontAwesomeIcon.Binoculars,new Vector4(0.98f,0.82f,0.30f,1)),

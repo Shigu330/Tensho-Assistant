@@ -327,6 +327,9 @@ public sealed class MapViewSettings
     public System.Numerics.Vector4 LeveAreaColor { get; set; } = new(0.15f,0.55f,0.20f,0.40f);
     public System.Numerics.Vector4 FateAreaColor { get; set; } = new(0.75f,0.45f,0.95f,0.25f);
     public System.Numerics.Vector4 GatheringAreaColor { get; set; } = new(0.55f,0.90f,0.55f,0.20f);
+    /// <summary>X-516 (0.1711, the user's request of 16/11): the areas of timed gathering points, their own switch and colour (pink: no other area uses it).</summary>
+    public bool ShowTimedGatheringAreas { get; set; } = true;
+    public System.Numerics.Vector4 TimedGatheringAreaColor { get; set; } = new(0.95f,0.40f,0.75f,0.28f);
     // 0.111: size of each game icon (key = icon id) on top of IconScale; 0 hides that icon, absent keeps 100 %.
     // 0.289 (user request): the user's tuned values become the defaults — party members at 50 %; aetherytes (60453, 60430, 60959)
     // drawn above other icons (+1), 60442 and the side-quest icon 71021 below (−1). Icon ids read from the user's saved settings.

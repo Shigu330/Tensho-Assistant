@@ -55,6 +55,7 @@
     <Compile Include="../../src/TenshoAssistant/Alarms/DiscordNotifier.cs" Link="Alarms/DiscordNotifier.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/MapCatalog.cs" Link="Maps/MapCatalog.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/MapFloors.cs" Link="Maps/MapFloors.cs" />
+    <Compile Include="../../src/TenshoAssistant/Maps/GatheringNodeIcons.cs" Link="Maps/GatheringNodeIcons.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/BuiltOnce.cs" Link="Maps/BuiltOnce.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/MapBookmarks.cs" Link="Maps/MapBookmarks.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/PendingPasteImport.cs" Link="Maps/PendingPasteImport.cs" />

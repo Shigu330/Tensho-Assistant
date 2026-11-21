@@ -534,7 +534,16 @@ if(Environment.GetEnvironmentVariable("PROBE_OCEANLIVE") is { Length:>0 })
 if(Environment.GetEnvironmentVariable("PROBE_GATHERTYPE") is { Length:>0 })
 {
     var bases=data.Excel.GetSheet<GatheringPointBase>().GroupBy(row=>row.GatheringType.RowId).ToDictionary(group=>group.Key,group=>group.Count());
-    foreach(var type in data.Excel.GetSheet<GatheringType>(Language.English))Console.WriteLine($"TYPE {type.RowId} '{type.Name.ExtractText()}' bases {bases.GetValueOrDefault(type.RowId)}");
+    // X-516 (0.1711): each type's map icons (IconMain, IconOff) and how many of its physical points are timed (GatheringPointTransient: a rare
+    // pop table, or an ephemeral window other than 65535), to choose the icons of the present resources on Tensho's map.
+    var transient=data.Excel.GetSheet<GatheringPointTransient>();
+    bool TimedPoint(GatheringPoint point)=>transient.GetRowOrDefault(point.RowId) is { } timing
+        && (timing.GatheringRarePopTimeTable.RowId!=0 || timing.EphemeralStartTime!=65535 && timing.EphemeralEndTime!=65535);
+    var points=data.Excel.GetSheet<GatheringPoint>().Where(point=>point.GatheringPointBase.RowId!=0 && point.GatheringPointBase.IsValid).ToArray();
+    foreach(var type in data.Excel.GetSheet<GatheringType>(Language.English))
+        Console.WriteLine($"TYPE {type.RowId} '{type.Name.ExtractText()}' bases {bases.GetValueOrDefault(type.RowId)} iconMain {type.IconMain} iconOff {type.IconOff}"
+            +$" points {points.Count(point=>point.GatheringPointBase.Value.GatheringType.RowId==type.RowId)} timed {points.Count(point=>point.GatheringPointBase.Value.GatheringType.RowId==type.RowId && TimedPoint(point))}"
+            +$" pointTypes {string.Join(",",points.Where(point=>point.GatheringPointBase.Value.GatheringType.RowId==type.RowId).GroupBy(point=>point.Type).OrderBy(group=>group.Key).Select(group=>$"{group.Key}:{group.Count()}/{group.Count(TimedPoint)}"))}");
     foreach(var job in data.Excel.GetSheet<ClassJob>(Language.English).Where(row=>row.RowId is 16 or 17 or 18))Console.WriteLine($"JOB {job.RowId} '{job.Name.ExtractText()}'");
     return;
 }

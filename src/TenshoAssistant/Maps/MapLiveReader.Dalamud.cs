@@ -104,6 +104,8 @@ internal sealed class MapLiveReader : IDisposable
     private readonly uint[] allCurrents;private readonly uint[] adventureRows;private int loggedVistas=-1,loggedNative=-1;private int logUnlock=-1,logUnlockEx=-1;
     private IReadOnlyList<MapFateMarker> fates=[];
     private readonly Dictionary<uint,int> gatheringLevels=[];
+    // X-516 (0.1711): the icon of each gathering point (GatheringPoint row) when present: its job and timing (GatheringNodeIcons).
+    private readonly Dictionary<uint,uint> gatheringIcons=[];
     // 0.621: where the player stands, as the game's map writes it. Names read again only when the place changes.
     private readonly IDataManager placeData;
     private uint areaId,subAreaId;private string areaName="",subAreaName="";
@@ -177,8 +179,15 @@ internal sealed class MapLiveReader : IDisposable
         catch(Exception error){log.Warning(error,"Aether current data unavailable; flight state stays unknown.");}
         try
         {
+            var transient=data.GetExcelSheet<GatheringPointTransient>();
             foreach(var point in data.GetExcelSheet<GatheringPoint>())
-                if(point.GatheringPointBase.RowId!=0 && point.GatheringPointBase.IsValid)gatheringLevels[point.RowId]=point.GatheringPointBase.Value.GatheringLevel;
+                if(point.GatheringPointBase.RowId!=0 && point.GatheringPointBase.IsValid)
+                {
+                    gatheringLevels[point.RowId]=point.GatheringPointBase.Value.GatheringLevel;
+                    var timed=transient.GetRowOrDefault(point.RowId) is { } timing
+                        && GatheringNodeIcons.TimedPoint(timing.GatheringRarePopTimeTable.RowId,timing.EphemeralStartTime,timing.EphemeralEndTime);
+                    if(GatheringNodeIcons.For(point.GatheringPointBase.Value.GatheringType.RowId,timed) is var icon and not 0)gatheringIcons[point.RowId]=icon;
+                }
         }
         catch(Exception error){log.Warning(error,"Gathering point levels unavailable.");}
         try
@@ -420,7 +429,7 @@ internal sealed class MapLiveReader : IDisposable
             result.Add(new(kind.Value,item.Name.TextValue,item.Position,kind==MapObjectKind.Gathering ? gatheringLevels.GetValueOrDefault(item.BaseId)
                 :kind==MapObjectKind.HuntMark ? huntMarks.GetValueOrDefault(item.BaseId):0,
                 kind==MapObjectKind.HuntMark && item is Dalamud.Game.ClientState.Objects.Types.IBattleNpc mark ? mark.NameId:0,kind==MapObjectKind.HuntMark ? item.BaseId:0,
-                kind==MapObjectKind.IslandAnimal ? islandAnimals.GetValueOrDefault(item.BaseId):0));
+                kind==MapObjectKind.IslandAnimal ? islandAnimals.GetValueOrDefault(item.BaseId):kind==MapObjectKind.Gathering ? gatheringIcons.GetValueOrDefault(item.BaseId):0));
         }
         return result.AsReadOnly();
     }
