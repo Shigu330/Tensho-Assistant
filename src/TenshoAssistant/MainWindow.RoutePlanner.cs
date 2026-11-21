@@ -41,6 +41,13 @@ internal sealed partial class MainWindow
     private int[] plannerMissingCounts=[];
     // X-200 (0.1703): the sector aimed at (0: none), for the way to unlock it.
     private uint plannerUnlockTarget;
+    // X-604 (0.1707): the item of the loot goal (0: none), the sectors chosen by hand (and their best order, kept while they do not change),
+    // and the fleet's search, as the airships'.
+    private uint submarineLootItem;
+    private readonly List<uint> submarineChosen=[];
+    private (string Key,(int Distance,int Seconds,SubmarineSector[] Order)? Route)? submarineChosenCache;
+    private readonly PlannerSearch<IReadOnlyList<(string Key,string Name,int Rank,int Speed,int Range,PlannedRoute? Route)>> submarineFleetSearch=new();
+    private IReadOnlyList<(string Key,string Name,int Rank,int Speed,int Range,PlannedRoute? Route)> submarineFleet=[];
 
     private void DrawSubmarineRoutes()
     {
@@ -62,9 +69,9 @@ internal sealed partial class MainWindow
         Tip("RoutePlanner.MapTip");
         DrawPlannerStats(VesselKind.Submarine);
         ImGui.SetNextItemWidth(220);
-        if(ImGui.BeginCombo(localization.Get("RoutePlanner.Goal")+"##PlannerGoal",localization.Get("RoutePlanner.Goal"+plannerGoal)))
+        if(ImGui.BeginCombo(localization.Get("RoutePlanner.Goal")+"##PlannerGoal",localization.Get(RouteGoalKey(plannerGoal))))
         {
-            try{foreach(var goal in Enum.GetValues<RouteGoal>())if(ImGui.Selectable(localization.Get("RoutePlanner.Goal"+goal),goal==plannerGoal))plannerGoal=goal;}
+            try{foreach(var goal in Enum.GetValues<RouteGoal>())if(ImGui.Selectable(localization.Get(RouteGoalKey(goal)),goal==plannerGoal))plannerGoal=goal;}
             finally{ImGui.EndCombo();}
         }
         Tip("RoutePlanner.GoalTip");
@@ -94,7 +101,8 @@ internal sealed partial class MainWindow
         // 0.331 (audit): manual input with several companies read: the sectors were read, a submarine (its company) is what is missing.
         if(configuration.RouteUnlockedOnly && unlockedList is null)
             ImGui.TextDisabled(localization.Get(house is null && configuration.SubmarineUnlocked is { Count:>1 } ? "RoutePlanner.UnlockedChoose":"RoutePlanner.UnlockedUnknown"));
-        DrawSubmarineUnlockTarget(catalog,unlockedList);
+        // X-604 (0.1707): the target of the loot and unlock goals (null: none for this goal).
+        var targets=DrawSubmarineTarget(catalog,unlockedList);
 
         // 0.335: market prices of the listed routes' loot, fetched on a click (32 items per click), for the current character and world.
         var world=market.State;var character=bankBridge.State.CharacterId;var prices=routePrices.State;
@@ -112,14 +120,14 @@ internal sealed partial class MainWindow
         if(plannerMarket)DrawRoutePriceFetch(world,character,prices);
 
         // New search when an input changed or a price list ended (submarineSearch.Again above); the running one is cancelled.
-        var key=$"{plannerMap}|{inputs.Rank}|{inputs.Speed}|{inputs.Range}|{plannerGoal}|{useUnlocked}|{house}|{unlockedList?.Count}|{plannerMarket}|{plannerBand}|{world.WorldId}";
+        var key=$"{plannerMap}|{inputs.Rank}|{inputs.Speed}|{inputs.Range}|{plannerGoal}|{useUnlocked}|{house}|{unlockedList?.Count}|{plannerMarket}|{plannerBand}|{world.WorldId}|{(targets is null ? "-":string.Join(",",targets))}";
         if(submarineSearch.Needs(key))
         {
             var (map,rank,speed,range,goal,band)=(plannerMap,inputs.Rank,inputs.Speed,inputs.Range,plannerGoal,plannerBand);
             var unlocked=unlockedList?.ToHashSet() ?? [];
             ISet<uint>? excluded=useUnlocked ? catalog.SectorsOf(map).Where(sector=>!sector.Start && !unlocked.Contains(sector.Id)).Select(sector=>sector.Id).ToHashSet():null;
             var values=BuildRouteValues(catalog,map,world.WorldId);plannerValues=values;
-            submarineSearch.Start(key,token=>VoyagePlanner.Plan(catalog.SectorsOf(map),rank,speed,range,goal,id=>SectorValue(catalog,values,band,id),25,token,excluded));
+            submarineSearch.Start(key,token=>VoyagePlanner.Plan(catalog.SectorsOf(map),rank,speed,range,goal,id=>SectorValue(catalog,values,band,id),25,token,excluded,targets));
         }
         if(submarineSearch.Take(out var found,out var failure))
         {
@@ -132,9 +140,12 @@ internal sealed partial class MainWindow
             plannerMissingCounts=plannerValues is { } counted ? plannerRoutes.Select(route=>RouteMissing(catalog,counted,route,plannerBand)).ToArray():[];
         }
         else if(failure is not null)log.Warning(failure,"Submarine routes could not be planned.");
+        // X-604 (0.1707): the sectors chosen by hand and the fleet, as the airships'.
+        DrawSubmarineChosen(catalog,inputs);
+        DrawSubmarineFleet(catalog,targets,useUnlocked);
         if(submarineSearch.Searching){ImGui.TextDisabled(localization.Get("RoutePlanner.Searching"));return;}
         if(plannerRoutes.Count==0){ImGui.TextDisabled(localization.Get("RoutePlanner.None"));return;}
-        if(!ImGui.BeginTable("PlannerRoutes",7,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH|ImGuiTableFlags.ScrollY,new Vector2(0,ImGui.GetContentRegionAvail().Y-ImGui.GetTextLineHeightWithSpacing()*2)))return;
+        if(!ImGui.BeginTable("PlannerRoutes",7,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH|ImGuiTableFlags.ScrollY,new Vector2(0,Math.Max(ImGui.GetTextLineHeightWithSpacing()*10,ImGui.GetContentRegionAvail().Y-ImGui.GetTextLineHeightWithSpacing()*2))))return;
         try
         {
             ImGui.TableSetupScrollFreeze(0,1);
@@ -160,6 +171,11 @@ internal sealed partial class MainWindow
                 ImGui.TableNextColumn();ImGui.TextUnformatted($"{(route.Exp).ToString("N0",Numbers)}");
                 // 0.315: open this route in Builds (range, voyage time, breakpoints, best builds) for the chosen submarine.
                 ImGui.TableNextColumn();
+                // X-604 (0.1707): this route into the sectors measured by hand, as the airships'.
+                if(ImGui.SmallButton(localization.Get("AirshipPlanner.Use")+$"##PlannerTake{index}")){submarineChosen.Clear();submarineChosen.AddRange(route.Sectors);}
+                Tip("AirshipPlanner.UseTip");
+                var takeHovered=ImGui.IsItemHovered();
+                ImGui.SameLine();
                 if(ImGui.SmallButton(localization.Get("RoutePlanner.ToBuild")+$"##ToBuild{index}"))
                 {
                     buildRoute=[..route.Sectors];buildSearchKey=null;freeCompanyTabRequest=2;
@@ -177,7 +193,7 @@ internal sealed partial class MainWindow
                     }
                 }
                 Tip("RoutePlanner.ToBuildTip");
-                if(rowHovered && !ImGui.IsItemHovered())DrawRouteLootTooltip(catalog,route,missingPrices);
+                if(rowHovered && !takeHovered && !ImGui.IsItemHovered())DrawRouteLootTooltip(catalog,route,missingPrices);
             }
         }
         finally{ImGui.EndTable();}
@@ -187,11 +203,117 @@ internal sealed partial class MainWindow
     }
 
     /// <summary>
+    /// X-604 (0.1707): the target of the loot and unlock goals for submarines, as the airships' (DrawAirshipTarget): the sectors the routes must
+    /// visit (null: no target for this goal; empty: none chosen yet, or none to visit, so no route).
+    /// </summary>
+    private IReadOnlyCollection<uint>? DrawSubmarineTarget(SubmarineCatalog catalog,IReadOnlyCollection<uint>? unlockedList)
+    {
+        if(plannerGoal==RouteGoal.Unlock)return DrawSubmarineUnlockTarget(catalog,unlockedList);
+        if(plannerGoal!=RouteGoal.Loot)return null;
+        var items=itemCatalog.State.Catalog;
+        string ItemName(uint id)=>items?.Find(id)?.Name ?? $"#{id}";
+        var map=catalog.SectorsOf(plannerMap).Select(sector=>sector.Id).ToArray();
+        submarineLootItem=DrawPlannerTarget("AirshipPlanner.LootItem","RoutePlanner.LootItemTip",submarineLootItem,ItemName(submarineLootItem),
+            PlannerTargets.LootItems(catalog.Loot,map).Select(id=>(id,ItemName(id))));
+        if(submarineLootItem==0){ImGui.TextDisabled(localization.Get("AirshipPlanner.LootChoose"));return [];}
+        var where=PlannerTargets.DropSectors(catalog.Loot,map,submarineLootItem);
+        ImGui.TextDisabled(localization.Format("AirshipPlanner.LootWhere",where.Count==0 ? "—":string.Join(", ",where.Select(id=>catalog.Sectors[id].Name))));
+        return where;
+    }
+
+    /// <summary>
+    /// X-604 (0.1707): the sectors chosen by hand (ticked in the list of this map's sectors, or a route taken), as the airships': best order,
+    /// distance against the range, duration, experience and value (the last search's values).
+    /// </summary>
+    private void DrawSubmarineChosen(SubmarineCatalog catalog,PlannerInputs inputs)
+    {
+        submarineChosen.RemoveAll(id=>!catalog.Sectors.TryGetValue(id,out var sector) || sector.Map!=plannerMap);
+        var start=catalog.SectorsOf(plannerMap).FirstOrDefault(sector=>sector.Start);
+        var key=$"{plannerMap}|{inputs.Speed}|{string.Join(",",submarineChosen)}";
+        if(submarineChosenCache?.Key!=key)
+            submarineChosenCache=(key,start is null || submarineChosen.Count==0 ? null:VoyagePlanner.BestOrder(start,[.. submarineChosen.Select(id=>catalog.Sectors[id])],inputs.Speed));
+        if(submarineChosenCache?.Route is not { } mine)ImGui.TextDisabled(localization.Get("RoutePlanner.ChooseHint"));
+        else
+        {
+            var values=plannerValues;
+            var value=values is null ? "—":mine.Order.Sum(sector=>SectorValue(catalog,values,plannerBand,sector.Id)).ToString("N0",Numbers);
+            ImGui.TextUnformatted(localization.Format("RoutePlanner.Chosen",string.Join(" › ",mine.Order.Select(sector=>sector.Name)),mine.Distance,inputs.Range,
+                HoursMinutes(TimeSpan.FromSeconds(mine.Seconds)),mine.Order.Sum(sector=>(long)sector.Exp).ToString("N0",Numbers),value));
+            if(mine.Distance>inputs.Range)ImGui.TextColored(UI.FfxivTheme.Gold,localization.Get("AirshipPlanner.OverRange"));
+            ImGui.SameLine();
+            if(ImGui.SmallButton(localization.Get("AirshipPlanner.Clear")+"##PlannerClear"))submarineChosen.Clear();
+            Tip("AirshipPlanner.ClearTip");
+        }
+        if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("RoutePlanner.Sectors")))return;
+        if(!TenshoAssistant.UI.UiComponents.BeginDataTable("PlannerSectors",4))return;
+        try
+        {
+            string[] labels=[.. new[]{"ColumnChoose","ColumnSector","ColumnRank","ColumnExp"}.Select(column=>localization.Get("AirshipSectors."+column))];
+            ImGui.TableSetupColumn(labels[0],ImGuiTableColumnFlags.WidthFixed);
+            foreach(var label in labels.Skip(1))ImGui.TableSetupColumn(label);
+            TenshoAssistant.UI.UiComponents.HeadersRow(labels,column=>column>=2);
+            foreach(var sector in catalog.SectorsOf(plannerMap).Where(sector=>!sector.Start))
+            {
+                ImGui.TableNextRow();
+                ImGui.TableNextColumn();DrawSectorChoice(submarineChosen,sector.Id,VoyagePlanner.MaxSectors);
+                ImGui.TableNextColumn();ImGui.TextUnformatted(sector.Name);
+                ImGui.TableNextColumn();TenshoAssistant.UI.UiComponents.NumberCell(sector.RankReq.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                ImGui.TableNextColumn();TenshoAssistant.UI.UiComponents.NumberCell(sector.Exp>0 ? sector.Exp.ToString("N0",Numbers):"—");
+            }
+        }
+        finally{ImGui.EndTable();}
+    }
+
+    /// <summary>
+    /// X-604 (0.1707): one line per submarine read in the workshop, its own best route on this map for the goal and target chosen above (its rank,
+    /// speed and range; its company's unlocked sectors when « Unlocked sectors only » is ticked), as the airships' fleet. Searched on a worker
+    /// only while the list is open. Proposed only: « Choose » fills the planner, nothing is sent to the game.
+    /// </summary>
+    private void DrawSubmarineFleet(SubmarineCatalog catalog,IReadOnlyCollection<uint>? targets,bool useUnlocked)
+    {
+        var shown=TenshoAssistant.UI.UiComponents.Header(localization.Get("RoutePlanner.Fleet"));
+        Tip("RoutePlanner.FleetTip");
+        if(!shown)return;
+        var subs=(configuration.Voyages ?? []).Where(vessel=>vessel.Kind==VesselKind.Submarine).ToArray();
+        if(subs.Length==0){ImGui.TextDisabled(localization.Get("RoutePlanner.FleetNone"));return;}
+        if(plannerValues is not { } values)return;
+        var (map,goal,band)=(plannerMap,plannerGoal,plannerBand);
+        ISet<uint>? Excluded(VoyageVessel sub)=>!useUnlocked || Voyages.UnlockedFor(configuration.SubmarineUnlocked,sub.HouseId) is not { } unlocked ? null
+            :catalog.SectorsOf(map).Where(sector=>!sector.Start && !unlocked.Contains(sector.Id)).Select(sector=>sector.Id).ToHashSet();
+        var ships=subs.Select(sub=>(Key:VesselKey(sub),sub.Name,sub.Rank,Speed:Math.Max(1,sub.Speed),Range:Math.Max(1,sub.Range),Excluded:Excluded(sub))).ToArray();
+        var key=$"{map}|{goal}|{band}|{System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(values)}|{(targets is null ? "-":string.Join(",",targets))}|"
+            +string.Join(";",ships.Select(ship=>$"{ship.Key},{ship.Rank},{ship.Speed},{ship.Range},{ship.Excluded?.Count}"));
+        if(submarineFleetSearch.Needs(key))
+            submarineFleetSearch.Start(key,token=>(IReadOnlyList<(string,string,int,int,int,PlannedRoute?)>)[.. ships.Select(ship=>(ship.Key,ship.Name,ship.Rank,ship.Speed,ship.Range,
+                VoyagePlanner.Plan(catalog.SectorsOf(map),ship.Rank,ship.Speed,ship.Range,goal,id=>SectorValue(catalog,values,band,id),1,token,ship.Excluded,targets).FirstOrDefault()))]);
+        if(submarineFleetSearch.Take(out var fleet,out var failure))submarineFleet=fleet;
+        else if(failure is not null)log.Warning(failure,"Submarine fleet routes could not be planned.");
+        if(submarineFleetSearch.Searching && submarineFleet.Count==0){ImGui.TextDisabled(localization.Get("RoutePlanner.Searching"));return;}
+        var index=0;
+        foreach(var (shipKey,name,shipRank,speed,range,route) in submarineFleet)
+        {
+            index++;
+            var head=localization.Format("AirshipPlanner.FleetShip",name,shipRank,speed,range);
+            if(route is null){ImGui.TextDisabled(head+" — "+localization.Get("AirshipPlanner.FleetNoRoute"));continue;}
+            var names=string.Join(" › ",route.Sectors.Select(id=>catalog.Sectors.TryGetValue(id,out var sector) ? sector.Name:id.ToString(System.Globalization.CultureInfo.InvariantCulture)));
+            ImGui.TextUnformatted(head+" — "+localization.Format("RoutePlanner.FleetRoute",names,route.Distance,range,HoursMinutes(TimeSpan.FromSeconds(route.Seconds)),
+                route.Value.ToString("N0",Numbers),route.ValuePerDay.ToString("N0",Numbers),route.Exp.ToString("N0",Numbers)));
+            ImGui.SameLine();
+            if(ImGui.SmallButton(localization.Get("AirshipPlanner.Use")+$"##PlannerFleetUse{index}"))
+            {
+                submarineInputs.VesselKey=shipKey;submarineInputs.Rank=shipRank;submarineInputs.Speed=speed;submarineInputs.Range=range;
+                submarineChosen.Clear();submarineChosen.AddRange(route.Sectors);
+            }
+            Tip("RoutePlanner.FleetUseTip");
+        }
+    }
+
+    /// <summary>
     /// X-200 (0.1703, the user's request of 12/11, as the airships' unlock goal): a sector of this map aimed at, and the sectors to explore
     /// first to unlock it (SubmarineUnlocks.Route: LuminaSupplemental's tree), from the last one already unlocked in the company's workshop
     /// when it was read; each step with the rank it asks (SubmarineExploration). Unknown, open from the start or already unlocked: said so.
     /// </summary>
-    private void DrawSubmarineUnlockTarget(SubmarineCatalog catalog,IReadOnlyCollection<uint>? unlockedList)
+    private IReadOnlyCollection<uint> DrawSubmarineUnlockTarget(SubmarineCatalog catalog,IReadOnlyCollection<uint>? unlockedList)
     {
         string Step(uint id)=>catalog.Sectors.TryGetValue(id,out var sector) ? localization.Format("RoutePlanner.UnlockStep",sector.Name,sector.RankReq):id.ToString(System.Globalization.CultureInfo.InvariantCulture);
         if(plannerUnlockTarget!=0 && (!catalog.Sectors.TryGetValue(plannerUnlockTarget,out var aimed) || aimed.Map!=plannerMap))plannerUnlockTarget=0;
@@ -207,11 +329,13 @@ internal sealed partial class MainWindow
             finally{ImGui.EndCombo();}
         }
         Tip("RoutePlanner.UnlockTargetTip");
-        if(plannerUnlockTarget==0)return;
+        if(plannerUnlockTarget==0){ImGui.TextDisabled(localization.Get("AirshipPlanner.UnlockChoose"));return [];}
         var (state,explore)=SubmarineUnlocks.Route(catalog.Sectors,catalog.Unlocks,plannerUnlockTarget,unlockedList);
-        if(state!=SubmarineUnlockState.Path){ImGui.TextDisabled(localization.Get("RoutePlanner.Unlock"+state));return;}
+        if(state!=SubmarineUnlockState.Path){ImGui.TextDisabled(localization.Get("RoutePlanner.Unlock"+state));return [];}
         ImGui.TextWrapped(localization.Format("RoutePlanner.UnlockPath",catalog.Sectors[plannerUnlockTarget].Name,string.Join(" › ",explore.Select(Step))));
         if(unlockedList is null)ImGui.TextDisabled(localization.Get("RoutePlanner.UnlockNotRead"));
+        // X-604 (0.1707): the routes listed go through the next sector to explore.
+        return PlannerTargets.UnlockVisit(state,explore);
     }
 
     private void DrawRoutePriceFetch(Market.MarketState world,ulong character,Market.PreparationPriceState prices)

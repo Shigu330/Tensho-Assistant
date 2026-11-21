@@ -22,6 +22,7 @@ internal sealed partial class MainWindow
     private readonly PlannerInputs submarineInputs=new(){Rank=1};
     private readonly PlannerInputs airshipInputs=new();
     private PlannerInputs Inputs(VesselKind kind)=>kind==VesselKind.Airship ? airshipInputs:submarineInputs;
+    private string plannerTargetSearch="";
 
     private void DrawRoutePlanner()
     {
@@ -85,6 +86,37 @@ internal sealed partial class MainWindow
         }
         return chosen;
     }
+
+    /// <summary>
+    /// X-604 (0.1707, from the airships' X-201): the target of the loot and unlock goals, for both kinds: a list with a search box, sorted by
+    /// name; the id chosen (0: none).
+    /// </summary>
+    private uint DrawPlannerTarget(string labelKey,string tipKey,uint chosen,string shown,IEnumerable<(uint Id,string Name)> rows)
+    {
+        ImGui.SetNextItemWidth(260);
+        if(ImGui.BeginCombo(localization.Get(labelKey)+"##PlannerTarget",chosen==0 ? "—":shown))
+        {
+            try
+            {
+                ImGui.SetNextItemWidth(220);ImGui.InputTextWithHint("##PlannerTargetSearch",localization.Get("AirshipPlanner.TargetSearch"),ref plannerTargetSearch,60);Tip("AirshipPlanner.TargetSearchTip");
+                var search=plannerTargetSearch.Trim();
+                foreach(var (id,name) in rows.Where(row=>search.Length==0 || SearchText.Contains(row.Name,search,StringComparison.CurrentCultureIgnoreCase))
+                            .OrderBy(row=>row.Name,StringComparer.CurrentCultureIgnoreCase))
+                    if(ImGui.Selectable($"{name}##PlannerTarget{id}",id==chosen))chosen=id;
+            }
+            finally{ImGui.EndCombo();}
+        }
+        Tip(tipKey);
+        return chosen;
+    }
+
+    // X-604 (0.1707): the goals both kinds share are named once (the airships' texts).
+    private static string RouteGoalKey(RouteGoal goal)=>goal switch
+    {
+        RouteGoal.ExperiencePerVoyage=>"AirshipPlanner.GoalExpPerVoyage",
+        RouteGoal.Shortest or RouteGoal.Loot or RouteGoal.Unlock=>"AirshipPlanner.Goal"+goal,
+        _=>"RoutePlanner.Goal"+goal,
+    };
 
     /// <summary>X-604: rank, speed and range of this kind's search (an airship's rank 0: every sector, as before).</summary>
     private void DrawPlannerStats(VesselKind kind)

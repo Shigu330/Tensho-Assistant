@@ -29,7 +29,6 @@ internal sealed partial class MainWindow
     private (AirshipCatalog Catalog,uint[] Ids)? airshipPointIds;
     // X-201 (0.1243): the item (loot goal) or the sector (unlock goal) the routes must serve; 0: none chosen yet.
     private uint airshipLootItem,airshipUnlockSector;
-    private string airshipTargetSearch="";
 
     private void DrawAirshipPlanner(AirshipCatalog catalog)
     {
@@ -132,23 +131,12 @@ internal sealed partial class MainWindow
         string SectorName(uint id)=>catalog.Find(id)?.ShortName ?? id.ToString();
         var chosen=loot ? airshipLootItem:airshipUnlockSector;
         var unlockable=loot ? []:catalog.Sectors.Where(sector=>AirshipSectors.Unlocker(catalog,sector.Id) is not null).ToArray();
-        ImGui.SetNextItemWidth(260);
-        var label=localization.Get(loot ? "AirshipPlanner.LootItem":"AirshipPlanner.UnlockSector");
-        if(ImGui.BeginCombo(label+"##AirshipTarget",chosen==0 ? "—":loot ? ItemName(chosen):SectorName(chosen)))
-        {
-            try
-            {
-                ImGui.SetNextItemWidth(220);ImGui.InputTextWithHint("##AirshipTargetSearch",localization.Get("AirshipPlanner.TargetSearch"),ref airshipTargetSearch,60);Tip("AirshipPlanner.TargetSearchTip");
-                var search=airshipTargetSearch.Trim();
-                var rows=loot ? AirshipSectors.LootItems(catalog).Select(id=>(Id:id,Name:ItemName(id)))
-                    :unlockable.Select(sector=>(sector.Id,Name:$"{sector.ShortName} · {sector.Name}"));
-                foreach(var (id,name) in rows.Where(row=>search.Length==0 || SearchText.Contains(row.Name,search,StringComparison.CurrentCultureIgnoreCase))
-                            .OrderBy(row=>row.Name,StringComparer.CurrentCultureIgnoreCase))
-                    if(ImGui.Selectable($"{name}##AirshipTarget{id}",id==chosen)){if(loot)airshipLootItem=id;else airshipUnlockSector=id;}
-            }
-            finally{ImGui.EndCombo();}
-        }
-        Tip(loot ? "AirshipPlanner.LootItemTip":"AirshipPlanner.UnlockSectorTip");
+        var rows=loot ? AirshipSectors.LootItems(catalog).Select(id=>(Id:id,Name:ItemName(id)))
+            :unlockable.Select(sector=>(sector.Id,Name:$"{sector.ShortName} · {sector.Name}"));
+        // X-604 (0.1707): the list with a search box is the planner's, for both kinds (DrawPlannerTarget).
+        chosen=DrawPlannerTarget(loot ? "AirshipPlanner.LootItem":"AirshipPlanner.UnlockSector",loot ? "AirshipPlanner.LootItemTip":"AirshipPlanner.UnlockSectorTip",chosen,
+            chosen==0 ? "—":loot ? ItemName(chosen):SectorName(chosen),rows);
+        if(loot)airshipLootItem=chosen;else airshipUnlockSector=chosen;
         if(chosen==0){ImGui.TextDisabled(localization.Get(loot ? "AirshipPlanner.LootChoose":"AirshipPlanner.UnlockChoose"));return [];}
         if(loot)
         {
@@ -217,16 +205,19 @@ internal sealed partial class MainWindow
         =>string.Join(" › ",route.Sectors.Select(id=>catalog.Find(id)?.ShortName ?? id.ToString()));
 
     // Ticking a sector in the table adds it to the chosen route (5 at most).
-    private void DrawAirshipChoice(AirshipSector sector)
+    private void DrawAirshipChoice(AirshipSector sector)=>DrawSectorChoice(airshipChosen,sector.Id,AirshipPlanner.MaxSectors);
+
+    /// <summary>X-604 (0.1707): a sector ticked into the route measured by hand (<paramref name="max"/> at most), for both kinds.</summary>
+    private void DrawSectorChoice(List<uint> chosen,uint sector,int max)
     {
-        var ticked=airshipChosen.Contains(sector.Id);
-        ImGui.BeginDisabled(!ticked && airshipChosen.Count>=AirshipPlanner.MaxSectors);
+        var ticked=chosen.Contains(sector);
+        ImGui.BeginDisabled(!ticked && chosen.Count>=max);
         try
         {
-            if(ImGui.Checkbox($"##AirshipChoose{sector.Id}",ref ticked))
+            if(ImGui.Checkbox($"##SectorChoose{sector}",ref ticked))
             {
-                if(ticked && !airshipChosen.Contains(sector.Id))airshipChosen.Add(sector.Id);
-                else if(!ticked)airshipChosen.Remove(sector.Id);
+                if(ticked && !chosen.Contains(sector))chosen.Add(sector);
+                else if(!ticked)chosen.Remove(sector);
             }
         }
         finally{ImGui.EndDisabled();}

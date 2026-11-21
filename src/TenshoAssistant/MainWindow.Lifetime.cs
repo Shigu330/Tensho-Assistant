@@ -34,7 +34,7 @@ internal sealed partial class MainWindow
         cactpotSolve.Dispose();
         // 0.315: the route and build searches stop with the window.
         // X-604 (0.1706): the planner's three searches (the fleet's was left running before).
-        submarineSearch.Cancel();
+        submarineSearch.Cancel();submarineFleetSearch.Cancel();
         buildSearchCancel?.Cancel();buildSearchCancel?.Dispose();buildSearchCancel=null;
         airshipSearch.Cancel();airshipFleetSearch.Cancel();
         bankFrameRows.Clear();
