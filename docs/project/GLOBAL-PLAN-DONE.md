@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (728 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (731 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -579,6 +579,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-471 | Tool, idea I-014 put on the plan by the user on 11/15 around 10:35 pm: the same… | Done in 0.1467.0 |
 | X-472 | Bug seen by the user on 11/15 around 10:40 pm (screenshot, game chat and Tensho… | Done in 0.1471.0 |
 | X-474 | Bug seen by the user on 11/15 around 10:50 pm: in the Tensho chat window, the «… | Done in 0.1477 |
+| X-475 | User remark of 11/15 around 10:50 pm: the chat still has no memory between two… | Done in 0.1492.0 |
 | X-476 | User request of 11/15 around 10:50 pm (two screenshots side by side, Tensho… | Done in 0.1481.0 |
 | X-477 | Display bug seen by the user on 11/15 around 10:55 pm (screenshot): Tensho chat… | Done in 0.1476.0 |
 | X-478 | User request of 11/15 around 11 pm (Tensho chat window): a chosen colour for… | Done in 0.1476.0 |
@@ -796,12 +797,14 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-711 | Review of block 0.1699 to 0.1703 (review 0.1703, 21/11), minor M1, M2, M3: M1… | Done in 0.1705.0 |
 | X-712 | Review of block 0.1704 to 0.1708 (review 0.1708, 21/11), minor M1, M2: M1 in… | Done in 0.1709.0 |
 | X-713 | Finding of relay 158 (21/11), same shape as X-711 M3 for submarines… | Done in 0.1712.0 |
+| X-714 | Review of block 0.1709 to 0.1712 (review 0.1712, 21/11), minor M1, M2: M1 in… | Done in 0.1713.0 |
+| X-716 | User request of 21/11 around 11:35 (screenshot of the chat settings, kept out… | Done in 0.1716.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (728 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (731 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1378,6 +1381,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-471 | Outil, idée I-014 mise au plan par l'utilisateur le 15/11 vers 22 h 35 : la… | Fait en 0.1467.0 |
 | X-472 | Bug vu par l'utilisateur le 15/11 vers 22 h 40 (capture, chat du jeu et fenêtre… | Fait en 0.1471.0 |
 | X-474 | Bug vu par l'utilisateur le 15/11 vers 22 h 50 : dans la fenêtre de chat… | Fait en 0.1477 |
+| X-475 | Remarque de l'utilisateur du 15/11 vers 22 h 50 : « le chat a toujours pas de… | Fait en 0.1492.0 |
 | X-476 | Demande de l'utilisateur du 15/11 vers 22 h 50 (deux captures côte à côte… | Fait en 0.1481.0 |
 | X-477 | Bug d'affichage vu par l'utilisateur le 15/11 vers 22 h 55 (capture) : fenêtre… | Fait en 0.1476.0 |
 | X-478 | Demande de l'utilisateur du 15/11 vers 23 h (fenêtre de chat Tensho) : une… | Fait en 0.1476.0 |
@@ -1595,3 +1599,5 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-711 | Relecture du bloc 0.1699 à 0.1703 (relecture 0.1703, 21/11), mineurs M1, M2, M3… | Fait en 0.1705.0 |
 | X-712 | Relecture du bloc 0.1704 à 0.1708 (relecture 0.1708, 21/11), mineurs M1, M2… | Fait en 0.1709.0 |
 | X-713 | Constat du relais 158 (21/11), même forme que X-711 M3 pour les sous-marins… | Fait en 0.1712.0 |
+| X-714 | Relecture du bloc 0.1709 à 0.1712 (relecture 0.1712, 21/11), mineurs M1, M2… | Fait en 0.1713.0 |
+| X-716 | Demande de l'utilisateur du 21/11 vers 11 h 35 (capture des réglages du chat… | Fait en 0.1716.0 |

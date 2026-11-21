@@ -83,7 +83,6 @@ Open points, produced by script from the agent's source of decisions. Choices al
 | No. | Point | Choice applied, or record awaited | Where |
 |---|---|---|---|
 | D-200 | Chat tab order: one order for the window and the context profiles, or one order per profile? | One order (applied): a profile shows its tabs in the settings' order; dragging them in a profile changes their order for all |  |
-| D-202 | Tensho chat window: the game's menu of a player far away. The game's library offers no function to open it; the game's chat goes through an internal event of its interface, unnamed (evidence 0.1688). | Keep it so: near you, friend request, blacklist and report open the game's menu of that character; far away, the game's chat line. |  |
 <!-- /gen:decisions:en -->
 
 ## In-game tests
@@ -183,7 +182,6 @@ Points ouverts, produits par script depuis la source des décisions de l'agent. 
 | N° | Point | Choix appliqué, ou relevé attendu | Où |
 |---|---|---|---|
 | D-200 | Ordre des onglets du chat (X-687) : un seul ordre pour la fenêtre et les profils par contexte, ou un ordre par profil ? | Un seul ordre (appliqué) : un profil montre ses onglets dans l'ordre des réglages ; les faire glisser dans un profil change leur ordre pour tous |  |
-| D-202 | Fenêtre de chat de Tensho : menu du jeu d'un joueur loin. La bibliothèque du jeu n'offre aucune fonction pour l'ouvrir ; le chat du jeu passe par un événement interne de son interface, sans nom (preuve 0.1688). | Garder ainsi : près de vous, requête d'ami, liste noire et signaler ouvrent le menu du jeu de ce personnage ; loin, la ligne du chat du jeu. |  |
 <!-- /gen:decisions:fr -->
 
 ## Tests en jeu

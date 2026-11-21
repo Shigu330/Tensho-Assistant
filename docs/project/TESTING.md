@@ -2553,6 +2553,20 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1711) Paramètres › Carte : « Zones de récolte à horaire » (case et couleur) ; dans la liste des icônes, survoler l'icône de la ligne des points de récolte proches : la légende montre les quatre icônes et les deux couleurs de zone
 
+- [ ] (0.1713) Carte de Tensho › réglages des zones colorées : décocher « Zones de récolte » : la case « Zones de récolte à horaire » se grise et aucune zone de récolte n'est dessinée, ni verte ni rose ; recocher : les deux reviennent
+
+- [ ] (0.1714) Fenêtre de chat Tensho : clic droit sur un onglet › « Détacher dans sa propre fenêtre » : l'onglet quitte la barre et s'ouvre dans sa propre fenêtre, avec son nom et ses messages ; les messages nouveaux y arrivent, les liens, le clic droit sur un message (copier, épingler, choisir du texte) et la molette y marchent ; la déplacer et la redimensionner, puis /xlplugins › recharger Tensho : elle revient à la même place
+
+- [ ] (0.1714) Fenêtre de chat Tensho : avec un onglet détaché, le bouton en haut de sa fenêtre (flèche vers une boîte), puis sa croix une autre fois : l'onglet revient dans la barre de la fenêtre de chat, affiché ; avec un seul onglet restant dans la fenêtre de chat, « Détacher » est grisé et son info-bulle dit pourquoi
+
+- [ ] (0.1714) Fenêtre de chat Tensho : avec un onglet détaché, taper « /tensho chat hide » : toutes les fenêtres de chat Tensho disparaissent ; recevoir un message, puis taper « /tensho chat » : elles reviennent, le message est là ; clic droit sur un onglet › « Masquer toutes les fenêtres de chat un moment » fait de même
+
+- [ ] (0.1715) Fenêtre de chat Tensho, onglet du combat : prendre un effet (manger un plat, une potion, ou un effet en combat), puis survoler le nom de l'effet dans la ligne « … bénéficie de l'effet … » : l'info-bulle montre son icône, son nom et sa description comme celle du jeu ; si rien ne s'affiche, le dire (le jeu ne lie peut-être pas ce statut)
+
+- [ ] (0.1715) Mode développeur, après quelques lignes de combat (actions, dégâts, effets) dans le chat du jeu : dalamud.log a des lignes « Chat window, pieces of a combat line (kind …) » et « pieces of a message with a link » avec « Status … » (rien d'autre à faire : l'agent les lit)
+
+- [ ] (0.1716) Fenêtre de chat Tensho › roue dentée › Joueurs : ajouter plus de 8 noms à « Joueurs cachés » : la liste reste haute de 8 lignes avec sa barre de défilement, et la croix d'une ligne la retire toujours
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.

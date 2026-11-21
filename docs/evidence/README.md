@@ -128,9 +128,9 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1700-tab-bar-settle.md](0.1700-tab-bar-settle.md) | `src/TenshoAssistant/UI/TabBarDrag.cs`, `tests/TenshoAssistant.Tests/TabBarSettle1700Tests.cs` | `docs/changelog/CHANGELOG-0.1700-0.1799.md` |
 | [0.1703-submarine-unlocks.md](0.1703-submarine-unlocks.md) | `src/TenshoAssistant/FreeCompany/SubmarineUnlocks.cs`, `tests/TenshoAssistant.Tests/SubmarineUnlock1703Tests.cs` | `docs/changelog/CHANGELOG-0.1700-0.1799.md` |
 | [0.1706-route-planners.md](0.1706-route-planners.md) | `src/TenshoAssistant/MainWindow.Planner.cs`, `tests/TenshoAssistant.Tests/RoutePlanner1706Tests.cs` | `docs/changelog/CHANGELOG-0.1700-0.1799.md` |
-| [0.1708-quest-info.md](0.1708-quest-info.md) | `src/TenshoAssistant/MainWindow.Quests.cs`, `src/TenshoAssistant/Quests/QuestService.cs`, `tests/TenshoAssistant.Tests/QuestInfo1708Tests.cs` | `CHANGELOG.md` |
+| [0.1708-quest-info.md](0.1708-quest-info.md) | `src/TenshoAssistant/MainWindow.Quests.cs`, `src/TenshoAssistant/Quests/QuestService.cs`, `tests/TenshoAssistant.Tests/QuestInfo1708Tests.cs` | `docs/changelog/CHANGELOG-0.1700-0.1799.md` |
 | [0.171.0-cosmic-vendors-probe.log](0.171.0-cosmic-vendors-probe.log) | `tests/TenshoAssistant.Tests/MapProjectionTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
-| [0.1711-gathering-node-icons.md](0.1711-gathering-node-icons.md) | `src/TenshoAssistant/Maps/GatheringNodeIcons.cs` | `CHANGELOG.md` |
+| [0.1711-gathering-node-icons.md](0.1711-gathering-node-icons.md) | `src/TenshoAssistant/Maps/GatheringNodeIcons.cs` | `docs/changelog/CHANGELOG-0.1700-0.1799.md` |
 | [0.174.0-triad-seldeck-capture.log](0.174.0-triad-seldeck-capture.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.175.0-auxesia-maps-probe.log](0.175.0-auxesia-maps-probe.log) | `src/TenshoAssistant/Maps/MapCatalog.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.176.0-kaede-talk-probe.log](0.176.0-kaede-talk-probe.log) | `src/TenshoAssistant/Npcs/NpcVendorCatalog.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
