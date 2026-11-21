@@ -15,6 +15,13 @@ public readonly record struct ChatRun(string Text,ChatRole Role,ChatLink? Link=n
 /// <summary>X-403 phase 1 (D-166; back from 0.471): how one message reads, and its lines for a given width. Pure: the width of a text is given by the caller.</summary>
 public static class ChatFormat
 {
+    /// <summary>X-683 (0.1664): a link's tooltip text cut at its first line: the name on top, the rest (what a click does) for the bottom.</summary>
+    public static (string Head,string Tail) TipLines(string text)
+    {
+        var cut=text.IndexOf('\n');
+        return cut<0 ? (text.TrimEnd('\r'),""):(text[..cut].TrimEnd('\r'),text[(cut+1)..].Trim());
+    }
+
     /// <summary>X-565 (0.1565): whether the next control, this wide, still fits on the current line (the width left on it); a width left not
     /// known (NaN, infinite) counts as not fitting, so the control goes to the next line rather than past the edge.</summary>
     public static bool FitsOnLine(float left,float needed)=>float.IsFinite(left) && float.IsFinite(needed) && needed<=left;

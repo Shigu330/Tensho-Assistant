@@ -2038,16 +2038,28 @@ internal sealed partial class MainWindow
         if(ImGui.IsItemHovered())
             using(TooltipScope.Begin())
             {
+                // X-683 (0.1664, the user's request of 20/11 around 21:50, picture « Agrégat d'eau »): the name on top, the clicks' line at the
+                // bottom; between them the game's description and the body of Tensho's common item tooltip, called as that tooltip calls it
+                // (DrawItemInfoBody, the same code and caches: note, collection, stock, NPC price, usages, how to get it). The comparison with
+                // the piece worn stays in the common tooltip only (X-294: one path for the gear part); the parts' settings are the panel's
+                // under the game's tooltip only (HoverPanelParts).
+                var (named,clicks)=ChatFormat.TipLines(localization.Format(link.Hq ? "ChatWindow.ItemLinkTipHq":"ChatWindow.ItemLinkTip",item.Name));
                 DrawGameIcon(item.IconId,new Vector2(32,32)*Dalamud.Interface.Utility.ImGuiHelpers.GlobalScale);
                 ImGui.SameLine();
-                ImGui.TextUnformatted(localization.Format(link.Hq ? "ChatWindow.ItemLinkTipHq":"ChatWindow.ItemLinkTip",item.Name));
-                if(ChatPlayers?.Description(item.Id) is { Length:>0 } description)
+                ImGui.TextColored(Accent,named);
+                ImGui.PushTextWrapPos(ImGui.GetFontSize()*28);
+                try
                 {
+                    if(ChatPlayers?.Description(item.Id) is { Length:>0 } description)
+                    {
+                        ImGui.Separator();
+                        ImGui.TextColored(Muted,description);
+                    }
                     ImGui.Separator();
-                    ImGui.PushTextWrapPos(ImGui.GetFontSize()*28);
-                    try{ImGui.TextColored(Muted,description);}
-                    finally{ImGui.PopTextWrapPos();}
+                    DrawItemInfoBody(item,item.Id);
+                    if(clicks.Length>0){ImGui.Separator();ImGui.TextDisabled(clicks);}
                 }
+                finally{ImGui.PopTextWrapPos();}
             }
         if(ChatLinkClicked(id))
         {
