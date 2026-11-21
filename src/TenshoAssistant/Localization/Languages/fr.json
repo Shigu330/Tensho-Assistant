@@ -4934,6 +4934,7 @@
     "SuccessTip": "Taux de réussite actuel (0–100 %), effets cochés plus bas déjà inclus. À 0, aucune action qui l'augmente n'est proposée.",
     "BoonTip": "Chance de supplément actuelle (0–100 %), effets cochés plus bas déjà inclus. À 0, aucune action qui l'augmente n'est proposée.",
     "OtherEffectTip": "Cochez si un effet non décrit ici est actif : la comparaison est alors refusée, car hors modèle.",
+    "ActionTipDetail": "Niveau {0} · {1} PR",
     "ActiveEffectTip": "Cochez si cet effet est déjà actif : il n'est pas proposé une seconde fois et son coût passé n'est pas compté."
   },
   "ChainUi": {

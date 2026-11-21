@@ -4934,6 +4934,7 @@
     "SuccessTip": "Current success rate (0–100%), effects ticked below already included. At 0, no action raising it is offered.",
     "BoonTip": "Current boon chance (0–100%), effects ticked below already included. At 0, no action raising it is offered.",
     "OtherEffectTip": "Tick if an effect not listed here is active: the comparison is then refused, as it is outside the model.",
+    "ActionTipDetail": "Level {0} · {1} GP",
     "ActiveEffectTip": "Tick if this effect is already active: it is not offered again and its past cost is not counted."
   },
   "ChainUi": {

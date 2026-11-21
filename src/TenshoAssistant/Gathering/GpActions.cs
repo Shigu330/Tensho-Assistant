@@ -6,6 +6,12 @@ public enum GpEffect { Success, Yield, BoonChance1, BoonChance2, BoonYield, Boun
 public sealed record GpActionSpec(uint Id,uint JobId,int Level,int Cost,GpEffect Effect,int Magnitude);
 public sealed record GpAction(GpActionSpec Spec,string Name,uint Icon,string Description);
 
+/// <summary>X-684 (0.1675): the detail line of a gathering action's tooltip: level and GP (the game's Action sheet, as read).</summary>
+public static class GpActionTips
+{
+    public static string Detail(int level,int cost,string format)=>string.Format(format,level,cost);
+}
+
 public sealed class GpActionCatalog
 {
     private static readonly IReadOnlyList<GpActionSpec> specs = Array.AsReadOnly(new GpActionSpec[]

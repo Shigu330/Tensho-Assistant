@@ -1,6 +1,7 @@
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using TenshoAssistant.Craft;
+using TenshoAssistant.Gathering;
 
 namespace TenshoAssistant;
 
@@ -24,6 +25,11 @@ internal sealed partial class MainWindow
             if(after is { Length:>0 }){ImGui.Separator();ImGui.TextDisabled(after);}
         }
     }
+
+    /// <summary>X-684 (0.1675): a gathering action (the gathering panel's next action and plan, the GP plan, the crystal plan, the GP settings).</summary>
+    private void DrawGatheringActionTooltip(uint icon,string name,string description,int level,int cost,string? after=null)
+        =>DrawActionTooltip(icon,name,description,GpActionTips.Detail(level,cost,localization.Get("GpUi.ActionTipDetail")),after);
+    private void DrawGatheringActionTooltip(GpAction action,string? after=null)=>DrawGatheringActionTooltip(action.Icon,action.Name,action.Description,action.Spec.Level,action.Spec.Cost,after);
 
     /// <summary>X-684 (0.1674): a crafting action (Crafting simulator, the craft log's steps, the recorder, the projection, the Manipulation box).</summary>
     private void DrawCraftActionTooltip(CraftActionMetadata action,string? title=null,string? after=null)
