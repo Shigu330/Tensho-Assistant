@@ -62,7 +62,7 @@ internal static class PlannerStats1722Tests
             Check(!planner.Contains("Math.Max(1,vessel.Speed)", StringComparison.Ordinal) && planner.Contains("var (speed,range,source)=VesselBuilds.PlannerStats(vessel,VesselParts?.Invoke());", StringComparison.Ordinal), "no 1 in silence");
             Check(planner.Contains("if(inputs.StatsFrom==VesselStatsSource.Unknown)StateLine(UI.UiState.Waiting,localization.Get(\"RoutePlanner.StatsUnknown\"));", StringComparison.Ordinal)
                 && planner.Contains("OriginLine(UI.UiOrigin.Estimated,localization.Get(\"RoutePlanner.StatsFromParts\"));", StringComparison.Ordinal), "unknown and from the parts: said");
-            Check(planner.Contains("if(ImGui.InputInt(localization.Get(\"RoutePlanner.Speed\")+\"##PlannerSpeed\",ref inputs.Speed))inputs.StatsFrom=VesselStatsSource.Read;", StringComparison.Ordinal), "typed: known");
+            Check(planner.Contains("if(ImGui.InputInt(localization.Get(\"RoutePlanner.Speed\")+\"##PlannerSpeed\",ref inputs.Speed)){inputs.SpeedTyped=true;inputs.StatsFrom=VesselBuilds.AfterTyping(", StringComparison.Ordinal), "typed: known (both, when unknown: X-730 M1)");
             foreach (var file in new[] { "MainWindow.AirshipPlanner.cs", "MainWindow.RoutePlanner.cs" })
                 Check(Read(file).Contains("if(inputs.StatsFrom==VesselStatsSource.Unknown)return;", StringComparison.Ordinal), file + ": nothing searched while unknown");
             var watcher = Read("FreeCompany/VoyageWatcher.Dalamud.cs");

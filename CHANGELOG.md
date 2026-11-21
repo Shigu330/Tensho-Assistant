@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1728.0
+- Plan global, X-730 : Planificateur de trajets (X-730 M1, relecture du bloc 0.1721 à 0.1726) : quand la vitesse et la distance du vaisseau choisi sont inconnues (0.1722), en saisir une seule les faisait passer pour connues et la recherche reprenait avec l'autre restée à 1 (ou celle d'un vaisseau choisi avant) : « Aucun trajet possible » ou un résultat faux, sans la ligne « non lues ». Désormais elles restent inconnues (ligne dite, rien cherché) jusqu'à ce que les deux soient saisies ; lues ou tirées des pièces, une seule saisie suffit, comme avant ; choisir un vaisseau remet le compte à zéro. Texte « … ou saisissez les deux ici » en et fr.
+- Pour les joueurs : planificateur de trajets : avec la vitesse et la distance d'un vaisseau inconnues, en saisir une seule ne lance plus une recherche avec l'autre fausse.
+- Tests : PlannerTyped1728Tests. Verify.ps1 (agent) : 3683/3683, 0 avertissement, 0 erreur ; DLL 0.1728.0.0. Non validé en jeu.
+### English
+- Route planner (X-730 M1, review of block 0.1721 to 0.1726): when the chosen vessel's speed and range are unknown (0.1722), typing only one of them made them count as known and the search went on with the other one still at 1 (or a vessel's chosen before): « No route possible » or a wrong result, without the « not read » line. Now they stay unknown (line said, nothing searched) until both are typed; read or taken from the parts, one typed is enough, as before; choosing a vessel starts over. Text « … or type both here » in en and fr.
+- For players: Route planner: with a vessel's speed and range unknown, typing only one of them no longer starts a search with the other one wrong.
+
 ## 0.1727.0
 - Plan global, X-729 : Jardin (X-729 et X-731, relecture du bloc 0.1721 à 0.1726) : l'entrée « Rappels terminés » de la barre du serveur et la ligne « Terminé » de l'accueil comptaient un emplacement seulement mûr selon le calcul avec ceux que le jeu dit mûrs (« Emplacements mûrs : {0} »), le symptôme corrigé en 0.1723 revenu ailleurs. Désormais deux lignes : « Emplacements mûrs : {0} » pour ceux que le jeu a dits mûrs, « Emplacements mûrs selon le calcul, à confirmer en jeu : {0} » pour les autres ; un emplacement dit en pousse après l'heure calculée n'est compté dans aucune (inconnu, comme en 0.1572). L'échéance de l'accueil pour une récolte à venir dit « {0} : mûr (calcul) », comme la liste des alarmes du jardin (avant : « {0} à récolter »). Info-bulle du réglage des rappels terminés à jour. Textes en et fr.
 - Pour les joueurs : jardin : la barre du serveur et l'accueil distinguent les emplacements que le jeu a dits mûrs de ceux qui ne sont mûrs que selon le calcul, à confirmer en jeu.

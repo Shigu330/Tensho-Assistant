@@ -5820,7 +5820,7 @@
   "RoutePlanner": {
     "UsePlan": "Planned build",
     "UsePlanTip": "Takes the rank, speed and range of this vessel's planned build (Builds tab).",
-    "StatsUnknown": "Speed and range of this vessel not read: the game gave neither them nor its parts. In the workshop, open the voyage control panel and this vessel's details, or type them here.",
+    "StatsUnknown": "Speed and range of this vessel not read: the game gave neither them nor its parts. In the workshop, open the voyage control panel and this vessel's details, or type both here.",
     "StatsFromParts": "Speed and range from its parts read in the workshop.",
     "LootItemTip": "The items that may drop on a submersible voyage of this map (community records). The routes listed go through a sector where the chosen item may drop, shortest first.",
     "Sectors": "Sectors of this map: choose by hand",
