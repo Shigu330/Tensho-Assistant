@@ -68,6 +68,8 @@ internal sealed partial class MainWindow
         var obtained = state.Obtained;
         if (obtained is null) ImGui.TextDisabled(localization.Get(state.ObtainedUnavailable ? "BeastUi.ObtainedFailed" : "BeastUi.ObtainedUnknown"));
         else ImGui.TextDisabled(localization.Format("BeastUi.ObtainedCount", obtained.Count, catalog.Beasts.Count));
+        // X-764 M3 (review of 0.1751): the effects' columns no longer hold flags (a game update): said once here, no beast shows « none ».
+        if (catalog.EffectsUnavailable) ImGui.TextDisabled(localization.Get("BeastUi.EffectsUnavailable"));
         ImGui.SetNextItemWidth(200); ImGui.InputTextWithHint("##BeastQuery", localization.Get("BeastUi.Search"), ref beastQuery, 64); Tip("BeastUi.SearchTip");
         ImGui.SameLine();
         ImGui.SetNextItemWidth(150);

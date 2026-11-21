@@ -146,6 +146,8 @@ public sealed class SettingsFile<T>(string path,string? legacyPath,Action<Except
     private readonly object gate=new();
     private JsonObject? before;
     private bool failing;
+    private bool closing;
+    private bool? closingSave;
     private bool unseen;
     private bool unseenSaid;
     private bool freeSaid;
@@ -162,6 +164,19 @@ public sealed class SettingsFile<T>(string path,string? legacyPath,Action<Except
 
     /// <summary>X-763 M1: the name of the copy of an unreadable settings file kept aside (« Settings.unreadable-….json »); null when none.</summary>
     public string? KeptAside{get;private set;}
+
+    /// <summary>
+    /// X-764 M1 (review of 0.1751): the unload begins. Every save from now on is the last one: it waits for another client's lock and reads
+    /// the file as long as a save off the game's thread does (LockWaitMs, not the game's tenth of a second: no later save will try again),
+    /// and its failure is said every time, as the loss it is (not « written at the next save »), even when a failure was said before.
+    /// </summary>
+    public void Close(){lock(gate)closing=true;}
+
+    /// <summary>X-764 M1: the last save asked after <see cref="Close"/>: true written, false failed (said), null none asked.</summary>
+    public bool? ClosingSave{get{lock(gate)return closingSave;}}
+
+    /// <summary>X-764 M1: true while the last write failed and none succeeded since: the file is older than the settings in memory.</summary>
+    public bool Failing{get{lock(gate)return failing;}}
 
     /// <summary>The settings file in the plugin's folder (pluginConfigs\TenshoAssistant).</summary>
     public static string In(string folder)=>Path.Combine(folder,FileName);
@@ -256,11 +271,25 @@ public sealed class SettingsFile<T>(string path,string? legacyPath,Action<Except
         try{text=SettingsJson.Write(live);}
         catch(Exception error) when(error is JsonException or NotSupportedException or InvalidOperationException)
         {
-            Fail(error,"The settings could not be turned into text; nothing was written.");
+            lock(gate)
+            {
+                if(closing){closingSave=false;warn(error,ClosingLost);}
+                else Fail(error,"The settings could not be turned into text; nothing was written.");
+            }
             return false;
         }
-        lock(gate)return onGameThread ? Write(text,GameThreadLockWaitMs,GameThreadReadAttempts) : Write(text);
+        lock(gate)
+        {
+            // X-764 M1: the unload's save waits as long as the worker's, whatever thread asks it, and says its failure.
+            if(!closing)return onGameThread ? Write(text,GameThreadLockWaitMs,GameThreadReadAttempts) : Write(text);
+            var written=Write(text,LockWaitMs,ReadAttempts,atClose:true);
+            closingSave=written;
+            return written;
+        }
     }
+
+    /// <summary>X-764 M1: said at each failed save after <see cref="Close"/>.</summary>
+    public const string ClosingLost="The last settings could not be written at unload (the settings file was held by another program or could not be written); the changes since the last save written are lost.";
 
     private void Remember(T value)
     {
@@ -269,7 +298,7 @@ public sealed class SettingsFile<T>(string path,string? legacyPath,Action<Except
     }
 
     // Under gate.
-    private bool Write(string text,int lockWaitMs=LockWaitMs,int readAttempts=ReadAttempts)
+    private bool Write(string text,int lockWaitMs=LockWaitMs,int readAttempts=ReadAttempts,bool atClose=false)
     {
         try
         {
@@ -296,7 +325,8 @@ public sealed class SettingsFile<T>(string path,string? legacyPath,Action<Except
         }
         catch(Exception error) when(error is IOException or UnauthorizedAccessException or JsonException)
         {
-            Fail(error,"The settings could not be written; they stay in memory and are written at the next save.");
+            if(atClose){failing=true;warn(error,ClosingLost);}
+            else Fail(error,"The settings could not be written; they stay in memory and are written at the next save.");
             return false;
         }
     }

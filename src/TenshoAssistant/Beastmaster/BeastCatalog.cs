@@ -72,6 +72,13 @@ public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Boa
     /// <summary>X-755 (0.1750): the names of <see cref="BeastEffects.Order"/> in the client's language (Addon); empty when not given (tests).</summary>
     public IReadOnlyList<string> EffectNames { get; init; } = [];
 
+    /// <summary>
+    /// X-764 M3 (review of 0.1751): true when a beast's XBMPet columns 11 to 21 are not all flags (a game update changed their type, or
+    /// moved them at the same column count): no beast shows an effect then, and the bestiary says the effects are unavailable, instead of
+    /// « none » for every beast.
+    /// </summary>
+    public bool EffectsUnavailable { get; init; }
+
     /// <summary>X-551 (0.1574): the number of the font icon a sheet's text starts with (« &lt;icon(56)&gt;Feu » → 56); 0 when it starts with none.</summary>
     public static uint IconOfMacro(string? macro)
     {
@@ -107,12 +114,14 @@ public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Boa
         string Auto(uint action) => AutoRow(action) is var element and not 0 ? Element(element) : "";
         var grow = sheets["XBMPetParamGrow"].GroupBy(row => row.Row).ToDictionary(group => group.Key, group => group.OrderBy(row => row.Sub)
             .Select(row => new BeastStats(row.Int(0), row.Int(1), row.Int(2), row.Int(3), row.Int(4))).ToArray());
+        // X-764 M3 (review of 0.1751): the eleven flags read only when every beast's columns 11 to 21 hold flags (R08; empty, as XbmRow reads it: none).
+        var effectsRead = sheets["XBMPet"].Where(row => row.Row != 0 && row.UInt(4) != 0).All(row => BeastEffects.Order.All(effect => effect.Column < row.Cells.Length && row.Cells[effect.Column] is null or bool));
         var beasts = sheets["XBMPet"].Where(row => row.Row != 0 && row.UInt(4) != 0).Select(row => new Beast(row.Row, Capitalize(petName(row.UInt(0))), row.UInt(4),
             familyName(row.Int(1)), Auto(row.UInt(5)), row.Text(9), row.Text(10), Array.AsReadOnly(grow.GetValueOrDefault(row.UInt(2)) ?? []),
             // 0.688 (user report): columns 6 and 7, where the beast is caught: docs/evidence/0.688-beast-places.md.
             catchPlace?.Invoke(row.Int(6), row.UInt(7)) ?? "", AutoRow(row.UInt(5)))
             // X-755 (0.1750): columns 11 to 21, the effects it inflicts, put in the game's order (BeastEffects).
-            { Effects = BeastEffects.Of(column => row.Cells[column] is true) }).ToArray();
+            { Effects = effectsRead ? BeastEffects.Of(column => row.Cells[column] is true) : [] }).ToArray();
 
         var shapes = sheets["XBMActionEffectType"].ToDictionary(row => row.Row, row => row.Text(0));
         var targets = sheets["XBMActionTarget"].ToDictionary(row => row.Row, row => row.Text(0));
@@ -150,6 +159,7 @@ public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Boa
         {
             ElementIcons = icons,
             EffectNames = effectName is null ? [] : BeastEffects.Order.Select(effect => effectName(effect.Name)).ToArray(),
+            EffectsUnavailable = !effectsRead,
         };
     }
 

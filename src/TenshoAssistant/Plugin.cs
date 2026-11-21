@@ -190,9 +190,18 @@ public sealed partial class Plugin : IDalamudPlugin
             registrations.Register(()=>_=saver.Warm(()=>File.Exists(settingsFile.FilePath) ? File.ReadAllText(settingsFile.FilePath) : null),
                 ()=>
                 {
-                    if(saver.Flush(TimeSpan.FromSeconds(5)))return;
+                    // X-764 M1 (review of 0.1751): from here every save is the last one: the full wait for another client's lock on any
+                    // thread (the game's tenth of a second refused it before, and no save followed), its failure said as a loss.
+                    settingsFile.Close();
+                    if(saver.Flush(TimeSpan.FromSeconds(5)))
+                    {
+                        // A write of the worker that failed just before (said « written at the next save »): the next save is this one (the saver,
+                        // closed by Flush, saves the live settings at once).
+                        if(settingsFile.Failing && settingsFile.ClosingSave is null)saver.Save();
+                        return;
+                    }
                     // X-184 N22 (0.1207): the live settings were handed to the writer: waited for, and said as it is.
-                    if(saver.Settle(TimeSpan.FromSeconds(15)))log.Warning("The last settings save took more than 5 s at unload; the settings were written once it ended.");
+                    if(saver.Settle(TimeSpan.FromSeconds(15)))log.Warning(settingsFile.ClosingSave==false ? "The last settings save took more than 5 s at unload and failed (said above)." : "The last settings save took more than 5 s at unload; the settings were written once it ended.");
                     else log.Warning("The settings were still being written 20 s after the unload began; the last ones may not be on disk.");
                 });
             void SaveTimed(string what)

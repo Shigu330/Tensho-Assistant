@@ -259,6 +259,7 @@
     "Boards": "Plateaux",
     "ObtainedUnknown": "Bêtes obtenues : pas encore lues. Ouvrez une fois le bestiaire de dresseur dans le jeu.",
     "ObtainedFailed": "Bêtes obtenues : lecture impossible (peut-être après une mise à jour du jeu).",
+    "EffectsUnavailable": "Effets infligés par les bêtes : indisponibles (peut-être après une mise à jour du jeu).",
     "ObtainedCount": "Bêtes obtenues : {0}/{1}",
     "Search": "Rechercher",
     "SearchTip": "Filtre par nom, ou par le texte des deux attaques.",
