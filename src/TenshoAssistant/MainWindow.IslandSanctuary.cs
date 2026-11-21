@@ -24,13 +24,12 @@ internal sealed partial class MainWindow
     private void DrawIslandSanctuary()
     {
         Heading(localization.Get("Island.Title"),localization.Get("Island.Subtitle"));
-        if(!ImGui.BeginTabBar("IslandTabs"))return;
-        try
-        {
-            if(ImGui.BeginTabItem(localization.Get("Island.TabWorkshop")+"###IslandTabWorkshop")){try{DrawIslandWorkshop();}finally{ImGui.EndTabItem();}}
-            if(ImGui.BeginTabItem(localization.Get("Island.TabPasture")+"###IslandTabPasture")){try{DrawIslandPasture();}finally{ImGui.EndTabItem();}}
-        }
-        finally{ImGui.EndTabBar();}
+        // X-605 (0.1701): the tabs arranged with the mouse (OrderedTabs).
+        OrderedTabs("IslandTabs",
+        [
+            new("Workshop",localization.Get("Island.TabWorkshop"),DrawIslandWorkshop),
+            new("Pasture",localization.Get("Island.TabPasture"),DrawIslandPasture),
+        ]);
     }
 
     private void DrawIslandWorkshop()

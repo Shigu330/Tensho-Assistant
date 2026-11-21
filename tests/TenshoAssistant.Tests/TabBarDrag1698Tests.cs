@@ -39,7 +39,7 @@ internal static class TabBarDrag1698Tests
         ("Tab bar drag 1698: wiring: the detail tabs reorderable, drawn in the order kept, kept when a drag ends; reset with the families'", () =>
         {
             var detail = Read("UI/Components/DetailPage.cs");
-            Check(detail.Contains("ImGui.BeginTabBar(id+\"/\"+drag.Generation,drag.Settle(arranged,tab=>tab.Key) ? ImGuiTabBarFlags.None:ImGuiTabBarFlags.Reorderable)", StringComparison.Ordinal), "reorderable (settling one frame without), its number in its id");
+            Check(detail.Contains("ImGui.BeginTabBar(id+\"/\"+drag.Generation,flags|(drag.Settle(arranged,tab=>tab.Key) ? ImGuiTabBarFlags.None:ImGuiTabBarFlags.Reorderable))", StringComparison.Ordinal), "reorderable (settling one frame without), its number in its id");
             Check(detail.Contains("TabOrder.Arrange(tabs,configuration.TabOrders.GetValueOrDefault(id),tab=>tab.Key)", StringComparison.Ordinal), "drawn in the order kept");
             Check(detail.Contains("drag.Places.Add((key,ImGui.GetItemRectMin().X));", StringComparison.Ordinal) && detail.Contains("TabBarAfter(id,drag,dragged);", StringComparison.Ordinal)
                 && detail.Contains("if(drag.After(dragged,configuration.TabOrders.GetValueOrDefault(id)) is not { } keep)return;", StringComparison.Ordinal), "places read, kept when a drag ends");

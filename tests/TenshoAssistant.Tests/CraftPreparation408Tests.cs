@@ -15,7 +15,7 @@ internal static class CraftPreparation408Tests
             Check(plan.Contains("OpenCraftPreparation(recipe)") && plan.Contains("focusCraftPage=CraftPageTab.Preparation"),"link to the Crafting tab");
             Check(plan.Contains("OpenCraftItem(material.ItemId)") && Read("MainWindow.CraftChain.cs").Contains("OpenCraftItem(id)"),"items named in the preparation open their sheet");
             var page=Read("MainWindow.CraftSimulation.cs");
-            Check(page.Contains("###CraftPreparationTab") && page.Contains("if(preparation) { DrawCraftPlan(recipe); return; }"),"Crafting page tab");
+            Check(page.Contains("new(\"Preparation\",localization.Get(\"CraftSimulation.PreparationTab\"),()=>preparation=true,focusCraftPage==CraftPageTab.Preparation),") && page.Contains("if(preparation) { DrawCraftPlan(recipe); return; }"),"Crafting page tab");
             Check(page.IndexOf("###CraftPreparationTab",StringComparison.Ordinal) < page.IndexOf("CraftSimulation.Unsupported(recipe)",StringComparison.Ordinal),
                 "the preparation does not depend on the simulator's support of the recipe");
             Check(Read("MainWindow.CraftChain.cs").Contains("craftChain.ValidateContext(character, recipe.ResultItemId,")

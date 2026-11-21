@@ -20,22 +20,19 @@ internal sealed partial class MainWindow
     private void DrawFreeCompany()
     {
         Heading(localization.Get("FreeCompany.Title"),localization.Get("FreeCompany.Description"));
-        if(!ImGui.BeginTabBar("FreeCompanyTabs"))return;
-        try
-        {
-            // 0.315: a route's « Build » button selects the Builds tab once.
-            ImGuiTabItemFlags Request(int tab)=>freeCompanyTabRequest==tab ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None;
-            var request=freeCompanyTabRequest;
-            if(ImGui.BeginTabItem(localization.Get("FreeCompany.TabVessels")+"###FcVessels",Request(0))){try{DrawFreeCompanyVessels();}finally{ImGui.EndTabItem();}}
-            if(ImGui.BeginTabItem(localization.Get("FreeCompany.TabRoutes")+"###FcRoutes",Request(1))){try{DrawRoutePlanner();}finally{ImGui.EndTabItem();}}
-            if(ImGui.BeginTabItem(localization.Get("FreeCompany.TabBuilds")+"###FcBuilds",Request(2))){try{DrawVesselBuilds();}finally{ImGui.EndTabItem();}}
-            if(ImGui.BeginTabItem(localization.Get("FreeCompany.TabAirships")+"###FcAirships",Request(3))){try{DrawAirshipSectors();}finally{ImGui.EndTabItem();}}
-            if(ImGui.BeginTabItem(localization.Get("FreeCompany.TabWorkshop")+"###FcWorkshop")){try{DrawWorkshopProjects();}finally{ImGui.EndTabItem();}}
+        // 0.315: a route's « Build » button selects the Builds tab once. X-605 (0.1701): the tabs arranged with the mouse (OrderedTabs).
+        var request=freeCompanyTabRequest;
+        var drawn=OrderedTabs("FreeCompanyTabs",
+        [
+            new("Vessels",localization.Get("FreeCompany.TabVessels"),DrawFreeCompanyVessels,request==0),
+            new("Routes",localization.Get("FreeCompany.TabRoutes"),DrawRoutePlanner,request==1),
+            new("Builds",localization.Get("FreeCompany.TabBuilds"),DrawVesselBuilds,request==2),
+            new("Airships",localization.Get("FreeCompany.TabAirships"),DrawAirshipSectors,request==3),
+            new("Workshop",localization.Get("FreeCompany.TabWorkshop"),DrawWorkshopProjects),
             // 0.379 (g, M-10): loot history.
-            if(ImGui.BeginTabItem(localization.Get("VoyageHistory.Tab")+"###FcHistory")){try{DrawVoyageHistory();}finally{ImGui.EndTabItem();}}
-            if(request>=0 && freeCompanyTabRequest==request)freeCompanyTabRequest=-1;
-        }
-        finally{ImGui.EndTabBar();}
+            new("History",localization.Get("VoyageHistory.Tab"),DrawVoyageHistory),
+        ]);
+        if(drawn && request>=0 && freeCompanyTabRequest==request)freeCompanyTabRequest=-1;
     }
 
     private void DrawFreeCompanyVessels()

@@ -76,7 +76,7 @@ internal static class IslandAnimalsTests
         ("Island page: the workshop and the pasture are two tabs",() =>
         {
             var page=Read("MainWindow.IslandSanctuary.cs");
-            Check(page.Contains("###IslandTabWorkshop") && page.Contains("###IslandTabPasture") && page.Contains("private void DrawIslandWorkshop()"),"tabs");
+            Check(page.Contains("new(\"Workshop\",localization.Get(\"Island.TabWorkshop\"),DrawIslandWorkshop)") && page.Contains("new(\"Pasture\",localization.Get(\"Island.TabPasture\"),DrawIslandPasture)") && page.Contains("private void DrawIslandWorkshop()"),"tabs");
         }),
         // From IslandAnimals901Tests: 0.901 (X-83): the island's wild animals on the map, from MJIAnimals (BNpcBase → icon).
         ("Island animals: MJIAnimals by BNpcBase, living ones only, their own icon, a setting on by default",() =>

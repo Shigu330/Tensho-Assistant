@@ -163,21 +163,14 @@ internal sealed partial class MainWindow
         // a short view with a link here.
         // 0.464 (user request, in-game campaign): the crafting list is a tab too, with or without a recipe shown.
         var preparation=false;var listsTab=false;var stockTab=false;
-        if(ImGui.BeginTabBar("CraftPageTabs"))
-        {
-            try
-            {
-                if(ImGui.BeginTabItem(localization.Get("CraftSimulation.SimulationTab")+"###CraftSimulationTab",focusCraftPage==CraftPageTab.Simulation ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None))
-                    ImGui.EndTabItem();
-                if(ImGui.BeginTabItem(localization.Get("CraftSimulation.PreparationTab")+"###CraftPreparationTab",focusCraftPage==CraftPageTab.Preparation ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None))
-                { preparation=true; ImGui.EndTabItem(); }
-                if(ImGui.BeginTabItem(localization.Get("CraftSimulation.ListsTab")+"###CraftListsTab"))
-                { listsTab=true; ImGui.EndTabItem(); }
-                if(ImGui.BeginTabItem(localization.Get("CraftSimulation.StockTab")+"###CraftStockTab"))
-                { stockTab=true; ImGui.EndTabItem(); }
-            }
-            finally { ImGui.EndTabBar(); }
-        }
+        // X-605 (0.1701): the tabs arranged with the mouse (OrderedTabs); each tab notes that it is open, the page below draws it.
+        OrderedTabs("CraftPageTabs",
+        [
+            new("Simulation",localization.Get("CraftSimulation.SimulationTab"),()=>{},focusCraftPage==CraftPageTab.Simulation),
+            new("Preparation",localization.Get("CraftSimulation.PreparationTab"),()=>preparation=true,focusCraftPage==CraftPageTab.Preparation),
+            new("Lists",localization.Get("CraftSimulation.ListsTab"),()=>listsTab=true),
+            new("Stock",localization.Get("CraftSimulation.StockTab"),()=>stockTab=true),
+        ]);
         focusCraftPage=CraftPageTab.None;
         if(listsTab) { DrawCraftLists(); return; }
         if(stockTab) { DrawCraftFromStock(); return; }

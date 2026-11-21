@@ -68,7 +68,6 @@ internal sealed partial class MainWindow
     // 0.273: a link can ask for the Deck or « NPCs and cards » tab (an NPC's « Triple Triad tool », the Deck button of the settings).
     private string? triadFocusTab;
     private void OpenTriadTab(string tab){page=Page.TripleTriad;triadFocusTab=tab;}
-    private ImGuiTabItemFlags TriadTabFlags(string tab)=>triadFocusTab==tab ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None;
     // 0.267: « Show in Triple Triad » from any menu — the notebook tab, filters cleared so the card cannot be hidden, card selected.
     private void ShowTriadCard(uint cardId)
     {
@@ -97,40 +96,17 @@ internal sealed partial class MainWindow
             triadCards = state.Entries.Where(entry => entry.Kind == CollectionKind.TripleTriad && entry.Card is { IsValid: true })
                 .OrderBy(entry => entry.Card!.Extra).ThenBy(entry => entry.Card!.Number).ThenBy(entry => entry.Id).ToArray();
         }
-        if (ImGui.BeginTabBar("TriadNotebook"))
-        {
-            try
-            {
-                var notebookFlags = focusTriadNotebook ? ImGuiTabItemFlags.SetSelected : ImGuiTabItemFlags.None; focusTriadNotebook = false;
-                if (ImGui.BeginTabItem(localization.Get("TriadUi.Notebook"), notebookFlags))
-                {
-                    try { DrawTriadNotebook(state); }
-                    finally { ImGui.EndTabItem(); }
-                }
-                if (ImGui.BeginTabItem(localization.Get("TriadUi.Deck"), TriadTabFlags("Deck")))
-                {
-                    try { DrawTriadSavedDecks(); DrawTriadDeck(); }
-                    finally { ImGui.EndTabItem(); }
-                }
-                if (ImGui.BeginTabItem(localization.Get("TriadUi.Simulation")))
-                {
-                    try { DrawTriadSimulation(); }
-                    finally { ImGui.EndTabItem(); }
-                }
-                if (ImGui.BeginTabItem(localization.Get("TriadNpcs.Tab"), TriadTabFlags("Npcs")))
-                {
-                    try { DrawTriadNpcs(); }
-                    finally { ImGui.EndTabItem(); }
-                }
-                triadFocusTab = null;
-                if (ImGui.BeginTabItem(localization.Get("TriadUi.Observation")))
-                {
-                    try { DrawTriadObservation(); }
-                    finally { ImGui.EndTabItem(); }
-                }
-            }
-            finally { ImGui.EndTabBar(); }
-        }
+        // X-605 (0.1701): the tabs arranged with the mouse (OrderedTabs). A tab asked (the notebook, a deck, an NPC) is selected once.
+        var notebook = focusTriadNotebook; var asked = triadFocusTab;
+        focusTriadNotebook = false; triadFocusTab = null;
+        OrderedTabs("TriadNotebook",
+        [
+            new("Notebook", localization.Get("TriadUi.Notebook"), () => DrawTriadNotebook(state), notebook),
+            new("Deck", localization.Get("TriadUi.Deck"), () => { DrawTriadSavedDecks(); DrawTriadDeck(); }, asked == "Deck"),
+            new("Simulation", localization.Get("TriadUi.Simulation"), DrawTriadSimulation),
+            new("Npcs", localization.Get("TriadNpcs.Tab"), DrawTriadNpcs, asked == "Npcs"),
+            new("Observation", localization.Get("TriadUi.Observation"), DrawTriadObservation),
+        ]);
         if (state.CharacterId == 0) ImGui.TextDisabled(localization.Get("TriadUi.Login"));
         ImGui.TextWrapped(localization.Get("TriadUi.Help"));
     }
@@ -157,16 +133,13 @@ internal sealed partial class MainWindow
         }
         Tip("TriadUi.TypeTip");
         DrawTriadSortControls();
-        if (ImGui.BeginTabBar("TriadSeries"))
-        {
-            try
-            {
-                var focus = focusTriadSeries; focusTriadSeries = false;
-                if (ImGui.BeginTabItem(localization.Get("TriadSort.SeriesNormal"), focus && !triadExSeries ? ImGuiTabItemFlags.SetSelected : ImGuiTabItemFlags.None)) { if (!focus) triadExSeries = false; ImGui.EndTabItem(); }
-                if (ImGui.BeginTabItem(localization.Get("TriadSort.SeriesEx"), focus && triadExSeries ? ImGuiTabItemFlags.SetSelected : ImGuiTabItemFlags.None)) { if (!focus) triadExSeries = true; ImGui.EndTabItem(); }
-            }
-            finally { ImGui.EndTabBar(); }
-        }
+        // X-605 (0.1701): the two series arranged with the mouse too (OrderedTabs); a jump to a card selects its series once.
+        var focus = focusTriadSeries; focusTriadSeries = false;
+        OrderedTabs("TriadSeries",
+        [
+            new("Normal", localization.Get("TriadSort.SeriesNormal"), () => { if (!focus) triadExSeries = false; }, focus && !triadExSeries),
+            new("Ex", localization.Get("TriadSort.SeriesEx"), () => { if (!focus) triadExSeries = true; }, focus && triadExSeries),
+        ]);
         // 0.331 (audit): « Ex. 12 » typed on the ordinary tab moves to the Ex. tab (the series filter runs first). Only when the query
         // changes, so the ordinary tab stays reachable with the same query.
         if (!triadExSeries && triadQuery != triadPreviousQuery && triadQuery.Trim().StartsWith("Ex.", StringComparison.OrdinalIgnoreCase)) { triadExSeries = true; focusTriadSeries = true; }

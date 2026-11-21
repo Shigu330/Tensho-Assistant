@@ -25,21 +25,12 @@ internal sealed partial class MainWindow
             if(deliveryClients is { Count:>0 } && ReadDeliveries is not null)deliveryRead=ReadDeliveries(deliveryClients);
         }
         if(deliveryClients is not { Count:>0 } clients){ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("CustomDeliveries.SheetsUnavailable"));return;}
-        if(!ImGui.BeginTabBar("###CustomDeliveriesTabs"))return;
-        try
-        {
-            if(ImGui.BeginTabItem(localization.Get("CustomDeliveries.TabClients")+"###DeliveryClients"))
-            {
-                try{DrawDeliveryStatus(clients);}
-                finally{ImGui.EndTabItem();}
-            }
-            if(ImGui.BeginTabItem(localization.Get("CustomDeliveries.TabRewards")+"###DeliveryRewards"))
-            {
-                try{DrawDeliveryRewards(clients);}
-                finally{ImGui.EndTabItem();}
-            }
-        }
-        finally{ImGui.EndTabBar();}
+        // X-605 (0.1701): the tabs arranged with the mouse (OrderedTabs).
+        OrderedTabs("CustomDeliveriesTabs",
+        [
+            new("Clients",localization.Get("CustomDeliveries.TabClients"),()=>DrawDeliveryStatus(clients)),
+            new("Rewards",localization.Get("CustomDeliveries.TabRewards"),()=>DrawDeliveryRewards(clients)),
+        ]);
     }
 
     // W-01 (0.730): what a client gives, from the sheets alone: docs/evidence/0.730-delivery-rewards.md.

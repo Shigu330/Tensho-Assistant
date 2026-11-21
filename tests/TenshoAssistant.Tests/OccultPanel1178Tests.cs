@@ -36,7 +36,8 @@ internal static class OccultPanel1178Tests
             Check(lore == (2, 3), $"read {lore.Read} of {lore.Total}");
             Check(OccultCrescent.Lore([]) == (0, 0), "nothing read yet");
             var collections = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Collections.cs"));
-            Check(collections.Contains("focusCollectionKind==extraKind ? ImGuiTabItemFlags.SetSelected", StringComparison.Ordinal), "the extra kinds' tabs follow a jump");
+            Check(collections.Contains("Kind(extraKind.ToString(), extraKind, \"ExtraCollections.\" + extraKind)", StringComparison.Ordinal)
+                && collections.Contains("focusCollectionKind = null; }, focusCollectionKind == kind);", StringComparison.Ordinal), "the extra kinds' tabs follow a jump");
         }),
         ("Occult panel 1178: wiring: the panel only on the island, its switch on, coins from MKDData, « what it buys » opens the currency's tab", () =>
         {

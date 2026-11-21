@@ -16,15 +16,12 @@ internal static class UiRatchets1612Tests
             .Where(name=>!name.StartsWith("UI/",StringComparison.Ordinal) && !name.Split('/').Any(part=>part is "obj" or "bin"))
             .Select(name=>(name,File.ReadAllText(Path.Combine(Root,name))));
 
-    // The tab bars written by hand on 20/11 (file and id). A new one is refused: use DetailTabs; one converted leaves the list.
+    // The tab bars written by hand on 20/11 (file and id). A new one is refused: use DetailTabs or OrderedTabs; one converted leaves the list.
+    // X-605 (0.1701): every page's bar goes through OrderedTabs (arranged with the mouse); the chat's tabs keep their own (X-687: their
+    // order lives with the chat tabs).
     private static readonly (string File,string Id)[] TabBars=
     [
-        ("MainWindow.Bank.cs","BankOriginTabs"),("MainWindow.ChatWindow.cs","###TenshoChatTabs"),("MainWindow.Collections.cs","CollectionKinds"),
-        ("MainWindow.CraftSimulation.cs","CraftPageTabs"),("MainWindow.CustomDeliveries.cs","###CustomDeliveriesTabs"),("MainWindow.FreeCompany.cs","FreeCompanyTabs"),
-        ("MainWindow.IslandSanctuary.cs","IslandTabs"),("MainWindow.Items.cs","StorageScope"),("MainWindow.Items.cs","RecipeDirections"),
-        ("MainWindow.MapLocalLists.cs","MapLocalTabs"),("MainWindow.Maps.cs","MapsTabs"),("MainWindow.Market.cs","MarketTabs"),
-        ("MainWindow.Settings.cs","SettingsSections"),("MainWindow.Storage.cs","StorageTabs"),("MainWindow.TripleTriad.cs","TriadNotebook"),
-        ("MainWindow.TripleTriad.cs","TriadSeries"),
+        ("MainWindow.ChatWindow.cs","###TenshoChatTabs"),
     ];
     // The tables written by hand on 20/11, outside UI/: lower these numbers when a table moves to BeginDataTable / HeadersRow.
     private const int HandTables=96,HandHeaderRows=82;
@@ -39,7 +36,7 @@ internal static class UiRatchets1612Tests
             foreach(var (name,text) in Pages())
                 foreach(Match match in Regex.Matches(text,@"ImGui\.BeginTabBar\(""([^""]*)"""))found.Add((name,match.Groups[1].Value));
             var extra=found.Where(site=>!TabBars.Contains(site)).ToArray();
-            Check(extra.Length==0,"a tab bar written by hand; use DetailTabs(id,[(key,label,draw)…],ref focus): "+string.Join(", ",extra.Select(site=>site.Item1+" "+site.Item2)));
+            Check(extra.Length==0,"a tab bar written by hand; use DetailTabs(id,[(key,label,draw)…],ref focus) or OrderedTabs(id,[new(key,label,draw)…]): "+string.Join(", ",extra.Select(site=>site.Item1+" "+site.Item2)));
             var gone=TabBars.Where(site=>!found.Contains(site)).ToArray();
             Check(gone.Length==0,"converted or renamed, take it out of TabBars (the ratchet goes down): "+string.Join(", ",gone.Select(site=>site.Item1+" "+site.Item2)));
             Check(Pages().Sum(page=>Count(page.Text,"ImGui.BeginTabBar("))==TabBars.Length,"every tab bar written by hand has a literal id in the list");

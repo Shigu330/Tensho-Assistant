@@ -27,29 +27,28 @@ internal sealed partial class MainWindow
     {
         // 0.400 (user report « framing »): wide enough for every tab name (8 since 0.401), at most 90 % of the screen; when the screen is
         // narrower the tabs scroll with arrows instead of being cut.
+        // X-605 (0.1701): the tabs arranged with the mouse (OrderedTabs); the width counts the same tabs (one list).
         var style=ImGui.GetStyle();
-        var tabs=new[]{"MapLocal.Favorites","MapLocal.Quests","MapLocal.Fates","MapLocal.Gathering","MapLocal.Aetherytes","MapLocal.Vendors","MapLocal.TripleTriad","MapLocal.Currents","VistaLog.Tab"};
-        var needed=tabs.Sum(key=>ImGui.CalcTextSize(localization.Get(key)).X+style.FramePadding.X*2+style.ItemInnerSpacing.X)+style.WindowPadding.X*2+8;
+        OrderedTab[] tabs=
+        [
+            new("Favorites",localization.Get("MapLocal.Favorites"),()=>DrawLocalFavorites(map)),
+            new("Quests",localization.Get("MapLocal.Quests"),()=>DrawLocalQuests(map)),
+            new("Fates",localization.Get("MapLocal.Fates"),()=>DrawLocalFates(map,live)),
+            new("Gathering",localization.Get("MapLocal.Gathering"),()=>DrawLocalGathering(map)),
+            new("Aetherytes",localization.Get("MapLocal.Aetherytes"),()=>DrawLocalAetherytes(map)),
+            new("Vendors",localization.Get("MapLocal.Vendors"),()=>DrawLocalVendors(map)),
+            new("TripleTriad",localization.Get("MapLocal.TripleTriad"),()=>DrawLocalTriad(map)),
+            new("Currents",localization.Get("MapLocal.Currents"),()=>DrawLocalCollectibles(map,live,MapLocalKind.AetherCurrent)),
+            // 0.361 (g, C-11): the whole sightseeing log, every zone. 0.401 (user report): the zone-only « Sightseeing » tab is gone, this
+            // log covers it.
+            new("Vistas",localization.Get("VistaLog.Tab"),()=>DrawVistaLog(live)),
+        ];
+        var needed=tabs.Sum(tab=>ImGui.CalcTextSize(tab.Label).X+style.FramePadding.X*2+style.ItemInnerSpacing.X)+style.WindowPadding.X*2+8;
         var width=Math.Clamp(needed,640,Math.Max(640,ImGui.GetMainViewport().WorkSize.X*0.9f));
         var open=ImGui.BeginChild("MapLocalLists",new Vector2(width,360),true);
         try
         {
-            if(!open || !ImGui.BeginTabBar("MapLocalTabs",ImGuiTabBarFlags.FittingPolicyScroll))return;
-            try
-            {
-                if(ImGui.BeginTabItem(localization.Get("MapLocal.Favorites"))){try{DrawLocalFavorites(map);}finally{ImGui.EndTabItem();}}
-                if(ImGui.BeginTabItem(localization.Get("MapLocal.Quests"))){try{DrawLocalQuests(map);}finally{ImGui.EndTabItem();}}
-                if(ImGui.BeginTabItem(localization.Get("MapLocal.Fates"))){try{DrawLocalFates(map,live);}finally{ImGui.EndTabItem();}}
-                if(ImGui.BeginTabItem(localization.Get("MapLocal.Gathering"))){try{DrawLocalGathering(map);}finally{ImGui.EndTabItem();}}
-                if(ImGui.BeginTabItem(localization.Get("MapLocal.Aetherytes"))){try{DrawLocalAetherytes(map);}finally{ImGui.EndTabItem();}}
-                if(ImGui.BeginTabItem(localization.Get("MapLocal.Vendors"))){try{DrawLocalVendors(map);}finally{ImGui.EndTabItem();}}
-                if(ImGui.BeginTabItem(localization.Get("MapLocal.TripleTriad"))){try{DrawLocalTriad(map);}finally{ImGui.EndTabItem();}}
-                if(ImGui.BeginTabItem(localization.Get("MapLocal.Currents"))){try{DrawLocalCollectibles(map,live,MapLocalKind.AetherCurrent);}finally{ImGui.EndTabItem();}}
-                // 0.361 (g, C-11): the whole sightseeing log, every zone. 0.401 (user report): the zone-only « Sightseeing » tab is gone, this
-                // log covers it.
-                if(ImGui.BeginTabItem(localization.Get("VistaLog.Tab"))){try{DrawVistaLog(live);}finally{ImGui.EndTabItem();}}
-            }
-            finally{ImGui.EndTabBar();}
+            if(open)OrderedTabs("MapLocalTabs",tabs,ImGuiTabBarFlags.FittingPolicyScroll);
         }
         finally{ImGui.EndChild();}
     }
