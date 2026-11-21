@@ -80,7 +80,9 @@ in-game readings through GitHub, on the player's click or the opt-in daily excha
 <!-- gen:decisions:en -->
 Open points, produced by script from the agent's source of decisions. Choices already taken: [DECISIONS](DECISIONS.md); the former tables: [archive](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/archive/DECISIONS-EN-ATTENTE-2026-11-09.md).
 
-Nothing open.
+| No. | Point | Choice applied, or record awaited | Where |
+|---|---|---|---|
+| D-200 | Chat tab order: one order for the window and the context profiles, or one order per profile? | One order (applied): a profile shows its tabs in the settings' order; dragging them in a profile changes their order for all |  |
 <!-- /gen:decisions:en -->
 
 ## In-game tests
@@ -177,7 +179,9 @@ donnée prise sur des sites web).
 <!-- gen:decisions:fr -->
 Points ouverts, produits par script depuis la source des décisions de l'agent. Choix déjà faits : [DECISIONS](DECISIONS.md) ; anciens tableaux : [archive](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/archive/DECISIONS-EN-ATTENTE-2026-11-09.md).
 
-Aucune en attente.
+| N° | Point | Choix appliqué, ou relevé attendu | Où |
+|---|---|---|---|
+| D-200 | Ordre des onglets du chat (X-687) : un seul ordre pour la fenêtre et les profils par contexte, ou un ordre par profil ? | Un seul ordre (appliqué) : un profil montre ses onglets dans l'ordre des réglages ; les faire glisser dans un profil change leur ordre pour tous |  |
 <!-- /gen:decisions:fr -->
 
 ## Tests en jeu

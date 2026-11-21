@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (693 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (699 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -756,17 +756,23 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-676 | Review of block 0.1644 to 0.1650 (review 0.1650, 20/11), minor M1: M1 in… | Done in 0.1652.0 |
 | X-677 | Review of block 0.1644 to 0.1650 (review 0.1650, 20/11), pre-existing before… | Done in 0.1651.0 |
 | X-678 | Tool: the decisions tool has no option to set a dated exception (field «… | Done in 0.1650.0 |
+| X-680 | User request (chat, 20/11 about 9:40 pm, two screenshots: the game's menu and… | Done in 0.1662.0 |
+| X-681 | User request (chat, 20/11 about 9:45 pm): « Tell: can't we do it directly with… | Done in 0.1660.0 |
 | X-682 | Tool: the plan tool (public cells, the agent's paths list) does not refuse an… | Done in 0.1656.0 |
 | X-686 | User-reported bug (chat, 20/11 about 10 pm): a chat tab removed by mistake («… | Done in 0.1656.0 |
+| X-687 | User request (chat, 20/11 about 10:05 pm): « no way to arrange the tabs » of… | Done in 0.1663.0 |
+| X-688 | In-game test T-0.1526-2 (test page, 20/11 around 22:08): problem reported by… | Done in 0.1661.0 |
 | X-689 | User-reported bug (20/11 about 10:45 pm): the game's chat still comes back… | Done in 0.1657.0 |
+| X-692 | Tests T-0.1526-1 and -2 in game (20/11, screenshots): at the Beastmaster… | Done in 0.1661.0 |
 | X-693 | Tool: page_essais.py import queues (R28.5) a « plan.py add » then « q.py ko… | Done in 0.1655.0 |
 | X-694 | User-reported bug (chat, 20/11 about 10:50 pm, screenshot « Coal »): the game's… | Done in 0.1657.0 |
+| X-696 | Review of block 0.1656 to 0.1658 (review 0.1658, 20/11), minor M1, M2: M1 in… | Done in 0.1659.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (693 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (699 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1520,8 +1526,14 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-676 | Relecture du bloc 0.1644 à 0.1650 (relecture 0.1650, 20/11), mineurs M1 : M1… | Fait en 0.1652.0 |
 | X-677 | Relecture du bloc 0.1644 à 0.1650 (relecture 0.1650, 20/11), déjà là avant le… | Fait en 0.1651.0 |
 | X-678 | Outil : l'outil des décisions n'a pas d'option pour poser une dérogation datée… | Fait en 0.1650.0 |
+| X-680 | Demande de l'utilisateur (chat, 20/11 vers 21 h 40, deux captures : menu du jeu… | Fait en 0.1662.0 |
+| X-681 | Demande de l'utilisateur (chat, 20/11 vers 21 h 45) : « Murmurer, on ne peut… | Fait en 0.1660.0 |
 | X-682 | Outil : l'outil du plan (cellules publiques, liste des chemins de l'agent) ne… | Fait en 0.1656.0 |
 | X-686 | Bug signalé par l'utilisateur (chat, 20/11 vers 22 h) : un onglet du chat… | Fait en 0.1656.0 |
+| X-687 | Demande de l'utilisateur (chat, 20/11 vers 22 h 05) : « aucun moyen de ranger… | Fait en 0.1663.0 |
+| X-688 | Essai T-0.1526-2 en jeu (page des essais, 20/11 vers 22 h 08) : problème… | Fait en 0.1661.0 |
 | X-689 | Bug signalé par l'utilisateur (20/11 vers 22 h 45) : le chat du jeu réapparaît… | Fait en 0.1657.0 |
+| X-692 | Essais T-0.1526-1 et T-0.1526-2 en jeu (page des essais, 20/11 vers 22 h 04 et… | Fait en 0.1661.0 |
 | X-693 | Outil : page_essais.py import met en file (R28.5) un « plan.py add » puis un «… | Fait en 0.1655.0 |
 | X-694 | Bug signalé par l'utilisateur (chat, 20/11 vers 22 h 50, capture « Charbon »)… | Fait en 0.1657.0 |
+| X-696 | Relecture du bloc 0.1656 à 0.1658 (relecture 0.1658, 20/11), mineurs M1, M2… | Fait en 0.1659.0 |

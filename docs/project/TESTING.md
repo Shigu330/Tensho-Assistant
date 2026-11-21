@@ -2405,6 +2405,28 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1658) Recharger Tensho (ou relancer le jeu), puis, dans les 30 secondes, recevoir un message d'un joueur (Dire ou Hurler) ; une minute plus tard, clic droit sur son nom dans le chat de Tensho : les entrées du jeu sont là (Murmurer actif, Carte de personnage…), comme pour un message reçu plus tard.
 
+- [ ] (0.1659) Fenêtre de chat, réglages des onglets : retirer l'onglet « Combat », cliquer « Remettre « Combat » », puis « Annuler » avant la fin des 10 secondes : un seul onglet « Combat », pas deux.
+
+- [ ] (0.1659) Réglages de la fenêtre de chat : cocher « Cacher les messages du chat du jeu » et « Masquer en combat » : une ligne orange dit qu'aucun chat ne sera visible en combat ou en mission ; cocher « Afficher les deux chats » : la ligne disparaît.
+
+- [ ] (0.1660) Fenêtre de chat : clic droit sur le nom d'un joueur dans un message « Hurler » et dans un « Dire » neufs, puis dans un message ancien (de l'historique, d'avant le dernier chargement) : les entrées du jeu sont toujours là ; celles qui ne peuvent pas servir sont grisées et leur info-bulle dit pourquoi.
+
+- [ ] (0.1660) Fenêtre de chat : juste après un rechargement de Tensho, « Murmurer » sur un message reçu (même ancien) : la ligne de saisie du jeu passe en murmure vers ce joueur, rien n'est envoyé ; écrire un mot et l'envoyer : le murmure arrive bien (sinon, le dire).
+
+- [ ] (0.1660) Fenêtre de chat : clic droit sur votre propre message : aucune entrée du jeu (seulement celles de Tensho).
+
+- [ ] (0.1661) Au Dédale bestial, devant « Formation de l'équipe » : le panneau de Tensho montre « Votre équipe (lue dans le jeu) : 10 bêtes », les trois bêtes de chaque combat prises parmi les vôtres, et « Sans X (conseillée) : Y à la place » quand une conseillée vous manque.
+
+- [ ] (0.1661) Au Dédale bestial, après un combat où une bête est tombée ou a perdu beaucoup de PV, rouvrir « Formation de l'équipe » : le panneau dit « … est à terre : pas appelée » ou « … : PV bas (a/b) » et ne l'appelle plus si elle est à terre.
+
+- [ ] (0.1662) Fenêtre de chat : clic droit sur le nom d'un joueur dans un « Hurler » puis dans un « Dire », et comparer au menu du chat du jeu sur le même message : mêmes entrées dans le même ordre (Fonctions de blocage en sous-menu) ; Recherche d'équipe ouvre l'annonce du joueur s'il en a une ; les entrées grisées disent pourquoi.
+
+- [ ] (0.1663) Fenêtre de chat : faire glisser un onglet à une autre place, puis recharger Tensho (ou relancer le jeu) : l'ordre est gardé.
+
+- [ ] (0.1663) Fenêtre de chat : clic droit sur un onglet, « Déplacer à droite » : l'onglet change de place, celui affiché reste affiché ; dans les réglages des onglets, les boutons « Déplacer à gauche / à droite » font de même.
+
+- [ ] (0.1664) Fenêtre de chat : survoler un objet lié (par exemple un cristal ou un agrégat) : nom en haut, description du jeu, puis collection, stock, prix de vente aux PNJ, usages et « Comment l'obtenir » comme dans l'info-bulle d'objet de Tensho, la ligne des clics en bas ; comparer avec le survol du même objet dans l'inventaire.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
