@@ -42,12 +42,15 @@ internal sealed partial class MainWindow
         return chatAllTabs;
     }
 
-    /// <summary>X-447 B11 (0.1714): the tab drawn in window n, when the context shows it (a context's profile can leave it out); else null.</summary>
+    /// <summary>X-447 B11 (0.1714): the tab drawn in window n, when the context shows it (a context's profile can leave it out); else null.
+    /// X-717 M2 (review of 0.1716): null too while the chat window keeps it, every tab the context shows being detached (ChatWindows.Kept).</summary>
     private ChatTabSettings? ChatDetachedTab(int window)
     {
         var options=ChatOptions;
-        return ChatWindows.In(ChatAllTabs(options),window) is { } tab
-            && (tab.Conversation is not null || ChatContexts.ShowsTab(ChatContexts.ProfileOf(options,chatContextNow),tab)) ? tab:null;
+        var all=ChatAllTabs(options);
+        if(ChatWindows.In(all,window) is not { } tab
+            || tab.Conversation is null && !ChatContexts.ShowsTab(ChatContexts.ProfileOf(options,chatContextNow),tab))return null;
+        return ReferenceEquals(ChatWindows.Kept(ChatWindowTabs(options),all),tab) ? null:tab;
     }
 
     /// <summary>X-447 B11 (0.1714): the window's title: its tab's name, its unread count and its alert mark, as on the tab.</summary>
@@ -114,7 +117,8 @@ internal sealed partial class MainWindow
     private void DrawChatDetachEntry(ChatTabSettings tab)
     {
         var all=ChatAllTabs(ChatOptions);
-        var free=ChatWindows.Free(all,tab)!=0;
+        // X-717 M2 (review of 0.1716): nor the last tab the context shows in the chat window.
+        var free=ChatWindows.Free(all,tab,ChatWindowTabs(ChatOptions))!=0;
         var any=ChatWindows.Any(all);
         ImGui.BeginDisabled(!free);
         try{if(ImGui.Selectable(localization.Get("ChatWindow.Detach")))DetachChatTab(tab);}
@@ -129,7 +133,7 @@ internal sealed partial class MainWindow
     /// <summary>X-447 B11 (0.1714): a tab of the chat window into the first free window of its own; saved (a conversation's tab never is).</summary>
     private void DetachChatTab(ChatTabSettings tab)
     {
-        if(!ChatWindows.Detach(ChatAllTabs(ChatOptions),tab))return;
+        if(!ChatWindows.Detach(ChatAllTabs(ChatOptions),tab,ChatWindowTabs(ChatOptions)))return;
         if(tab.Conversation is null)TrySave("Chat window tabs");
     }
 

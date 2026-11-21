@@ -36,8 +36,8 @@ internal static class ChatLists1716Tests
             var row = Read("UI/Components/SettingRow.cs");
             Check(row.Contains("if(scrolled)ImGui.BeginChild(\"###ListLines\",new Vector2(0,ListRowsShown*ImGui.GetFrameHeightWithSpacing()),true);", StringComparison.Ordinal)
                 && row.Contains("finally{if(scrolled)ImGui.EndChild();}", StringComparison.Ordinal), "the scroll area");
-            Check(row.Contains("else{listSettingDrafts[draftId]=draft;if(Chat.ChatTextFilter.TryAdd(read(),draft,maximum,matchCase?.Invoke()??false).Full)listSettingFull.Add(draftId);}", StringComparison.Ordinal)
-                && row.Contains("if(listSettingFull.Contains(draftId))ImGui.TextColored(Warning,localization.Format(\"ChatWindow.ListFull\",maximum));", StringComparison.Ordinal), "full: the text kept, said");
+            Check(row.Contains("else{listSettingDrafts[draftId]=draft;if(Chat.ChatTextFilter.TryAdd(read(),draft,maximum,matchCase?.Invoke()??false).Full)listSettingFull[draftId]=(draft,read()??\"\");}", StringComparison.Ordinal)
+                && row.Contains("if(Chat.ChatTextFilter.StillRefused(refused,listSettingDrafts.GetValueOrDefault(draftId)??\"\",read()))ImGui.TextColored(Warning,localization.Format(\"ChatWindow.ListFull\",maximum));", StringComparison.Ordinal), "full: the text kept, said");
             var window = Read("MainWindow.ChatWindow.cs");
             Check(!window.Contains(",600)", StringComparison.Ordinal), "no old limit left for the players and the alert words");
             Check(window.Split("ChatTextFilter.ListMaximum").Length - 1 >= 7, "the one limit");

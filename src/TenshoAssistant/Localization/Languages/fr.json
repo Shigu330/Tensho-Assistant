@@ -6756,6 +6756,7 @@
     "TabColorTip": "La couleur du nom de cet onglet, pour reconnaître les onglets d'un coup d'œil ; une couleur trop proche du fond de l'onglet est éclaircie ou foncée pour que le nom reste lisible.\nPar défaut : la couleur du texte du thème.",
     "TabRemove": "Retirer",
     "TabRemoveTip": "Retire cet onglet ; ses messages restent dans les autres onglets. Vous pouvez l'annuler pendant 10 secondes, juste au-dessus des onglets.",
+    "TabRemoveLastTip": "Impossible : c'est le dernier onglet resté dans la fenêtre de chat, les autres étant chacun dans leur propre fenêtre. Remettez-en d'abord un (le bouton en haut de sa fenêtre, ou le menu de son nom).",
     "TabChannels": "Canaux ({0})",
     "TabAdd": "Ajouter un onglet",
     "TabAddTip": "Un nouvel onglet avec ce que disent les gens (12 onglets au plus) ; choisissez ses canaux sous son nom.",

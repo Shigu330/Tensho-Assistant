@@ -83,6 +83,10 @@ public static class ChatTextFilter
         return names.Any(chosen=>string.Equals(chosen,name,StringComparison.OrdinalIgnoreCase) || string.Equals(chosen,sender.Trim(),StringComparison.OrdinalIgnoreCase));
     }
 
+    /// <summary>X-717 M1 (review of 0.1716): as <see cref="IsPlayer(string,IReadOnlyList{string})"/>, against a set cut once (a lookup, not a
+    /// walk through up to two hundred and fifty names for each line drawn).</summary>
+    public static bool IsPlayer(string sender,ChatPlayerSet names)=>names.Holds(sender);
+
     public static string Text(ChatRecord record)=>record.Sender+" "+string.Concat(record.Body.Select(segment=>segment.Text));
 
     /// <summary>X-508 (0.1566): the player's name of a sender, without its world (« Ann Doe@World » gives « Ann Doe »); empty for none.</summary>
@@ -120,6 +124,12 @@ public static class ChatTextFilter
         return joined.Length<=maximum ? (joined,false):(null,true);
     }
 
+    /// <summary>X-717 M3 (review of 0.1716): the « list full » line under a list's box still holds: the text typed and the list are those of the
+    /// addition refused (<paramref name="refused"/>). Typing something else, or the list changed another way (a player taken away from a
+    /// message's menu), takes the line away. A list null or empty is the same.</summary>
+    public static bool StillRefused((string Draft,string List) refused,string draft,string? list)
+        =>string.Equals(refused.Draft,draft,StringComparison.Ordinal) && string.Equals(refused.List,list ?? "",StringComparison.Ordinal);
+
     /// <summary>X-508 (0.1566): the list without its line at this index (an index out of the list leaves it as it is, written again).</summary>
     public static string Remove(string? list,int index)
     {
@@ -136,6 +146,42 @@ public static class ChatTextFilter
     /// (« Ann Doe » and « Ann Doe@World », capitals ignored): what the menu offers to take away is really taken away.</summary>
     public static string RemovePlayer(string? list,string sender)
         =>string.Join(", ",Words(list).Where(line=>!IsPlayer(sender,[line])));
+}
+
+/// <summary>
+/// X-717 M1 (review of 0.1716): a list of players (put forward or hidden) cut once into a set, and cut again only when its text changes. What
+/// is drawn at each frame looks a sender up, instead of cutting the whole list again and walking it name by name: since 0.1716 a list holds
+/// up to 6000 characters (about two hundred and fifty names), looked at up to three times for each line drawn and again in each detached
+/// window. Same answer as <see cref="ChatTextFilter.IsPlayer(string,IReadOnlyList{string})"/>: the name before the world, or the whole
+/// sender, capitals ignored. Used by one thread at a time (the frame's).
+/// </summary>
+public sealed class ChatPlayerSet
+{
+    private string text="";
+    private HashSet<string> names=new(StringComparer.OrdinalIgnoreCase);
+
+    public ChatPlayerSet(string? list=null)=>Update(list);
+
+    public int Count=>names.Count;
+
+    /// <summary>The list's text now: cut again only when it differs from the text before (false: nothing changed). Null is empty.</summary>
+    public bool Update(string? list)
+    {
+        list??="";
+        if(string.Equals(list,text,StringComparison.Ordinal))return false;
+        text=list;
+        names=new HashSet<string>(ChatTextFilter.Words(list),StringComparer.OrdinalIgnoreCase);
+        return true;
+    }
+
+    /// <summary>The sender is one of the players: its whole name (« Ann Doe@World », or without a world) or its name before the world.</summary>
+    public bool Holds(string sender)
+    {
+        if(names.Count==0 || sender.Length==0)return false;
+        if(names.Contains(sender.Trim()))return true;
+        var at=sender.IndexOf('@');
+        return at>0 && names.Contains(sender[..at].Trim());
+    }
 }
 
 /// <summary>X-484 (0.1520, beyond the game): the alert words: a message holding one stands out and marks its tab until seen. Pure (tests).</summary>
@@ -259,13 +305,15 @@ public sealed class ChatTabFilter
     private readonly ChatTabSettings tab;
     private readonly ChatFilterTable? table;
     private readonly HashSet<uint>? chosen;
-    private readonly IReadOnlyList<string> keep,hide,hidden;
+    private readonly IReadOnlyList<string> keep,hide;
+    // X-717 M1 (review of 0.1716): the players hidden, a set (a lookup per message).
+    private readonly ChatPlayerSet hidden;
 
     public ChatTabFilter(ChatTabSettings tab,ChatFilterTable? table,ChatSettings? settings)
     {
         this.tab=tab;
         if(tab.Filters is { } filters && table is { Rows.Count:>0 }){this.table=table;chosen=filters.ToHashSet();}
-        keep=ChatTextFilter.Words(tab.KeepWords);hide=ChatTextFilter.Words(tab.HideWords);hidden=ChatTextFilter.Words(settings?.HiddenPlayers);
+        keep=ChatTextFilter.Words(tab.KeepWords);hide=ChatTextFilter.Words(tab.HideWords);hidden=new(settings?.HiddenPlayers);
     }
 
     public bool Shows(ChatRecord record)

@@ -96,10 +96,16 @@ internal sealed partial class MainWindow
             {
                 // X-716 (0.1716): a full list keeps what was typed and says so (never an addition lost silently).
                 if(Chat.ChatTextFilter.Add(read(),draft,maximum,matchCase?.Invoke()??false) is { } added){write(added);changed=true;listSettingDrafts[draftId]="";listSettingFull.Remove(draftId);}
-                else{listSettingDrafts[draftId]=draft;if(Chat.ChatTextFilter.TryAdd(read(),draft,maximum,matchCase?.Invoke()??false).Full)listSettingFull.Add(draftId);}
+                else{listSettingDrafts[draftId]=draft;if(Chat.ChatTextFilter.TryAdd(read(),draft,maximum,matchCase?.Invoke()??false).Full)listSettingFull[draftId]=(draft,read()??"");}
                 if(enter)listSettingFocus.Add(draftId);
             }
-            if(listSettingFull.Contains(draftId))ImGui.TextColored(Warning,localization.Format("ChatWindow.ListFull",maximum));
+            // X-717 M3 (review of 0.1716): said while the text typed and the list are those of the addition refused; another text, or the list
+            // changed another way (a player taken away from a message's menu), takes it away.
+            if(listSettingFull.TryGetValue(draftId,out var refused))
+            {
+                if(Chat.ChatTextFilter.StillRefused(refused,listSettingDrafts.GetValueOrDefault(draftId)??"",read()))ImGui.TextColored(Warning,localization.Format("ChatWindow.ListFull",maximum));
+                else listSettingFull.Remove(draftId);
+            }
             ImGui.Unindent();
         }
         finally{ImGui.PopID();}
@@ -110,8 +116,9 @@ internal sealed partial class MainWindow
     private readonly Dictionary<uint,string> listSettingDrafts=[];
     /// <summary>X-626 M2: the « Add » boxes where Enter was pressed: the cursor goes back into them on the next frame.</summary>
     private readonly HashSet<uint> listSettingFocus=[];
-    /// <summary>X-716 (0.1716): the lists whose last addition did not fit (said under their box until a line goes or one is added).</summary>
-    private readonly HashSet<uint> listSettingFull=[];
+    /// <summary>X-716 (0.1716): the lists whose last addition did not fit, said under their box. X-717 M3 (review of 0.1716): with the text
+    /// refused and the list then, the line going as soon as either changes.</summary>
+    private readonly Dictionary<uint,(string Draft,string List)> listSettingFull=[];
     /// <summary>X-716 (0.1716): the lines a list shows before its own scroll bar.</summary>
     private const int ListRowsShown=8;
 

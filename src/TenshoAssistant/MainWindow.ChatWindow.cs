@@ -50,8 +50,8 @@ internal sealed partial class MainWindow
             return chatFilterTable;
         }
     }
-    // X-484 (0.1482): the players whose name stands out, read once per frame.
-    private IReadOnlyList<string> chatHighlighted=[];
+    // X-484 (0.1482): the players whose name stands out. X-717 M1 (review of 0.1716): a set, cut again only when the list's text changes.
+    private readonly ChatPlayerSet chatHighlighted=new();
     // X-484 (0.1520): the alert words. X-634 (review of 0.1520, M2): looked once per message by the tab's view (ChatTabView.AlertAt).
     private string? chatAlertWords;
     // X-636 (bench X-631, review of 0.1441, M3): the link the left button was pressed on (it acts on the release over it, without a drag).
@@ -689,14 +689,22 @@ internal sealed partial class MainWindow
                 if(tabs.Count>1)
                 {
                     SameLineIfFits(ImGui.CalcTextSize(localization.Get("ChatWindow.TabRemove")).X+style.FramePadding.X*2);
+                    // X-717 M2 (review of 0.1716): never the last tab left in the chat window, the others each in a window of their own
+                    // (greyed, and its tooltip says why).
+                    var removable=ChatWindows.Removable(tabs,ChatAllTabs(options),tab);
+                    bool remove;
+                    ImGui.BeginDisabled(!removable);
+                    try{remove=ImGui.SmallButton(localization.Get("ChatWindow.TabRemove"));}
+                    finally{ImGui.EndDisabled();}
+                    if(removable)Tip("ChatWindow.TabRemoveTip");
+                    else Tip("ChatWindow.TabRemoveLastTip");
                     // X-686: the tab is kept a few seconds, the time to undo it (the line above the tabs)
-                    if(ImGui.SmallButton(localization.Get("ChatWindow.TabRemove")) && chatTabUndo.Remove(tabs,index,Environment.TickCount64))
+                    if(remove && chatTabUndo.Remove(tabs,index,Environment.TickCount64))
                     {
                         ChatMessages.Restart(tab);
                         chatSettingsPending=true;
                         return;
                     }
-                    Tip("ChatWindow.TabRemoveTip");
                 }
                 // X-520 (0.1537): the desktop application's picture of the chat's tabs shows the first tab's channels (X-560's grid).
                 if(index==0 && desktopChatChannelsOpen){ImGui.SetNextItemOpen(true);desktopChatChannelsOpen=false;}
@@ -1256,7 +1264,7 @@ internal sealed partial class MainWindow
         ChatWindows.InChatWindow(tabs,ChatAllTabs(options),chatMainTabs);
         tabs=chatMainTabs;
         if(developerMode)SlowFrames.Add(ImGui.GetFrameCount(),"Chat refresh",System.Diagnostics.Stopwatch.GetElapsedTime(refreshStarted).TotalMilliseconds);
-        chatHighlighted=ChatTextFilter.Words(options.HighlightedPlayers);
+        chatHighlighted.Update(options.HighlightedPlayers);
         chatAlertWords=options.AlertWords;
         // X-467 (0.1504): reduced to its tabs, the lines are not drawn (never while it stands over the game's hidden messages).
         var reduced=chatReduced && !chatFollowing;

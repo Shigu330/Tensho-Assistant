@@ -6756,6 +6756,7 @@
     "TabColorTip": "The colour of this tab's name, to tell the tabs apart at a glance; a colour too close to the tab's background is made lighter or darker so the name stays legible.\nDefault: the theme's text colour.",
     "TabRemove": "Remove",
     "TabRemoveTip": "Removes this tab; its messages stay in the other tabs. You can undo it for 10 seconds, just above the tabs.",
+    "TabRemoveLastTip": "Not possible: this is the last tab left in the chat window, the others each in a window of their own. Put one of them back first (the button at the top of its window, or its name's menu).",
     "TabChannels": "Channels ({0})",
     "TabAdd": "Add a tab",
     "TabAddTip": "A new tab with what people say (12 tabs at most); choose its channels under its name.",
