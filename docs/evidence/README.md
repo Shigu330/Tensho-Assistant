@@ -133,7 +133,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1711-gathering-node-icons.md](0.1711-gathering-node-icons.md) | `src/TenshoAssistant/Maps/GatheringNodeIcons.cs` | `docs/changelog/CHANGELOG-0.1700-0.1799.md` |
 | [0.1718-chat-link-click-probe.md](0.1718-chat-link-click-probe.md) | `src/TenshoAssistant/Chat/ChatLinkProbe.cs`, `src/TenshoAssistant/Chat/ChatLinkWatch.Dalamud.cs`, `tests/TenshoAssistant.Tests/ChatLinkProbe1718Tests.cs` | `docs/changelog/CHANGELOG-0.1700-0.1799.md` |
 | [0.1720-chat-action-names.md](0.1720-chat-action-names.md) | `tests/TenshoAssistant.Tests/ChatActions1720Tests.cs` | `docs/changelog/CHANGELOG-0.1700-0.1799.md` |
-| [0.1734-chat-action-lines.md](0.1734-chat-action-lines.md) | `src/TenshoAssistant/Chat/ChatActionLines.cs`, `src/TenshoAssistant/Chat/ChatActionTips.cs`, `src/TenshoAssistant/Chat/ChatPayloads.cs`, `tests/TenshoAssistant.Tests/ChatLines1734Tests.cs` | `CHANGELOG.md` |
+| [0.1734-chat-action-lines.md](0.1734-chat-action-lines.md) | `src/TenshoAssistant/Chat/ChatActionLines.cs`, `src/TenshoAssistant/Chat/ChatActionTips.cs`, `src/TenshoAssistant/Chat/ChatPayloads.cs`, `tests/TenshoAssistant.Tests/ChatLines1734Tests.cs` | `docs/changelog/CHANGELOG-0.1700-0.1799.md` |
 | [0.1739-meal-status-gained.md](0.1739-meal-status-gained.md) | — | `CHANGELOG.md` |
 | [0.174.0-triad-seldeck-capture.log](0.174.0-triad-seldeck-capture.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.1741-unload-json.md](0.1741-unload-json.md) | `src/TenshoAssistant/TenshoJson.cs` | `CHANGELOG.md` |

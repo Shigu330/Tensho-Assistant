@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (755 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (759 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -673,6 +673,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-581 | Bug seen by the user on 18/11 around 00:35 (capture of the Garden page, house… | Done in 0.1572 |
 | X-582 | Tool (defect seen on 18/11 around 00:30, relay 110): q.py plafond, hence… | Done in 0.1548 |
 | X-583 | Tool: on 18/11 around 01:00, relay 110 asked the master a question then waited… | Done in 0.1551 |
+| X-584 | Defect seen by the user on 18/11 around 00:25 (test T-0.1508-1, test page, two… | Done in 0.1657.0 |
 | X-585 | Review of block 0.1540 to 0.1550 (review 0.1550, 18/11), minor M1, M2, M3, M4… | Done in 0.1558 |
 | X-586 | External audit of 18/11 (GPT-6.2 Astra, commit c6389abe, 27 new findings, 6… | Done in 0.1550 |
 | X-587 | External audit of 18/11, family « player data after an error »: A16 (critical… | Done in 0.1551 |
@@ -822,13 +823,16 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-734 | In-game test T-0.1720-1 (test page, 21/11 around 15:49): problem reported by… | Done in 0.1734.0 |
 | X-735 | Review of block 0.1727 to 0.1733 (review 0.1733, 21/11), minor M1: M1 in… | Done in 0.1735.0 |
 | X-748 | Idea I-022 chosen by the user on 21/11 around 16:00 (idea box): Vendors: hide… | Done in 0.1738.0 |
+| X-751 | Idea I-049 chosen by the user on 21/11 around 16:00 (idea box): Tool: mutation… | Done in 0.1742.0 |
 | X-754 | Idea I-050 chosen by the user on 21/11 around 16:00 (idea box): Capture mode… | Done in 0.1737.0 |
+| X-756 | Review of block 0.1734 to 0.1738 (review 0.1738, 21/11), I1: finding in… | Done in 0.1739.0 |
+| X-757 | Review of block 0.1734 to 0.1738 (review 0.1738, 21/11), minor M1, M2, M3, M4… | Done in 0.1740.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (755 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (759 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1499,6 +1503,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-581 | Bug vu par l'utilisateur le 18/11 vers 0 h 35 (capture de la page Jardin… | Fait en 0.1572 |
 | X-582 | Outil (défaut constaté le 18/11 vers 0 h 30, relais 110) : q.py plafond, et… | Fait en 0.1548 |
 | X-583 | Outil : le 18/11 vers 1 h, le relais 110 a posé une question à la maître puis… | Fait en 0.1551 |
+| X-584 | Défaut vu par l'utilisateur le 18/11 vers 0 h 25 (essai T-0.1508-1, page des… | Fait en 0.1657.0 |
 | X-585 | Relecture du bloc 0.1540 à 0.1550 (relecture 0.1550, 18/11), mineurs M1, M2… | Fait en 0.1558 |
 | X-586 | Audit externe du 18/11 (GPT-6.2 Astra, commit c6389abe, 27 constats nouveaux… | Fait en 0.1550 |
 | X-587 | Audit externe du 18/11, famille « données du joueur après une erreur » : A16… | Fait en 0.1551 |
@@ -1648,4 +1653,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-734 | Essai T-0.1720-1 en jeu (page des essais, 21/11 vers 15 h 49) : problème… | Fait en 0.1734.0 |
 | X-735 | Relecture du bloc 0.1727 à 0.1733 (relecture 0.1733, 21/11), mineurs M1 : M1… | Fait en 0.1735.0 |
 | X-748 | Idée I-022 choisie par l'utilisateur le 21/11 vers 16 h (boîte à idées) : Essai… | Fait en 0.1738.0 |
+| X-751 | Idée I-049 choisie par l'utilisateur le 21/11 vers 16 h (boîte à idées) : Outil… | Fait en 0.1742.0 |
 | X-754 | Idée I-050 choisie par l'utilisateur le 21/11 vers 16 h (boîte à idées) : Mode… | Fait en 0.1737.0 |
+| X-756 | Relecture du bloc 0.1734 à 0.1738 (relecture 0.1738, 21/11), I1 : X-733 : le… | Fait en 0.1739.0 |
+| X-757 | Relecture du bloc 0.1734 à 0.1738 (relecture 0.1738, 21/11), mineurs M1, M2… | Fait en 0.1740.0 |

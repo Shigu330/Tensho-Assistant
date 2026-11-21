@@ -2556,7 +2556,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1717) Réglages du chat › Joueurs mis en avant : après l'avis « liste pleine », retirer un joueur par le menu d'un message (« Ne plus mettre en avant ») ou changer le texte tapé : l'avis disparaît
 
-- [ ] (0.1718) Mode développeur : dans le chat du jeu, cliquer sur le nom d'un joueur, du bouton gauche puis du droit : un joueur près de vous, un joueur loin sur votre monde, un joueur d'un autre monde ; le journal (dalamud.log) doit montrer une ligne « Chat link probe, click N » par clic et, quand le menu du jeu s'ouvre, une ligne « menu after click N » (ou « without a link click »), sans nom de joueur
+- [x] (0.1718) Mode développeur : dans le chat du jeu, cliquer sur le nom d'un joueur, du bouton gauche puis du droit : un joueur près de vous, un joueur loin sur votre monde, un joueur d'un autre monde ; le journal (dalamud.log) doit montrer une ligne « Chat link probe, click N » par clic et, quand le menu du jeu s'ouvre, une ligne « menu after click N » (ou « without a link click »), sans nom de joueur
 
 - [ ] (0.1719) Maison de la compagnie, base de tour éthéréen : installer un tour (fenêtre ouverte) : Tensho › Rappels, ligne « Tours éthéréens » : « 1 en charge », et « Tour par tour » donne le tour, son emplacement, sa charge et « chargé à » l'heure d'installation plus 20, 45 ou 70 heures selon le grade ; une alarme automatique « … chargé » est créée à cette heure (page Alertes)
 
@@ -2615,6 +2615,10 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] (0.1737) Mode capture de la fenêtre de chat coché, page Cartes, liens de carte du chat : survoler un lien envoyé par un joueur : l'info-bulle montre « #XXXXX », le même code que la fenêtre de chat pour ce joueur, jamais son nom ; décoché : son nom avec son monde (Nom@Monde)
 
 - [ ] (0.1738) Page Marchands, un objet vendu par beaucoup de PNJ dont certains à placer chez soi (un meuble ou une teinture courante) : les marchands sur une carte d'abord, puis une seule ligne « Marchands sans position : N (cliquez pour les afficher) » ; un clic les montre, un autre les cache
+
+- [ ] (0.1739) Fenêtre de chat de Tensho, déjà Repu d'un repas : manger un autre repas ; survoler la nouvelle ligne « Vous bénéficiez de l'effet Repu » : les bonus du nouveau repas (pas de l'ancien) ; à la fin de l'effet, la ligne « Vous perdez l'effet Repu » montre seulement la description
+
+- [ ] (0.1740) Fenêtre de chat, « S'effacer après » à 10 s et historique gardé : recharger Tensho, attendre que la fenêtre s'efface sans écrire : elle ne revient pas quand les anciens messages sont remis (dans les premières secondes) ; un nouveau message de l'onglet la fait revenir
 
 **0.535 : interfaces** — à voir en jouant
 
