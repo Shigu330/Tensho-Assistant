@@ -23,6 +23,22 @@ public static class UnloadWatch
     public const string Context="context";
     /// <summary>0.1191: how the compiler names the field of a closure that holds the closure of the scope around it.</summary>
     public const string ClosureField="CS$<>8__locals";
+    /// <summary>X-685 (0.1755): the key an instance notes at its unload with the count of full collections then (no part: its target is null).</summary>
+    public const string UnloadedAt="unloaded at full collection ";
+
+    /// <summary>
+    /// X-685 (0.1755, the reading of 0.1752 in the game: « context alive » ten minutes after the unload, one full collection meanwhile): the
+    /// count of full (generation 2) collections at the unload, so the next loads say how many ran since. A context that can unload needs at
+    /// least two after its last reference goes (one finds it unreachable and runs its finaliser, a later one frees it): « alive » after fewer
+    /// proves nothing.
+    /// </summary>
+    public static void Unloaded(Dictionary<string,WeakReference> parts,int fullCollections)=>
+        parts[UnloadedAt+fullCollections.ToString(System.Globalization.CultureInfo.InvariantCulture)]=new WeakReference(null);
+
+    /// <summary>X-685 (0.1755): the full collections run since the unload noted in these parts; null when none was noted.</summary>
+    public static int? FullCollectionsSinceUnload(IReadOnlyDictionary<string,WeakReference> parts,int now)=>
+        parts.Keys.FirstOrDefault(key=>key.StartsWith(UnloadedAt,StringComparison.Ordinal)) is { } mark
+        && int.TryParse(mark.AsSpan(UnloadedAt.Length),System.Globalization.NumberStyles.None,System.Globalization.CultureInfo.InvariantCulture,out var at) ? Math.Max(0,now-at):null;
 
     /// <summary>0.1191: the closure of the scope around a closure (the first field the compiler named so); null when there is none.</summary>
     public static object? OuterClosure(object? closure)
@@ -99,7 +115,9 @@ public static class UnloadWatch
     public static string Describe(string label,IReadOnlyDictionary<string,WeakReference> parts,int names=24)
     {
         var context=parts.TryGetValue(Context,out var held) ? (held.IsAlive ? "alive":"collected"):"unknown";
-        var noted=parts.Where(part=>part.Key!=Context).ToList();
+        // X-685 (0.1755): how many full collections ran since its unload (said when noted).
+        if(FullCollectionsSinceUnload(parts,MachineMemory.FullCollections) is { } since)context+=$" after {since} full collection(s) since its unload";
+        var noted=parts.Where(part=>part.Key!=Context && !part.Key.StartsWith(UnloadedAt,StringComparison.Ordinal)).ToList();
         if(noted.Count==0)return $"{label}: context {context}, parts not noted";
         // 0.1195: each part read once (a target taken is alive for the line); a part shared by construction is counted apart from those a
         // root holds (an instance noted before 0.1195 has its empty arrays and static values among its parts; none is noted since).

@@ -1752,5 +1752,7 @@ public sealed partial class Plugin : IDalamudPlugin
             var held=Diagnostics.UnloadRelease.ProcessEventsFrom(System.Runtime.Loader.AssemblyLoadContext.GetLoadContext(typeof(Plugin).Assembly));
             log.Information("Unload: process event handlers still from this copy: {0}.",held is null ? "unknown":held.Count==0 ? "none":string.Join(", ",held));
         }
+        // X-685 (0.1755): the count of full collections at the end of the unload, for the next loads' line (« after N full collection(s) »).
+        if(unloadParts is { } unloaded)Diagnostics.UnloadWatch.Unloaded(unloaded,GC.CollectionCount(2));
     }
 }

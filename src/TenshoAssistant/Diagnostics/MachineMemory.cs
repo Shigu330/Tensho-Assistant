@@ -11,6 +11,9 @@ namespace TenshoAssistant.Diagnostics;
 /// </summary>
 public static class MachineMemory
 {
+    /// <summary>X-685 (0.1755): the full (generation 2) collections of the process so far (read only, nothing collected).</summary>
+    public static int FullCollections=>GC.CollectionCount(2);
+
     /// <summary>The machine's physical memory: available and total bytes, the load in percent, the commit charge still available.</summary>
     public readonly record struct Reading(long AvailableBytes,long TotalBytes,int LoadPercent,long CommitAvailableBytes);
 
