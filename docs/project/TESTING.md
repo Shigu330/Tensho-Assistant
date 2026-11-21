@@ -2529,7 +2529,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1702) Barre de côté : tirer une entrée (par exemple Carte) au-dessus d'une autre du même groupe : un trait doré montre la place, au relâchement l'entrée y reste et la page ne change pas ; un simple clic ouvre toujours la page ; recharger le plugin : l'ordre reste ; Paramètres › Apparence › « Remettre les onglets des pages dans l'ordre » remet aussi la barre de côté
 
-- [ ] (0.1703) Compagnie libre › Routes : choisir un sous-marin puis un « Secteur à débloquer » encore fermé : la suite des secteurs à explorer s'affiche avec leurs rangs, à partir du dernier déjà débloqué ; un secteur déjà débloqué ou le premier de la carte est dit tel quel
+- [ ] (0.1703) Compagnie libre › Meilleurs trajets › Sous-marins : choisir un sous-marin, le but « Débloquer un secteur », puis un « Secteur à débloquer » encore fermé : la suite des secteurs à explorer s'affiche avec leurs rangs, à partir du dernier déjà débloqué ; un secteur déjà débloqué ou le premier de la carte est dit tel quel
 
 - [ ] (0.1705) Barre de côté : cliquer une entrée en bougeant un peu la souris pendant le clic : la page s'ouvre ; commencer à glisser une entrée, fermer la fenêtre par son raccourci en tenant le bouton, relâcher, rouvrir : l'entrée n'a pas bougé
 
@@ -2542,6 +2542,16 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] (0.1707) Meilleurs trajets › Sous-marins : ouvrir « Secteurs de cette carte », cocher deux secteurs : la ligne du trajet mesuré s'affiche (distance, durée, expérience, valeur) ; « Choisir » sur un meilleur trajet le coche ; « Vider » décoche
 
 - [ ] (0.1707) Meilleurs trajets › Sous-marins : ouvrir « Vos sous-marins » : un meilleur trajet par sous-marin lu à l'atelier ; « Choisir » reprend ce sous-marin et coche son trajet
+
+- [ ] (0.1709) Meilleurs trajets › Sous-marins : but « Débloquer un secteur », choisir un secteur déjà débloqué à l'atelier, ouvrir « Vos sous-marins » : chaque sous-marin de cette compagnie dit que le secteur est déjà débloqué ; avec un secteur encore fermé, chacun passe par le prochain secteur à explorer de sa compagnie (sous-marins de deux compagnies : chacun suit la sienne)
+
+- [ ] (0.1710) Quêtes : ouvrir la fiche d'une quête : le donneur avec son lieu et ses coordonnées, le PNJ de fin, les classes et jobs (et le peuple allié pour une quête de peuple allié) ; « Placer le donneur sur la carte » ouvre la carte de Tensho sur le donneur avec le drapeau, au même endroit que le donneur sur la carte du jeu
+
+- [ ] (0.1710) Quêtes : fiche d'une quête acceptée à étapes (par exemple une quête de classe dans Limsa Lominsa) : « Étape en cours » donne le lieu de l'étape ; « Placer l'étape en cours sur la carte » pose le drapeau au même endroit que le repère de la carte du jeu ; refaire après l'étape suivante
+
+- [ ] (0.1711) Carte de Tensho près de points de récolte, en mineur puis en botaniste : les points présents ont la pioche (mineur) ou la feuille (botaniste) ; un point à horaire présent a l'icône à étincelles avec une petite horloge verte ; sa zone est rose, celle d'un point normal verte, sur une carte claire et une carte sombre
+
+- [ ] (0.1711) Paramètres › Carte : « Zones de récolte à horaire » (case et couleur) ; dans la liste des icônes, survoler l'icône de la ligne des points de récolte proches : la légende montre les quatre icônes et les deux couleurs de zone
 
 **0.535 : interfaces** — à voir en jouant
 

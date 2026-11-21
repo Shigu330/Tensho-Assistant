@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (723 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (728 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -615,6 +615,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-512 | Tool (defect seen by the user on 11/16 around 10:55 am): on the test page, a… | Done in 0.1492.0 |
 | X-514 | Review  (review 0.1492, 16/11), I1: finding in… | Done in 0.1493 |
 | X-515 | Review  (review 0.1492, 16/11), minor M1, M2, M3, M4, M5: M1 in… | Done in 0.1493.0 |
+| X-516 | User request of 11/16 around noon (screenshot of Tensho's map, gathering… | Done in 0.1711.0 |
 | X-517 | Review  (review 0.1494, 16/11), I1: finding in… | Done in 0.1495 |
 | X-518 | Review  (review 0.1494, 16/11), minor M1, M2, M3, M4, M5: M1 in… | Done in 0.1586 |
 | X-519 | Review  (review 0.1497, 16/11), I1: finding in… | Done in 0.1498 |
@@ -687,7 +688,9 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-601 | User request of 18/11 around 2 pm (screenshots: Crafting, Gathering, Storage… | Done in 0.1681.0 |
 | X-602 | User request of 18/11 around 2 pm (screenshots: Crafting, Gathering, Storage… | Done in 0.1608.0 |
 | X-603 | User request of 18/11 around 2 pm (screenshots: Crafting, Gathering, Storage… | Done in 0.1609.0 |
+| X-604 | User request of 18/11 around 2 pm (screenshots: Crafting, Gathering, Storage… | Done in 0.1707.0 |
 | X-605 | User request of 18/11 around 2 pm (screenshots: Crafting, Gathering, Storage… | Done in 0.1702.0 |
+| X-606 | User request of 18/11 around 2 pm (screenshots: Crafting, Gathering, Storage… | Done in 0.1710.0 |
 | X-608 | Rule R03.1 changed on 18/11 (user's choice, rules journal): in PvE combat… | Done in 0.1575 |
 | X-609 | Tool (seen by relay 116 on 19/11 around 23:35): plan.py add takes --tri and… | Done in 0.1557 |
 | X-610 | Bug seen by the user on 19/11 around 23:15 (item card capture, kept off the… | Done in 0.1568 |
@@ -791,12 +794,14 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-709 | Review of block 0.1693 to 0.1698 (review 0.1698, 21/11), minor M1: M1 in… | Done in 0.1700.0 |
 | X-710 | Review of block 0.1699 to 0.1703 (review 0.1703, 21/11), I1: finding in… | Done in 0.1704.0 |
 | X-711 | Review of block 0.1699 to 0.1703 (review 0.1703, 21/11), minor M1, M2, M3: M1… | Done in 0.1705.0 |
+| X-712 | Review of block 0.1704 to 0.1708 (review 0.1708, 21/11), minor M1, M2: M1 in… | Done in 0.1709.0 |
+| X-713 | Finding of relay 158 (21/11), same shape as X-711 M3 for submarines… | Done in 0.1712.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (723 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (728 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1409,6 +1414,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-512 | Outil (défaut vu par l'utilisateur le 16/11 vers 10 h 55) : sur la page des… | Fait en 0.1492.0 |
 | X-514 | Relecture  (relecture 0.1492, 16/11), I1 : X-475 garde sur disque les liens de… | Fait en 0.1493 |
 | X-515 | Relecture  (relecture 0.1492, 16/11), mineurs M1, M2, M3, M4, M5 : M1 : «… | Fait en 0.1493.0 |
+| X-516 | Demande de l'utilisateur du 16/11 vers 12 h (capture de la carte de Tensho… | Fait en 0.1711.0 |
 | X-517 | Relecture  (relecture 0.1494, 16/11), I1 : La réponse publique de la FAQ sur… | Fait en 0.1495 |
 | X-518 | Relecture  (relecture 0.1494, 16/11), mineurs M1, M2, M3, M4, M5 : M1 : Avec «… | Fait en 0.1586 |
 | X-519 | Relecture  (relecture 0.1497, 16/11), I1 : Onze textes montrés aux joueurs… | Fait en 0.1498 |
@@ -1481,7 +1487,9 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-601 | Demande de l'utilisateur du 18/11 vers 14 h (captures : Artisanat, Récolte… | Fait en 0.1681.0 |
 | X-602 | Demande de l'utilisateur du 18/11 vers 14 h (captures : Artisanat, Récolte… | Fait en 0.1608.0 |
 | X-603 | Demande de l'utilisateur du 18/11 vers 14 h (captures : Artisanat, Récolte… | Fait en 0.1609.0 |
+| X-604 | Demande de l'utilisateur du 18/11 vers 14 h (captures : Artisanat, Récolte… | Fait en 0.1707.0 |
 | X-605 | Demande de l'utilisateur du 18/11 vers 14 h (captures : Artisanat, Récolte… | Fait en 0.1702.0 |
+| X-606 | Demande de l'utilisateur du 18/11 vers 14 h (captures : Artisanat, Récolte… | Fait en 0.1710.0 |
 | X-608 | Règle R03.1 changée le 18/11 (choix de l'utilisateur, journal des règles) : en… | Fait en 0.1575 |
 | X-609 | Outil (vu par le relais 116 le 19/11 vers 23 h 35) : plan.py add n'accepte… | Fait en 0.1557 |
 | X-610 | Bug vu par l'utilisateur le 19/11 vers 23 h 15 (capture de la fiche d'objet… | Fait en 0.1568 |
@@ -1585,3 +1593,5 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-709 | Relecture du bloc 0.1693 à 0.1698 (relecture 0.1698, 21/11), mineurs M1 : M1… | Fait en 0.1700.0 |
 | X-710 | Relecture du bloc 0.1699 à 0.1703 (relecture 0.1703, 21/11), I1 : La… | Fait en 0.1704.0 |
 | X-711 | Relecture du bloc 0.1699 à 0.1703 (relecture 0.1703, 21/11), mineurs M1, M2, M3… | Fait en 0.1705.0 |
+| X-712 | Relecture du bloc 0.1704 à 0.1708 (relecture 0.1708, 21/11), mineurs M1, M2… | Fait en 0.1709.0 |
+| X-713 | Constat du relais 158 (21/11), même forme que X-711 M3 pour les sous-marins… | Fait en 0.1712.0 |
