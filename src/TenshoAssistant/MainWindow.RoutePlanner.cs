@@ -42,6 +42,8 @@ internal sealed partial class MainWindow
     private RouteValues? plannerValues;
     private uint[] plannerWanted=[];
     private int[] plannerMissingCounts=[];
+    // X-200 (0.1703): the sector aimed at (0: none), for the way to unlock it.
+    private uint plannerUnlockTarget;
 
     private void DrawRoutePlanner()
     {
@@ -127,6 +129,7 @@ internal sealed partial class MainWindow
         // 0.331 (audit): manual input with several companies read: the sectors were read, a submarine (its company) is what is missing.
         if(configuration.RouteUnlockedOnly && unlockedList is null)
             ImGui.TextDisabled(localization.Get(house is null && configuration.SubmarineUnlocked is { Count:>1 } ? "RoutePlanner.UnlockedChoose":"RoutePlanner.UnlockedUnknown"));
+        DrawSubmarineUnlockTarget(catalog,unlockedList);
 
         // 0.335: market prices of the listed routes' loot, fetched on a click (32 items per click), for the current character and world.
         var world=market.State;var character=bankBridge.State.CharacterId;var prices=routePrices.State;
@@ -221,6 +224,34 @@ internal sealed partial class MainWindow
         ImGui.TextDisabled(plannerMarket
             ? localization.Format("RoutePlanner.SourceMarket",catalog.LootSource,catalog.LootBuilt,world.WorldName.Length>0 ? world.WorldName:"—")
             :localization.Format("RoutePlanner.Source",catalog.LootSource,catalog.LootBuilt));
+    }
+
+    /// <summary>
+    /// X-200 (0.1703, the user's request of 12/11, as the airships' unlock goal): a sector of this map aimed at, and the sectors to explore
+    /// first to unlock it (SubmarineUnlocks.Route: LuminaSupplemental's tree), from the last one already unlocked in the company's workshop
+    /// when it was read; each step with the rank it asks (SubmarineExploration). Unknown, open from the start or already unlocked: said so.
+    /// </summary>
+    private void DrawSubmarineUnlockTarget(SubmarineCatalog catalog,IReadOnlyCollection<uint>? unlockedList)
+    {
+        string Step(uint id)=>catalog.Sectors.TryGetValue(id,out var sector) ? localization.Format("RoutePlanner.UnlockStep",sector.Name,sector.RankReq):id.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        if(plannerUnlockTarget!=0 && (!catalog.Sectors.TryGetValue(plannerUnlockTarget,out var aimed) || aimed.Map!=plannerMap))plannerUnlockTarget=0;
+        ImGui.SetNextItemWidth(260);
+        if(ImGui.BeginCombo(localization.Get("RoutePlanner.UnlockTarget")+"##PlannerUnlock",plannerUnlockTarget!=0 && catalog.Sectors.TryGetValue(plannerUnlockTarget,out var shown) ? shown.Name:"—"))
+        {
+            try
+            {
+                if(ImGui.Selectable("—##PlannerUnlockNone",plannerUnlockTarget==0))plannerUnlockTarget=0;
+                foreach(var sector in catalog.SectorsOf(plannerMap))
+                    if(!sector.Start && ImGui.Selectable($"{sector.Name}##PlannerUnlock{sector.Id}",sector.Id==plannerUnlockTarget))plannerUnlockTarget=sector.Id;
+            }
+            finally{ImGui.EndCombo();}
+        }
+        Tip("RoutePlanner.UnlockTargetTip");
+        if(plannerUnlockTarget==0)return;
+        var (state,explore)=SubmarineUnlocks.Route(catalog.Sectors,catalog.Unlocks,plannerUnlockTarget,unlockedList);
+        if(state!=SubmarineUnlockState.Path){ImGui.TextDisabled(localization.Get("RoutePlanner.Unlock"+state));return;}
+        ImGui.TextWrapped(localization.Format("RoutePlanner.UnlockPath",catalog.Sectors[plannerUnlockTarget].Name,string.Join(" › ",explore.Select(Step))));
+        if(unlockedList is null)ImGui.TextDisabled(localization.Get("RoutePlanner.UnlockNotRead"));
     }
 
     private void DrawRoutePriceFetch(Market.MarketState world,ulong character,Market.PreparationPriceState prices)

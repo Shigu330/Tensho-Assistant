@@ -289,7 +289,12 @@ public sealed unsafe class VoyageWatcher : IDisposable
             .ToDictionary(id=>id,id=>items.GetRowOrDefault(id) is { } row ? row.PriceLow:0u);
         // 0.335: same rule as the item catalog's IsMarketable (tradable and listed in a market search category).
         var marketable=prices.Keys.Where(id=>items.GetRowOrDefault(id) is { } row && !row.IsUntradable && row.ItemSearchCategory.RowId!=0).ToHashSet();
-        return new SubmarineCatalog{Sectors=sectors,Maps=maps,Loot=loot,SellPrices=prices,Marketable=marketable,LootSource=source,LootBuilt=built};
+        // X-200 (0.1703): the unlock tree (LuminaSupplemental, embedded with its notice).
+        IReadOnlyDictionary<uint,SubmarineUnlock> unlocks;
+        using(var unlockStream=typeof(VoyageWatcher).Assembly.GetManifestResourceStream("TenshoAssistant.FreeCompany.Data.submarine-unlock.csv")
+            ?? throw new InvalidOperationException("Embedded submarine unlocks are missing."))
+        using(var reader=new StreamReader(unlockStream))unlocks=SubmarineUnlocks.Read(reader);
+        return new SubmarineCatalog{Sectors=sectors,Maps=maps,Loot=loot,SellPrices=prices,Marketable=marketable,LootSource=source,LootBuilt=built,Unlocks=unlocks};
     }
 
     // Part rows in sheet slot order (0..3); an id the sheet does not know is dropped (0 = unknown).

@@ -38,6 +38,8 @@ public sealed class SubmarineCatalog
     public IReadOnlySet<uint> Marketable { get; init; }=new HashSet<uint>();
     public required string LootSource { get; init; }
     public required string LootBuilt { get; init; }
+    /// <summary>X-200 (0.1703): the unlock tree (LuminaSupplemental SubmarineUnlock), by sector.</summary>
+    public IReadOnlyDictionary<uint,SubmarineUnlock> Unlocks { get; init; }=new Dictionary<uint,SubmarineUnlock>();
 
     public IEnumerable<SubmarineSector> SectorsOf(uint map)=>Sectors.Values.Where(sector=>sector.Map==map).OrderBy(sector=>sector.Id);
 }
