@@ -46,8 +46,9 @@ public sealed record MapLiveState(uint TerritoryId,uint MapId,Vector3 Position,f
     public (uint Objective,uint Icon)? ActiveLeve { get; init; }
 }
 
-// Party member in the same territory as the player (not the player): job icon = 62100 + ClassJob row.
-public sealed record MapPartyMarker(string Name,uint Job,int Level,Vector3 Position);
+// Party member in the same territory as the player (not the player): job icon = 62100 + ClassJob row. X-684 (0.1690): its home world too,
+// for the player's tooltip (name and world, job and level, as in the chat).
+public sealed record MapPartyMarker(string Name,uint Job,int Level,Vector3 Position,ushort World=0);
 
 internal sealed class MapLiveReader : IDisposable
 {
@@ -459,7 +460,7 @@ internal sealed class MapLiveReader : IDisposable
         {
             if(member is null || member.EntityId==self || member.Territory.RowId!=client.TerritoryType || !float.IsFinite(member.Position.X))continue;
             // A member in view has an exact position; the party list's comes from the server, from time to time.
-            result.Add(new(member.Name.TextValue,member.ClassJob.RowId,member.Level,member.GameObject?.Position ?? member.Position));
+            result.Add(new(member.Name.TextValue,member.ClassJob.RowId,member.Level,member.GameObject?.Position ?? member.Position,(ushort)member.World.RowId));
             if(result.Count>=8)break;
         }
         return result.AsReadOnly();

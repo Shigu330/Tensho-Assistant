@@ -1914,8 +1914,8 @@ internal sealed partial class MainWindow
         var name=source?.Name is { Length:>0 } known ? known:ChatCopy.NameOf(ChatFormat.Clean(record.Sender));
         var world=source is { World:>0 } withWorld && ChatPlayers is { } players ? players.World(withWorld.World):ChatCopy.WorldOf(ChatFormat.Clean(record.Sender));
         var seen=source is not null ? ChatPlayers?.Seen(source):null;
-        return ChatCopy.SenderTip(name,world,seen?.Job,seen?.Level ?? 0,(who,where)=>localization.Format("ChatWindow.SenderTipWorld",who,where),
-            (job,level)=>localization.Format("ChatWindow.SenderTipJob",job,level));
+        // X-684 (0.1690): the one player tooltip (MainWindow.PlayerTooltip.cs), as on the Tensho map.
+        return PlayerTip(name,world,seen?.Job,seen?.Level ?? 0);
     }
 
     // X-455 E1 (0.1624): the tab's text made when « Select text » was chosen (null: closed); its box opened at the next frame.

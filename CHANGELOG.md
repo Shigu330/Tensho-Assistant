@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1690.0
+- Plan global, X-684 : Info-bulles complètes (X-684), neuvième morceau : les joueurs. Une seule info-bulle de joueur (MainWindow.PlayerTooltip.cs, PlayerTip, sur ChatCopy.SenderTip) : nom et monde, puis classe et niveau quand le jeu les montre. Elle sert aux noms des auteurs dans la fenêtre de chat (comme avant) et maintenant aux membres de l'équipe sur la carte Tensho, sur la carte et au bord (avant : « nom · niv. », sans monde ni classe) ; le monde de chaque membre est lu avec l'équipe. Calculée une fois par état de membre et par langue, pas à chaque image.
+- Pour les joueurs : les membres de l'équipe sur la carte Tensho montrent maintenant leur monde, leur classe et leur niveau, comme dans la fenêtre de chat de Tensho.
+- Tests : PlayerTips1690Tests. Verify.ps1 (agent) : 3567/3567, 0 avertissement, 0 erreur ; DLL 0.1690.0.0. Non validé en jeu.
+### English
+- Complete tooltips (X-684), ninth part: players. One player tooltip (MainWindow.PlayerTooltip.cs, PlayerTip, on ChatCopy.SenderTip): name and world, then job and level when the game shows them. It serves the senders' names in the chat window (as before) and now the party members on the Tensho map, on the map and at its edge (before: « name · lv. », without world nor job); each member's world is read with the party. Built once per member state and language, not every frame.
+- For players: Party members on the Tensho map now show their world, job and level, as in the Tensho chat window.
+
 ## 0.1689.0
 - Plan global, X-684 : Info-bulles complètes (X-684), huitième morceau : les PNJ. Une seule info-bulle de PNJ (MainWindow.NpcTooltip.cs, DrawNpcTooltip ; faits dans Npcs/NpcTips.cs) : icône de ses boutiques sur la carte, nom, lieux (zone et coordonnées, trois au plus puis combien d'autres), chaque boutique avec son nombre d'objets (celles dont aucune vente n'est lue comptées à part), puis ce que Tensho sait d'autre : pour un joueur de Triple Triade, mise et cartes possibles, cartes qui vous manquent, battu ou non, quêtes demandées ; puis l'effet du clic. Elle sert aux listes de la carte Tensho (marchands, joueurs de Triple Triade), à la page Marchands (qui n'en avait pas), aux marchands des sources d'un objet (qui n'en avaient pas) et à la page Triple Triade (qui ne disait pas « battu ») ; les étiquettes de la carte prennent les mêmes faits en texte. Calculée une fois par PNJ survolé.
 - Pour les joueurs : les info-bulles des PNJ disent maintenant tout ce que Tensho sait (lieux, boutiques, Triple Triade), les mêmes sur la carte, la page Marchands, les sources d'un objet et la page Triple Triade.

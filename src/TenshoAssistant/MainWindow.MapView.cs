@@ -1711,7 +1711,7 @@ internal sealed partial class MainWindow
                     draw.AddCircleFilled(at,badge*0.6f,ImGui.GetColorU32(new Vector4(0.15f,0.45f,0.95f,0.85f)),20);
                     if(member.Job!=0 && textures.TryGetFromGameIcon(new GameIconLookup(62100+member.Job),out var shared) && shared.TryGetWrap(out var image,out _) && image is not null)
                         draw.AddImage(image.Handle,at-new Vector2(badge/2),at+new Vector2(badge/2));
-                    if(hovered && Vector2.Distance(io.MousePos,at)<=badge/2){tooltip=localization.Format("MapView.PartyMember",member.Name,member.Level);sightseeingTip=null;tooltipPoint=null;}
+                    if(hovered && Vector2.Distance(io.MousePos,at)<=badge/2){tooltip=PartyMemberTip(member);sightseeingTip=null;tooltipPoint=null;}
                 }
             // 0.378 (g, M-08): the player's bookmarks of this map (star); a click on one places the flag there.
             MapBookmark? hoveredBookmark=null;
@@ -2435,7 +2435,7 @@ internal sealed partial class MainWindow
                 targets.Add((MapProjection.PixelFromWorld(new Vector3(point.Position!.X,0,point.Position.Z),map),point.Icon,GatheringLabelOf(point),false,0));
         }
         if(settings.EdgeParty && settings.ShowParty && settings.SizeOf(GlyphParty,map.MapId)>0 && live?.Party is { } members && live.MapId==map.MapId)
-            foreach(var member in members)targets.Add((MapProjection.PixelFromWorld(member.Position,map),0,localization.Format("MapView.PartyMember",member.Name,member.Level),false,member.Job));
+            foreach(var member in members)targets.Add((MapProjection.PixelFromWorld(member.Position,map),0,PartyMemberTip(member),false,member.Job));
         const float margin=20,badge=26;
         var centre=origin+size/2;var low=origin+new Vector2(margin);var high=origin+size-new Vector2(margin);
         string? label=null;
