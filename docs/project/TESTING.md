@@ -2642,6 +2642,22 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1758) Tensho, page Marché, un objet, onglet Historique : « Copier en CSV », la note « N vente(s) copiée(s) » s'affiche ; changez de filtre ou d'objet : la note disparaît. De même à la Banque après un changement d'onglet ou de filtre.
 
+- [ ] (0.1759) Près d'un autre joueur qui prend deux repas différents à moins de 3 s d'écart : survolez l'effet « Repu » de la deuxième ligne dans la fenêtre de chat de Tensho : l'info-bulle montre les bonus du deuxième repas, ou aucun, jamais ceux du premier ; le journal dit « the meal shown for that player's line of the 4 s before » quand c'est ce cas.
+
+- [ ] (0.1760) Utilisez un manuel d'artisan (ou de récolteur) pendant que Tensho tourne, puis fabriquez (ou récoltez) : page Équipement, sous le dernier artisan (ou récolteur), « Grâce de l'artisan — environ N points de bonus restants » ; N baisse à chaque ligne d'expérience de la part du manuel (sans autre bonus : 60 % des points gagnés) ; le journal dit « Grace: an experience line read ».
+
+- [ ] (0.1760) Avec un manuel compté : rechargez Tensho (/xlplugins) : la ligne garde son nombre. Un manuel déjà actif quand Tensho se charge sans compte gardé (ou après de l'expérience gagnée sans Tensho) : « Points restants inconnus ».
+
+- [ ] (0.1760) Quand le jeu retire la Grâce (plafond atteint), la ligne disparaît ; le dernier nombre vu était proche de 0 (à rapporter s'il en était loin).
+
+- [ ] (0.1761) Survolez dans le jeu un objet recyclable (une pièce d'équipement fabriquée) : sous l'infobulle, « Recyclage : <artisan>, niveau de l'objet N, votre niveau M : au-dessus / en dessous de votre niveau » ; M est celui de la fenêtre de recyclage du jeu pour cet artisan.
+
+- [ ] (0.1761) Survolez un coffret ou un paquet de cartes : « Collections : les N obtenus » quand vous avez tout, sinon « n sur N pas encore obtenus » ; coupez chaque ligne dans Paramètres › infobulles : elle disparaît.
+
+- [ ] (0.1762) À une sonnette, ouvrez la liste des servants puis la liste de vente d'un servant qui vend quelque chose : page Personnages, tableau des servants, sous ce servant, « Objets en vente (relevés le …) » et chaque objet avec sa quantité et son prix (HQ dit) ; un servant jamais ouvert qui vend dit « pas encore relevés ».
+
+- [ ] (0.1762) Rechargez Tensho : la liste du servant reste, avec sa date ; vendez ou retirez un objet puis rouvrez la liste de vente : la liste et sa date changent.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.

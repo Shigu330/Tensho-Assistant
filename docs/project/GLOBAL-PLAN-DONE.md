@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (771 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (775 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -577,6 +577,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-464 | Review of block 0.1455 to 0.1461 (review 0.1461, 15/11), minor M1, M2, M3, M4… | Done in 0.1466 |
 | X-465 | Bug seen in the Beastmaster labyrinth by the user on 11/15 around 9:56 pm… | Done in 0.1465 |
 | X-466 | User request of 11/15 around 10:15 pm (Tensho chat window): the chat should… | Done in 0.1476 |
+| X-469 | User decision of 11/15 around 10:30 pm (D-174, retainer table X-196): « items… | Done in 0.1762.0 |
 | X-470 | Tool, idea I-015 put on the plan by the user on 11/15 around 10:35 pm… | Done in 0.1467.0 |
 | X-471 | Tool, idea I-014 put on the plan by the user on 11/15 around 10:35 pm: the same… | Done in 0.1467.0 |
 | X-472 | Bug seen by the user on 11/15 around 10:40 pm (screenshot, game chat and Tensho… | Done in 0.1471.0 |
@@ -825,6 +826,8 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-735 | Review of block 0.1727 to 0.1733 (review 0.1733, 21/11), minor M1: M1 in… | Done in 0.1735.0 |
 | X-748 | Idea I-022 chosen by the user on 21/11 around 16:00 (idea box): Vendors: hide… | Done in 0.1738.0 |
 | X-751 | Idea I-049 chosen by the user on 21/11 around 16:00 (idea box): Tool: mutation… | Done in 0.1742.0 |
+| X-752 | Idea I-043 chosen by the user on 21/11 around 16:00 (idea box): Sources… | Done in 0.1763.0 |
+| X-753 | Idea I-044 chosen by the user on 21/11 around 16:00 (idea box): Sources… | Done in 0.1764.0 |
 | X-754 | Idea I-050 chosen by the user on 21/11 around 16:00 (idea box): Capture mode… | Done in 0.1737.0 |
 | X-755 | Idea I-051 chosen by the user on 21/11 around 16:00 (idea box): Labyrinth… | Done in 0.1750.0 |
 | X-756 | Review of block 0.1734 to 0.1738 (review 0.1738, 21/11), I1: finding in… | Done in 0.1739.0 |
@@ -839,12 +842,13 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-765 | Review of block 0.1747 to 0.1751 (review 0.1751, 21/11), pre-existing before… | Done in 0.1754.0 |
 | X-766 | Another player's meal, a first meal put on before its line (review of 0.1751… | Done in 0.1757.0 |
 | X-767 | Review of block 0.1752 to 0.1756 (review 0.1756, 21/11), minor M1, M2: M1 in… | Done in 0.1758.0 |
+| X-768 | Review of block 0.1757 to 0.1758 (review 0.1758, 21/11), minor M1, M2: M1 in… | Done in 0.1759.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (771 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (775 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1419,6 +1423,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-464 | Relecture du bloc 0.1455 à 0.1461 (relecture 0.1461, 15/11), mineurs M1, M2… | Fait en 0.1466 |
 | X-465 | Bug vu au Dédale bestial par l'utilisateur le 15/11 vers 21 h 56 (mode… | Fait en 0.1465 |
 | X-466 | Demande de l'utilisateur du 15/11 vers 22 h 15 (fenêtre de chat Tensho) : « il… | Fait en 0.1476 |
+| X-469 | Décision de l'utilisateur du 15/11 vers 22 h 30 (D-174, tableau des servants… | Fait en 0.1762.0 |
 | X-470 | Outil, idée I-015 mise au plan par l'utilisateur le 15/11 vers 22 h 35… | Fait en 0.1467.0 |
 | X-471 | Outil, idée I-014 mise au plan par l'utilisateur le 15/11 vers 22 h 35 : la… | Fait en 0.1467.0 |
 | X-472 | Bug vu par l'utilisateur le 15/11 vers 22 h 40 (capture, chat du jeu et fenêtre… | Fait en 0.1471.0 |
@@ -1667,6 +1672,8 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-735 | Relecture du bloc 0.1727 à 0.1733 (relecture 0.1733, 21/11), mineurs M1 : M1… | Fait en 0.1735.0 |
 | X-748 | Idée I-022 choisie par l'utilisateur le 21/11 vers 16 h (boîte à idées) : Essai… | Fait en 0.1738.0 |
 | X-751 | Idée I-049 choisie par l'utilisateur le 21/11 vers 16 h (boîte à idées) : Outil… | Fait en 0.1742.0 |
+| X-752 | Idée I-043 choisie par l'utilisateur le 21/11 vers 16 h (boîte à idées)… | Fait en 0.1763.0 |
+| X-753 | Idée I-044 choisie par l'utilisateur le 21/11 vers 16 h (boîte à idées)… | Fait en 0.1764.0 |
 | X-754 | Idée I-050 choisie par l'utilisateur le 21/11 vers 16 h (boîte à idées) : Mode… | Fait en 0.1737.0 |
 | X-755 | Idée I-051 choisie par l'utilisateur le 21/11 vers 16 h (boîte à idées) : Essai… | Fait en 0.1750.0 |
 | X-756 | Relecture du bloc 0.1734 à 0.1738 (relecture 0.1738, 21/11), I1 : X-733 : le… | Fait en 0.1739.0 |
@@ -1681,3 +1688,4 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-765 | Relecture du bloc 0.1747 à 0.1751 (relecture 0.1751, 21/11), déjà là avant le… | Fait en 0.1754.0 |
 | X-766 | Repas d'un autre joueur, premier repas posé avant sa ligne (relecture 0.1751… | Fait en 0.1757.0 |
 | X-767 | Relecture du bloc 0.1752 à 0.1756 (relecture 0.1756, 21/11), mineurs M1, M2… | Fait en 0.1758.0 |
+| X-768 | Relecture du bloc 0.1757 à 0.1758 (relecture 0.1758, 21/11), mineurs M1, M2… | Fait en 0.1759.0 |
