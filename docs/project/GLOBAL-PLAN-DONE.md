@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (762 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (766 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -825,17 +825,21 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-748 | Idea I-022 chosen by the user on 21/11 around 16:00 (idea box): Vendors: hide… | Done in 0.1738.0 |
 | X-751 | Idea I-049 chosen by the user on 21/11 around 16:00 (idea box): Tool: mutation… | Done in 0.1742.0 |
 | X-754 | Idea I-050 chosen by the user on 21/11 around 16:00 (idea box): Capture mode… | Done in 0.1737.0 |
+| X-755 | Idea I-051 chosen by the user on 21/11 around 16:00 (idea box): Labyrinth… | Done in 0.1750.0 |
 | X-756 | Review of block 0.1734 to 0.1738 (review 0.1738, 21/11), I1: finding in… | Done in 0.1739.0 |
 | X-757 | Review of block 0.1734 to 0.1738 (review 0.1738, 21/11), minor M1, M2, M3, M4… | Done in 0.1740.0 |
 | X-758 | Follow-up of D-202 b and X-715: probe reading received on 21/11 around 18:45… | Done in 0.1746.0 |
 | X-759 | Review of block 0.1739 to 0.1742 (review 0.1742, 21/11), I1: finding in… | Done in 0.1743.0 |
 | X-760 | Review of block 0.1739 to 0.1742 (review 0.1742, 21/11), minor M1, M2: M1 in… | Done in 0.1744.0 |
+| X-761 | Review of block 0.1743 to 0.1746 (review 0.1746, 21/11), I1: finding in… | Done in 0.1747.0 |
+| X-762 | Review of block 0.1743 to 0.1746 (review 0.1746, 21/11), I2: finding in… | Done in 0.1748.0 |
+| X-763 | Review of block 0.1743 to 0.1746 (review 0.1746, 21/11), minor M1, M2, M3: M1… | Done in 0.1749.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (762 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (766 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1658,8 +1662,12 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-748 | Idée I-022 choisie par l'utilisateur le 21/11 vers 16 h (boîte à idées) : Essai… | Fait en 0.1738.0 |
 | X-751 | Idée I-049 choisie par l'utilisateur le 21/11 vers 16 h (boîte à idées) : Outil… | Fait en 0.1742.0 |
 | X-754 | Idée I-050 choisie par l'utilisateur le 21/11 vers 16 h (boîte à idées) : Mode… | Fait en 0.1737.0 |
+| X-755 | Idée I-051 choisie par l'utilisateur le 21/11 vers 16 h (boîte à idées) : Essai… | Fait en 0.1750.0 |
 | X-756 | Relecture du bloc 0.1734 à 0.1738 (relecture 0.1738, 21/11), I1 : X-733 : le… | Fait en 0.1739.0 |
 | X-757 | Relecture du bloc 0.1734 à 0.1738 (relecture 0.1738, 21/11), mineurs M1, M2… | Fait en 0.1740.0 |
 | X-758 | Suite de D-202 b et X-715 : relevé de la sonde reçu le 21/11 vers 18 h 45… | Fait en 0.1746.0 |
 | X-759 | Relecture du bloc 0.1739 à 0.1742 (relecture 0.1742, 21/11), I1 : R04 (données… | Fait en 0.1743.0 |
 | X-760 | Relecture du bloc 0.1739 à 0.1742 (relecture 0.1742, 21/11), mineurs M1, M2… | Fait en 0.1744.0 |
+| X-761 | Relecture du bloc 0.1743 à 0.1746 (relecture 0.1746, 21/11), I1 : Settings.json… | Fait en 0.1747.0 |
+| X-762 | Relecture du bloc 0.1743 à 0.1746 (relecture 0.1746, 21/11), I2 : R04, données… | Fait en 0.1748.0 |
+| X-763 | Relecture du bloc 0.1743 à 0.1746 (relecture 0.1746, 21/11), mineurs M1, M2, M3… | Fait en 0.1749.0 |

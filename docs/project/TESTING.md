@@ -2628,6 +2628,12 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1745) Après quelques rechargements (mode développeur) : les lignes « context alive » ne nomment aucune copie chargée depuis cette version, et la mémoire gérée ne monte plus d'une copie à chaque rechargement
 
+- [ ] (0.1748) Chat de Tensho, un autre joueur à portée mange un repas (ligne « … bénéficie de l'effet Repu ») : l'info-bulle de « Repu » montre les bonus de ce repas, ou seulement la description du statut ; jamais les bonus d'un repas plus ancien ; le journal dit l'issue (« another player's, … »).
+
+- [ ] (0.1750) Tensho, page Dresseur (bestiaire) et panneau du Dédale bestial (équipe, bêtes appelées pour un combat) : après le texte de chaque bête, les icônes des effets qu'elle inflige, dans l'ordre de la fenêtre « Formation de l'équipe » du jeu, chacune nommée au survol (Mouton : Sommeil ; Mandragore : Pesanteur puis Poison ; Cu sith : aucune).
+
+- [ ] (0.1751) Tensho, page Banque, un onglet avec des objets (filtres au choix) : « Copier en CSV », puis collez dans un tableur : une ligne par rangement, objet et qualité, avec la quantité ; le message dit le nombre de lignes copiées.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.

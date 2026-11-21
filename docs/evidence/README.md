@@ -137,7 +137,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1739-meal-status-gained.md](0.1739-meal-status-gained.md) | `tests/TenshoAssistant.Tests/MealConsent1743Tests.cs`, `tests/TenshoAssistant.Tests/MealOther1748Tests.cs` | `docs/changelog/CHANGELOG-0.1700-0.1799.md` |
 | [0.174.0-triad-seldeck-capture.log](0.174.0-triad-seldeck-capture.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.1741-unload-json.md](0.1741-unload-json.md) | `src/TenshoAssistant/SettingsFile.cs`, `src/TenshoAssistant/TenshoJson.cs` | `docs/changelog/CHANGELOG-0.1700-0.1799.md`, `docs/evidence/0.1745-settings-file.md` |
-| [0.1745-settings-file.md](0.1745-settings-file.md) | — | `CHANGELOG.md` |
+| [0.1745-settings-file.md](0.1745-settings-file.md) | — | `docs/changelog/CHANGELOG-0.1700-0.1799.md` |
 | [0.1746-chat-player-menu-measure.md](0.1746-chat-player-menu-measure.md) | `tests/TenshoAssistant.Tests/ChatMenuMeasure1746Tests.cs` | `CHANGELOG.md` |
 | [0.175.0-auxesia-maps-probe.log](0.175.0-auxesia-maps-probe.log) | `src/TenshoAssistant/Maps/MapCatalog.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.1750-beast-effects.md](0.1750-beast-effects.md) | `src/TenshoAssistant/Beastmaster/BeastEffects.cs`, `tests/TenshoAssistant.Tests/BeastEffects1750Tests.cs` | `CHANGELOG.md` |
