@@ -2076,7 +2076,8 @@ internal sealed partial class MainWindow
             // 0.1442: a quest link: left click opens it on Tensho's Quests page.
             if(quests.State.ById?.GetValueOrDefault(link.QuestId) is not { } quest){TipText(localization.Get("ChatWindow.LinkUnknownTip"));return;}
             if(ImGui.IsItemHovered())ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-            TipText(()=>localization.Format("ChatWindow.QuestLinkTip",quest.Name));
+            // X-684 (0.1670): the one quest tooltip, the click's effect under it.
+            if(ImGui.IsItemHovered())DrawQuestTooltip(quest,localization.Format("ChatWindow.QuestLinkTip","").Trim());
             if(ChatLinkClicked(id)){SelectQuest(quest.Id);page=Page.Quests;IsOpen=true;}
             if(ImGui.IsItemClicked(ImGuiMouseButton.Right)){chatWindowQuest=quest.Name;ImGui.OpenPopup("###TenshoChatQuest");}
             return;

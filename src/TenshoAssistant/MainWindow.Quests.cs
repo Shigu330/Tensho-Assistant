@@ -198,9 +198,8 @@ internal sealed partial class MainWindow
                 if (ImGui.IsItemClicked()) SelectQuest(entry.Id);
                 ImGui.SameLine();
                 if (ImGui.Selectable($"{entry.Name}##quest{entry.Id}", selectedQuestId == entry.Id)) SelectQuest(entry.Id);
-                // X-89 (0.970): the quest's expansion (game data) in its tooltip.
-                if (ImGui.IsItemHovered()) WrappedTooltip($"{entry.Name}\n{entry.Section} › {entry.Category}"
-                    +(entry.Expansion is { Length:>0 } questExpansion ? "\n"+localization.Format("QuestDetails.Expansion",questExpansion):"")+(developerMode ? $"\nID: {entry.Id}":""));
+                // X-89 (0.970): the quest's expansion (game data) in its tooltip. X-684 (0.1670): the one quest tooltip.
+                if (ImGui.IsItemHovered()) DrawQuestTooltip(entry);
                 QuestMenu($"QuestMenu{entry.Id}", entry.Id, entry.Name);
                 ImGui.TableNextColumn(); if (entry.Level > 0) ImGui.TextUnformatted(entry.Level.ToString(CultureInfo.CurrentCulture)); else ImGui.TextDisabled("?");
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(entry.Zone ?? "");
@@ -414,5 +413,31 @@ internal sealed partial class MainWindow
             }
         }
         if (questFollowError is { } errorText) ImGui.TextWrapped(localization.Get(errorText));
+    }
+
+    /// <summary>
+    /// X-684 (0.1670, the user's request of 20/11: « every tooltip gives everything Tensho knows »): the one tooltip of a quest, wherever it is
+    /// named (the Quests page, the items' quest sources, a quest link of the chat): icon, name, journal section and genre, level, zone,
+    /// expansion, progress, repeatable, then what the caller adds (a click's effect). Everything read from the quest's entry (QuestEntry,
+    /// built off the frame), nothing worked out under the mouse.
+    /// </summary>
+    private void DrawQuestTooltip(QuestEntry entry,string? after=null)
+    {
+        using(TooltipScope.Begin())
+        {
+            if(entry.Icon>0){DrawGameIcon(entry.Icon,new Vector2(32));ImGui.SameLine();}
+            ImGui.BeginGroup();
+            ImGui.TextColored(Accent,entry.Name);
+            ImGui.TextDisabled(entry.Section.Length>0 ? $"{entry.Section} › {entry.Category}":entry.Category);
+            ImGui.EndGroup();
+            if(entry.Level>0)ImGui.TextUnformatted(localization.Format("QuestDetails.Level",entry.Level));
+            if(entry.AdditionalLevel>0)ImGui.TextUnformatted(localization.Format("QuestDetails.OtherLevel",entry.AdditionalLevel));
+            if(entry.Zone.Length>0)ImGui.TextUnformatted(localization.Format("QuestDetails.Zone",entry.Zone));
+            if(entry.Expansion.Length>0)ImGui.TextDisabled(localization.Format("QuestDetails.Expansion",entry.Expansion));
+            ImGui.TextColored(entry.Progress==QuestProgress.Complete ? Success:Muted,QuestProgressLabel(entry));
+            if(entry.IsRepeatable)ImGui.TextDisabled(localization.Get("QuestDetails.Repeatable"));
+            if(developerMode)ImGui.TextDisabled($"ID: {entry.Id}");
+            if(after is { Length:>0 }){ImGui.Separator();ImGui.TextDisabled(after);}
+        }
     }
 }

@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1670.0
+- Plan global, X-684 : Info-bulles complètes (X-684), deuxième morceau : les quêtes. Une seule info-bulle de quête (DrawQuestTooltip, MainWindow.Quests.cs) : icône, nom, section et genre du journal, niveau (et niveau supplémentaire), zone, extension, avancement, répétable, puis ce que l'appelant ajoute (l'effet du clic) ; tout vient de l'entrée de la quête, rien n'est calculé sous la souris. La page Quêtes, les quêtes sources d'un objet et les liens de quête du chat passent par elle (avant : nom et genre, ou nom seul dans le chat). QuestTips1670Tests (2). Reste de X-684 : lieux, monstres, actions, ALEA, PNJ, donjons, joueurs, recettes, récolte.
+- Pour les joueurs : info-bulles de quêtes : la page Quêtes, les sources d'objets et les liens de quête du chat montrent la même info-bulle complète (niveau, zone, extension, avancement).
+- Tests : QuestTips1670Tests. Verify.ps1 (agent) : 3520/3520, 0 avertissement, 0 erreur ; DLL 0.1670.0.0. Non validé en jeu.
+### English
+- Complete tooltips (X-684), second part: quests. One quest tooltip (DrawQuestTooltip, MainWindow.Quests.cs): icon, name, journal section and genre, level (and additional level), zone, expansion, progress, repeatable, then what the caller adds (the click's effect); everything from the quest's entry, nothing worked out under the mouse. The Quests page, an item's quest sources and the chat's quest links use it (before: name and genre, or the name alone in the chat). QuestTips1670Tests (2). Left of X-684: places, monsters, actions, FATEs, NPCs, duties, players, recipes, gathering.
+- For players: Quest tooltips: the Quests page, item sources and chat quest links show the same full quest tooltip (level, zone, expansion, progress).
+
 ## 0.1669.0
 - Plan global, X-684 : Info-bulles complètes (X-684), premier morceau : les objets. Relevé de toutes les info-bulles de Tensho par genre écrit avant le code (seul le genre « objet » a un corps commun). L'aperçu du rangement passe par l'info-bulle commune d'objet (DrawItemInfoTooltip, qualité donnée), l'emplacement et la quantité ajoutés à la suite, au lieu d'un nom écrit à la main (l'info-bulle commune ne prend pas de crochet de page, X-294) ; les récompenses d'événement, les appâts (pêche et pêche en mer) ne réécrivent plus le nom sous l'info-bulle commune (la remontée et le clic droit restent) ; les listes du servant donnent la qualité (HQ). ItemTips1669Tests (2). Reste de X-684 : quêtes, lieux, monstres, actions, ALEA, PNJ, donjons, joueurs, recettes, récolte.
 - Pour les joueurs : info-bulles d'objets : l'aperçu du rangement, les récompenses d'événement et les appâts montrent l'info-bulle complète de l'objet.
