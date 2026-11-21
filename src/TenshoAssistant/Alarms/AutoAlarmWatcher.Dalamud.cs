@@ -58,6 +58,9 @@ public sealed unsafe class AutoAlarmWatcher : IDisposable
                 if(vessel.ReturnAt is { } back)
                     events.Add(new($"vessel:{vessel.HouseId}/{vessel.Kind}/{vessel.Slot}",string.Format(text("AutoAlarms.Vessel"),vessel.Name),
                         text("AutoAlarms.VesselGroup"),back,AlarmSource.Voyage));
+            // X-225 (0.1719): each aetherial wheel on the company's stand, at the latest time it is primed; a wheel no longer there loses its alarm.
+            events.AddRange(TenshoAssistant.FreeCompany.AetherialWheels.Due(configuration.AetherialWheels,now,name=>string.Format(text("AutoAlarms.Wheel"),name),text("AutoAlarms.WheelGroup")));
+            gone.AddRange(TenshoAssistant.FreeCompany.AetherialWheels.Gone(configuration.Alarms,configuration.AetherialWheels));
             // 0.455 (user request, in-game campaign): the squadron's mission and training, as the Reminders page reads them (PlayerState).
             var player=FFXIVClientStructs.FFXIV.Client.Game.UI.PlayerState.Instance();
             if(player!=null && player->IsLoaded)

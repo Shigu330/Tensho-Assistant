@@ -13,6 +13,8 @@ public static class ConfigurationReset
         "TripleTriadDecks", "FollowedQuests", "Observations", "InventorySortProfiles", "InventorySortTemplates", "LanguageCode",
         // 0.315: saved data added since 0.258 (vessels, gear and materia plans).
         "Voyages", "OceanSightings", "WeatherStoryZones", "GearPlans", "SRankKills", "DutyNotes", "GearPlanSets", "CollectionMemories", "LastCraftStats", "FashionOutfit", "WeatherFavorites", "GearMateria", "SubmarineUnlocked", "VesselPlans",
+        // X-225 (0.1719): the aetherial wheels on the company's stand, as last read.
+        "AetherialWheels",
         // 0.321: interface state, not a setting (which navigation groups are folded).
         "NavigationCollapsed",
         // X-521 M2 (D-180): interface state, not a setting (the category chosen in each tab of the Settings page).
@@ -490,6 +492,8 @@ public sealed partial class Configuration
     public DateTimeOffset? TreasureMapAt { get; set; }
     // 0.307 (R-07): free company submarines and airships as last read in the workshop.
     public List<TenshoAssistant.FreeCompany.VoyageVessel>? Voyages { get; set; }
+    // X-225 (0.1719): the aetherial wheels on the company's stand as last read in its window, per house.
+    public List<TenshoAssistant.FreeCompany.AetherialWheelSlot>? AetherialWheels { get; set; }
     // 0.315 (R-11): unlocked submarine sectors per workshop (house id) and planned vessel builds (key → rank, four part rows).
     public Dictionary<string,List<uint>>? SubmarineUnlocked { get; set; }
     public Dictionary<string,List<uint>>? VesselPlans { get; set; }

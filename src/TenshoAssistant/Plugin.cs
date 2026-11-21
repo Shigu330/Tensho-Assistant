@@ -856,6 +856,9 @@ public sealed partial class Plugin : IDalamudPlugin
             // X-715 (0.1718, D-202 b): developer mode, what the game's chat sends on a click on a player's name, read only.
             Chat.ChatLinkWatch? chatLinkWatch=null;
             registrations.Register(()=>chatLinkWatch=new Chat.ChatLinkWatch(interop,framework,contextMenus,log,()=>configuration.DeveloperMode),()=>chatLinkWatch?.Dispose());
+            // X-225 (0.1719): the aetherial wheels of the company's stand, read in its window (the Reminders page and the automatic alarms follow).
+            FreeCompany.AetherialWheelReader? wheelReader=null;
+            registrations.Register(()=>wheelReader=new FreeCompany.AetherialWheelReader(framework,gameGui,data,log,configuration,()=>SaveTimed("aetherial wheels"),()=>configuration.DeveloperMode),()=>wheelReader?.Dispose());
             Alarms.AutoAlarmWatcher? autoAlarms=null;
             registrations.Register(()=>autoAlarms=new Alarms.AutoAlarmWatcher(framework,client,log,configuration,()=>SaveTimed("automatic alarms"),localization.Get),
                 ()=>autoAlarms?.Dispose());
