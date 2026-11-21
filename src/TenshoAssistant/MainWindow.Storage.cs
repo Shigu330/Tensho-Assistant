@@ -8,7 +8,6 @@ internal sealed partial class MainWindow
 {
     private void DrawStorage()
     {
-        Heading(localization.Get("StorageUi.Title"), localization.Get("StorageUi.Description"));
         // X-01 C5 (0.1206, analysis of 12/11: « page Storage 3 137 ms », no tab timed): each tab timed in developer mode (Slow frame line).
         if (!ImGui.BeginTabBar("StorageTabs")) return;
         try

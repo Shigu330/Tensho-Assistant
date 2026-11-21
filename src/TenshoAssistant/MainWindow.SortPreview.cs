@@ -32,7 +32,6 @@ internal sealed partial class MainWindow
     }
     private void DrawSortPreview()
     {
-        Heading(localization.Get("SortUi.Title"), localization.Get("SortUi.Subtitle"));
         // 0.388 (user request): the button drawn on the game's inventory window.
         BoolSetting("SortButton.Setting","SortButton.SettingTip",()=>configuration.InventorySortButton,value=>configuration.InventorySortButton=value,c=>c.InventorySortButton);
         if(configuration.InventorySortButton)

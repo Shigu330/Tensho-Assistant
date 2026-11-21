@@ -56,6 +56,11 @@ internal static class PageFamilies1677Tests
         ("Navigation.HuntingLog", "Bestiaire", "Hunting Log", "MainCommand 8"),
         ("Navigation.Gear", "Équipement", "Gear", "HowToCategory 7"),
         ("Navigation.RelicWeapons", "Armes antiques", "Relic Weapons", "AchievementCategory 62"),
+        ("Navigation.Items", "Objets", "Items", "HowToCategory 6"),
+        ("Navigation.ItemSearch", "Recherche d'objets", "Item Search", "Addon 1940"),
+        ("Navigation.Sort", "Trier", "Sort", "Addon 1389"),
+        ("Navigation.Market", "Marchés", "Markets", "Addon 548"),
+        // More names: added by each version of X-601, above this line.
     ];
 
     public static IEnumerable<(string Name, Action Run)> Cases =>
@@ -104,12 +109,15 @@ internal static class PageFamilies1677Tests
             var window = Read("src/TenshoAssistant/MainWindow.cs");
             Check(window.Contains("Enum.TryParse<Page>(configuration.LastPage,out var saved)") && window.Contains("configuration.LastPage=page.ToString();"), "the last page is kept by its name");
         }),
-        ("Page families 1677: « Character » groups the pages of D-199, in its order", () =>
+        ("Page families 1677: each page that groups holds the pages of D-199, in its order", () =>
         {
             var real = Real(out var names);
             string[] Family(string root) => PageFamilies.Of(real, names.IndexOf(root)).Select(at => names[at]).ToArray();
             Check(Family("Collections").SequenceEqual(["Collections", "BlueMagic", "MaskedCarnivale", "Beastmaster", "Chocobo", "HuntingLog", "Gear", "RelicWeapons"]), "Character: " + string.Join(",", Family("Collections")));
             Check(Read("src/TenshoAssistant/MainWindow.Pages.cs").Contains("new(Page.Collections,\"Progression\",PageLabel(\"Navigation.Character\"),"), "named « Character » in the side bar");
+            Check(Family("Items").SequenceEqual(["Items", "Storage", "SortPreview", "Market"]), "Items: " + string.Join(",", Family("Items")));
+            Check(Read("src/TenshoAssistant/MainWindow.Pages.cs").Contains("new(Page.Items,\"Objects\",PageLabel(\"Navigation.Items\"),"), "named « Items » in the side bar");
+            // More families: added by each version of X-601, above this line.
         }),
         ("Page families 1677: the side bar, the page header, the quick search and the page places read the families", () =>
         {

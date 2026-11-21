@@ -24,10 +24,11 @@ internal sealed partial class MainWindow
     private PageEntry[] PageEntries=>pageEntries??=
     [
         new(Page.Home,null,PageLabel("Navigation.Home"),DrawHome,"MainWindow.Home.cs"),
-        new(Page.Items,"Objects",PageLabel("Navigation.Items"),DrawItems,"MainWindow.Items*.cs, MainWindow.ItemSheet.cs"),
-        new(Page.Storage,"Objects",PageLabel("Navigation.Storage"),DrawStorage,"MainWindow.Storage.cs, MainWindow.Bank.cs"),
-        new(Page.SortPreview,"Objects",PageLabel("Category.Sorting"),DrawSortPreview,"MainWindow.Sort*.cs, Inventory/"),
-        new(Page.Market,"Objects",PageLabel("Navigation.Market"),DrawMarket,"MainWindow.Market*.cs, Market/"),
+        // X-601 (0.1678, D-199): « Items », the item search, the storage, the sort and the markets, each a tab of the one page header (the wishlist stays apart).
+        new(Page.Items,"Objects",PageLabel("Navigation.Items"),DrawItems,"MainWindow.Items*.cs, MainWindow.ItemSheet.cs",Tab:PageLabel("Navigation.ItemSearch"),About:PageLabel("ItemsUi.Description")),
+        new(Page.Storage,"Objects",null,DrawStorage,"MainWindow.Storage.cs, MainWindow.Bank.cs",Page.Items,Tab:PageLabel("Navigation.Storage"),About:PageLabel("StorageUi.Description")),
+        new(Page.SortPreview,"Objects",null,DrawSortPreview,"MainWindow.Sort*.cs, Inventory/",Page.Items,Tab:PageLabel("Navigation.Sort"),About:PageLabel("SortUi.Subtitle")),
+        new(Page.Market,"Objects",null,DrawMarket,"MainWindow.Market*.cs, Market/",Page.Items,Tab:PageLabel("Navigation.Market"),About:PageLabel("MarketUi.Description")),
         // X-127 (0.1106): the wishlist, a tool of its own (it was a tab of Collections).
         new(Page.Wishlist,"Objects",PageLabel("Navigation.Wishlist"),DrawWishlistPage,"MainWindow.Wishlist.cs, Items/Wishlist*.cs"),
         // X-600 (0.1573): the tabs of a family are drawn in the order of this list.

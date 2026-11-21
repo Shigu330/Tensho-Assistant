@@ -10,7 +10,6 @@ internal sealed partial class MainWindow
 {
     private void DrawMarket()
     {
-        Heading(localization.Get("MarketUi.Title"), localization.Get("MarketUi.Description"));
         var state = market.State;
         UI.UiComponents.SubTitle(state.WorldId == 0 ? localization.Get("MarketUi.World") : state.WorldName);
         if (itemId <= 0) { ImGui.TextWrapped(localization.Get("MarketUi.Select")); return; }
