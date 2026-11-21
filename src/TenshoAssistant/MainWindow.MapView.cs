@@ -2385,7 +2385,8 @@ internal sealed partial class MainWindow
     // Each shop: its name (or its kind when the game gives none, or only an untranslated Japanese placeholder such as
     // « アイテムの購入 », seen 0.137) and how many items it sells; shops without sales in the catalogue are counted apart. X-684 (0.1689): the
     // NPC tooltip's facts as text (one body for the label and the tooltip; an NPC of a service with no shop: its name only, as since 0.679).
-    private string VendorLabel(Npcs.NpcVendor vendor)=>Npcs.NpcTips.Text(BuildVendorTip(vendor));
+    // X-707 (0.1693): the name and the shop lines only (VendorShopLines), the label's whole text; the tooltip's places and icon are not built here.
+    private string VendorLabel(Npcs.NpcVendor vendor)=>Npcs.NpcTips.Text(Npcs.NpcTips.Build(NpcName(vendor),0,[],VendorShopLines(vendor,npcVendors?.State.Catalog?.ShopSummaries),[]));
     private string GatheringPointLabel(MapLocalGatheringPoint point)
     {
         var items=itemCatalog.State.Catalog;

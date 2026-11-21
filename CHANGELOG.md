@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1693.0
+- Plan global, X-707 : Relecture de 0.1687 à 0.1692 (X-707), constat mineur M1 corrigé : les étiquettes des marchands de la carte Tensho (calculées une fois par carte pour chaque marchand) ne passent plus par toute l'info-bulle du PNJ, dont les lieux et l'icône étaient formatés puis jetés aussitôt ; elles prennent le nom et les lignes de boutiques seuls (VendorShopLines, partagées avec l'info-bulle). La liste des lignes d'une info-bulle de PNJ (NpcTips.Lines) dédoublonne par un ensemble au lieu d'une recherche dans la liste. Le texte des étiquettes et des info-bulles ne change pas.
+- Tests : Review1692Fixes1693Tests. Verify.ps1 (agent) : 3574/3574, 0 avertissement, 0 erreur ; DLL 0.1693.0.0. Rien à essayer en jeu.
+### English
+- Review of 0.1687 to 0.1692 (X-707), minor finding M1 fixed: the Tensho map's vendor labels (built once per map for every vendor) no longer go through the whole NPC tooltip, whose places and icon were formatted and thrown away at once; they take the name and the shop lines alone (VendorShopLines, shared with the tooltip). The lines of an NPC tooltip (NpcTips.Lines) are deduplicated through a set instead of a search in the list. The text of the labels and tooltips does not change.
+
 ## 0.1692.0
 - Plan global, X-684 : Info-bulles complètes (X-684), onzième morceau : les recettes. Une seule info-bulle de recette (MainWindow.RecipeTooltip.cs, DrawRecipeTooltip ; faits dans Craft/RecipeTips.cs) : icône de la classe, objet fabriqué (et combien), classe et niveau, durabilité, progression et qualité de la recette, attributs minimum (contrôle, habileté), ce qu'elle permet et demande (HQ, travail rapide, livre, spécialiste, expert, objet ou état requis), déjà fabriquée ou non, ingrédients (six puis combien d'autres), puis ce qu'ajoute l'endroit. Elle sert au livre de recettes (avant : classe et niveau seulement), aux fabrications d'un panneau de liste et aux fabrications depuis le stock ; la ligne des faits est la même que celle de la préparation. Calculée une fois par recette survolée.
 - Pour les joueurs : les recettes ont maintenant une info-bulle complète (chiffres, attributs minimum, HQ et autres faits, déjà fabriquée, ingrédients) dans le livre de recettes, les panneaux de liste et la fabrication depuis le stock.

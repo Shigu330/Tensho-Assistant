@@ -41,11 +41,19 @@ internal sealed partial class MainWindow
     /// <summary>X-684 (0.1689): a vendor's facts under the cursor (built once while hovered).</summary>
     private NpcTipFacts VendorTipFacts(NpcVendor vendor)=>NpcTipOf("v"+vendor.NpcId,()=>BuildVendorTip(vendor));
 
-    /// <summary>X-684 (0.1689): a vendor's facts: the map's icon of its shops, its name, its places, each shop with its items. The map's labels
-    /// (VendorLabel, built once per map) take the same facts as text.</summary>
+    /// <summary>X-684 (0.1689): a vendor's facts: the map's icon of its shops, its name, its places, each shop with its items.</summary>
     private NpcTipFacts BuildVendorTip(NpcVendor vendor)
     {
         var shops=npcVendors?.State.Catalog?.ShopSummaries;
+        var places=NpcTips.Lines(VendorLocations(vendor).Select(NpcPlace),NpcTips.MaxPlaces,more=>localization.Format("MapView.HoverMore",more));
+        return NpcTips.Build(NpcName(vendor),VendorIconOf(vendor,shops),places,VendorShopLines(vendor,shops),[]);
+    }
+
+    /// <summary>X-684 (0.1689): a vendor's shop lines, each shop with its items (the tooltip's and the map label's). X-707 (0.1693, review of
+    /// 0.1692): the map's labels (VendorLabel, built once per map for every vendor) take these lines alone; through the whole tooltip, the places
+    /// and the icon were formatted for every vendor and thrown away at once.</summary>
+    private IReadOnlyList<string> VendorShopLines(NpcVendor vendor,IReadOnlyDictionary<uint,(string Name,NpcShopKind Kind,int Items)>? shops)
+    {
         var read=new List<string>();var unknown=0;
         foreach(var id in vendor.ShopIds.Distinct())
         {
@@ -55,10 +63,8 @@ internal sealed partial class MainWindow
                 ? localization.Get("MapLocal.ShopKind"+shop.Kind):shop.Name;
             read.Add(localization.Format("MapLocal.ShopLine",shopName,shop.Items));
         }
-        var lines=NpcTips.Shops(vendor.ShopIds.Count,read,unknown,more=>localization.Format("MapView.HoverMore",more),
+        return NpcTips.Shops(vendor.ShopIds.Count,read,unknown,more=>localization.Format("MapView.HoverMore",more),
             count=>localization.Format("MapLocal.ShopsUnknown",count),localization.Get("MapLocal.ShopsNone"));
-        var places=NpcTips.Lines(VendorLocations(vendor).Select(NpcPlace),NpcTips.MaxPlaces,more=>localization.Format("MapView.HoverMore",more));
-        return NpcTips.Build(NpcName(vendor),VendorIconOf(vendor,shops),places,lines,[]);
     }
 
     /// <summary>X-684 (0.1689): a Triple Triad NPC's facts: its name, its place, fee and cards it may give, the cards still missing, beaten or

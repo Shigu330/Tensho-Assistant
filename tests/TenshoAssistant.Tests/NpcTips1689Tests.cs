@@ -46,7 +46,7 @@ internal static class NpcTips1689Tests
             Check(Read("src/TenshoAssistant/MainWindow.NpcVendors.cs").Contains("if(ImGui.IsItemHovered())DrawNpcTooltip(VendorTipFacts(offer.Vendor));", StringComparison.Ordinal), "the Vendors page");
             Check(Read("src/TenshoAssistant/MainWindow.SourceLinks.cs").Contains("if(ImGui.IsItemHovered())DrawNpcTooltip(VendorTipFacts(vendor),localization.Get(\"NpcUi.ClickVendor\"));", StringComparison.Ordinal), "an item's sources");
             var map = Read("src/TenshoAssistant/MainWindow.MapView.cs");
-            Check(map.Contains("private string VendorLabel(Npcs.NpcVendor vendor)=>Npcs.NpcTips.Text(BuildVendorTip(vendor));", StringComparison.Ordinal), "the map's labels: the same facts as text");
+            Check(map.Contains("private string VendorLabel(Npcs.NpcVendor vendor)=>Npcs.NpcTips.Text(Npcs.NpcTips.Build(NpcName(vendor),0,[],VendorShopLines(vendor,", StringComparison.Ordinal), "the map's labels: the same shop lines as text (X-707)");
             var everywhere = string.Join("\n", Directory.EnumerateFiles(Path.GetFullPath("src/TenshoAssistant"), "MainWindow*.cs").Select(File.ReadAllText));
             Check(!everywhere.Contains("WrappedTooltip(localization.Format(\"TriadNpcs.Tooltip\"", StringComparison.Ordinal) && !everywhere.Contains("WrappedTooltip(VendorLabel(", StringComparison.Ordinal), "no NPC tooltip written by hand any more");
             Check(System.Text.RegularExpressions.Regex.Matches(everywhere, "\"TriadNpcs\\.Tooltip\"").Count == 1, "the Triple Triad facts said in one place");

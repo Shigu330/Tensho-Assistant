@@ -13,12 +13,13 @@ public static class NpcTips
     /// <summary>Shops shown before « and n more » (as the map's labels since 0.137).</summary>
     public const int MaxShops=6;
 
-    /// <summary>The lines of a list: blanks left out, each said once, in the order given, at most <paramref name="max"/>, then « and n more ».</summary>
+    /// <summary>The lines of a list: blanks left out, each said once, in the order given, at most <paramref name="max"/>, then « and n more ».
+    /// X-707 (0.1693): each said once through a set (List.Contains made it quadratic on a vendor's many places).</summary>
     public static IReadOnlyList<string> Lines(IEnumerable<string?> lines,int max,Func<int,string> more)
     {
-        var kept=new List<string>();
+        var kept=new List<string>();var seen=new HashSet<string>(StringComparer.Ordinal);
         foreach(var line in lines)
-            if(line is { } text && text.Trim() is { Length:>0 } trimmed && !kept.Contains(trimmed))kept.Add(trimmed);
+            if(line is { } text && text.Trim() is { Length:>0 } trimmed && seen.Add(trimmed))kept.Add(trimmed);
         if(kept.Count<=max)return kept;
         return [..kept.Take(max),more(kept.Count-max)];
     }

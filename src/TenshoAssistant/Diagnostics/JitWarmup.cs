@@ -186,7 +186,7 @@ public sealed class JitWarmup : IDisposable
     /// labels, edge markers, glyphs, the player's arrow, the beasts' places, the quest index), compiled early with the map's; their lambdas
     /// and local functions carry the outer name in angle brackets. A test checks that each name is still declared in the sources.
     /// </summary>
-    public static readonly IReadOnlyList<string> MapPathMethods=["VendorLayout","VendorLabel","BuildVendorTip","VendorIconOf","VendorCandidates","VendorMarker","EventLabel","FateLabel",
+    public static readonly IReadOnlyList<string> MapPathMethods=["VendorLayout","VendorLabel","BuildVendorTip","VendorShopLines","VendorIconOf","VendorCandidates","VendorMarker","EventLabel","FateLabel",
         "DrawEdgeMarkers","DrawGlyph","DrawPlayerArrow","BeastPlacesOf","RefreshQuestIndex"];
     private static readonly string[] MapPathBracketed=Bracketed(MapPathMethods);
     /// <summary>X-01 C3.3 (0.1188): the settings' methods the canvas calls for each icon (size and priority, per map).</summary>
