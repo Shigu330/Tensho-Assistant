@@ -40,8 +40,9 @@ public sealed class GardenNeighbour
 }
 
 /// <summary>X-581 (0.1572): Unknown = whether the bed is ripe is not known: the game said it was still growing after the time expected for its
-/// harvest, or that it withered. Never « Ripe » then.</summary>
-public enum GardenState { Growing, ToTend, Ripe, Unknown }
+/// harvest, or that it withered. Never « Ripe » then. X-720 (0.1723): Ripe = the game said so; Expected = the calculated time has passed
+/// and the game has not said yet: « ripe by the calculation, to confirm in game ».</summary>
+public enum GardenState { Growing, ToTend, Ripe, Unknown, Expected }
 
 /// <summary>0.461: where a bed sits: its place (« zone ward-plot »), its patch and its bed number, read from the journal's place text.</summary>
 public sealed record GardenSlot(string Zone,int Patch,int Bed);
@@ -96,15 +97,32 @@ public static class GardenJournal
     }
 
     /// <summary>
-    /// X-581 (0.1572, user report of 18/11): « Ripe » only when the game said so, or when the planting time plus the seed's growing time has
-    /// passed and the game has not said since that the crop was still growing. The growing times come from outside the game (Lotlab); on 17/11
-    /// four carrots were said ripe at 23:55 by them, the game still said « se porte bien » at 00:13, and they were harvested the next day.
+    /// X-581 (0.1572, user report of 18/11): the growing times come from outside the game (Lotlab); on 17/11 four carrots were said ripe at 23:55
+    /// by them, the game still said « se porte bien » at 00:13, and they were harvested the next day. X-720 (0.1723, user report of 21/11: the
+    /// carrots planted on 18/11 at 13:00, ripe in the game at about 14:01 on 21/11, 72 h and an hour): « Ripe » only when the game said so;
+    /// the planting time plus the seed's growing time passed without it: Expected (ripe by the calculation, to confirm in game); said growing
+    /// at or after that time: Unknown.
     /// </summary>
     public static GardenState State(GardenBed bed,DateTimeOffset now)
     {
         if(bed.GameState==GardenGameState.Ripe)return GardenState.Ripe;
         if(Unknown(bed,now))return GardenState.Unknown;
-        return now>=RipeAt(bed) ? GardenState.Ripe:TendAt(bed) is { } due && now>=due ? GardenState.ToTend:GardenState.Growing;
+        return now>=RipeAt(bed) ? GardenState.Expected:TendAt(bed) is { } due && now>=due ? GardenState.ToTend:GardenState.Growing;
+    }
+
+    /// <summary>X-720 (0.1723): the chat notice of a due reminder: ripe as the game said, ripe by the calculation (to confirm in game), or to tend.</summary>
+    public static string NoticeKey(GardenState state)=>state switch{GardenState.Ripe=>"Garden.RipeNotice",GardenState.Expected=>"Garden.ExpectedNotice",_=>"Garden.TendNotice"};
+
+    /// <summary>X-720 (0.1723, the probe): a bed for the developer's log: its patch and bed (never the place's name), seed item, planting time to
+    /// the second, growing time and its source, tending, the expected harvest and how far now is from it (minutes), the game's last state.</summary>
+    public static string Describe(GardenBed bed,DateTimeOffset now,string source)
+    {
+        static string Local(DateTimeOffset at)=>at.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss zzz",System.Globalization.CultureInfo.InvariantCulture);
+        var slot=Slot(bed);var ripe=RipeAt(bed);
+        var gap=(long)Math.Floor((now-ripe).Ticks/(double)TimeSpan.TicksPerMinute);
+        var game=bed.GameStateAt is { } at ? bed.GameState+" at "+Local(at):bed.GameState.ToString();
+        return string.Create(System.Globalization.CultureInfo.InvariantCulture,
+            $"patch {slot?.Patch ?? 0}, bed {slot?.Bed ?? 0}, seed item {bed.SeedId}, planted {Local(bed.PlantedAt)}, growing {ClampGrow(bed.GrowHours)} h ({source}), tending {ClampTend(bed.TendHours)} h, expected ripe {Local(ripe)} ({(gap>=0 ? "+":"")}{gap} min now), game {game}, shown {State(bed,now)}");
     }
 
     /// <summary>X-581 (0.1572): the bed's ripeness is unknown: withered, or said growing by the game at or after the expected harvest, now past.</summary>
@@ -132,7 +150,7 @@ public static class GardenJournal
     /// <summary>X-628 M1 (0.1576): the beds a harvest may be of: ripe, or of unknown ripeness but not withered (a withered crop is not
     /// harvested, docs/evidence/0.1572-garden-ripe.md).</summary>
     public static GardenBed[] HarvestCandidates(IEnumerable<GardenBed> beds,DateTimeOffset now)
-        =>beds.Where(bed=>State(bed,now) is GardenState.Ripe || State(bed,now) is GardenState.Unknown && bed.GameState!=GardenGameState.Withered).ToArray();
+        =>beds.Where(bed=>State(bed,now) is GardenState.Ripe or GardenState.Expected || State(bed,now) is GardenState.Unknown && bed.GameState!=GardenGameState.Withered).ToArray();
 
     /// <param name="among">X-383 (0.1360): the journal at that moment: the neighbours planted then are kept in the new bed (null: none kept).</param>
     public static GardenBed Plant(string place,string seed,int growHours,int tendHours,DateTimeOffset now,uint seedId=0,IEnumerable<GardenBed>? among=null)
@@ -232,7 +250,8 @@ public static class GardenJournal
         {
             if(bed.PlantedAt>now)continue;
             var state=State(bed,now);
-            if(state==GardenState.Ripe && !bed.RipeSaid){bed.RipeSaid=true;due.Add((bed,state));}
+            // X-720 (0.1723): ripe by the calculation is said too, as such (NoticeKey); once said, not again when the game says ripe.
+            if(state is GardenState.Ripe or GardenState.Expected && !bed.RipeSaid){bed.RipeSaid=true;due.Add((bed,state));}
             else if(state==GardenState.ToTend && TendAt(bed) is { } at && bed.TendSaidFor!=at){bed.TendSaidFor=at;due.Add((bed,state));}
         }
         return due;
@@ -258,7 +277,7 @@ public sealed class GardenBell
             present.Add(bed.Id);
             if(bed.PlantedAt>now)continue;
             var state=GardenJournal.State(bed,now);
-            if(state==GardenState.Ripe && !bed.RipeSaid && rung.Add((bed.Id,state,GardenJournal.RipeAt(bed))))due.Add((bed,state));
+            if(state is GardenState.Ripe or GardenState.Expected && !bed.RipeSaid && rung.Add((bed.Id,GardenState.Ripe,GardenJournal.RipeAt(bed))))due.Add((bed,state));
             else if(state==GardenState.ToTend && GardenJournal.TendAt(bed) is { } at && bed.TendSaidFor!=at && rung.Add((bed.Id,state,at)))due.Add((bed,state));
         }
         rung.RemoveWhere(entry=>!present.Contains(entry.Bed));

@@ -88,6 +88,8 @@ internal sealed partial class MainWindow
                 if(GardenView.Left(bed,now) is { } left)ImGui.TextUnformatted(GardenLeftText(left));
                 // X-581 (0.1572): never « Ripe » when the game said otherwise: « Unknown », and why under the mouse.
                 else if(state==GardenState.Unknown){ImGui.TextColored(Muted,localization.Get("Garden.StateUnknown"));TipText(GardenUnknownText(bed));}
+                // X-720 (0.1723): past the calculated time without the game's word: « Ripe? », and why under the mouse.
+                else if(state==GardenState.Expected){ImGui.TextColored(Accent,localization.Get("Garden.StateExpectedShort"));TipText(localization.Get("Garden.ExpectedWhy"));}
                 else ImGui.TextColored(Success,localization.Get("Garden.Ripe"));
                 // Without the icon there is no mark: the word says a tending is due.
                 if(!asIcon && badge==GardenBadge.Due)ImGui.TextColored(Warning,localization.Get("Garden.StateToTend"));
@@ -129,6 +131,7 @@ internal sealed partial class MainWindow
             GardenBadge.Due=>(Warning,background,FontAwesomeIcon.Exclamation),
             GardenBadge.Ripe=>(Success,background,FontAwesomeIcon.Check),
             GardenBadge.Unknown=>(Muted,background,FontAwesomeIcon.Question),
+            GardenBadge.Expected=>(Accent,background,FontAwesomeIcon.HourglassEnd),
             _=>(background,Muted,FontAwesomeIcon.Tint),
         };
         draw.AddCircleFilled(centre,diameter/2,ImGui.GetColorU32(fill));
@@ -157,11 +160,14 @@ internal sealed partial class MainWindow
             if(item is not null){DrawItemIcon(item,new Vector2(32),false);ImGui.SameLine();}
             ImGui.TextColored(GardenColor(state),item?.Name ?? bed.Seed);
             ImGui.TextDisabled(bed.Place);
-            ImGui.TextColored(GardenColor(state),localization.Get(state switch{GardenState.Ripe=>"Garden.Ripe",GardenState.ToTend=>"Garden.StateToTend",GardenState.Unknown=>"Garden.StateUnknown",_=>"Garden.StateGrowing"}));
+            ImGui.TextColored(GardenColor(state),localization.Get(state switch{GardenState.Ripe=>"Garden.Ripe",GardenState.ToTend=>"Garden.StateToTend",GardenState.Unknown=>"Garden.StateUnknown",
+                GardenState.Expected=>"Garden.StateExpected",_=>"Garden.StateGrowing"}));
             if(state==GardenState.Unknown)ImGui.TextDisabled(GardenUnknownText(bed));
+            else if(state==GardenState.Expected)ImGui.TextDisabled(localization.Get("Garden.ExpectedWhy"));
             ImGui.TextUnformatted(localization.Format("Garden.TipPlanted",bed.PlantedAt.ToLocalTime().ToString("g")));
             var ripe=GardenJournal.RipeAt(bed).ToLocalTime().ToString("g");
-            ImGui.TextUnformatted(GardenView.Left(bed,now) is { } left ? localization.Format("Garden.TipRipeIn",ripe,GardenLeftText(left)):localization.Format("Garden.RipeAt",ripe));
+            ImGui.TextUnformatted(GardenView.Left(bed,now) is { } left ? localization.Format("Garden.TipRipeIn",ripe,GardenLeftText(left))
+                :localization.Format(state==GardenState.Expected ? "Garden.ExpectedAt":"Garden.RipeAt",ripe));
             if(GardenJournal.TendAt(bed) is { } due)
             {
                 var when=due.ToLocalTime().ToString("g");

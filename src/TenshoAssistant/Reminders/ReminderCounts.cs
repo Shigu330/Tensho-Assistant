@@ -46,7 +46,8 @@ public static class ReminderCounts
         Add(FinishedKind.Voyages,vessels?.Count(vessel=>Voyages.StateOf(vessel,now)==VoyageState.Returned) ?? 0);
         Add(FinishedKind.SquadronMission,Over(mission,now) ? 1:0);
         Add(FinishedKind.SquadronTraining,Over(training,now) ? 1:0);
-        Add(FinishedKind.Garden,beds?.Count(bed=>GardenJournal.State(bed,now)==GardenState.Ripe) ?? 0);
+        // X-720 (0.1723): a bed ripe by the calculation (to confirm in game) is one to look at too.
+        Add(FinishedKind.Garden,beds?.Count(bed=>GardenJournal.State(bed,now) is GardenState.Ripe or GardenState.Expected) ?? 0);
         return list;
     }
 }
