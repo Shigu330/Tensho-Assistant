@@ -199,9 +199,15 @@ internal sealed partial class MainWindow
                                 {
                                     var min=ImGui.GetItemRectMin();
                                     ImGui.GetWindowDrawList().AddRect(min,min+new Vector2(slot),ImGui.GetColorU32(reserved.Preserve ? Success:Accent),4);
-                                    if(ImGui.IsItemHovered())WrappedTooltip(previewStack is { } zoneItem
-                                        ? $"{catalog.Find(zoneItem.Stack.Item.Id.Value)?.Name ?? localization.Format("BankUi.Item",zoneItem.Stack.Item.Id.Value)}\n{(zoneItem.Stack.Item.IsHighQuality ? "HQ":"NQ")} : {zoneItem.Stack.Quantity:N0}\n"+localization.Format("SortUi.Slot",target+1,reserved.Name,reserved.Preserve ? localization.Get("SortUi.Protected"):"")
-                                        : localization.Format("SortUi.EmptySlot",target+1,reserved.Name,reserved.Preserve ? localization.Get("SortUi.Protected"):""));
+                                    // X-684 (0.1669): an item in the slot: the common item tooltip, then the slot and the quantity (the same
+                                    // tooltip: the game's ImGui adds a second one of the frame under the first, as the fashion page does).
+                                    if(ImGui.IsItemHovered() && previewStack is { } zoneItem)
+                                    {
+                                        var stack=zoneItem.Stack;
+                                        DrawItemInfoTooltip(stack.Item.Id.Value,hq:stack.Item.IsHighQuality);
+                                        WrappedTooltip($"{(stack.Item.IsHighQuality ? "HQ":"NQ")} : {stack.Quantity:N0}\n"+localization.Format("SortUi.Slot",target+1,reserved.Name,reserved.Preserve ? localization.Get("SortUi.Protected"):""));
+                                    }
+                                    else if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("SortUi.EmptySlot",target+1,reserved.Name,reserved.Preserve ? localization.Get("SortUi.Protected"):""));
                                 }
                             }
                             finally { ImGui.PopID(); }

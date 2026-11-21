@@ -64,7 +64,7 @@ internal sealed partial class MainWindow
                     ImGui.TableNextRow();
                     ImGui.TableNextColumn();
                     ImGui.TextUnformatted((catalog?.Find(row.Item)?.Name ?? $"#{row.Item}") + (row.Hq ? " HQ" : ""));
-                    if (ImGui.IsItemHovered()) DrawItemInfoTooltip(row.Item);
+                    if (ImGui.IsItemHovered()) DrawItemInfoTooltip(row.Item, hq: row.Hq);
                     ImGui.TableNextColumn(); ImGui.TextUnformatted(row.Quantity.ToString("N0", Numbers));
                     ImGui.TableNextColumn(); ImGui.TextUnformatted(row.Price?.Unit.ToString("N0", Numbers) ?? localization.Get("RetainerSales.SaleListUnknownPrice"));
                     ImGui.TableNextColumn(); ImGui.TextUnformatted(row.Total?.ToString("N0", Numbers) ?? localization.Get("RetainerSales.SaleListUnknownPrice"));

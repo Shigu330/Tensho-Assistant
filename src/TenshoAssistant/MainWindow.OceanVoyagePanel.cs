@@ -160,7 +160,8 @@ internal sealed partial class MainWindow
                         DrawItemIcon(bait,new Vector2(22));
                         if(step==0 && inHand==row.Route[0])
                             ImGui.GetWindowDrawList().AddRect(ImGui.GetItemRectMin()-new Vector2(1),ImGui.GetItemRectMax()+new Vector2(1),ImGui.GetColorU32(Success),3,ImDrawFlags.None,2);
-                        if(ImGui.IsItemHovered())WrappedTooltip((bait?.Name ?? row.Route[step].ToString())+(step==0 ? "":"\n"+localization.Get("FishingSources.Mooch")));
+                        // X-684 (0.1669): the bait's icon carries the common item tooltip; only what it does not say is added under it.
+                        if(ImGui.IsItemHovered() && (bait is null || step>0))WrappedTooltip(bait is null ? row.Route[step]+(step==0 ? "":"\n"+localization.Get("FishingSources.Mooch")):localization.Get("FishingSources.Mooch"));
                     }
                     if(row.Route.Count==0)ImGui.TextDisabled("?");
                     ImGui.TableNextColumn();
