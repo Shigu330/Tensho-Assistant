@@ -55,6 +55,14 @@ internal sealed partial class MainWindow
             ImGui.Indent();
             var lines=Chat.ChatTextFilter.Words(read());
             if(lines.Count==0)ImGui.TextDisabled(localization.Get("ChatWindow.ListEmpty"));
+            // X-626 M1 (review of 0.1568): the draft is kept by the box's ImGui id, so « Only with » of tab 1 and tab 2 each have their own.
+            var draftId=ImGui.GetID("###ListDraft");
+            // X-716 (0.1716, the user's request of 21/11): a long list in an area of its own height, with its scroll bar: the page no longer
+            // grows with it.
+            var scrolled=lines.Count>ListRowsShown;
+            if(scrolled)ImGui.BeginChild("###ListLines",new Vector2(0,ListRowsShown*ImGui.GetFrameHeightWithSpacing()),true);
+            try
+            {
             for(var index=0;index<lines.Count;index++)
             {
                 ImGui.PushID(index);
@@ -67,12 +75,12 @@ internal sealed partial class MainWindow
                     Tip("ChatWindow.ListRemoveTip");
                     ImGui.SameLine();
                     ImGui.TextWrapped(lines[index]);
-                    if(removed){write(Chat.ChatTextFilter.Remove(read(),index));changed=true;break;}
+                    if(removed){write(Chat.ChatTextFilter.Remove(read(),index));changed=true;listSettingFull.Remove(draftId);break;}
                 }
                 finally{ImGui.PopID();}
             }
-            // X-626 M1 (review of 0.1568): the draft is kept by the box's ImGui id, so « Only with » of tab 1 and tab 2 each have their own.
-            var draftId=ImGui.GetID("###ListDraft");
+            }
+            finally{if(scrolled)ImGui.EndChild();}
             listSettingDrafts.TryGetValue(draftId,out var draft);
             draft??="";
             ImGui.SetNextItemWidth(Math.Min(260,Math.Max(120,ImGui.GetContentRegionAvail().X-120)));
@@ -86,10 +94,12 @@ internal sealed partial class MainWindow
             Tip("ChatWindow.ListAddTip");
             if((enter || clicked) && draft.Trim().Length>0)
             {
-                if(Chat.ChatTextFilter.Add(read(),draft,maximum,matchCase?.Invoke()??false) is { } added){write(added);changed=true;listSettingDrafts[draftId]="";}
-                else listSettingDrafts[draftId]=draft;
+                // X-716 (0.1716): a full list keeps what was typed and says so (never an addition lost silently).
+                if(Chat.ChatTextFilter.Add(read(),draft,maximum,matchCase?.Invoke()??false) is { } added){write(added);changed=true;listSettingDrafts[draftId]="";listSettingFull.Remove(draftId);}
+                else{listSettingDrafts[draftId]=draft;if(Chat.ChatTextFilter.TryAdd(read(),draft,maximum,matchCase?.Invoke()??false).Full)listSettingFull.Add(draftId);}
                 if(enter)listSettingFocus.Add(draftId);
             }
+            if(listSettingFull.Contains(draftId))ImGui.TextColored(Warning,localization.Format("ChatWindow.ListFull",maximum));
             ImGui.Unindent();
         }
         finally{ImGui.PopID();}
@@ -100,6 +110,10 @@ internal sealed partial class MainWindow
     private readonly Dictionary<uint,string> listSettingDrafts=[];
     /// <summary>X-626 M2: the « Add » boxes where Enter was pressed: the cursor goes back into them on the next frame.</summary>
     private readonly HashSet<uint> listSettingFocus=[];
+    /// <summary>X-716 (0.1716): the lists whose last addition did not fit (said under their box until a line goes or one is added).</summary>
+    private readonly HashSet<uint> listSettingFull=[];
+    /// <summary>X-716 (0.1716): the lines a list shows before its own scroll bar.</summary>
+    private const int ListRowsShown=8;
 
     /// <summary>X-503 M2: an on/off setting of something that is not a field of Configuration (a chat tab): no « ↺ », its default is the
     /// tab's own; the tooltip still names it.</summary>

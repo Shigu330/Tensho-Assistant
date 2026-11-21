@@ -6439,6 +6439,7 @@
     "ListAddHint": "Add…",
     "ListAddTip": "Type a name or a word, then Enter or « Add »: it becomes a line of the list. Several at once: separate them with commas. A line already there is not added twice.",
     "ListRemoveTip": "Remove this line from the list.",
+    "ListFull": "The list is full ({0} characters at most): remove a line to add another.",
     "MenuHidePlayer": "Hide {0}",
     "MenuHighlightPlayer": "Put {0} forward",
     "MenuGameMenu": "Game menu…",

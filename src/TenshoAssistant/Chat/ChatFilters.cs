@@ -97,7 +97,15 @@ public static class ChatTextFilter
     /// entry may hold commas: each piece is a line. Null when nothing is added: empty, already there (capitals ignored), or the list would
     /// go past its maximum length. X-626 M3 (review of 0.1568): with <paramref name="matchCase"/> (a tab's « Match case »), « Foo » is not
     /// the double of « foo ».</summary>
-    public static string? Add(string? list,string? entry,int maximum,bool matchCase=false)
+    public static string? Add(string? list,string? entry,int maximum,bool matchCase=false)=>TryAdd(list,entry,maximum,matchCase).List;
+
+    /// <summary>X-716 (0.1716, the user's request of 21/11): the longest a list of players (hidden or put forward) or of alert words may be:
+    /// about two hundred and fifty names (was 600 characters, about thirty). A tab's words to keep or hide stay at 300.</summary>
+    public const int ListMaximum=6000;
+
+    /// <summary>X-716 (0.1716): as <see cref="Add"/>, and why nothing was added: <c>Full</c> when the list would go past
+    /// <paramref name="maximum"/> (said to the player, never an addition lost silently); else nothing new (empty, or already there).</summary>
+    public static (string? List,bool Full) TryAdd(string? list,string? entry,int maximum,bool matchCase=false)
     {
         var lines=Words(list).ToList();
         var added=false;
@@ -107,9 +115,9 @@ public static class ChatTextFilter
             if(lines.Any(line=>string.Equals(line,word,comparison)))continue;
             lines.Add(word);added=true;
         }
-        if(!added)return null;
+        if(!added)return (null,false);
         var joined=string.Join(", ",lines);
-        return joined.Length<=maximum ? joined:null;
+        return joined.Length<=maximum ? (joined,false):(null,true);
     }
 
     /// <summary>X-508 (0.1566): the list without its line at this index (an index out of the list leaves it as it is, written again).</summary>

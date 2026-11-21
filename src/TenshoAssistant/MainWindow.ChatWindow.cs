@@ -908,9 +908,10 @@ internal sealed partial class MainWindow
     /// <summary>X-484 (0.1482, beyond the game): players hidden from every tab, players whose name stands out.</summary>
     private void DrawChatPlayers(ChatSettings options)
     {
-        ListSetting("ChatWindow.HiddenPlayers","ChatWindow.HiddenPlayersTip",()=>options.HiddenPlayers,value=>{options.HiddenPlayers=value;RestartChatTabs(options);},600);
-        ListSetting("ChatWindow.HighlightedPlayers","ChatWindow.HighlightedPlayersTip",()=>options.HighlightedPlayers,value=>{options.HighlightedPlayers=value;chatSettingsPending=true;},600);
-        ListSetting("ChatWindow.AlertWords","ChatWindow.AlertWordsTip",()=>options.AlertWords,value=>{options.AlertWords=value;chatSettingsPending=true;},600);
+        // X-716 (0.1716): about two hundred and fifty names each (ChatTextFilter.ListMaximum), each list in an area with its own scroll bar.
+        ListSetting("ChatWindow.HiddenPlayers","ChatWindow.HiddenPlayersTip",()=>options.HiddenPlayers,value=>{options.HiddenPlayers=value;RestartChatTabs(options);},ChatTextFilter.ListMaximum);
+        ListSetting("ChatWindow.HighlightedPlayers","ChatWindow.HighlightedPlayersTip",()=>options.HighlightedPlayers,value=>{options.HighlightedPlayers=value;chatSettingsPending=true;},ChatTextFilter.ListMaximum);
+        ListSetting("ChatWindow.AlertWords","ChatWindow.AlertWordsTip",()=>options.AlertWords,value=>{options.AlertWords=value;chatSettingsPending=true;},ChatTextFilter.ListMaximum);
         // X-447 B7 (0.1643): the tab holding an alert not seen blinks.
         BoolSetting("ChatWindow.BlinkAlerts","ChatWindow.BlinkAlertsTip",()=>configuration.Chat.BlinkAlerts,value=>configuration.Chat.BlinkAlerts=value,c=>c.Chat.BlinkAlerts);
         // X-447 B7 (0.1646, after Prat): your character's first name said by a player alerts as the words do.
@@ -953,15 +954,33 @@ internal sealed partial class MainWindow
         // X-455 E3 (0.1617): the player's name with their world, copied (nothing kept, R04).
         if(ImGui.Selectable(localization.Format("ChatWindow.MenuCopyPlayer",shown)))
             ImGui.SetClipboardText(ChatCopy.Player(player,ChatSenders?.For(said.Id) is { World:>0 } source && ChatPlayers is { } players ? players.World(source.World):ChatCopy.WorldOf(said.Sender)));
-        if(ImGui.Selectable(localization.Format("ChatWindow.MenuHidePlayer",shown)) && ChatTextFilter.Add(options.HiddenPlayers,player,600) is { } hidden)
-            SetHiddenPlayers(options,hidden);
+        // X-716 (0.1716): a full list greys its entry and says why (never an addition lost silently).
+        var hideFull=ChatTextFilter.TryAdd(options.HiddenPlayers,player,ChatTextFilter.ListMaximum).Full;
+        ImGui.BeginDisabled(hideFull);
+        try
+        {
+            if(ImGui.Selectable(localization.Format("ChatWindow.MenuHidePlayer",shown)) && ChatTextFilter.Add(options.HiddenPlayers,player,ChatTextFilter.ListMaximum) is { } hidden)
+                SetHiddenPlayers(options,hidden);
+        }
+        finally{ImGui.EndDisabled();}
+        if(hideFull)TipText(()=>localization.Format("ChatWindow.ListFull",ChatTextFilter.ListMaximum));
         if(ChatTextFilter.IsPlayer(said.Sender,ChatTextFilter.Words(options.HighlightedPlayers)))
         {
             if(ImGui.Selectable(localization.Format("ChatWindow.MenuUnhighlightPlayer",shown))){options.HighlightedPlayers=ChatTextFilter.RemovePlayer(options.HighlightedPlayers,said.Sender);chatSettingsPending=true;}
         }
-        else if(ImGui.Selectable(localization.Format("ChatWindow.MenuHighlightPlayer",shown)) && ChatTextFilter.Add(options.HighlightedPlayers,player,600) is { } forward)
+        else
         {
-            options.HighlightedPlayers=forward;chatSettingsPending=true;
+            var forwardFull=ChatTextFilter.TryAdd(options.HighlightedPlayers,player,ChatTextFilter.ListMaximum).Full;
+            ImGui.BeginDisabled(forwardFull);
+            try
+            {
+                if(ImGui.Selectable(localization.Format("ChatWindow.MenuHighlightPlayer",shown)) && ChatTextFilter.Add(options.HighlightedPlayers,player,ChatTextFilter.ListMaximum) is { } forward)
+                {
+                    options.HighlightedPlayers=forward;chatSettingsPending=true;
+                }
+            }
+            finally{ImGui.EndDisabled();}
+            if(forwardFull)TipText(()=>localization.Format("ChatWindow.ListFull",ChatTextFilter.ListMaximum));
         }
         // X-447 B10 (0.1654): the conversation with this player, opened (or the one open) and shown; a player's own lines open none.
         if(options.Conversations && ChatSpoken(said) && ImGui.Selectable(localization.Format("ChatWindow.MenuConversation",shown))

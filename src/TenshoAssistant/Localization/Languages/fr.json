@@ -6439,6 +6439,7 @@
     "ListAddHint": "Ajouter…",
     "ListAddTip": "Tapez un nom ou un mot, puis Entrée ou « Ajouter » : il devient une ligne de la liste. Plusieurs d'un coup : séparez-les par des virgules. Une ligne déjà là n'est pas ajoutée deux fois.",
     "ListRemoveTip": "Retirer cette ligne de la liste.",
+    "ListFull": "La liste est pleine ({0} caractères au plus) : retirez une ligne pour en ajouter une.",
     "MenuHidePlayer": "Cacher {0}",
     "MenuHighlightPlayer": "Mettre {0} en avant",
     "MenuGameMenu": "Menu du jeu…",
