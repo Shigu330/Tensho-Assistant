@@ -3542,6 +3542,8 @@
     "SeenChest": "Chest (seen in game)",
     "UnlockedBy": "Unlocked by:",
     "Unlocks": "Unlocks: {0}",
+    "TipKind": "{0} · level {1}",
+    "TipClick": "Click: its loot and details in Tensho.",
     "Title": "Duty loot",
     "Description": "Game catalogue · loot data requested manually from Garland Tools",
     "Back": "Back to duties",

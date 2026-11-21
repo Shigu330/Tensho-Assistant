@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1691.0
+- Plan global, X-684 : Info-bulles complètes (X-684), dixième morceau : les donjons et autres contenus. Une seule info-bulle de contenu (MainWindow.DutyTooltip.cs, DrawDutyTooltip ; faits dans Duties/DutyTips.cs) : icône, nom, genre et niveau, zone, votre avancement (terminé, débloqué, verrouillé), la quête qui le débloque quand le jeu en nomme une (avec son avancement), les identifiants en mode développeur, puis l'effet du clic. Elle sert à la page Contenus (avant : les identifiants seulement, en mode développeur), aux étages des donjons profonds et au contenu d'un monstre. Calculée une fois par contenu survolé.
+- Pour les joueurs : les contenus ont maintenant une info-bulle complète (genre, niveau, zone, votre avancement, quête de déblocage) sur la page Contenus, les donjons profonds et le contenu d'un monstre.
+- Tests : DutyTips1691Tests. Verify.ps1 (agent) : 3569/3569, 0 avertissement, 0 erreur ; DLL 0.1691.0.0. Non validé en jeu.
+### English
+- Complete tooltips (X-684), tenth part: duties. One duty tooltip (MainWindow.DutyTooltip.cs, DrawDutyTooltip; facts in Duties/DutyTips.cs): icon, name, kind and level, zone, your progress (completed, unlocked, locked), the quest that unlocks it when the game names one (with its progress), the ids in developer mode, then the click's effect. It serves the Duties page (before: the ids only, in developer mode), the deep dungeons' floors and a monster's duty. Built once per hovered duty.
+- For players: Duties now have a full tooltip (kind, level, zone, your progress, the unlocking quest) on the Duties page, the deep dungeons and a monster's duty.
+
 ## 0.1690.0
 - Plan global, X-684 : Info-bulles complètes (X-684), neuvième morceau : les joueurs. Une seule info-bulle de joueur (MainWindow.PlayerTooltip.cs, PlayerTip, sur ChatCopy.SenderTip) : nom et monde, puis classe et niveau quand le jeu les montre. Elle sert aux noms des auteurs dans la fenêtre de chat (comme avant) et maintenant aux membres de l'équipe sur la carte Tensho, sur la carte et au bord (avant : « nom · niv. », sans monde ni classe) ; le monde de chaque membre est lu avec l'équipe. Calculée une fois par état de membre et par langue, pas à chaque image.
 - Pour les joueurs : les membres de l'équipe sur la carte Tensho montrent maintenant leur monde, leur classe et leur niveau, comme dans la fenêtre de chat de Tensho.

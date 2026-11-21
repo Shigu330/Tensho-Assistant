@@ -3542,6 +3542,8 @@
     "SeenChest": "Coffre (vu en jeu)",
     "UnlockedBy": "Débloqué par :",
     "Unlocks": "Débloque : {0}",
+    "TipKind": "{0} · niveau {1}",
+    "TipClick": "Clic : son butin et ses détails dans Tensho.",
     "Title": "Butin des missions",
     "Description": "Catalogue du jeu · données de butin consultées manuellement auprès de Garland Tools",
     "Back": "Retour aux missions",
