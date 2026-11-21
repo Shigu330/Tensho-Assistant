@@ -82,7 +82,7 @@ Open points, produced by script from the agent's source of decisions. Choices al
 
 | No. | Point | Choice applied, or record awaited | Where |
 |---|---|---|---|
-| D-203 | Tensho chat window: the game's menu of a player far away. Whether to imitate the event the game's chat sends on a click on a player, to settle after the developer-mode probe's measure (evidence 0.1718; in-game test: a player near you, a player far away, a player of another world). | Keep it so: near you, the game's menu of that character; far away, the line in the game's own chat. Pros: nothing fragile, never another player's menu. Cons: far away, the game's chat is still needed. |  |
+| D-203 | Tensho chat window: the game's menu of a player far away. Measure of 21/11 (5 clicks, evidence 0.1746): the game chat's click sends an unnamed handler the name, the home world and the number of the line in the game's log, never the content id; the game finds the player in its own line. No named function opens that menu for a player far away. | Keep it so (recommended): far away, Tensho offers the tell (typing box), the invitation and the adventurer plate; friend request, blacklist and report through the game chat's line; near you, the game's whole menu. Pros: named functions only, never another player's menu, nothing fragile. Cons: far away, three entries still need the game's chat. |  |
 <!-- /gen:decisions:en -->
 
 ## In-game tests
@@ -181,7 +181,7 @@ Points ouverts, produits par script depuis la source des décisions de l'agent. 
 
 | N° | Point | Choix appliqué, ou relevé attendu | Où |
 |---|---|---|---|
-| D-203 | Fenêtre de chat de Tensho : menu du jeu d'un joueur loin. Imiter ou non l'événement que le chat du jeu envoie au clic sur un joueur, à trancher après la mesure de la sonde en mode développeur (preuve 0.1718 ; essai en jeu : un joueur près, un joueur loin, un joueur d'un autre monde). | Garder ainsi : près de vous, le menu du jeu de ce personnage ; loin, la ligne du chat du jeu. Pour : rien de fragile, jamais le menu d'un autre joueur. Contre : loin, il faut encore passer par le chat du jeu. |  |
+| D-203 | Fenêtre de chat de Tensho : menu du jeu d'un joueur loin. Mesure du 21/11 (5 clics, preuve 0.1746) : le clic du chat du jeu envoie à un gestionnaire sans nom le nom, le monde d'origine et le numéro de la ligne dans le journal du jeu, jamais le content id ; le jeu retrouve le joueur dans sa propre ligne. Aucune fonction nommée n'ouvre ce menu pour un joueur loin. | Garder ainsi (recommandé) : loin, Tensho offre le message privé (zone de saisie), l'invitation et la fiche d'aventurier ; demande d'ami, liste noire et signaler par la ligne du chat du jeu ; près, le menu entier du jeu. Pour : seulement des fonctions nommées, jamais le menu d'un autre joueur, rien de fragile. Contre : loin, trois entrées demandent encore le chat du jeu. |  |
 <!-- /gen:decisions:fr -->
 
 ## Tests en jeu

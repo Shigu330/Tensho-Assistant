@@ -2620,6 +2620,14 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1740) Fenêtre de chat, « S'effacer après » à 10 s et historique gardé : recharger Tensho, attendre que la fenêtre s'efface sans écrire : elle ne revient pas quand les anciens messages sont remis (dans les premières secondes) ; un nouveau message de l'onglet la fait revenir
 
+- [ ] (0.1744) Chat de Tensho : manger un repas alors qu'on est déjà Repu d'un autre repas : l'info-bulle de la nouvelle ligne « Repu » montre les bonus du nouveau repas ; puis lire le journal : la ligne « status put on N frame(s) (M ms) after its line » donne le délai du jeu, s'il y en a un
+
+- [ ] (0.1745) Premier chargement de cette version : les réglages sont les mêmes qu'avant (thème, alarmes, chat, carte, tailles d'icônes) ; le journal dit une fois « Settings moved from Dalamud's settings file to Tensho's own (Settings.json) » ; le fichier pluginConfigs\TenshoAssistant\Settings.json existe
+
+- [ ] (0.1745) Changer un réglage, recharger Tensho : le réglage est gardé
+
+- [ ] (0.1745) Après quelques rechargements (mode développeur) : les lignes « context alive » ne nomment aucune copie chargée depuis cette version, et la mémoire gérée ne monte plus d'une copie à chaque rechargement
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
