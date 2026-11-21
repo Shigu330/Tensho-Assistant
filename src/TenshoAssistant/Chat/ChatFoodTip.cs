@@ -91,6 +91,23 @@ public static class ChatStatusWatch
     /// only two, read on 21/11/2026).</summary>
     public static bool ExtendsMeals(uint status)=>status is 360 or 1084;
 
+    /// <summary>X-768 (0.1759, review of 0.1758, M2): how long after another player's meal line a Well Fed status may still be at its full
+    /// duration (<see cref="PutOnAtLine"/>) with that line's meal: put on 3 s at most before it or half a second at most after it, then
+    /// <see cref="FreshSeconds"/> below its full duration: 3.5 s; 4 s kept.</summary>
+    public const int EarlierMealMs=4000;
+
+    /// <summary>
+    /// X-768 (0.1759, review of 0.1758, M2; D-208, never an older meal): another player's Well Fed status held at a line at its full duration
+    /// is not that line's when it is the meal shown for the same player's line of the <see cref="EarlierMealMs"/> before: an older meal A eaten
+    /// just before the line of a meal B (A still at 1797 to 1800 s when B's line arrives), B put on past half a second. A Param that changes
+    /// within the half second still wins (<see cref="Other"/>).
+    /// </summary>
+    /// <param name="held">The Param held at the line.</param>
+    /// <param name="earlier">The meals shown for the same player's earlier lines (0: not read, or still being read), with their line's time.</param>
+    /// <param name="lineAt">This line's time, in the same milliseconds.</param>
+    public static bool ShownJustBefore(ushort held,IEnumerable<(ushort Param,long LineAt)> earlier,long lineAt)=>
+        held!=0 && earlier.Any(shown=>shown.Param==held && lineAt>=shown.LineAt && lineAt-shown.LineAt<=EarlierMealMs);
+
     /// <summary>
     /// X-766: the full duration of a meal's Well Fed status by its Param (the ItemFood row, plus 10000 for HQ), from the ItemAction rows:
     /// status (Data[0], 48 for a meal), ItemFood row (Data[1]) and seconds (Data[2]), the same three in DataHQ for the HQ item. A Param given
@@ -109,6 +126,52 @@ public static class ChatStatusWatch
         }
         foreach(var param in unclear)durations.Remove(param);
         return durations;
+    }
+}
+
+/// <summary>
+/// X-768 (0.1759, review of 0.1758, M1): what the log says of another player's Well Fed status held at its line, by the gap between its
+/// remaining time and its meal's full duration (X-766, D-211): what <see cref="ChatStatusWatch.FreshSeconds"/> must cover, measured in game.
+/// Taken as the line's (within the margin): said each time the largest gap taken grows. Not taken but near (past the margin, up to
+/// <see cref="NearSeconds"/>) or the meal shown for that player's line just before (<see cref="ChatStatusWatch.ShownJustBefore"/>): said each
+/// time, <see cref="NearMost"/> times at most since the plugin loaded (a first meal that far shows no bonus: the margin is to be widened; the
+/// in-game test reads that line). Farther (an older meal), past the full duration (eaten again), an extension held or an unknown duration:
+/// nothing. 0.1757 said only the smallest gap seen, which never told a first meal missed. Pure (tests).
+/// </summary>
+public sealed class MealGapLog
+{
+    /// <summary>How far below its full duration a status is still said (an older meal is farther, unless eaten that many seconds before).</summary>
+    public const float NearSeconds=30;
+
+    /// <summary>The near gaps said at most since the plugin loaded.</summary>
+    public const int NearMost=20;
+
+    private float largestTaken=-1;
+    private int nearSaid;
+
+    /// <returns>The words of the log line (English, after « another player's meal held at its line »), or null: nothing to say.</returns>
+    public string? Say(float remaining,int fullSeconds,bool extended,bool shownJustBefore)
+    {
+        if(fullSeconds<=0 || extended)return null;
+        var gap=fullSeconds-remaining;
+        var said=string.Create(System.Globalization.CultureInfo.InvariantCulture,$"{gap:F1} s from its full duration ({fullSeconds} s)");
+        var margin=string.Create(System.Globalization.CultureInfo.InvariantCulture,$"{ChatStatusWatch.FreshSeconds:0.#} s");
+        var atFull=ChatStatusWatch.PutOnAtLine(remaining,fullSeconds,extended);
+        if(atFull && !shownJustBefore)
+        {
+            var size=Math.Abs(gap);
+            if(size<=largestTaken)return null;
+            largestTaken=size;
+            return $"{said}: taken as put on just before its line, the largest gap taken since the plugin loaded (margin {margin})";
+        }
+        var older=atFull && shownJustBefore;
+        if(!older && (gap<=ChatStatusWatch.FreshSeconds || gap>NearSeconds))return null;
+        if(nearSaid>=NearMost)return null;
+        nearSaid++;
+        var last=nearSaid==NearMost ? $"; the next ones are not written (at most {NearMost} since the plugin loaded)":"";
+        return older
+            ? $"{said}: the meal shown for that player's line of the {ChatStatusWatch.EarlierMealMs/1000} s before, an older meal: no bonus unless it changes within half a second{last}"
+            : $"{said}: past the {margin} margin, not taken: no bonus unless it changes within half a second (for a first meal, the margin is to be widened){last}";
     }
 }
 

@@ -98,7 +98,7 @@ internal static class MealFull1757Tests
             var players = Read("src/TenshoAssistant/Chat/ChatPlayerActions.Dalamud.cs");
             Check(players.Contains("if(seen==0 && held.StatusId==status && held.Param!=0){seen=held.Param;remaining=held.RemainingTime;}", StringComparison.Ordinal)
                 && players.Contains("if(ChatStatusWatch.ExtendsMeals(held.StatusId))extended=true;", StringComparison.Ordinal), "the remaining time and the extensions");
-            Check(players.Contains("if(frame==0 && name is not null && status==Craft.CraftConsumables.WellFed && seen!=0)fresh=MealPutOnAtLine(seen,remaining,extended);", StringComparison.Ordinal), "at the line, another player's Well Fed only");
+            Check(players.Contains("if(frame==0 && name is not null && status==Craft.CraftConsumables.WellFed && seen!=0)fresh=MealPutOnAtLine(seen,remaining,extended,name,world,lineAt);", StringComparison.Ordinal), "at the line, another player's Well Fed only");
             Check(players.Contains("data.GetExcelSheet<Lumina.Excel.Sheets.ItemAction>()", StringComparison.Ordinal) && players.Contains("return ChatStatusWatch.PutOnAtLine(remaining,full,extended);", StringComparison.Ordinal), "the durations from the game");
             var publishing = Read("docs/project/PUBLISHING.md");
             Check(publishing.Contains("its remaining time at the line (D-211,", StringComparison.Ordinal) && publishing.Contains("son temps restant à la ligne (D-211,", StringComparison.Ordinal), "rule 5, en and fr");

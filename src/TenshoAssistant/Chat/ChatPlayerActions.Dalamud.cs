@@ -247,7 +247,9 @@ internal sealed unsafe class ChatPlayerActions : IDisposable,IChatLineData
             if(frame==0)atLine=seen;
             // X-766 (review of 0.1751, X-764 M2; D-211, the owner's choice of 21/11 at about 10:30 pm, R04): another player's Well Fed status
             // held at its line is the line's when its remaining time is the meal's full duration (put on just before the line).
-            if(frame==0 && name is not null && status==Craft.CraftConsumables.WellFed && seen!=0)fresh=MealPutOnAtLine(seen,remaining,extended);
+            // X-768 (review of 0.1758, M2): never the meal shown for that player's line of the 4 s before (D-208).
+            if(frame==0 && name is not null && status==Craft.CraftConsumables.WellFed && seen!=0)fresh=MealPutOnAtLine(seen,remaining,extended,name,world,lineAt);
+            if(frame==0 && name is not null && status==Craft.CraftConsumables.WellFed)MealLine(param,name,world,lineAt);
             var read=name is null ? ChatStatusWatch.Next(atLine,seen,frame,elapsed):ChatStatusWatch.Other(atLine,seen,elapsed,fresh);
             if(read.Over){if(read.Value!=0)param.Value=read.Value;StatusSaid(read.How);if(read.Value!=0 && read.Value!=atLine)StatusLate(frame,elapsed);return;}
             framework.RunOnTick(()=>ReadStatus(param,status,name,world,frame+1,atLine,lineAt,fresh),delayTicks:1);
@@ -260,12 +262,12 @@ internal sealed unsafe class ChatPlayerActions : IDisposable,IChatLineData
     }
 
     // X-766 (D-211): each meal's full duration by its Param (ItemAction, read once); null when unreadable (then no meal is taken as put on
-    // at its line: as before). The gap between the full duration and the remaining time at the line, the closest seen, is said in the log:
-    // what ChatStatusWatch.FreshSeconds must cover, measured in game.
+    // at its line: as before). X-768 (review of 0.1758, M1): the gap between the full duration and the remaining time at the line is said in
+    // the log (MealGapLog: the largest taken, and each near one not taken): what ChatStatusWatch.FreshSeconds must cover, measured in game.
     private IReadOnlyDictionary<ushort,int>? mealDurations;
     private bool mealDurationsRead;
-    private float mealGapSaid=float.MaxValue;
-    private bool MealPutOnAtLine(ushort param,float remaining,bool extended)
+    private readonly MealGapLog mealGaps=new();
+    private bool MealPutOnAtLine(ushort param,float remaining,bool extended,string name,ushort world,long lineAt)
     {
         if(!mealDurationsRead)
         {
@@ -280,12 +282,19 @@ internal sealed unsafe class ChatPlayerActions : IDisposable,IChatLineData
             catch(Exception error){log.Warning(error,"Chat window, the meals' durations could not be read (maybe after a game update): another player's meal put on before its line shows no bonus.");}
         }
         var full=mealDurations?.GetValueOrDefault(param) ?? 0;
-        if(full>0 && !extended && Math.Abs(full-remaining)<mealGapSaid)
-        {
-            mealGapSaid=Math.Abs(full-remaining);
-            log.Information("Chat window, another player's meal held at its line {0:F1} s from its full duration ({1} s): the closest seen since the plugin loaded (taken as put on just before its line within {2} s).",full-remaining,full,ChatStatusWatch.FreshSeconds);
-        }
+        var earlier=ChatStatusWatch.ShownJustBefore(param,mealLines.Where(line=>line.Name==name && line.World==world).Select(line=>(line.Param.Value,line.LineAt)),lineAt);
+        if(mealGaps.Say(remaining,full,extended,earlier) is { } said)log.Information("Chat window, another player's meal held at its line {0}.",said);
+        if(earlier)return false;
         return ChatStatusWatch.PutOnAtLine(remaining,full,extended);
+    }
+
+    // X-768 (review of 0.1758, M2): the boxes of another player's meal lines of the last seconds (the meal shown with each line, 0 while it is
+    // read), in memory only, dropped past ChatStatusWatch.EarlierMealMs: what a later line of the same player compares with (D-208).
+    private readonly List<(string Name,ushort World,ChatStatusParam Param,long LineAt)> mealLines=[];
+    private void MealLine(ChatStatusParam param,string name,ushort world,long lineAt)
+    {
+        mealLines.RemoveAll(line=>lineAt-line.LineAt>ChatStatusWatch.EarlierMealMs);
+        mealLines.Add((name,world,param,lineAt));
     }
 
     private void StatusSaid(string how)
