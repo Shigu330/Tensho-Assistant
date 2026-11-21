@@ -113,28 +113,33 @@ internal sealed class Host
         if(!File.Exists(own) && !File.Exists(path)){note="new (no saved settings at "+path+")";return null;}
         try
         {
-            var value=Parse(path);
-            note=value is null ? "new (saved settings empty)" : "read from "+(File.Exists(own) ? own : path)+" (read-only, without the Discord addresses)";
+            var value=Parse(path,out var from);
+            note=value is null ? "new (saved settings empty)" : DesktopPaths.ReadNote(from,own,File.Exists(own));
             return value;
         }
         catch(Exception error){note=$"new (saved settings unreadable: {error.GetType().Name}: {error.Message})";return null;}
     }
+
+    public object? Parse(string path)=>Parse(path,out _);
 
     /// <summary>
     /// X-150 (0.1120): one reading of the plugin's settings into a new Configuration, never into the live one: the file read whole and
     /// bounded (SettingsGuard.ReadBounded), its secrets taken out (SettingsGuard.Project), then Newtonsoft with type names whose binder
     /// accepts the closed list of SettingsGuard.AllowedType only. Any thread (the app reads it off the frame). Throws when it is not valid.
     /// </summary>
-    public object? Parse(string path)
+    /// <param name="from">X-763 M3: the file actually read (Dalamud's older one when the plugin copy cannot read Tensho's own).</param>
+    public object? Parse(string path,out string from)
     {
         // X-685 part 2 (0.1745): Tensho's own file (System.Text.Json, no type names), through the same guard, read by the plugin's own
         // reader (SettingsJson.Read); Dalamud's file below while the plugin has not written its own yet.
         var own=DesktopPaths.OwnSettings(path);
         if(File.Exists(own) && Plugin.GetType("TenshoAssistant.SettingsJson")?.GetMethod("Read",[typeof(string),typeof(Type)]) is { } read)
         {
+            from=own;
             try{return read.Invoke(null,[SettingsGuard.Project(SettingsGuard.ReadBounded(own)),configurationType]);}
             catch(TargetInvocationException error) when(error.InnerException is not null){System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw(error.InnerException);throw;}
         }
+        from=path;
         var settings=new Newtonsoft.Json.JsonSerializerSettings
         {
             TypeNameHandling=Newtonsoft.Json.TypeNameHandling.Objects,

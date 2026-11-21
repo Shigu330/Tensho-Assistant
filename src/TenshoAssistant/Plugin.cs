@@ -151,6 +151,7 @@ public sealed partial class Plugin : IDalamudPlugin
                 (error,message)=>{if(error is null)log.Warning(message);else log.Warning(error,message);});
             var configuration=settingsFile.Load(out var settingsOrigin);
             var newInstall=settingsOrigin==SettingsOrigin.New;
+            var keptAside=settingsFile.KeptAside;
             if(settingsOrigin is SettingsOrigin.Legacy)log.Information("Settings moved from Dalamud's settings file to Tensho's own (Settings.json), once; Dalamud's file is left as it was.");
             TenshoAssistant.Competitive.CompetitiveGate.Developer=()=>configuration.DeveloperMode;
             // X-177 C4.2 (0.1200): one thread compiles at a time, in the order of the need: the readers' classes wait until the window
@@ -183,7 +184,7 @@ public sealed partial class Plugin : IDalamudPlugin
             var saver=new SettingsSaver<Configuration>(configuration,
                 live=>SettingsJson.Write(live),
                 text=>SettingsJson.Read<Configuration>(text),
-                copy=>settingsFile.Save(copy),
+                copy=>settingsFile.Save(copy,framework.IsInFrameworkUpdateThread),
                 action=>_=framework.RunOnFrameworkThread(action),
                 (error,message)=>{if(error is null)log.Warning(message);else log.Warning(error,message);});
             registrations.Register(()=>_=saver.Warm(()=>File.Exists(settingsFile.FilePath) ? File.ReadAllText(settingsFile.FilePath) : null),
@@ -527,16 +528,20 @@ public sealed partial class Plugin : IDalamudPlugin
             mainWindow.GuideNewInstall=newInstall;
             // X-761 (review of 0.1746, I1): the settings file held by another program at load: said in the chat (now, or at the next login),
             // and once more when it can be read again; this session writes nothing to it (SettingsFile.Unseen).
-            string? settingsNotice=null;
-            void SettingsNotice(string key)=>_=framework.RunOnFrameworkThread(()=>
+            var settingsNotices=new List<string>();
+            void SettingsNotice(string key,params object[] values)=>_=framework.RunOnFrameworkThread(()=>
             {
-                var text=localization.Get(key);
-                if(client.IsLoggedIn)chat.Print("[Tensho] "+text);else settingsNotice=text;
+                var text=values.Length==0 ? localization.Get(key):localization.Format(key,values);
+                if(client.IsLoggedIn)chat.Print("[Tensho] "+text);else settingsNotices.Add(text);
             });
-            Action settingsNoticeOnLogin=()=>{if(settingsNotice is { } text){settingsNotice=null;chat.Print("[Tensho] "+text);}};
+            Action settingsNoticeOnLogin=()=>{foreach(var text in settingsNotices)chat.Print("[Tensho] "+text);settingsNotices.Clear();};
             registrations.Register(()=>client.Login+=settingsNoticeOnLogin,()=>client.Login-=settingsNoticeOnLogin);
             if(settingsOrigin is SettingsOrigin.Held or SettingsOrigin.HeldBackup)SettingsNotice(settingsOrigin==SettingsOrigin.HeldBackup ? "Plugin.SettingsHeldBackup" : "Plugin.SettingsHeld");
             settingsFile.FreeAgain=()=>SettingsNotice("Plugin.SettingsFreeAgain");
+            // X-763 M1 (review of 0.1746): a settings file that could not be read at load, kept aside: said in the chat, with what was read
+            // instead (the previous copy, Dalamud's older file, or new settings).
+            var unreadableKey=settingsOrigin switch{SettingsOrigin.Backup when keptAside is not null=>"Plugin.SettingsUnreadableBackup",SettingsOrigin.LegacyAfterUnreadable=>"Plugin.SettingsUnreadableLegacy",SettingsOrigin.NewAfterUnreadable=>"Plugin.SettingsUnreadableNew",_=>null};
+            if(unreadableKey is not null)SettingsNotice(unreadableKey,keptAside ?? "?");
             // 0.508 (I-05): the retainer sale list. Read only while it is open; Universalis on the panel's button only.
             Market.RetainerSalesReader? retainerSales=null;
             registrations.Register(()=>retainerSales=new Market.RetainerSalesReader(framework,gameGui,client,player,log,()=>configuration.RetainerSalesPanel,()=>configuration.DeveloperMode),()=>retainerSales?.Dispose());

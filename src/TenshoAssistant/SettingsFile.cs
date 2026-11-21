@@ -110,8 +110,10 @@ public static class SettingsJson
 /// <summary>
 /// Where the settings came from when Tensho loaded. Held and HeldBackup (X-761): the file was there but another program kept it from being
 /// opened; new settings, or its backup's, for this session, which writes nothing to the file (SettingsFile.Unseen). Neither is a new install.
+/// LegacyAfterUnreadable and NewAfterUnreadable (X-763 M1): Settings.json was there but could not be read (kept aside: SettingsFile.KeptAside),
+/// nor its backup; Dalamud's older file, or new settings. Neither is the first move nor a new install.
 /// </summary>
-public enum SettingsOrigin { New, Own, Backup, Legacy, Held, HeldBackup }
+public enum SettingsOrigin { New, Own, Backup, Legacy, Held, HeldBackup, LegacyAfterUnreadable, NewAfterUnreadable }
 
 /// <summary>
 /// X-685 part 2 (0.1745, D-206 a): Tensho's settings file of its own, pluginConfigs\TenshoAssistant\Settings.json (before: Dalamud's
@@ -133,6 +135,13 @@ public sealed class SettingsFile<T>(string path,string? legacyPath,Action<Except
     /// holding it a moment does not cost the session its settings.
     /// </summary>
     public const int LoadAttempts=9;
+    /// <summary>
+    /// X-763 M2 (review of 0.1746): a save on the game's thread (the saver's fallback) waits this long at most for another game client's lock
+    /// (Dalamud's save cost 64 to 71 ms there), and reads the file with one retry; refused past it, said once, written at the next save.
+    /// </summary>
+    public const int GameThreadLockWaitMs=100;
+    public const int GameThreadReadAttempts=2;
+    private const int ReadAttempts=6;
 
     private readonly object gate=new();
     private JsonObject? before;
@@ -150,6 +159,9 @@ public sealed class SettingsFile<T>(string path,string? legacyPath,Action<Except
 
     /// <summary>X-761: called once, off the lock, when a session that never read the file finds it readable again at a save.</summary>
     public Action? FreeAgain{get;set;}
+
+    /// <summary>X-763 M1: the name of the copy of an unreadable settings file kept aside (« Settings.unreadable-….json »); null when none.</summary>
+    public string? KeptAside{get;private set;}
 
     /// <summary>The settings file in the plugin's folder (pluginConfigs\TenshoAssistant).</summary>
     public static string In(string folder)=>Path.Combine(folder,FileName);
@@ -186,6 +198,8 @@ public sealed class SettingsFile<T>(string path,string? legacyPath,Action<Except
                 if(Parse(own,legacy:false) is { } value){origin=SettingsOrigin.Own;Remember(value);return value;}
                 KeepAside(path,own);
             }
+            // X-763 M1 (review of 0.1746): Settings.json was there and could not be read: what is read below is a step back, said as such.
+            var unreadable=own is not null;
             if(ReadText(BackupPath) is { } backup && Parse(backup,legacy:false) is { } saved)
             {
                 warn(null,"The settings file could not be read; its backup was read (the file kept aside, the backup written in its place).");
@@ -198,22 +212,29 @@ public sealed class SettingsFile<T>(string path,string? legacyPath,Action<Except
             {
                 if(Parse(old,legacy:true) is { } moved)
                 {
-                    origin=SettingsOrigin.Legacy;
+                    // X-763 M1: after Tensho's own file and its backup could not be read, Dalamud's file is a step back (it may be weeks
+                    // old): said so, never as the first move.
+                    origin=unreadable ? SettingsOrigin.LegacyAfterUnreadable : SettingsOrigin.Legacy;
+                    if(unreadable)warn(null,"The settings file and its backup could not be read; Dalamud's older settings file of Tensho was read instead (the settings may be older than the last ones saved).");
                     Remember(moved);
                     Write(SettingsJson.Write(moved));
                     return moved;
                 }
                 warn(null,"Dalamud's settings file of Tensho could not be read; new settings are used (that file is left as it is).");
             }
-            origin=SettingsOrigin.New;
+            origin=unreadable ? SettingsOrigin.NewAfterUnreadable : SettingsOrigin.New;
+            if(unreadable)warn(null,"The settings file could not be read, nor any copy of it; new settings are used.");
             var fresh=new T();
             Remember(fresh);
             return fresh;
         }
     }
 
-    /// <summary>Writes the settings (merged with the file as it is now); false when it failed (said once, the next save tries again).</summary>
-    public bool Save(T live)
+    /// <summary>
+    /// Writes the settings (merged with the file as it is now); false when it failed (said once, the next save tries again). X-763 M2:
+    /// <paramref name="onGameThread"/>: a tenth of a second at most for another client's lock (GameThreadLockWaitMs), never 10 s.
+    /// </summary>
+    public bool Save(T live,bool onGameThread=false)
     {
         // X-761: a session that never read the file writes nothing to it; said once, and once more when the file can be read again.
         bool unread,freeAgain=false;
@@ -238,7 +259,7 @@ public sealed class SettingsFile<T>(string path,string? legacyPath,Action<Except
             Fail(error,"The settings could not be turned into text; nothing was written.");
             return false;
         }
-        lock(gate)return Write(text);
+        lock(gate)return onGameThread ? Write(text,GameThreadLockWaitMs,GameThreadReadAttempts) : Write(text);
     }
 
     private void Remember(T value)
@@ -248,15 +269,15 @@ public sealed class SettingsFile<T>(string path,string? legacyPath,Action<Except
     }
 
     // Under gate.
-    private bool Write(string text)
+    private bool Write(string text,int lockWaitMs=LockWaitMs,int readAttempts=ReadAttempts)
     {
         try
         {
             var mine=SettingsJson.Node(text);
-            using(FairFileLock.Hold(LockPath,LockWaitMs,error=>new IOException("The settings file's lock is held by another program.",error)))
+            using(FairFileLock.Hold(LockPath,lockWaitMs,error=>new IOException("The settings file's lock is held by another program.",error)))
             {
                 JsonObject? theirs=null;
-                if(ReadText(path) is { } now)
+                if(ReadText(path,readAttempts) is { } now)
                 {
                     try{theirs=SettingsJson.Node(now);}
                     catch(JsonException){KeepAside(path,now);}
@@ -306,7 +327,7 @@ public sealed class SettingsFile<T>(string path,string? legacyPath,Action<Except
 
     // The whole text, read while another program may write it (a write moves a whole new file in place); null when absent. Tried again a
     // few times while a scanner holds it an instant; still held: an IOException (never taken for an absent file).
-    private static string? ReadText(string file,int attempts=6)
+    private static string? ReadText(string file,int attempts=ReadAttempts)
     {
         for(var attempt=1;;attempt++)
         {
@@ -332,6 +353,7 @@ public sealed class SettingsFile<T>(string path,string? legacyPath,Action<Except
         {
             var aside=Path.Combine(Path.GetDirectoryName(file)!,Path.GetFileNameWithoutExtension(FileName)+".unreadable-"+DateTime.Now.ToString("yyyyMMdd-HHmmss",System.Globalization.CultureInfo.InvariantCulture)+".json");
             if(!File.Exists(aside))File.Copy(file,aside);
+            KeptAside=Path.GetFileName(aside);
             warn(null,"A settings file could not be read; it is kept aside as "+Path.GetFileName(aside)+".");
         }
         catch(Exception error) when(error is IOException or UnauthorizedAccessException){warn(error,"A settings file could not be read, nor kept aside.");}

@@ -359,7 +359,7 @@ internal static class SettingsFile1745Tests
                 System.IO.File.WriteAllText(Path.Combine(other, "TenshoAssistant.json"), Legacy(value));
                 Directory.CreateDirectory(Path.Combine(other, "TenshoAssistant"));
                 System.IO.File.WriteAllText(Path.Combine(other, "TenshoAssistant", "Settings.json"), "not json");
-                Check(Settings(other).Load(out var fallback) is not null && fallback == SettingsOrigin.Legacy, "no backup: Dalamud's file: " + fallback);
+                Check(Settings(other).Load(out var fallback) is not null && fallback == SettingsOrigin.LegacyAfterUnreadable, "no backup: Dalamud's file: " + fallback);
             });
         })),
         ("Settings file 1745: behaviour: a copy of Tensho that read and wrote its settings is collected after its unload (the leak X-685 found)", () => InTemp(root =>
@@ -387,7 +387,7 @@ internal static class SettingsFile1745Tests
             Check(!plugin.Contains("GetPluginConfig()", StringComparison.Ordinal) && !plugin.Contains("SavePluginConfig(", StringComparison.Ordinal), "Dalamud's settings calls gone");
             Check(plugin.Contains("new SettingsFile<Configuration>(SettingsFile<Configuration>.In(pluginInterface.GetPluginConfigDirectory()),pluginInterface.ConfigFile.FullName,", StringComparison.Ordinal)
                 && plugin.Contains("var configuration=settingsFile.Load(out var settingsOrigin);", StringComparison.Ordinal)
-                && plugin.Contains("copy=>settingsFile.Save(copy),", StringComparison.Ordinal), "the plugin's settings file");
+                && plugin.Contains("copy=>settingsFile.Save(copy,framework.IsInFrameworkUpdateThread),", StringComparison.Ordinal), "the plugin's settings file");
             var desktop = System.IO.File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Desktop.cs"));
             Check(desktop.Contains("SettingsFile<Configuration>.In(pluginInterface.GetPluginConfigDirectory())", StringComparison.Ordinal) && !desktop.Contains("ConfigFile", StringComparison.Ordinal), "the link watches the new file");
             var folder = Path.GetFullPath("src/TenshoAssistant");
