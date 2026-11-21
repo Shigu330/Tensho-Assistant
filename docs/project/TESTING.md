@@ -2445,6 +2445,22 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1670) Survoler une quête dans la page Quêtes, dans les sources d'un objet (onglet des quêtes qui le donnent) et un lien de quête dans le chat de Tensho : la même info-bulle (icône, section et genre, niveau, zone, extension, avancement), avec « Clic gauche… » en bas pour le chat
 
+- [ ] (0.1671) Au carillon, ouvrir un servant puis sa liste de vente, « 20 meilleurs à vendre », « Demander à Universalis » : les prix arrivent, l'heure s'affiche à côté ; puis « Comparer » dans le panneau : les prix de la liste restent
+
+- [ ] (0.1671) Servant avec plus de 100 objets différents : cliquer deux fois « Demander à Universalis » (3 s d'écart) : le nombre d'objets sans prix baisse la deuxième fois
+
+- [ ] (0.1671) Liste de vente : le bas dit « taxe de 5 % (taux de l'aide du jeu…) » ; si le journal du plugin écrit « Market tax rates received », il dit le taux de la ville du servant ouvert
+
+- [ ] (0.1672) Survoler un lien de carte dans le chat de Tensho, un favori de la page Cartes et une adresse du carnet d'adresses : la même info-bulle (zone, région, coordonnées, éthérite la plus proche avec son coût, météo actuelle), avec « Clic gauche… » en bas pour le chat et la note pour le favori
+
+- [ ] (0.1673) Survoler un monstre proche sur la carte Tensho, l'icône au-dessus d'un monstre en jeu et un monstre de la page Monstres : la même info-bulle (nom, niveau, zone sur la page Monstres, raisons : magie bleue, carnet de chasse…)
+
+- [ ] (0.1674) Survoler une action dans la palette du simulateur d'artisanat, une étape du journal d'artisanat et un effet de l'artisanat en direct : la même info-bulle (icône, nom, niveau et PS, solidité, description du jeu), avec le numéro de l'étape dans le titre pour le journal
+
+- [ ] (0.1675) Pendant une récolte, survoler l'action conseillée du panneau de récolte, puis une action du plan des PR (page Récolte) : la même info-bulle (icône, nom, niveau et PR, description du jeu)
+
+- [ ] (0.1676) Survoler une ALEA de la page ALEA, puis une ALEA en cours dans la liste de la carte Tensho (onglet des ALEA) : la même info-bulle (icône, nom, ALEA et niveau, lieu, progression et temps restant pour celle en cours, description)
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.

@@ -116,9 +116,9 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1660-tell-by-name.md](0.1660-tell-by-name.md) | `src/TenshoAssistant/Chat/ChatPlayerActions.Dalamud.cs`, `tests/TenshoAssistant.Tests/ChatSenders1660Tests.cs` | `docs/changelog/CHANGELOG-0.1600-0.1699.md` |
 | [0.1661-beast-team-rank-glyph.md](0.1661-beast-team-rank-glyph.md) | `src/TenshoAssistant/Beastmaster/BeastTeams.cs`, `tests/TenshoAssistant.Tests/BeastTeamGlyph1661Tests.cs` | `docs/changelog/CHANGELOG-0.1600-0.1699.md` |
 | [0.1662-chat-player-menu-game-entries.md](0.1662-chat-player-menu-game-entries.md) | `src/TenshoAssistant/Chat/ChatSources.cs`, `tests/TenshoAssistant.Tests/ChatPlayerMenu1662Tests.cs` | `docs/changelog/CHANGELOG-0.1600-0.1699.md` |
-| [0.1665-chat-reply-modes.md](0.1665-chat-reply-modes.md) | `src/TenshoAssistant/Chat/ChatSources.cs`, `tests/TenshoAssistant.Tests/ChatReplyModes1665Tests.cs` | `CHANGELOG.md` |
-| [0.1666-chat-job-roles.md](0.1666-chat-job-roles.md) | `src/TenshoAssistant/Chat/ChatJobs.cs`, `tests/TenshoAssistant.Tests/ChatJobs1666Tests.cs` | `CHANGELOG.md` |
-| [0.1667-retainer-sale-list.md](0.1667-retainer-sale-list.md) | `src/TenshoAssistant/Market/RetainerSaleList.cs` | `CHANGELOG.md`, `docs/evidence/0.1671-retainer-sale-list-review.md` |
+| [0.1665-chat-reply-modes.md](0.1665-chat-reply-modes.md) | `src/TenshoAssistant/Chat/ChatSources.cs`, `tests/TenshoAssistant.Tests/ChatReplyModes1665Tests.cs` | `docs/changelog/CHANGELOG-0.1600-0.1699.md` |
+| [0.1666-chat-job-roles.md](0.1666-chat-job-roles.md) | `src/TenshoAssistant/Chat/ChatJobs.cs`, `tests/TenshoAssistant.Tests/ChatJobs1666Tests.cs` | `docs/changelog/CHANGELOG-0.1600-0.1699.md` |
+| [0.1667-retainer-sale-list.md](0.1667-retainer-sale-list.md) | `src/TenshoAssistant/Market/RetainerSaleList.cs` | `docs/changelog/CHANGELOG-0.1600-0.1699.md`, `docs/evidence/0.1671-retainer-sale-list-review.md` |
 | [0.1671-retainer-sale-list-review.md](0.1671-retainer-sale-list-review.md) | `src/TenshoAssistant/Market/MarketTax.cs`, `src/TenshoAssistant/Market/RetainerSales.cs` | `CHANGELOG.md` |
 | [0.168.0-triad-sources-probe.log](0.168.0-triad-sources-probe.log) | `src/TenshoAssistant/MiniGames/TriadNpcCatalog.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.171.0-cosmic-vendors-probe.log](0.171.0-cosmic-vendors-probe.log) | `tests/TenshoAssistant.Tests/MapProjectionTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
