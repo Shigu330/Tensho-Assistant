@@ -319,6 +319,7 @@ internal sealed partial class MainWindow
             else if(bankPersonalNotice is null)ImGui.TextDisabled(localization.Get("BankUi.EmptyStorage"));
             return;
         }
+        DrawBankCsvCopy(sourceKey,selectedEntries);
         if(configuration.BankListView){DrawBankList(sourceKey,selectedEntries);return;}
         foreach(var error in bankFrameErrors)ImGui.TextWrapped(error);
         DrawInventoryFrames(bankFrameGroups);

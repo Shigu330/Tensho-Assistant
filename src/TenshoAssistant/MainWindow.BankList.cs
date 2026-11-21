@@ -13,6 +13,32 @@ internal sealed partial class MainWindow
     private BankListRow[] bankListRows=[];
     private int bankListSort;
     private bool bankListDescending;
+    private string? bankCsvMessage;
+
+    // The stacks of the tab shown (the character's bags, then the selected storages; never the gil purses), as the list and the CSV read them.
+    private IEnumerable<(string Storage,uint Item,bool Hq,long Amount)> BankQuantities(BankSourceViewKey source,IReadOnlyList<BankEntry> selected)
+    {
+        var quantities=bankSourcePersonal.SelectMany(container=>container.Quantities.Select(quantity=>(localization.Get("BankUi.Character"),quantity.Key.Id.Value,quantity.Key.IsHighQuality,quantity.Value)));
+        // X-291 (0.1293): the gil purses are an amount on their own line, not a row of the list.
+        if(!source.Personal)quantities=quantities.Concat(selected.SelectMany(entry=>entry.Snapshot.Containers.Values.Where(container=>!InventoryDisplayLayout.IsGil(container.Location.Container.Value))
+            .SelectMany(container=>container.Quantities.Select(quantity=>(BankEntryName(entry),quantity.Key.Id.Value,quantity.Key.IsHighQuality,quantity.Value)))));
+        return quantities;
+    }
+
+    // X-212 (0.1751, the user's request of 12/11): the tab shown with its filters, copied as CSV for a spreadsheet; the lines counted.
+    private void DrawBankCsvCopy(BankSourceViewKey source,IReadOnlyList<BankEntry> selected)
+    {
+        if(ImGui.SmallButton(localization.Get("BankUi.CopyCsv")))
+        {
+            var items=source.Items;
+            var shown=BankQuantities(source,selected).Where(stack=>MatchesBankFilters(new(stack.Item,stack.Hq ? 0:stack.Amount,stack.Hq ? stack.Amount:0))).ToList();
+            var text=BankList.Csv(shown,id=>items?.Find(id)?.Name ?? $"#{id}",id=>items?.Find(id)?.UiCategoryName ?? "");
+            ImGui.SetClipboardText(text);
+            bankCsvMessage=localization.Format("BankUi.CsvCopied",text.Count(character=>character=='\n')-1);
+        }
+        Tip("BankUi.CopyCsvTip");
+        if(bankCsvMessage is { } message){ImGui.SameLine();ImGui.TextDisabled(message);}
+    }
 
     private void DrawBankList(BankSourceViewKey source,IReadOnlyList<BankEntry> selected)
     {
@@ -37,11 +63,7 @@ internal sealed partial class MainWindow
             if(bankListKey!=key)
             {
                 var items=source.Items;
-                var quantities=bankSourcePersonal.SelectMany(container=>container.Quantities.Select(quantity=>(localization.Get("BankUi.Character"),quantity.Key.Id.Value,quantity.Key.IsHighQuality,quantity.Value)));
-                // X-291 (0.1293): the gil purses are an amount on their own line, not a row of the list.
-                if(!source.Personal)quantities=quantities.Concat(selected.SelectMany(entry=>entry.Snapshot.Containers.Values.Where(container=>!InventoryDisplayLayout.IsGil(container.Location.Container.Value))
-                    .SelectMany(container=>container.Quantities.Select(quantity=>(BankEntryName(entry),quantity.Key.Id.Value,quantity.Key.IsHighQuality,quantity.Value)))));
-                bankListRows=BankList.Sorted(BankList.Merge(quantities).Where(row=>MatchesBankFilters(new(row.ItemId,row.Nq,row.Hq))),(BankListSort)bankListSort,bankListDescending,
+                bankListRows=BankList.Sorted(BankList.Merge(BankQuantities(source,selected)).Where(row=>MatchesBankFilters(new(row.ItemId,row.Nq,row.Hq))),(BankListSort)bankListSort,bankListDescending,
                     id=>items?.Find(id)?.Name ?? "",id=>items?.Find(id)?.UiCategoryName ?? "");
                 bankListKey=key;
             }
