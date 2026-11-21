@@ -91,7 +91,8 @@ internal static class OceanVoyageTests
         ("Ocean panel 918: fish table like the fishing help, spectral fish of the stop, stopwatch, keys in both languages",() =>
         {
             var panel=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.OceanVoyagePanel.cs"));
-            Check(panel.Contains("private void DrawOceanFishTable(string id,IReadOnlyList<uint> fishList,uint spotId,uint? inHand,int? elapsed"),"shared table");
+            // X-701 (0.1685): the stopwatch is passed whole (frozen at the bite, Chum), no longer its seconds.
+            Check(panel.Contains("private void DrawOceanFishTable(string id,IReadOnlyList<uint> fishList,uint spotId,uint? inHand,FishingClock? clock"),"shared table");
             Check(panel.Contains("var spotId=stop.Spectral ? stop.Spot.SpectralSpot:stop.Spot.MainSpot;") && panel.Contains("biteTimes?.Get(spotId)"),"bite times of the spot fished");
             Check(panel.Contains("DrawOceanFishTable(\"OceanSpectralFish\",spectralFish,stop.Spot.SpectralSpot,inHand,null,") && panel.Contains("if(!stop.Spectral && stop.Spot.SpectralSpot!=0"),"spectral fish folded outside the current");
             Check(panel.Contains("inHand==row.Route[0]") && panel.Contains("ItemCell(fish,fishId,22"),"icons and bait in hand");
@@ -110,7 +111,8 @@ internal static class OceanVoyageTests
             Check(OceanVoyages.Plausible(Frame(3820,12)) && !OceanVoyages.Plausible(Frame(57359,27127)) && !OceanVoyages.Plausible(Frame(-1,0)),"plausible");
             Check(OceanSchedule.Proven.Any(sighting=>sighting.Slot==249084 && sighting.Route==14),"proven sighting");
             string Read(string file)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+file));
-            Check(Read("MainWindow.OceanVoyagePanel.cs").Contains("passed>time.Maximum)ImGui.TextColored(Error,text)") && Read("MainWindow.FishingPanel.cs").Contains("passed>time.Maximum)ImGui.TextColored(Error,text)"),"red");
+            // X-701 (0.1685): one bite time cell for both panels (MainWindow.FishingClock.cs), red once the window is passed.
+            Check(Read("MainWindow.FishingClock.cs").Contains("FishingStopwatch.Passed(passed.Seconds,time.Maximum,chum))ImGui.TextColored(Error,text)") && Read("MainWindow.OceanVoyagePanel.cs").Contains("DrawBiteTimeCell(time,clock)") && Read("MainWindow.FishingPanel.cs").Contains("DrawBiteTimeCell(time,clock)"),"red");
             Check(Read("MainWindow.OceanVoyagePanel.cs").Contains("target>0 ? Math.Min(progress,target):progress"),"capped");
             Check(Read("MainWindow.OceanFishing.cs").Contains(".Concat(OceanSchedule.Proven)"),"sightings with the proven one");
         }),

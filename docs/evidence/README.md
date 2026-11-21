@@ -122,6 +122,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1671-retainer-sale-list-review.md](0.1671-retainer-sale-list-review.md) | `src/TenshoAssistant/Market/MarketTax.cs`, `src/TenshoAssistant/Market/RetainerSales.cs` | `docs/changelog/CHANGELOG-0.1600-0.1699.md` |
 | [0.1677-game-names.md](0.1677-game-names.md) | `tests/TenshoAssistant.Tests/PageFamilies1677Tests.cs`, `tests/TenshoAssistant.Tests/SideBarNames1683Tests.cs`, `tools/HelpTextProbe/Program.cs` | `CHANGELOG.md` |
 | [0.168.0-triad-sources-probe.log](0.168.0-triad-sources-probe.log) | `src/TenshoAssistant/MiniGames/TriadNpcCatalog.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
+| [0.1685-fishing-bite-stopwatch.md](0.1685-fishing-bite-stopwatch.md) | `src/TenshoAssistant/Gathering/FishingStopwatch.cs`, `tests/TenshoAssistant.Tests/FishingBite1685Tests.cs` | `CHANGELOG.md` |
 | [0.171.0-cosmic-vendors-probe.log](0.171.0-cosmic-vendors-probe.log) | `tests/TenshoAssistant.Tests/MapProjectionTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.174.0-triad-seldeck-capture.log](0.174.0-triad-seldeck-capture.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.175.0-auxesia-maps-probe.log](0.175.0-auxesia-maps-probe.log) | `src/TenshoAssistant/Maps/MapCatalog.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
@@ -297,7 +298,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.866-credit-references.md](0.866-credit-references.md) | — | `docs/project/GLOBAL-PLAN.md` |
 | [0.871-regions.md](0.871-regions.md) | `src/TenshoAssistant/Market/MarketBoardService.cs` | — |
 | [0.874-probe-coverage.md](0.874-probe-coverage.md) | `src/TenshoAssistant/Diagnostics/ReadingCapture.Dalamud.cs`, `tests/TenshoAssistant.Tests/AuditsFolder1086Tests.cs`, `tests/TenshoAssistant.Tests/ReadingCaptureTests.cs` | `docs/changelog/CHANGELOG-0.800-0.899.md`, `docs/project/DECISIONS.md` |
-| [0.887-fishing-bite.md](0.887-fishing-bite.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `src/TenshoAssistant/Discoveries/ItemDiscoveryWatcher.Dalamud.cs`, `src/TenshoAssistant/Gathering/FishingBaitReader.Dalamud.cs`, `tests/TenshoAssistant.Tests/FishingWiringTests.cs` | `docs/changelog/CHANGELOG-0.800-0.899.md`, `docs/evidence/0.933-fishing-intuition.md` |
+| [0.887-fishing-bite.md](0.887-fishing-bite.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `src/TenshoAssistant/Discoveries/ItemDiscoveryWatcher.Dalamud.cs`, `src/TenshoAssistant/Gathering/FishingBaitReader.Dalamud.cs`, `src/TenshoAssistant/Gathering/FishingLine.cs`, `tests/TenshoAssistant.Tests/FishingWiringTests.cs` | `docs/changelog/CHANGELOG-0.800-0.899.md`, `docs/evidence/0.1685-fishing-bite-stopwatch.md`, `docs/evidence/0.933-fishing-intuition.md` |
 | [0.888-aetherial-reduction.md](0.888-aetherial-reduction.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `src/TenshoAssistant/Discoveries/ItemDiscoveryWatcher.Dalamud.cs` | `docs/changelog/CHANGELOG-0.800-0.899.md` |
 | [0.889-hand-in.md](0.889-hand-in.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `src/TenshoAssistant/Discoveries/ItemDiscoveryWatcher.Dalamud.cs` | `docs/changelog/CHANGELOG-0.800-0.899.md` |
 | [0.890-spearfishing.md](0.890-spearfishing.md) | — | `docs/changelog/CHANGELOG-0.800-0.899.md` |
@@ -347,5 +348,5 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [x91-parsers-check.md](x91-parsers-check.md) | `src/TenshoAssistant/MainWindow.SRankConditions.cs`, `tests/TenshoAssistant.Tests/ParsersCheck971Tests.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md`, `docs/project/GLOBAL-PLAN-DONE.md` |
 | [x93-load-test.md](x93-load-test.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `tests/TenshoAssistant.Tests/Evidence1069Tests.cs`, `tests/TenshoAssistant.Tests/LoadTest1036Tests.cs`, `tools/DiscoveryLoadProbe/Program.cs`, `tools/README.md`, `tools/discoveries-load.py` | `docs/changelog/CHANGELOG-0.1300-0.1399.md`, `docs/evidence/x172-sqlite-trial.md` |
 
-Counted · compté : 335 files · fichiers ; 290 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
+Counted · compté : 336 files · fichiers ; 291 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
 <!-- /docgen:evidence -->

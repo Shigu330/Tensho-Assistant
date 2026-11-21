@@ -105,7 +105,7 @@ internal sealed partial class MainWindow
     /// X-85 V2 (0.918): the fish of one ocean spot as in the usual fishing help: icon and stock, bait route with icons (green frame on the bait in
     /// hand, mooches), bite and hookset in colour, bite time of that spot (Teamcraft) against the stopwatch. Baits and bites: GatherBuddy.
     /// </summary>
-    private void DrawOceanFishTable(string id,IReadOnlyList<uint> fishList,uint spotId,uint? inHand,int? elapsed,Func<uint,string?,IReadOnlyList<string>>? countsFor=null)
+    private void DrawOceanFishTable(string id,IReadOnlyList<uint> fishList,uint spotId,uint? inHand,FishingClock? clock,Func<uint,string?,IReadOnlyList<string>>? countsFor=null)
     {
         if(fishList.Count==0 || !ImGui.BeginTable(id,4,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingFixedFit|ImGuiTableFlags.BordersInnerV))return;
         try
@@ -174,14 +174,7 @@ internal sealed partial class MainWindow
                     }
                     else ImGui.TextDisabled("?");
                     ImGui.TableNextColumn();
-                    if(bites?.Times?.GetValueOrDefault(fishId) is { } time)
-                    {
-                        var inside=elapsed is { } spent && spent>=time.Minimum && spent<=time.Maximum;
-                        var text=localization.Format("FishingPanel.BiteShort",time.Minimum,time.Maximum,time.Usual);
-                        // X-98 (0.958, user request): green while the bite time runs, red once the stopwatch has passed it.
-                        if(inside)ImGui.TextColored(Success,text);else if(elapsed is { } passed && passed>time.Maximum)ImGui.TextColored(Error,text);else ImGui.TextUnformatted(text);
-                        if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("FishingPanel.BiteTime",time.Minimum,time.Maximum,time.Usual)+"\n"+localization.Format("FishingPanel.BiteTimeHelp",time.Reports));
-                    }
+                    if(bites?.Times?.GetValueOrDefault(fishId) is { } time)DrawBiteTimeCell(time,clock);
                     else ImGui.TextDisabled(bites is { Loading:true } ? "…":"—");
                 }
                 finally{ImGui.PopID();}
@@ -209,14 +202,9 @@ internal sealed partial class MainWindow
             if(!fishingState)oceanFishingSince=null;
             else oceanFishingSince=FromCast(oceanFishingSince,FishingCastAt?.Invoke());
             oceanFishingBefore=fishingState;
-            var elapsed=oceanFishingSince is { } since ? (int)(DateTimeOffset.UtcNow-since).TotalSeconds:(int?)null;
-            if(elapsed is { } seconds)
-            {
-                ImGui.TextColored(Accent,localization.Format("FishingPanel.Elapsed",seconds));
-                ImGui.SameLine();
-                if(ImGui.SmallButton(localization.Get("FishingPanel.Restart")+"##OceanRestart"))oceanFishingSince=DateTimeOffset.UtcNow;
-                Tip("FishingPanel.RestartHelp");
-            }
+            // X-701 (0.1685): frozen at the bite read in the game, Chum said (MainWindow.FishingClock.cs, one way with the fishing help).
+            var clock=ReadFishingClock(oceanFishingSince);
+            if(clock is { } shownClock)DrawFishingClock(shownClock,ref oceanFishingSince,"##OceanRestart");
             if(FishingIntuitionLeft?.Invoke() is { } intuitionLeft)
                 ImGui.TextColored(Accent,localization.Format("FishingPanel.IntuitionLeft",(int)intuitionLeft/60,(int)intuitionLeft%60));
             var items=itemCatalog.State.Catalog;
@@ -233,7 +221,7 @@ internal sealed partial class MainWindow
             var missionsNow=frame.Missions.Where(mission=>mission.Type!=0 && data.Missions.ContainsKey(mission.Type))
                 .Select(mission=>(data.Missions[mission.Type].Text,mission.Progress,data.Missions[mission.Type].Target,data.Missions[mission.Type].Criterion)).ToArray();
             IReadOnlyList<string> CountsFor(uint fish,string? bite)=>OceanMissionRules.CountsFor(fish,data.FishBonuses,bite,missionsNow);
-            OceanPart("ocean fish table",()=>DrawOceanFishTable("OceanVoyageFish",stop.Fish,spotId,inHand,elapsed,CountsFor));
+            OceanPart("ocean fish table",()=>DrawOceanFishTable("OceanVoyageFish",stop.Fish,spotId,inHand,clock,CountsFor));
             // The spectral current's fish, highlighted, folded while the current is not there (they are never in the usual spot: IKDSpot.SpotSub).
             if(!stop.Spectral && stop.Spot.SpectralSpot!=0 && data.SpotFish.GetValueOrDefault(stop.Spot.SpectralSpot) is { Count:>0 } spectralFish)
             {

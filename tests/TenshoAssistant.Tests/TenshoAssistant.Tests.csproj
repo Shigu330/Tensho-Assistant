@@ -145,6 +145,7 @@
     <Compile Include="../../src/TenshoAssistant/Gathering/FishingNotebook.cs" Link="Gathering/FishingNotebook.cs" />
     <Compile Include="../../src/TenshoAssistant/Gathering/RegenTick.cs" Link="Gathering/RegenTick.cs" />
     <Compile Include="../../src/TenshoAssistant/Gathering/FishingStopwatch.cs" Link="Gathering/FishingStopwatch.cs" />
+    <Compile Include="../../src/TenshoAssistant/Gathering/FishingLine.cs" Link="Gathering/FishingLine.cs" />
     <Compile Include="../../src/TenshoAssistant/Gathering/OceanFishing.cs" Link="Gathering/OceanFishing.cs" />
     <Compile Include="../../src/TenshoAssistant/Gathering/OceanVoyage.cs" Link="Gathering/OceanVoyage.cs" />
     <Compile Include="../../src/TenshoAssistant/Gathering/OceanVoyageRecord.cs" Link="Gathering/OceanVoyageRecord.cs" />

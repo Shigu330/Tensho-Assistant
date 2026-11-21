@@ -64,7 +64,8 @@ internal static class FishingWiringTests
         {
             var reader=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Gathering/FishingBaitReader.Dalamud.cs"));
             Check(HasCode(reader,"if(disposed)return; ReadLine();"),"every frame, before the half-second throttle");
-            Check(reader.Contains("if(state==lineState)return;") && reader.Contains("if(state==1)Volatile.Write(ref castAt"),"CastingOut only, on change");
+            // X-701 (0.1685): the line feeds FishingLine (cast, bite, Chum), on change, and on every frame while it bites for the strength.
+            Check(reader.Contains("if(state==lineState && state!=FishingLine.Bite)return;") && reader.Contains("public DateTimeOffset? CastAt=>line.Last?.Cast;"),"CastingOut only, on change");
             var plugin=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Gathering.cs"));   // X-153 (0.1412): the gathering family
             Check(plugin.Contains("mainWindow.FishingCastAt=()=>baitReader?.CastAt;"),"wired");
             Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.FishingPanel.cs")).Contains("fishingSince=FromCast(fishingSince,FishingCastAt?.Invoke());"),"fishing help");

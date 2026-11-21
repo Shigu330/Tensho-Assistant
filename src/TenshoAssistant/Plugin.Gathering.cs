@@ -35,6 +35,8 @@ public sealed partial class Plugin
         mainWindow.FishingBait=()=>baitReader?.Bait;
         mainWindow.FishingIntuitionLeft=()=>baitReader?.IntuitionLeft;
         mainWindow.FishingCastAt=()=>baitReader?.CastAt;
+        // X-701 (0.1685): the whole last cast (bite, strength, Chum) for the stopwatch frozen at the bite.
+        mainWindow.FishingLastCast=()=>baitReader?.LastCast;
         // 0.604 (C35): the player copied on the framework thread, again only when it changed; the two tables built off the frame on first use, nothing
         // shown until they are ready, a failure logged once.
         System.Runtime.CompilerServices.StrongBox<(uint Job,uint Territory,float X,float Z,bool Fishing)?> fishingNowCopy=new(null);
