@@ -15,7 +15,10 @@
     "NoToolMatch": "No tool matches this filter.",
     "CommandHelp": "Open Tensho Assistant. /tensho fish (or peche): show or hide the fishing help. « chat »: show or hide the Tensho chat window; « chat hide »: hide every Tensho chat window for a moment, or show them back. « wiki <item> » / « lodestone <item> » open the item's page. « todo <task> » adds a task to Reminders. « item <item> », « price », « gather », « recipe » open it in Tensho.",
     "ToolFilterTip": "Part of a category, tool or reference plugin name; accents and case ignored.",
-    "NeedsCharacter": "Tensho needs a character: log in with a character first."
+    "NeedsCharacter": "Tensho needs a character: log in with a character first.",
+    "SettingsHeld": "Tensho's settings file is held by another program (an antivirus or a backup tool, for instance): default settings are used for this session, and nothing is written to the file, so none of your saved settings is lost. Changes made now are not kept: turn Tensho off and on again in Dalamud's plugin list once the file is free.",
+    "SettingsHeldBackup": "Tensho's settings file is held by another program (an antivirus or a backup tool, for instance): the previous copy of your settings is used for this session, and nothing is written to the file, so none of your saved settings is lost. Changes made now are not kept: turn Tensho off and on again in Dalamud's plugin list once the file is free.",
+    "SettingsFreeAgain": "Tensho's settings file can be read again: turn Tensho off and on again in Dalamud's plugin list (or restart the game) to get your settings back. Changes made since Tensho loaded are not kept."
   },
   "MyToolsEditor": {
     "Theme": "Proposed theme",

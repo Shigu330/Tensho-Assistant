@@ -107,8 +107,11 @@ public static class SettingsJson
     }
 }
 
-/// <summary>Where the settings came from when Tensho loaded.</summary>
-public enum SettingsOrigin { New, Own, Backup, Legacy }
+/// <summary>
+/// Where the settings came from when Tensho loaded. Held and HeldBackup (X-761): the file was there but another program kept it from being
+/// opened; new settings, or its backup's, for this session, which writes nothing to the file (SettingsFile.Unseen). Neither is a new install.
+/// </summary>
+public enum SettingsOrigin { New, Own, Backup, Legacy, Held, HeldBackup }
 
 /// <summary>
 /// X-685 part 2 (0.1745, D-206 a): Tensho's settings file of its own, pluginConfigs\TenshoAssistant\Settings.json (before: Dalamud's
@@ -117,17 +120,36 @@ public enum SettingsOrigin { New, Own, Backup, Legacy }
 /// by the game clients of the PC (FairFileLock), merged with the file as it is (SettingsJson.Merge): two game clients saving their own
 /// changes keep each other's, and names this version does not know are kept. A write that fails changes nothing on disk and is said once;
 /// the settings stay in memory and are written at the next save. A file that cannot be read is kept aside (« Settings.unreadable-… »),
-/// never written over unseen; then the backup, then Dalamud's file, then new settings.
+/// never written over unseen; then the backup, then Dalamud's file, then new settings. X-761 (review of 0.1746, I1): a file there but held
+/// by another program past the attempts at load is never written by that session (Unseen), which shows its backup's settings, else new ones.
 /// </summary>
 public sealed class SettingsFile<T>(string path,string? legacyPath,Action<Exception?,string> warn) where T:class,new()
 {
     public const string FileName="Settings.json";
     /// <summary>The wait for another game client's write (a write takes milliseconds).</summary>
     public const int LockWaitMs=10_000;
+    /// <summary>
+    /// X-761 (review of 0.1746, I1): the attempts to open the file at load, about 1.8 s in all (0.75 s at a save): a scanner or a backup tool
+    /// holding it a moment does not cost the session its settings.
+    /// </summary>
+    public const int LoadAttempts=9;
 
     private readonly object gate=new();
     private JsonObject? before;
     private bool failing;
+    private bool unseen;
+    private bool unseenSaid;
+    private bool freeSaid;
+
+    /// <summary>
+    /// X-761: true when the file was there at load but held by another program past the attempts. This session never read it, so it never
+    /// writes it: a save merged over a file it never read would put this session's lists (alarms, bookmarks, tasks: taken whole) over the
+    /// saved ones, and the next save the backup over the one before. Its changes stay in memory; Tensho reads the file when it loads again.
+    /// </summary>
+    public bool Unseen{get{lock(gate)return unseen;}}
+
+    /// <summary>X-761: called once, off the lock, when a session that never read the file finds it readable again at a save.</summary>
+    public Action? FreeAgain{get;set;}
 
     /// <summary>The settings file in the plugin's folder (pluginConfigs\TenshoAssistant).</summary>
     public static string In(string folder)=>Path.Combine(folder,FileName);
@@ -142,14 +164,20 @@ public sealed class SettingsFile<T>(string path,string? legacyPath,Action<Except
         lock(gate)
         {
             string? own;
-            try{own=ReadText(path);}
+            try{own=ReadText(path,LoadAttempts);}
             catch(Exception error) when(error is IOException or UnauthorizedAccessException)
             {
-                // Held by another program past the attempts: new settings for this session, the file left as it is (each save merges
-                // with it: only what is changed in this session is written over it).
-                warn(error,"The settings file could not be opened; new settings are used for this session, the file is left as it is.");
-                origin=SettingsOrigin.New;
-                var held=new T();
+                // X-761 (review of 0.1746, I1): held by another program past the attempts. The backup's settings, else new ones, for this
+                // session, which writes nothing to the file until Tensho loads again (Unseen). Not a new install: no guide.
+                unseen=true;
+                T? copy=null;
+                try{if(ReadText(BackupPath) is { } copyText)copy=Parse(copyText,legacy:false);}
+                catch(Exception other) when(other is IOException or UnauthorizedAccessException){}
+                origin=copy is null ? SettingsOrigin.Held : SettingsOrigin.HeldBackup;
+                warn(error,copy is null
+                    ? "The settings file could not be opened (held by another program); new settings are used for this session, and nothing is written to the file until Tensho loads again."
+                    : "The settings file could not be opened (held by another program); its backup is used for this session, and nothing is written to the file until Tensho loads again.");
+                var held=copy ?? new T();
                 Remember(held);
                 return held;
             }
@@ -187,6 +215,22 @@ public sealed class SettingsFile<T>(string path,string? legacyPath,Action<Except
     /// <summary>Writes the settings (merged with the file as it is now); false when it failed (said once, the next save tries again).</summary>
     public bool Save(T live)
     {
+        // X-761: a session that never read the file writes nothing to it; said once, and once more when the file can be read again.
+        bool unread,freeAgain=false;
+        lock(gate)
+        {
+            unread=unseen;
+            if(unread)
+            {
+                if(!unseenSaid){unseenSaid=true;warn(null,"The settings are not written: the settings file was held by another program when Tensho loaded and this session never read it; its changes are kept in memory only.");}
+                if(!freeSaid && Readable(path)){freeSaid=freeAgain=true;warn(null,"The settings file can be read again; Tensho reads it when it loads again (nothing of this session is written to it).");}
+            }
+        }
+        if(unread)
+        {
+            if(freeAgain)FreeAgain?.Invoke();
+            return false;
+        }
         string text;
         try{text=SettingsJson.Write(live);}
         catch(Exception error) when(error is JsonException or NotSupportedException or InvalidOperationException)
@@ -253,9 +297,16 @@ public sealed class SettingsFile<T>(string path,string? legacyPath,Action<Except
         }
     }
 
+    // X-761: one attempt, so that a save is never held up by a file still held; false while it cannot be opened, or is absent.
+    private static bool Readable(string file)
+    {
+        try{return ReadText(file,1) is not null;}
+        catch(Exception error) when(error is IOException or UnauthorizedAccessException){return false;}
+    }
+
     // The whole text, read while another program may write it (a write moves a whole new file in place); null when absent. Tried again a
     // few times while a scanner holds it an instant; still held: an IOException (never taken for an absent file).
-    private static string? ReadText(string file)
+    private static string? ReadText(string file,int attempts=6)
     {
         for(var attempt=1;;attempt++)
         {
@@ -268,7 +319,7 @@ public sealed class SettingsFile<T>(string path,string? legacyPath,Action<Except
             }
             catch(FileNotFoundException){return null;}
             catch(DirectoryNotFoundException){return null;}
-            catch(Exception error) when(attempt<6 && error is IOException or UnauthorizedAccessException){Thread.Sleep(50*attempt);}
+            catch(Exception error) when(attempt<attempts && error is IOException or UnauthorizedAccessException){Thread.Sleep(50*attempt);}
         }
     }
 

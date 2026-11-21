@@ -525,6 +525,18 @@ public sealed partial class Plugin : IDalamudPlugin
             mainWindow.BeastName=id=>beasts.State.Catalog?.Beasts.FirstOrDefault(beast=>beast.Id==id)?.Name ?? "";
             mainWindow.SpellName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.AozAction>().GetRowOrDefault(id) is { } spell ? data.GetExcelSheet<Lumina.Excel.Sheets.Action>().GetRowOrDefault(spell.Action.RowId)?.Name.ExtractText() ?? "":"";
             mainWindow.GuideNewInstall=newInstall;
+            // X-761 (review of 0.1746, I1): the settings file held by another program at load: said in the chat (now, or at the next login),
+            // and once more when it can be read again; this session writes nothing to it (SettingsFile.Unseen).
+            string? settingsNotice=null;
+            void SettingsNotice(string key)=>_=framework.RunOnFrameworkThread(()=>
+            {
+                var text=localization.Get(key);
+                if(client.IsLoggedIn)chat.Print("[Tensho] "+text);else settingsNotice=text;
+            });
+            Action settingsNoticeOnLogin=()=>{if(settingsNotice is { } text){settingsNotice=null;chat.Print("[Tensho] "+text);}};
+            registrations.Register(()=>client.Login+=settingsNoticeOnLogin,()=>client.Login-=settingsNoticeOnLogin);
+            if(settingsOrigin is SettingsOrigin.Held or SettingsOrigin.HeldBackup)SettingsNotice(settingsOrigin==SettingsOrigin.HeldBackup ? "Plugin.SettingsHeldBackup" : "Plugin.SettingsHeld");
+            settingsFile.FreeAgain=()=>SettingsNotice("Plugin.SettingsFreeAgain");
             // 0.508 (I-05): the retainer sale list. Read only while it is open; Universalis on the panel's button only.
             Market.RetainerSalesReader? retainerSales=null;
             registrations.Register(()=>retainerSales=new Market.RetainerSalesReader(framework,gameGui,client,player,log,()=>configuration.RetainerSalesPanel,()=>configuration.DeveloperMode),()=>retainerSales?.Dispose());

@@ -15,7 +15,10 @@
     "NoToolMatch": "Aucun outil ne correspond à ce filtre.",
     "CommandHelp": "Ouvrir Tensho Assistant. /tensho peche (ou fish) : afficher ou masquer l'aide à la pêche. « chat » : afficher ou masquer la fenêtre de chat Tensho ; « chat hide » : masquer un moment toutes les fenêtres de chat Tensho, ou les remontrer. « wiki <objet> » / « lodestone <objet> » ouvrent la page de l'objet. « todo <tâche> » ajoute une tâche aux Rappels. « objet <objet> », « prix », « recolte », « recette » l'ouvrent dans Tensho.",
     "ToolFilterTip": "Partie du nom d'un domaine, d'un outil ou d'un plugin de référence ; accents et majuscules ignorés.",
-    "NeedsCharacter": "Tensho a besoin d'un personnage : connectez-vous d'abord avec un personnage."
+    "NeedsCharacter": "Tensho a besoin d'un personnage : connectez-vous d'abord avec un personnage.",
+    "SettingsHeld": "Le fichier des réglages de Tensho est tenu par un autre programme (un antivirus ou un outil de sauvegarde, par exemple) : les réglages par défaut servent pour cette séance, et rien n'est écrit dans le fichier, aucun de vos réglages enregistrés n'est donc perdu. Les changements faits maintenant ne sont pas gardés : désactivez puis réactivez Tensho dans la liste des plugins de Dalamud une fois le fichier libéré.",
+    "SettingsHeldBackup": "Le fichier des réglages de Tensho est tenu par un autre programme (un antivirus ou un outil de sauvegarde, par exemple) : la copie précédente de vos réglages sert pour cette séance, et rien n'est écrit dans le fichier, aucun de vos réglages enregistrés n'est donc perdu. Les changements faits maintenant ne sont pas gardés : désactivez puis réactivez Tensho dans la liste des plugins de Dalamud une fois le fichier libéré.",
+    "SettingsFreeAgain": "Le fichier des réglages de Tensho peut de nouveau être lu : désactivez puis réactivez Tensho dans la liste des plugins de Dalamud (ou relancez le jeu) pour retrouver vos réglages. Les changements faits depuis le chargement de Tensho ne sont pas gardés."
   },
   "MyToolsEditor": {
     "Theme": "Thème proposé",
