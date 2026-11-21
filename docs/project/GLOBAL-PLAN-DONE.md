@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (769 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (771 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -837,12 +837,14 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-763 | Review of block 0.1743 to 0.1746 (review 0.1746, 21/11), minor M1, M2, M3: M1… | Done in 0.1749.0 |
 | X-764 | Review of block 0.1747 to 0.1751 (review 0.1751, 21/11), minor M1, M2, M3: M1… | Done in 0.1753.0 |
 | X-765 | Review of block 0.1747 to 0.1751 (review 0.1751, 21/11), pre-existing before… | Done in 0.1754.0 |
+| X-766 | Another player's meal, a first meal put on before its line (review of 0.1751… | Done in 0.1757.0 |
+| X-767 | Review of block 0.1752 to 0.1756 (review 0.1756, 21/11), minor M1, M2: M1 in… | Done in 0.1758.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (769 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (771 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1677,3 +1679,5 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-763 | Relecture du bloc 0.1743 à 0.1746 (relecture 0.1746, 21/11), mineurs M1, M2, M3… | Fait en 0.1749.0 |
 | X-764 | Relecture du bloc 0.1747 à 0.1751 (relecture 0.1751, 21/11), mineurs M1, M2, M3… | Fait en 0.1753.0 |
 | X-765 | Relecture du bloc 0.1747 à 0.1751 (relecture 0.1751, 21/11), déjà là avant le… | Fait en 0.1754.0 |
+| X-766 | Repas d'un autre joueur, premier repas posé avant sa ligne (relecture 0.1751… | Fait en 0.1757.0 |
+| X-767 | Relecture du bloc 0.1752 à 0.1756 (relecture 0.1756, 21/11), mineurs M1, M2… | Fait en 0.1758.0 |

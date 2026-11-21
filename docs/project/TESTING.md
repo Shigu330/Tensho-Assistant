@@ -2638,6 +2638,10 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1756) Tensho, page Marché, un objet, onglet Historique (filtres au choix) : « Copier en CSV », puis collez dans un tableur : une ligne par vente affichée, dans l'ordre du tableau, avec la date, le monde, le prix unitaire, la quantité et la qualité ; le message dit le nombre de ventes copiées.
 
+- [ ] (0.1757) Près d'un autre joueur qui n'est pas Repu, quand il prend un repas : survolez l'effet « Repu » de sa ligne dans la fenêtre de chat de Tensho : l'info-bulle montre les bonus de ce repas ; si elle n'en montre aucun, la ligne du journal « … s from its full duration » dit l'écart vu (à rapporter).
+
+- [ ] (0.1758) Tensho, page Marché, un objet, onglet Historique : « Copier en CSV », la note « N vente(s) copiée(s) » s'affiche ; changez de filtre ou d'objet : la note disparaît. De même à la Banque après un changement d'onglet ou de filtre.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.

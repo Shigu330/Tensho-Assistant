@@ -141,7 +141,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1746-chat-player-menu-measure.md](0.1746-chat-player-menu-measure.md) | `tests/TenshoAssistant.Tests/ChatMenuMeasure1746Tests.cs` | `docs/changelog/CHANGELOG-0.1700-0.1799.md` |
 | [0.175.0-auxesia-maps-probe.log](0.175.0-auxesia-maps-probe.log) | `src/TenshoAssistant/Maps/MapCatalog.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.1750-beast-effects.md](0.1750-beast-effects.md) | `src/TenshoAssistant/Beastmaster/BeastEffects.cs`, `tests/TenshoAssistant.Tests/BeastEffects1750Tests.cs` | `docs/changelog/CHANGELOG-0.1700-0.1799.md` |
-| [0.1752-unload-sqlite.md](0.1752-unload-sqlite.md) | `src/TenshoAssistant/Diagnostics/UnloadRelease.cs` | `CHANGELOG.md` |
+| [0.1752-unload-sqlite.md](0.1752-unload-sqlite.md) | `src/TenshoAssistant/Diagnostics/UnloadRelease.cs` | `docs/changelog/CHANGELOG-0.1700-0.1799.md` |
 | [0.176.0-kaede-talk-probe.log](0.176.0-kaede-talk-probe.log) | `src/TenshoAssistant/Npcs/NpcVendorCatalog.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.180.0-achievement-probe.log](0.180.0-achievement-probe.log) | `src/TenshoAssistant/Collections/CollectionReader.Completion.Dalamud.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.182.0-paramgrow-probe.log](0.182.0-paramgrow-probe.log) | `src/TenshoAssistant/Character/StatFormulas.cs`, `tests/TenshoAssistant.Tests/StatFormulaTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md`, `docs/evidence/0.320-credits.json`, `docs/project/REFERENCES.md`, `docs/project/ROADMAP.md` |

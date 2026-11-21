@@ -80,10 +80,7 @@ in-game readings through GitHub, on the player's click or the opt-in daily excha
 <!-- gen:decisions:en -->
 Open points, produced by script from the agent's source of decisions. Choices already taken: [DECISIONS](DECISIONS.md); the former tables: [archive](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/archive/DECISIONS-EN-ATTENTE-2026-11-09.md).
 
-| No. | Point | Choice applied, or record awaited | Where |
-|---|---|---|---|
-| D-209 | Settings file held by another program when Tensho loads (0.1747) | Applied: the previous copy of the settings (or the default settings) for the session, nothing written to the file until the next load, said in the chat; the session's changes are not kept |  |
-| D-211 | Another player's meal (X-764 M2): when the game puts the Well Fed status on before its chat line (a first meal, no older one), Tensho says « no bonus (maybe an older meal) », the status not changing within the half second (D-208). What to do? | Also read the status's remaining time at the line: a Well Fed status at its full duration (1800 s, from the meal item's action in the game data) is the line's, its bonus shown; otherwise as now; recommended |  |
+Nothing open.
 <!-- /gen:decisions:en -->
 
 ## In-game tests
@@ -180,10 +177,7 @@ donnée prise sur des sites web).
 <!-- gen:decisions:fr -->
 Points ouverts, produits par script depuis la source des décisions de l'agent. Choix déjà faits : [DECISIONS](DECISIONS.md) ; anciens tableaux : [archive](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/archive/DECISIONS-EN-ATTENTE-2026-11-09.md).
 
-| N° | Point | Choix appliqué, ou relevé attendu | Où |
-|---|---|---|---|
-| D-209 | Fichier des réglages tenu par un autre programme quand Tensho se charge (0.1747) | Appliqué : la copie précédente des réglages (ou les réglages par défaut) pour la séance, rien n'est écrit dans le fichier jusqu'au prochain chargement, dit dans le chat ; les changements de la séance ne sont pas gardés |  |
-| D-211 | Repas d'un autre joueur (X-764 M2) : quand le jeu pose son statut Repu avant sa ligne du chat (un premier repas, aucun ancien), Tensho dit « aucun bonus (peut-être un ancien repas) », le statut ne changeant pas dans la demi-seconde (D-208). Que faire ? | Lire aussi le temps restant du statut à la ligne : un statut Repu à sa durée pleine (1800 s, d'après l'action de l'objet du repas dans les données du jeu) est celui de la ligne, son bonus est montré ; sinon comme aujourd'hui ; recommandé |  |
+Aucune en attente.
 <!-- /gen:decisions:fr -->
 
 ## Tests en jeu
