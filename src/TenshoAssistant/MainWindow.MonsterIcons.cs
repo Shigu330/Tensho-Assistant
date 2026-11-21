@@ -21,7 +21,7 @@ internal sealed partial class MainWindow
         var size=Math.Clamp(settings.MonsterIconSize,16,96)*Dalamud.Interface.Utility.ImGuiHelpers.GlobalScale;
         var distance=Math.Clamp(settings.MonsterIconDistance,5,150);
         var mouse=ImGui.GetIO().MousePos;var mouseFree=!ImGui.GetIO().WantCaptureMouse;
-        string? tip=null;
+        MonsterTipFacts? tip=null;
         foreach(var monster in monsters)
         {
             if(Vector3.Distance(monster.Position,live.Position)>distance)continue;
@@ -42,9 +42,10 @@ internal sealed partial class MainWindow
                 draw.AddText(UiBuilder.IconFont,size*0.8f,corner+new Vector2(size*0.1f),ImGui.GetColorU32(colour),symbol.ToIconString());
             }
             if(mouseFree && mouse.X>=corner.X && mouse.X<=corner.X+size && mouse.Y>=corner.Y && mouse.Y<=corner.Y+size)
-                tip=localization.Format("MapView.MonsterLabel",monster.Name,monster.Level)+"\n"+string.Join("\n",notes.Where(note=>MonsterIconAbove(note.Kind,settings)).Select(note=>note.Text));
+                tip=MonsterTips.Build(monster.Name,localization.Format("MapView.MonsterTipLevel",monster.Level),null,notes.Where(note=>MonsterIconAbove(note.Kind,settings)).Select(note=>note.Text));
         }
-        if(tip is not null)WrappedTooltip(tip);
+        // X-684 (0.1673): the one monster tooltip.
+        if(tip is not null)DrawMonsterTooltip(tip);
     }
     private static bool MonsterIconAbove(MonsterNoteKind kind,MapViewSettings settings)=>kind switch
     {

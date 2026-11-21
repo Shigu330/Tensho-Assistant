@@ -1605,7 +1605,12 @@ internal sealed partial class MainWindow
                     var label=item.Kind==MapObjectKind.Gathering && item.Level>0 ? localization.Format("MapView.GatheringLabel",item.Name,item.Level)
                         :item.Kind==MapObjectKind.HuntMark ? localization.Format("MapView.HuntMarkLabel",item.Name,item.Level switch{3=>"S",2=>"A",_=>"B"})
                         :item.Kind==MapObjectKind.IslandAnimal ? IslandAnimalLabel(item):item.Name;
-                    if(hovered && Vector2.Distance(io.MousePos,at)<=glyph){tooltip=label;tooltipPoint=null;}
+                    // X-684 (0.1673): a hunt mark is a monster: the one monster tooltip (its rank).
+                    if(hovered && Vector2.Distance(io.MousePos,at)<=glyph)
+                    {
+                        tooltip=item.Kind==MapObjectKind.HuntMark ? MapMonsterTip(MonsterTips.Build(item.Name,localization.Format("MapView.MonsterTipRank",item.Level switch{3=>"S",2=>"A",_=>"B"}),null,[])):label;
+                        tooltipPoint=null;
+                    }
                 }
             MapMark("canvas nearby objects");
             // 0.795 (X-35, user request): nearby monsters that drop an item the tracking lists still need.
@@ -1636,7 +1641,8 @@ internal sealed partial class MainWindow
                     }
                     if(hovered && Vector2.Distance(io.MousePos,at)<=glyph)
                     {
-                        tooltip=localization.Format("MapView.MonsterLabel",monster.Name,monster.Level)+"\n"+string.Join("\n",notes.Where(note=>MonsterNoteShown(note,settings)).Select(note=>note.Text));
+                        // X-684 (0.1673): the one monster tooltip (name, level, every reason shown).
+                        tooltip=MapMonsterTip(MonsterTips.Build(monster.Name,localization.Format("MapView.MonsterTipLevel",monster.Level),null,notes.Where(note=>MonsterNoteShown(note,settings)).Select(note=>note.Text)));
                         tooltipPoint=null;
                     }
                 }
@@ -1657,7 +1663,8 @@ internal sealed partial class MainWindow
                     if(monster.EventId==0 || (monster.EventId & 0xFFFF)!=leve.Objective)continue;
                     var at=origin+mapPan+MapProjection.PixelFromWorld(monster.Position,map)*mapZoom;
                     draw.AddImage(leveIcon.Handle,at-new Vector2(leveSize/2),at+new Vector2(leveSize/2));
-                    if(hovered && Vector2.Distance(io.MousePos,at)<=leveSize/2){tooltip=localization.Format("MapView.LeveTarget",monster.Name,monster.Level);tooltipPoint=null;}
+                    if(hovered && Vector2.Distance(io.MousePos,at)<=leveSize/2)
+                    {tooltip=MapMonsterTip(MonsterTips.Build(monster.Name,localization.Format("MapView.MonsterTipLevel",monster.Level),null,[localization.Get("MapView.MonsterTipLeveTarget")]));tooltipPoint=null;}
                 }
             }
             MapMark("canvas monsters");
@@ -1748,7 +1755,7 @@ internal sealed partial class MainWindow
                         draw.AddImage(wildIcon.Handle,at-new Vector2(tameSize/2),at+new Vector2(tameSize/2),Vector2.Zero,Vector2.One,ImGui.GetColorU32(new Vector4(1,1,1,0.85f)));
                         if(!hovered || Vector2.Distance(io.MousePos,at)>tameSize/2)continue;
                         sightseeingTip=null;tooltipPoint=null;
-                        tooltip=localization.Format("MapView.BeastToTame",wild.Name)+"\n"+localization.Get("MapView.BookmarkClick");
+                        tooltip=MapMonsterTip(MonsterTips.Build(wild.Name,null,null,[localization.Get("MapView.MonsterTipToTame")]),localization.Get("MapView.BookmarkClick"));
                         if(top is null && ImGui.IsMouseReleased(ImGuiMouseButton.Left) && !mapDragged)FlagFromMap(map,place.X,place.Y);
                     }
                 }
@@ -1818,7 +1825,12 @@ internal sealed partial class MainWindow
             mapHoveredVista=sightseeingTip?.Vista;
             if(tooltipPoint is { } gatheringTip)DrawGatheringTooltip(gatheringTip);
             else if(sightseeingTip is { } vistaTip)DrawSightseeingTooltip(vistaTip.Vista,vistaTip.Done);
-            else if(tooltip is not null)WrappedTooltip(tooltip);
+            else if(tooltip is not null)
+            {
+                // X-684 (0.1673): a monster's tooltip set last is drawn with the one monster tooltip.
+                if(mapMonsterTip is { } monsterTip && ReferenceEquals(monsterTip.Text,tooltip))DrawMonsterTooltip(monsterTip.Facts,monsterTip.After);
+                else WrappedTooltip(tooltip);
+            }
             else if(hits.Count>0)DrawIconListTooltip(hits,top,settings);
             // 0.640 (user capture): a quest icon on top of a door hid its link.
             if(linkUnderMouse is null && edgeLabel is null && top is not { Flag:not null } && top is not { Point:not null } && top is not { Fixed:{ AetheryteId:not 0 } })

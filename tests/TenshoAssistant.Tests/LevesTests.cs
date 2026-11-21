@@ -29,7 +29,7 @@ internal static class LevesTests
             Check(reader.Contains("if(info->ShouldRender && (active==0 || info->ObjectiveId!=active))From(info);"),"filter");
             Check(reader.Contains("{ActiveLeve=ReadActiveLeve()}"),"active leve");
             var map=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.MapView.cs"));
-            Check(map.Contains("(monster.EventId & 0xFFFF)!=leve.Objective") && map.Contains("\"MapView.LeveTarget\""),"targets");
+            Check(map.Contains("(monster.EventId & 0xFFFF)!=leve.Objective") && map.Contains("\"MapView.MonsterTipLeveTarget\""),"targets");
         }),
         // From LevePrepare988Tests: X-103 (0.988): « Prepare » puts what the accepted crafting leves still need into a crafting list.
         ("Leve prepare 988: quantities added up per item, held taken off, recipes only, unknown quantity counts one",() =>
