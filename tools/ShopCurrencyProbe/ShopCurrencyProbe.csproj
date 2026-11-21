@@ -4,6 +4,7 @@
     <Reference Include="Lumina"><HintPath>$(APPDATA)/XIVLauncher/addon/Hooks/dev/Lumina.dll</HintPath></Reference>
     <Reference Include="Lumina.Excel"><HintPath>$(APPDATA)/XIVLauncher/addon/Hooks/dev/Lumina.Excel.dll</HintPath></Reference>
     <Compile Include="../../src/TenshoAssistant/FreeCompany/VoyagePlanner.cs" Link="VoyagePlanner.cs" />
+    <Compile Include="../../src/TenshoAssistant/FreeCompany/SubmarineUnlocks.cs" Link="SubmarineUnlocks.cs" />
     <!-- X-480 (0.1469): PROBE_FLOORS=check evaluates the plugin's own floors rule on every territory. -->
     <Compile Include="../../src/TenshoAssistant/Maps/MapFloors.cs" Link="MapFloors.cs" />
   </ItemGroup>
