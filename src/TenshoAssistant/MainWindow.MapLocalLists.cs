@@ -127,7 +127,10 @@ internal sealed partial class MainWindow
             DrawSmallGameIcon(fate.Icon);
             if(ImGui.Selectable($"{FateLabel(fate)}##Fate{fate.Id}"))FlagAt(map,fate.Position);
             PlaceMenu($"FatePlace{fate.Id}",map,CoordinateOf(map,fate.Position),FateLabel(fate));
-            if(ImGui.IsItemHovered())WrappedTooltip(CoordinateText(map,fate.Position)+"\n"+localization.Get("MapLocal.ClickFlag"));
+            // X-684 (0.1676): the one FATE tooltip (its state now), the click's effect under it.
+            if(ImGui.IsItemHovered())DrawFateTooltip(Fields.FateTips.Build(fate.Name,fate.Icon,fate.Level,localization.Get("FieldContent.KindFate"),$"{map.Zone} · {CoordinateText(map,fate.Position)}",
+                localization.Format("MapLocal.FateTipProgress",fate.Progress)+(fate.SecondsLeft>0 ? localization.Format("MapLocal.FateTime",fate.SecondsLeft/60,(fate.SecondsLeft%60).ToString("00")):"")
+                +(fate.HasBonus ? localization.Get("MapLocal.FateBonus"):""),null,0),localization.Get("MapLocal.ClickFlag"));
         }
     }
     private string FateLabel(MapFateMarker fate)

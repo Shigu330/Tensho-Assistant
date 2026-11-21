@@ -15,6 +15,9 @@ internal sealed partial class MainWindow
         using(TooltipScope.Begin())ImGui.TextUnformatted(text);
     }
 
+    // X-684 (0.1676): the title of a tooltip that names a thing of the game (place, monster, action, FATE): its name, the same everywhere.
+    private void TooltipTitle(string text)=>ImGui.TextColored(Accent,text);
+
     // Tooltip of the last drawn item (also when disabled).
     private void Tip(string key)
     {

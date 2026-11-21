@@ -14,7 +14,7 @@ internal sealed partial class MainWindow
     {
         using(TooltipScope.Begin())
         {
-            ImGui.TextColored(Accent,facts.Name);
+            TooltipTitle(facts.Name);
             if(facts.Level is { } level)ImGui.TextDisabled(level);
             if(facts.Zone is { } zone)ImGui.TextUnformatted(zone);
             foreach(var note in facts.Notes)ImGui.TextUnformatted(note);

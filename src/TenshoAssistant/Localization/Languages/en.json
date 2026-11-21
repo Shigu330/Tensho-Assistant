@@ -8567,6 +8567,7 @@
     "FatesOtherZone": "The game only gives FATEs for your current zone.",
     "FatesNone": "No FATE running in this zone.",
     "FateLine": "Lv. {0}  {1}  {2}%",
+    "FateTipProgress": "Progress: {0}%",
     "FateBonus": "  ·  EXP bonus",
     "FateTime": "  · {0}:{1}",
     "GatheringLoading": "Gathering catalogue loading…",

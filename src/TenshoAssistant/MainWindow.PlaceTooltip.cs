@@ -32,7 +32,7 @@ internal sealed partial class MainWindow
         var facts=PlaceTipFactsOf(map,coordinate);
         using(TooltipScope.Begin())
         {
-            if(name is { Length:>0 })ImGui.TextColored(Accent,name);
+            if(name is { Length:>0 })TooltipTitle(name);
             ImGui.TextUnformatted(facts.Area);
             if(facts.Region.Length>0 && facts.Region!=map.Zone)ImGui.TextDisabled(facts.Region);
             if(facts.Coordinates is { } text)ImGui.TextUnformatted(text);

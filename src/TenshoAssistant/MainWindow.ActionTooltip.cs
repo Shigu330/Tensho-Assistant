@@ -18,7 +18,7 @@ internal sealed partial class MainWindow
         {
             if(icon!=0){DrawGameIcon(icon,new Vector2(32));ImGui.SameLine();}
             ImGui.BeginGroup();
-            ImGui.TextColored(Accent,name);
+            TooltipTitle(name);
             if(detail is { Length:>0 })ImGui.TextDisabled(detail);
             ImGui.EndGroup();
             if(description is { Length:>0 })ImGui.TextUnformatted(description);

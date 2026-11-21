@@ -243,7 +243,10 @@ internal sealed partial class MainWindow
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();
                 if(ImGui.Selectable($"{row.Name}##FieldEvent{row.Kind}{row.Id}") && map is not null && coordinate is { } target)OpenMapPointFromPage(map,target.X,target.Y);
-                if(ImGui.IsItemHovered())WrappedTooltip(FieldEventTip(row));
+                // X-684 (0.1676): the one FATE tooltip (a FATE, a skirmish or a critical engagement).
+                if(ImGui.IsItemHovered())DrawFateTooltip(FateTips.Build(row.Name,0,row.Level,
+                    localization.Get(row.Kind==FieldEventKind.Fate ? (zone.Use==FieldBoard.BozjaUse ? "FieldContent.KindSkirmish":"FieldContent.KindFate"):"FieldContent.KindEngagement"),
+                    coordinate is { } eventPlace ? $"{zone.Name} · {MapProjection.CoordinateText(eventPlace)}":zone.Name,null,row.Description.Length>0 ? row.Description:localization.Get("FieldContent.NoDescription"),row.Participants));
                 if(map is not null && coordinate is { } place)PlaceMenu($"FieldPlace{row.Kind}{row.Id}",map,place,row.Name);
                 ImGui.TableNextColumn();ImGui.TextUnformatted(localization.Get(row.Kind==FieldEventKind.Fate ? (zone.Use==FieldBoard.BozjaUse ? "FieldContent.KindSkirmish":"FieldContent.KindFate"):"FieldContent.KindEngagement"));
                 ImGui.TableNextColumn();
@@ -253,12 +256,6 @@ internal sealed partial class MainWindow
             }
         }
         finally{ImGui.EndTable();}
-    }
-
-    private string FieldEventTip(FieldEvent row)
-    {
-        var text=row.Description.Length>0 ? row.Description:localization.Get("FieldContent.NoDescription");
-        return row.Participants>0 ? text+"\n\n"+localization.Format("FieldContent.Participants",row.Participants):text;
     }
 
     private void DrawFieldRecords(FieldCatalog catalog)
