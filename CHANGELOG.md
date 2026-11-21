@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1738.0
+- Plan global, X-748 : Page Marchands, marchands sans position (X-748, idée I-022 choisie par l'utilisateur le 21/11 vers 16 h, après l'essai T-0.1374-1 du 17/11 : une vingtaine de lignes « Marchand · Position non renseignée » pour un objet). Les marchands d'un objet qui sont sur une carte viennent d'abord, dans leur ordre ; ceux que le jeu ne place sur aucune carte (à placer chez soi, plus accessibles) sont regroupés en une seule ligne « Marchands sans position : N », cachés par défaut, qu'un clic déplie ou replie (pour la session) ; son info-bulle dit ce qu'ils sont. Les places viennent des feuilles du jeu, comme avant. Textes en et fr.
+- Pour les joueurs : marchands : les marchands qui ne sont sur aucune carte sont regroupés en une ligne, cachés jusqu'à un clic.
+- Tests : VendorRows1738Tests. Verify.ps1 (agent) : 3712/3712, 0 avertissement, 0 erreur ; DLL 0.1738.0.0. Non validé en jeu.
+### English
+- Vendors page, vendors without a position (X-748, idea I-022 chosen by the user on 21/11 around 16:00, after test T-0.1374-1 of 17/11: about twenty rows « Vendor · Position not available » for one item). An item's vendors that stand on a map come first, in their order; those the game puts on no map (to place at home, no longer reachable) are grouped in one row « Vendors without a position: N », hidden by default, that a click unfolds or folds (for the session); its tooltip says what they are. The places come from the game's sheets, as before. Texts in en and fr.
+- For players: Vendors: the vendors on no map are grouped in one row, hidden until you click it.
+
 ## 0.1737.0
 - Plan global, X-754 : Page Cartes, liens de carte du chat, mode capture (X-754, idée I-050 choisie par l'utilisateur le 21/11 vers 16 h ; R25). L'info-bulle d'un lien montrait le nom de celui qui l'a envoyé même en mode capture de la fenêtre de chat. En mode capture, elle écrit maintenant le code #XXXXX de ce joueur, le même que la fenêtre de chat (même règle : numéro et job du groupe gardés, le nom remplacé), jamais le nom. L'envoyeur est gardé comme le lit la fenêtre de chat (avec son monde « Nom@Monde », au lieu de « NomMonde »), d'où le même code. Aucun texte nouveau.
 - Pour les joueurs : cartes : en mode capture de la fenêtre de chat, l'info-bulle d'un lien de carte du chat montre le code de l'envoyeur au lieu de son nom.
