@@ -107,10 +107,24 @@ public static class ChatFormat
     /// game's number and job abbreviation stay before the stand-in (only the name is replaced).</summary>
     public static string ShownSender(ChatRecord record,bool capture)
     {
+        // X-730 M2 (0.1729, review of 0.1721 to 0.1726): the number and the job in their brackets, as the line shows them (« [1] [SAG] Name »).
+        var (number,job,shown)=ShownParts(record,capture);
+        return ((number.Length>0 ? $"[{number}] ":"")+(job.Length>0 ? $"[{job}] ":"")+shown).TrimEnd();
+    }
+
+    /// <summary>X-730 M2 (0.1729): the same sender without brackets (« 1 SAG Name »): the search finds what is shown, typed with its brackets or
+    /// without them.</summary>
+    public static string SenderWords(ChatRecord record,bool capture)
+    {
+        var (number,job,shown)=ShownParts(record,capture);
+        return string.Join(' ',new[]{number,job,shown}.Where(part=>part.Length>0));
+    }
+
+    /// <summary>The sender's number, job and name as shown: in capture mode, a player's stand-in for the name (a character of the story keeps its name).</summary>
+    private static (string Number,string Job,string Name) ShownParts(ChatRecord record,bool capture)
+    {
         var (number,job,name)=SenderParts(record.Sender);
-        var shown=capture && name.Length>0 && record.Channel is not ChatChannel.Npc ? StandIn(name):name;
-        var before=number+job;
-        return before.Length>0 && shown.Length>0 ? before+" "+shown:before+shown;
+        return (number,job,capture && name.Length>0 && record.Channel is not ChatChannel.Npc ? StandIn(name):name);
     }
 
     /// <summary>

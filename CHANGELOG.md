@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1729.0
+- Plan global, X-730 : Fenêtre de discussion (X-730 M2, relecture du bloc 0.1721 à 0.1726) : depuis 0.1724, une ligne d'équipe montre « [1] [SAG] Nom », mais la recherche comparait au texte « 1SAG Nom » (numéro et job collés) : « [1] » ou « 1 SAG » ne trouvaient rien. La recherche prend désormais l'expéditeur tel que la ligne le montre (« [1] [SAG] Nom ») et aussi sans ses crochets (« 1 SAG Nom ») ; en mode capture, le remplaçant du nom, jamais le nom ; un expéditeur sans le numéro du jeu : comme avant. Avec X-730 M1 (0.1728), les deux constats mineurs de la relecture sont corrigés.
+- Pour les joueurs : fenêtre de discussion : la recherche trouve la ligne d'un membre d'équipe par ce qui est montré devant son nom (« [1] [SAG] »).
+- Tests : ChatSenderSearch1729Tests. Verify.ps1 (agent) : 3686/3686, 0 avertissement, 0 erreur ; DLL 0.1729.0.0. Non validé en jeu.
+### English
+- Chat window (X-730 M2, review of block 0.1721 to 0.1726): since 0.1724, a party line shows « [1] [SAG] Name », but the search compared with the text « 1SAG Name » (number and job glued): « [1] » or « 1 SAG » found nothing. The search now takes the sender as the line shows it (« [1] [SAG] Name ») and also without its brackets (« 1 SAG Name »); in capture mode, the name's stand-in, never the name; a sender without the game's number: as before. With X-730 M1 (0.1728), both minor findings of the review are fixed.
+- For players: Chat window: the search finds a party member's line by what is shown before the name (« [1] [SAG] »).
+
 ## 0.1728.0
 - Plan global, X-730 : Planificateur de trajets (X-730 M1, relecture du bloc 0.1721 à 0.1726) : quand la vitesse et la distance du vaisseau choisi sont inconnues (0.1722), en saisir une seule les faisait passer pour connues et la recherche reprenait avec l'autre restée à 1 (ou celle d'un vaisseau choisi avant) : « Aucun trajet possible » ou un résultat faux, sans la ligne « non lues ». Désormais elles restent inconnues (ligne dite, rien cherché) jusqu'à ce que les deux soient saisies ; lues ou tirées des pièces, une seule saisie suffit, comme avant ; choisir un vaisseau remet le compte à zéro. Texte « … ou saisissez les deux ici » en et fr.
 - Pour les joueurs : planificateur de trajets : avec la vitesse et la distance d'un vaisseau inconnues, en saisir une seule ne lance plus une recherche avec l'autre fausse.

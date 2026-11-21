@@ -24,7 +24,8 @@ public static class ChatSearch
         if(query.Length==0)return true;
         var compare=CultureInfo.InvariantCulture.CompareInfo;
         const CompareOptions options=CompareOptions.IgnoreCase|CompareOptions.IgnoreNonSpace;
-        if(compare.IndexOf(ChatFormat.ShownSender(record,capture),query,options)>=0)return true;
+        // X-730 M2 (0.1729): the sender as shown (« [1] [SAG] Name ») or without its brackets (« 1 SAG Name »).
+        if(compare.IndexOf(ChatFormat.ShownSender(record,capture),query,options)>=0 || compare.IndexOf(ChatFormat.SenderWords(record,capture),query,options)>=0)return true;
         return compare.IndexOf(string.Concat(record.Body.Select(segment=>segment.Text)),query,options)>=0;
     }
 }
