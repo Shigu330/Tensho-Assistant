@@ -326,7 +326,8 @@ internal sealed partial class MainWindow
     /// </summary>
     /// <param name="glamourOnly">X-290: a piece of the gear plan kept for its look only: its mark instead of the stats.</param>
     /// <param name="hq">X-294: the HQ state when the caller knows it (a worn or planned piece); else « assume HQ » of the Gear page.</param>
-    private void DrawItemInfoTooltip(uint id,bool glamourOnly=false,bool? hq=null)
+    /// <param name="lines">X-727 (0.1733): the caller's own lines (the tracker's place and next time), drawn under the item's header; data only, no hook.</param>
+    private void DrawItemInfoTooltip(uint id,bool glamourOnly=false,bool? hq=null,IReadOnlyList<string>? lines=null)
     {
         if(ItemTooltipAlreadyDrawn(id))return;
         var item=itemCatalog.State.Catalog?.Find(id);
@@ -343,6 +344,12 @@ internal sealed partial class MainWindow
             // X-363 (0.1350): asked of Garland once the mouse rested on this item (patchDwell), read from what is known before.
             if(ItemPatchText(id,ask:patchDwell.Settled(id,Environment.TickCount64)) is { } patchText)ImGui.TextDisabled(patchText);
             if(ShowIds)ImGui.TextDisabled($"ID {id}");
+            if(lines is { Count:>0 })
+            {
+                ImGui.Separator();
+                foreach(var line in lines)ImGui.TextUnformatted(line);
+                ImGui.Separator();
+            }
             DrawItemGearStats(id,glamourOnly,hq);
             DrawItemInfoBody(item,id);
         }

@@ -23,7 +23,7 @@ internal static class GearTipEverywhere1295Tests
         {
             var hover = Read("MainWindow.MarketHover.cs");
             var tooltip = hover[hover.IndexOf("private void DrawItemInfoTooltip(", StringComparison.Ordinal)..hover.IndexOf("private void DrawItemInfoBody(", StringComparison.Ordinal)];
-            Check(tooltip.Contains("private void DrawItemInfoTooltip(uint id,bool glamourOnly=false,bool? hq=null)"), "no page hook (Action) in the item tooltip: one way");
+            Check(tooltip.Contains("private void DrawItemInfoTooltip(uint id,bool glamourOnly=false,bool? hq=null,IReadOnlyList<string>? lines=null)") && !tooltip[..tooltip.IndexOf('{')].Contains("Action"), "no page hook (Action) in the item tooltip: one way (X-727: the caller's lines are data)");
             Check(tooltip.Contains("DrawItemGearStats(id,glamourOnly,hq);\n            DrawItemInfoBody(item,id);"), "stats and comparison, then the common body");
         }),
         ("X-294 ratchet: one path for the item tooltip: the gear part, its stats table and the comparison are drawn only by the common parts", () =>

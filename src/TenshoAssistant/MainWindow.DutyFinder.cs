@@ -171,12 +171,14 @@ internal sealed partial class MainWindow
     }
 
     private readonly HashSet<uint> goThereLogged=[];
-    private void ItemLinksMenu(string id,ItemDefinition? item,bool copyName=false)
+    /// <param name="first">X-727 (0.1733): the caller's own entries (the tracker's alarm gestures), drawn first under the name, then the common menu.</param>
+    private void ItemLinksMenu(string id,ItemDefinition? item,bool copyName=false,Action? first=null)
     {
         if(item is null || !ImGui.BeginPopupContextItem(id))return;
         try
         {
             ImGui.TextColored(Accent,item.Name);
+            if(first is not null){first();ImGui.Separator();}
             // X-455 E4 (0.1617): from an item link of the chat window, its name copied.
             if(copyName && ImGui.Selectable(localization.Get("ChatWindow.CopyItem")+$"##CopyItem{item.Id}"))ImGui.SetClipboardText(item.Name);
             foreach(var route in RelevantRoutes(item.Id))

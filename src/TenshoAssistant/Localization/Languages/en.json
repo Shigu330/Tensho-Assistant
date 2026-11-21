@@ -7587,6 +7587,9 @@
     "Title": "Tensho tracker",
     "Empty": "No active item alarm.",
     "Map": "Map",
+    "Place": "Place: {0} · {1}",
+    "Next": "Next alarm: {0} · {1}",
+    "TurnOff": "Turn this alarm off",
     "Setting": "Pinned tracking window",
     "SettingTip": "Small on-screen window with the items of your active Tensho alarms (gathering, fishing), soonest first with the time left; click a name: its item page; « Map »: the game map on the point when known. Hidden with the game's interface; the cross closes it.\nDefault: off."
   },
