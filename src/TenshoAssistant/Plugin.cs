@@ -104,7 +104,7 @@ public sealed partial class Plugin : IDalamudPlugin
 
     public Plugin(IDalamudPluginInterface pluginInterface, ICommandManager commands, IPluginLog log,
         IGameInventory inventory, IPlayerState player, IClientState client, IFramework framework, IDataManager data, IGameGui gameGui,
-        ITextureProvider textures, IUnlockState unlocks, IGameInteropProvider interop,IObjectTable objects,IContextMenu contextMenus,IGameConfig gameConfig,ICondition condition,IFateTable fateTable,ITargetManager targets,IPartyList partyList,IChatGui chat,IDtrBar dtrBar,IKeyState keyState,IMarketBoard marketBoardEvents,IAddonLifecycle addonLifecycle)
+        ITextureProvider textures, IUnlockState unlocks, IGameInteropProvider interop,IObjectTable objects,IContextMenu contextMenus,IGameConfig gameConfig,ICondition condition,IFateTable fateTable,ITargetManager targets,IPartyList partyList,IChatGui chat,IDtrBar dtrBar,IKeyState keyState,IMarketBoard marketBoardEvents,ISeStringEvaluator seStrings,IAddonLifecycle addonLifecycle)
     {
         // 0.525 (user report: lag when the plugin loads): what the load costs, said in the log, to tell the plugin's own work from the runtime's pauses.
         var loadStarted=System.Diagnostics.Stopwatch.GetTimestamp();var pausesBefore=GC.GetTotalPauseDuration();var gen2Before=GC.CollectionCount(2);
@@ -851,7 +851,7 @@ public sealed partial class Plugin : IDalamudPlugin
             registrations.Register(()=>mainWindow.ChatMessages.Renumbered+=chatSenders.Renumber,()=>mainWindow.ChatMessages.Renumbered-=chatSenders.Renumber);
             RegisterChat(configuration,client,addonLifecycle,framework,player,pluginInterface.GetPluginConfigDirectory(),chatSenders);
             Chat.ChatPlayerActions? chatPlayers=null;
-            registrations.Register(()=>mainWindow.ChatPlayers=chatPlayers=new Chat.ChatPlayerActions(interop,framework,client,objects,targets,partyList,data,log,chatSenders,gameConfig),
+            registrations.Register(()=>mainWindow.ChatPlayers=chatPlayers=new Chat.ChatPlayerActions(interop,framework,client,objects,targets,partyList,data,log,chatSenders,gameConfig,seStrings),
                 ()=>{mainWindow.ChatPlayers=null;chatPlayers?.Dispose();chatSenders.Clear();});
             // X-715 (0.1718, D-202 b): developer mode, what the game's chat sends on a click on a player's name, read only.
             Chat.ChatLinkWatch? chatLinkWatch=null;

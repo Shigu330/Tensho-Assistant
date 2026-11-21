@@ -9,10 +9,11 @@ public enum ChatSegmentKind { Text,MapLink,ItemLink,QuestLink,WebLink,DalamudLin
 /// <param name="Data">X-496 M1 (0.1478): a DalamudLink's own string, encoded: its payloads from the link to its end (the link terminator
 /// included), as Dalamud passes it to the link's handler; null when not read (the handler then gets the link's text).</param>
 /// <param name="StatusId">X-473 (0.1715): a StatusLink's status (its row in the game's Status sheet).</param>
-/// <param name="Action">X-473 (0.1720): an ActionName's name as the combat line writes it (no link of the game: its coloured text).</param>
-public sealed record ChatLink(ChatSegmentKind Kind,uint TerritoryId=0,uint MapId=0,float X=0,float Y=0,string Place="",uint ItemId=0,bool Hq=false,uint QuestId=0,string Url="",string Plugin="",uint CommandId=0,byte[]? Data=null,uint StatusId=0,string Action="");
-/// <summary>X-473 (0.1715): what the game's tooltip of a status shows: its icon, its name, its description (Status sheet, the client's language).</summary>
-public sealed record ChatStatusTip(uint Icon,string Name,string Description);
+/// <param name="Action">X-473 (0.1720): an ActionName's name as the combat line writes it (no link of the game; X-734, 0.1734: found in the
+/// line's text by the game's template, ChatActionLines).</param>
+/// <param name="Param">X-733 (0.1734): a meal's or a medicine's status: its Param on the one who gained it (ChatFoodTip), read at the line's
+/// arrival; null for any other status.</param>
+public sealed record ChatLink(ChatSegmentKind Kind,uint TerritoryId=0,uint MapId=0,float X=0,float Y=0,string Place="",uint ItemId=0,bool Hq=false,uint QuestId=0,string Url="",string Plugin="",uint CommandId=0,byte[]? Data=null,uint StatusId=0,string Action="",ChatStatusParam? Param=null);
 public sealed record ChatSegment(string Text,ChatSegmentKind Kind=ChatSegmentKind.Text,ChatLink? Link=null);
 /// <summary>A copy of one chat message, in plain managed data; nothing of the game's memory is kept.</summary>
 /// <param name="Source">X-484 (0.1482): who does it, Dalamud's XivChatRelationKind (0 none), and <paramref name="Target"/> to whom: the

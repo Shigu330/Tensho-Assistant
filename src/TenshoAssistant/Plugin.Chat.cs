@@ -22,6 +22,8 @@ public sealed partial class Plugin
             try{chatReader=new Chat.ChatReader(chatGui,client,log,()=>configuration.Chat,mainWindow.ChatMessages,()=>mainWindow.DeveloperMode,history,()=>player.CharacterName);}
             catch{history.Dispose();throw;}
             chatReader.Sources=senders;
+            // X-733, X-734 (0.1734): the actions named in combat lines and the meals' statuses, read by the chat window's player actions.
+            chatReader.LineData=()=>mainWindow.ChatPlayers;
             // X-447 B7 (0.1646): the alerts' and channels' sounds, the game's own (as the macros' <se.N>).
             chatReader.PlaySound=sound=>Alarms.AlarmService.PlayChatSound(sound,log);
             mainWindow.ChatHistoryFolder=history.Folder;

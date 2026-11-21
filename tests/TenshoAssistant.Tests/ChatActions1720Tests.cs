@@ -14,28 +14,31 @@ internal static class ChatActions1720Tests
     private static ChatPayload Glow => Other("UIGlowPayload");
     private static readonly ChatPayload End = new(ChatPayloadKind.LinkEnd, "LinkEnd");
     private static string Shape(IEnumerable<ChatSegment> body) => string.Join("|", body.Select(segment => $"{segment.Kind}:{segment.Text}"));
+    // X-734 (0.1734): a combat line's finder that names no action (the colours alone never make one).
+    private static readonly Func<string, (int Start, int Length)?> NoAction = _ => null;
 
     public static IEnumerable<(string Name, Action Run)> Cases =>
     [
-        ("Chat actions 1720: the coloured name of a combat line (kind 44 of 21/11) is an action's name; elsewhere it stays text", () =>
+        // X-734 (0.1734): the coloured text of kind 44 is an item's name (LogMessage 535: « … utilisez <frnoun(Item…)>. »), no longer an action;
+        // an action is named in the plain text, where the template puts it (ChatLines1734Tests).
+        ("Chat actions 1720: the coloured name of a combat line (kind 44 of 21/11) is an item's name (X-734): it stays text", () =>
         {
             var payloads = new List<ChatPayload> { Other("PlayerPayload"), Text("Ann Doe"), End, Text(" uses "), On, Glow, Text("Fire"), Glow, Off, Text(".") };
-            var body = ChatPayloads.Segments(payloads, combat: true);
-            Check(Shape(body) == "Text:Ann Doe|Text: uses |ActionName:Fire|Text:.", "the action's name: " + Shape(body));
-            Check(body[2].Link is { Kind: ChatSegmentKind.ActionName, Action: "Fire" }, "its name kept");
+            var body = ChatPayloads.Segments(payloads, NoAction);
+            Check(Shape(body) == "Text:Ann Doe|Text: uses |Text:Fire|Text:.", "a coloured name: text: " + Shape(body));
             Check(Shape(ChatPayloads.Segments(payloads)) == "Text:Ann Doe|Text: uses |Text:Fire|Text:.", "not a combat line: text, as before");
             Check(ChatPayloads.Describe(payloads) == "PlayerPayload, TextPayload (7 characters), LinkEnd, TextPayload (6 characters), UIForegroundPayload, UIGlowPayload, TextPayload (4 characters), UIGlowPayload, UIForegroundPayload, TextPayload (1 characters)", "the developer's line unchanged: " + ChatPayloads.Describe(payloads));
         }),
         ("Chat actions 1720: a status's own colours, an icon inside, a colour never ended, no letter: no action", () =>
         {
             var status = new ChatPayload(ChatPayloadKind.Status, "Status", Link: new ChatLink(ChatSegmentKind.StatusLink, StatusId: 18));
-            var linked = ChatPayloads.Segments([Text("You gain "), status, On, Glow, Text(""), Glow, Off, Text(" "), On, Text("Protect"), Off, End, Text(".")], combat: true);
+            var linked = ChatPayloads.Segments([Text("You gain "), status, On, Glow, Text(""), Glow, Off, Text(" "), On, Text("Protect"), Off, End, Text(".")], NoAction);
             Check(!linked.Any(segment => segment.Kind == ChatSegmentKind.ActionName) && linked.Any(segment => segment.Kind == ChatSegmentKind.StatusLink), "inside a status link: its colours are not an action: " + Shape(linked));
-            var icon = ChatPayloads.Segments([Text("You use "), On, new ChatPayload(ChatPayloadKind.Icon, "IconPayload", Icon: 51), Text("Potion"), Off], combat: true);
+            var icon = ChatPayloads.Segments([Text("You use "), On, new ChatPayload(ChatPayloadKind.Icon, "IconPayload", Icon: 51), Text("Potion"), Off], NoAction);
             Check(!icon.Any(segment => segment.Kind == ChatSegmentKind.ActionName) && string.Concat(icon.Select(segment => segment.Text)).EndsWith("Potion", StringComparison.Ordinal), "an icon inside: text");
-            Check(!ChatPayloads.Segments([On, Text("Fire")], combat: true).Any(segment => segment.Kind == ChatSegmentKind.ActionName), "a colour never ended: text");
-            Check(!ChatPayloads.Segments([On, Text("12345"), Off], combat: true).Any(segment => segment.Kind == ChatSegmentKind.ActionName), "no letter (a number): text");
-            Check(ChatPayloads.ColouredName([On, Glow, Text(" Fire "), Glow, Off], 0) == ("Fire", 4), "the name trimmed, its end");
+            Check(!ChatPayloads.Segments([On, Text("Fire")], NoAction).Any(segment => segment.Kind == ChatSegmentKind.ActionName), "a colour never ended: text");
+            Check(!ChatPayloads.Segments([On, Text("12345"), Off], NoAction).Any(segment => segment.Kind == ChatSegmentKind.ActionName), "no letter (a number): text");
+            Check(ChatPayloads.LastPlainText([On, Glow, Text(" Fire "), Glow, Off]) == 2, "the last text outside a link (X-734: where a template puts an action)");
         }),
         ("Chat actions 1720: a tooltip only for a name that is one action for sure; a player's line among the player's actions", () =>
         {
@@ -67,7 +70,7 @@ internal static class ChatActions1720Tests
         {
             var reader = Read("Chat/ChatReader.Dalamud.cs");
             Check(reader.Contains("UIForegroundPayload colour=>new(ChatPayloadKind.Colour,payload.GetType().Name,Size:colour.ColorKey),", StringComparison.Ordinal)
-                && reader.Contains("var body=ChatPayloads.Segments(payloads,ChatChannels.From((int)message.LogKind)==ChatChannel.Combat);", StringComparison.Ordinal), "the reader");
+                && reader.Contains("var body=ChatPayloads.Segments(payloads,lineData is { } named && ChatChannels.From(logKind)==ChatChannel.Combat ? text=>named.ActionIn(logKind,text):null);", StringComparison.Ordinal), "the reader");
             var window = Read("MainWindow.ChatWindow.cs");
             Check(window.Contains("ChatSegmentKind.ActionName=>false,", StringComparison.Ordinal) && window.Contains("DrawChatActionTip(actionName.Action,ChatActionTips.ByPlayer(record.Source));", StringComparison.Ordinal)
                 && window.Contains("if(ChatPlayers?.Action(name,byPlayer) is not { } action)return;", StringComparison.Ordinal), "drawn as text, its tooltip, none when unsure");

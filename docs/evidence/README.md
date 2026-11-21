@@ -132,7 +132,8 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.171.0-cosmic-vendors-probe.log](0.171.0-cosmic-vendors-probe.log) | `tests/TenshoAssistant.Tests/MapProjectionTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.1711-gathering-node-icons.md](0.1711-gathering-node-icons.md) | `src/TenshoAssistant/Maps/GatheringNodeIcons.cs` | `docs/changelog/CHANGELOG-0.1700-0.1799.md` |
 | [0.1718-chat-link-click-probe.md](0.1718-chat-link-click-probe.md) | `src/TenshoAssistant/Chat/ChatLinkProbe.cs`, `src/TenshoAssistant/Chat/ChatLinkWatch.Dalamud.cs`, `tests/TenshoAssistant.Tests/ChatLinkProbe1718Tests.cs` | `docs/changelog/CHANGELOG-0.1700-0.1799.md` |
-| [0.1720-chat-action-names.md](0.1720-chat-action-names.md) | `src/TenshoAssistant/Chat/ChatActionTips.cs`, `src/TenshoAssistant/Chat/ChatPayloads.cs`, `tests/TenshoAssistant.Tests/ChatActions1720Tests.cs` | `docs/changelog/CHANGELOG-0.1700-0.1799.md` |
+| [0.1720-chat-action-names.md](0.1720-chat-action-names.md) | `tests/TenshoAssistant.Tests/ChatActions1720Tests.cs` | `docs/changelog/CHANGELOG-0.1700-0.1799.md` |
+| [0.1734-chat-action-lines.md](0.1734-chat-action-lines.md) | `src/TenshoAssistant/Chat/ChatActionLines.cs`, `src/TenshoAssistant/Chat/ChatActionTips.cs`, `src/TenshoAssistant/Chat/ChatPayloads.cs`, `tests/TenshoAssistant.Tests/ChatLines1734Tests.cs` | `CHANGELOG.md` |
 | [0.174.0-triad-seldeck-capture.log](0.174.0-triad-seldeck-capture.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.175.0-auxesia-maps-probe.log](0.175.0-auxesia-maps-probe.log) | `src/TenshoAssistant/Maps/MapCatalog.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.176.0-kaede-talk-probe.log](0.176.0-kaede-talk-probe.log) | `src/TenshoAssistant/Npcs/NpcVendorCatalog.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
@@ -197,7 +198,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.411-gathering-jobs.md](0.411-gathering-jobs.md) | `src/TenshoAssistant/Gear/Gearsets.cs`, `tests/TenshoAssistant.Tests/GatheringGearset411Tests.cs` | `docs/changelog/CHANGELOG-0.400-0.499.md` |
 | [0.417-spearfishing.md](0.417-spearfishing.md) | `src/TenshoAssistant/Gathering/Spearfishing.cs`, `tests/TenshoAssistant.Tests/SpearfishingTests.cs`, `tools/DiscoveryCheckProbe/Program.cs` | `docs/changelog/CHANGELOG-0.400-0.499.md` |
 | [0.418-ocean-voyage.md](0.418-ocean-voyage.md) | `src/TenshoAssistant/Gathering/OceanVoyage.cs`, `tests/TenshoAssistant.Tests/OceanVoyageTests.cs` | `docs/changelog/CHANGELOG-0.400-0.499.md` |
-| [0.420-craft-food.md](0.420-craft-food.md) | `src/TenshoAssistant/Craft/CraftConsumables.cs`, `tests/TenshoAssistant.Tests/CraftConsumables420Tests.cs` | `docs/changelog/CHANGELOG-0.400-0.499.md` |
+| [0.420-craft-food.md](0.420-craft-food.md) | `src/TenshoAssistant/Chat/ChatFoodTip.cs`, `src/TenshoAssistant/Craft/CraftConsumables.cs`, `tests/TenshoAssistant.Tests/CraftConsumables420Tests.cs` | `docs/changelog/CHANGELOG-0.400-0.499.md`, `docs/evidence/0.1734-chat-action-lines.md` |
 | [0.434-craft-actions.md](0.434-craft-actions.md) | `src/TenshoAssistant/Craft/CraftActionCatalog.cs`, `src/TenshoAssistant/Craft/CraftSimulation.cs`, `tests/TenshoAssistant.Tests/CraftActions434Tests.cs` | `docs/changelog/CHANGELOG-0.400-0.499.md` |
 | [0.440-hunt-bills.md](0.440-hunt-bills.md) | `src/TenshoAssistant/Reminders/HuntBills.cs`, `tests/TenshoAssistant.Tests/HuntTests.cs` | `docs/changelog/CHANGELOG-0.400-0.499.md` |
 | [0.441-hunt-marks.md](0.441-hunt-marks.md) | `src/TenshoAssistant/Maps/MapLiveReader.Dalamud.cs` | `docs/changelog/CHANGELOG-0.400-0.499.md` |
@@ -357,5 +358,5 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [x91-parsers-check.md](x91-parsers-check.md) | `src/TenshoAssistant/MainWindow.SRankConditions.cs`, `tests/TenshoAssistant.Tests/ParsersCheck971Tests.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md`, `docs/project/GLOBAL-PLAN-DONE.md` |
 | [x93-load-test.md](x93-load-test.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `tests/TenshoAssistant.Tests/Evidence1069Tests.cs`, `tests/TenshoAssistant.Tests/LoadTest1036Tests.cs`, `tools/DiscoveryLoadProbe/Program.cs`, `tools/README.md`, `tools/discoveries-load.py` | `docs/changelog/CHANGELOG-0.1300-0.1399.md`, `docs/evidence/x172-sqlite-trial.md` |
 
-Counted · compté : 345 files · fichiers ; 300 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
+Counted · compté : 346 files · fichiers ; 301 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
 <!-- /docgen:evidence -->

@@ -1931,7 +1931,8 @@ internal sealed partial class MainWindow
                     if(!chatLinesBlocked && run.Role==ChatRole.Sender && !options.CaptureNames && ChatChannels.Spoken(record.Channel))TipText(()=>ChatSenderTip(record));
                     if(!chatLinesBlocked && run.Link is { Kind:ChatSegmentKind.DalamudLink })TipText(localization.Get("ChatWindow.DalamudLinkGameTip"));
                     // X-473 (0.1715): a status the game linked: its icon, name and description, as the game's tooltip.
-                    if(!chatLinesBlocked && run.Link is { Kind:ChatSegmentKind.StatusLink } statusLink && ImGui.IsItemHovered())DrawChatStatusTip(statusLink.StatusId);
+                    // X-733 (0.1734): a meal's or a medicine's: the bonuses of what was eaten or drunk, as the game's status tooltip.
+                    if(!chatLinesBlocked && run.Link is { Kind:ChatSegmentKind.StatusLink } statusLink && ImGui.IsItemHovered())DrawChatStatusTip(statusLink.StatusId,statusLink.Param);
                     // X-473 (0.1720): an action a combat line names: its icon, name and description, as the game's tooltip; none when the name is
                     // not one action for sure (the line's subject: a player's action or any).
                     if(!chatLinesBlocked && run.Link is { Kind:ChatSegmentKind.ActionName } actionName && ImGui.IsItemHovered())DrawChatActionTip(actionName.Action,ChatActionTips.ByPlayer(record.Source));
@@ -2039,11 +2040,12 @@ internal sealed partial class MainWindow
     };
 
     /// <summary>X-473 (0.1715): a status's tooltip, as the game's: its icon, its name, its description (Status sheet); none for a status the
-    /// sheet does not name (never a false one). Display only: nothing counted nor kept (R03.1).</summary>
-    private void DrawChatStatusTip(uint id)
+    /// sheet does not name (never a false one). Display only: nothing counted nor kept (R03.1). X-733 (0.1734): a meal's or a medicine's,
+    /// once its Param was read on the one who gained it: the bonuses instead of the description, as the game's status tooltip.</summary>
+    private void DrawChatStatusTip(uint id,Chat.ChatStatusParam? param)
     {
         if(ChatPlayers?.Status(id) is not { } status)return;
-        DrawChatGameTip(status,new Vector2(24,32));
+        DrawChatGameTip(status,new Vector2(24,32),param is { Value:>0 } read ? ChatPlayers.FoodLines(id,read.Value):null);
     }
 
     /// <summary>X-473 (0.1720): an action's tooltip, as the game's: its icon, its name, its description (Action and ActionTransient sheets);
@@ -2054,14 +2056,21 @@ internal sealed partial class MainWindow
         DrawChatGameTip(action,new Vector2(32,32));
     }
 
-    /// <summary>X-473 (0.1715, 0.1720): a tooltip of the game's data: its icon (<paramref name="icon"/> at the interface's scale), name and description.</summary>
-    private void DrawChatGameTip(ChatStatusTip tip,Vector2 icon)
+    /// <summary>X-473 (0.1715, 0.1720): a tooltip of the game's data: its icon (<paramref name="icon"/> at the interface's scale), name and description.
+    /// X-733 (0.1734): <paramref name="lines"/>, when given, in place of the description (a meal's bonuses).</summary>
+    private void DrawChatGameTip(ChatStatusTip tip,Vector2 icon,IReadOnlyList<string>? lines=null)
     {
         using(TooltipScope.Begin())
         {
             DrawGameIcon(tip.Icon,icon*Dalamud.Interface.Utility.ImGuiHelpers.GlobalScale);
             ImGui.SameLine();
             ImGui.TextColored(Accent,tip.Name);
+            if(lines is { Count:>0 })
+            {
+                ImGui.Separator();
+                foreach(var line in lines)ImGui.TextColored(Text,line);
+                return;
+            }
             if(tip.Description.Length==0)return;
             ImGui.PushTextWrapPos(ImGui.GetFontSize()*28);
             try{ImGui.Separator();ImGui.TextColored(Muted,tip.Description);}

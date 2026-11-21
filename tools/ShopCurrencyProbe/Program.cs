@@ -5,6 +5,49 @@ using Lumina.Excel.Sheets;
 // Read-only evidence for NPC-VENDORS-014: how scrip exchanges encode currencies and how NPCs reach their shops.
 if(args.Length is <1 or >2)throw new ArgumentException("Supply installed sqpack directory and optionally an item name.");
 using var data=new GameData(args[0],new LuminaOptions{DefaultExcelLanguage=Language.French,CacheFileResources=false});
+// PROBE_CHATACTIONS (X-734, 0.1734): the plugin's own rules (Chat/ChatActionLines.cs, Chat/ChatActionTips.cs) on the client's sheets in the
+// language given (PROBE_CHATACTIONS=French, English, German or Japanese): each combat kind's ends after an action's name (LogMessage), then
+// the sample lines of PROBE_CHATLINES (« kind#text|kind#text »): the action found, its tooltip in a player's line and in another's, its rows.
+if(Environment.GetEnvironmentVariable("PROBE_CHATACTIONS") is { Length:>0 } chatLanguage)
+{
+    var language=Enum.Parse<Language>(chatLanguage);
+    var transient=data.Excel.GetSheet<ActionTransient>(language);
+    // As the plugin (Chat/ChatPlayerActions.Dalamud.cs): the general actions are the player's, with their sheet's description when
+    // ActionTransient has none; each row's class category.
+    var generalRows=data.Excel.GetSheet<GeneralAction>(language).Where(row=>row.Action.RowId!=0).GroupBy(row=>row.Action.RowId)
+        .ToDictionary(group=>group.Key,group=>group.First().Description.ExtractText().Trim());
+    var actionRows=data.Excel.GetSheet<Lumina.Excel.Sheets.Action>(language).Where(row=>!row.Name.IsEmpty)
+        .Select(row=>new TenshoAssistant.Chat.ChatActionRow(row.RowId,row.Name.ExtractText(),row.Icon,row.IsPlayerAction,row.IsPvP,
+            transient.GetRowOrDefault(row.RowId)?.Description.ExtractText().Trim() is { Length:>0 } described ? described:generalRows.GetValueOrDefault(row.RowId,""),
+            row.ClassJobCategory.RowId,generalRows.ContainsKey(row.RowId))).ToList();
+    var tips=TenshoAssistant.Chat.ChatActionTips.Build(actionRows);
+    var templates=data.Excel.GetSheet<LogMessage>(language).Where(row=>row.LogKind.RowId is (>=41 and <=49) or 58).Select(row=>((int)row.LogKind.RowId,row.Text.ToMacroString())).ToList();
+    var lines=new TenshoAssistant.Chat.ChatActionLines(templates,actionRows.Select(row=>row.Name),language!=Language.Japanese);
+    Console.WriteLine($"ACTIONS rows {actionRows.Count} names {lines.Names} player names {tips.Players.Count} all {tips.All.Count}; combat kinds with an end {lines.Kinds}");
+    foreach(var group in templates.Where(template=>TenshoAssistant.Chat.ChatActionLines.End(template.Item2) is not null).GroupBy(template=>template.Item1))
+        Console.WriteLine($"KIND {group.Key}: {group.Count()} templates, ends "+string.Join(" | ",group.Select(template=>"«"+TenshoAssistant.Chat.ChatActionLines.End(template.Item2)+"»").Distinct()));
+    if(Environment.GetEnvironmentVariable("PROBE_CHATAMBIGUOUS") is { Length:>0 })
+    {
+        var actionSheet=data.Excel.GetSheet<Lumina.Excel.Sheets.Action>(language);
+        var ambiguous=actionRows.Where(row=>row.Player && !row.PvP).GroupBy(row=>row.Name.Trim()).Where(group=>group.Select(row=>(row.Icon,row.Description)).Distinct().Count()>1).ToList();
+        Console.WriteLine($"PLAYER names {actionRows.Where(row=>row.Player && !row.PvP).Select(row=>row.Name.Trim()).Distinct().Count()}, ambiguous {ambiguous.Count}, "
+            +$"still without a tooltip in a player's line {ambiguous.Count(group=>!tips.Players.ContainsKey(group.Key))}: "+string.Join(", ",ambiguous.Where(group=>!tips.Players.ContainsKey(group.Key)).Take(20).Select(group=>"«"+group.Key+"»")));
+        foreach(var group in ambiguous.Take(25))
+            Console.WriteLine($"AMBIGUOUS «{group.Key}»: "+string.Join(", ",group.Select(row=>actionSheet.GetRow(row.Id) is var full ? $"{row.Id} icon {row.Icon} job {full.ClassJob.RowId} cat {full.ClassJobCategory.RowId} lvl {full.ClassJobLevel} desc {row.Description.Length}":"")));
+        var general=data.Excel.GetSheet<GeneralAction>(language).Where(row=>row.Action.RowId!=0).ToList();
+        Console.WriteLine($"GENERAL actions with an action: {general.Count}: "+string.Join(", ",general.Take(30).Select(row=>$"{row.RowId}→{row.Action.RowId} «{row.Name.ExtractText()}» icon {row.Icon} desc {row.Description.ExtractText().Length}")));
+    }
+    foreach(var sample in (Environment.GetEnvironmentVariable("PROBE_CHATLINES") ?? "").Split('|',StringSplitOptions.RemoveEmptyEntries))
+    {
+        var parts=sample.Split('#',2);var kind=int.Parse(parts[0]);var text=parts[1];
+        var found=lines.Find(kind,text);
+        var name=found is { } at ? text.Substring(at.Start,at.Length):"";
+        string Tip(bool byPlayer)=>TenshoAssistant.Chat.ChatActionTips.Find(tips,name,byPlayer) is { } tip ? $"icon {tip.Icon} «{tip.Description[..Math.Min(70,tip.Description.Length)]}»":"none";
+        Console.WriteLine(found is null ? $"LINE kind {kind} «{text}»: no action"
+            :$"LINE kind {kind} «{text}»: «{name}»; a player's line: {Tip(true)}; another's: {Tip(false)}; rows "+string.Join(", ",actionRows.Where(row=>row.Name.Trim()==name).Take(8).Select(row=>$"{row.Id} icon {row.Icon} player {row.Player} pvp {row.PvP}")));
+    }
+    return;
+}
 // PROBE_SRANK (X-76 P5, 0.931): the notorious monsters of every territory (TerritoryType.NotoriousMonsterTerritory -> NotoriousMonster: BNpcName,
 // Rank), to check Tensho's S rank table (Hunting/SRankConditions.cs) against the game; read-only.
 // X-462 (0.1464): territories drawn on several maps of the same frame (same territory, scale and offset) but with their own marker range: the

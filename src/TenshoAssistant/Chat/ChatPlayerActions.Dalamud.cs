@@ -22,17 +22,20 @@ namespace TenshoAssistant.Chat;
 /// menu of a character in range (AgentHUD.OpenContextMenuFromTarget: friend request, blacklist… as the game offers them). A failure turns the
 /// entries off until the plugin reloads, said once.
 /// </summary>
-internal sealed unsafe class ChatPlayerActions : IDisposable
+internal sealed unsafe class ChatPlayerActions : IDisposable,IChatLineData
 {
     private readonly IFramework framework;private readonly IClientState client;private readonly IObjectTable objects;private readonly ITargetManager targets;
     private readonly IPartyList party;private readonly IDataManager data;private readonly IPluginLog log;private readonly ChatSources sources;
     private readonly IGameConfig? config;
+    // X-733 (0.1734): the game's words of a meal's bonuses (Addon 1016 and 1017), evaluated as the game does (null: none, as outside the game).
+    private readonly ISeStringEvaluator? strings;
+    private bool disposed;
     private Hook<RaptureLogModule.Delegates.AddMsgSourceEntry>? hook;
     private bool failed;
 
-    public ChatPlayerActions(IGameInteropProvider interop,IFramework framework,IClientState client,IObjectTable objects,ITargetManager targets,IPartyList party,IDataManager data,IPluginLog log,ChatSources sources,IGameConfig? config=null)
+    public ChatPlayerActions(IGameInteropProvider interop,IFramework framework,IClientState client,IObjectTable objects,ITargetManager targets,IPartyList party,IDataManager data,IPluginLog log,ChatSources sources,IGameConfig? config=null,ISeStringEvaluator? strings=null)
     {
-        this.framework=framework;this.client=client;this.objects=objects;this.targets=targets;this.party=party;this.data=data;this.log=log;this.sources=sources;this.config=config;
+        this.framework=framework;this.client=client;this.objects=objects;this.targets=targets;this.party=party;this.data=data;this.log=log;this.sources=sources;this.config=config;this.strings=strings;
         client.Logout+=OnLogout;
         // X-690 (0.1666): each job's role, read once from the ClassJob sheet; the jobs the game shows, once a second.
         try{sources.Jobs.SetRoles(data.GetExcelSheet<Lumina.Excel.Sheets.ClassJob>().Select(row=>(row.RowId,row.Role)));}
@@ -151,33 +154,125 @@ internal sealed unsafe class ChatPlayerActions : IDisposable
         return tip;
     }
 
-    // X-473 (0.1720): the actions by name (Action and ActionTransient sheets, the client's language), made once on a thread of their own at the
-    // first hover: no tooltip until they are ready, none at all if they could not be read.
-    private Task<(Dictionary<string,ChatStatusTip> Players,Dictionary<string,ChatStatusTip> All)>? actionTips;
+    // X-473 (0.1720): the actions by name (Action and ActionTransient sheets, the client's language), made once on a thread of their own: no
+    // tooltip until they are ready, none at all if they could not be read. X-734 (0.1734): with the combat lines' templates (LogMessage) that
+    // say where a line names one (ChatActionLines), made at the first message the chat window copies (Prepare), before any combat line.
+    private Task<ChatActionData>? actionTips;
+    private sealed record ChatActionData((Dictionary<string,ChatStatusTip> Players,Dictionary<string,ChatStatusTip> All) Tips,ChatActionLines? Lines);
     /// <summary>X-473 (0.1720): an action a combat line names, as the game's tooltip shows it; null when the name is not one action for sure
     /// (ChatActionTips) or the actions are not read yet.</summary>
     public ChatStatusTip? Action(string name,bool byPlayer)
     {
         actionTips??=Task.Run(ActionTips);
-        return actionTips.IsCompletedSuccessfully ? ChatActionTips.Find(actionTips.Result,name,byPlayer):null;
+        return actionTips.IsCompletedSuccessfully ? ChatActionTips.Find(actionTips.Result.Tips,name,byPlayer):null;
     }
 
-    private (Dictionary<string,ChatStatusTip>,Dictionary<string,ChatStatusTip>) ActionTips()
+    /// <summary>X-734 (0.1734): starts reading the actions' names and the lines' templates, once.</summary>
+    public void Prepare()=>actionTips??=Task.Run(ActionTips);
+
+    /// <summary>X-734 (0.1734): where the last text of a combat line of <paramref name="kind"/> names an action; null when none, or not read yet.</summary>
+    public (int Start,int Length)? ActionIn(int kind,string text)
+        =>actionTips is { IsCompletedSuccessfully:true } ready && ready.Result.Lines is { } lines ? lines.Find(kind,text):null;
+
+    private ChatActionData ActionTips()
     {
         try
         {
             var transient=data.GetExcelSheet<Lumina.Excel.Sheets.ActionTransient>();
+            // X-734 (0.1734): the general actions (Sprint, Teleport, Return…) are the player's, with the GeneralAction sheet's description
+            // when ActionTransient has none (Teleport: none there, 98 characters here, read on 21/11).
+            var general=data.GetExcelSheet<Lumina.Excel.Sheets.GeneralAction>().Where(row=>row.Action.RowId!=0).GroupBy(row=>row.Action.RowId)
+                .ToDictionary(group=>group.Key,group=>group.First().Description.ExtractText().Trim());
             var rows=data.GetExcelSheet<Lumina.Excel.Sheets.Action>().Where(row=>!row.Name.IsEmpty)
-                .Select(row=>new ChatActionRow(row.RowId,row.Name.ExtractText(),row.Icon,row.IsPlayerAction,row.IsPvP,transient.GetRowOrDefault(row.RowId)?.Description.ExtractText().Trim() ?? "")).ToList();
+                .Select(row=>new ChatActionRow(row.RowId,row.Name.ExtractText(),row.Icon,row.IsPlayerAction,row.IsPvP,
+                    transient.GetRowOrDefault(row.RowId)?.Description.ExtractText().Trim() is { Length:>0 } described ? described:general.GetValueOrDefault(row.RowId,""),
+                    row.ClassJobCategory.RowId,general.ContainsKey(row.RowId))).ToList();
             var tips=ChatActionTips.Build(rows);
-            log.Information("Chat window, the actions' names read for their tooltips: {0} rows, {1} names of the player's actions, {2} names in all.",rows.Count,tips.Players.Count,tips.All.Count);
-            return tips;
+            var lines=Lines(rows);
+            log.Information("Chat window, the actions' names read for their tooltips: {0} rows, {1} names of the player's actions, {2} names in all; {3} combat kinds whose lines can end with an action's name.",
+                rows.Count,tips.Players.Count,tips.All.Count,lines?.Kinds ?? 0);
+            return new(tips,lines);
         }
         catch(Exception error)
         {
             log.Warning(error,"Chat window, the actions could not be read (maybe after a game update): no action tooltip.");
-            return (new Dictionary<string,ChatStatusTip>(),new Dictionary<string,ChatStatusTip>());
+            return new((new Dictionary<string,ChatStatusTip>(),new Dictionary<string,ChatStatusTip>()),null);
         }
+    }
+
+    /// <summary>X-734 (0.1734): the combat lines' templates (LogMessage, the client's language) and the actions' names; null when unreadable
+    /// (no action is then found in a line).</summary>
+    private ChatActionLines? Lines(IEnumerable<ChatActionRow> rows)
+    {
+        try
+        {
+            var templates=data.GetExcelSheet<Lumina.Excel.Sheets.LogMessage>().Where(row=>ChatChannels.From((int)row.LogKind.RowId)==ChatChannel.Combat)
+                .Select(row=>((int)row.LogKind.RowId,row.Text.ToMacroString())).ToList();
+            return new ChatActionLines(templates,rows.Select(row=>row.Name),data.Language!=Dalamud.Game.ClientLanguage.Japanese);
+        }
+        catch(Exception error)
+        {
+            log.Warning(error,"Chat window, the combat lines' templates could not be read (maybe after a game update): no action named in a line.");
+            return null;
+        }
+    }
+
+    // X-733 (0.1734): a meal's or a medicine's status looked for on the one who gained it, at its line and in the frames after (the game may
+    // print the line first); each outcome said once in the log. A failure turns it off until the plugin reloads.
+    private const int StatusFrames=10;
+    private readonly HashSet<string> statusSaid=[];
+    private bool statusFailed;
+    /// <summary>X-733 (0.1734): reads into <paramref name="param"/> the Param of <paramref name="status"/> on the player named (name and home
+    /// world), or on you (<paramref name="name"/> null): now, or in the next frames (on the game's thread).</summary>
+    public void StatusParam(ChatStatusParam param,uint status,string? name,ushort world)=>ReadStatus(param,status,name,world,0);
+
+    private void ReadStatus(ChatStatusParam param,uint status,string? name,ushort world,int frame)
+    {
+        if(disposed || statusFailed || TenshoAssistant.Competitive.CompetitiveGate.Cut || !client.IsLoggedIn)return;
+        try
+        {
+            var character=name is null ? objects.LocalPlayer:objects.OfType<IPlayerCharacter>().FirstOrDefault(found=>found.Name.TextValue==name && found.HomeWorld.RowId==world);
+            ushort value=0;
+            if(character is not null)
+                foreach(var held in character.StatusList)
+                    if(held.StatusId==status && held.Param!=0){value=held.Param;break;}
+            if(value!=0){param.Value=value;StatusSaid(frame==0 ? "at once":"after some frames");return;}
+            if(character is null || frame>=StatusFrames){StatusSaid(character is null ? "the one who gained it is not in range":"not found");return;}
+            framework.RunOnTick(()=>ReadStatus(param,status,name,world,frame+1),delayTicks:1);
+        }
+        catch(Exception error)
+        {
+            statusFailed=true;
+            log.Warning(error,"Chat window, a meal's status could not be read (maybe after a game update): its tooltip shows the status's description only, until the plugin reloads.");
+        }
+    }
+
+    private void StatusSaid(string how)
+    {
+        if(statusSaid.Add(how))log.Information("Chat window, a meal's or a medicine's status read for its line's tooltip: {0}.",how);
+    }
+
+    // X-733 (0.1734): the lines of a meal's or a medicine's tooltip, made once per status and Param (ItemFood and BaseParam sheets, Addon 1016
+    // and 1017, the client's language, evaluated by Dalamud as the game does); null when they cannot be made (the description then).
+    private readonly Dictionary<(uint,ushort),IReadOnlyList<string>?> foods=[];
+    /// <summary>X-733 (0.1734): what the game's tooltip of a meal's or a medicine's status shows for this Param; null when not known.</summary>
+    public IReadOnlyList<string>? FoodLines(uint status,ushort param)
+    {
+        if(param==0 || strings is null || !ChatFoodTip.Holds(status))return null;
+        if(foods.TryGetValue((status,param),out var known))return known;
+        IReadOnlyList<string>? lines=null;
+        try
+        {
+            var (row,hq)=ChatFoodTip.Row(param);
+            if(data.GetExcelSheet<Lumina.Excel.Sheets.ItemFood>().GetRowOrDefault(row) is { } food)
+                lines=ChatFoodTip.Lines(status,hq,food.EXPBonusPercent,
+                    food.Params.Where(bonus=>bonus.BaseParam.RowId!=0).Select(bonus=>new ChatFoodBonus(bonus.BaseParam.ValueNullable?.Name.ExtractText() ?? "",bonus.IsRelative,bonus.Value,bonus.Max,bonus.ValueHQ,bonus.MaxHQ)).ToList(),
+                    exp=>strings.EvaluateFromAddon(1017,[new((uint)exp)]).ExtractText(),
+                    (relative,value,max)=>strings.EvaluateFromAddon(1016,[new(relative ? 1u:0u),new((uint)value),new((uint)max)]).ExtractText()) is { Count:>0 } made ? made:null;
+        }
+        catch(Exception error){log.Warning(error,"Chat window, a meal's bonuses could not be read (maybe after a game update): its tooltip shows the status's description.");}
+        if(foods.Count<200)foods[(status,param)]=lines;
+        return lines;
     }
 
     /// <summary>The character of that player in range (name and home world), or null.</summary>
@@ -309,5 +404,5 @@ internal sealed unsafe class ChatPlayerActions : IDisposable
         return found;
     }
 
-    public void Dispose(){TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnJobsTick);client.Logout-=OnLogout;hook?.Dispose();hook=null;sources.Clear();}
+    public void Dispose(){disposed=true;TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnJobsTick);client.Logout-=OnLogout;hook?.Dispose();hook=null;sources.Clear();}
 }
