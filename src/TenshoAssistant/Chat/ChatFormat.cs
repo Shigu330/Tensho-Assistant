@@ -103,11 +103,34 @@ public static class ChatFormat
     }
 
     /// <summary>X-670 M3 (review of 0.1638): a message's sender as the window writes it: cleaned, and in capture mode a player's stand-in (a
-    /// character of the story keeps its name). The lines and the search both take it, so the search finds what is shown.</summary>
+    /// character of the story keeps its name). The lines and the search both take it, so the search finds what is shown. X-722 (0.1724): the
+    /// game's number and job abbreviation stay before the stand-in (only the name is replaced).</summary>
     public static string ShownSender(ChatRecord record,bool capture)
     {
-        var sender=Clean(record.Sender).Trim();
-        return capture && sender.Length>0 && record.Channel is not ChatChannel.Npc ? StandIn(sender):sender;
+        var (number,job,name)=SenderParts(record.Sender);
+        var shown=capture && name.Length>0 && record.Channel is not ChatChannel.Npc ? StandIn(name):name;
+        var before=number+job;
+        return before.Length>0 && shown.Length>0 ? before+" "+shown:before+shown;
+    }
+
+    /// <summary>
+    /// X-722 (0.1724, the user's request of 21/11): a sender as the game writes it before a party or alliance member's name (the chat history's
+    /// sender texts of 21/11: the game's number glyph, then the job's abbreviation and a space, then the name): its number (the glyph made
+    /// readable, « 1 »), the abbreviation (two to four capitals between the number and a space; else none: a name is never cut) and the name,
+    /// each cleaned. Without the game's glyph first: the whole sender is the name.
+    /// </summary>
+    public static (string Number,string Job,string Name) SenderParts(string? sender)
+    {
+        var raw=(sender ?? "").Trim();
+        var at=0;
+        while(at<raw.Length && ChatGlyphs.IsGlyph(raw[at]))at++;
+        if(at==0)return ("","",Clean(raw).Trim());
+        var number=Clean(raw[..at]).Trim();
+        var rest=raw[at..];
+        var space=rest.IndexOf(' ');
+        if(space is >= 2 and <= 4 && rest[..space].All(letter=>char.IsLetter(letter) && char.IsUpper(letter)) && Clean(rest[(space+1)..]).Trim() is { Length:>0 } name)
+            return (number,rest[..space],name);
+        return (number,"",Clean(rest).Trim());
     }
 
     /// <summary>X-482 M1 (0.1472): the part of the layout key that says which lists of names are loaded.</summary>
@@ -154,6 +177,15 @@ public static class ChatFormat
         if(record.Kind==28 && sender.Length>0)runs.Add(new($"{sender} ",ChatRole.Sender));
         else if(sender.Length>0 && (spoken || record.Channel is ChatChannel.Npc))
         {
+            // X-722 (0.1724): on a spoken line, the game's number in its own brackets, then the job's abbreviation in others (the job's icon,
+            // ChatFormat.WithJobIcon, goes just inside them: before the first sender run), then the name; capture mode: only the name replaced.
+            var (number,job,name)=spoken ? SenderParts(record.Sender):("","",sender);
+            if(number.Length+job.Length>0)
+            {
+                sender=settings.CaptureNames && name.Length>0 ? StandIn(name):name;
+                if(job.Length>0){runs.Add(new(number.Length>0 ? $"[{number}] [":"[",ChatRole.Channel));runs.Add(new($"{job}] ",ChatRole.Sender));}
+                else runs.Add(new($"[{number}] ",ChatRole.Channel));
+            }
             // X-447 B5 (0.1621): a player's name in brackets when chosen (a character of the game's story keeps its name as it is).
             var named=spoken ? Sender(sender,settings):sender;
             runs.Add(new(record.Channel switch{ChatChannel.TellOut=>$">> {named}: ",ChatChannel.TellIn=>$"{named} >> ",_=>$"{named}: "},ChatRole.Sender));

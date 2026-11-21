@@ -35,6 +35,8 @@ internal sealed class ChatReader : IDisposable
     private int bareSaid;
     // X-525 M3 (0.1503): developer mode: the icon codes met in senders' names, once per code, at most twenty per session (codes only).
     private readonly ChatPieceLog senderIconsSaid=new(1,20);
+    // X-722 (0.1724): the pieces of a sender's name, once per kind (developer mode).
+    private readonly ChatPieceLog senderPiecesSaid=new(1,20);
     private const int BareSaidMax=10;
     // X-473 (0.1715): developer mode: the pieces of a combat line without a link, one per kind, thirty at most per session (kinds and lengths
     // only, never the words): how the game sends an action's name, to tell it surely before any tooltip (R06).
@@ -111,7 +113,13 @@ internal sealed class ChatReader : IDisposable
             // X-484 (0.1482): who does it and to whom (Dalamud 15: IChatMessage.SourceKind and TargetKind), for the game's log filters.
             // X-554 (0.1521): what you say yourself marked as yours (ChatAlert.Source): it never alerts nor counts as unread.
             var source=ChatAlert.Source(ChatChannels.From((int)message.LogKind),(byte)message.SourceKind,sender,ownName?.Invoke());
-            var record=store.Add(ChatFormat.When(message.Timestamp,DateTimeOffset.UtcNow),(int)message.LogKind,sender,body,current.BoundedMaxLines,source,(byte)message.TargetKind);
+            // X-722 (0.1724, the probe): the pieces of a sender's name (icons, the game's glyphs, capitals, the player's link; never a name).
+            if(developer?.Invoke()==true && senderPiecesSaid.Take((int)message.LogKind))
+                log.Information("Chat window, pieces of a sender's name (kind {0}): {1}.",(int)message.LogKind,ChatPayloads.DescribeSender(message.Sender.Payloads.Select(Payload)));
+            // X-723 (0.1724): the sender's job the game shows now, kept with the line (its colour and icon stay after the party).
+            var sentBy=message.Sender.Payloads.OfType<PlayerPayload>().FirstOrDefault();
+            var job=sources is not null && sentBy is not null ? sources.Jobs.Find(sentBy.PlayerName,(ushort)sentBy.World.RowId):0u;
+            var record=store.Add(ChatFormat.When(message.Timestamp,DateTimeOffset.UtcNow),(int)message.LogKind,sender,body,current.BoundedMaxLines,source,(byte)message.TargetKind,job);
             // X-475: kept on disk too when the player turned the history on.
             history?.Keep(record);
             // X-447 B7 (0.1646): your name for the tabs' alerts.

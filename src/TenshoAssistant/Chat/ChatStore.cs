@@ -17,7 +17,9 @@ public sealed record ChatSegment(string Text,ChatSegmentKind Kind=ChatSegmentKin
 /// <summary>A copy of one chat message, in plain managed data; nothing of the game's memory is kept.</summary>
 /// <param name="Source">X-484 (0.1482): who does it, Dalamud's XivChatRelationKind (0 none), and <paramref name="Target"/> to whom: the
 /// game's log filters tell the combat lines apart by them.</param>
-public sealed record ChatRecord(long Id,DateTimeOffset Time,int Kind,ChatChannel Channel,string Sender,IReadOnlyList<ChatSegment> Body,byte Source=0,byte Target=0);
+/// <param name="Job">X-723 (0.1724): the sender's job the game showed when the line arrived (ClassJob row; 0: not known), kept with the line
+/// (in the chat history too when it is on): its role colour and job icon stay after the party, and after a reload.</param>
+public sealed record ChatRecord(long Id,DateTimeOffset Time,int Kind,ChatChannel Channel,string Sender,IReadOnlyList<ChatSegment> Body,byte Source=0,byte Target=0,uint Job=0);
 
 /// <summary>
 /// X-403 phase 1 (D-166; back from 0.471): the messages of this session, in memory only (other players' names and words are in them: never written
@@ -52,11 +54,11 @@ public sealed class ChatStore
 
     public static int Bounded(int cap)=>Math.Clamp(cap,MinimumLines,MaximumLines);
 
-    public ChatRecord Add(DateTimeOffset time,int kind,string sender,IReadOnlyList<ChatSegment> body,int cap,byte source=0,byte target=0)
+    public ChatRecord Add(DateTimeOffset time,int kind,string sender,IReadOnlyList<ChatSegment> body,int cap,byte source=0,byte target=0,uint job=0)
     {
         lock(gate)
         {
-            var record=new ChatRecord(nextId++,time,kind,ChatChannels.From(kind),sender,body,source,target);
+            var record=new ChatRecord(nextId++,time,kind,ChatChannels.From(kind),sender,body,source,target,job);
             records.Add(record);
             if(record.Channel==ChatChannel.Combat)combat++;
             var limit=Bounded(cap);

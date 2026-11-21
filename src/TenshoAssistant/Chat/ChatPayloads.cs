@@ -71,6 +71,26 @@ public static class ChatPayloads
     public static string Text(IEnumerable<ChatPayload> payloads)
         =>string.Concat(payloads.Select(payload=>payload.Kind switch{ChatPayloadKind.Text=>payload.Text ?? "",ChatPayloadKind.Icon=>ChatGlyphs.SenderIcon(payload.Icon),_=>""}));
 
+    /// <summary>X-722 (0.1724, the probe): a sender's pieces for the developer's log, never a name: icons by number, the game's glyphs by code,
+    /// a word of two to four capitals as it is (a job's abbreviation), any other word by its length, a player's link said as such.</summary>
+    public static string DescribeSender(IEnumerable<ChatPayload> payloads)
+        =>string.Join(" | ",payloads.Select(payload=>payload.Kind switch
+        {
+            ChatPayloadKind.Icon=>"icon "+payload.Icon.ToString(System.Globalization.CultureInfo.InvariantCulture),
+            ChatPayloadKind.Text=>(payload.Name=="PlayerPayload" ? "player link: ":"text: ")+Masked(payload.Text),
+            _=>payload.Name,
+        }));
+
+    private static string Masked(string? text)=>string.Join(" ",(text ?? "").Split(' ').Select(word=>
+    {
+        var glyphs=0;
+        while(glyphs<word.Length && ChatGlyphs.IsGlyph(word[glyphs]))glyphs++;
+        var codes=string.Concat(word[..glyphs].Select(letter=>string.Create(System.Globalization.CultureInfo.InvariantCulture,$"U+{(int)letter:X4}")));
+        var rest=word[glyphs..];
+        var said=rest.Length==0 ? "":rest.Length is >= 2 and <= 4 && rest.All(char.IsUpper) ? "'"+rest+"'":string.Create(System.Globalization.CultureInfo.InvariantCulture,$"({rest.Length} letters)");
+        return codes+said;
+    }));
+
     /// <summary>X-525 M3 (0.1503): the icon codes in a sender's name, in order (codes only, never a letter of the name), with what the
     /// window does with each: « 88 kept », « 128 left out » (ChatGlyphs.IsSenderDecoration). Empty when the name has no icon.</summary>
     public static IReadOnlyList<string> SenderIcons(IEnumerable<ChatPayload> payloads)

@@ -41,6 +41,8 @@ public static class ChatHistory
     public const long MaximumReadBytes=64L*1024*1024;
     // A hand-edited line is bounded too.
     private const int MaximumText=4096,MaximumPieces=256,MaximumSender=256;
+    /// <summary>X-723 (0.1724): a job read back above this is no ClassJob row (the sheet has about 45): not kept.</summary>
+    private const uint MaximumJob=255;
 
     public static int BoundedMessages(int messages)=>Math.Clamp(messages,MinimumMessages,MaximumMessages);
     public static int BoundedDays(int days)=>Math.Clamp(days,MinimumDays,MaximumDays);
@@ -69,6 +71,8 @@ public static class ChatHistory
         [JsonPropertyName("sender")] public string? Sender{get;set;}
         [JsonPropertyName("source")] public byte Source{get;set;}
         [JsonPropertyName("target")] public byte Target{get;set;}
+        // X-723 (0.1724): the sender's job when the line arrived (0, not written: not known).
+        [JsonPropertyName("job")] public uint Job{get;set;}
         [JsonPropertyName("body")] public List<PieceLine>? Body{get;set;}
     }
 
@@ -109,7 +113,7 @@ public static class ChatHistory
     /// <summary>One message as one line (no line break).</summary>
     public static string Encode(ChatRecord record)=>JsonSerializer.Serialize(new MessageLine
     {
-        Time=record.Time.ToUnixTimeMilliseconds(),Kind=record.Kind,Sender=Empty(record.Sender),Source=record.Source,Target=record.Target,
+        Time=record.Time.ToUnixTimeMilliseconds(),Kind=record.Kind,Sender=Empty(record.Sender),Source=record.Source,Target=record.Target,Job=record.Job,
         // X-514: a link of Dalamud or of a plugin is kept as its text (its command is valid in this session only). X-473 (0.1715): a status
         // link too (its row is not in the format; its name stays).
         // X-473 (0.1720): an action's name too (it is no link of the game).
@@ -140,7 +144,7 @@ public static class ChatHistory
                 var link=piece?.Link is { } stored ? Link(stored):null;
                 pieces.Add(link is null ? new ChatSegment(text):new ChatSegment(text,link.Kind,link));
             }
-            return new ChatRecord(id,time,read.Kind,ChatChannels.From(read.Kind),Cut(read.Sender,MaximumSender),pieces,read.Source,read.Target);
+            return new ChatRecord(id,time,read.Kind,ChatChannels.From(read.Kind),Cut(read.Sender,MaximumSender),pieces,read.Source,read.Target,read.Job is >0 and <=MaximumJob ? read.Job:0);
         }
         catch(Exception error) when(error is JsonException or ArgumentOutOfRangeException or NotSupportedException or InvalidOperationException)
         {

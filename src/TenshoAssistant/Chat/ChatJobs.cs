@@ -68,6 +68,10 @@ public sealed class ChatJobs
     public int Count{get{lock(gate)return seen.Count;}}
     public void Clear(){lock(gate)seen=[];}
 
+    /// <summary>X-723 (0.1724, the user's report of 21/11): a line's sender's job: the one kept with the line when it arrived (ChatRecord.Job, in
+    /// the chat history too: a reload keeps it), else the one kept with its sender in memory (ChatSources); 0: not known (never guessed).</summary>
+    public static uint JobOf(ChatRecord record,ChatSource? source)=>record.Job!=0 ? record.Job:source?.Job ?? 0;
+
     /// <summary>The job icon before a sender's name: the setting on, a spoken channel, the job known; 0 otherwise.</summary>
     public static uint IconFor(ChatSettings settings,ChatChannel channel,uint job)=>settings.JobIcons && ChatChannels.Spoken(channel) ? Icon(job):0;
 

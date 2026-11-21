@@ -1853,11 +1853,12 @@ internal sealed partial class MainWindow
             text=>ImGui.CalcTextSize(text).X,ChatLook.Indent(ImGui.GetFontSize(),options.WrapIndent),ChatLook.IconWidth(ImGui.GetTextLineHeight())));
 
     /// <summary>X-690 (0.1666): the job icon of a message's sender, the job the game showed when it arrived (0: not known, or the setting off).</summary>
-    private uint ChatJobIcon(ChatRecord record,ChatSettings options)=>ChatSenders is { } senders ? Chat.ChatJobs.IconFor(options,record.Channel,senders.For(record.Id)?.Job ?? 0):0;
+    /// X-723 (0.1724): the job kept with the line first (it stays after the party and after a reload), else the sender's kept in memory.
+    private uint ChatJobIcon(ChatRecord record,ChatSettings options)=>Chat.ChatJobs.IconFor(options,record.Channel,Chat.ChatJobs.JobOf(record,ChatSenders?.For(record.Id)));
 
     /// <summary>X-690 (0.1666): the colour of a message's sender by role (red, green and blue), null when not known or the setting off.</summary>
     private (float R,float G,float B)? ChatRoleColour(ChatRecord record,ChatSettings options)
-        =>ChatSenders is { } senders && senders.Jobs.ColourFor(options,record.Channel,senders.For(record.Id)?.Job ?? 0) is { } argb ? Chat.ChatJobs.Rgb(argb):null;
+        =>ChatSenders is { } senders && senders.Jobs.ColourFor(options,record.Channel,Chat.ChatJobs.JobOf(record,senders.For(record.Id))) is { } argb ? Chat.ChatJobs.Rgb(argb):null;
 
     /// <summary>X-447 B14 (0.1641): the icon of an item link's item, from Tensho's item list (0: not loaded, or not an item).</summary>
     private uint ChatLinkIcon(ChatLink link)=>link.Kind==ChatSegmentKind.ItemLink ? itemCatalog.State.Catalog?.Find(link.ItemId)?.IconId ?? 0:0;

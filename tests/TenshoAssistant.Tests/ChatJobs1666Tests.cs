@@ -80,7 +80,7 @@ internal static class ChatJobs1666Tests
             var sources=Read("src/TenshoAssistant/Chat/ChatSources.cs");
             Check(sources.Contains("sources[id]=new(name,world,Job:Jobs.Find(name,world));"),"taken at arrival");
             var store=Read("src/TenshoAssistant/Chat/ChatStore.cs")+Read("src/TenshoAssistant/Chat/ChatHistory.cs");
-            Check(!store.Contains("Job"),"never in the chat history on disk");
+            Check(!store.Contains("ContentId") && !store.Contains("AccountId") && store.Contains("[JsonPropertyName(\"job\")] public uint Job{get;set;}"),"X-723 (0.1724): on disk only the line's job, with the line, never the player's identifiers");
             var window=Read("src/TenshoAssistant/MainWindow.ChatWindow.cs");
             Check(window.Contains("if(run.Role==ChatRole.JobIcon)") && window.Contains("ChatFormat.WithJobIcon(ChatFormat.Runs(view.RecordAt(index)") && window.Contains("if(ChatRoleColour(record,options) is var (red,green,blue))"),"drawn and coloured");
         }),
