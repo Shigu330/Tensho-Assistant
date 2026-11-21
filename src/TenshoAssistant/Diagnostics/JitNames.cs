@@ -21,6 +21,9 @@ public sealed class JitNames : EventListener
     public const int Cap=200;
     private readonly object gate=new();
     private readonly List<(long Thread,string Name)> seen=[];
+    // X-703 (0.1684): the threads heard at least once, and the events left out past the cap, for Hears and State.
+    private readonly HashSet<long> threads=[];
+    private int dropped;
     private readonly string startMark="TenshoJitStart"+Guid.NewGuid().ToString("N"),stopMark="TenshoJitStop"+Guid.NewGuid().ToString("N");
 
     protected override void OnEventSourceCreated(EventSource source)
@@ -32,7 +35,11 @@ public sealed class JitNames : EventListener
     {
         if(data.EventId!=JittingStarted && data.EventName?.StartsWith("MethodJittingStarted",StringComparison.Ordinal)!=true)return;
         var method=Text(data,"MethodNamespace")+"::"+Text(data,"MethodName");
-        lock(gate){if(seen.Count<20_000)seen.Add((data.OSThreadId,method));}
+        lock(gate)
+        {
+            threads.Add(data.OSThreadId);
+            if(seen.Count<20_000)seen.Add((data.OSThreadId,method));else dropped++;
+        }
     }
 
     private static string Text(EventWrittenEventArgs data,string field)
@@ -53,6 +60,25 @@ public sealed class JitNames : EventListener
         il.Emit(OpCodes.Ldc_I4_1);
         il.Emit(OpCodes.Ret);
         ((Func<int>)method.CreateDelegate(typeof(Func<int>)))();
+    }
+
+    /// <summary>X-703 (0.1684): a compilation on <paramref name="thread"/> was heard: the listener hears that thread (its window can open).</summary>
+    public bool Hears(long thread)
+    {
+        lock(gate)return threads.Contains(thread);
+    }
+
+    /// <summary>X-703 (0.1684): what was heard, for a log or a failed test: the marks of <paramref name="thread"/>, its events, all events, those left out.</summary>
+    public string State(long thread)
+    {
+        lock(gate)
+        {
+            var mine=seen.Count(entry=>entry.Thread==thread);
+            var start=seen.Any(entry=>entry.Thread==thread && entry.Name.EndsWith("::"+startMark,StringComparison.Ordinal));
+            var stop=seen.Any(entry=>entry.Thread==thread && entry.Name.EndsWith("::"+stopMark,StringComparison.Ordinal));
+            return string.Create(System.Globalization.CultureInfo.InvariantCulture,
+                $"start mark {(start ? "heard":"not heard")}, stop mark {(stop ? "heard":"not heard")}, {mine} compilation(s) heard on the thread, {seen.Count} in all, {dropped} past the cap");
+        }
     }
 
     /// <summary>Both marks of <paramref name="thread"/> (the system's thread id) were heard: <see cref="Names"/> is whole.</summary>
