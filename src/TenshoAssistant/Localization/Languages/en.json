@@ -4469,6 +4469,8 @@
     "ByRaphaelKept": "Solver: Raphael (sequence already computed, nothing recalculated)",
     "ManipulationTip": "Whether the calculation may use Manipulation. It is turned on when the game says the job has learned it. If that is wrong, change it here: it holds for this job until the plugin is reloaded.",
     "ManipulationDetected": "detected: {0}",
+    "ActionTipDetail": "Level {0} · {1} CP",
+    "ActionTipDurability": " · {0} durability",
     "TargetTip": "Quality to reach, kept for this recipe. It counts once you leave the field. The search stops aiming higher, and a saved sequence reaching it is enough.",
     "TargetMaximum": "Maximum",
     "SaveBest": "Save as best sequence",

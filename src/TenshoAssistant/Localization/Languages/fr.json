@@ -4469,6 +4469,8 @@
     "ByRaphaelKept": "Solveur : Raphael (séquence déjà calculée, rien n'a été recalculé)",
     "ManipulationTip": "Indique si le calcul peut utiliser Manipulation. La case est cochée quand le jeu dit que le job l'a apprise. Si c'est faux, changez-la ici : le choix vaut pour ce job jusqu'au rechargement du plugin.",
     "ManipulationDetected": "détectée : {0}",
+    "ActionTipDetail": "Niveau {0} · {1} PS",
+    "ActionTipDurability": " · {0} de solidité",
     "TargetTip": "Qualité à atteindre, gardée pour cette recette. Elle compte quand vous quittez le champ. La recherche ne vise pas plus haut, et une séquence enregistrée qui l'atteint suffit.",
     "TargetMaximum": "Maximum",
     "SaveBest": "Enregistrer comme meilleure séquence",

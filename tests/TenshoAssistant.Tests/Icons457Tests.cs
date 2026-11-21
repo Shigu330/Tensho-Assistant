@@ -12,7 +12,7 @@ internal static class Icons457Tests
             var rules=Read("MainWindow.CraftRules.cs");
             Check(rules.Contains(icon) && rules.IndexOf(icon,StringComparison.Ordinal)<rules.IndexOf("ImGui.Checkbox(",StringComparison.Ordinal),"forbidden actions: icon before the box");
             var recorder=Read("MainWindow.CraftRecorder.cs");
-            Check(recorder.Contains(icon) && recorder.Contains("WrappedTooltip($\"{index+1}. {metadata?.Name ?? actions[index].ToString()}\");") && !recorder.Contains("string.Join(\" › \""),"recorder: icons, name on hover");
+            Check(recorder.Contains(icon) && recorder.Contains("DrawCraftActionTooltip(metadata,$\"{index+1}. {metadata.Name}\");") && !recorder.Contains("string.Join(\" › \""),"recorder: icons, name on hover");
         }),
     ];
 }

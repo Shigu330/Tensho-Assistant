@@ -292,10 +292,11 @@ internal sealed partial class MainWindow
                             ImGui.BeginDisabled(forbidden || simulationActions.Count>=100 || simulationLevel<spec.Level || spec.Kind==CraftActionKind.Manipulation && !simulationManipulation);
                             try
                             {
+                                // X-684 (0.1674): the one action tooltip on the icon and on the name; why it is greyed out under it.
                                 DrawGameIcon(action.Icon,new Vector2(26)); var click=ImGui.IsItemClicked();
-                                TipText(action.Description);
+                                if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled)) DrawCraftActionTooltip(action,after:forbidden ? localization.Get("CraftRules.ForbiddenTip"):null);
                                 ImGui.SameLine(); click|=ImGui.SmallButton(action.Name);
-                                if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled)) WrappedTooltip(forbidden ? localization.Get("CraftRules.ForbiddenTip"):localization.Format("SimulationHelp.Action",action.Description,spec.Level,spec.Cp));
+                                if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled)) DrawCraftActionTooltip(action,after:forbidden ? localization.Get("CraftRules.ForbiddenTip"):null);
                                 if(click && !forbidden && simulationActions.Count<100 && simulationLevel>=spec.Level && (spec.Kind!=CraftActionKind.Manipulation || simulationManipulation))
                                 { simulationActions.Add(spec.Kind); simulationResult=null; }
                             }

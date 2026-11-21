@@ -194,7 +194,8 @@ internal sealed partial class MainWindow
                 if(index%perRow!=0)ImGui.SameLine(0,iconGap);
                 var metadata=catalog.Find(job,steps[index].Action);
                 DrawGameIcon(metadata?.Icon ?? 0,new Vector2(iconSize));
-                if(ImGui.IsItemHovered())WrappedTooltip($"{index+1}. {metadata?.Name ?? steps[index].Action.ToString()}");
+                // X-684 (0.1674): the one action tooltip, the step's number in its title.
+                if(ImGui.IsItemHovered()){if(metadata is not null)DrawCraftActionTooltip(metadata,$"{index+1}. {metadata.Name}");else WrappedTooltip($"{index+1}. {steps[index].Action}");}
             }
             if(steps.Count>30)ImGui.TextDisabled(localization.Format("CraftLogUi.More",steps.Count-30));
             ImGui.Spacing();
@@ -288,7 +289,12 @@ internal sealed partial class MainWindow
         ImGui.SameLine();
         var skill=craftActions.State.Catalog?.Find(job,CraftActionKind.Manipulation);
         DrawGameIcon(skill?.Icon ?? 0,new Vector2(28));
-        if(ImGui.IsItemHovered())WrappedTooltip((skill?.Name ?? CraftActionKind.Manipulation.ToString())+"\n"+localization.Format("CraftLogUi.ManipulationDetected",CraftYesNo(detected))+"\n"+localization.Get("CraftLogUi.ManipulationTip"));
+        // X-684 (0.1674): the one action tooltip, what was detected under it.
+        if(ImGui.IsItemHovered())
+        {
+            var manipulationText=localization.Format("CraftLogUi.ManipulationDetected",CraftYesNo(detected))+"\n"+localization.Get("CraftLogUi.ManipulationTip");
+            if(skill is not null)DrawCraftActionTooltip(skill,after:manipulationText);else WrappedTooltip(CraftActionKind.Manipulation+"\n"+manipulationText);
+        }
         if(used!=detected){ImGui.SameLine();ImGui.TextDisabled(localization.Format("CraftLogUi.ManipulationDetected",CraftYesNo(detected)));}
     }
     // 0.468 (user request, in-game campaign): the target of the panel's calculation, kept by recipe; applied once the field is left, so typing does not start a search for each digit.
