@@ -4,11 +4,12 @@ namespace TenshoAssistant.Chat;
 public enum ChatContext { None,Duty,Crafting,Town }
 
 /// <summary>X-447 B13 (0.1655): a context's profile: its own look (a B16 code, ChatTheme; null: the window's) and the tabs it shows (their names;
-/// null: every tab).</summary>
+/// null: every tab). X-697 M2 (0.1665): its own order of the tabs (their names; null: the settings' order).</summary>
 public sealed class ChatContextProfile
 {
     public string? Look{get;set;}
     public List<string>? Tabs{get;set;}
+    public List<string>? Order{get;set;}
 }
 
 /// <summary>
@@ -77,13 +78,50 @@ public static class ChatContexts
         profile.Tabs=tabs.All(each=>names.Contains(each.Name,StringComparer.OrdinalIgnoreCase)) ? null:names;
     }
 
-    /// <summary>The tabs the window shows in a context, added to <paramref name="into"/>: those of the profile, in the settings' order; every tab
-    /// when there is no profile or list, or when none of its names is a tab any more (a tab renamed: never an empty window).</summary>
+    /// <summary>The tabs the window shows in a context, added to <paramref name="into"/>: those of the profile, in the profile's own order (X-697
+    /// M2, 0.1665; a tab it does not name yet comes after, in the settings' order), else the settings' order; every tab when there is no profile
+    /// or list, or when none of its names is a tab any more (a tab renamed: never an empty window).</summary>
     public static void Shown(IReadOnlyList<ChatTabSettings> tabs,ChatContextProfile? profile,List<ChatTabSettings> into)
     {
         var start=into.Count;
         if(profile?.Tabs is { Count:>0 } names)
             foreach(var tab in tabs)if(names.Contains(tab.Name,StringComparer.OrdinalIgnoreCase))into.Add(tab);
         if(into.Count==start)into.AddRange(tabs);
+        if(profile?.Order is not { Count:>0 } order || into.Count-start<2)return;
+        var sorted=into.GetRange(start,into.Count-start).OrderBy(tab=>Place(order,tab.Name)).ToList();
+        into.RemoveRange(start,sorted.Count);
+        into.AddRange(sorted);
+    }
+
+    private static int Place(List<string> order,string name)
+    {
+        var at=order.FindIndex(each=>string.Equals(each,name,StringComparison.OrdinalIgnoreCase));
+        return at<0 ? int.MaxValue:at;
+    }
+
+    /// <summary>X-697 M2 (0.1665, the definition of X-687: « each profile keeps its order »): after a drag in a context, the order the window shows
+    /// becomes that profile's order only (the settings' order and the other profiles unchanged); the tabs it does not show keep their places
+    /// after them; conversations (not in <paramref name="tabs"/>) left out. False when nothing changes.</summary>
+    public static bool SetOrder(ChatContextProfile profile,IReadOnlyList<ChatTabSettings> tabs,IReadOnlyList<ChatTabSettings> shown)
+    {
+        var names=shown.Where(tabs.Contains).Select(tab=>tab.Name).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+        if(names.Count==0)return false;
+        foreach(var name in profile.Order ?? [])
+            if(!names.Contains(name,StringComparer.OrdinalIgnoreCase) && tabs.Any(tab=>string.Equals(tab.Name,name,StringComparison.OrdinalIgnoreCase)))names.Add(name);
+        var before=new List<ChatTabSettings>();
+        Shown(tabs,profile,before);
+        var now=new List<ChatTabSettings>();
+        Shown(tabs,new ChatContextProfile{Tabs=profile.Tabs,Order=names},now);
+        if(before.SequenceEqual(now))return false;
+        profile.Order=names;
+        return true;
+    }
+
+    /// <summary>X-697 M2 (0.1665): a tab one place to the left (-1) or right (+1) in a context's order, by its menu; false at an end.</summary>
+    public static bool Move(ChatContextProfile profile,IReadOnlyList<ChatTabSettings> tabs,ChatTabSettings tab,int step)
+    {
+        var shown=new List<ChatTabSettings>();
+        Shown(tabs,profile,shown);
+        return ChatTabOrder.Move(shown,shown.IndexOf(tab),step) && SetOrder(profile,tabs,shown);
     }
 }

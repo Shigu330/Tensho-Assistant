@@ -35,8 +35,8 @@ internal static class ChatPlayerMenu1662Tests
             foreach(var channel in ChatChannels.All.Where(ChatChannels.Spoken))
             {
                 var reply=ChatPlayerMenu.Entries(source,channel,false,false).SingleOrDefault(e=>e.Action==ChatPlayerAction.Reply);
-                var on=channel is ChatChannel.TellIn or ChatChannel.TellOut or ChatChannel.Say or ChatChannel.Party or ChatChannel.Alliance;
-                Check(reply.AddonRow==368 && reply.Enabled==on && reply.Why==(on ? ChatPlayerWhy.None:ChatPlayerWhy.NoReplyMode),"reply on "+channel);
+                // X-697 M3 (0.1665): on for every spoken channel (before: tells, say, party and alliance only).
+                Check(reply.AddonRow==368 && reply.Enabled && reply.Why==ChatPlayerWhy.None,"reply on "+channel);
             }
             Check(ChatPlayerMenu.Entries(source,ChatChannel.Emote,false,false).All(e=>e.Action!=ChatPlayerAction.Reply) && ChatPlayerMenu.Entries(source,ChatChannel.System,false,false).All(e=>e.Action!=ChatPlayerAction.Reply),"no reply where nobody speaks");
         }),

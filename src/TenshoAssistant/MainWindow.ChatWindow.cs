@@ -1293,8 +1293,19 @@ internal sealed partial class MainWindow
                         // X-687 (0.1663): the tab one place to the left or right (a settings' tab; a conversation's stays after them).
                         var all=ChatTabs(options);
                         var at=all.IndexOf(tab);
+                        // X-697 M2 (0.1665): in a context with a profile, the move is that profile's order only.
+                        if(ChatContexts.ProfileOf(options,chatContextNow) is { } profile)
+                        {
+                            var own=tabs.Where(all.Contains).ToList();
+                            var place=own.IndexOf(tab);
+                            if(place>0 && ImGui.Selectable(localization.Get("ChatWindow.TabMoveLeft")) && ChatContexts.Move(profile,all,tab,-1))ChatTabsMoved(tabs);
+                            if(place>=0 && place<own.Count-1 && ImGui.Selectable(localization.Get("ChatWindow.TabMoveRight")) && ChatContexts.Move(profile,all,tab,1))ChatTabsMoved(tabs);
+                        }
+                        else
+                        {
                         if(at>0 && ImGui.Selectable(localization.Get("ChatWindow.TabMoveLeft")) && ChatTabOrder.Move(all,at,-1))ChatTabsMoved(tabs);
                         if(at>=0 && at<all.Count-1 && ImGui.Selectable(localization.Get("ChatWindow.TabMoveRight")) && ChatTabOrder.Move(all,at,1))ChatTabsMoved(tabs);
+                        }
                     }
                     finally{ImGui.EndPopup();}
                 }
@@ -1329,6 +1340,8 @@ internal sealed partial class MainWindow
         if(chatTabDragging)
         {
             chatTabDragging=false;
+            // X-697 M2 (0.1665): a drag in a context with a profile changes that profile's order only (the settings' and the others' kept).
+            if(!same && ChatContexts.ProfileOf(options,chatContextNow) is { } profile){if(ChatContexts.SetOrder(profile,ChatTabs(options),shown))ChatTabsMoved(tabs);return;}
             if(!same && ChatTabOrder.Apply(ChatTabs(options),shown))ChatTabsMoved(tabs);
             return;
         }

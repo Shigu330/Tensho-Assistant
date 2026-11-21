@@ -163,8 +163,25 @@ public static class ChatPlayerMenu
     /// d'équipe ».</summary>
     public const uint FriendRow=61,BlockRow=16061,BlacklistRow=59,ReportRow=10870,PartyFinderRow=2200;
 
-    /// <summary>The channels whose mode « Reply in selected mode » sets (the game's ChatChannel values of ClientStructs: Say 1, Party 2, Alliance 3), tells apart.</summary>
-    public static int? ReplyChannel(ChatChannel channel)=>channel switch{ChatChannel.Say=>1,ChatChannel.Party=>2,ChatChannel.Alliance=>3,_=>null};
+    /// <summary>The channels whose mode « Reply in selected mode » sets, tells apart: the game's typing modes given to
+    /// RaptureShellModule.ChangeChatChannel. Say 1, Party 2, Alliance 3 are named by ClientStructs' ChatChannel; X-697 M3 (0.1665): Yell 4,
+    /// Shout 5, Free Company 6, Novice Network 8, cross-world linkshells 9 to 16, linkshells 19 to 26, each with its linkshell's index from 0
+    /// (docs/evidence/0.1665-chat-reply-modes.md; to confirm in game).</summary>
+    public static int? ReplyChannel(ChatChannel channel)=>channel switch
+    {
+        ChatChannel.Say=>1,ChatChannel.Party=>2,ChatChannel.Alliance=>3,ChatChannel.Yell=>4,ChatChannel.Shout=>5,ChatChannel.FreeCompany=>6,ChatChannel.Novice=>8,
+        >=ChatChannel.Cwls1 and <=ChatChannel.Cwls8=>9+(channel-ChatChannel.Cwls1),
+        >=ChatChannel.Ls1 and <=ChatChannel.Ls8=>19+(channel-ChatChannel.Ls1),
+        _=>null,
+    };
+
+    /// <summary>X-697 M3 (0.1665): the linkshell's index (0 to 7) given with a linkshell's mode; 0 for every other channel.</summary>
+    public static uint ReplyLinkshell(ChatChannel channel)=>channel switch
+    {
+        >=ChatChannel.Cwls1 and <=ChatChannel.Cwls8=>(uint)(channel-ChatChannel.Cwls1),
+        >=ChatChannel.Ls1 and <=ChatChannel.Ls8=>(uint)(channel-ChatChannel.Ls1),
+        _=>0,
+    };
 
     /// <summary>
     /// X-679 (0.1660): a sender not known (null) shows the entries greyed with the reason, never an empty menu. X-681 (0.1660, the user's

@@ -174,7 +174,7 @@ internal sealed unsafe class ChatPlayerActions : IDisposable
                 finally{name->Dtor(true);worldName->Dtor(true);}
                 break;
             case ChatPlayerAction.Reply:
-                if(ChatPlayerMenu.ReplyChannel(channel) is { } mode)RaptureShellModule.Instance()->ChangeChatChannel(mode,0,null,true);
+                if(ChatPlayerMenu.ReplyChannel(channel) is { } mode)RaptureShellModule.Instance()->ChangeChatChannel(mode,ChatPlayerMenu.ReplyLinkshell(channel),null,true);
                 break;
             case ChatPlayerAction.Invite:
                 var invite=InfoProxyPartyInvite.Instance();
