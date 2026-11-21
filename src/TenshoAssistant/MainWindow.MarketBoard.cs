@@ -51,7 +51,8 @@ internal sealed partial class MainWindow
     private (int Column,bool Descending) marketOfferSort=(0,false),marketSaleSort=(0,true);
     private (MarketBoard? Board,MarketFilter Filter,(int,bool) Sort) marketSalesKey;
     private MarketSale[] marketSalesShown=[];
-    private string? marketSalesCsvMessage;
+    // X-767 M2 (review of 0.1756): the « N sale(s) copied » note, shown only while the item, filters and order copied are shown.
+    private readonly TenshoAssistant.Market.CopiedNote<(MarketBoard? Board,MarketFilter Filter,(int,bool) Sort)> marketSalesCopied=new();
     // I22 (0.669): the filtered sales and their statistics, once per change, not at each frame.
     private MarketSale[] marketSalesFiltered=[];
     private TenshoAssistant.Market.MarketSaleStats? marketSalesStats;
@@ -282,10 +283,10 @@ internal sealed partial class MainWindow
         {
             var text=MarketBoardMath.SalesCsv(board.ItemId,itemCatalog.State.Catalog?.Find(board.ItemId)?.Name ?? $"#{board.ItemId}",marketSalesShown);
             ImGui.SetClipboardText(text);
-            marketSalesCsvMessage=localization.Format("MarketBoard.CsvCopied",marketSalesShown.Length);
+            marketSalesCopied.Copied(marketSalesKey,localization.Format("MarketBoard.CsvCopied",marketSalesShown.Length));
         }
         Tip("MarketBoard.CopyCsvTip");
-        if(marketSalesCsvMessage is { } copied){ImGui.SameLine();ImGui.TextDisabled(copied);}
+        if(marketSalesCopied.For(marketSalesKey) is { } copied){ImGui.SameLine();ImGui.TextDisabled(copied);}
         if(!UI.UiComponents.BeginDataTable("MarketSales",5,sortable:true,scrollHeight:Math.Max(160,ImGui.GetContentRegionAvail().Y)))return;
         try
         {

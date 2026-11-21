@@ -13,7 +13,8 @@ internal sealed partial class MainWindow
     private BankListRow[] bankListRows=[];
     private int bankListSort;
     private bool bankListDescending;
-    private string? bankCsvMessage;
+    // X-767 M2 (review of 0.1756): the « N line(s) copied » note, shown only while the tab, its data and the filters copied are shown.
+    private readonly TenshoAssistant.Market.CopiedNote<(BankSourceViewKey Source,string Category,int Quality,string Query)> bankCopied=new();
 
     // The stacks of the tab shown (the character's bags, then the selected storages; never the gil purses), as the list and the CSV read them.
     private IEnumerable<(string Storage,uint Item,bool Hq,long Amount)> BankQuantities(BankSourceViewKey source,IReadOnlyList<BankEntry> selected)
@@ -34,11 +35,16 @@ internal sealed partial class MainWindow
             var shown=BankQuantities(source,selected).Where(stack=>MatchesBankFilters(new(stack.Item,stack.Hq ? 0:stack.Amount,stack.Hq ? stack.Amount:0))).ToList();
             var text=BankList.Csv(shown,id=>items?.Find(id)?.Name ?? $"#{id}",id=>items?.Find(id)?.UiCategoryName ?? "");
             ImGui.SetClipboardText(text);
-            bankCsvMessage=localization.Format("BankUi.CsvCopied",text.Count(character=>character=='\n')-1);
+            bankCopied.Copied(BankCopyKey(source),localization.Format("BankUi.CsvCopied",text.Count(character=>character=='\n')-1));
         }
         Tip("BankUi.CopyCsvTip");
-        if(bankCsvMessage is { } message){ImGui.SameLine();ImGui.TextDisabled(message);}
+        if(bankCopied.For(BankCopyKey(source)) is { } message){ImGui.SameLine();ImGui.TextDisabled(message);}
     }
+
+    // X-767 M2: what a copy of the bank depends on: the tab and its data (the storages selected come from them: BankSourceViewKey), the
+    // filters.
+    private (BankSourceViewKey Source,string Category,int Quality,string Query) BankCopyKey(BankSourceViewKey source)=>
+        (source,bankCategoryFilter,bankQualityFilter,bankQuery);
 
     private void DrawBankList(BankSourceViewKey source,IReadOnlyList<BankEntry> selected)
     {

@@ -146,7 +146,8 @@ public sealed class SettingsFile<T>(string path,string? legacyPath,Action<Except
     private readonly object gate=new();
     private JsonObject? before;
     private bool failing;
-    private bool closing;
+    // X-767 M1: set by Close without the gate (volatile), read under it.
+    private volatile bool closing;
     private bool? closingSave;
     private bool unseen;
     private bool unseenSaid;
@@ -176,8 +177,11 @@ public sealed class SettingsFile<T>(string path,string? legacyPath,Action<Except
     /// X-764 M1 (review of 0.1751): the unload begins. Every save from now on is the last one: it waits for another client's lock and reads
     /// the file as long as a save off the game's thread does (LockWaitMs, not the game's tenth of a second: no later save will try again),
     /// and its failure is said every time, as the loss it is (not « written at the next save »), even when a failure was said before.
+    /// X-767 M1 (review of 0.1756): without the gate, which a write under way holds while it waits for another client's lock (up to
+    /// LockWaitMs): the game's thread is never held here, so the saver's Flush keeps its bound of 5 s and its log line at unload. A write
+    /// already under way ends as it began (not the last one: the saver's Flush hands the live settings to the next).
     /// </summary>
-    public void Close(){lock(gate)closing=true;}
+    public void Close()=>closing=true;
 
     /// <summary>X-764 M1: the last save asked after <see cref="Close"/>: true written, false failed (said), null none asked.</summary>
     public bool? ClosingSave{get{lock(gate)return closingSave;}}
