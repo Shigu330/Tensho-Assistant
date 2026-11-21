@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (706 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (707 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -683,6 +683,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-598 | Quota verdict: the Fable line says « Fable relays allowed » from Fable's own… | Done in 0.1550 |
 | X-599 | Dead button (reported by the user on 18/11, screenshot): in the item sheet's… | Done in 0.1567 |
 | X-600 | User request of 18/11 around 2 pm (screenshots: Crafting, Gathering, Storage… | Done in 0.1573 |
+| X-601 | User request of 18/11 around 2 pm (screenshots: Crafting, Gathering, Storage… | Done in 0.1681.0 |
 | X-602 | User request of 18/11 around 2 pm (screenshots: Crafting, Gathering, Storage… | Done in 0.1608.0 |
 | X-603 | User request of 18/11 around 2 pm (screenshots: Crafting, Gathering, Storage… | Done in 0.1609.0 |
 | X-608 | Rule R03.1 changed on 18/11 (user's choice, rules journal): in PvE combat… | Done in 0.1575 |
@@ -779,7 +780,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (706 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (707 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1460,6 +1461,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-598 | Verdict de quota : la ligne Fable dit « Fable relays allowed » en ne regardant… | Fait en 0.1550 |
 | X-599 | Bouton mort (signalé par l'utilisateur le 18/11, capture) : dans la fiche… | Fait en 0.1567 |
 | X-600 | Demande de l'utilisateur du 18/11 vers 14 h (captures : Artisanat, Récolte… | Fait en 0.1573 |
+| X-601 | Demande de l'utilisateur du 18/11 vers 14 h (captures : Artisanat, Récolte… | Fait en 0.1681.0 |
 | X-602 | Demande de l'utilisateur du 18/11 vers 14 h (captures : Artisanat, Récolte… | Fait en 0.1608.0 |
 | X-603 | Demande de l'utilisateur du 18/11 vers 14 h (captures : Artisanat, Récolte… | Fait en 0.1609.0 |
 | X-608 | Règle R03.1 changée le 18/11 (choix de l'utilisateur, journal des règles) : en… | Fait en 0.1575 |

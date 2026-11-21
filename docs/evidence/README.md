@@ -119,7 +119,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1665-chat-reply-modes.md](0.1665-chat-reply-modes.md) | `src/TenshoAssistant/Chat/ChatSources.cs`, `tests/TenshoAssistant.Tests/ChatReplyModes1665Tests.cs` | `docs/changelog/CHANGELOG-0.1600-0.1699.md` |
 | [0.1666-chat-job-roles.md](0.1666-chat-job-roles.md) | `src/TenshoAssistant/Chat/ChatJobs.cs`, `tests/TenshoAssistant.Tests/ChatJobs1666Tests.cs` | `docs/changelog/CHANGELOG-0.1600-0.1699.md` |
 | [0.1667-retainer-sale-list.md](0.1667-retainer-sale-list.md) | `src/TenshoAssistant/Market/RetainerSaleList.cs` | `docs/changelog/CHANGELOG-0.1600-0.1699.md`, `docs/evidence/0.1671-retainer-sale-list-review.md` |
-| [0.1671-retainer-sale-list-review.md](0.1671-retainer-sale-list-review.md) | `src/TenshoAssistant/Market/MarketTax.cs`, `src/TenshoAssistant/Market/RetainerSales.cs` | `CHANGELOG.md` |
+| [0.1671-retainer-sale-list-review.md](0.1671-retainer-sale-list-review.md) | `src/TenshoAssistant/Market/MarketTax.cs`, `src/TenshoAssistant/Market/RetainerSales.cs` | `docs/changelog/CHANGELOG-0.1600-0.1699.md` |
 | [0.1677-game-names.md](0.1677-game-names.md) | `tests/TenshoAssistant.Tests/PageFamilies1677Tests.cs`, `tools/HelpTextProbe/Program.cs` | `CHANGELOG.md` |
 | [0.168.0-triad-sources-probe.log](0.168.0-triad-sources-probe.log) | `src/TenshoAssistant/MiniGames/TriadNpcCatalog.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.171.0-cosmic-vendors-probe.log](0.171.0-cosmic-vendors-probe.log) | `tests/TenshoAssistant.Tests/MapProjectionTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |

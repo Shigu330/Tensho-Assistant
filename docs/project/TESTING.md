@@ -2461,6 +2461,24 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1676) Survoler une ALEA de la page ALEA, puis une ALEA en cours dans la liste de la carte Tensho (onglet des ALEA) : la même info-bulle (icône, nom, ALEA et niveau, lieu, progression et temps restant pour celle en cours, description)
 
+- [ ] (0.1677) Barre de côté : « Personnage » remplace Collections, Équipement, Chocobo, Bestiaire, La Grande Mascarade, Armes antiques et Dresseur ; ses huit onglets s'ouvrent ; quitter la page puis recliquer « Personnage » : l'onglet quitté revient
+
+- [ ] (0.1677) Recherche rapide : taper « bestiaire » puis « équipement » : le résultat « … · Personnage » ouvre le bon onglet ; depuis l'accueil, la tuile Équipement ouvre l'onglet Équipement
+
+- [ ] (0.1678) Barre de côté : « Objets » ouvre quatre onglets (Recherche d'objets, Rangements, Trier, Marchés) ; « Souhaits » reste une entrée à part ; clic droit sur un objet du jeu › prix : l'onglet Marchés s'ouvre ; « Voir les quantités » de l'objet en contexte ouvre l'onglet Recherche d'objets
+
+- [ ] (0.1679) Barre de côté : « Monde » ouvre sept onglets (Carte, Météo, ALÉA, Échoppes, Butin des missions, Butin des monstres, Découvertes) ; « Artisanat » a l'onglet Macros et « Récolte » l'onglet Pêche en mer ; un lien de carte du chat ou « Voir sur la carte » ouvre l'onglet Carte ; la météo ouverte depuis une zone montre le nom de la zone sous le titre
+
+- [ ] (0.1680) Barre de côté : « Quêtes » (Journal, Mandats, Événements saisonniers, Peuples alliés, Grandes compagnies), « Livraisons » (2 onglets), « Missions » (Eurêka et Bozja, Donjons sans fond) et « Gold Saucer » (Revue de mode, Triple Triade, Mini Cactpot) ouvrent leurs onglets ; un lien vers une quête depuis une autre page ouvre l'onglet Journal sur cette quête
+
+- [ ] (0.1681) Barre de côté : 19 entrées, une seule catégorie « Suivi » ; si « Suivi » était repliée avant la mise à jour elle l'est encore, sinon elle est ouverte ; la replier, recharger le plugin : elle reste repliée
+
+- [ ] (0.1681) Avec « Ouvrir sur la dernière page » coché : fermer la fenêtre sur un onglet (par exemple Personnage › Bestiaire), recharger le plugin, /tensho : le même onglet s'ouvre
+
+- [ ] (0.1681) « Aide » a trois onglets (Aide, Lexique, Crédits) ; « Paramètres » un seul hors mode développeur, deux avec ; le « ? » d'une page ouvre l'onglet Aide sur cette page ; fenêtre étroite : le bouton de menu montre la même liste courte
+
+- [ ] (0.1681) Prise en main : relancer le guide (Aide, « Relancer le guide ») et vérifier : aucun : aucune page ni réglage nouveau ; le guide et l'aide gardent leurs pages, seule leur place dans la barre change
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
