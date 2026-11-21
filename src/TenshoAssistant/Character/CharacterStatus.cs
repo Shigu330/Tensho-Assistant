@@ -27,12 +27,60 @@ public sealed record RetainerState
     public int? Stacks { get; init; }
     public int? HqStacks { get; init; }
     public int? Crystals { get; init; }
+    // X-469 (0.1762, D-174): its items on sale as last read in the game's sale list (null: never read), and when.
+    public RetainerSaleItem[]? Listed { get; init; }
+    public DateTimeOffset? ListedAt { get; init; }
 }
+
+/// <summary>X-469 (0.1762, D-174, the owner's choice of 15/11/2026 at about 10:30 pm): one item a retainer has on sale, as the game's sale list
+/// showed it (RetainerSalesReader: item, HQ, quantity, unit price; null: not read).</summary>
+public sealed record RetainerSaleItem(uint ItemId,bool Hq,int Quantity,long? UnitPrice);
 
 /// <summary>X-196 (0.1409): the game's values of a retainer as Tensho keeps them (a zero time is « none », texts bounded).</summary>
 public static class RetainerStates
 {
     public const int MaximumText=40;
+
+    /// <summary>X-469 (0.1762): a retainer sells 20 items at most (the game's sale list).</summary>
+    public const int MaximumListed=20;
+
+    /// <summary>X-469: the sale list's rows kept (an item and a quantity; 20 at most, in the list's order).</summary>
+    public static RetainerSaleItem[] Listing(IEnumerable<(uint ItemId,bool Hq,int Quantity,long? UnitPrice)> rows)=>
+        [.. rows.Where(row=>row.ItemId!=0 && row.Quantity>0).Take(MaximumListed).Select(row=>new RetainerSaleItem(row.ItemId,row.Hq,row.Quantity,row.UnitPrice is >= 0 ? row.UnitPrice:null))];
+
+    /// <summary>X-469: the same listing of the same open retainer gives the same key (read again only when it changes or the list reopens).</summary>
+    public static string ListingKey(ulong retainer,IEnumerable<RetainerSaleItem> listed)=>
+        retainer.ToString(CultureInfo.InvariantCulture)+":"+string.Join(";",listed.Select(item=>FormattableString.Invariant($"{item.ItemId},{item.Hq},{item.Quantity},{item.UnitPrice}")));
+
+    /// <summary>X-469: the retainers with this one's listing (by its name, unique among a character's retainers) read at <paramref name="at"/>;
+    /// null when no retainer has that name (its list not read at a summoning bell yet).</summary>
+    public static RetainerState[]? WithListing(RetainerState[] retainers,string name,RetainerSaleItem[] listed,DateTimeOffset at)
+    {
+        var index=Array.FindIndex(retainers,retainer=>retainer.Name==Text(name));
+        if(index<0)return null;
+        var next=(RetainerState[])retainers.Clone();
+        next[index]=next[index] with{Listed=listed,ListedAt=at};
+        return next;
+    }
+
+    /// <summary>
+    /// X-469: a fresh reading at a summoning bell (no listing in it) keeps each retainer's listing as last read (by name); a retainer with
+    /// nothing on the market has none for sure (an empty listing, dated once: read again it is the same, so nothing to save); one selling
+    /// again after an empty listing is not read yet.
+    /// </summary>
+    public static RetainerState[]? KeepListings(RetainerState[]? old,RetainerState[]? fresh,DateTimeOffset at)
+    {
+        if(fresh is null)return null;
+        return [.. fresh.Select(retainer=>
+        {
+            if(retainer.Listed is not null)return retainer;
+            var known=old?.FirstOrDefault(kept=>kept.Name==retainer.Name);
+            if(NothingOnSale(retainer.MarketItems))
+                return known?.Listed is { Length:0 } empty ? retainer with{Listed=empty,ListedAt=known.ListedAt}:retainer with{Listed=[],ListedAt=at};
+            // Something on sale again after an empty listing: that listing says nothing of it (not read since).
+            return known?.Listed is { Length:>0 } listed ? retainer with{Listed=listed,ListedAt=known.ListedAt}:retainer;
+        })];
+    }
 
     public static RetainerState From(string name,string job,int level,long gil,int items,int marketItems,uint marketExpire,uint venture,uint ventureComplete,string town,
         (int Stacks,int HqStacks,int Crystals)? stock)=>new()
@@ -159,7 +207,8 @@ public static class CharacterStatuses
             TimersAt=fresh.DeliveriesLeft is null && fresh.AlliedQuestsLeft is null ? old.TimersAt:fresh.TimersAt,
             SquadronMissionDone=fresh.SquadronMissionDone ?? old.SquadronMissionDone,
             SquadronTrainingDone=fresh.SquadronTrainingDone ?? old.SquadronTrainingDone,
-            Retainers=fresh.Retainers ?? old.Retainers,
+            // X-469 (0.1762): each retainer's listing kept through a reading at a summoning bell.
+            Retainers=RetainerStates.KeepListings(old.Retainers,fresh.Retainers,fresh.SeenAt) ?? old.Retainers,
         };
     }
 
@@ -235,6 +284,7 @@ public static class CharacterStatuses
         Retainers=status.Retainers?.Take(MaximumVentures).Select(retainer=>retainer with
         {
             Name=RetainerStates.Text(retainer.Name),Job=RetainerStates.Text(retainer.Job),Town=RetainerStates.Text(retainer.Town),
+            Listed=retainer.Listed?.Take(RetainerStates.MaximumListed).ToArray(),
         }).ToArray(),
         Done=status.Done is { Count:>MaximumDone } done ? done.Take(MaximumDone).ToDictionary():status.Done,
     };

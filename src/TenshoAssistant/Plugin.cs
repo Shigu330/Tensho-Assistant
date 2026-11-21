@@ -856,7 +856,9 @@ public sealed partial class Plugin : IDalamudPlugin
                 ()=>dailyRoulettes,Path.Combine(pluginInterface.GetPluginConfigDirectory(),"Characters"),
                 // X-196 (0.1409): the retainers' job and market town, named from the sheets (ClassJob abbreviation; Town, whose rows are RetainerTown's values).
                 job=>data.GetExcelSheet<Lumina.Excel.Sheets.ClassJob>().GetRowOrDefault(job)?.Abbreviation.ExtractText() ?? "",
-                town=>data.GetExcelSheet<Lumina.Excel.Sheets.Town>().GetRowOrDefault(town)?.Name.ExtractText() ?? ""),()=>characterStatus?.Dispose());
+                town=>data.GetExcelSheet<Lumina.Excel.Sheets.Town>().GetRowOrDefault(town)?.Name.ExtractText() ?? "",
+                // X-469 (0.1762, D-174): the open retainer's items on sale, as the sale list reader copies them.
+                sales:()=>retainerSales?.State),()=>characterStatus?.Dispose());
             mainWindow.CharacterStatusSource=characterStatus;
             // g, C-03 (0.357): items the armoire takes, for the storage report.
             IReadOnlySet<uint>? cabinetItems=null;

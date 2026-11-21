@@ -116,7 +116,7 @@ internal sealed partial class MainWindow
         ImGui.TextDisabled(localization.Get("CharacterStatus.RetainersHelp"));
         ImGui.PopTextWrapPos();
         var now=DateTimeOffset.UtcNow;
-        if(!TenshoAssistant.UI.UiComponents.BeginDataTable("RetainerTable",8,scrollHeight:Math.Min(320,(rows.Count+1)*ImGui.GetFrameHeightWithSpacing()+8)))return;
+        if(!TenshoAssistant.UI.UiComponents.BeginDataTable("RetainerTable",8,scrollHeight:Math.Min(320,(rows.Count+1+rows.Sum(row=>RetainerListingLines(row.Retainer)))*ImGui.GetFrameHeightWithSpacing()+8)))return;
         try
         {
             // X-435 M4 (0.1421): Gil and Items fit their numbers (they took a stretched share and left the market town cut at 1280 px).
@@ -148,12 +148,39 @@ internal sealed partial class MainWindow
                     else ImGui.TextUnformatted(done.ToLocalTime().ToString("g"));
                     ImGui.TableNextColumn();
                     if(retainer.Town.Length>0)ImGui.TextUnformatted(retainer.Town);else ImGui.TextDisabled(localization.Get("CharacterStatus.Unknown"));
+                    DrawRetainerListing(retainer);
                 }
                 finally{ImGui.PopID();}
             }
         }
         finally{ImGui.EndTable();}
         ImGui.TextDisabled(localization.Format("CharacterStatus.RetainersGil",rows.Sum(row=>row.Retainer.Gil).ToString("N0",Numbers)));
+    }
+
+    // X-469 (0.1762, D-174): under the retainer's row, its items on sale as last read in the game's sale list, dated (« not read yet » when
+    // something is on sale and the list was never read; nothing when nothing is on sale and nothing was read).
+    // The lines the row under the retainer takes (none when it is not drawn), for the table's height.
+    private static int RetainerListingLines(RetainerState retainer)=>retainer.Listed is null && RetainerStates.NothingOnSale(retainer.MarketItems) ? 0
+        :Math.Max(1,retainer.Listed?.Length ?? 0);
+
+    private void DrawRetainerListing(RetainerState retainer)
+    {
+        if(RetainerListingLines(retainer)==0)return;
+        ImGui.TableNextRow();ImGui.TableNextColumn();ImGui.TableNextColumn();
+        if(retainer.Listed is not { } listed || retainer.ListedAt is not { } at)
+        {
+            ImGui.TextDisabled(localization.Get("CharacterStatus.ListedNever"));
+            Tip("CharacterStatus.ListedNeverTip");
+            return;
+        }
+        var date=at.ToLocalTime().ToString("g");
+        if(listed.Length==0){ImGui.TextDisabled(localization.Format("CharacterStatus.ListedNone",date));return;}
+        ImGui.TextDisabled(localization.Format("CharacterStatus.ListedAt",date));
+        for(var column=0;column<4;column++)ImGui.TableNextColumn();
+        var items=itemCatalog.State.Catalog;
+        foreach(var item in listed)
+            ImGui.TextUnformatted(localization.Format("CharacterStatus.ListedItem",(items?.Find(item.ItemId)?.Name ?? item.ItemId.ToString(Numbers))+(item.Hq ? " HQ":""),
+                item.Quantity.ToString(Numbers),item.UnitPrice?.ToString("N0",Numbers) ?? "?"));
     }
 
     private void DrawRetainerSale(RetainerState retainer,DateTimeOffset now)

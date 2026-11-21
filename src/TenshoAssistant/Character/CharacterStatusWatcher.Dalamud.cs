@@ -27,9 +27,17 @@ public sealed class CharacterStatusWatcher : IDisposable
     private DateTimeOffset nextRead,nextSave;
     private bool disposed,warned;
 
+    // X-469 (0.1762): the game's sale list of the open retainer, as RetainerSalesReader copies it (null: not wired, as in the tests).
+    private readonly Func<TenshoAssistant.Market.RetainerSalesState?>? sales;
+    private string? lastListing;
+    private DateTimeOffset nextListing;
+    private bool listingWarned;
+
     public CharacterStatusWatcher(IFramework framework,IPlayerState player,IPluginLog log,Configuration configuration,Action saveConfiguration,
-        Func<IReadOnlyList<RouletteRow>?> roulettes,string folder,Func<byte,string>? jobName=null,Func<byte,string>? townName=null)
+        Func<IReadOnlyList<RouletteRow>?> roulettes,string folder,Func<byte,string>? jobName=null,Func<byte,string>? townName=null,
+        Func<TenshoAssistant.Market.RetainerSalesState?>? sales=null)
     {
+        this.sales=sales;
         this.framework=framework;this.player=player;this.log=log;this.configuration=configuration;this.saveConfiguration=saveConfiguration;
         this.roulettes=roulettes;this.folder=folder;this.jobName=jobName;this.townName=townName;
         foreach(var status in CharacterStatuses.ReadAll(folder,(path,error)=>
@@ -88,6 +96,7 @@ public sealed class CharacterStatusWatcher : IDisposable
     {
         if(disposed || !framework.IsInFrameworkUpdateThread || framework.IsFrameworkUnloading)return;
         var now=DateTimeOffset.UtcNow;
+        ReadListing(now);
         if(now<nextRead)return;
         nextRead=now.AddSeconds(30);
         try
@@ -151,6 +160,41 @@ public sealed class CharacterStatusWatcher : IDisposable
     }
 
     // X-196 (0.1409): guarded on its own: a failure leaves the retainers as last read, the rest of the status goes on.
+    /// <summary>
+    /// X-469 (0.1762, D-174): once a second while the game's sale list of a retainer is open and read (RetainerSalesReader, its own checks:
+    /// « unavailable » rather than a partial table, R08), its items on sale are kept with that retainer (found by the open retainer's id,
+    /// named from the game's list), dated; again only when the listing changes or the list reopens. A retainer not read at a summoning bell
+    /// yet has no row to keep it in: nothing is kept then.
+    /// </summary>
+    private void ReadListing(DateTimeOffset now)
+    {
+        if(sales is null || now<nextListing)return;
+        nextListing=now.AddSeconds(1);
+        try
+        {
+            if(sales() is not { Status:TenshoAssistant.Market.RetainerSalesStatus.Ready,RetainerId:not 0 } open){lastListing=null;return;}
+            var id=player.IsLoaded ? player.ContentId:0;
+            if(id==0 || unreadable.Contains(id))return;
+            var listed=RetainerStates.Listing(open.Listings.Select(row=>(row.ItemId,row.Hq,row.Quantity,row.UnitPrice)));
+            var key=RetainerStates.ListingKey(open.RetainerId,listed);
+            if(key==lastListing || RetainerReader.NameOf(open.RetainerId) is not { Length:>0 } name)return;
+            lock(gate)
+            {
+                if(!statuses.TryGetValue(id,out var status) || status.Retainers is not { } retainers
+                   || RetainerStates.WithListing(retainers,name,listed,now) is not { } next)return;
+                statuses[id]=status with{Retainers=next};
+                QueueWrite(id);
+            }
+            lastListing=key;
+            listingWarned=false;
+        }
+        catch(Exception error)
+        {
+            nextListing=now.AddSeconds(60);
+            if(!listingWarned){listingWarned=true;log.Warning(error,"A retainer's items on sale could not be kept (maybe after a game update).");}
+        }
+    }
+
     private RetainerState[]? ReadRetainers()
     {
         try{return RetainerReader.Read(jobName,townName);}
