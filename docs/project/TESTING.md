@@ -2544,7 +2544,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1714) Fenêtre de chat Tensho : avec un onglet détaché, taper « /tensho chat hide » : toutes les fenêtres de chat Tensho disparaissent ; recevoir un message, puis taper « /tensho chat » : elles reviennent, le message est là ; clic droit sur un onglet › « Masquer toutes les fenêtres de chat un moment » fait de même
 
-- [ ] (0.1715) Fenêtre de chat Tensho, onglet du combat : prendre un effet (manger un plat, une potion, ou un effet en combat), puis survoler le nom de l'effet dans la ligne « … bénéficie de l'effet … » : l'info-bulle montre son icône, son nom et sa description comme celle du jeu ; si rien ne s'affiche, le dire (le jeu ne lie peut-être pas ce statut)
+- [ ] (0.1715) Fenêtre de chat Tensho, onglet du combat : manger un plat (ou boire une potion), puis survoler « Repu » (ou l'effet de la potion) dans la ligne « Vous bénéficiez de l'effet … » : l'info-bulle montre l'icône et le nom, puis les bonus comme l'info-bulle du statut dans le jeu (« Effets du repas (exp +n%) », puis « Collecte +n% (max m) »…, valeurs HQ pour un plat HQ) ; un autre effet montre sa description ; si un repas ne montre que « Sous l'effet d'un repas. », le dire
 
 - [x] (0.1715) Mode développeur, après quelques lignes de combat (actions, dégâts, effets) dans le chat du jeu : dalamud.log a des lignes « Chat window, pieces of a combat line (kind …) » et « pieces of a message with a link » avec « Status … » (rien d'autre à faire : l'agent les lit)
 
@@ -2564,7 +2564,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1719) Quand un tour est chargé : la ligne dit « chargé » (ou « chargé depuis … au plus tard »), l'alarme a sonné ; retirer un tour de la base (fenêtre ouverte) : il quitte la ligne et son alarme à venir disparaît
 
-- [ ] (0.1720) Fenêtre de chat Tensho, onglet de combat : utiliser une compétence (et laisser un allié en utiliser une) : son nom dans la ligne « … utilise … » montre au survol l'info-bulle du jeu (icône, nom, description) ; le nom d'une action d'ennemi qui porte le nom d'une action de joueur n'a pas d'info-bulle
+- [ ] (0.1720) Fenêtre de chat Tensho, onglet de combat : se téléporter, utiliser une compétence de votre job (et laisser un allié en utiliser une), puis survoler le nom de l'action dans la ligne « Vous utilisez … » ou « … utilise … » : l'info-bulle montre son icône, son nom et sa description ; survoler aussi le nom d'un effet (« Vous bénéficiez de l'effet … ») : son info-bulle ; le nom d'une action d'ennemi qui porte le nom d'une action de joueur n'a pas d'info-bulle
 
 - [x] (0.1722) Mode développeur, atelier de la compagnie, panneau de contrôle aérien : liste des aéronefs, puis le détail de l'aéronef (ses pièces) : le journal a des lignes « Workshop vessel read: Airship 1: rank …, speed …, range … » ; dire si vitesse, distance et pièces sont à 0 avant le détail et lues après
 
@@ -2607,6 +2607,14 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] (0.1733) Fenêtre « Suivi Tensho » avec une alarme d'objet créée sans icône (terreau, minerai) : la ligne montre l'icône de l'objet ; survoler l'icône ou le nom : l'info-bulle de l'objet, avec sous son nom le lieu et la prochaine alarme
 
 - [ ] (0.1733) Clic droit sur une ligne du suivi : « Ouvrir le module Alerte », « Couper cette alarme » (la ligne disparaît, l'alarme est coupée dans Alerte), « Carte », puis le menu habituel de l'objet
+
+- [ ] (0.1736) Fenêtre de chat Tensho, « S'effacer après » à 10 s (réglages de la fenêtre de chat) : attendre qu'elle s'efface, puis qu'un message arrive dans l'onglet affiché (un /dire d'un joueur proche, ou /echo dans un onglet qui le montre) : la fenêtre revient ; un message d'un autre onglet ne la fait pas revenir
+
+- [ ] (0.1736) Même réglage, avec « Revenir aussi pour un message privé ou une alerte » coché : effacée, un message privé reçu (ou un message avec votre prénom) dans un autre onglet la fait revenir ; décoché, non
+
+- [ ] (0.1737) Mode capture de la fenêtre de chat coché, page Cartes, liens de carte du chat : survoler un lien envoyé par un joueur : l'info-bulle montre « #XXXXX », le même code que la fenêtre de chat pour ce joueur, jamais son nom ; décoché : son nom avec son monde (Nom@Monde)
+
+- [ ] (0.1738) Page Marchands, un objet vendu par beaucoup de PNJ dont certains à placer chez soi (un meuble ou une teinture courante) : les marchands sur une carte d'abord, puis une seule ligne « Marchands sans position : N (cliquez pour les afficher) » ; un clic les montre, un autre les cache
 
 **0.535 : interfaces** — à voir en jouant
 
