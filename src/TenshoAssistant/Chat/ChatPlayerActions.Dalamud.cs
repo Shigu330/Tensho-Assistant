@@ -137,6 +137,20 @@ internal sealed unsafe class ChatPlayerActions : IDisposable
         return text;
     }
 
+    // X-473 (0.1715): the statuses' tooltips read once each, on hover (the Status sheet, the client's language).
+    private readonly Dictionary<uint,ChatStatusTip?> statuses=[];
+    /// <summary>X-473 (0.1715): a status the game linked in a message: its icon, name and description as the game's tooltip gives them (texts
+    /// without the game's formatting); null for row 0 or a row without a name (never a tooltip made up).</summary>
+    public ChatStatusTip? Status(uint id)
+    {
+        if(id==0)return null;
+        if(statuses.TryGetValue(id,out var known))return known;
+        var tip=data.GetExcelSheet<Lumina.Excel.Sheets.Status>().GetRowOrDefault(id) is { } status && status.Name.ExtractText().Trim() is { Length:>0 } name
+            ? new ChatStatusTip(status.Icon,name,status.Description.ExtractText().Trim()):null;
+        if(statuses.Count<2000)statuses[id]=tip;
+        return tip;
+    }
+
     /// <summary>The character of that player in range (name and home world), or null.</summary>
     public IPlayerCharacter? InRange(ChatSource source)
         =>objects.OfType<IPlayerCharacter>().FirstOrDefault(character=>character.Name.TextValue==source.Name && character.HomeWorld.RowId==source.World);

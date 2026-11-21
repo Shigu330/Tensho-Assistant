@@ -110,8 +110,9 @@ public static class ChatHistory
     public static string Encode(ChatRecord record)=>JsonSerializer.Serialize(new MessageLine
     {
         Time=record.Time.ToUnixTimeMilliseconds(),Kind=record.Kind,Sender=Empty(record.Sender),Source=record.Source,Target=record.Target,
-        // X-514: a link of Dalamud or of a plugin is kept as its text (its command is valid in this session only).
-        Body=record.Body.Select(segment=>new PieceLine{Text=Empty(segment.Text),Link=segment.Link is { Kind:not ChatSegmentKind.DalamudLink } link ? Link(link):null}).ToList(),
+        // X-514: a link of Dalamud or of a plugin is kept as its text (its command is valid in this session only). X-473 (0.1715): a status
+        // link too (its row is not in the format; its name stays).
+        Body=record.Body.Select(segment=>new PieceLine{Text=Empty(segment.Text),Link=segment.Link is { Kind:not (ChatSegmentKind.DalamudLink or ChatSegmentKind.StatusLink) } link ? Link(link):null}).ToList(),
     },Json);
 
     private static string? Empty(string? text)=>string.IsNullOrEmpty(text) ? null:text;
@@ -151,7 +152,7 @@ public static class ChatHistory
     // A link of a type this version does not know stays plain text; X-514: so does a link of Dalamud or of a plugin (0.1492 wrote them),
     // so that a click never runs a command number of an older session.
     private static ChatLink? Link(LinkLine link)
-        =>Enum.TryParse<ChatSegmentKind>(link.Type,false,out var kind) && kind is not (ChatSegmentKind.Text or ChatSegmentKind.DalamudLink) && Enum.IsDefined(kind)
+        =>Enum.TryParse<ChatSegmentKind>(link.Type,false,out var kind) && kind is not (ChatSegmentKind.Text or ChatSegmentKind.DalamudLink or ChatSegmentKind.StatusLink) && Enum.IsDefined(kind)
             ? new ChatLink(kind,link.Territory,link.Map,link.X,link.Y,Cut(link.Place,MaximumSender),link.Item,link.Hq,link.Quest,Cut(link.Url,MaximumText),
                 Cut(link.Plugin,MaximumSender),link.Command,link.Data is { Length:>0 and <=MaximumText } data ? data:null)
             : null;

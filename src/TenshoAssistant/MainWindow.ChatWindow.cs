@@ -1842,6 +1842,7 @@ internal sealed partial class MainWindow
         ChatSegmentKind.ItemLink=>itemCatalog.State.Catalog?.Find(link.ItemId)?.Name,
         ChatSegmentKind.QuestLink=>quests.State.ById?.GetValueOrDefault(link.QuestId)?.Name,
         ChatSegmentKind.MapLink=>link.Place.Length>0 ? link.Place:maps.State.Catalog?.Find(link.MapId)?.Zone,
+        ChatSegmentKind.StatusLink=>ChatPlayers?.Status(link.StatusId)?.Name,
         _=>null,
     } is { Length:>0 } name ? name:localization.Get("ChatWindow.LinkNoName");
 
@@ -1895,6 +1896,8 @@ internal sealed partial class MainWindow
                     // X-473 (0.1627): a player's name: their world, and their job and level when the game shows them (never in capture mode).
                     if(!chatLinesBlocked && run.Role==ChatRole.Sender && !options.CaptureNames && ChatChannels.Spoken(record.Channel))TipText(()=>ChatSenderTip(record));
                     if(!chatLinesBlocked && run.Link is { Kind:ChatSegmentKind.DalamudLink })TipText(localization.Get("ChatWindow.DalamudLinkGameTip"));
+                    // X-473 (0.1715): a status the game linked: its icon, name and description, as the game's tooltip.
+                    if(!chatLinesBlocked && run.Link is { Kind:ChatSegmentKind.StatusLink } statusLink && ImGui.IsItemHovered())DrawChatStatusTip(statusLink.StatusId);
                     // 0.1442: a right click on a message's text: its menu (copy). X-482 M2: not under the « back to the bottom » button.
                     if(!chatLinesBlocked && ImGui.IsItemClicked(ImGuiMouseButton.Right)){chatWindowLine=record;ImGui.OpenPopup("###TenshoChatLine");}
                 }
@@ -1989,7 +1992,30 @@ internal sealed partial class MainWindow
 
     /// <summary>X-474 (0.1477): a link drawn as a link: all of them, except a link of Dalamud or of a plugin that Dalamud has no handler for
     /// (a plugin unloaded since): plain text, its tooltip says to open it from the game's chat.</summary>
-    private bool ChatLinkActive(ChatLink link)=>link.Kind!=ChatSegmentKind.DalamudLink || DalamudLinkKnown?.Invoke(link.Plugin,link.CommandId)==true;
+    // X-473 (0.1715): a status link is drawn as the message's text (nothing to click), its tooltip on hover (DrawChatStatusTip).
+    private bool ChatLinkActive(ChatLink link)=>link.Kind switch
+    {
+        ChatSegmentKind.DalamudLink=>DalamudLinkKnown?.Invoke(link.Plugin,link.CommandId)==true,
+        ChatSegmentKind.StatusLink=>false,
+        _=>true,
+    };
+
+    /// <summary>X-473 (0.1715): a status's tooltip, as the game's: its icon, its name, its description (Status sheet); none for a status the
+    /// sheet does not name (never a false one). Display only: nothing counted nor kept (R03.1).</summary>
+    private void DrawChatStatusTip(uint id)
+    {
+        if(ChatPlayers?.Status(id) is not { } status)return;
+        using(TooltipScope.Begin())
+        {
+            DrawGameIcon(status.Icon,new Vector2(24,32)*Dalamud.Interface.Utility.ImGuiHelpers.GlobalScale);
+            ImGui.SameLine();
+            ImGui.TextColored(Accent,status.Name);
+            if(status.Description.Length==0)return;
+            ImGui.PushTextWrapPos(ImGui.GetFontSize()*28);
+            try{ImGui.Separator();ImGui.TextColored(Muted,status.Description);}
+            finally{ImGui.PopTextWrapPos();}
+        }
+    }
 
     // X-403 phase 2 (0.1441): the place menu a right click on a map link opened (drawn by DrawChatLines).
     private (Maps.MapDefinition Map,Vector2 Coordinate,string Place)? chatWindowPlace;

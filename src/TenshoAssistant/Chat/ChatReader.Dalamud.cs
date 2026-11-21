@@ -36,6 +36,9 @@ internal sealed class ChatReader : IDisposable
     // X-525 M3 (0.1503): developer mode: the icon codes met in senders' names, once per code, at most twenty per session (codes only).
     private readonly ChatPieceLog senderIconsSaid=new(1,20);
     private const int BareSaidMax=10;
+    // X-473 (0.1715): developer mode: the pieces of a combat line without a link, one per kind, thirty at most per session (kinds and lengths
+    // only, never the words): how the game sends an action's name, to tell it surely before any tooltip (R06).
+    private readonly ChatPieceLog combatSaid=new(1,30);
     // X-654 (0.1602): the sender of each message, for a player's menu (in memory only; null: none, as outside the game). Cleared with the
     // messages: window off, logout (ChatPlayerActions), unload.
     internal ChatSources? Sources{get;set;}
@@ -96,6 +99,8 @@ internal sealed class ChatReader : IDisposable
                     log.Information("Chat window, a link without text of its own (kind {0}), its target's name written instead: {1}.",kind,ChatPayloads.Describe(payloads));
                 }
             }
+            else if(developer?.Invoke()==true && ChatChannels.From((int)message.LogKind)==ChatChannel.Combat && combatSaid.Take((int)message.LogKind))
+                log.Information("Chat window, pieces of a combat line (kind {0}): {1}.",(int)message.LogKind,ChatPayloads.Describe(payloads));
             // X-472 (0.1471): the sender with its world icon written « @ » (TextValue left it out: « NameWorld »).
             var sender=ChatPayloads.Text(message.Sender.Payloads.Select(Payload));
             if(developer?.Invoke()==true && message.Sender.Payloads.Select(Payload).ToList() is var senderPayloads)
@@ -138,6 +143,8 @@ internal sealed class ChatReader : IDisposable
         // 0.1442: a quest link.
         QuestPayload quest=>new(ChatPayloadKind.Quest,"Quest",Link:new ChatLink(ChatSegmentKind.QuestLink,QuestId:quest.Quest.RowId)),
         // X-474 (0.1477): a link of Dalamud or of a plugin (« Learn more here » of « Developer Mode is enabled »): its plugin and command.
+        // X-473 (0.1715): a status the game links (its tooltip in the game's chat): the status's row.
+        StatusPayload status=>new(ChatPayloadKind.Status,"Status",Link:new ChatLink(ChatSegmentKind.StatusLink,StatusId:status.Status.RowId)),
         DalamudLinkPayload dalamud=>new(ChatPayloadKind.Dalamud,"DalamudLink",Link:new ChatLink(ChatSegmentKind.DalamudLink,Plugin:dalamud.Plugin ?? "",CommandId:dalamud.CommandId)),
         RawPayload raw when raw.Equals(RawPayload.LinkTerminator)=>new(ChatPayloadKind.LinkEnd,"LinkEnd"),
         ITextProvider text=>new(ChatPayloadKind.Text,payload.GetType().Name,Text:text.Text),
