@@ -61,7 +61,9 @@ internal static class ChatFrameJit1633Tests
             Check(names.Heard(thread),$"both marks heard within {Patience.TotalMinutes} min: "+names.State(thread));
             Check(names.State(thread).StartsWith("start mark heard, stop mark heard, ",StringComparison.Ordinal) && !names.Hears(thread+1),"what was heard, said: "+names.State(thread));
             var heard=names.Names(thread);
-            Check(heard.Any(name=>name.EndsWith("::Never",StringComparison.Ordinal)) && !heard.Any(name=>name.Contains("TenshoJit",StringComparison.Ordinal)),"named, marks aside: "+string.Join(", ",heard));
+            // X-706 (0.1687): the probes are compiled on this thread just before the window opens: a true case outside it, which must stay out.
+            Check(heard.Any(name=>name.EndsWith("::Never",StringComparison.Ordinal)) && !heard.Any(name=>name.Contains("TenshoJit",StringComparison.Ordinal))
+                && !heard.Any(name=>name.Contains("Probe1633",StringComparison.Ordinal)),"named, marks and the probes before the window aside: "+string.Join(", ",heard));
             Check(names.Names(thread+1).Count==0,"another thread's are not its own");
         }),
         ("Chat frame jit 1633: wiring: developer mode only, the names logged off the game's thread, the listener let go",()=>

@@ -122,7 +122,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1671-retainer-sale-list-review.md](0.1671-retainer-sale-list-review.md) | `src/TenshoAssistant/Market/MarketTax.cs`, `src/TenshoAssistant/Market/RetainerSales.cs` | `docs/changelog/CHANGELOG-0.1600-0.1699.md` |
 | [0.1677-game-names.md](0.1677-game-names.md) | `tests/TenshoAssistant.Tests/PageFamilies1677Tests.cs`, `tests/TenshoAssistant.Tests/SideBarNames1683Tests.cs`, `tools/HelpTextProbe/Program.cs` | `CHANGELOG.md` |
 | [0.168.0-triad-sources-probe.log](0.168.0-triad-sources-probe.log) | `src/TenshoAssistant/MiniGames/TriadNpcCatalog.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
-| [0.1685-fishing-bite-stopwatch.md](0.1685-fishing-bite-stopwatch.md) | `src/TenshoAssistant/Gathering/FishingStopwatch.cs`, `tests/TenshoAssistant.Tests/FishingBite1685Tests.cs` | `CHANGELOG.md` |
+| [0.1685-fishing-bite-stopwatch.md](0.1685-fishing-bite-stopwatch.md) | `src/TenshoAssistant/Gathering/FishingStopwatch.cs`, `tests/TenshoAssistant.Tests/FishingBite1685Tests.cs`, `tests/TenshoAssistant.Tests/Review1686Fixes1687Tests.cs` | `CHANGELOG.md` |
 | [0.171.0-cosmic-vendors-probe.log](0.171.0-cosmic-vendors-probe.log) | `tests/TenshoAssistant.Tests/MapProjectionTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.174.0-triad-seldeck-capture.log](0.174.0-triad-seldeck-capture.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.175.0-auxesia-maps-probe.log](0.175.0-auxesia-maps-probe.log) | `src/TenshoAssistant/Maps/MapCatalog.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
