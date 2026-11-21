@@ -15,6 +15,8 @@ public static class ConfigurationReset
         "Voyages", "OceanSightings", "WeatherStoryZones", "GearPlans", "SRankKills", "DutyNotes", "GearPlanSets", "CollectionMemories", "LastCraftStats", "FashionOutfit", "WeatherFavorites", "GearMateria", "SubmarineUnlocked", "VesselPlans",
         // X-225 (0.1719): the aetherial wheels on the company's stand, as last read.
         "AetherialWheels",
+        // X-221 (0.1760): the bonus points of a manual counted per character (the player's data).
+        "GraceCounts",
         // 0.321: interface state, not a setting (which navigation groups are folded).
         "NavigationCollapsed",
         // X-521 M2 (D-180): interface state, not a setting (the category chosen in each tab of the Settings page).
@@ -653,6 +655,8 @@ public sealed partial class Configuration
     public bool ShowEnglishItemName { get; set; }
     // 0.554 (C3): per character and job, the attributes last read; the player's data, kept by « reset all ».
     public Dictionary<ulong,Dictionary<uint,TenshoAssistant.Craft.CraftJobStats>>? LastCraftStats { get; set; }
+    // X-221 (0.1760): per character, what Tensho counted of each manual's Grace (statuses 45 and 46): the player's data, kept by « reset all ».
+    public Dictionary<ulong,List<TenshoAssistant.Gear.GraceCount>>? GraceCounts { get; set; }
     // 0.552 (C2): the crafting log panel also tries the sequences saved for other recipes.
     public bool CraftLogTryAllPresets { get; set; } = true;
     public int SortPreviewField { get; set; }

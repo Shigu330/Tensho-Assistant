@@ -674,6 +674,11 @@ public sealed partial class Plugin : IDalamudPlugin
             Gear.GameGearsetReader? gameGearsets=null;
             registrations.Register(()=>gameGearsets=new Gear.GameGearsetReader(framework,client,log,expIndex,jobOrder,expToNext),()=>gameGearsets?.Dispose());
             mainWindow.GearsetSource=gameGearsets;
+            // X-221 (0.1760, the user's request of 12/11, K-37): the bonus points left of a manual's Grace, counted from your experience lines.
+            Gear.GraceWatcher? graceWatcher=null;
+            registrations.Register(()=>graceWatcher=new Gear.GraceWatcher(framework,client,player,objects,chat,log,expIndex,()=>configuration.GraceCounts??=[],()=>SaveTimed("grace"),
+                status=>data.GetExcelSheet<Lumina.Excel.Sheets.Status>().GetRowOrDefault(status)?.Name.ExtractText() ?? status.ToString(System.Globalization.CultureInfo.InvariantCulture)),()=>graceWatcher?.Dispose());
+            mainWindow.GraceSource=()=>graceWatcher?.Shown;
             // X-223 (0.1233): the region of the home world's data centre (WorldRegionGroup row), for the Jumbo Cactpot's draw time.
             mainWindow.HomeRegion=()=>player.HomeWorld.ValueNullable?.DataCenter.ValueNullable?.Region.RowId ?? 0;
             // X-222 (0.1232): the player's own kills for the S ranks counted by kills, from the game's « You defeat » message.
