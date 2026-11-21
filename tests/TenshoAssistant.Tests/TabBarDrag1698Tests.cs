@@ -26,21 +26,23 @@ internal static class TabBarDrag1698Tests
             Frame(drag, ("A", 0), ("B", 100));
             Check(drag.After(false, null) is null, "a drag that ends where it began: nothing kept");
         }),
-        ("Tab bar drag 1698: another order than the one asked, outside a drag: a new bar, the tab shown selected once", () =>
+        // X-709 (0.1700): another order shown settles the same bar in the next frame (TabBarSettle1700Tests); a new bar only to put back in order.
+        ("Tab bar drag 1698: another order than the one asked, outside a drag: the bar settles (no new bar); put back in order: a new bar, the tab shown selected once", () =>
         {
             var drag = new TabBarDrag { Shown = "B" };
             Frame(drag, ("A", 0), ("New", 300), ("B", 100));
-            Check(drag.After(false, null) is null && drag.Generation == 1, "made again");
-            Check(drag.TakeFresh() && !drag.TakeFresh(), "the tab shown selected once");
+            Check(drag.After(false, null) is null && drag.Generation == 0, "not made again");
+            Check(drag.Settle<string>(["A", "New", "B"], id => id), "settled in the next frame");
             drag.Renew();
-            Check(drag.Generation == 2 && drag.TakeFresh(), "put back in order: a new bar too");
+            Check(drag.Generation == 1 && drag.TakeFresh() && !drag.TakeFresh(), "put back in order: a new bar, the tab shown selected once");
         }),
         ("Tab bar drag 1698: wiring: the detail tabs reorderable, drawn in the order kept, kept when a drag ends; reset with the families'", () =>
         {
             var detail = Read("UI/Components/DetailPage.cs");
-            Check(detail.Contains("ImGui.BeginTabBar(id+\"/\"+drag.Generation,ImGuiTabBarFlags.Reorderable)", StringComparison.Ordinal), "reorderable, its number in its id");
+            Check(detail.Contains("ImGui.BeginTabBar(id+\"/\"+drag.Generation,drag.Settle(arranged,tab=>tab.Key) ? ImGuiTabBarFlags.None:ImGuiTabBarFlags.Reorderable)", StringComparison.Ordinal), "reorderable (settling one frame without), its number in its id");
             Check(detail.Contains("TabOrder.Arrange(tabs,configuration.TabOrders.GetValueOrDefault(id),tab=>tab.Key)", StringComparison.Ordinal), "drawn in the order kept");
-            Check(detail.Contains("drag.Places.Add((key,ImGui.GetItemRectMin().X));", StringComparison.Ordinal) && detail.Contains("if(drag.After(dragged,configuration.TabOrders.GetValueOrDefault(id)) is { } keep)", StringComparison.Ordinal), "places read, kept when a drag ends");
+            Check(detail.Contains("drag.Places.Add((key,ImGui.GetItemRectMin().X));", StringComparison.Ordinal) && detail.Contains("TabBarAfter(id,drag,dragged);", StringComparison.Ordinal)
+                && detail.Contains("if(drag.After(dragged,configuration.TabOrders.GetValueOrDefault(id)) is not { } keep)return;", StringComparison.Ordinal), "places read, kept when a drag ends");
             Check(detail.Contains("ImGui.BeginTabItem(label+\"###\"+id+key,", StringComparison.Ordinal), "each tab's id stays its key (the tab open is kept across the update)");
             Check(Read("UI/Navigation/MainWindow.PageHeader.cs").Contains("foreach(var drag in tabBarDrags.Values)drag.Renew();", StringComparison.Ordinal), "put back in order with the families' tabs");
         }),

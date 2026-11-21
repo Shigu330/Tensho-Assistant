@@ -71,7 +71,7 @@ internal static class PageHeader1573Tests
         ("Page header 1573 (ratchet): one component draws the tabs of the sub-pages; no row of sub-page buttons written by hand", () =>
         {
             var header = Read("src/TenshoAssistant/UI/Navigation/MainWindow.PageHeader.cs");
-            Check(header.Contains("foreach(var entry in PageEntries)") && header.Contains("Heading(title(),shown.About?.Invoke() ?? \"\");") && header.Contains("ImGui.BeginTabBar(\"PageTabs\"+root+\"###PageTabs\"+root+\"/\"+pageTabGeneration,ImGuiTabBarFlags.Reorderable)")
+            Check(header.Contains("foreach(var entry in PageEntries)") && header.Contains("Heading(title(),shown.About?.Invoke() ?? \"\");") && header.Contains("ImGui.BeginTabBar(\"PageTabs\"+root+\"###PageTabs\"+root+\"/\"+drag.Generation,drag.Settle(arranged,entry=>entry.Page.ToString()) ? ImGuiTabBarFlags.None:ImGuiTabBarFlags.Reorderable)")
                 && header.Contains("pageTabs.Force(current,entry.Page)") && header.Contains("pageTabs.Chosen(current,entry.Page)") && header.Contains("pageTabs.Shown(page);"), "the header: title, description and tabs from the page list");
             var window = Read("src/TenshoAssistant/MainWindow.cs");
             Check(window.IndexOf("DrawPageHeader();", StringComparison.Ordinal) is var at and > 0 && at < window.IndexOf("PageEntryFor(page)?.Draw();", StringComparison.Ordinal), "drawn above every page");

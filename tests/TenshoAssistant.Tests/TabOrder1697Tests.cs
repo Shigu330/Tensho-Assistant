@@ -25,10 +25,11 @@ internal static class TabOrder1697Tests
         ("Tab order 1697: wiring: reorderable bar, places read after each tab, kept when a drag ends, made again otherwise, reset in Settings", () =>
         {
             var header = Read("UI/Navigation/MainWindow.PageHeader.cs");
-            Check(header.Contains("ImGuiTabBarFlags.Reorderable", StringComparison.Ordinal) && header.Contains("pageTabPlaces.Add((entry.Page.ToString(),ImGui.GetItemRectMin().X));", StringComparison.Ordinal), "reorderable, places read");
+            Check(header.Contains("ImGuiTabBarFlags.Reorderable", StringComparison.Ordinal) && header.Contains("drag.Places.Add((entry.Page.ToString(),ImGui.GetItemRectMin().X));", StringComparison.Ordinal), "reorderable, places read");
             Check(header.Contains("TabOrder.Arrange(natural,configuration.TabOrders.GetValueOrDefault(key),entry=>entry.Page.ToString())", StringComparison.Ordinal), "drawn in the order kept");
-            Check(header.Contains("TabOrder.Keep(shown,configuration.TabOrders.GetValueOrDefault(key))", StringComparison.Ordinal) && header.Contains("TrySave(\"TabOrders\");", StringComparison.Ordinal), "kept and saved when a drag ends");
-            Check(header.Contains("if(!same){pageTabGeneration++;pageTabs.Reset();}", StringComparison.Ordinal), "another order than the one kept: a new bar, the page shown selected");
+            // X-709 (0.1700): the families' header uses the detail tabs' memory (TabBarDrag): kept when a drag ends, settled otherwise.
+            Check(header.Contains("TabBarAfter(key,drag,dragged);", StringComparison.Ordinal) && header.Contains("TrySave(\"TabOrders\");", StringComparison.Ordinal), "kept and saved when a drag ends");
+            Check(header.Contains("if(drag.TakeFresh())pageTabs.Reset();", StringComparison.Ordinal), "a new bar (put back in order): the page shown selected");
             Check(Read("MainWindow.Settings.cs").Contains("if(SettingButton(\"Settings.TabOrderReset\",\"Settings.TabOrderResetTip\"))ResetTabOrders();", StringComparison.Ordinal), "put back in order");
             var configuration = Read("Configuration.cs");
             Check(configuration.Contains("public Dictionary<string,List<string>> TabOrders { get; set; } = new();", StringComparison.Ordinal) && configuration.Contains("\"TabOrders\",", StringComparison.Ordinal), "saved, reset with the settings");
