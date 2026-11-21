@@ -13,7 +13,8 @@ using TenshoAssistant.Desktop;
 /// IDataManager, IFramework and IPluginLog as in tools/ClientSnapshot; ITextureProvider reads the game icon (.tex) through Lumina and
 /// uploads it to the desktop renderer; any other Dalamud interface is an "absent" stand-in that answers default values and records each
 /// member the page code reached (X-118's inventory evidence).
-/// The plugin's saved settings (pluginConfigs\TenshoAssistant.json) are read as Dalamud reads them, read-only: the app never saves them.
+/// The plugin's saved settings are read, read-only: the app never saves them. X-685 part 2 (0.1745): Tensho's own file (pluginConfigs\
+/// TenshoAssistant\Settings.json) by the plugin's own reader when it exists, else Dalamud's (pluginConfigs\TenshoAssistant.json) as before.
 /// </summary>
 internal sealed class Host
 {
@@ -104,15 +105,16 @@ internal sealed class Host
             throw new InvalidDataException($"The game's sheets cannot be read (reference picture of the error state: {method?.Name}).");
     }
 
-    /// <summary>The plugin's saved settings read as Dalamud reads them (Newtonsoft, type names), or null (no file, or unreadable).</summary>
+    /// <summary>The plugin's saved settings (Tensho's own file, else Dalamud's), or null (no file, or unreadable).</summary>
     private object? ReadSettings(string? path,Type configurationType,out string note)
     {
         if(path is null){note="new (asked)";return null;}
-        if(!File.Exists(path)){note="new (no saved settings at "+path+")";return null;}
+        var own=DesktopPaths.OwnSettings(path);
+        if(!File.Exists(own) && !File.Exists(path)){note="new (no saved settings at "+path+")";return null;}
         try
         {
             var value=Parse(path);
-            note=value is null ? "new (saved settings empty)" : "read from "+path+" (read-only, without the Discord addresses)";
+            note=value is null ? "new (saved settings empty)" : "read from "+(File.Exists(own) ? own : path)+" (read-only, without the Discord addresses)";
             return value;
         }
         catch(Exception error){note=$"new (saved settings unreadable: {error.GetType().Name}: {error.Message})";return null;}
@@ -125,6 +127,14 @@ internal sealed class Host
     /// </summary>
     public object? Parse(string path)
     {
+        // X-685 part 2 (0.1745): Tensho's own file (System.Text.Json, no type names), through the same guard, read by the plugin's own
+        // reader (SettingsJson.Read); Dalamud's file below while the plugin has not written its own yet.
+        var own=DesktopPaths.OwnSettings(path);
+        if(File.Exists(own) && Plugin.GetType("TenshoAssistant.SettingsJson")?.GetMethod("Read",[typeof(string),typeof(Type)]) is { } read)
+        {
+            try{return read.Invoke(null,[SettingsGuard.Project(SettingsGuard.ReadBounded(own)),configurationType]);}
+            catch(TargetInvocationException error) when(error.InnerException is not null){System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw(error.InnerException);throw;}
+        }
         var settings=new Newtonsoft.Json.JsonSerializerSettings
         {
             TypeNameHandling=Newtonsoft.Json.TypeNameHandling.Objects,

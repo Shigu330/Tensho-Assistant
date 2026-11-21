@@ -1,0 +1,288 @@
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
+using System.Text.Unicode;
+
+namespace TenshoAssistant;
+
+/// <summary>
+/// X-685 part 2 (0.1745, D-206 a, the user's choice of 21/11): how Tensho's settings are turned into text and back, with System.Text.Json and
+/// options of Tensho's own (TenshoJson), no longer by Dalamud (Newtonsoft with type names: Newtonsoft and TypeDescriptor, shared by the whole
+/// game process, kept the types of every copy of Tensho for good, and so each unloaded copy; docs/evidence/0.1741-unload-json.md). The shape
+/// stays Newtonsoft's: public fields written too (Vector4), objects and collections already made filled in place as Newtonsoft's « Auto »
+/// does (IconSizes relies on it: a default kept for an icon absent from the file), names read whatever their case, NaN and infinities
+/// written as text. Pure (tests; the desktop app reads the file through it, by reflection).
+/// </summary>
+public static class SettingsJson
+{
+    /// <summary>The depth of JSON read (Configuration is far less deep).</summary>
+    public const int MaxDepth=64;
+
+    public static readonly JsonSerializerOptions Options=TenshoJson.Own(new JsonSerializerOptions
+    {
+        IncludeFields=true,
+        PreferredObjectCreationHandling=JsonObjectCreationHandling.Populate,
+        PropertyNameCaseInsensitive=true,
+        NumberHandling=JsonNumberHandling.AllowNamedFloatingPointLiterals,
+        ReadCommentHandling=JsonCommentHandling.Skip,
+        AllowTrailingCommas=true,
+        MaxDepth=MaxDepth,
+        WriteIndented=true,
+        Encoder=JavaScriptEncoder.Create(UnicodeRanges.All),
+    });
+
+    private static readonly JsonDocumentOptions Document=new(){CommentHandling=JsonCommentHandling.Skip,AllowTrailingCommas=true,MaxDepth=MaxDepth};
+
+    public static string Write<T>(T value)=>JsonSerializer.Serialize(value,Options);
+    public static T? Read<T>(string text)=>JsonSerializer.Deserialize<T>(text,Options);
+    /// <summary>For the desktop app, which has the plugin's type by reflection only.</summary>
+    public static object? Read(string text,Type type)=>JsonSerializer.Deserialize(text,type,Options);
+
+    /// <summary>The text as a JSON object (JsonException when it is not one).</summary>
+    public static JsonObject Node(string text)=>JsonNode.Parse(text,documentOptions:Document) as JsonObject ?? throw new JsonException("the settings are not a JSON object");
+    public static string Text(JsonObject node)=>node.ToJsonString(Options);
+
+    /// <summary>
+    /// Dalamud's file (pluginConfigs\TenshoAssistant.json, Newtonsoft with TypeNameHandling.Objects): the « $type » names Newtonsoft writes at
+    /// the head of every object, dictionaries included, are taken out at any depth, then the rest is read as Tensho's own file.
+    /// </summary>
+    public static T? ReadLegacy<T>(string text)=>WithoutTypeNames(text).Deserialize<T>(Options);
+    /// <summary>For the desktop app.</summary>
+    public static object? ReadLegacy(string text,Type type)=>WithoutTypeNames(text).Deserialize(type,Options);
+
+    public static JsonObject WithoutTypeNames(string text)
+    {
+        var root=Node(text);
+        var stack=new Stack<JsonNode>();
+        stack.Push(root);
+        while(stack.Count>0)
+        {
+            switch(stack.Pop())
+            {
+                case JsonObject node:
+                    node.Remove("$type");
+                    foreach(var (_,child) in node)if(child is not null)stack.Push(child);
+                    break;
+                case JsonArray list:
+                    foreach(var child in list)if(child is not null)stack.Push(child);
+                    break;
+            }
+        }
+        return root;
+    }
+
+    /// <summary>
+    /// The text to write when the file changed since this instance last read or wrote it (another game client's Tensho, a newer Tensho's
+    /// values): three-way, property by property at any depth. <paramref name="before"/> is this instance's own settings as it last read or
+    /// wrote them, <paramref name="mine"/> as they are now, <paramref name="theirs"/> the file as it is now. A value this instance did not
+    /// change is taken from the file (another's change kept, a name it does not know kept, a key another removed stays removed); a value it
+    /// changed is its own, two objects both changed are merged the same way inside; a name it removed (it had it, it no longer has it) stays
+    /// removed. Arrays and plain values are taken whole. Mine's order first, then the file's other names.
+    /// </summary>
+    public static JsonObject Merge(JsonObject? before,JsonObject mine,JsonObject theirs)=>Merge(before,mine,theirs,0);
+
+    private static JsonObject Merge(JsonObject? before,JsonObject mine,JsonObject theirs,int depth)
+    {
+        var result=new JsonObject();
+        foreach(var (name,value) in mine)
+        {
+            JsonNode? old=null;
+            var had=before is not null && before.TryGetPropertyValue(name,out old);
+            var there=theirs.TryGetPropertyValue(name,out var other);
+            if(had && JsonNode.DeepEquals(old,value))
+            {
+                if(there)result[name]=other?.DeepClone();
+                continue;
+            }
+            result[name]=value is JsonObject own && other is JsonObject file && depth<MaxDepth ? Merge(old as JsonObject,own,file,depth+1) : value?.DeepClone();
+        }
+        foreach(var (name,other) in theirs)
+        {
+            if(mine.ContainsKey(name))continue;
+            if(before is not null && before.ContainsKey(name))continue;
+            result[name]=other?.DeepClone();
+        }
+        return result;
+    }
+}
+
+/// <summary>Where the settings came from when Tensho loaded.</summary>
+public enum SettingsOrigin { New, Own, Backup, Legacy }
+
+/// <summary>
+/// X-685 part 2 (0.1745, D-206 a): Tensho's settings file of its own, pluginConfigs\TenshoAssistant\Settings.json (before: Dalamud's
+/// pluginConfigs\TenshoAssistant.json, read once at the first load and then left as it was, so an older Tensho still finds its settings).
+/// Written whole (AtomicFile: a crash or a full disk never leaves half a file), the version before kept as « .bak », under a fair lock shared
+/// by the game clients of the PC (FairFileLock), merged with the file as it is (SettingsJson.Merge): two game clients saving their own
+/// changes keep each other's, and names this version does not know are kept. A write that fails changes nothing on disk and is said once;
+/// the settings stay in memory and are written at the next save. A file that cannot be read is kept aside (« Settings.unreadable-… »),
+/// never written over unseen; then the backup, then Dalamud's file, then new settings.
+/// </summary>
+public sealed class SettingsFile<T>(string path,string? legacyPath,Action<Exception?,string> warn) where T:class,new()
+{
+    public const string FileName="Settings.json";
+    /// <summary>The wait for another game client's write (a write takes milliseconds).</summary>
+    public const int LockWaitMs=10_000;
+
+    private readonly object gate=new();
+    private JsonObject? before;
+    private bool failing;
+
+    /// <summary>The settings file in the plugin's folder (pluginConfigs\TenshoAssistant).</summary>
+    public static string In(string folder)=>Path.Combine(folder,FileName);
+
+    public string FilePath=>path;
+    public string BackupPath=>path+".bak";
+    public string LockPath=>path+".lock";
+
+    /// <summary>The settings: this file, else its backup, else Dalamud's (once: then written here), else new ones.</summary>
+    public T Load(out SettingsOrigin origin)
+    {
+        lock(gate)
+        {
+            string? own;
+            try{own=ReadText(path);}
+            catch(Exception error) when(error is IOException or UnauthorizedAccessException)
+            {
+                // Held by another program past the attempts: new settings for this session, the file left as it is (each save merges
+                // with it: only what is changed in this session is written over it).
+                warn(error,"The settings file could not be opened; new settings are used for this session, the file is left as it is.");
+                origin=SettingsOrigin.New;
+                var held=new T();
+                Remember(held);
+                return held;
+            }
+            if(own is not null)
+            {
+                if(Parse(own,legacy:false) is { } value){origin=SettingsOrigin.Own;Remember(value);return value;}
+                KeepAside(path,own);
+            }
+            if(ReadText(BackupPath) is { } backup && Parse(backup,legacy:false) is { } saved)
+            {
+                warn(null,"The settings file could not be read; its backup was read (the file kept aside, the backup written in its place).");
+                origin=SettingsOrigin.Backup;
+                Remember(saved);
+                Write(SettingsJson.Write(saved));
+                return saved;
+            }
+            if(legacyPath is not null && ReadText(legacyPath) is { } old)
+            {
+                if(Parse(old,legacy:true) is { } moved)
+                {
+                    origin=SettingsOrigin.Legacy;
+                    Remember(moved);
+                    Write(SettingsJson.Write(moved));
+                    return moved;
+                }
+                warn(null,"Dalamud's settings file of Tensho could not be read; new settings are used (that file is left as it is).");
+            }
+            origin=SettingsOrigin.New;
+            var fresh=new T();
+            Remember(fresh);
+            return fresh;
+        }
+    }
+
+    /// <summary>Writes the settings (merged with the file as it is now); false when it failed (said once, the next save tries again).</summary>
+    public bool Save(T live)
+    {
+        string text;
+        try{text=SettingsJson.Write(live);}
+        catch(Exception error) when(error is JsonException or NotSupportedException or InvalidOperationException)
+        {
+            Fail(error,"The settings could not be turned into text; nothing was written.");
+            return false;
+        }
+        lock(gate)return Write(text);
+    }
+
+    private void Remember(T value)
+    {
+        try{before=SettingsJson.Node(SettingsJson.Write(value));}
+        catch(Exception error) when(error is JsonException or NotSupportedException or InvalidOperationException){before=null;}
+    }
+
+    // Under gate.
+    private bool Write(string text)
+    {
+        try
+        {
+            var mine=SettingsJson.Node(text);
+            using(FairFileLock.Hold(LockPath,LockWaitMs,error=>new IOException("The settings file's lock is held by another program.",error)))
+            {
+                JsonObject? theirs=null;
+                if(ReadText(path) is { } now)
+                {
+                    try{theirs=SettingsJson.Node(now);}
+                    catch(JsonException){KeepAside(path,now);}
+                }
+                var merged=theirs is null ? mine : SettingsJson.Merge(before,mine,theirs);
+                if(theirs is not null)
+                {
+                    try{File.Copy(path,BackupPath,true);}
+                    catch(Exception error) when(error is IOException or UnauthorizedAccessException){}
+                }
+                AtomicFile.Write(path,SettingsJson.Text(merged));
+            }
+            before=mine;
+            if(failing){failing=false;warn(null,"The settings are written again.");}
+            return true;
+        }
+        catch(Exception error) when(error is IOException or UnauthorizedAccessException or JsonException)
+        {
+            Fail(error,"The settings could not be written; they stay in memory and are written at the next save.");
+            return false;
+        }
+    }
+
+    private void Fail(Exception error,string message)
+    {
+        if(failing)return;
+        failing=true;
+        warn(error,message);
+    }
+
+    private T? Parse(string text,bool legacy)
+    {
+        try{return legacy ? SettingsJson.ReadLegacy<T>(text) : SettingsJson.Read<T>(text);}
+        catch(Exception error) when(error is JsonException or NotSupportedException or InvalidOperationException or FormatException or OverflowException)
+        {
+            warn(error,legacy ? "Dalamud's settings file of Tensho could not be read." : "A settings file could not be read.");
+            return null;
+        }
+    }
+
+    // The whole text, read while another program may write it (a write moves a whole new file in place); null when absent. Tried again a
+    // few times while a scanner holds it an instant; still held: an IOException (never taken for an absent file).
+    private static string? ReadText(string file)
+    {
+        for(var attempt=1;;attempt++)
+        {
+            try
+            {
+                if(!File.Exists(file))return null;
+                using var stream=new FileStream(file,FileMode.Open,FileAccess.Read,FileShare.ReadWrite|FileShare.Delete);
+                using var reader=new StreamReader(stream);
+                return reader.ReadToEnd();
+            }
+            catch(FileNotFoundException){return null;}
+            catch(DirectoryNotFoundException){return null;}
+            catch(Exception error) when(attempt<6 && error is IOException or UnauthorizedAccessException){Thread.Sleep(50*attempt);}
+        }
+    }
+
+    // A file that cannot be read is copied aside once (each text once), never written over unseen.
+    private readonly HashSet<string> keptAside=new(StringComparer.Ordinal);
+    private void KeepAside(string file,string text)
+    {
+        if(!keptAside.Add(text))return;
+        try
+        {
+            var aside=Path.Combine(Path.GetDirectoryName(file)!,Path.GetFileNameWithoutExtension(FileName)+".unreadable-"+DateTime.Now.ToString("yyyyMMdd-HHmmss",System.Globalization.CultureInfo.InvariantCulture)+".json");
+            if(!File.Exists(aside))File.Copy(file,aside);
+            warn(null,"A settings file could not be read; it is kept aside as "+Path.GetFileName(aside)+".");
+        }
+        catch(Exception error) when(error is IOException or UnauthorizedAccessException){warn(error,"A settings file could not be read, nor kept aside.");}
+    }
+}

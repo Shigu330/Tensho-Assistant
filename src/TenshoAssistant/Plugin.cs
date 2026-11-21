@@ -145,9 +145,13 @@ public sealed partial class Plugin : IDalamudPlugin
             registrations.Register(() => { }, dutyLoot.Dispose);
             registrations.Register(() => { }, monsterLoot.Dispose);
             registrations.Register(() => { }, fashionData.Dispose);
-            var saved = pluginInterface.GetPluginConfig() as Configuration;
-            var newInstall = saved is null;
-            var configuration = saved ?? new Configuration();
+            // X-685 part 2 (0.1745, D-206 a): Tensho's own settings file (pluginConfigs\TenshoAssistant\Settings.json, System.Text.Json), no
+            // longer Dalamud's (Newtonsoft kept every unloaded copy of Tensho in the game process); Dalamud's file read once, then left as it was.
+            var settingsFile=new SettingsFile<Configuration>(SettingsFile<Configuration>.In(pluginInterface.GetPluginConfigDirectory()),pluginInterface.ConfigFile.FullName,
+                (error,message)=>{if(error is null)log.Warning(message);else log.Warning(error,message);});
+            var configuration=settingsFile.Load(out var settingsOrigin);
+            var newInstall=settingsOrigin==SettingsOrigin.New;
+            if(settingsOrigin is SettingsOrigin.Legacy)log.Information("Settings moved from Dalamud's settings file to Tensho's own (Settings.json), once; Dalamud's file is left as it was.");
             TenshoAssistant.Competitive.CompetitiveGate.Developer=()=>configuration.DeveloperMode;
             // X-177 C4.2 (0.1200): one thread compiles at a time, in the order of the need: the readers' classes wait until the window
             // exists and its warm-up has compiled the interface's code (bounded by ReaderCompiler.MaxHold; dropped at unload).
@@ -175,14 +179,14 @@ public sealed partial class Plugin : IDalamudPlugin
             var saveNotes=new Diagnostics.SlowNotes(TimeSpan.FromMinutes(5));
             // X-177 step 2 (0.1164): Dalamud's save is the cost (64 to 71 ms each time, 371 to 648 ms the first time after a load; the text
             // itself about 2 ms once warm): only the text is made here, a checked copy is written off the game's thread (SettingsSaver).
-            var saveText=new Newtonsoft.Json.JsonSerializerSettings{TypeNameAssemblyFormatHandling=Newtonsoft.Json.TypeNameAssemblyFormatHandling.Simple,TypeNameHandling=Newtonsoft.Json.TypeNameHandling.Objects};
+            // X-685 part 2 (0.1745): the text is System.Text.Json's (SettingsJson), the copy written to Tensho's own file, merged with it.
             var saver=new SettingsSaver<Configuration>(configuration,
-                live=>Newtonsoft.Json.JsonConvert.SerializeObject(live,saveText),
-                text=>Newtonsoft.Json.JsonConvert.DeserializeObject<Configuration>(text),
-                copy=>pluginInterface.SavePluginConfig(copy),
+                live=>SettingsJson.Write(live),
+                text=>SettingsJson.Read<Configuration>(text),
+                copy=>settingsFile.Save(copy),
                 action=>_=framework.RunOnFrameworkThread(action),
                 (error,message)=>{if(error is null)log.Warning(message);else log.Warning(error,message);});
-            registrations.Register(()=>_=saver.Warm(()=>pluginInterface.ConfigFile is { Exists: true } file ? File.ReadAllText(file.FullName) : null),
+            registrations.Register(()=>_=saver.Warm(()=>File.Exists(settingsFile.FilePath) ? File.ReadAllText(settingsFile.FilePath) : null),
                 ()=>
                 {
                     if(saver.Flush(TimeSpan.FromSeconds(5)))return;

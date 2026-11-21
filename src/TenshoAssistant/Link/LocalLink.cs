@@ -178,7 +178,7 @@ public static class LocalLinkProtocol
 
     /// <summary>
     /// X-149 (0.1119): the category a saved file's change is sent as: « settings » for the settings file itself (pluginConfigs\
-    /// TenshoAssistant.json), else the category of the plugin folder's file or sub-folder it is in (Categories); null for anything else,
+    /// TenshoAssistant\Settings.json since 0.1745, X-685; its backup and the files kept aside are none), else the category of the plugin folder's file or sub-folder it is in (Categories); null for anything else,
     /// a temporary or lock file, the data cache and the play state.
     /// </summary>
     public static string? ChangeCategory(string settingsFile,string folder,string path)

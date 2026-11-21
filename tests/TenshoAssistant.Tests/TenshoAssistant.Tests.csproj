@@ -203,6 +203,7 @@
     <Compile Include="../../src/TenshoAssistant/AtomicFile.cs" Link="AtomicFile.cs" />
     <Compile Include="../../src/TenshoAssistant/BackgroundWriter.cs" Link="BackgroundWriter.cs" />
     <Compile Include="../../src/TenshoAssistant/SettingsSaver.cs" Link="SettingsSaver.cs" />
+    <Compile Include="../../src/TenshoAssistant/SettingsFile.cs" Link="SettingsFile.cs" />
     <Compile Include="../../src/TenshoAssistant/TenshoDataDatabase.cs" Link="TenshoDataDatabase.cs" />
     <Compile Include="../../src/TenshoAssistant/OnceSet.cs" Link="OnceSet.cs" />
     <Compile Include="../../src/TenshoAssistant/FairFileLock.cs" Link="FairFileLock.cs" />
