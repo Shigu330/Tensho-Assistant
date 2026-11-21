@@ -62,6 +62,12 @@ internal sealed partial class MainWindow
     private void TabBarAfter(string id,TenshoAssistant.UI.TabBarDrag drag,bool dragged)
     {
         if(drag.After(dragged,configuration.TabOrders.GetValueOrDefault(id)) is not { } keep)return;
+        KeepOrder(id,keep);
+    }
+
+    /// <summary>X-605: an order the player arranged (a tab bar, a group of the side bar, 0.1702), kept by id and saved.</summary>
+    private void KeepOrder(string id,List<string> keep)
+    {
         configuration.TabOrders=new Dictionary<string,List<string>>(configuration.TabOrders){[id]=keep};
         TrySave("TabOrders");
     }
