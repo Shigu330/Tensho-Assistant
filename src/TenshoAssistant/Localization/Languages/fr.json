@@ -5005,6 +5005,10 @@
     "Variant": "{0} · niv. {1} · rendement {2}",
     "ChoiceTip": "Plusieurs recettes produisent cet ingrédient : choisissez celle à développer, puis relancez le calcul de la chaîne."
   },
+  "RecipeTip": {
+    "Minimum": "Minimum : {0}",
+    "Ingredients": "Ingrédients : {0}"
+  },
   "RecipeUi": {
     "Crafted": "déjà fabriquée",
     "NeverCrafted": "jamais fabriquée",

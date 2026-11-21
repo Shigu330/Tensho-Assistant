@@ -236,7 +236,7 @@ internal sealed partial class MainWindow
                     if(craft.Recipe.CraftTypeId<8)
                     {
                         DrawGameIcon(62108+craft.Recipe.CraftTypeId,new Vector2(ImGui.GetTextLineHeight()));
-                        if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("ListPanels.CraftRuns",craft.Recipe.CraftType,craft.Runs.ToString("N0",Numbers)));
+                        if(ImGui.IsItemHovered())DrawRecipeTooltip(RecipeTipOf(craft.Recipe),localization.Format("ListPanels.CraftRuns",craft.Recipe.CraftType,craft.Runs.ToString("N0",Numbers)));
                         ImGui.SameLine();
                     }
                     DrawListPanelLine(key+"Crafts",craft.Item,craft.Needed,GetRecipeHoldings(craft.Item));

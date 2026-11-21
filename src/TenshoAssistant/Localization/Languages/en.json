@@ -5005,6 +5005,10 @@
     "Variant": "{0} · lv. {1} · yield {2}",
     "ChoiceTip": "Several recipes make this ingredient: choose the one to expand, then calculate the chain again."
   },
+  "RecipeTip": {
+    "Minimum": "Minimum: {0}",
+    "Ingredients": "Ingredients: {0}"
+  },
   "RecipeUi": {
     "Crafted": "crafted before",
     "NeverCrafted": "never crafted",

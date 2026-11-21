@@ -24,10 +24,8 @@ internal sealed partial class MainWindow
     private void DrawRecipeFacts(RecipeDefinition recipe)
     {
         if(recipe.Simulation is not { } p)return;
-        var parts=RecipeFacts.Of(p,id=>itemCatalog.State.Catalog?.Find(id)?.Name).Select(fact=>fact.Key=="QuickFrom"
-            ? localization.Format("RecipeFacts.QuickFrom",fact.Value.Split('|')[0],fact.Value.Split('|')[1])
-            : localization.Format("RecipeFacts."+fact.Key,fact.Value));
-        ImGui.TextDisabled(string.Join(" · ",parts));
+        // X-684 (0.1692): the same line as the recipe's tooltip (MainWindow.RecipeTooltip.cs).
+        ImGui.TextDisabled(RecipeFactsText(p));
     }
 
     private void DrawCraftReadiness(RecipeDefinition recipe)

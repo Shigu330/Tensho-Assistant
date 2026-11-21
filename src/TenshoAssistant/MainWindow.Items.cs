@@ -551,7 +551,8 @@ internal sealed partial class MainWindow
                                 if (ImGui.Selectable($"{result?.Name ?? recipe.ResultItemId.ToString()}##Recipe", craftBookRecipe == recipe.RecipeId,
                                         ImGuiSelectableFlags.None, new Vector2(0, 30)) || clickedIcon)
                                     craftBookRecipe = recipe.RecipeId;
-                                if (ImGui.IsItemHovered()) WrappedTooltip(localization.Format("RecipeUi.JobLevel",recipe.CraftType,recipe.Level));
+                                // X-684 (0.1692): the one recipe tooltip (before: the crafter and the level only).
+                                if (ImGui.IsItemHovered()) DrawRecipeTooltip(RecipeTipOf(recipe));
                             }
                             finally { ImGui.PopID(); }
                         }
