@@ -53,7 +53,7 @@ internal static class SideBarDrag1702Tests
             Check(window.Contains("var key=\"SideBar.\"+(group.Category ?? \"Group\"+index);", StringComparison.Ordinal)
                 && window.Contains("TabOrder.Arrange(group.Entries,configuration.TabOrders.GetValueOrDefault(key),entry=>entry.Page.ToString())", StringComparison.Ordinal), "each group in the order kept");
             Check(window.Contains("if(FamilyTarget(entry.Page) is { } target)Navigation(entry.Label!(),entry.Page,target);", StringComparison.Ordinal) && window.Contains("sideBarRows=drag;", StringComparison.Ordinal)
-                && window.Contains("if (dragging) clicked = false;", StringComparison.Ordinal), "rows told by Navigation; no page opened while a drag is under way");
+                && window.Contains("if (!rows.KeepsClick(root.ToString())) clicked = false;", StringComparison.Ordinal), "rows told by Navigation; no page opened by a drag of another row (X-711)");
             Check(window.Contains("ImGui.IsItemActive() && ImGui.IsMouseDragging(ImGuiMouseButton.Left)", StringComparison.Ordinal) && window.Contains("SideBarAfter(key,drag);", StringComparison.Ordinal), "rows told, after each group");
             Check(window.Contains("if(drag.Drop(mouse) is { } order)KeepOrder(key,TenshoAssistant.UI.TabOrder.Keep(order,configuration.TabOrders.GetValueOrDefault(key)));", StringComparison.Ordinal), "kept by the one way (KeepOrder)");
             Check(Read("UI/Components/DetailPage.cs").Contains("private void KeepOrder(string id,List<string> keep)", StringComparison.Ordinal), "one way to keep an order");

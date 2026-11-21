@@ -15,6 +15,26 @@ public sealed class ListDrag
     /// <summary>A new frame: the rows are told again.</summary>
     public void Clear()=>Places.Clear();
 
+    private int seen;
+
+    /// <summary>
+    /// X-711 (0.1705, review M2): a new frame, numbered (ImGui's frame count): the rows are told again; a drag not seen on the frame just
+    /// before (the window closed or folded while the button was held: its release never seen) ends without moving anything, rather than
+    /// dropping the row later at wherever the mouse happens to be.
+    /// </summary>
+    public void Frame(int number)
+    {
+        if(Dragged is not null && number!=unchecked(seen+1))Dragged=null;
+        seen=number;
+        Places.Clear();
+    }
+
+    /// <summary>
+    /// X-711 (0.1705, review M1): a click on a row counts unless another row is being dragged. A row pressed, moved past ImGui's drag
+    /// threshold and released over itself is a click (the game's list reports it only then, and <see cref="Drop"/> gives nothing for it).
+    /// </summary>
+    public bool KeepsClick(string id)=>Dragged is null || Dragged==id;
+
     /// <summary>A row drawn this frame; <paramref name="dragging"/>: pressed and dragged now (it starts the drag when none is under way).</summary>
     public void Row(string id,float left,float top,float right,float bottom,bool dragging)
     {

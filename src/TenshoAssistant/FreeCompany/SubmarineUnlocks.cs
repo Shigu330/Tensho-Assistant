@@ -41,10 +41,15 @@ public static class SubmarineUnlocks
         return path;
     }
 
+    /// <summary>X-711 (0.1705, review M3): the chain goes back to a sector open from the start (not cut by an unknown link or a loop).</summary>
+    public static bool Whole(IReadOnlyDictionary<uint,SubmarineUnlock> unlocks,IReadOnlyList<uint> path)
+        =>path.Count>0 && unlocks.TryGetValue(path[0],out var first) && first.UnlockedBy==0;
+
     /// <summary>
     /// The sectors to explore, in order, to unlock <paramref name="target"/>: its chain without itself, from the last sector of the chain already
     /// unlocked in the company's workshop (<paramref name="unlocked"/>; null when not read: the whole chain). Unknown, open from the start or
-    /// already unlocked: said as such, nothing to explore.
+    /// already unlocked: said as such, nothing to explore. X-711 (0.1705, review M3): a chain cut before any sector already unlocked (a link
+    /// the game's sheet does not know, a loop) is unknown, never shown as whole.
     /// </summary>
     public static (SubmarineUnlockState State,IReadOnlyList<uint> Explore) Route(IReadOnlyDictionary<uint,SubmarineSector> sectors,
         IReadOnlyDictionary<uint,SubmarineUnlock> unlocks,uint target,IReadOnlyCollection<uint>? unlocked)
@@ -55,7 +60,9 @@ public static class SubmarineUnlocks
         var path=Path(sectors,unlocks,target);
         if(path.Count<2)return (SubmarineUnlockState.Unknown,[]);
         var explore=path.Take(path.Count-1).ToList();
-        if(unlocked is not null && explore.FindLastIndex(id=>unlocked.Contains(id)) is var last and > 0)explore=explore.Skip(last).ToList();
+        var last=unlocked is null ? -1:explore.FindLastIndex(id=>unlocked.Contains(id));
+        if(last<0 && !Whole(unlocks,path))return (SubmarineUnlockState.Unknown,[]);
+        if(last>0)explore=explore.Skip(last).ToList();
         return (SubmarineUnlockState.Path,explore);
     }
 }

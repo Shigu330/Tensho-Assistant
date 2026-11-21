@@ -423,7 +423,7 @@ internal sealed partial class MainWindow : Window, IDisposable
                 // order kept (« SideBar.<group> »).
                 var key="SideBar."+(group.Category ?? "Group"+index);
                 if(!sideBarDrags.TryGetValue(key,out var drag))sideBarDrags[key]=drag=new();
-                drag.Clear();
+                drag.Frame(ImGui.GetFrameCount());
                 sideBarRows=drag;
                 try
                 {
@@ -473,9 +473,9 @@ internal sealed partial class MainWindow : Window, IDisposable
         if (sideBarRows is { } rows)
         {
             var (min, max) = (ImGui.GetItemRectMin(), ImGui.GetItemRectMax());
-            var dragging = rows.Dragged is not null;
             rows.Row(root.ToString(), min.X, min.Y, max.X, max.Y, ImGui.IsItemActive() && ImGui.IsMouseDragging(ImGuiMouseButton.Left));
-            if (dragging) clicked = false;
+            // X-711 (0.1705, review M1): released over itself after a small move, the row dragged is still a click.
+            if (!rows.KeepsClick(root.ToString())) clicked = false;
         }
         if (clicked && NavigationPage(page) != root)
             page = target;
