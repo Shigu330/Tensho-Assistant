@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (713 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (715 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -775,18 +775,20 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-696 | Review of block 0.1656 to 0.1658 (review 0.1658, 20/11), minor M1, M2: M1 in… | Done in 0.1659.0 |
 | X-697 | Review of block 0.1659 to 0.1664 (review 0.1664, 21/11), minor M1, M2, M3: M1… | Done in 0.1665.0 |
 | X-698 | Review of block 0.1665 to 0.1670 (review 0.1670, 21/11), minor M1, M2, M3, M4… | Done in 0.1671.0 |
+| X-699 | User request (chat, 21/11 about 2:35 am): « is there really no way to keep the… | Done in 0.1688.0 |
 | X-700 | Review of block 0.1671 to 0.1676 (review 0.1676, 21/11), minor M1, M2, M3: M1… | Done in 0.1686.0 |
 | X-701 | User request (ocean fishing, 21/11 about 3:30 am, panel screenshot): « the… | Done in 0.1685.0 |
 | X-702 | User request (ocean fishing, 21/11 about 3:35 am), after the frozen-timer… | Done in 0.1685.0 |
 | X-703 | Fragile test seen in relay 153 (21/11 about 4:10 am): ChatFrameJit1633Tests « a… | Done in 0.1684.0 |
 | X-704 | CI red on 0.1679, 0.1680 and 0.1681 (job « New tool skeleton passes Verify »)… | Done in 0.1682.0 |
 | X-705 | User's choice (21/11 about 4:35 am, D-201 b): in the grouped side bar (X-601)… | Done in 0.1683.0 |
+| X-706 | Review of block 0.1682 to 0.1686 (review 0.1686, 21/11), minor M1, M2, M3: M1… | Done in 0.1687.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (713 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (715 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1559,9 +1561,11 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-696 | Relecture du bloc 0.1656 à 0.1658 (relecture 0.1658, 20/11), mineurs M1, M2… | Fait en 0.1659.0 |
 | X-697 | Relecture du bloc 0.1659 à 0.1664 (relecture 0.1664, 21/11), mineurs M1, M2, M3… | Fait en 0.1665.0 |
 | X-698 | Relecture du bloc 0.1665 à 0.1670 (relecture 0.1670, 21/11), mineurs M1, M2… | Fait en 0.1671.0 |
+| X-699 | Demande de l'utilisateur (chat, 21/11 vers 2 h 35) : « y a vraiment aucun moyen… | Fait en 0.1688.0 |
 | X-700 | Relecture du bloc 0.1671 à 0.1676 (relecture 0.1676, 21/11), mineurs M1, M2, M3… | Fait en 0.1686.0 |
 | X-701 | Demande de l'utilisateur (pêche en mer, 21/11 vers 3 h 30, capture du panneau)… | Fait en 0.1685.0 |
 | X-702 | Demande de l'utilisateur (pêche en mer, 21/11 vers 3 h 35), suite du point sur… | Fait en 0.1685.0 |
 | X-703 | Test fragile vu au relais 153 (21/11 vers 4 h 10) : ChatFrameJit1633Tests « a… | Fait en 0.1684.0 |
 | X-704 | CI rouge sur 0.1679, 0.1680 et 0.1681 (runs 44858515933, 44859015883… | Fait en 0.1682.0 |
 | X-705 | Choix de l'utilisateur (21/11 vers 4 h 35, D-201 b) : dans la barre de côté… | Fait en 0.1683.0 |
+| X-706 | Relecture du bloc 0.1682 à 0.1686 (relecture 0.1686, 21/11), mineurs M1, M2, M3… | Fait en 0.1687.0 |

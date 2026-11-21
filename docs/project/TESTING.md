@@ -2491,6 +2491,22 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1686) Liste de vente d'un servant (bouton de la fenêtre de vente) : après avoir ouvert le tableau du marché une fois cette semaine, choisir dans la liste un autre servant que celui ouvert : le pied de liste dit « le taux de sa ville » avec le taux de cette ville, plus 5 % d'office
 
+- [ ] (0.1687) Pêche sous Amorçage (panneau de pêche) : survoler le badge « Amorçage » puis une case de la colonne « Temps de touche » : les deux disent « règle de Tensho (ni le jeu ni la source ne donnent de chiffre) »
+
+- [ ] (0.1688) Fenêtre de chat de Tensho, clic droit sur le nom d'un joueur près de vous (Dire) : « Envoyer une requête d'ami », « Fonctions de blocage › Ajouter à la liste noire » et « Signaler ce joueur » ne sont plus grisés ; leur info-bulle dit qu'ils ouvrent le menu du jeu ; un clic sur l'un d'eux ouvre le menu du jeu de ce personnage, où se trouve l'entrée
+
+- [ ] (0.1688) Fenêtre de chat de Tensho, clic droit sur un Hurler d'un joueur loin : les trois mêmes entrées restent grisées ; leur info-bulle dit de passer par le chat du jeu ou de s'approcher du joueur ; dans le chat du jeu, le clic droit sur ce joueur donne bien ces entrées
+
+- [ ] (0.1689) Survoler un marchand dans la liste « Marchands » de la carte Tensho (clic droit sur la carte), sur la page Marchands (colonne PNJ) et parmi les sources d'un objet vendu : même info-bulle (icône, nom, lieux, boutiques avec leur nombre d'objets), puis l'effet du clic
+
+- [ ] (0.1689) Survoler un joueur de Triple Triade sur la page Triple Triade puis dans la liste de la carte : même info-bulle (lieu, mise et cartes, cartes manquantes, battu ou non, quêtes demandées)
+
+- [ ] (0.1690) En équipe, carte Tensho ouverte : survoler un membre de l'équipe sur la carte puis son repère au bord de la carte : nom et monde, puis classe et niveau, comme en survolant son nom dans la fenêtre de chat de Tensho
+
+- [ ] (0.1691) Page Contenus : survoler un donjon de la liste : icône, nom, genre et niveau, zone, avancement, quête qui le débloque, puis « Clic : son butin et ses détails » ; même info-bulle sur un étage de la page des donjons profonds et sur le bouton du contenu d'un monstre (page Monstres)
+
+- [ ] (0.1692) Page Artisanat, livre de recettes : survoler une recette de la liste : icône de la classe, objet et quantité, classe et niveau, durabilité, progression et qualité, minimum, faits (HQ, travail rapide…), déjà fabriquée, ingrédients ; même info-bulle sur l'icône de classe d'une fabrication dans un panneau de liste et dans « Fabriquer depuis le stock »
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
