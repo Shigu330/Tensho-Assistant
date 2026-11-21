@@ -26,6 +26,9 @@ public sealed class ChatTabSettings
     /// <summary>X-447 B2 (0.1622): this tab's own text size (60 to 200 %); null: the window's.</summary>
     public int? FontScale{get;set;}
     public int ScaleIn(ChatSettings window)=>FontScale is { } own ? Math.Clamp(own,60,200):window.BoundedFontScale;
+    /// <summary>X-447 B11 (0.1714): the window of its own this tab is drawn in (1 to <see cref="ChatWindows.Maximum"/>); 0: the chat window.
+    /// A conversation's tab keeps it in memory only, as the rest of it.</summary>
+    public int Window{get;set;}
     public bool Shows(ChatChannel channel)=>Channels?.Contains(channel)==true;
     /// <summary>X-447 B10 (0.1654): a conversation's tab: the player whose tells it shows (ChatConversations); null for the tabs of the settings.
     /// Such a tab lives in memory only: it is never in <see cref="ChatSettings.Tabs"/>, never saved (R04).</summary>

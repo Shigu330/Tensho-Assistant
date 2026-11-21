@@ -1506,6 +1506,8 @@ public sealed partial class Plugin : IDalamudPlugin
         if (arguments.Trim().ToLowerInvariant() is "peche" or "pêche" or "fish" or "fishing") { mainWindow?.ToggleFishingPanel(); return; }
         // X-403 (0.1434, D-166): « /tensho chat » shows or hides the Tensho chat window.
         if (arguments.Trim().ToLowerInvariant() is "chat") { mainWindow?.ToggleChatWindow(); return; }
+        // X-447 B12 (0.1714): « /tensho chat hide » hides every Tensho chat window for a moment, or shows them back.
+        if (string.Join(' ', arguments.Split(' ', StringSplitOptions.RemoveEmptyEntries)).ToLowerInvariant() is "chat hide") { mainWindow?.ToggleChatWindowsHidden(); return; }
         // 0.349 (g, X-07): « /tensho wiki <item> » and « /tensho lodestone <item> » open the item's page in the browser.
         var parts = arguments.Trim().Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
         // 0.494: « /tensho selftest » writes the self-check to the log.

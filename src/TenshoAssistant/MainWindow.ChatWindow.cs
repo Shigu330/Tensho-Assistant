@@ -18,7 +18,7 @@ internal sealed partial class MainWindow
     /// <summary>X-447 B7 (0.1647): the messages with an alert not seen yet in the Tensho chat window, a message in two tabs counted once.</summary>
     internal int ChatAlertsUnseen=>Volatile.Read(ref chatAlertsUnseen);
     /// <summary>X-447 B7 (0.1647): the server bar's entry clicked: the first tab holding an alert not seen is shown at the next frame.</summary>
-    internal void ShowChatAlert()=>Volatile.Write(ref chatShowAlert,true);
+    internal void ShowChatAlert(){chatAllHidden=false;Volatile.Write(ref chatShowAlert,true);}
     /// <summary>X-475: the folder of the chat history files (said when the player is asked to turn it on); null outside the game.</summary>
     internal string? ChatHistoryFolder{get;set;}
     /// <summary>X-475: « Erase the history » (every character's file, and what is queued); its answer says whether every file went.</summary>
@@ -174,7 +174,8 @@ internal sealed partial class MainWindow
 
     private bool ChatWindowVisible()
     {
-        if(!ChatWindowShown())return false;
+        // X-447 B12 (0.1714): every chat window hidden for a moment.
+        if(!ChatWindowShown() || chatAllHidden)return false;
         // X-533 (0.1508): over the game's messages, the window steps aside while the game's channel menu is open (the menu opens upward over it).
         if(ChatFollow.StepsAside(ChatHidesGameMessages(),ChatGameChannelMenu?.Invoke()==true))return false;
         var at=chatAt ?? Vector2.Zero;
@@ -198,6 +199,8 @@ internal sealed partial class MainWindow
     /// <summary>« /tensho chat »: shows or hides the window, as its setting does.</summary>
     internal void ToggleChatWindow()
     {
+        // X-447 B12 (0.1714): the chat windows hidden for a moment are shown back first (nothing was closed).
+        if(chatAllHidden){chatAllHidden=false;if(ChatOptions.WindowOpen)return;}
         var open=!ChatOptions.WindowOpen;
         ChatOptions.WindowOpen=open;
         if(!open)ChatMessages.Clear();
@@ -604,8 +607,9 @@ internal sealed partial class MainWindow
         }
     }
 
-    /// <summary>X-447 B10 (0.1654): a conversation's tab never replaced while shown or holding something not seen.</summary>
-    private bool ChatConversationBusy(ChatTabSettings tab)=>ReferenceEquals(tab,chatShownTab) || ChatMessages.ViewOf(tab) is { Unread:>0 } or { Alerts:>0 };
+    /// <summary>X-447 B10 (0.1654): a conversation's tab never replaced while shown or holding something not seen; X-447 B11 (0.1714), nor while
+    /// it is drawn in a window of its own.</summary>
+    private bool ChatConversationBusy(ChatTabSettings tab)=>ReferenceEquals(tab,chatShownTab) || ChatWindows.Of(tab)!=0 || ChatMessages.ViewOf(tab) is { Unread:>0 } or { Alerts:>0 };
 
     /// <summary>X-447 B10 (0.1654): a conversation closed: its view and its pins dropped (nothing of it left).</summary>
     private void ChatConversationClosed(ChatTabSettings tab){ChatMessages.Restart(tab);ChatMessages.Unpin(tab);}
@@ -1229,6 +1233,9 @@ internal sealed partial class MainWindow
         foreach(var tab in tabs)ChatMessages.ViewOf(tab).Refresh(ChatMessages,tab,options.BoundedMaxLines,table,options);
         // X-447 B7 (0.1647): the alerts not seen, for the server bar.
         Volatile.Write(ref chatAlertsUnseen,ChatAlert.Unseen(tabs.Select(ChatMessages.ViewOf),chatUnseen));
+        // X-447 B11 (0.1714): the tabs drawn in a window of their own leave this window's bar (their lines were refreshed above, their alerts counted).
+        ChatWindows.InChatWindow(tabs,ChatAllTabs(options),chatMainTabs);
+        tabs=chatMainTabs;
         if(developerMode)SlowFrames.Add(ImGui.GetFrameCount(),"Chat refresh",System.Diagnostics.Stopwatch.GetElapsedTime(refreshStarted).TotalMilliseconds);
         chatHighlighted=ChatTextFilter.Words(options.HighlightedPlayers);
         chatAlertWords=options.AlertWords;
@@ -1312,6 +1319,8 @@ internal sealed partial class MainWindow
                         // X-447 B10 (0.1654): a conversation's tab closed (its messages stay in the other tabs).
                         if(tab.Conversation is not null && ImGui.Selectable(localization.Get("ChatWindow.CloseConversation")) && chatConversations.Close(tab))
                             ChatConversationClosed(tab);
+                        // X-447 B11 and B12 (0.1714): the tab in a window of its own; with one, every chat window hidden for a moment.
+                        DrawChatDetachEntry(tab);
                         // X-687 (0.1663): the tab one place to the left or right (a settings' tab; a conversation's stays after them).
                         var all=ChatTabs(options);
                         var at=all.IndexOf(tab);
@@ -1994,7 +2003,7 @@ internal sealed partial class MainWindow
     private bool chatFirstLinesLogged;
     private string? chatWindowQuest;
     // 0.1460 (X-457): the scrolling of the tab shown, frame by frame, in developer mode.
-    private readonly ChatScrollWatch chatScrollWatch=new();
+    private ChatScrollWatch chatScrollWatch=new();
     // 0.1453: the web address whose menu a click opened.
     private string? chatWindowWeb;
     // 0.1456 (X-451): its site, read when the menu shows a new address.
