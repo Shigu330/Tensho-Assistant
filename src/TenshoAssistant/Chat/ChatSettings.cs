@@ -87,6 +87,9 @@ public sealed class ChatSettings
     /// the mouse on it, a menu of the chat or a new message brings it back.</summary>
     public int FadeAfter{get;set;}
     public int BoundedFadeAfter=>Math.Clamp(FadeAfter,0,600);
+    /// <summary>X-732 (0.1736, the user's report of 21/11): faded out, a tell received or a message holding an alert (your first name, an alert
+    /// word) in any tab brings the window back too, not only a new message of the tab shown (off by default).</summary>
+    public bool FadeBackOnTell{get;set;}
     /// <summary>X-447 B2 (0.1622, Prat, Chattynator): pixels added between the lines.</summary>
     public int LineSpacing{get;set;}
     public int BoundedLineSpacing=>Math.Clamp(LineSpacing,0,12);

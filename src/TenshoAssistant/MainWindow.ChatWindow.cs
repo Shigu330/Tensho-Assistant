@@ -72,20 +72,46 @@ internal sealed partial class MainWindow
         Padding:new Vector2(ChatLook.Padding.X,ChatLook.Padding.Y),Place:ChatPlace,Frame:ChatFrame,Once:ChatPlaceOnce,Early:()=>WarmupChatDone);
 
     /// <summary>X-447 D6 (0.1618): faded under a game window, else the opacity chosen while the mouse is not on the window (ChatLook.Alpha).
-    /// X-447 B1 (0.1622): then faded out after the delay without a new message in the tab shown (ChatLook.Idle); faded out, the clicks go through.</summary>
+    /// X-447 B1 (0.1622): then faded out after the delay without a new message in the tab shown (ChatLook.Idle); faded out, the clicks go through.
+    /// X-732 (0.1736): faded out, the content is not drawn (ImGui skips a window whose alpha is 0 at its Begin) and its lines are no longer
+    /// refreshed there: the tab shown's newest message is then taken here, from the chat's data (ChatFadeClock); with the setting on, a tell
+    /// received or an alert in any tab counts too.</summary>
     private float? ChatFade()
     {
         var hovered=chatAt is { } at && ChatLook.Under((ImGui.GetMousePos().X,ImGui.GetMousePos().Y),(at.X,at.Y),(chatSize.X,chatSize.Y));
-        if(chatShownNewest!=chatSeenNewest){chatSeenNewest=chatShownNewest;chatLastMessageAt=Environment.TickCount64;}
-        var alpha=ChatLook.Idle(ChatBaseFade(hovered),ChatOptions.BoundedFadeAfter,(Environment.TickCount64-chatLastMessageAt)/1000d,hovered || chatMenuOpen);
+        var now=Environment.TickCount64;
+        var wake=false;
+        if(chatIdleOut && chatShownTab is { } shownTab)
+        {
+            var options=ChatOptions;
+            chatShownNewest=ChatFadeClock.Newest(ChatMessages,shownTab,options,ChatFilterTableNow());
+            var last=ChatMessages.LastId;
+            wake=options.FadeBackOnTell && last>chatWakeChecked
+                && ChatFadeClock.Wakes(ChatMessages.After(chatWakeChecked),ChatTextFilter.Words(options.AlertWords),options.AlertOwnName ? ChatMessages.OwnName:null);
+            chatWakeChecked=last;
+        }
+        else chatWakeChecked=ChatMessages.LastId;
+        var newest=chatShownNewest;
+        var before=chatFadeClock.LastAt;
+        chatFadeClock.Note(newest,wake,now);
+        var alpha=chatFadeClock.Alpha(ChatBaseFade(hovered),ChatOptions.BoundedFadeAfter,now,hovered || chatMenuOpen);
+        // X-732 (0.1736): developer mode, how a faded-out window came back (ten times at most per session; never a message's words).
+        if(chatIdleOut && alpha is not <= 0f && developerMode && chatFadeSaid<10)
+        {
+            chatFadeSaid++;
+            log.Information("Chat window, faded out, back: {0}.",chatFadeClock.LastAt!=before ? (wake ? "a tell or an alert (the setting on)":"a new message of the tab shown"):"the mouse or a menu of the chat");
+        }
         chatIdleOut=alpha is <= 0f;
         return alpha;
     }
     private float? ChatBaseFade(bool hovered)
         =>ChatLook.Alpha(ChatCover.Faded(ChatOptions.WhenCovered,chatCovered) ? ChatCover.FadedAlpha:null,ChatOptions.BoundedTextOpacity,hovered);
-    // X-447 B1 (0.1622): the newest message of the tab shown (its id; -1: none), the one seen last, when it came, and the window faded out.
-    private long chatShownNewest=-1,chatSeenNewest=-1,chatLastMessageAt=Environment.TickCount64;
+    // X-447 B1 (0.1622): the newest message of the tab shown (its id; -1: none) and the window faded out. X-732 (0.1736): when the last message
+    // that keeps it up came (ChatFadeClock), the last message looked at for a tell or an alert, the developer's lines said.
+    private long chatShownNewest=-1,chatWakeChecked;
+    private readonly ChatFadeClock chatFadeClock=new(Environment.TickCount64);
     private bool chatIdleOut;
+    private int chatFadeSaid;
 
     /// <summary>X-447 D5 (0.1618): the window's margins, corners and frame thickness from its settings.</summary>
     private PanelFrame ChatFrame()=>new(new Vector2(ChatOptions.BoundedMarginX,ChatOptions.BoundedMarginY),ChatOptions.BoundedRounding,ChatOptions.BoundedBorder);
@@ -345,6 +371,8 @@ internal sealed partial class MainWindow
         // X-447 B2 (0.1622): spacing between the lines; B1: the window fades out after a delay without message.
         SliderSetting("ChatWindow.LineSpacing","ChatWindow.LineSpacingTip",()=>configuration.Chat.BoundedLineSpacing,value=>configuration.Chat.LineSpacing=value,0,12,defaults.LineSpacing,"%d px");
         SliderSetting("ChatWindow.FadeAfter","ChatWindow.FadeAfterTip",()=>configuration.Chat.BoundedFadeAfter,value=>configuration.Chat.FadeAfter=value,0,600,defaults.FadeAfter,"%d s");
+        // X-732 (0.1736): a tell or an alert in any tab brings the faded window back too (off by default).
+        BoolSetting("ChatWindow.FadeBackOnTell","ChatWindow.FadeBackOnTellTip",()=>configuration.Chat.FadeBackOnTell,value=>configuration.Chat.FadeBackOnTell=value,c=>c.Chat.FadeBackOnTell);
         IntSetting("ChatWindow.MaxLines","ChatWindow.MaxLinesTip",()=>configuration.Chat.BoundedMaxLines,value=>configuration.Chat.MaxLines=value,ChatStore.MinimumLines,ChatStore.MaximumLines,defaults.MaxLines);
         DrawChatLookCode();
     }

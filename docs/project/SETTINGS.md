@@ -96,7 +96,8 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 | `Chat.Clock24` | bool | true | Settings › Panels › ChatWindow | **24-hour clock** — Otherwise a 12-hour clock with AM or PM. Greyed while the time is not shown. Default: on. |
 | `Chat.ContextProfiles` | bool | false | Settings › Panels › ChatTabs | **Change by context** — The window's look and the tabs it shows change automatically in a duty, while crafting and in a city, as chosen below; the window's own look comes back when you leave. A change of the look made there is kept for that context. Nothing else changes, and never anything in combat beyond what is shown. Default: off. |
 | `Chat.Conversations` | bool | false | Settings › Panels › ChatPlayers | **Private conversations** — Each player you exchange tells with gets a tab of their own, opened by the first tell (received or sent) or from a player's menu (right click on their message); right click on the tab to close it. At most 6: the least recent one with nothing not seen leaves its place. In memory only: nothing is saved, the tabs leave at a logout; the tells stay in the other tabs. Default: off. |
-| `Chat.FadeAfter` | int | 0 | Settings › Panels › ChatWindow | **Fade out after (seconds without message)** — The whole window fades out when no new message came in the tab shown for that long, and the clicks then go through to the game; the mouse on it, an open menu of the chat or a new message brings it back. 0: never. Default: 0 s. |
+| `Chat.FadeAfter` | int | 0 | Settings › Panels › ChatWindow | **Fade out after (seconds without message)** — The whole window fades out when no new message came in the tab shown for that long, and the clicks then go through to the game; the mouse on it, an open menu of the chat or a new message in the tab shown brings it back (with the next box, also a tell received or an alert in another tab). 0: never. Default: 0 s. |
+| `Chat.FadeBackOnTell` | bool | false | Settings › Panels › ChatWindow | **Also come back for a tell or an alert** — Faded out, the window also comes back when a tell arrives or a message holds an alert (your first name said by a player, an alert word), in any tab; without this box, only a new message in the tab shown brings it back. Default: off. |
 | `Chat.FontScale` | int | 100 | Settings › Panels › ChatWindow | **Text size** — Size of the messages, from 60% to 200% of Tensho's text. Default: 100%. |
 | `Chat.GameLinks` | bool | true | Settings › Panels › ChatWindow | **Links as in the game** — Draws the links as the game's chat: its orange arrow before them, their text in the message's colour, not underlined. Otherwise they are underlined in the accent colour. Default: on. |
 | `Chat.GameTabs` | bool | true | Settings › Panels › ChatWindow | **Tabs as in the game** — Rounded grey tabs, the one shown marked by a dot, as the game's chat. Default: on. |
@@ -426,7 +427,7 @@ Settings reset by « Restore every setting » without a control in the interface
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Counted: 368 controls (312 linked to `Configuration`, 56 to another file), 36 settings without a control.
+Counted: 369 controls (313 linked to `Configuration`, 56 to another file), 36 settings without a control.
 <!-- /docgen:settings -->
 
 ---
@@ -528,7 +529,8 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 | `Chat.Clock24` | bool | true | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Horloge sur 24 heures** — Sinon, une horloge sur 12 heures avec AM ou PM. Grisé tant que l'heure n'est pas affichée. Par défaut : activé. |
 | `Chat.ContextProfiles` | bool | false | Paramètres › Panneaux à côté du jeu › Onglets du chat | **Changer selon le contexte** — L'aspect de la fenêtre et les onglets qu'elle montre changent seuls en mission, en artisanat et en ville, comme choisi ci-dessous ; l'aspect de la fenêtre revient quand vous en sortez. Un changement d'aspect fait là est gardé pour ce contexte. Rien d'autre ne change, et jamais rien en combat au-delà de ce qui est affiché. Par défaut : désactivé. |
 | `Chat.Conversations` | bool | false | Paramètres › Panneaux à côté du jeu › Joueurs du chat | **Conversations privées** — Chaque joueur avec qui vous échangez des murmures a son propre onglet, ouvert au premier murmure (reçu ou envoyé) ou depuis le menu d'un joueur (clic droit sur son message) ; clic droit sur l'onglet pour le fermer. Au plus 6 : le moins récent sans rien de pas vu laisse sa place. En mémoire seulement : rien n'est enregistré, les onglets partent à la déconnexion ; les murmures restent dans les autres onglets. Par défaut : désactivé. |
-| `Chat.FadeAfter` | int | 0 | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **S'effacer après (secondes sans message)** — Toute la fenêtre s'efface quand aucun nouveau message n'est arrivé dans l'onglet affiché depuis ce temps, et les clics passent alors au jeu ; la souris dessus, un menu du chat ouvert ou un nouveau message la font revenir. 0 : jamais. Par défaut : 0 s. |
+| `Chat.FadeAfter` | int | 0 | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **S'effacer après (secondes sans message)** — Toute la fenêtre s'efface quand aucun nouveau message n'est arrivé dans l'onglet affiché depuis ce temps, et les clics passent alors au jeu ; la souris dessus, un menu du chat ouvert ou un nouveau message de l'onglet affiché la font revenir (avec la case suivante, aussi un message privé reçu ou une alerte dans un autre onglet). 0 : jamais. Par défaut : 0 s. |
+| `Chat.FadeBackOnTell` | bool | false | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Revenir aussi pour un message privé ou une alerte** — Effacée, la fenêtre revient aussi quand un message privé arrive ou qu'un message contient une alerte (votre prénom dit par un joueur, un mot d'alerte), dans n'importe quel onglet ; sans cette case, seul un nouveau message de l'onglet affiché la fait revenir. Par défaut : désactivé. |
 | `Chat.FontScale` | int | 100 | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Taille du texte** — Taille des messages, de 60 % à 200 % du texte de Tensho. Par défaut : 100 %. |
 | `Chat.GameLinks` | bool | true | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Liens comme dans le jeu** — Dessine les liens comme le chat du jeu : sa flèche orange devant, le texte dans la couleur du message, sans soulignement. Sinon, ils sont soulignés dans la couleur d'accent. Par défaut : activé. |
 | `Chat.GameTabs` | bool | true | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Onglets comme dans le jeu** — Des onglets gris arrondis, celui qui est affiché marqué d'un point, comme dans le chat du jeu. Par défaut : activé. |
@@ -858,5 +860,5 @@ Réglages remis par « Tout remettre par défaut » sans case dans l'interface (
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Compté : 368 cases (312 reliées à `Configuration`, 56 à un autre fichier), 36 réglages sans case.
+Compté : 369 cases (313 reliées à `Configuration`, 56 à un autre fichier), 36 réglages sans case.
 <!-- /docgen:settings-fr -->

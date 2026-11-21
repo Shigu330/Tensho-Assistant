@@ -33,7 +33,8 @@ internal static class ChatIdle1622Tests
         ("Chat idle 1622: wiring: the fade, the clicks, the newest message, the size and spacing, the settings",()=>
         {
             var chat=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.ChatWindow.cs")).Replace("\r\n","\n");
-            Check(chat.Contains("var alpha=ChatLook.Idle(ChatBaseFade(hovered),ChatOptions.BoundedFadeAfter,(Environment.TickCount64-chatLastMessageAt)/1000d,hovered || chatMenuOpen);"),"the fade");
+            // X-732 (0.1736): the time of the last message kept by ChatFadeClock (ChatLook.Idle inside), the newest taken from the data when faded out.
+            Check(chat.Contains("var alpha=chatFadeClock.Alpha(ChatBaseFade(hovered),ChatOptions.BoundedFadeAfter,now,hovered || chatMenuOpen);"),"the fade");
             Check(chat.Contains("|(chatIdleOut ? ImGuiWindowFlags.NoInputs:ImGuiWindowFlags.None)") && chat.Contains("chatShownNewest=view.Count>0 ? view.RecordAt(view.Count-1).Id:-1;"),"the clicks and the newest message");
             Check(chat.Contains("ImGui.SetWindowFontScale(scale/100f);") && chat.Contains("var height=ImGui.GetTextLineHeightWithSpacing()+options.BoundedLineSpacing;") && chat.Contains("maps.State.Catalog is not null))+\"|\"+scale;"),"size and spacing");
             Check(chat.Contains("SliderSetting(\"ChatWindow.LineSpacing\",") && chat.Contains("SliderSetting(\"ChatWindow.FadeAfter\",") && chat.Contains("###ChatTabFontOwn"),"settings");
