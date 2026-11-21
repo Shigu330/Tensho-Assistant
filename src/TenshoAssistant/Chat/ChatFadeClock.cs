@@ -21,6 +21,20 @@ public sealed class ChatFadeClock(long now)
         seen=newest;LastAt=at;
     }
 
+    private long restoresSeen;
+    /// <summary>X-757 M3 (0.1740, review of 0.1738): whether the chat was put back on its history since the last call (ChatStore.Restore numbers
+    /// every line again, at any time of the history's second): then the caller takes the tab's newest again from the data and gives it to
+    /// <see cref="Renumbered"/>, and looks for tells and alerts only after the last line (none of the lines put back is new).</summary>
+    public bool Restored(long restores)
+    {
+        if(restores==restoresSeen)return false;
+        restoresSeen=restores;
+        return true;
+    }
+
+    /// <summary>X-757 M3 (0.1740): the tab shown's newest after its lines were numbered again: seen, never new (the delay goes on).</summary>
+    public void Renumbered(long newest)=>seen=newest;
+
     /// <summary>The window's alpha at <paramref name="at"/> (ChatLook.Idle: <paramref name="after"/> seconds without such a message, then it fades out).</summary>
     public float? Alpha(float? alpha,int after,long at,bool kept)=>ChatLook.Idle(alpha,after,(at-LastAt)/1000d,kept);
 

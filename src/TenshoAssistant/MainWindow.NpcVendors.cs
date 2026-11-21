@@ -52,7 +52,8 @@ internal sealed partial class MainWindow
             if(unplaced.Count>0)
             {
                 ImGui.TableNextRow();ImGui.TableNextColumn();
-                if(ImGui.Selectable(localization.Format(npcVendorsUnplacedOpen ? "NpcUi.UnplacedOpen":"NpcUi.UnplacedClosed",unplaced.Count)+"##Unplaced",false,ImGuiSelectableFlags.SpanAllColumns))
+                // X-757 M2 (0.1740): the vendors counted, not their offers.
+                if(ImGui.Selectable(localization.Format(npcVendorsUnplacedOpen ? "NpcUi.UnplacedOpen":"NpcUi.UnplacedClosed",NpcVendorRows.Vendors(unplaced,offer=>offer.Vendor.NpcId))+"##Unplaced",false,ImGuiSelectableFlags.SpanAllColumns))
                     npcVendorsUnplacedOpen=!npcVendorsUnplacedOpen;
                 Tip("NpcUi.UnplacedTip");
                 if(npcVendorsUnplacedOpen)for(var index=0;index<unplaced.Count;index++)DrawNpcOfferRow(unplaced[index],placed.Count+index);

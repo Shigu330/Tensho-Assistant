@@ -81,6 +81,15 @@ internal sealed partial class MainWindow
         var hovered=chatAt is { } at && ChatLook.Under((ImGui.GetMousePos().X,ImGui.GetMousePos().Y),(at.X,at.Y),(chatSize.X,chatSize.Y));
         var now=Environment.TickCount64;
         var wake=false;
+        // X-757 M3 (0.1740, review of 0.1738): the chat put back on its history (every line numbered again): the tab's newest and the last
+        // message looked at taken again from the data, none of them new (as ChatConversations); before the content draws, which takes the
+        // newest again the same way.
+        if(chatFadeClock.Restored(ChatMessages.Restores))
+        {
+            if(chatShownTab is { } restoredTab)chatShownNewest=ChatFadeClock.Newest(ChatMessages,restoredTab,ChatOptions,ChatFilterTableNow());
+            chatWakeChecked=ChatMessages.LastId;
+            chatFadeClock.Renumbered(chatShownNewest);
+        }
         if(chatIdleOut && chatShownTab is { } shownTab)
         {
             var options=ChatOptions;
@@ -95,13 +104,17 @@ internal sealed partial class MainWindow
         var before=chatFadeClock.LastAt;
         chatFadeClock.Note(newest,wake,now);
         var alpha=chatFadeClock.Alpha(ChatBaseFade(hovered),ChatOptions.BoundedFadeAfter,now,hovered || chatMenuOpen);
-        // X-732 (0.1736): developer mode, how a faded-out window came back (ten times at most per session; never a message's words).
+        // X-732 (0.1736): developer mode, how a faded-out window came back (ten times at most per session; never a message's words). X-757 M4
+        // (0.1740): with the tab shown, the newest message's number and the alpha before and after (the probe X-732's definition asked for).
         if(chatIdleOut && alpha is not <= 0f && developerMode && chatFadeSaid<10)
         {
             chatFadeSaid++;
-            log.Information("Chat window, faded out, back: {0}.",chatFadeClock.LastAt!=before ? (wake ? "a tell or an alert (the setting on)":"a new message of the tab shown"):"the mouse or a menu of the chat");
+            log.Information("Chat window, faded out, back: {0}; tab « {1} », its newest message {2}; alpha {3} then {4}.",
+                chatFadeClock.LastAt!=before ? (wake ? "a tell or an alert (the setting on)":"a new message of the tab shown"):"the mouse or a menu of the chat",
+                chatShownTab?.Name ?? "",newest,ChatFadeText(chatFadeAlpha),ChatFadeText(alpha));
         }
         chatIdleOut=alpha is <= 0f;
+        chatFadeAlpha=alpha;
         return alpha;
     }
     private float? ChatBaseFade(bool hovered)
@@ -112,6 +125,9 @@ internal sealed partial class MainWindow
     private readonly ChatFadeClock chatFadeClock=new(Environment.TickCount64);
     private bool chatIdleOut;
     private int chatFadeSaid;
+    // X-757 M4 (0.1740): the alpha given at the last frame (null: the window's own), for the developer's line.
+    private float? chatFadeAlpha;
+    private static string ChatFadeText(float? alpha)=>alpha is { } value ? value.ToString("0.00",System.Globalization.CultureInfo.InvariantCulture):"its own";
 
     /// <summary>X-447 D5 (0.1618): the window's margins, corners and frame thickness from its settings.</summary>
     private PanelFrame ChatFrame()=>new(new Vector2(ChatOptions.BoundedMarginX,ChatOptions.BoundedMarginY),ChatOptions.BoundedRounding,ChatOptions.BoundedBorder);

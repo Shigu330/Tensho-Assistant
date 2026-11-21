@@ -15,6 +15,10 @@ public static class NpcVendorRows
         return (on,off);
     }
 
+    /// <summary>X-757 M2 (0.1740, review of 0.1738): how many vendors (distinct NPCs) the offers name: a vendor of two shops counts once, as
+    /// the page's header counts them.</summary>
+    public static int Vendors<T>(IEnumerable<T> offers,Func<T,uint> npc)=>offers.Select(npc).Distinct().Count();
+
     /// <summary>The rows the table shows: the placed vendors, then one row for the others when there are any, then those when unfolded.</summary>
     public static int Rows(int placed,int unplaced,bool open)=>placed+(unplaced>0 ? 1+(open ? unplaced:0):0);
 }
