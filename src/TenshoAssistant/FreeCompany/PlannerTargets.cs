@@ -18,4 +18,15 @@ public static class PlannerTargets
     /// <summary>The sector to visit now to unlock the target: the first of the sectors to explore; none when unknown, open or already unlocked.</summary>
     public static IReadOnlyList<uint> UnlockVisit(SubmarineUnlockState state,IReadOnlyList<uint> explore)
         =>state==SubmarineUnlockState.Path && explore.Count>0 ? [explore[0]]:[];
+
+    /// <summary>
+    /// X-712 (review M2): the sector one vessel visits to unlock the target, from its own company's unlocked sectors (null when not read: the
+    /// whole chain), with the state that says why there is none.
+    /// </summary>
+    public static (SubmarineUnlockState State,IReadOnlyList<uint> Visit) UnlockVisitFor(IReadOnlyDictionary<uint,SubmarineSector> sectors,
+        IReadOnlyDictionary<uint,SubmarineUnlock> unlocks,uint target,IReadOnlyCollection<uint>? unlocked)
+    {
+        var (state,explore)=SubmarineUnlocks.Route(sectors,unlocks,target,unlocked);
+        return (state,UnlockVisit(state,explore));
+    }
 }

@@ -5798,7 +5798,7 @@
     "ChooseHint": "Cochez jusqu'à 5 secteurs ci-dessous, ou prenez l'un des meilleurs trajets, pour mesurer un trajet.",
     "Chosen": "Trajet : {0} · distance {1} / {2} · {3} · expérience {4} · valeur {5}",
     "Fleet": "Vos sous-marins : meilleur trajet de chacun",
-    "FleetTip": "Chaque sous-marin lu dans l'atelier, avec son rang, sa vitesse et son autonomie (et les secteurs débloqués de sa compagnie quand « Secteurs débloqués seulement » est coché), et son meilleur trajet sur cette carte pour le but (et l'objet ou le secteur) choisi plus haut. Cherché seulement quand cette liste est ouverte. Proposé seulement : « Choisir » remplit le planificateur, rien n'est envoyé au jeu.",
+    "FleetTip": "Chaque sous-marin lu dans l'atelier, avec son rang, sa vitesse et son autonomie (et les secteurs débloqués de sa compagnie quand « Secteurs débloqués seulement » est coché), et son meilleur trajet sur cette carte pour le but (et l'objet ou le secteur) choisi plus haut. Avec « Débloquer un secteur », chacun passe par le prochain secteur à explorer d'après les secteurs débloqués de sa propre compagnie. Cherché seulement quand cette liste est ouverte. Proposé seulement : « Choisir » remplit le planificateur, rien n'est envoyé au jeu.",
     "FleetNone": "Aucun sous-marin lu pour l'instant : ouvrez la liste des sous-marins à l'atelier de la compagnie en jeu.",
     "FleetRoute": "{0} · {1} / {2} · {3} · valeur {4} · {5} gils par jour · exp {6}",
     "FleetUseTip": "Choisit ce sous-marin plus haut et coche les secteurs de ce trajet.",

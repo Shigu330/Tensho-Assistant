@@ -5798,7 +5798,7 @@
     "ChooseHint": "Tick up to 5 sectors below, or take one of the best routes, to measure a route.",
     "Chosen": "Route: {0} · distance {1} / {2} · {3} · experience {4} · value {5}",
     "Fleet": "Your submersibles: best route of each",
-    "FleetTip": "Each submersible read in the workshop, with its own rank, speed and range (and its company's unlocked sectors when « Unlocked sectors only » is on), and its best route on this map for the goal (and item or sector) chosen above. Searched only while this list is open. Proposed only: « Choose » fills the planner, nothing is sent to the game.",
+    "FleetTip": "Each submersible read in the workshop, with its own rank, speed and range (and its company's unlocked sectors when « Unlocked sectors only » is on), and its best route on this map for the goal (and item or sector) chosen above. With « Unlock a sector », each one goes through the next sector to explore from its own company's unlocked sectors. Searched only while this list is open. Proposed only: « Choose » fills the planner, nothing is sent to the game.",
     "FleetNone": "No submersible read yet: open the submersible list at the company workshop in the game.",
     "FleetRoute": "{0} · {1} / {2} · {3} · value {4} · {5} gil a day · exp {6}",
     "FleetUseTip": "Chooses this submersible above and ticks this route's sectors.",

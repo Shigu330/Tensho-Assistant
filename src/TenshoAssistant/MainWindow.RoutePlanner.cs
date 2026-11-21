@@ -46,8 +46,9 @@ internal sealed partial class MainWindow
     private uint submarineLootItem;
     private readonly List<uint> submarineChosen=[];
     private (string Key,(int Distance,int Seconds,SubmarineSector[] Order)? Route)? submarineChosenCache;
-    private readonly PlannerSearch<IReadOnlyList<(string Key,string Name,int Rank,int Speed,int Range,PlannedRoute? Route)>> submarineFleetSearch=new();
-    private IReadOnlyList<(string Key,string Name,int Rank,int Speed,int Range,PlannedRoute? Route)> submarineFleet=[];
+    // X-712 (review M2): Unlock is the submarine's own unlock state for « Unlock a sector » (null for the other goals).
+    private readonly PlannerSearch<IReadOnlyList<(string Key,string Name,int Rank,int Speed,int Range,PlannedRoute? Route,SubmarineUnlockState? Unlock)>> submarineFleetSearch=new();
+    private IReadOnlyList<(string Key,string Name,int Rank,int Speed,int Range,PlannedRoute? Route,SubmarineUnlockState? Unlock)> submarineFleet=[];
 
     private void DrawSubmarineRoutes()
     {
@@ -280,21 +281,32 @@ internal sealed partial class MainWindow
         var (map,goal,band)=(plannerMap,plannerGoal,plannerBand);
         ISet<uint>? Excluded(VoyageVessel sub)=>!useUnlocked || Voyages.UnlockedFor(configuration.SubmarineUnlocked,sub.HouseId) is not { } unlocked ? null
             :catalog.SectorsOf(map).Where(sector=>!sector.Start && !unlocked.Contains(sector.Id)).Select(sector=>sector.Id).ToHashSet();
-        var ships=subs.Select(sub=>(Key:VesselKey(sub),sub.Name,sub.Rank,Speed:Math.Max(1,sub.Speed),Range:Math.Max(1,sub.Range),Excluded:Excluded(sub))).ToArray();
-        var key=$"{map}|{goal}|{band}|{System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(values)}|{(targets is null ? "-":string.Join(",",targets))}|"
-            +string.Join(";",ships.Select(ship=>$"{ship.Key},{ship.Rank},{ship.Speed},{ship.Range},{ship.Excluded?.Count}"));
+        // X-712 (review M2): for « Unlock a sector », each submarine visits the next sector to explore from its own company's unlocked sectors,
+        // not the chosen submarine's company's (the targets drawn above); the other goals share the targets above.
+        var unlockTarget=plannerUnlockTarget;
+        (SubmarineUnlockState? State,IReadOnlyCollection<uint>? Targets) TargetsOf(VoyageVessel sub)
+        {
+            if(goal!=RouteGoal.Unlock || unlockTarget==0)return (null,targets);
+            var (state,visit)=PlannerTargets.UnlockVisitFor(catalog.Sectors,catalog.Unlocks,unlockTarget,Voyages.UnlockedFor(configuration.SubmarineUnlocked,sub.HouseId));
+            return (state,visit);
+        }
+        var ships=subs.Select(sub=>(Key:VesselKey(sub),sub.Name,sub.Rank,Speed:Math.Max(1,sub.Speed),Range:Math.Max(1,sub.Range),Excluded:Excluded(sub),Target:TargetsOf(sub))).ToArray();
+        var key=$"{map}|{goal}|{band}|{System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(values)}|"
+            +string.Join(";",ships.Select(ship=>$"{ship.Key},{ship.Rank},{ship.Speed},{ship.Range},{ship.Excluded?.Count},{(ship.Target.Targets is null ? "-":string.Join("+",ship.Target.Targets))}"));
         if(submarineFleetSearch.Needs(key))
-            submarineFleetSearch.Start(key,token=>(IReadOnlyList<(string,string,int,int,int,PlannedRoute?)>)[.. ships.Select(ship=>(ship.Key,ship.Name,ship.Rank,ship.Speed,ship.Range,
-                VoyagePlanner.Plan(catalog.SectorsOf(map),ship.Rank,ship.Speed,ship.Range,goal,id=>SectorValue(catalog,values,band,id),1,token,ship.Excluded,targets).FirstOrDefault()))]);
+            submarineFleetSearch.Start(key,token=>(IReadOnlyList<(string,string,int,int,int,PlannedRoute?,SubmarineUnlockState?)>)[.. ships.Select(ship=>(ship.Key,ship.Name,ship.Rank,ship.Speed,ship.Range,
+                VoyagePlanner.Plan(catalog.SectorsOf(map),ship.Rank,ship.Speed,ship.Range,goal,id=>SectorValue(catalog,values,band,id),1,token,ship.Excluded,ship.Target.Targets).FirstOrDefault(),
+                ship.Target.State))]);
         if(submarineFleetSearch.Take(out var fleet,out var failure))submarineFleet=fleet;
         else if(failure is not null)log.Warning(failure,"Submarine fleet routes could not be planned.");
         if(submarineFleetSearch.Searching && submarineFleet.Count==0){ImGui.TextDisabled(localization.Get("RoutePlanner.Searching"));return;}
         var index=0;
-        foreach(var (shipKey,name,shipRank,speed,range,route) in submarineFleet)
+        foreach(var (shipKey,name,shipRank,speed,range,route,unlock) in submarineFleet)
         {
             index++;
             var head=localization.Format("AirshipPlanner.FleetShip",name,shipRank,speed,range);
-            if(route is null){ImGui.TextDisabled(head+" — "+localization.Get("AirshipPlanner.FleetNoRoute"));continue;}
+            // X-712 (review M2): nothing to explore for this submarine's company (already unlocked, open, unknown): said as such.
+            if(route is null){ImGui.TextDisabled(head+" — "+localization.Get(unlock is { } own && own!=SubmarineUnlockState.Path ? "RoutePlanner.Unlock"+own:"AirshipPlanner.FleetNoRoute"));continue;}
             var names=string.Join(" › ",route.Sectors.Select(id=>catalog.Sectors.TryGetValue(id,out var sector) ? sector.Name:id.ToString(System.Globalization.CultureInfo.InvariantCulture)));
             ImGui.TextUnformatted(head+" — "+localization.Format("RoutePlanner.FleetRoute",names,route.Distance,range,HoursMinutes(TimeSpan.FromSeconds(route.Seconds)),
                 route.Value.ToString("N0",Numbers),route.ValuePerDay.ToString("N0",Numbers),route.Exp.ToString("N0",Numbers)));
