@@ -32,7 +32,6 @@ internal sealed partial class MainWindow
       (EquipmentSlots.Ears,"Ears"),(EquipmentSlots.Neck,"Neck"),(EquipmentSlots.Wrists,"Wrists"),(EquipmentSlots.Ring,"Ring") ];
     private void DrawFashion()
     {
-        Heading(localization.Get("FashionUi.Title"),localization.Get("FashionUi.Description"));
         var native=fashionHints.State;
         // 0.213: the week first (theme, 11 slots of the game window, gear per slot), then every category.
         if(native.Catalog is not null && TenshoAssistant.UI.UiComponents.Header(localization.Get("FashionWeek.Title")+"###FashionWeek",ImGuiTreeNodeFlags.DefaultOpen))DrawFashionWeek();

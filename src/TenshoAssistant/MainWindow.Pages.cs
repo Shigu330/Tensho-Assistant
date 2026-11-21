@@ -57,8 +57,12 @@ internal sealed partial class MainWindow
         new(Page.Garden,"Tracking",()=>GardenAlarmCount is var gardenAlarms and >0 ? localization.Format("Navigation.GardenCount",gardenAlarms):localization.Get("Navigation.Garden"),DrawGardenPage,"MainWindow.Garden.cs, MainWindow.GardenCrosses.cs"),
         new(Page.FreeCompany,"Tracking",PageLabel("Navigation.FreeCompany"),DrawFreeCompany,"MainWindow.FreeCompany.cs, MainWindow.RoutePlanner.cs, MainWindow.VesselBuilds.cs, FreeCompany/"),
         // 0.341 (user request): the Character page is gone (the Gear page shows the same real values); the chocobo has its own page.
-        new(Page.Quests,"Progression",PageLabel("Navigation.Quests"),DrawQuests,"MainWindow.Quests.cs, Quests/"),
-        new(Page.Events,"Progression",PageLabel("Navigation.Events"),DrawEventsPage,"MainWindow.Events.cs, Events/"),
+        // X-601 (0.1680, D-199): « Quests », the journal, the levequests, the seasonal events, the allied societies and the grand companies.
+        new(Page.Quests,"Progression",PageLabel("Navigation.Quests"),DrawQuests,"MainWindow.Quests.cs, Quests/",Tab:PageLabel("Navigation.Journal"),About:PageLabel("QuestsBrowser.Description")),
+        new(Page.Leves,"Progression",null,DrawLeves,"MainWindow.Leves.cs",Page.Quests,Tab:PageLabel("Navigation.Leves"),About:PageLabel("Leves.Description")),
+        new(Page.Events,"Progression",null,DrawEventsPage,"MainWindow.Events.cs, Events/",Page.Quests,Tab:PageLabel("Navigation.Events"),About:PageLabel("Events.Description")),
+        new(Page.AlliedSocieties,"Progression",null,DrawAlliedSocieties,"MainWindow.AlliedSocieties.cs, Societies/",Page.Quests,Tab:PageLabel("Navigation.AlliedSocieties"),About:PageLabel("Allied.Subtitle")),
+        new(Page.GrandCompanies,"Progression",null,DrawGrandCompanies,"MainWindow.GrandCompanies.cs, GrandCompanies/",Page.Quests,Tab:PageLabel("Navigation.GrandCompanies"),About:PageLabel("GrandCompany.Subtitle")),
         // X-601 (0.1677, D-199): « Character », the first page that groups: the collections, blue magic and its carnivale, the beastmaster,
         // the chocobo, the hunting log, the gear and the relic weapons, each a tab of the one page header.
         new(Page.Collections,"Progression",PageLabel("Navigation.Character"),()=>DrawCollections(),"MainWindow.Collections.cs, Collections/",Tab:PageLabel("Navigation.Collection"),About:PageLabel("CollectionsBrowser.Description")),
@@ -69,17 +73,17 @@ internal sealed partial class MainWindow
         new(Page.HuntingLog,"Progression",null,DrawHuntingLog,"MainWindow.HuntingLog.cs",Page.Collections,Tab:PageLabel("Navigation.HuntingLog"),About:PageLabel("HuntingLog.Description")),
         new(Page.Gear,"Progression",null,DrawGearPlanner,"MainWindow.Gear.cs, Gear/",Page.Collections,Tab:PageLabel("Navigation.Gear"),About:PageLabel("Gear.Description")),
         new(Page.RelicWeapons,"Content",null,DrawRelicWeapons,"MainWindow.RelicWeapons.cs, Relics/",Page.Collections,Tab:PageLabel("Navigation.RelicWeapons"),About:PageLabel("Relics.Subtitle")),
-        new(Page.AlliedSocieties,"Progression",PageLabel("Navigation.AlliedSocieties"),DrawAlliedSocieties,"MainWindow.AlliedSocieties.cs, Societies/"),
-        new(Page.GrandCompanies,"Progression",PageLabel("Navigation.GrandCompanies"),DrawGrandCompanies,"MainWindow.GrandCompanies.cs, GrandCompanies/"),
-        new(Page.SpecialDeliveries,"Progression",PageLabel("Navigation.SpecialDeliveries"),DrawSpecialDeliveries,"MainWindow.SpecialDeliveries.cs, Deliveries/SpecialDeliveries.cs"),
-        new(Page.CustomDeliveries,"Progression",PageLabel("Navigation.CustomDeliveries"),DrawCustomDeliveries,"MainWindow.CustomDeliveries.cs, Deliveries/"),
-        new(Page.Leves,"Progression",PageLabel("Navigation.Leves"),DrawLeves,"MainWindow.Leves.cs"),
+        // X-601 (0.1680, D-199): « Deliveries », the special and the custom deliveries.
+        new(Page.SpecialDeliveries,"Progression",PageLabel("Navigation.Deliveries"),DrawSpecialDeliveries,"MainWindow.SpecialDeliveries.cs, Deliveries/SpecialDeliveries.cs",Tab:PageLabel("Navigation.SpecialDeliveries"),About:PageLabel("SpecialDeliveries.Subtitle")),
+        new(Page.CustomDeliveries,"Progression",null,DrawCustomDeliveries,"MainWindow.CustomDeliveries.cs, Deliveries/",Page.SpecialDeliveries,Tab:PageLabel("Navigation.CustomDeliveries"),About:PageLabel("CustomDeliveries.Subtitle")),
         // X-100 (0.998, DEC-048): « Content », one family of content per page (X-90, X-92).
-        new(Page.FieldContent,"Content",PageLabel("Navigation.FieldContent"),DrawFieldContent,"MainWindow.FieldContent.cs, Fields/"),
-        new(Page.DeepDungeons,"Content",PageLabel("Navigation.DeepDungeons"),DrawDeepDungeons,"MainWindow.DeepDungeons.cs, DeepDungeons/"),
-        new(Page.Fashion,"GoldSaucer",PageLabel("Category.Fashion"),DrawFashion,"MainWindow.Fashion*.cs, Fashion/"),
-        new(Page.TripleTriad,"GoldSaucer",PageLabel("Category.Triad"),DrawTripleTriad,"MainWindow.TripleTriad.cs, MainWindow.Triad*.cs, MiniGames/"),
-        new(Page.MiniCactpot,"GoldSaucer",PageLabel("Category.Cactpot"),DrawMiniCactpot,"MainWindow.MiniCactpot.cs, MiniGames/"),
+        // X-601 (0.1680, D-199): « Duty » (the game's name for its contents), the field operations and the deep dungeons.
+        new(Page.FieldContent,"Content",PageLabel("Navigation.Duty"),DrawFieldContent,"MainWindow.FieldContent.cs, Fields/",Tab:PageLabel("Navigation.FieldContent"),About:PageLabel("FieldContent.Subtitle")),
+        new(Page.DeepDungeons,"Content",null,DrawDeepDungeons,"MainWindow.DeepDungeons.cs, DeepDungeons/",Page.FieldContent,Tab:PageLabel("Navigation.DeepDungeons"),About:PageLabel("DeepDungeon.Subtitle")),
+        // X-601 (0.1680, D-199): « Gold Saucer », the fashion report, Triple Triad and the Mini Cactpot.
+        new(Page.Fashion,"GoldSaucer",PageLabel("Category.GoldSaucer"),DrawFashion,"MainWindow.Fashion*.cs, Fashion/",Tab:PageLabel("Category.Fashion"),About:PageLabel("FashionUi.Description")),
+        new(Page.TripleTriad,"GoldSaucer",null,DrawTripleTriad,"MainWindow.TripleTriad.cs, MainWindow.Triad*.cs, MiniGames/",Page.Fashion,Tab:PageLabel("Category.Triad"),About:PageLabel("TriadUi.Description")),
+        new(Page.MiniCactpot,"GoldSaucer",null,DrawMiniCactpot,"MainWindow.MiniCactpot.cs, MiniGames/",Page.Fashion,Tab:PageLabel("Category.Cactpot"),About:PageLabel("CactpotUi.Description")),
         // X-100 (0.998, DEC-048): « References », what is looked up.
         new(Page.Lexicon,"References",PageLabel("Navigation.Lexicon"),DrawLexicon,"MainWindow.Lexicon.cs, Lexicon/"),
         new(Page.Help,"References",PageLabel("Navigation.Help"),DrawHelpPage,"MainWindow.Help.cs, Help/"),

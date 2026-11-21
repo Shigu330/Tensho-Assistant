@@ -46,7 +46,6 @@ internal sealed partial class MainWindow
 
     private void DrawQuests()
     {
-        Heading(localization.Get("QuestsBrowser.Title"),localization.Get("QuestsBrowser.Description"));
         var state = quests.State;
         if (!ReferenceEquals(questMetadataEntries,state.Entries))
         {

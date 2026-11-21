@@ -34,7 +34,6 @@ internal sealed partial class MainWindow
 
     private void DrawFieldContent()
     {
-        Heading(localization.Get("FieldContent.Title"),localization.Get("FieldContent.Subtitle"));
         FieldCatalogReady();
         if(fieldFailed){ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("FieldContent.Unavailable"));return;}
         if(fieldCatalog is not { } catalog){ImGui.TextDisabled(localization.Get("FieldContent.Loading"));return;}

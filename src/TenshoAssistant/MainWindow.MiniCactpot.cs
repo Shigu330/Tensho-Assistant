@@ -96,7 +96,6 @@ internal sealed partial class MainWindow
     private void DrawMiniCactpot()
     {
         DrawMiniCactpotRewards();
-        Heading(localization.Get("CactpotUi.Title"),localization.Get("CactpotUi.Description"));
         if(windowDisposed)return;
         DrawGoldSaucerTimes();
         var observation=cactpotObservation.State;var enabled=observation.Enabled;

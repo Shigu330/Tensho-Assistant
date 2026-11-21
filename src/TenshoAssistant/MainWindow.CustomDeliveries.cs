@@ -18,7 +18,6 @@ internal sealed partial class MainWindow
 
     private void DrawCustomDeliveries()
     {
-        Heading(localization.Get("CustomDeliveries.Title"),localization.Get("CustomDeliveries.Subtitle"));
         if(!deliveryClientsTried)
         {
             deliveryClientsTried=true;

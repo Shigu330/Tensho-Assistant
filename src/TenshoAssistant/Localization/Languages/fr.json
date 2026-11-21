@@ -934,6 +934,9 @@
     "ClearNo": "Non"
   },
   "Navigation": {
+    "Duty": "Missions",
+    "Deliveries": "Livraisons",
+    "Journal": "Journal",
     "Shops": "Échoppes",
     "World": "Monde",
     "Macros": "Macros",
@@ -999,7 +1002,7 @@
     "Leves": "Mandats",
     "HuntingLog": "Bestiaire",
     "Chocobo": "Chocobo",
-    "Events": "Événements"
+    "Events": "Événements saisonniers"
   },
   "SettingTips": {
     "HelpBanners": "La première fois que vous ouvrez une page, deux lignes l'expliquent, une seule fois. Le « ? » garde toujours l'aide.\nPar défaut : activé.",

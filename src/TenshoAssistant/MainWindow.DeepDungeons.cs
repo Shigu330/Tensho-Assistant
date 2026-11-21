@@ -16,7 +16,6 @@ internal sealed partial class MainWindow
 
     private void DrawDeepDungeons()
     {
-        Heading(localization.Get("DeepDungeon.Title"),localization.Get("DeepDungeon.Subtitle"));
         if(deepDungeons is null && !deepDungeonFailed && deepDungeonTask is null && DeepDungeonLoad is { } load)deepDungeonTask=Task.Run(load);
         if(deepDungeonTask is { IsCompleted:true } done)
         {

@@ -83,7 +83,6 @@ internal sealed partial class MainWindow
 
     private void DrawTripleTriad()
     {
-        Heading(localization.Get("TriadUi.Title"), localization.Get("TriadUi.Description"));
         var state = collections.State;
         if (ImGui.SmallButton(localization.Get("TriadUi.Refresh"))) collections.RequestRefresh();
         DrawCacheStamp(TenshoAssistant.Caching.CacheArea.Collections,collections.State.ObservedAt,collections.State.FromCache);

@@ -67,6 +67,20 @@ internal static class PageFamilies1677Tests
         ("Navigation.Map", "Carte", "Map", "MainCommand 16"),
         ("Navigation.Fates", "ALÉA", "FATEs", "ContentType 8"),
         ("Navigation.Shops", "Échoppes", "Shops", "HowTo 20"),
+        ("Navigation.Quests", "Quêtes", "Quests", "HowToCategory 5"),
+        ("Navigation.Journal", "Journal", "Journal", "MainCommand 4"),
+        ("Navigation.Leves", "Mandats", "Levequests", "ContentType 10"),
+        ("Navigation.Events", "Événements saisonniers", "Seasonal Events", "AchievementCategory 38"),
+        ("Navigation.AlliedSocieties", "Peuples alliés", "Society Quests", "NotebookDivisionCategory 5"),
+        ("Navigation.GrandCompanies", "Grandes compagnies", "Grand Companies", "HowToCategory 10"),
+        ("Navigation.Deliveries", "Livraisons", "Deliveries", "DescriptionString 1631"),
+        ("Navigation.CustomDeliveries", "Commandes spéciales", "Custom Deliveries", "ContentType 25"),
+        ("Navigation.Duty", "Missions", "Duty", "MainCommand 43"),
+        ("Navigation.DeepDungeons", "Donjons sans fond", "Deep Dungeons", "ContentType 21"),
+        ("Category.GoldSaucer", "Gold Saucer", "Gold Saucer", "MainCommand 65"),
+        ("Category.Fashion", "Revue de mode", "Fashion Report", "Addon 8819"),
+        ("Category.Triad", "Triple Triade", "Triple Triad", "ContentType 32"),
+        ("Category.Cactpot", "Mini Cactpot", "Mini Cactpot", "Addon 9358"),
         // More names: added by each version of X-601, above this line.
     ];
 
@@ -130,6 +144,14 @@ internal static class PageFamilies1677Tests
             Check(Read("src/TenshoAssistant/MainWindow.Pages.cs").Contains("new(Page.Gathering,\"Production\",PageLabel(\"Navigation.Gathering\"),"), "named « Gathering » in the side bar");
             Check(Family("Maps").SequenceEqual(["Maps", "Weather", "Fates", "NpcVendors", "DutyLoot", "MonsterLoot", "Discoveries"]), "World: " + string.Join(",", Family("Maps")));
             Check(Read("src/TenshoAssistant/MainWindow.Pages.cs").Contains("new(Page.Maps,\"World\",PageLabel(\"Navigation.World\"),"), "named « World » in the side bar");
+            Check(Family("Quests").SequenceEqual(["Quests", "Leves", "Events", "AlliedSocieties", "GrandCompanies"]), "Quests: " + string.Join(",", Family("Quests")));
+            Check(Read("src/TenshoAssistant/MainWindow.Pages.cs").Contains("new(Page.Quests,\"Progression\",PageLabel(\"Navigation.Quests\"),"), "named « Quests » in the side bar");
+            Check(Family("SpecialDeliveries").SequenceEqual(["SpecialDeliveries", "CustomDeliveries"]), "Deliveries: " + string.Join(",", Family("SpecialDeliveries")));
+            Check(Read("src/TenshoAssistant/MainWindow.Pages.cs").Contains("new(Page.SpecialDeliveries,\"Progression\",PageLabel(\"Navigation.Deliveries\"),"), "named « Deliveries » in the side bar");
+            Check(Family("FieldContent").SequenceEqual(["FieldContent", "DeepDungeons"]), "Duty: " + string.Join(",", Family("FieldContent")));
+            Check(Read("src/TenshoAssistant/MainWindow.Pages.cs").Contains("new(Page.FieldContent,\"Content\",PageLabel(\"Navigation.Duty\"),"), "named « Duty » in the side bar");
+            Check(Family("Fashion").SequenceEqual(["Fashion", "TripleTriad", "MiniCactpot"]), "Gold Saucer: " + string.Join(",", Family("Fashion")));
+            Check(Read("src/TenshoAssistant/MainWindow.Pages.cs").Contains("new(Page.Fashion,\"GoldSaucer\",PageLabel(\"Category.GoldSaucer\"),"), "named « Gold Saucer » in the side bar");
             // More families: added by each version of X-601, above this line.
         }),
         ("Page families 1677: the side bar, the page header, the quick search and the page places read the families", () =>

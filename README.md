@@ -61,7 +61,10 @@ and the help text of each page (the « ? » beside its title):
 |  | **Garden** | Your beds and pots with their reminders, and seed crossbreeds with a planting plan. |
 |  | **Free Company** | Submersibles and airships: rank, route, return, finds, best routes, builds and the history of your voyages; also the materials of the workshop's projects, with an on-screen panel. |
 | Progression | **Quests** | The quests of the game with your progress, their rewards and their chains. |
+|  | **Guildleves** | Guildleves and tradecraft leves, with your allowances, what is done and what is accepted. |
 |  | **Events** | The seasonal events running now, with their quests, what you have done and their shops. |
+|  | **Allied Societies** | Each allied society: your rank and reputation, its place and its currency. |
+|  | **Grand Companies** | Your rank and seals in each Grand Company, the next promotion, and what seals buy. |
 |  | **Collections** | Mounts, minions, emotes, cards, orchestrion rolls, titles, achievements, hairstyles and more, with what you own and how to get the rest; also your wishlist. |
 |  | **Blue magic** | The blue mage's spells, known or not, with the monsters that teach them. |
 |  | **Masked Carnivale** | The stages of the Masked Carnivale, done or left, with their enemies and times. |
@@ -70,11 +73,8 @@ and the help text of each page (the « ? » beside its title):
 |  | **Hunting Log** | Your hunting logs: rank, monsters and kills, for your class and grand company. |
 |  | **Gear** | Plan your gear in the style of the Character window: worn pieces, materia, real and planned stats, upgrades, your game gear sets, wear and spiritbond. |
 |  | **Relics** | Relic weapons and armour, the stages you hold and the Trials of the Braves book in progress. |
-|  | **Allied Societies** | Each allied society: your rank and reputation, its place and its currency. |
-|  | **Grand Companies** | Your rank and seals in each Grand Company, the next promotion, and what seals buy. |
 |  | **Special deliveries** | The delivery quest lines of crafters and gatherers: Crystarium, Studium and Wachumeqimeqi, done or left. |
 |  | **Custom Deliveries** | Your custom delivery clients: rank, points and what each one still takes this week; and each client's rewards, from the game's sheets. |
-|  | **Guildleves** | Guildleves and tradecraft leves, with your allowances, what is done and what is accepted. |
 | Content | **Eureka and Bozja** | Where FATEs, skirmishes and critical engagements take place in these zones, the field records and the lost actions. |
 |  | **Deep Dungeons** | Prepare before going in: the floors, their state, the items of each dungeon and what its coffers give. |
 | Gold Saucer | **Fashion Report** | This week's theme and categories, what you own for each, and the equipment reported by the community. |
@@ -261,7 +261,10 @@ La barre latérale range les pages en groupes repliables. Le tableau est écrit 
 |  | **Jardinage** | Vos emplacements de potager et vos pots avec leurs rappels, et les croisements de graines avec un plan de plantation. |
 |  | **Compagnie libre** | Sous-marins et aéronefs : rang, trajet, retour, trouvailles, meilleurs trajets, montages et l'historique de vos expéditions ; aussi les matériaux des projets de l'atelier, avec un panneau à l'écran. |
 | Progression | **Quêtes** | Les quêtes du jeu avec votre progression, leurs récompenses et leurs enchaînements. |
+|  | **Mandats** | Les mandats et les mandats d'artisanat, avec vos autorisations, ce qui est fait et ce qui est accepté. |
 |  | **Événements** | Les événements saisonniers en cours, avec leurs quêtes, ce que vous avez fait et leurs boutiques. |
+|  | **Peuples alliés** | Chaque peuple allié : votre rang et votre réputation, son lieu et sa monnaie. |
+|  | **Grandes compagnies** | Votre grade et vos sceaux dans chaque grande compagnie, la prochaine promotion et ce que les sceaux achètent. |
 |  | **Collections** | Montures, mascottes, emotes, cartes, rouleaux d'orchestrion, titres, hauts faits, coiffures et plus, avec ce que vous avez et comment obtenir le reste ; aussi votre liste de souhaits. |
 |  | **Magie bleue** | Les sorts du mage bleu, connus ou non, avec les monstres qui les enseignent. |
 |  | **La Grande Mascarade** | Les niveaux de la Grande Mascarade, réussis ou non, avec leurs ennemis et leurs temps. |
@@ -270,11 +273,8 @@ La barre latérale range les pages en groupes repliables. Le tableau est écrit 
 |  | **Bestiaire** | Vos carnets du bestiaire : rang, monstres à vaincre et nombre vaincu, pour votre classe et votre grande compagnie. |
 |  | **Équipement** | Préparez votre équipement dans le style de la fenêtre Personnage : pièces portées, matérias, statistiques réelles et prévues, améliorations, tenues du jeu, usure et symbiose. |
 |  | **Armes antiques** | Les armes antiques et leurs armures, les étapes que vous détenez et le livre des Chroniques du zodiaque en cours. |
-|  | **Peuples alliés** | Chaque peuple allié : votre rang et votre réputation, son lieu et sa monnaie. |
-|  | **Grandes compagnies** | Votre grade et vos sceaux dans chaque grande compagnie, la prochaine promotion et ce que les sceaux achètent. |
 |  | **Livraisons spéciales** | Les quêtes de livraison des artisans et récolteurs : Cristarium, Académie de magie et Bazar aux Mille Perles, faites ou à faire. |
 |  | **Commandes spéciales** | Vos clients des commandes spéciales : rang, points et ce que chacun prend encore cette semaine ; et les récompenses de chaque client, d'après les feuilles du jeu. |
-|  | **Mandats** | Les mandats et les mandats d'artisanat, avec vos autorisations, ce qui est fait et ce qui est accepté. |
 | Contenus | **Eurêka et Bozja** | Où se tiennent les ALÉA, escarmouches et affrontements cruciaux de ces zones, les rapports du front bozjien et les actions oubliées. |
 |  | **Donjons sans fond** | Pour se préparer avant d'entrer : les étages, leur état, les objets de chaque donjon et ce que donnent ses coffres. |
 | Gold Saucer | **Revue de mode** | Le thème et les catégories de la semaine, ce que vous possédez pour chacune, et l'équipement signalé par la communauté. |

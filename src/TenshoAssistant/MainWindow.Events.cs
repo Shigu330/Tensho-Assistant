@@ -24,7 +24,6 @@ internal sealed partial class MainWindow
 
     private void DrawEventsPage()
     {
-        Heading(localization.Get("Events.Title"),localization.Get("Events.Description"));
         // X-04 (0.447, decided 2026-11-03): player events stay on partake.gg, opened on click only; Tensho reads nothing from the site.
         if(ImGui.SmallButton(localization.Get("Events.Partake")))Dalamud.Utility.Util.OpenLink(PartakeAddress);
         Tip("Events.PartakeTip");

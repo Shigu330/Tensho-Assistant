@@ -20,7 +20,6 @@ internal sealed partial class MainWindow
 
     private void DrawGrandCompanies()
     {
-        Heading(localization.Get("GrandCompany.Title"),localization.Get("GrandCompany.Subtitle"));
         // The grades' names depend on the character: read that first, then the sheets, once.
         // X-285 (0.1300): without the game (the desktop application) the character is not known: the sheets with the grades' usual names.
         if(!gcTried && GcFeminine is not null){gcTried=true;gcGender=GcFeminine();}
