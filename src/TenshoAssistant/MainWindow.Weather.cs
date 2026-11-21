@@ -77,7 +77,6 @@ internal sealed partial class MainWindow
     }
     private void DrawWeather()
     {
-        Heading(localization.Get("Weather.Title"),weatherZone);
         DrawGatheringClock();
         DrawAlarmsLink();
         if(ImGui.SmallButton(localization.Get("Navigation.Map")))page=Page.Maps;ImGui.SameLine();if(ImGui.SmallButton(localization.Get("Navigation.Gathering")))page=Page.Gathering;

@@ -15,7 +15,6 @@ internal sealed partial class MainWindow
 
     private void DrawNpcVendors()
     {
-        Heading(localization.Get("NpcUi.Title"),localization.Get("NpcUi.Subtitle"));
         if(TenshoAssistant.UI.UiComponents.Header(localization.Get("NpcUi.Choose")+"##Npc",itemId<=0 ? ImGuiTreeNodeFlags.DefaultOpen:ImGuiTreeNodeFlags.None))DrawItemSearch(160);
         if(npcVendors?.State is not { } state)return;
         if(state.Catalog is not { } catalog)

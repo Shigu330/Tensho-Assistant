@@ -364,7 +364,6 @@ internal sealed partial class MainWindow
 
     private void DrawDiscoveries()
     {
-        TenshoAssistant.UI.UiComponents.SectionHeader(localization.Get("DiscoveriesUi.Title"),localization.Get("DiscoveriesUi.Help"));
         if(DiscoveriesSetAside is { } setAside)
         {
             ImGui.PushStyleColor(ImGuiCol.Text,DiscoveriesWriteBlocked ? Error:Warning);

@@ -20,7 +20,6 @@ internal sealed partial class MainWindow
 
     private void DrawFates()
     {
-        Heading(localization.Get("Fates.Title"),localization.Get("Fates.Subtitle"));
         if(fateZones is null && !fatesFailed && fatesTask is null && FatesLoad is { } load)fatesTask=Task.Run(load);
         if(fatesTask is { IsCompleted:true } done)
         {

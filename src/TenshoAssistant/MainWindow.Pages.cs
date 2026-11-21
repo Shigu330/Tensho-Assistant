@@ -32,21 +32,25 @@ internal sealed partial class MainWindow
         // X-127 (0.1106): the wishlist, a tool of its own (it was a tab of Collections).
         new(Page.Wishlist,"Objects",PageLabel("Navigation.Wishlist"),DrawWishlistPage,"MainWindow.Wishlist.cs, Items/Wishlist*.cs"),
         // X-600 (0.1573): the tabs of a family are drawn in the order of this list.
+        // X-601 (0.1679, D-199): « Crafting » also holds the macro chains.
         new(Page.CraftSimulation,"Production",PageLabel("Navigation.Crafting"),DrawCraftSimulation,"MainWindow.Craft*.cs, Craft/",Tab:PageLabel("CraftSimulation.Title"),About:PageLabel("CraftSimulation.Description"),TabAction:(PageLabel("CraftSimulation.Notebook"),BackToCraftItem)),
         new(Page.CraftPresets,"Production",null,DrawCraftPresets,"MainWindow.Craft*.cs, Craft/",Page.CraftSimulation,Tab:PageLabel("CraftPresets.Browse"),About:PageLabel("CraftPresets.Description")),
         new(Page.CraftLive,"Production",null,DrawCraftLive,"MainWindow.Craft*.cs, Craft/",Page.CraftSimulation,Tab:PageLabel("CraftSimulation.Live"),About:PageLabel("CraftLiveUi.Description")),
+        new(Page.MacroChain,"Production",null,DrawMacroChain,"MainWindow.MacroChain*.cs, Macros/",Page.CraftSimulation,Tab:PageLabel("Navigation.Macros"),About:PageLabel("MacroUi.Description")),
+        // X-601 (0.1679, D-199): « Gathering » also holds ocean fishing.
         new(Page.Gathering,"Production",PageLabel("Navigation.Gathering"),DrawGatheringBrowser,"MainWindow.Gathering*.cs",Tab:PageLabel("GatheringBrowser.Title"),About:PageLabel("GatheringBrowser.Description")),
         new(Page.GatheringGp,"Production",null,DrawGatheringGp,"MainWindow.Gathering*.cs",Page.Gathering,Tab:PageLabel("Category.GatheringGp"),About:PageLabel("GpUi.Subtitle")),
         new(Page.GatheringCollectables,"Production",null,DrawCollectablesPage,"MainWindow.CollectableTable.cs, Gathering/Collectables.cs",Page.Gathering,Tab:()=>localization.Format("CollectableTable.Title",Collectables?.Catalog?.Count ?? 0),About:PageLabel("CollectableTable.Help")),
-        new(Page.OceanFishing,"Production",PageLabel("Navigation.OceanFishing"),DrawOceanFishing,"MainWindow.OceanFishing.cs"),
+        new(Page.OceanFishing,"Production",null,DrawOceanFishing,"MainWindow.OceanFishing.cs",Page.Gathering,Tab:PageLabel("Navigation.OceanFishing"),About:PageLabel("OceanFishing.Description")),
         new(Page.IslandSanctuary,"Production",PageLabel("Navigation.IslandSanctuary"),DrawIslandSanctuary,"MainWindow.IslandSanctuary.cs, Island/"),
-        new(Page.MacroChain,"Production",PageLabel("Category.MacroChain"),DrawMacroChain,"MainWindow.MacroChain*.cs, Macros/"),
-        new(Page.Maps,"World",PageLabel("Navigation.Map"),DrawMaps,"MainWindow.Maps.cs, MainWindow.MapView.cs"),
-        new(Page.Weather,"World",PageLabel("Category.Weather"),DrawWeather,"MainWindow.Weather.cs, Gathering/WeatherForecast.cs"),
-        new(Page.Fates,"World",PageLabel("Navigation.Fates"),DrawFates,"MainWindow.Fates.cs, Fields/"),
-        new(Page.NpcVendors,"World",PageLabel("Category.NpcVendors"),DrawNpcVendors,"MainWindow.NpcVendors.cs, Npcs/"),
-        new(Page.DutyLoot,"World",PageLabel("Category.DutyLoot"),DrawDutyLoot,"MainWindow.Duties.cs, Duties/"),
-        new(Page.MonsterLoot,"World",PageLabel("Category.MonsterLoot"),DrawMonsterLoot,"MainWindow.Monsters.cs, Monsters/"),
+        // X-601 (0.1679, D-199): « World », the map, the weather, the FATEs, the shops, the loot of duties and monsters and the discoveries, each a tab of the one page header.
+        new(Page.Maps,"World",PageLabel("Navigation.World"),DrawMaps,"MainWindow.Maps.cs, MainWindow.MapView.cs",Tab:PageLabel("Navigation.Map"),About:PageLabel("MapsUi.Description")),
+        new(Page.Weather,"World",null,DrawWeather,"MainWindow.Weather.cs, Gathering/WeatherForecast.cs",Page.Maps,Tab:PageLabel("Category.Weather"),About:()=>weatherZone),
+        new(Page.Fates,"World",null,DrawFates,"MainWindow.Fates.cs, Fields/",Page.Maps,Tab:PageLabel("Navigation.Fates"),About:PageLabel("Fates.Subtitle")),
+        new(Page.NpcVendors,"World",null,DrawNpcVendors,"MainWindow.NpcVendors.cs, Npcs/",Page.Maps,Tab:PageLabel("Navigation.Shops"),About:PageLabel("NpcUi.Subtitle")),
+        new(Page.DutyLoot,"World",null,DrawDutyLoot,"MainWindow.Duties.cs, Duties/",Page.Maps,Tab:PageLabel("Category.DutyLoot"),About:PageLabel("DutyUi.Description")),
+        new(Page.MonsterLoot,"World",null,DrawMonsterLoot,"MainWindow.Monsters.cs, Monsters/",Page.Maps,Tab:PageLabel("Category.MonsterLoot"),About:PageLabel("MonsterUi.Subtitle")),
+        new(Page.Discoveries,"World",null,DrawDiscoveries,"MainWindow.Discoveries.cs, Discoveries/",Page.Maps,Tab:PageLabel("Navigation.Discoveries"),About:PageLabel("DiscoveriesUi.Help")),
         // X-100 (0.998, DEC-048): « Tracking », the timers and reminders together.
         new(Page.Alarms,"Tracking",()=>localization.Format("Navigation.Alarms",AlarmsToolCount),DrawAlarmsPage,"MainWindow.Alarms.cs, Alarms/"),
         new(Page.Reminders,"Tracking",()=>ReminderAlarmCount is var reminderAlarms and >0 ? localization.Format("Navigation.RemindersCount",reminderAlarms):localization.Get("Navigation.Reminders"),DrawReminders,"MainWindow.Reminders.cs, Reminders/"),
@@ -84,7 +88,6 @@ internal sealed partial class MainWindow
         new(Page.Credits,"References",PageLabel("Navigation.Credits"),DrawCredits,"MainWindow.Credits.cs, Credits/"),
         new(Page.Diagnostics,"Preferences",PageLabel("Navigation.Diagnostics"),DrawDiagnostics,"MainWindow.Diagnostics.cs, MainWindow.Advanced.cs",Visible:()=>developerMode),
         new(Page.MyTools,null,PageLabel("Navigation.MyTools"),DrawMyTools,"MainWindow.MyTools.cs, MyTools/"),
-        new(Page.Discoveries,"World",PageLabel("Navigation.Discoveries"),DrawDiscoveries,"MainWindow.Discoveries.cs, Discoveries/"),
         // New tools: scripts/New-Tool.ps1 adds their line above this one.
     ];
     /// <summary>The navigation's groups, in the order of the list; a page without a label is not an entry.</summary>

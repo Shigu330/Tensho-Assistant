@@ -934,6 +934,9 @@
     "ClearNo": "No"
   },
   "Navigation": {
+    "Shops": "Shops",
+    "World": "World",
+    "Macros": "User Macros",
     "Sort": "Sort",
     "ItemSearch": "Item Search",
     "BlueMagic": "Blue Magic Spellbook",

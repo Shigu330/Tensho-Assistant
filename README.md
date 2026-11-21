@@ -43,12 +43,12 @@ and the help text of each page (the « ? » beside its title):
 | Production | **Crafting** | Simulate a recipe step by step, search a sequence, prepare the materials, and make a macro to copy or write into the game. Other tabs: crafting lists (with an on-screen panel of what they still need) and « What can I craft? » from your stocks. |
 |  | **Crafting presets** | Keep recipes and manual sequences to find them again. Nothing is run by itself. |
 |  | **Live synthesis** | During a synthesis: what the game shows, read by Tensho, and the comparison of your next moves under the current state. The page only reads and shows. |
+|  | **Macro chain** | Chain several game macros, one after the other. The sequence only starts when you click. |
 |  | **Gathering** | Find where and when a resource can be gathered or fished, with your gathering and fishing logs, an Eorzean clock and the fishing help. |
 |  | **GP plan** | Work out which gathering actions are worth their GP on an ordinary node, as a miner or botanist. |
 |  | **Collectables** | The table of gathered collectables: thresholds and scrip rewards. |
 |  | **Ocean Fishing** | The next departures from Limsa Lominsa and Kugane, with their stops and the time of day. |
 |  | **Island Sanctuary** | Your workshops' crafts with their estimated value, and the animals of your pasture, from what the game has loaded on your island. |
-|  | **Macro chain** | Chain several game macros, one after the other. The sequence only starts when you click. |
 | World | **Map** | The Tensho map, with your position, flags, favourites, vistas, gathering points and quests; also chat map links, plots for sale, a hunt train recorder and the S ranks' spawn conditions. |
 |  | **Weather** | The weather forecast of a zone, and its next windows. |
 |  | **FATEs** | Where each FATE of the open zones takes place, with its level, from the game files. |
@@ -243,12 +243,12 @@ La barre latérale range les pages en groupes repliables. Le tableau est écrit 
 | Production | **Artisanat** | Simulez une recette étape par étape, cherchez une séquence, préparez les matières, et faites une macro à copier ou à écrire dans le jeu. Autres onglets : les listes d'artisanat (avec un panneau à l'écran de ce qu'il leur manque) et « Que puis-je fabriquer ? » d'après vos stocks. |
 |  | **Préréglages d'artisanat** | Gardez des recettes et des séquences manuelles pour les retrouver. Rien ne s'exécute seul. |
 |  | **Synthèse en direct** | Pendant une synthèse : ce que le jeu affiche, lu par Tensho, et la comparaison de vos prochains coups selon l'état en cours. La page ne fait que lire et afficher. |
+|  | **Enchaînement de macros** | Enchaînez plusieurs macros du jeu, l'une après l'autre. La suite ne démarre que sur votre clic. |
 |  | **Récolte** | Trouvez où et quand récolter ou pêcher une ressource, avec vos carnets, l'horloge d'Éorzéa et l'aide à la pêche. |
 |  | **Plan de PR** | Calculez quelles actions de récolte valent leurs PR sur un point ordinaire, en mineur ou en botaniste. |
 |  | **Collectionnables** | Le tableau des collectionnables de récolte : seuils et assignats. |
 |  | **Pêche en mer** | Les prochains départs de Limsa Lominsa et de Kugane, avec leurs escales et le moment de la journée. |
 |  | **Félicité insulaire** | Les créations de vos fabriques avec leur valeur estimée, et les animaux de votre pâturage, à partir de ce que le jeu a chargé sur votre île. |
-|  | **Enchaînement de macros** | Enchaînez plusieurs macros du jeu, l'une après l'autre. La suite ne démarre que sur votre clic. |
 | Monde | **Carte** | La carte Tensho, avec votre position, drapeaux, favoris, lieux notoires, points de récolte et quêtes ; aussi les liens de carte du chat, les terrains en vente, un relevé de train de chasse et les conditions d'apparition des rangs S. |
 |  | **Météo** | Les prévisions météo d'une zone et ses prochaines fenêtres. |
 |  | **ALÉA** | Où se tient chaque ALÉA des zones ouvertes, avec son niveau, d'après les fichiers du jeu. |

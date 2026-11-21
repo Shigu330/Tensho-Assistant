@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1679.0
+- Plan global, X-601 : Barre de côté regroupée (X-601, D-199), troisième morceau : « Artisanat » reçoit l'onglet Macros (les enchaînements de macros), « Récolte » l'onglet Pêche en mer, et une page « Monde » regroupe en onglets de l'en-tête commun la carte, la météo, les ALÉA, les échoppes (les PNJ marchands), le butin des missions, le butin des monstres et les découvertes. Noms pris au jeu (docs/evidence/0.1677-game-names.md) : « Macros » / « User Macros » (MainCommand 21), « Échoppes » / « Shops » (HowTo 20) ; « Monde » est un nom propre à Tensho (dit dans la preuve). Dans l'application de bureau, où la carte reste en jeu, « Monde » s'ouvre sur son premier onglet atteignable.
+- Pour les joueurs : une nouvelle page « Monde » regroupe en onglets la carte, la météo, les ALÉA, les échoppes, le butin des missions et des monstres et les découvertes ; les enchaînements de macros sont un onglet d'Artisanat et la pêche en mer un onglet de Récolte.
+- Tests : PageFamilies1677Tests. Verify.ps1 (agent) : 3540/3540, 0 avertissement, 0 erreur ; DLL 0.1679.0.0. Non validé en jeu.
+### English
+- Grouped side bar (X-601, D-199), third part: « Crafting » gains the Macros tab (the macro chains), « Gathering » the Ocean Fishing tab, and a « World » page groups as tabs of the shared header the map, the weather, the FATEs, the shops (the NPC vendors), the duty loot, the monster loot and the discoveries. Names taken from the game (docs/evidence/0.1677-game-names.md): « Macros » / « User Macros » (MainCommand 21), « Échoppes » / « Shops » (HowTo 20); « World » is Tensho's own name (said in the evidence). In the desktop application, where the map stays in the game, « World » opens on its first tab that can be reached.
+- For players: A new « World » page groups the map, the weather, the FATE list, shops, duty and monster loot and the discoveries as tabs; macro chains are a tab of Crafting and ocean fishing a tab of Gathering.
+
 ## 0.1678.0
 - Plan global, X-601 : Barre de côté regroupée (X-601, D-199), deuxième morceau : la page « Objets ». Elle regroupe en onglets de l'en-tête commun la recherche d'objets (l'ancienne page Objets), les rangements, le tri et les marchés ; « Souhaits » reste à part. Noms pris au jeu (docs/evidence/0.1677-game-names.md) : « Recherche d'objets » / « Item Search » (Addon 1940), « Trier » / « Sort » (Addon 1389), « Marchés » / « Markets » (Addon 548). Les liens vers ces pages (menus d'objet, fiches, accueil) ouvrent leur onglet.
 - Pour les joueurs : la page « Objets » porte maintenant en onglets la recherche d'objets, les rangements, le tri et les marchés.

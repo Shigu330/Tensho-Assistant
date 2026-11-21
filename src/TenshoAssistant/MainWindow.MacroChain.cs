@@ -17,7 +17,6 @@ internal sealed partial class MainWindow
     private string? macroPlanError;
     private void DrawMacroChain()
     {
-        Heading(localization.Get("MacroUi.Title"), localization.Get("MacroUi.Description"));
         if (!macroPlanLoaded)
         {
             // 0.330: a reload (after a chained copy) replaces the list; it was appended to the previous plan, so old pages ran again.

@@ -60,6 +60,13 @@ internal static class PageFamilies1677Tests
         ("Navigation.ItemSearch", "Recherche d'objets", "Item Search", "Addon 1940"),
         ("Navigation.Sort", "Trier", "Sort", "Addon 1389"),
         ("Navigation.Market", "Marchés", "Markets", "Addon 548"),
+        ("Navigation.Crafting", "Artisanat", "Crafting", "HowToCategory 12"),
+        ("Navigation.Macros", "Macros", "User Macros", "MainCommand 21"),
+        ("Navigation.Gathering", "Récolte", "Gathering", "HowToCategory 13"),
+        ("Navigation.OceanFishing", "Pêche en mer", "Ocean Fishing", "ContentType 31"),
+        ("Navigation.Map", "Carte", "Map", "MainCommand 16"),
+        ("Navigation.Fates", "ALÉA", "FATEs", "ContentType 8"),
+        ("Navigation.Shops", "Échoppes", "Shops", "HowTo 20"),
         // More names: added by each version of X-601, above this line.
     ];
 
@@ -117,6 +124,12 @@ internal static class PageFamilies1677Tests
             Check(Read("src/TenshoAssistant/MainWindow.Pages.cs").Contains("new(Page.Collections,\"Progression\",PageLabel(\"Navigation.Character\"),"), "named « Character » in the side bar");
             Check(Family("Items").SequenceEqual(["Items", "Storage", "SortPreview", "Market"]), "Items: " + string.Join(",", Family("Items")));
             Check(Read("src/TenshoAssistant/MainWindow.Pages.cs").Contains("new(Page.Items,\"Objects\",PageLabel(\"Navigation.Items\"),"), "named « Items » in the side bar");
+            Check(Family("CraftSimulation").SequenceEqual(["CraftSimulation", "CraftPresets", "CraftLive", "MacroChain"]), "Crafting: " + string.Join(",", Family("CraftSimulation")));
+            Check(Read("src/TenshoAssistant/MainWindow.Pages.cs").Contains("new(Page.CraftSimulation,\"Production\",PageLabel(\"Navigation.Crafting\"),"), "named « Crafting » in the side bar");
+            Check(Family("Gathering").SequenceEqual(["Gathering", "GatheringGp", "GatheringCollectables", "OceanFishing"]), "Gathering: " + string.Join(",", Family("Gathering")));
+            Check(Read("src/TenshoAssistant/MainWindow.Pages.cs").Contains("new(Page.Gathering,\"Production\",PageLabel(\"Navigation.Gathering\"),"), "named « Gathering » in the side bar");
+            Check(Family("Maps").SequenceEqual(["Maps", "Weather", "Fates", "NpcVendors", "DutyLoot", "MonsterLoot", "Discoveries"]), "World: " + string.Join(",", Family("Maps")));
+            Check(Read("src/TenshoAssistant/MainWindow.Pages.cs").Contains("new(Page.Maps,\"World\",PageLabel(\"Navigation.World\"),"), "named « World » in the side bar");
             // More families: added by each version of X-601, above this line.
         }),
         ("Page families 1677: the side bar, the page header, the quick search and the page places read the families", () =>

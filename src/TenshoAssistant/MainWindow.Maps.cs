@@ -23,7 +23,6 @@ internal sealed partial class MainWindow
 
     private void DrawMaps()
     {
-        Heading(localization.Get("MapsUi.Title"), localization.Get("MapsUi.Description"));
         var state = maps.State;
         if (state.Catalog is not { } catalog)
         {

@@ -40,7 +40,6 @@ internal sealed partial class MainWindow
 
     private void DrawDutyLoot()
     {
-        Heading(localization.Get("DutyUi.Title"), localization.Get("DutyUi.Description"));
         var catalogState = duties.State;
         if (catalogState.Catalog is not { } catalog)
         { if(catalogState.Error is { } error)DrawDataError(error,"ServiceErrors.Duty");else ImGui.TextWrapped(localization.Format("ServiceErrors.DutyLoading",catalogState.Copied,catalogState.Total)); return; }

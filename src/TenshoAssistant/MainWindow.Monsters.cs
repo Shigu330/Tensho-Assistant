@@ -78,7 +78,6 @@ internal sealed partial class MainWindow
     }
     private void DrawMonsterLoot()
     {
-        Heading(localization.Get("MonsterUi.Title"),localization.Get("MonsterUi.Subtitle"));
         if (TenshoAssistant.UI.UiComponents.Header(localization.Get("MonsterUi.Choose")+"##Monster",itemId <= 0 ? ImGuiTreeNodeFlags.DefaultOpen : ImGuiTreeNodeFlags.None))
             DrawItemSearch(160);
         monsterLoot.SelectItem(itemId > 0 ? (uint)itemId : 0);
