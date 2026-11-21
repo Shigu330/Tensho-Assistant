@@ -115,6 +115,7 @@ internal sealed partial class MainWindow
                 if (BeastRanks?.TryGetValue(beast.Id, out var rankKnown) == true) { ImGui.SameLine(); ImGui.TextDisabled(localization.Format("BeastUi.KnownRank", rankKnown)); }
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(beast.Family);
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(beast.AutoAttack.Length > 0 ? beast.AutoAttack : localization.Get("BeastUi.Magical"));
+                DrawBeastEffects(catalog, beast);
                 var stats = beast.At(beastRank);
                 foreach (var value in new[] { stats?.Strength, stats?.Intelligence, stats?.PhysicalResistance, stats?.MagicalResistance, stats?.Vitality })
                 { ImGui.TableNextColumn(); ImGui.TextUnformatted(value?.ToString() ?? "?"); }
@@ -498,6 +499,20 @@ internal sealed partial class MainWindow
     /// drawn when the element has no icon, in the desktop application (no game font) or once the renderer failed (said once in the log):
     /// the word alone stays.
     /// </summary>
+    // X-755 (0.1750, the user's reading R-X-553): the effects a beast inflicts, after the text on its line: the game's icons in the game's order
+    // (BeastEffects, as the game's « Formation de l'équipe »), each named on hover in the client's words; nothing for a beast that inflicts none.
+    private void DrawBeastEffects(BeastCatalog catalog, Beast beast)
+    {
+        if (beast.Effects.Count == 0) return;
+        var side = new Vector2(ImGui.GetTextLineHeight());
+        foreach (var at in beast.Effects)
+        {
+            ImGui.SameLine();
+            DrawGameIcon(BeastEffects.Order[at].Icon, side);
+            if (at < catalog.EffectNames.Count && catalog.EffectNames[at].Length > 0) TipText(catalog.EffectNames[at]);
+        }
+    }
+
     private void DrawBeastElementIcon(BeastCatalog catalog, string element)
     {
         if (inDesktopApp || beastFontIconFailed || element.Length == 0 || !catalog.ElementIcons.TryGetValue(element, out var icon)) return;
@@ -602,6 +617,7 @@ internal sealed partial class MainWindow
                 var beast = catalog.Beasts.FirstOrDefault(row => row.Id == id);
                 if (beast is not null) { DrawSmallGameIcon(beast.Icon); ImGui.SameLine(); DrawBeastElementIcon(catalog, beast.AutoAttack); }
                 ImGui.TextUnformatted(BeastCallText(fight, place, id, catalog));
+                if (beast is not null) DrawBeastEffects(catalog, beast);
                 DrawBeastCombo(id);
             }
             if (fromTeam is { Lost.Count: > 0 } lost)
@@ -684,6 +700,7 @@ internal sealed partial class MainWindow
                     if (BeastTeams.RankLow(board, pick.Rank, pick.RankKnown)) { ImGui.SameLine(); ImGui.TextColored(Warning, localization.Format(BeastTeams.RankLowKey(board, false), board.RankRecommended, board.RankLimit)); }
                     // X-551 (0.1574): the type of damage after the game's own icon of it (none for an unaspected magical attack).
                     ImGui.TableNextColumn(); DrawBeastElementIcon(catalog, beast.AutoAttack); ImGui.TextDisabled(beast.AutoAttack.Length > 0 ? beast.AutoAttack : localization.Get("BeastUi.Magical"));
+                    DrawBeastEffects(catalog, beast);
                 }
             }
             finally { ImGui.EndTable(); }

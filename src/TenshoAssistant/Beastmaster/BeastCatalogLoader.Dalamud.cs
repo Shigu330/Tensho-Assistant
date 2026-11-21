@@ -89,6 +89,8 @@ internal sealed class BeastCatalogLoader : IDisposable
             statusName: id => data.GetExcelSheet<Lumina.Excel.Sheets.Status>().GetRowOrDefault(id)?.Name.ExtractText() ?? "",
             // X-622 M1 (review of 0.1560): 1 helpful, 2 harmful (docs/evidence/0.1562-beast-effect-category.md).
             statusCategory: id => data.GetExcelSheet<Lumina.Excel.Sheets.Status>().GetRowOrDefault(id)?.StatusCategory ?? 0,
+            // X-755 (0.1750): the names of the effects a beast inflicts, the game's own (Addon 12472 to 12481 and 17755).
+            effectName: row => addon.TryGetRow(row, out var text) ? text.Text.ExtractText() : "",
             elementMacro: row => elementMacros.GetValueOrDefault(row, ""));
     }
 

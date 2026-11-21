@@ -18,6 +18,9 @@ public sealed record BeastStats(int Strength, int Intelligence, int PhysicalResi
 /// unaspected one (« Neutre » in the game's beast book). AutoAttack is that row's name, empty for an unaspected one.</summary>
 public sealed record Beast(uint Id, string Name, uint Icon, string Family, string AutoAttack, string Assault, string Volley, IReadOnlyList<BeastStats> Ranks, string CatchPlace = "", uint AutoRow = 0)
 {
+    /// <summary>X-755 (0.1750): the effects it inflicts, as places in <see cref="BeastEffects.Order"/> (the game's order); empty for none.</summary>
+    public IReadOnlyList<int> Effects { get; init; } = [];
+
     /// <summary>Attributes at this rank; a rank outside the table is the nearest known one. Null when the table is empty.</summary>
     public BeastStats? At(int rank) => Ranks.Count == 0 ? null : Ranks[Math.Clamp(rank - 1, 0, Ranks.Count - 1)];
 }
@@ -66,6 +69,9 @@ public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Boa
     /// </summary>
     public IReadOnlyDictionary<string, uint> ElementIcons { get; init; } = new Dictionary<string, uint>();
 
+    /// <summary>X-755 (0.1750): the names of <see cref="BeastEffects.Order"/> in the client's language (Addon); empty when not given (tests).</summary>
+    public IReadOnlyList<string> EffectNames { get; init; } = [];
+
     /// <summary>X-551 (0.1574): the number of the font icon a sheet's text starts with (« &lt;icon(56)&gt;Feu » → 56); 0 when it starts with none.</summary>
     public static uint IconOfMacro(string? macro)
     {
@@ -84,7 +90,8 @@ public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Boa
 
     public static BeastCatalog Build(IReadOnlyDictionary<string, IReadOnlyList<XbmRow>> sheets, Func<uint, string> petName, Func<int, string> familyName,
         Func<uint, int> attackType, Func<uint, string> enemyName, Func<uint, string> actionName, Func<uint, (string Name, int Level, int ItemLevel)> content, Func<int, uint, string>? catchPlace = null,
-        Func<uint, int>? aspect = null, Func<uint, string>? statusName = null, Func<uint, int>? statusCategory = null, Func<uint, string>? elementMacro = null)
+        Func<uint, int>? aspect = null, Func<uint, string>? statusName = null, Func<uint, int>? statusCategory = null, Func<uint, string>? elementMacro = null,
+        Func<uint, string>? effectName = null)
     {
         foreach (var (sheet, columns) in Columns)
         {
@@ -103,7 +110,9 @@ public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Boa
         var beasts = sheets["XBMPet"].Where(row => row.Row != 0 && row.UInt(4) != 0).Select(row => new Beast(row.Row, Capitalize(petName(row.UInt(0))), row.UInt(4),
             familyName(row.Int(1)), Auto(row.UInt(5)), row.Text(9), row.Text(10), Array.AsReadOnly(grow.GetValueOrDefault(row.UInt(2)) ?? []),
             // 0.688 (user report): columns 6 and 7, where the beast is caught: docs/evidence/0.688-beast-places.md.
-            catchPlace?.Invoke(row.Int(6), row.UInt(7)) ?? "", AutoRow(row.UInt(5)))).ToArray();
+            catchPlace?.Invoke(row.Int(6), row.UInt(7)) ?? "", AutoRow(row.UInt(5)))
+            // X-755 (0.1750): columns 11 to 21, the effects it inflicts, put in the game's order (BeastEffects).
+            { Effects = BeastEffects.Of(column => row.Cells[column] is true) }).ToArray();
 
         var shapes = sheets["XBMActionEffectType"].ToDictionary(row => row.Row, row => row.Text(0));
         var targets = sheets["XBMActionTarget"].ToDictionary(row => row.Row, row => row.Text(0));
@@ -137,7 +146,11 @@ public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Boa
         if (elementMacro is not null)
             foreach (var (row, name) in elements)
                 if (name.Length > 0 && IconOfMacro(elementMacro(row)) is var icon and not 0) icons[name] = icon;
-        return new(Array.AsReadOnly(beasts), Array.AsReadOnly(boards)) { ElementIcons = icons };
+        return new(Array.AsReadOnly(beasts), Array.AsReadOnly(boards))
+        {
+            ElementIcons = icons,
+            EffectNames = effectName is null ? [] : BeastEffects.Order.Select(effect => effectName(effect.Name)).ToArray(),
+        };
     }
 
     /// <summary>
