@@ -36,6 +36,10 @@ public sealed record VesselBuild(VesselKind Kind,int Rank,uint Slot0,uint Slot1,
         =>values is { Count:5 } ? new(kind,(int)values[0],values[1],values[2],values[3],values[4]):null;
 }
 
+/// <summary>X-718 (0.1722): where the route planner's speed and range of a vessel read in the workshop come from (Read also: typed or
+/// taken from the planned build).</summary>
+public enum VesselStatsSource { Read, Parts, Unknown }
+
 /// <summary>What a build is worth, or why it cannot be built.</summary>
 public sealed record BuildSummary(VesselStats Stats,int Cost,int Capacity,int Repair,int HighestPartRank,bool RankTooLow,bool OverCapacity,bool Complete);
 
@@ -80,6 +84,21 @@ public static class VesselBuilds
     }
 
     public static int MaxRank(IReadOnlyList<VesselRank> ranks)=>ranks.Where(row=>row.Capacity>0).Select(row=>row.Rank).DefaultIfEmpty(1).Max();
+
+    /// <summary>
+    /// X-718 (0.1722, the user's report of 21/11): the speed and range the route planner takes for a vessel read in the workshop: its read
+    /// stats when both are known (above 0); else the sum of its four read parts (as « Planned build » does, the rank's bonus included for
+    /// submarines); else unknown, said by the planner: never 1 in silence (R06: 0 is not a value read).
+    /// </summary>
+    public static (int Speed,int Range,VesselStatsSource Source) PlannerStats(VoyageVessel vessel,VesselPartCatalog? catalog)
+    {
+        if(vessel.Speed>0 && vessel.Range>0)return (vessel.Speed,vessel.Range,VesselStatsSource.Read);
+        if(catalog is not null && vessel.Parts is { Count:4 } parts
+           && Summarize(catalog,new VesselBuild(vessel.Kind,vessel.Rank,parts[0],parts[1],parts[2],parts[3])) is { Complete:true } summary
+           && summary.Stats.Speed>0 && summary.Stats.Range>0)
+            return (summary.Stats.Speed,summary.Stats.Range,VesselStatsSource.Parts);
+        return (0,0,VesselStatsSource.Unknown);
+    }
 
     public static BuildSummary Summarize(VesselPartCatalog catalog,VesselBuild build)
     {

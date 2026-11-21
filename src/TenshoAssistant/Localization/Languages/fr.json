@@ -5819,6 +5819,8 @@
   "RoutePlanner": {
     "UsePlan": "Montage prévu",
     "UsePlanTip": "Prend le rang, la vitesse et l'autonomie du montage prévu de ce vaisseau (onglet Montages).",
+    "StatsUnknown": "Vitesse et distance de ce vaisseau non lues : le jeu n'a donné ni elles ni ses pièces. À l'atelier, ouvrez le panneau de contrôle aérien et le détail de ce vaisseau, ou saisissez-les ici.",
+    "StatsFromParts": "Vitesse et distance d'après ses pièces lues à l'atelier.",
     "LootItemTip": "Les objets qui peuvent tomber lors d'une expédition de sous-marin sur cette carte (relevés de la communauté). Les trajets proposés passent par un secteur où l'objet choisi peut tomber, les plus courts d'abord.",
     "Sectors": "Secteurs de cette carte : choisir à la main",
     "ChooseHint": "Cochez jusqu'à 5 secteurs ci-dessous, ou prenez l'un des meilleurs trajets, pour mesurer un trajet.",

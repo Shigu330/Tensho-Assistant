@@ -16,6 +16,8 @@ internal sealed partial class MainWindow
         // 0.331 (audit): the chosen vessel by its key (VesselKey, as the Builds tab), not by its index in a list re-sorted at each workshop read.
         public string? VesselKey;
         public int Rank,Speed=1,Range=1;
+        // X-718 (0.1722): where speed and range come from (Read: read, typed or the planned build); Unknown: said, nothing searched.
+        public VesselStatsSource StatsFrom=VesselStatsSource.Read;
     }
 
     private VesselKind plannerKind=VesselKind.Submarine;
@@ -53,19 +55,26 @@ internal sealed partial class MainWindow
         var inputs=Inputs(kind);
         var vessels=(configuration.Voyages ?? []).Where(vessel=>vessel.Kind==kind).ToArray();
         var chosen=inputs.VesselKey is null ? null:vessels.FirstOrDefault(vessel=>VesselKey(vessel)==inputs.VesselKey);
-        if(chosen is null)inputs.VesselKey=null;
+        if(chosen is null){inputs.VesselKey=null;if(inputs.StatsFrom!=VesselStatsSource.Read)inputs.StatsFrom=VesselStatsSource.Read;}
+        // X-718 (0.1722): the chosen vessel's speed and range unknown, then read in the workshop meanwhile: taken at once.
+        else if(inputs.StatsFrom==VesselStatsSource.Unknown && VesselBuilds.PlannerStats(chosen,VesselParts?.Invoke()) is { Source:not VesselStatsSource.Unknown } known)
+        {inputs.Speed=known.Speed;inputs.Range=known.Range;inputs.StatsFrom=known.Source;}
         var airship=kind==VesselKind.Airship;
         ImGui.SetNextItemWidth(220);
         if(ImGui.BeginCombo(localization.Get(airship ? "AirshipPlanner.Vessel":"RoutePlanner.Vessel")+"##PlannerVessel",chosen?.Name ?? localization.Get("RoutePlanner.Manual")))
         {
             try
             {
-                if(ImGui.Selectable(localization.Get("RoutePlanner.Manual"),chosen is null)){inputs.VesselKey=null;chosen=null;}
+                if(ImGui.Selectable(localization.Get("RoutePlanner.Manual"),chosen is null)){inputs.VesselKey=null;chosen=null;inputs.StatsFrom=VesselStatsSource.Read;}
                 for(var index=0;index<vessels.Length;index++)
                     if(ImGui.Selectable($"{vessels[index].Name} · {localization.Format("FreeCompany.Rank",vessels[index].Rank)}##PlannerVessel{index}",VesselKey(vessels[index])==inputs.VesselKey))
                     {
+                        // X-718 (0.1722): its speed and range read, else from its parts read, else unknown (said below), never 1 in silence;
+                        // choosing it again takes its values again.
                         var vessel=vessels[index];inputs.VesselKey=VesselKey(vessel);chosen=vessel;
-                        inputs.Rank=vessel.Rank;inputs.Speed=Math.Max(1,vessel.Speed);inputs.Range=Math.Max(1,vessel.Range);
+                        var (speed,range,source)=VesselBuilds.PlannerStats(vessel,VesselParts?.Invoke());
+                        inputs.Rank=vessel.Rank;inputs.StatsFrom=source;
+                        if(source!=VesselStatsSource.Unknown){inputs.Speed=speed;inputs.Range=range;}
                         chosenNow?.Invoke(vessel);
                     }
             }
@@ -80,7 +89,7 @@ internal sealed partial class MainWindow
             if(ImGui.SmallButton(localization.Get("RoutePlanner.UsePlan")))
             {
                 var summary=VesselBuilds.Summarize(parts,plannedBuild);
-                inputs.Rank=plannedBuild.Rank;inputs.Speed=Math.Max(1,summary.Stats.Speed);inputs.Range=Math.Max(1,summary.Stats.Range);
+                inputs.Rank=plannedBuild.Rank;inputs.Speed=Math.Max(1,summary.Stats.Speed);inputs.Range=Math.Max(1,summary.Stats.Range);inputs.StatsFrom=VesselStatsSource.Read;
             }
             Tip("RoutePlanner.UsePlanTip");
         }
@@ -118,14 +127,17 @@ internal sealed partial class MainWindow
         _=>"RoutePlanner.Goal"+goal,
     };
 
-    /// <summary>X-604: rank, speed and range of this kind's search (an airship's rank 0: every sector, as before).</summary>
+    /// <summary>X-604: rank, speed and range of this kind's search (an airship's rank 0: every sector, as before). X-718 (0.1722): the chosen
+    /// vessel's speed and range unknown: said (the planners search nothing until they are typed); taken from its parts: said too.</summary>
     private void DrawPlannerStats(VesselKind kind)
     {
         var inputs=Inputs(kind);
         var airship=kind==VesselKind.Airship;
         ImGui.SetNextItemWidth(90);ImGui.InputInt(localization.Get("RoutePlanner.Rank")+"##PlannerRank",ref inputs.Rank);Tip(airship ? "AirshipPlanner.RankTip":"RoutePlanner.RankTip");
-        ImGui.SameLine();ImGui.SetNextItemWidth(90);ImGui.InputInt(localization.Get("RoutePlanner.Speed")+"##PlannerSpeed",ref inputs.Speed);Tip(airship ? "AirshipPlanner.SpeedTip":"RoutePlanner.SpeedTip");
-        ImGui.SameLine();ImGui.SetNextItemWidth(90);ImGui.InputInt(localization.Get("RoutePlanner.Range")+"##PlannerRange",ref inputs.Range);Tip(airship ? "AirshipPlanner.RangeTip":"RoutePlanner.RangeTip");
+        ImGui.SameLine();ImGui.SetNextItemWidth(90);if(ImGui.InputInt(localization.Get("RoutePlanner.Speed")+"##PlannerSpeed",ref inputs.Speed))inputs.StatsFrom=VesselStatsSource.Read;Tip(airship ? "AirshipPlanner.SpeedTip":"RoutePlanner.SpeedTip");
+        ImGui.SameLine();ImGui.SetNextItemWidth(90);if(ImGui.InputInt(localization.Get("RoutePlanner.Range")+"##PlannerRange",ref inputs.Range))inputs.StatsFrom=VesselStatsSource.Read;Tip(airship ? "AirshipPlanner.RangeTip":"RoutePlanner.RangeTip");
         inputs.Rank=Math.Clamp(inputs.Rank,airship ? 0:1,200);inputs.Speed=Math.Clamp(inputs.Speed,1,1000);inputs.Range=Math.Clamp(inputs.Range,1,1000);
+        if(inputs.StatsFrom==VesselStatsSource.Unknown)StateLine(UI.UiState.Waiting,localization.Get("RoutePlanner.StatsUnknown"));
+        else if(inputs.StatsFrom==VesselStatsSource.Parts)OriginLine(UI.UiOrigin.Estimated,localization.Get("RoutePlanner.StatsFromParts"));
     }
 }

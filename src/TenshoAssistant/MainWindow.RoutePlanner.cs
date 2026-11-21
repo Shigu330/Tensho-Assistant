@@ -69,6 +69,8 @@ internal sealed partial class MainWindow
         }
         Tip("RoutePlanner.MapTip");
         DrawPlannerStats(VesselKind.Submarine);
+        // X-718 (0.1722): speed and range unknown (said above): nothing to search with.
+        if(inputs.StatsFrom==VesselStatsSource.Unknown)return;
         ImGui.SetNextItemWidth(220);
         if(ImGui.BeginCombo(localization.Get("RoutePlanner.Goal")+"##PlannerGoal",localization.Get(RouteGoalKey(plannerGoal))))
         {

@@ -68,6 +68,9 @@ public sealed unsafe class VoyageWatcher : IDisposable
     public Action<uint,uint,int,bool>? SectorLoot { get; set; }
     /// <summary>X-73 (0.1003): an airship's find: item, AirshipExplorationPoint row, quantity; once per voyage (AirshipLogRoute.Pair).</summary>
     public Action<uint,uint,int>? AirshipLoot { get; set; }
+    /// <summary>X-718 (0.1722): developer mode on: each vessel's stats and part rows as read are logged once per change (numbers only).</summary>
+    public Func<bool>? Developer { get; set; }
+    private readonly Dictionary<(ulong House,VesselKind Kind,int Slot),string> statsSaid=[];
     private readonly OnceSet<(ulong House,int Slot,uint Registered)> airshipsNoted=new(1024);
     /// <summary>X-76 P7 (0.934): one visit per sector of a voyage: sector, second find (DoubleDip), the vessel's surveillance.</summary>
     public Action<uint,bool,int>? SectorVisit { get; set; }
@@ -144,6 +147,7 @@ public sealed unsafe class VoyageWatcher : IDisposable
                     Range=sub.RangeBase+sub.RangeBonus,Favor=sub.FavorBase+sub.FavorBonus,
                     // 0.315: the four part rows (FFXIVClientStructs: « SubmarinePart Key »), placed by their sheet slot.
                     Parts=PartsBySlot(VesselKind.Submarine,[sub.HullId,sub.SternId,sub.BowId,sub.BridgeId])});
+                SayStats(read[^1],sub.HullId,sub.SternId,sub.BowId,sub.BridgeId);
             }
             // 0.331 (audit, R-14): airships and unlocked sectors are read apart. A failure keeps their saved values and is logged once
             // until that part reads again, so the submarines just read are still merged and saved.
@@ -172,6 +176,7 @@ public sealed unsafe class VoyageWatcher : IDisposable
                         RegisteredAt=Time(air.RegisterTime),ReturnAt=Time(air.ReturnTime),Loot=loot,ReadAt=now,
                         Surveillance=air.Surveillance,Retrieval=air.Retrieval,Speed=air.Speed,Range=air.Range,Favor=air.Favor,
                         Parts=PartsBySlot(VesselKind.Airship,[air.HullId,air.SternId,air.BowId,air.BridgeId])});
+                    SayStats(airRead[^1],air.HullId,air.SternId,air.BowId,air.BridgeId);
                 }
                 // T26 (0.919): the log does not say which airship it is about: kept only when the company has a single airship.
                 // X-73 (0.1003): the single airship's finds, paired with the route's sectors, once per voyage, for the discoveries base.
@@ -214,6 +219,8 @@ public sealed unsafe class VoyageWatcher : IDisposable
             // X-288 (0.1286): the list of a kind not opened in the workshop is not filled by the game: its saved vessels are kept (logged once per visit).
             if(keptLogged!=houseId && Voyages.KeptKinds(configuration.Voyages,houseId,read) is { Count:>0 } kept)
             {keptLogged=houseId;log.Information("Workshop read without {0}: the saved ones are kept.",string.Join(", ",kept));}
+            // X-718 (0.1722): a vessel read with no stat and no part keeps the ones saved for it.
+            read=Voyages.KeepKnownStats(configuration.Voyages,read);
             var merged=Voyages.Merge(configuration.Voyages,houseId,read);
             // 0.331 (audit): the first read of a visit is saved even when nothing changed, so « Read in the workshop » shows this visit;
             // the later 3 s reads that change nothing are not saved again.
@@ -298,6 +305,19 @@ public sealed unsafe class VoyageWatcher : IDisposable
     }
 
     // Part rows in sheet slot order (0..3); an id the sheet does not know is dropped (0 = unknown).
+    /// <summary>X-718 (0.1722, the probe): developer mode: a vessel's rank, stats, part rows by slot and the game's part ids as read, once per
+    /// change (numbers only, never its name).</summary>
+    private void SayStats(VoyageVessel vessel,ushort hull,ushort stern,ushort bow,ushort bridge)
+    {
+        if(Developer?.Invoke()!=true)return;
+        var said=string.Create(System.Globalization.CultureInfo.InvariantCulture,
+            $"{vessel.Kind} {vessel.Slot}: rank {vessel.Rank}, speed {vessel.Speed}, range {vessel.Range}, surveillance {vessel.Surveillance}, retrieval {vessel.Retrieval}, favor {vessel.Favor}, parts by slot {string.Join(",",vessel.Parts)} (game ids {hull},{stern},{bow},{bridge})");
+        var key=(vessel.HouseId,vessel.Kind,vessel.Slot);
+        if(statsSaid.TryGetValue(key,out var before) && before==said)return;
+        statsSaid[key]=said;
+        log.Information("Workshop vessel read: {0}.",said);
+    }
+
     private List<uint> PartsBySlot(VesselKind kind,ushort[] ids)
     {
         var parts=new List<uint>{0,0,0,0};
