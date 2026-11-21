@@ -21,7 +21,8 @@
     "SettingsFreeAgain": "Le fichier des réglages de Tensho peut de nouveau être lu : désactivez puis réactivez Tensho dans la liste des plugins de Dalamud (ou relancez le jeu) pour retrouver vos réglages. Les changements faits depuis le chargement de Tensho ne sont pas gardés.",
     "SettingsUnreadableBackup": "Le fichier des réglages de Tensho n'a pas pu être lu ; il est mis de côté sous le nom {0}, et la copie précédente de vos réglages a été lue à la place : votre dernier changement peut manquer.",
     "SettingsUnreadableLegacy": "Le fichier des réglages de Tensho et sa copie précédente n'ont pas pu être lus ; le fichier est mis de côté sous le nom {0}, et une copie plus ancienne de vos réglages a été lue à la place (le fichier de Dalamud, d'avant que Tensho garde le sien) : des changements récents peuvent manquer.",
-    "SettingsUnreadableNew": "Le fichier des réglages de Tensho n'a pas pu être lu, ni aucune copie ; il est mis de côté sous le nom {0}, et les réglages par défaut sont utilisés."
+    "SettingsUnreadableNew": "Le fichier des réglages de Tensho n'a pas pu être lu, ni aucune copie ; il est mis de côté sous le nom {0}, et les réglages par défaut sont utilisés.",
+    "SettingsBackupKeptAside": "La copie précédente des réglages de Tensho n'a pas pu être lue non plus ; elle est mise de côté sous le nom {0} (elle n'est plus écrasée)."
   },
   "MyToolsEditor": {
     "Theme": "Thème proposé",

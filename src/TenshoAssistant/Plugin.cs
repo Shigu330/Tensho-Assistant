@@ -551,6 +551,8 @@ public sealed partial class Plugin : IDalamudPlugin
             // instead (the previous copy, Dalamud's older file, or new settings).
             var unreadableKey=settingsOrigin switch{SettingsOrigin.Backup when keptAside is not null=>"Plugin.SettingsUnreadableBackup",SettingsOrigin.LegacyAfterUnreadable=>"Plugin.SettingsUnreadableLegacy",SettingsOrigin.NewAfterUnreadable=>"Plugin.SettingsUnreadableNew",_=>null};
             if(unreadableKey is not null)SettingsNotice(unreadableKey,keptAside ?? "?");
+            // X-765 M4 (review of 0.1751): its previous copy unreadable too, kept aside under its own name (no longer written over).
+            if(settingsFile.BackupKeptAside is { } backupAside)SettingsNotice("Plugin.SettingsBackupKeptAside",backupAside);
             // 0.508 (I-05): the retainer sale list. Read only while it is open; Universalis on the panel's button only.
             Market.RetainerSalesReader? retainerSales=null;
             registrations.Register(()=>retainerSales=new Market.RetainerSalesReader(framework,gameGui,client,player,log,()=>configuration.RetainerSalesPanel,()=>configuration.DeveloperMode),()=>retainerSales?.Dispose());

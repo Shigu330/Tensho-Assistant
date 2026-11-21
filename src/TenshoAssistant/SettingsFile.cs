@@ -166,6 +166,13 @@ public sealed class SettingsFile<T>(string path,string? legacyPath,Action<Except
     public string? KeptAside{get;private set;}
 
     /// <summary>
+    /// X-765 M4 (review of 0.1751): the name of the copy of an unreadable backup (Settings.json.bak) kept aside at load
+    /// (« Settings.backup-unreadable-….json »), before the next save writes the backup over it; null when none. A backup cut short is often
+    /// still mended by hand: it was lost at the next save before.
+    /// </summary>
+    public string? BackupKeptAside{get;private set;}
+
+    /// <summary>
     /// X-764 M1 (review of 0.1751): the unload begins. Every save from now on is the last one: it waits for another client's lock and reads
     /// the file as long as a save off the game's thread does (LockWaitMs, not the game's tenth of a second: no later save will try again),
     /// and its failure is said every time, as the loss it is (not « written at the next save »), even when a failure was said before.
@@ -215,7 +222,11 @@ public sealed class SettingsFile<T>(string path,string? legacyPath,Action<Except
             }
             // X-763 M1 (review of 0.1746): Settings.json was there and could not be read: what is read below is a step back, said as such.
             var unreadable=own is not null;
-            if(ReadText(BackupPath) is { } backup && Parse(backup,legacy:false) is { } saved)
+            var backup=ReadText(BackupPath);
+            var saved=backup is null ? null:Parse(backup,legacy:false);
+            // X-765 M4 (review of 0.1751): an unreadable backup is kept aside under a name of its own (the next save copies the file over it).
+            if(backup is not null && saved is null)KeepAside(BackupPath,backup,isBackup:true);
+            if(saved is not null)
             {
                 warn(null,"The settings file could not be read; its backup was read (the file kept aside, the backup written in its place).");
                 origin=SettingsOrigin.Backup;
@@ -376,14 +387,15 @@ public sealed class SettingsFile<T>(string path,string? legacyPath,Action<Except
 
     // A file that cannot be read is copied aside once (each text once), never written over unseen.
     private readonly HashSet<string> keptAside=new(StringComparer.Ordinal);
-    private void KeepAside(string file,string text)
+    private void KeepAside(string file,string text,bool isBackup=false)
     {
         if(!keptAside.Add(text))return;
         try
         {
-            var aside=Path.Combine(Path.GetDirectoryName(file)!,Path.GetFileNameWithoutExtension(FileName)+".unreadable-"+DateTime.Now.ToString("yyyyMMdd-HHmmss",System.Globalization.CultureInfo.InvariantCulture)+".json");
+            // X-765 M4: the backup's copy has a name of its own (the file's copy of the same second is not taken for it).
+            var aside=Path.Combine(Path.GetDirectoryName(file)!,Path.GetFileNameWithoutExtension(FileName)+(isBackup ? ".backup-unreadable-":".unreadable-")+DateTime.Now.ToString("yyyyMMdd-HHmmss",System.Globalization.CultureInfo.InvariantCulture)+".json");
             if(!File.Exists(aside))File.Copy(file,aside);
-            KeptAside=Path.GetFileName(aside);
+            if(isBackup)BackupKeptAside=Path.GetFileName(aside);else KeptAside=Path.GetFileName(aside);
             warn(null,"A settings file could not be read; it is kept aside as "+Path.GetFileName(aside)+".");
         }
         catch(Exception error) when(error is IOException or UnauthorizedAccessException){warn(error,"A settings file could not be read, nor kept aside.");}

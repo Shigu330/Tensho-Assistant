@@ -21,7 +21,8 @@
     "SettingsFreeAgain": "Tensho's settings file can be read again: turn Tensho off and on again in Dalamud's plugin list (or restart the game) to get your settings back. Changes made since Tensho loaded are not kept.",
     "SettingsUnreadableBackup": "Tensho's settings file could not be read; it is kept aside as {0}, and the previous copy of your settings was read instead: your last change may be missing.",
     "SettingsUnreadableLegacy": "Tensho's settings file and its previous copy could not be read; the file is kept aside as {0}, and an older copy of your settings was read instead (Dalamud's file, from before Tensho kept its own): recent changes may be missing.",
-    "SettingsUnreadableNew": "Tensho's settings file could not be read, nor any copy of it; it is kept aside as {0}, and default settings are used."
+    "SettingsUnreadableNew": "Tensho's settings file could not be read, nor any copy of it; it is kept aside as {0}, and default settings are used.",
+    "SettingsBackupKeptAside": "The previous copy of Tensho's settings could not be read either; it is kept aside as {0} (it is no longer written over)."
   },
   "MyToolsEditor": {
     "Theme": "Proposed theme",
