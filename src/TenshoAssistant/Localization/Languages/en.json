@@ -1358,7 +1358,7 @@
     "AlarmServerBar": "Alarm icon in the server bar",
     "AlarmServerBarTip": "Shows a clock and the number of active Tensho alarms in the game's server bar (next to the server name); hover = next alarm; click = Alarm page. Hidden without an active alarm.\nDefault: on.",
     "ReminderServerBar": "Reminders icon in the server bar",
-    "ReminderServerBarTip": "Shows its own icon and the number of things left to do in the game's server bar: reminders not ticked since their reset and your tasks marked on screen; hover = the list; click = Reminders page. The Reminders page chooses what it shows (« Bar » boxes).\nDefault: on.",
+    "ReminderServerBarTip": "Shows its own icon and the number of things left to do in the game's server bar: reminders not ticked since their reset and your tasks marked on screen; hover = the list; click = Reminders page. Hidden while nothing is left to do, back by itself as soon as something is. The Reminders page chooses what it shows (« Bar » boxes).\nDefault: on.",
     "ReminderFinishedServerBar": "Finished reminders icon in the server bar",
     "ReminderFinishedServerBarTip": "Shows its own icon and the number of finished things (ventures, vessels back, squadron, ripe beds) in the game's server bar, only when there are some; hover = the list; click = Reminders page.\nDefault: on.",
     "BagsServerBar": "Bags in the server bar",

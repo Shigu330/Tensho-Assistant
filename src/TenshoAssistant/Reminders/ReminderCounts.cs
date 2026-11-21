@@ -36,6 +36,10 @@ public static class ReminderCounts
     public static IReadOnlyList<string> Todo(Func<string,DateTimeOffset?> doneAt,IReadOnlyCollection<string>? hidden,DateTimeOffset now)
         =>CheckedRows.Where(row=>hidden?.Contains(row)!=true && !ResetSchedule.DoneSince(doneAt(row),LastReset(row,now))).ToArray();
 
+    /// <summary>X-721 (0.1725, the user's request of 21/11): the server bar's « Left to do » entry: its setting on and at least one thing left to
+    /// do (hidden at 0, back by itself at the next reading that finds one).</summary>
+    public static bool TodoShown(bool setting,int count)=>setting && count>0;
+
     public static IReadOnlyList<(FinishedKind Kind,int Count)> Finished(IEnumerable<DateTimeOffset?>? ventures,IEnumerable<VoyageVessel>? vessels,
         (ushort Id,DateTimeOffset? Done)? mission,(ushort Id,DateTimeOffset? Done)? training,IEnumerable<GardenBed>? beds,DateTimeOffset now)
     {

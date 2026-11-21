@@ -61,7 +61,8 @@ public sealed class ReminderDtrEntry : IDisposable
                 configuration.GardenBeds,now).Where(item=>configuration.ReminderBarHidden?.Contains(item.Kind.ToString())!=true).ToArray();
             finishedLines=finished.Select(item=>string.Format(TenshoAssistant.Localization.TenshoCulture.Current,text("Reminders.Bar"+item.Kind),item.Count)).ToArray();
             todoLines=todo(now);
-            todoBounds=Show(todoEntry,configuration.ReminderServerBar,SeIconChar.QuestRepeatable,todoLines.Count,text("Reminders.BarTitle"),todoLines.Count==0 ? [text("Reminders.BarNone")]:todoLines);
+            // X-721 (0.1725): hidden while nothing is left to do.
+            todoBounds=Show(todoEntry,ReminderCounts.TodoShown(configuration.ReminderServerBar,todoLines.Count),SeIconChar.QuestRepeatable,todoLines.Count,text("Reminders.BarTitle"),todoLines.Count==0 ? [text("Reminders.BarNone")]:todoLines);
             finishedBounds=Show(finishedEntry,configuration.ReminderFinishedServerBar && finished.Length>0,SeIconChar.BoxedStar,finished.Sum(item=>item.Count),text("Reminders.BarFinishedTitle"),finishedLines);
             warned=false;
         }

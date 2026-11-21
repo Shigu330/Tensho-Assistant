@@ -1358,7 +1358,7 @@
     "AlarmServerBar": "Icône d'alarme dans la barre du serveur",
     "AlarmServerBarTip": "Affiche une horloge et le nombre d'alarmes Tensho actives dans la barre du serveur du jeu (à côté du nom du serveur) ; survol = prochaine alarme ; clic = page Alerte. Masquée sans alarme active.\nPar défaut : activé.",
     "ReminderServerBar": "Icône des rappels dans la barre du serveur",
-    "ReminderServerBarTip": "Affiche sa propre icône et le nombre de choses qui restent à faire dans la barre du serveur du jeu : rappels non cochés depuis leur remise à zéro et vos tâches affichées à l'écran ; survol = la liste ; clic = page Rappels. La page Rappels choisit ce qu'elle montre (cases « Barre »).\nPar défaut : activé.",
+    "ReminderServerBarTip": "Affiche sa propre icône et le nombre de choses qui restent à faire dans la barre du serveur du jeu : rappels non cochés depuis leur remise à zéro et vos tâches affichées à l'écran ; survol = la liste ; clic = page Rappels. Cachée tant qu'il n'y a rien à faire, elle revient seule dès qu'il y a quelque chose. La page Rappels choisit ce qu'elle montre (cases « Barre »).\nPar défaut : activé.",
     "ReminderFinishedServerBar": "Icône des rappels terminés dans la barre du serveur",
     "ReminderFinishedServerBarTip": "Affiche sa propre icône et le nombre de choses terminées (tâches de servant, vaisseaux revenus, escouade, emplacements mûrs) dans la barre du serveur du jeu, seulement s'il y en a ; survol = la liste ; clic = page Rappels.\nPar défaut : activé.",
     "BagsServerBar": "Sacs dans la barre du serveur",
