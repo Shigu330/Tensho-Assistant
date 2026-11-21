@@ -145,7 +145,8 @@ public enum ChatPlayerAction : byte { Tell, Reply, Invite, Plate, Mute, Target, 
 
 /// <summary>X-679 (0.1660): why an entry is greyed, said in its tooltip (None: it can be used).</summary>
 /// X-680 (0.1662): GameOnly, the game does it only from its own menu (no function of the game's library for it); NoReplyMode, the channel's
-/// mode is not known to the game's library (only say, party and alliance are).
+/// mode is not known to the game's library (only say, party and alliance are). X-699 (0.1688): GameOnly is now said only for a player far
+/// away (the game opens its menu for one only from a line of its own chat); near you those entries open the game's menu (OpensGameMenu).
 public enum ChatPlayerWhy : byte { None, NoSender, NoIdentifiers, NoAccount, NotInRange, GameOnly, NoReplyMode }
 
 /// <summary>X-654 (0.1602): one entry, its text's Addon row (0: Tensho's own text), and whether it can be used now. X-679 (0.1660): why not.</summary>
@@ -195,7 +196,10 @@ public static class ChatPlayerMenu
     /// tell, reply in the same mode (every spoken channel, as the game offers it), invite, friend request, blocking functions (mute list,
     /// blacklist), report, party finder, target, adventurer plate, then Tensho's « Game menu… » for a character in range. What the game's
     /// library cannot do (friend request, blacklist, report: no function, docs/evidence/0.1662-chat-player-menu-game-entries.md) is greyed
-    /// with why; « Game menu… » or the game's chat do it.</remarks>
+    /// with why; « Game menu… » or the game's chat do it. X-699 (0.1688, the user's request of 21/11: « the game's chat does it »): near you,
+    /// friend request, blacklist and report open the game's own menu of that character, where they are; far away they stay greyed: no
+    /// function of the library opens that menu for a player far away, the game's chat does it by an unnamed event of its interface
+    /// (docs/evidence/0.1688-chat-player-menu-far.md).</remarks>
     public static IReadOnlyList<ChatPlayerEntry> Entries(ChatSource? source,ChatChannel channel,bool inRange,bool canInvite)
     {
         var tell=channel is ChatChannel.TellIn or ChatChannel.TellOut;
@@ -211,16 +215,21 @@ public static class ChatPlayerMenu
             list.Add(Entry(ChatPlayerAction.Reply,ReplyRow,mode,ChatPlayerWhy.NoReplyMode));
         }
         if(source is not null && canInvite)list.Add(Entry(ChatPlayerAction.Invite,InviteRow,true,ChatPlayerWhy.None));
-        list.Add(Entry(ChatPlayerAction.Friend,FriendRow,false,ChatPlayerWhy.GameOnly));
+        list.Add(Entry(ChatPlayerAction.Friend,FriendRow,inRange,ChatPlayerWhy.GameOnly));
         list.Add(Entry(ChatPlayerAction.Mute,MuteRow,account,known ? ChatPlayerWhy.NoAccount:ChatPlayerWhy.NoIdentifiers,true));
-        list.Add(Entry(ChatPlayerAction.Blacklist,BlacklistRow,false,ChatPlayerWhy.GameOnly,true));
-        list.Add(Entry(ChatPlayerAction.Report,ReportRow,false,ChatPlayerWhy.GameOnly));
+        list.Add(Entry(ChatPlayerAction.Blacklist,BlacklistRow,inRange,ChatPlayerWhy.GameOnly,true));
+        list.Add(Entry(ChatPlayerAction.Report,ReportRow,inRange,ChatPlayerWhy.GameOnly));
         list.Add(Entry(ChatPlayerAction.PartyFinder,PartyFinderRow,known,ChatPlayerWhy.NoIdentifiers));
         list.Add(Entry(ChatPlayerAction.Target,TargetRow,inRange,ChatPlayerWhy.NotInRange));
         list.Add(Entry(ChatPlayerAction.Plate,PlateRow,known,ChatPlayerWhy.NoIdentifiers));
         if(source is not null && inRange)list.Add(new(ChatPlayerAction.GameMenu,0,true));
         return list;
     }
+
+    /// <summary>X-699 (0.1688): the entries done by the game's own menu of a character in range (AgentHUD.OpenContextMenuFromTarget):
+    /// « Game menu… » and, near you, friend request, blacklist and report (the library has no function of their own for them).</summary>
+    public static bool OpensGameMenu(ChatPlayerAction action)
+        =>action is ChatPlayerAction.GameMenu or ChatPlayerAction.Friend or ChatPlayerAction.Blacklist or ChatPlayerAction.Report;
 
     /// <summary>X-679 (0.1660): the player a message names, from its sender's text (glyphs taken off, « Name@World »): the name, and the world's
     /// name (empty: none written, the game writes none for a player of the world you are on).</summary>

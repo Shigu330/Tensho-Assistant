@@ -19,11 +19,14 @@ internal static class ChatPlayerMenu1662Tests
             Check(entries.Where(e=>e.Block).Select(e=>e.Action).SequenceEqual([ChatPlayerAction.Mute,ChatPlayerAction.Blacklist]),"mute list and blacklist in « Blocking functions »");
             Check(entries.Select(e=>e.AddonRow).SequenceEqual(new uint[]{50,368,54,61,14833,59,10870,2200,8320,15083,0}) && ChatPlayerMenu.BlockRow==16061,"the client's texts (Addon rows)");
         }),
-        ("Chat player menu 1662: known and near, all on but what only the game's own menus do (friend request, blacklist, report), greyed with why",()=>
+        ("Chat player menu 1662: known and near, all on; what only the game's own menus do (friend request, blacklist, report) greyed with why far away",()=>
         {
             var entries=ChatPlayerMenu.Entries(new ChatSource("Aya Lune",73,1001,2001),ChatChannel.Say,true,true);
-            Check(entries.Where(e=>e.Action is ChatPlayerAction.Friend or ChatPlayerAction.Blacklist or ChatPlayerAction.Report).All(e=>!e.Enabled && e.Why==ChatPlayerWhy.GameOnly),"game only");
-            Check(entries.Where(e=>e.Action is not (ChatPlayerAction.Friend or ChatPlayerAction.Blacklist or ChatPlayerAction.Report)).All(e=>e.Enabled && e.Why==ChatPlayerWhy.None),"the rest on");
+            // X-699 (0.1688): near you, friend request, blacklist and report open the game's menu of that character (before: greyed, GameOnly).
+            Check(entries.Where(e=>e.Action is ChatPlayerAction.Friend or ChatPlayerAction.Blacklist or ChatPlayerAction.Report).All(e=>e.Enabled && e.Why==ChatPlayerWhy.None && ChatPlayerMenu.OpensGameMenu(e.Action)),"near: by the game's menu");
+            var far=ChatPlayerMenu.Entries(new ChatSource("Aya Lune",73,1001,2001),ChatChannel.Say,false,true);
+            Check(far.Where(e=>e.Action is ChatPlayerAction.Friend or ChatPlayerAction.Blacklist or ChatPlayerAction.Report).All(e=>!e.Enabled && e.Why==ChatPlayerWhy.GameOnly),"far: game only");
+            Check(entries.All(e=>e.Enabled && e.Why==ChatPlayerWhy.None),"all on");
             var named=ChatPlayerMenu.Entries(new ChatSource("Aya Lune",73),ChatChannel.Say,false,false);
             Check(named.Single(e=>e.Action==ChatPlayerAction.PartyFinder) is {Enabled:false,Why:ChatPlayerWhy.NoIdentifiers} && named.Single(e=>e.Action==ChatPlayerAction.Tell).Enabled,"party finder needs the identifiers; the tell not");
             var none=ChatPlayerMenu.Entries(null,ChatChannel.Say,false,false);

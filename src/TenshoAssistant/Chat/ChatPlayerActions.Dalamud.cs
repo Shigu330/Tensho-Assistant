@@ -197,7 +197,12 @@ internal sealed unsafe class ChatPlayerActions : IDisposable
             case ChatPlayerAction.Target:
                 if(InRange(source) is { } character)targets.Target=character;
                 break;
+            // X-699 (0.1688): friend request, blacklist and report near you open the game's own menu of that character, where they are
+            // (docs/evidence/0.1688-chat-player-menu-far.md); far away they are greyed, so never run.
             case ChatPlayerAction.GameMenu:
+            case ChatPlayerAction.Friend:
+            case ChatPlayerAction.Blacklist:
+            case ChatPlayerAction.Report:
                 if(InRange(source) is { } shown)AgentHUD.Instance()->OpenContextMenuFromTarget((FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)shown.Address);
                 break;
             // X-680 (0.1662): the player's party finder listing, as the game's menu opens it (AgentLookingForGroup.OpenListingByContentId of

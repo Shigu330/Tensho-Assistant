@@ -33,6 +33,8 @@ public static class Faq
         new("ChatWindow", "Settings"),
         // X-475: the chat history kept on this PC, off by default (what, where, how long, how to erase it).
         new("ChatHistory", "Settings"),
+        // X-699 (0.1688): the game's menu of a player far away (friend request, blacklist, report), from the Tensho chat window.
+        new("ChatPlayerFar"),
         new("Pause"),
         new("Update"),
         new("Reset", "Settings"),

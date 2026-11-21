@@ -1012,6 +1012,8 @@ internal sealed partial class MainWindow
                && entry.Enabled && source is not null)
                 actions.Run(entry.Action,source,said.Channel);
             if(ChatPlayerWhyKey(entry.Why) is { Length:>0 } why)Tip(why);
+            // X-699 (0.1688): near you, friend request, blacklist and report open the game's menu of that character: said.
+            else if(entry.Enabled && entry.Action!=Chat.ChatPlayerAction.GameMenu && Chat.ChatPlayerMenu.OpensGameMenu(entry.Action))Tip("ChatWindow.PlayerByGameMenu");
         }
         if(blockOpen)ImGui.EndMenu();
     }

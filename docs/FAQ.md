@@ -64,6 +64,10 @@ An extra window, off by default, that shows the game's chat beside it: tabs by c
 
 Not by default. Only if you tick « Keep the chat history on this PC » in the Tensho chat window's settings, and say yes to the question that follows, is every message the chat window reads kept on this PC (also those of channels no tab shows and those of the hidden players: the tabs and the hidden players only choose what is shown): one file per character in Tensho's folder (ChatHistory), the last messages and days you set (2,000 messages and 30 days by default; each can also be set to « No limit » to keep everything, and the place it takes on this PC is shown in the same settings), other players' names and words included, so that they show again after Tensho reloads or the game restarts. Tensho never sends them anywhere and does not read the chat in PvP or ranked play. « Erase the history », in the same settings, deletes every file; unticking the setting keeps nothing more.
 
+## Why are friend request, blacklist and report greyed in the Tensho chat window?
+
+The game does them only from its own player menu, and opens that menu only for a character near you or from a line of its own chat; its library offers Tensho no function to open it otherwise. For a player near you, these entries open the game's menu of that character; for a player far away, right-click their name in the game's chat.
+
 ## Why does Tensho stop in PvP, and why does its map give way in a deep dungeon?
 
 In PvP zones and other ranked content (Triple Triad tournaments, Mahjong), the whole plugin stops reading the game and says so. It comes back on its own when you leave. No setting changes this. In deep dungeons Tensho works as in any dungeon, but the game draws its own map there: Tensho's map hides and leaves the game's map until you leave.
@@ -189,6 +193,10 @@ Une fenêtre en plus, désactivée par défaut, qui affiche le chat du jeu à c�
 ## Tensho garde-t-il mes messages du chat ?
 
 Pas par défaut. C'est seulement si vous cochez « Garder l'historique du chat sur ce PC » dans les réglages de la fenêtre de chat Tensho, et répondez oui à la question qui suit, que chaque message lu par la fenêtre de chat est gardé sur ce PC (aussi ceux des canaux qu'aucun onglet ne montre et ceux des joueurs cachés : les onglets et les joueurs cachés ne choisissent que ce qui est affiché) : un fichier par personnage dans le dossier de Tensho (ChatHistory), les derniers messages et jours que vous fixez (2 000 messages et 30 jours par défaut ; chacun peut aussi être réglé sur « Sans limite » pour tout garder, et la place prise sur ce PC s'affiche dans les mêmes réglages), noms et mots des autres joueurs compris, pour les réafficher après un rechargement de Tensho ou une relance du jeu. Tensho ne les envoie jamais nulle part et ne lit pas le chat en JcJ ni dans les parties classées. « Effacer l'historique », dans les mêmes réglages, supprime tous les fichiers ; décocher le réglage ne garde plus rien.
+
+## Pourquoi requête d'ami, liste noire et signalement sont-ils grisés dans la fenêtre de chat de Tensho ?
+
+Le jeu ne les fait que depuis son propre menu de joueur, et n'ouvre ce menu que pour un personnage près de vous ou depuis une ligne de son propre chat ; sa bibliothèque n'offre à Tensho aucune fonction pour l'ouvrir autrement. Pour un joueur près de vous, ces entrées ouvrent le menu du jeu de ce personnage ; pour un joueur loin, faites un clic droit sur son nom dans le chat du jeu.
 
 ## Pourquoi Tensho s'arrête-t-il en JcJ, et pourquoi sa carte s'efface-t-elle en donjon sans fond ?
 
