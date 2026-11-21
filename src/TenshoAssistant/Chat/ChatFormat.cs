@@ -112,6 +112,16 @@ public static class ChatFormat
         return ((number.Length>0 ? $"[{number}] ":"")+(job.Length>0 ? $"[{job}] ":"")+shown).TrimEnd();
     }
 
+    /// <summary>X-754 (0.1737, idea I-050 chosen by the user on 21/11, R25): a chat map link's sender as the Maps page's tooltip writes it, by the
+    /// chat window's rule (<see cref="ShownSender"/>): the number and job in brackets, then the name; in capture mode the player's stand-in
+    /// (« #XXXXX », the code the chat window shows for that player), never the name.</summary>
+    public static string LinkSender(string? sender,bool capture)
+    {
+        var (number,job,name)=SenderParts(sender);
+        var shown=capture && name.Length>0 ? StandIn(name):name;
+        return ((number.Length>0 ? $"[{number}] ":"")+(job.Length>0 ? $"[{job}] ":"")+shown).TrimEnd();
+    }
+
     /// <summary>X-730 M2 (0.1729): the same sender without brackets (« 1 SAG Name »): the search finds what is shown, typed with its brackets or
     /// without them.</summary>
     public static string SenderWords(ChatRecord record,bool capture)
