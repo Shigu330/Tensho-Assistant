@@ -1732,5 +1732,14 @@ public sealed partial class Plugin : IDalamudPlugin
         gameDataCancel.Cancel();
         try { registrations.Dispose(); }
         catch (AggregateException error) { log.Error(error, "Failed to release some Tensho registrations."); }
+        // X-685 (0.1752): once the data files are closed, this copy's own Microsoft.Data.Sqlite factory is released: its prune timer and
+        // its two handlers of the process events held this whole load context after the unload, for good (Diagnostics.UnloadRelease).
+        log.Information("Unload: {0}.",Diagnostics.UnloadRelease.Sqlite().Text);
+        // Developer mode: what still holds this copy among the process's events (none expected; « unknown » on a runtime that keeps them elsewhere).
+        if(developerAtUnload())
+        {
+            var held=Diagnostics.UnloadRelease.ProcessEventsFrom(System.Runtime.Loader.AssemblyLoadContext.GetLoadContext(typeof(Plugin).Assembly));
+            log.Information("Unload: process event handlers still from this copy: {0}.",held is null ? "unknown":held.Count==0 ? "none":string.Join(", ",held));
+        }
     }
 }
