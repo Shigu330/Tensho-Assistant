@@ -79,6 +79,25 @@ no network request is added; any use would first need the R04 summary and the us
 | ff14angler (fr.ff14angler.com) | No licence or terms of use for its statistics (only Square Enix's copyright line); its data comes from players' logs sent by its own Windows client FF14AnglerRep, whose terms forbid copying that client; no API, no download | Bite times, baits and hooksets measured by players, which Tensho does not have | Reading its pages would be scraping a site without terms: not proposed (R04, R05) |
 | Console Games Wiki, « Community Resources » page | The wiki's text is under the GNU FDL, version not given (page FFXIV_Wiki:About); the page says nothing of the licences of the tools it lists | A list of tools by subject, each to be read on its own (X-753) | None |
 
+### Other sources of the « Community Resources » page (X-753, read on 22/11/2026)
+
+The tools of the Console Games Wiki page « Community Resources » that Tensho does not use yet, on the subjects the user named (deep dungeons,
+Eureka and Occult Crescent, ocean fishing, gardening, submarines, achievements), read by the agent only. None states terms for reuse or
+automated requests; most show only Square Enix's copyright line. Nothing is used: any use needs the R04 summary and the user's agreement.
+
+| Source | Licence and terms | Its data | What it would add |
+|---|---|---|---|
+| DDCompendium (ddcompendium.com; github.com/djcooke/compendium) | None found (no LICENSE in the repository) | Manual, community notes on enemies and bosses | Deep dungeon enemies and their notes (I-037); no licence: facts read only, never copied |
+| Eureka Tracker (ffxiv-eureka.com) | None found | Not stated (live instances shared by players) | Live notorious monsters of an instance: other players' reports, a network source (R04) |
+| Occult Tracker, Infi (tracker.infi.ovh, now tracker.xivstats.com) | None found | Not stated | The same for the Occult Crescent: R04 |
+| Occult Tracker, Noranda (ffxiv-occult.com, now xiv-shinies.com/occult) | None found | Not stated | The same: R04 |
+| Ocean Fishing Tracker (ffxiv.oceanfishing.boats) | None found | Not stated (schedule loaded by the page) | The voyages' schedule, which Tensho computes from the game's sheets |
+| Lulu's Tools, Ocean Fishing (ffxiv.pf-n.co; github.com/pillowfication/ffxiv) | None found (« data and code available on GitHub », no licence) | Ocean Fishing Spreadsheet (Tyo'to Tayuun) and Teamcraft's bite times | Baits and bite times of ocean fishing; no licence: facts read only |
+| FFXIV Gardening (ffxivgardening.com) | None found | Crossbreeding results gathered by the community | Crossbreeds, already in Tensho's garden data (LuminaSupplemental, kind 4) |
+| Mammet's Fleet (mammets-fleet.web.app) | None found (page not readable without its application) | Not stated | Submarines, already planned by Tensho from the game's sheets and SubmarineTracker (MIT) |
+| FFXIV Collect (ffxivcollect.com; github.com/fae-industries/ffxiv-collect) | Code MIT (« Copyright (c) 2019 Matt Antonelli »), no separate licence for its data; public JSON API without written terms | Game data (XIV Data Oxidizer), sources added by its moderators, players' collections from the Lodestone | Where each collectible comes from; Tensho reads the game and LuminaSupplemental; its API would be a network source (R04) |
+| Lalachievements (lalachievements.com) | Not read (the page refused the agent, HTTP 403) | Not read | Unknown |
+
 ## Records 0.184 → 0.315 (checked against the code on 2026-11-02)
 
 > Records 0.213 (REF-FASHION-AVANTGARDE) and 0.227 (REF-FISH-GATHERBUDDY) are at the end of the archive below.
@@ -1064,6 +1083,26 @@ par Tensho et aucune requête réseau n'est ajoutée ; tout usage demanderait d'
 | xivapi/ffxiv-datamining (GitHub) | Aucune licence (pas de fichier LICENSE, rien dans le README) ; ses CSV sont les feuilles du jeu (données de Square Enix) extraites avec XIV Data Oxidizer | Rien pour le plugin, qui lit les feuilles du client installé par Lumina ; pour les sondes de `tools/`, une copie de feuilles que le client a déjà | Aucune |
 | ff14angler (fr.ff14angler.com) | Aucune licence ni condition d'utilisation pour ses statistiques (seule la ligne de copyright de Square Enix) ; ses données viennent des journaux des joueurs envoyés par son propre client Windows FF14AnglerRep, dont les conditions interdisent de copier ce client ; ni API ni téléchargement | Temps de touche, appâts et ferrages mesurés par les joueurs, que Tensho n'a pas | Lire ses pages serait aspirer un site sans conditions : non proposé (R04, R05) |
 | Console Games Wiki, page « Community Resources » | Le texte du wiki est sous GNU FDL, version non donnée (page FFXIV_Wiki:About) ; la page ne dit rien des licences des outils qu'elle liste | Une liste d'outils par sujet, chacun à lire à part (X-753) | Aucune |
+
+### Autres sources de la page « Community Resources » (X-753, lues le 22/11/2026)
+
+Les outils de la page « Community Resources » du Console Games Wiki que Tensho n'utilise pas encore, sur les sujets nommés par
+l'utilisateur (donjons sans fond, Eurêka et Lunule, pêche en mer, jardinage, sous-marins, hauts faits), lus par l'agent seulement. Aucun
+n'annonce de conditions de réutilisation ni de requêtes automatiques ; la plupart ne montrent que la ligne de copyright de Square Enix.
+Rien n'est utilisé : tout usage demande le résumé R04 et l'accord de l'utilisateur.
+
+| Source | Licence et conditions | Ses données | Ce qu'elle apporterait |
+|---|---|---|---|
+| DDCompendium (ddcompendium.com ; github.com/djcooke/compendium) | Aucune trouvée (pas de LICENSE dans le dépôt) | Notes de la communauté, à la main, sur les ennemis et les boss | Les ennemis des donjons sans fond et leurs notes (I-037) ; sans licence : faits lus seulement, jamais copiés |
+| Eureka Tracker (ffxiv-eureka.com) | Aucune trouvée | Non dit (instances partagées par les joueurs) | Les monstres notoires en direct d'une instance : rapports d'autres joueurs, une source réseau (R04) |
+| Occult Tracker, Infi (tracker.infi.ovh, désormais tracker.xivstats.com) | Aucune trouvée | Non dit | La même chose pour Lunule : R04 |
+| Occult Tracker, Noranda (ffxiv-occult.com, désormais xiv-shinies.com/occult) | Aucune trouvée | Non dit | La même chose : R04 |
+| Ocean Fishing Tracker (ffxiv.oceanfishing.boats) | Aucune trouvée | Non dit (horaires chargés par la page) | L'horaire des traversées, que Tensho calcule depuis les feuilles du jeu |
+| Lulu's Tools, Ocean Fishing (ffxiv.pf-n.co ; github.com/pillowfication/ffxiv) | Aucune trouvée (« données et code disponibles sur GitHub », sans licence) | Ocean Fishing Spreadsheet (Tyo'to Tayuun) et temps de touche de Teamcraft | Appâts et temps de touche de la pêche en mer ; sans licence : faits lus seulement |
+| FFXIV Gardening (ffxivgardening.com) | Aucune trouvée | Résultats de croisements rassemblés par la communauté | Les croisements, déjà dans les données du jardin de Tensho (LuminaSupplemental, genre 4) |
+| Mammet's Fleet (mammets-fleet.web.app) | Aucune trouvée (page illisible sans son application) | Non dit | Les sous-marins, déjà planifiés par Tensho depuis les feuilles du jeu et SubmarineTracker (MIT) |
+| FFXIV Collect (ffxivcollect.com ; github.com/fae-industries/ffxiv-collect) | Code MIT (« Copyright (c) 2019 Matt Antonelli »), aucune licence à part pour ses données ; API JSON publique sans conditions écrites | Données du jeu (XIV Data Oxidizer), sources ajoutées par ses modérateurs, collections des joueurs tirées du Lodestone | D'où vient chaque objet de collection ; Tensho lit le jeu et LuminaSupplemental ; son API serait une source réseau (R04) |
+| Lalachievements (lalachievements.com) | Non lue (la page a refusé l'agent, HTTP 403) | Non lue | Inconnu |
 
 ## Fiches 0.184 → 0.315 (relues contre le code le 2026-11-02)
 
