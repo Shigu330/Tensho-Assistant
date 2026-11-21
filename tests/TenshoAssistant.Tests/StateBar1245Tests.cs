@@ -27,7 +27,7 @@ internal static class StateBar1245Tests
             var entry=Read("src/TenshoAssistant/Alarms/StateDtrEntry.Dalamud.cs");
             Check(entry.Contains("if(CompetitiveGate.Cut){entry.Shown=false;return;}") && entry.Contains("CompetitiveGate.RemoveAlways(framework,OnUpdate);") && entry.Contains("entry.Remove();"),"cut and removed like the others");
             Check(entry.Contains("var snapshot=configuration.StateServerBar ? state():null;") && entry.Contains("entry.Shown=StateBar.Shown(snapshot?.Overall,configuration.StateServerBarOnlyProblems);"),"shown by the rule");
-            Check(Read("src/TenshoAssistant/Plugin.ServerBar.cs").Contains("()=>mainWindow.DashboardState,localization.Get,localization.Format,mainWindow.OpenSettings)"),"in the server bar family, click opens the settings");
+            Check(Read("src/TenshoAssistant/Plugin.ServerBar.cs").Contains("()=>mainWindow.DashboardState,localization.Get,localization.Format,mainWindow.OpenStateSettings)"),"in the server bar family, click opens the settings (X-724: its category)");
             var advanced=Read("src/TenshoAssistant/MainWindow.Advanced.cs");
             Check(advanced.Contains("BoolSetting(\"Advanced.StateServerBar\",") && advanced.Contains("BoolSetting(\"Advanced.StateServerBarProblems\",") && advanced.Contains("                DrawDashboard();"),"settings and the dashboard for every player");
             Check(Read("src/TenshoAssistant/Configuration.cs").Contains("\"PlaceServerBar\", \"StateServerBar\", \"StateServerBarOnlyProblems\", "),"reset with the other settings");

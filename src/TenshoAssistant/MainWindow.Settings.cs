@@ -169,13 +169,6 @@ internal sealed partial class MainWindow
         BoolSetting("Advanced.HideBarsBehindGame","Advanced.HideBarsBehindGameTip",()=>configuration.HideBarsBehindGame,value=>configuration.HideBarsBehindGame=value,c=>c.HideBarsBehindGame);
     }
 
-    // X-100 (0.999, DEC-048): alarms, their game commands, and the server bar entries (also on their own pages).
-    private void DrawTrackingServerBarSettings()
-    {
-        BoolSetting("Currencies.ServerBar","Currencies.ServerBarTip",()=>configuration.CurrencyServerBar,value=>configuration.CurrencyServerBar=value,c=>c.CurrencyServerBar);
-        BoolSetting("GilJournal.ServerBar","GilJournal.ServerBarTip",()=>configuration.GilServerBar,value=>configuration.GilServerBar=value,c=>c.GilServerBar);
-    }
-
     // X-100 (0.999, DEC-048): a search among every setting of this page (SettingsIndex, kept in step with the code by a test); a click opens its tab.
     private string settingsQuery="";
     private void DrawSettingsSearch()

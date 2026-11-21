@@ -224,7 +224,7 @@ internal sealed partial class MainWindow
         if(DashboardState is not { } state)return;
         ImGui.TextColored(DashboardColour(state.Overall),StateHeadline(state.Overall.ToString(),state.HeapMegabytes));
         foreach(var issue in state.Issues)ImGui.TextUnformatted(issue);
-        if(ImGui.SmallButton(localization.Get("Dashboard.Details")+"##TenshoStateDetails"))OpenSettings();
+        if(ImGui.SmallButton(localization.Get("Dashboard.Details")+"##TenshoStateDetails"))OpenStateSettings();
         Tip("Dashboard.DetailsTip");
     }
 

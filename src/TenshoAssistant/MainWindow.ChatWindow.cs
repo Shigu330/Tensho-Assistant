@@ -224,7 +224,7 @@ internal sealed partial class MainWindow
         if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ChatWindow.SectionTabs")+"###ChatTabsSection"))DrawChatTabSettings(options);
         if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ChatWindow.SectionContexts")+"###ChatContextsSection"))DrawChatContextProfiles(options);
         if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ChatWindow.SectionColors")+"###ChatColorsSection"))DrawChatColorSettings(options);
-        if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ChatWindow.SectionPlayers")+"###ChatPlayersSection"))DrawChatPlayers(options);
+        if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ChatWindow.SectionPlayers")+"###ChatPlayersSection")){DrawChatPlayers(options);DrawChatServerBarSetting();}
         if(developerMode)DrawChatKinds();
         SaveChatSettingsWhenReleased();
     }
@@ -931,10 +931,15 @@ internal sealed partial class MainWindow
         try{if(ImGui.SmallButton(localization.Get("Alarms.Try")+"##ChatAlertSoundTry"))alarmService?.PreviewChatSound(configuration.Chat.AlertSound);}
         finally{ImGui.EndDisabled();}
         Tip("Advanced.TryTip");
-        // X-447 B7 (0.1647, after WIM): the alerts not seen counted in the game's server bar.
-        BoolSetting("ChatWindow.ServerBarAlerts","ChatWindow.ServerBarAlertsTip",()=>configuration.Chat.ServerBarAlerts,value=>configuration.Chat.ServerBarAlerts=value,c=>c.Chat.ServerBarAlerts);
         // X-447 B10 (0.1654, after WIM): each player's tells in a tab of their own (memory only).
         BoolSetting("ChatWindow.Conversations","ChatWindow.ConversationsTip",()=>configuration.Chat.Conversations,value=>configuration.Chat.Conversations=value,c=>c.Chat.Conversations);
+    }
+
+    /// <summary>X-447 B7 (0.1647, after WIM): the alerts not seen counted in the game's server bar. X-724 (0.1730): in the Settings page's
+    /// « Server bar » category with the other entries, and in the chat window's own settings under its players.</summary>
+    private void DrawChatServerBarSetting()
+    {
+        BoolSetting("ChatWindow.ServerBarAlerts","ChatWindow.ServerBarAlertsTip",()=>configuration.Chat.ServerBarAlerts,value=>configuration.Chat.ServerBarAlerts=value,c=>c.Chat.ServerBarAlerts);
     }
 
     private void SetHiddenPlayers(ChatSettings options,string value)

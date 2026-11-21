@@ -46,7 +46,7 @@ public sealed partial class Plugin
         infoBar=()=>info;
         // X-165 (0.1245): Tensho's state (off by default), from the snapshot the main window publishes; a click opens the settings, where the dashboard is.
         Alarms.StateDtrEntry? state=null;
-        registrations.Register(()=>state=new Alarms.StateDtrEntry(dtrBar,framework,gameGui,configuration,()=>mainWindow.DashboardState,localization.Get,localization.Format,mainWindow.OpenSettings),
+        registrations.Register(()=>state=new Alarms.StateDtrEntry(dtrBar,framework,gameGui,configuration,()=>mainWindow.DashboardState,localization.Get,localization.Format,mainWindow.OpenStateSettings),
             ()=>{state?.Dispose();state=null;});
         stateBar=()=>state;
     }

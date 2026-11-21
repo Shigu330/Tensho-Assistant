@@ -17,19 +17,22 @@ internal sealed partial class MainWindow
 
     // WrappedTooltip, Tip, TipText and HelpMarker: UI/Components/Tooltip.cs (X-76 H1).
 
-    // Header and home options (Settings › General).
-    private void DrawHeaderSettings()
+    // X-724 (0.1730, the user's request of 21/11): every entry of Tensho in the game's server bar, Tensho's state and the tooltip over the
+    // entries, in one category (Settings › Tracking › Server bar); before, most sat under General › Header, the currencies and the gil of
+    // the day were here alone, the chat's alerts with the chat's players. The pages keep their own row (currencies, gil, chat window).
+    private void DrawServerBarSettings()
     {
-        BoolSetting("Advanced.HeaderClock","Advanced.HeaderClockTip",()=>configuration.ShowHeaderClock,value=>configuration.ShowHeaderClock=value,c=>c.ShowHeaderClock);
-        BoolSetting("Advanced.HeaderEt","Advanced.HeaderEtTip",()=>configuration.ShowHeaderEorzeaTime,value=>configuration.ShowHeaderEorzeaTime=value,c=>c.ShowHeaderEorzeaTime);
-        BoolSetting("Advanced.HomeTools","Advanced.HomeToolsTip",()=>configuration.HomeShowTools,value=>configuration.HomeShowTools=value,c=>c.HomeShowTools);
         BoolSetting("Advanced.AlarmServerBar","Advanced.AlarmServerBarTip",()=>configuration.AlarmServerBar,value=>configuration.AlarmServerBar=value,c=>c.AlarmServerBar);
         BoolSetting("Advanced.ReminderServerBar","Advanced.ReminderServerBarTip",()=>configuration.ReminderServerBar,value=>configuration.ReminderServerBar=value,c=>c.ReminderServerBar);
         BoolSetting("Advanced.ReminderFinishedServerBar","Advanced.ReminderFinishedServerBarTip",()=>configuration.ReminderFinishedServerBar,value=>configuration.ReminderFinishedServerBar=value,c=>c.ReminderFinishedServerBar);
+        BoolSetting("Currencies.ServerBar","Currencies.ServerBarTip",()=>configuration.CurrencyServerBar,value=>configuration.CurrencyServerBar=value,c=>c.CurrencyServerBar);
+        BoolSetting("GilJournal.ServerBar","GilJournal.ServerBarTip",()=>configuration.GilServerBar,value=>configuration.GilServerBar=value,c=>c.GilServerBar);
         // X-217 (0.1226): bags, gear condition, zone and instance, each off by default.
         BoolSetting("Advanced.BagsServerBar","Advanced.BagsServerBarTip",()=>configuration.BagsServerBar,value=>configuration.BagsServerBar=value,c=>c.BagsServerBar);
         BoolSetting("Advanced.WearServerBar","Advanced.WearServerBarTip",()=>configuration.WearServerBar,value=>configuration.WearServerBar=value,c=>c.WearServerBar);
         BoolSetting("Advanced.PlaceServerBar","Advanced.PlaceServerBarTip",()=>configuration.PlaceServerBar,value=>configuration.PlaceServerBar=value,c=>c.PlaceServerBar);
+        // X-447 B7 (0.1647): the chat's alerts not seen (also in the chat window's own settings).
+        DrawChatServerBarSetting();
         // X-165 (0.1245): Tensho's state in the server bar (off by default), only when something is wrong (option), and the dashboard here.
         BoolSetting("Advanced.StateServerBar","Advanced.StateServerBarTip",()=>configuration.StateServerBar,value=>configuration.StateServerBar=value,c=>c.StateServerBar);
         // X-165 (0.1246, slice 3): the same state in a floating panel; « only when something is wrong » and the dashboard under either. In the
@@ -48,7 +51,8 @@ internal sealed partial class MainWindow
         // X-76 step 3 (0.952): the server bar tooltip belongs to the three bar entries above (not to the tracking window it sat under):
         // greyed while none of them is on; its count is read by the alarm entry only, greyed while that entry or the tooltip is off.
         ImGui.Indent();
-        ImGui.BeginDisabled(!configuration.AlarmServerBar && !configuration.ReminderServerBar && !configuration.ReminderFinishedServerBar && !configuration.CurrencyServerBar && !configuration.GilServerBar && !configuration.StateServerBar);
+        // X-724 (0.1730): greyed only while no entry at all is on (the bags, gear, zone and chat entries draw it too).
+        ImGui.BeginDisabled(!Alarms.ServerBarEntries.AnyOn(configuration));
         try
         {
             BoolSetting("Advanced.AlarmBarTooltip","Advanced.AlarmBarTooltipTip",()=>configuration.AlarmBarTooltip,value=>configuration.AlarmBarTooltip=value,c=>c.AlarmBarTooltip);
@@ -65,6 +69,14 @@ internal sealed partial class MainWindow
             finally{ImGui.EndDisabled();ImGui.Unindent();}
         }
         finally{ImGui.EndDisabled();ImGui.Unindent();}
+    }
+
+    // Header and home options (Settings › General).
+    private void DrawHeaderSettings()
+    {
+        BoolSetting("Advanced.HeaderClock","Advanced.HeaderClockTip",()=>configuration.ShowHeaderClock,value=>configuration.ShowHeaderClock=value,c=>c.ShowHeaderClock);
+        BoolSetting("Advanced.HeaderEt","Advanced.HeaderEtTip",()=>configuration.ShowHeaderEorzeaTime,value=>configuration.ShowHeaderEorzeaTime=value,c=>c.ShowHeaderEorzeaTime);
+        BoolSetting("Advanced.HomeTools","Advanced.HomeToolsTip",()=>configuration.HomeShowTools,value=>configuration.HomeShowTools=value,c=>c.HomeShowTools);
         // 0.426 (user request): close Tensho when it opens a game window.
         BoolSetting("Advanced.CloseOnGameWindow","Advanced.CloseOnGameWindowTip",()=>configuration.CloseOnGameWindow,value=>configuration.CloseOnGameWindow=value,c=>c.CloseOnGameWindow);
         // 0.415 (g, R-13): pinned tracking window.

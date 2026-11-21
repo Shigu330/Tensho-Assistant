@@ -51,6 +51,7 @@
     <Compile Include="../../src/TenshoAssistant/Alarms/WorldClocks.cs" Link="Alarms/WorldClocks.cs" />
     <Compile Include="../../src/TenshoAssistant/Alarms/TrackedAlarms.cs" Link="Alarms/TrackedAlarms.cs" />
     <Compile Include="../../src/TenshoAssistant/Alarms/InfoBarRules.cs" Link="Alarms/InfoBarRules.cs" />
+    <Compile Include="../../src/TenshoAssistant/Alarms/ServerBarEntries.cs" Link="Alarms/ServerBarEntries.cs" />
     <Compile Include="../../src/TenshoAssistant/Credits/CreditCatalog.cs" Link="Credits/CreditCatalog.cs" />
     <Compile Include="../../src/TenshoAssistant/Alarms/DiscordNotifier.cs" Link="Alarms/DiscordNotifier.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/MapCatalog.cs" Link="Maps/MapCatalog.cs" />
