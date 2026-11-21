@@ -145,8 +145,10 @@ internal sealed partial class MainWindow
             return where;
         }
         if(AirshipSectors.Unlocker(catalog,chosen) is not { } unlocker){ImGui.TextDisabled(localization.Get("AirshipPlanner.UnlockChoose"));return [];}
+        // X-713 (0.1712): a chain cut by an unknown link or a loop is said unknown, never shown as whole.
+        var path=AirshipSectors.UnlockPath(catalog,chosen);
         ImGui.TextWrapped(localization.Format("AirshipPlanner.UnlockBy",SectorName(unlocker.By),unlocker.Rank,unlocker.Surveillance,
-            string.Join(" › ",AirshipSectors.UnlockPath(catalog,chosen).Select(SectorName))));
+            AirshipSectors.Whole(catalog,path) ? string.Join(" › ",path.Select(SectorName)):localization.Get("AirshipSectors.PathUnknown")));
         return [unlocker.By];
     }
 

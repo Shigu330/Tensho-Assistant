@@ -5799,6 +5799,7 @@
     "UnlockUnknown": "Unknown",
     "UnlockSurveillance": "{0} (surveillance {1})",
     "UnlockTip": "Sector whose voyage discovers this one, with the surveillance it asks (LuminaSupplemental data). Path from the start: {0}.",
+    "PathUnknown": "unknown (a link of the chain is missing from the unlock table)",
     "LootCount": "Items: {0}",
     "LootNone": "No record",
     "LootTitle": "Possible loot (quantities and rates unknown)",

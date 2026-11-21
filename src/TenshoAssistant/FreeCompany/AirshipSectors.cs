@@ -124,6 +124,13 @@ public static class AirshipSectors
         return path;
     }
 
+    /// <summary>
+    /// X-713 (0.1712, as SubmarineUnlocks.Whole for submarines, X-711 M3): the chain goes back to a starting sector (one that unlocks itself in
+    /// the table, sector 0), not cut by an unknown link or a loop.
+    /// </summary>
+    public static bool Whole(AirshipCatalog catalog,IReadOnlyList<uint> path)
+        =>path.Count>0 && catalog.Find(path[0])?.Unlock is { } first && first.UnlockedBy==path[0];
+
     private static IEnumerable<string[]> Rows(TextReader reader,int columns)
     {
         string? line;

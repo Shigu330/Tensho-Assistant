@@ -74,8 +74,10 @@ internal sealed partial class MainWindow
                         ? unlock.Surveillance>0 ? localization.Format("AirshipSectors.UnlockSurveillance",by.ShortName,unlock.Surveillance):by.ShortName
                         :localization.Get("AirshipSectors.UnlockUnknown");
                 ImGui.TextUnformatted(unlockText);
-                if(unlock is not null && ImGui.IsItemHovered())
-                    WrappedTooltip(localization.Format("AirshipSectors.UnlockTip",string.Join(" › ",AirshipSectors.UnlockPath(catalog,sector.Id).Select(id=>catalog.Find(id)?.ShortName ?? id.ToString()))));
+                // X-713 (0.1712): a chain cut by an unknown link or a loop is said unknown, never shown as whole.
+                if(unlock is not null && ImGui.IsItemHovered() && AirshipSectors.UnlockPath(catalog,sector.Id) is var unlockPath)
+                    WrappedTooltip(localization.Format("AirshipSectors.UnlockTip",AirshipSectors.Whole(catalog,unlockPath)
+                        ? string.Join(" › ",unlockPath.Select(id=>catalog.Find(id)?.ShortName ?? id.ToString())):localization.Get("AirshipSectors.PathUnknown")));
                 ImGui.TableNextColumn();
                 var drops=catalog.Drops.GetValueOrDefault(sector.Id);
                 if(drops is not { Count:>0 }){ImGui.TextDisabled(localization.Get("AirshipSectors.LootNone"));continue;}

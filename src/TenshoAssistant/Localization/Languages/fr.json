@@ -5799,6 +5799,7 @@
     "UnlockUnknown": "Inconnu",
     "UnlockSurveillance": "{0} (exploration {1})",
     "UnlockTip": "Secteur dont une expédition découvre celui-ci, avec la surveillance demandée (données de LuminaSupplemental). Chemin depuis le départ : {0}.",
+    "PathUnknown": "inconnu (un maillon de la chaîne manque à la table de déblocage)",
     "LootCount": "Objets : {0}",
     "LootNone": "Aucun relevé",
     "LootTitle": "Butin possible (quantités et taux inconnus)",
