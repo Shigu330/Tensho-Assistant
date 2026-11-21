@@ -87,7 +87,8 @@ internal sealed class ChatReader : IDisposable
                     var last=ChatPayloads.LinkLast(payloads,index);
                     payloads[index]=payloads[index] with{Link=link with{Data=new SeString(message.Message.Payloads.Skip(index).Take(last-index+1).ToList()).Encode()}};
                 }
-            var body=ChatPayloads.Segments(payloads);
+            // X-473 (0.1720): in a combat line, an action's coloured name is kept as such (its tooltip on hover).
+            var body=ChatPayloads.Segments(payloads,ChatChannels.From((int)message.LogKind)==ChatChannel.Combat);
             if(developer?.Invoke()==true && ChatPayloads.HasLink(payloads))
             {
                 var kind=(int)message.LogKind;
@@ -147,6 +148,8 @@ internal sealed class ChatReader : IDisposable
         StatusPayload status=>new(ChatPayloadKind.Status,"Status",Link:new ChatLink(ChatSegmentKind.StatusLink,StatusId:status.Status.RowId)),
         DalamudLinkPayload dalamud=>new(ChatPayloadKind.Dalamud,"DalamudLink",Link:new ChatLink(ChatSegmentKind.DalamudLink,Plugin:dalamud.Plugin ?? "",CommandId:dalamud.CommandId)),
         RawPayload raw when raw.Equals(RawPayload.LinkTerminator)=>new(ChatPayloadKind.LinkEnd,"LinkEnd"),
+        // X-473 (0.1720): a text colour of the game, on (its key) or off (0): an action's name in a combat line is a coloured text.
+        UIForegroundPayload colour=>new(ChatPayloadKind.Colour,payload.GetType().Name,Size:colour.ColorKey),
         ITextProvider text=>new(ChatPayloadKind.Text,payload.GetType().Name,Text:text.Text),
         IconPayload icon=>new(ChatPayloadKind.Icon,payload.GetType().Name,Icon:(uint)icon.Icon),
         RawPayload raw=>new(ChatPayloadKind.Raw,"Raw",Size:raw.Data.Length),

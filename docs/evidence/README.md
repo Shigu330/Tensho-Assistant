@@ -132,6 +132,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.171.0-cosmic-vendors-probe.log](0.171.0-cosmic-vendors-probe.log) | `tests/TenshoAssistant.Tests/MapProjectionTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.1711-gathering-node-icons.md](0.1711-gathering-node-icons.md) | `src/TenshoAssistant/Maps/GatheringNodeIcons.cs` | `docs/changelog/CHANGELOG-0.1700-0.1799.md` |
 | [0.1718-chat-link-click-probe.md](0.1718-chat-link-click-probe.md) | `src/TenshoAssistant/Chat/ChatLinkProbe.cs`, `src/TenshoAssistant/Chat/ChatLinkWatch.Dalamud.cs`, `tests/TenshoAssistant.Tests/ChatLinkProbe1718Tests.cs` | `CHANGELOG.md` |
+| [0.1720-chat-action-names.md](0.1720-chat-action-names.md) | `src/TenshoAssistant/Chat/ChatActionTips.cs`, `src/TenshoAssistant/Chat/ChatPayloads.cs`, `tests/TenshoAssistant.Tests/ChatActions1720Tests.cs` | `CHANGELOG.md` |
 | [0.174.0-triad-seldeck-capture.log](0.174.0-triad-seldeck-capture.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.175.0-auxesia-maps-probe.log](0.175.0-auxesia-maps-probe.log) | `src/TenshoAssistant/Maps/MapCatalog.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.176.0-kaede-talk-probe.log](0.176.0-kaede-talk-probe.log) | `src/TenshoAssistant/Npcs/NpcVendorCatalog.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
@@ -356,5 +357,5 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [x91-parsers-check.md](x91-parsers-check.md) | `src/TenshoAssistant/MainWindow.SRankConditions.cs`, `tests/TenshoAssistant.Tests/ParsersCheck971Tests.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md`, `docs/project/GLOBAL-PLAN-DONE.md` |
 | [x93-load-test.md](x93-load-test.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `tests/TenshoAssistant.Tests/Evidence1069Tests.cs`, `tests/TenshoAssistant.Tests/LoadTest1036Tests.cs`, `tools/DiscoveryLoadProbe/Program.cs`, `tools/README.md`, `tools/discoveries-load.py` | `docs/changelog/CHANGELOG-0.1300-0.1399.md`, `docs/evidence/x172-sqlite-trial.md` |
 
-Counted · compté : 344 files · fichiers ; 299 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
+Counted · compté : 345 files · fichiers ; 300 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
 <!-- /docgen:evidence -->

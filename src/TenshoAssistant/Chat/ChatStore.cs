@@ -1,7 +1,7 @@
 namespace TenshoAssistant.Chat;
 
 /// <remarks>X-474 (0.1477): DalamudLink, a link of Dalamud or of a plugin (its plugin and command).</remarks>
-public enum ChatSegmentKind { Text,MapLink,ItemLink,QuestLink,WebLink,DalamudLink,StatusLink }
+public enum ChatSegmentKind { Text,MapLink,ItemLink,QuestLink,WebLink,DalamudLink,StatusLink,ActionName }
 /// <summary>X-403 phase 2 (0.1441): what a link of a message points to: a place (territory, map, coordinate, place name) or an item (id, high
 /// quality); 0.1442: or a quest (its row in the game's Quest sheet).</summary>
 /// <param name="Url">X-403 phase 2 (0.1453): a web address's absolute form (ChatWeb.Address), for a WebLink.</param>
@@ -9,7 +9,8 @@ public enum ChatSegmentKind { Text,MapLink,ItemLink,QuestLink,WebLink,DalamudLin
 /// <param name="Data">X-496 M1 (0.1478): a DalamudLink's own string, encoded: its payloads from the link to its end (the link terminator
 /// included), as Dalamud passes it to the link's handler; null when not read (the handler then gets the link's text).</param>
 /// <param name="StatusId">X-473 (0.1715): a StatusLink's status (its row in the game's Status sheet).</param>
-public sealed record ChatLink(ChatSegmentKind Kind,uint TerritoryId=0,uint MapId=0,float X=0,float Y=0,string Place="",uint ItemId=0,bool Hq=false,uint QuestId=0,string Url="",string Plugin="",uint CommandId=0,byte[]? Data=null,uint StatusId=0);
+/// <param name="Action">X-473 (0.1720): an ActionName's name as the combat line writes it (no link of the game: its coloured text).</param>
+public sealed record ChatLink(ChatSegmentKind Kind,uint TerritoryId=0,uint MapId=0,float X=0,float Y=0,string Place="",uint ItemId=0,bool Hq=false,uint QuestId=0,string Url="",string Plugin="",uint CommandId=0,byte[]? Data=null,uint StatusId=0,string Action="");
 /// <summary>X-473 (0.1715): what the game's tooltip of a status shows: its icon, its name, its description (Status sheet, the client's language).</summary>
 public sealed record ChatStatusTip(uint Icon,string Name,string Description);
 public sealed record ChatSegment(string Text,ChatSegmentKind Kind=ChatSegmentKind.Text,ChatLink? Link=null);

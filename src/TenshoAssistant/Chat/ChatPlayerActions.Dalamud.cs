@@ -151,6 +151,35 @@ internal sealed unsafe class ChatPlayerActions : IDisposable
         return tip;
     }
 
+    // X-473 (0.1720): the actions by name (Action and ActionTransient sheets, the client's language), made once on a thread of their own at the
+    // first hover: no tooltip until they are ready, none at all if they could not be read.
+    private Task<(Dictionary<string,ChatStatusTip> Players,Dictionary<string,ChatStatusTip> All)>? actionTips;
+    /// <summary>X-473 (0.1720): an action a combat line names, as the game's tooltip shows it; null when the name is not one action for sure
+    /// (ChatActionTips) or the actions are not read yet.</summary>
+    public ChatStatusTip? Action(string name,bool byPlayer)
+    {
+        actionTips??=Task.Run(ActionTips);
+        return actionTips.IsCompletedSuccessfully ? ChatActionTips.Find(actionTips.Result,name,byPlayer):null;
+    }
+
+    private (Dictionary<string,ChatStatusTip>,Dictionary<string,ChatStatusTip>) ActionTips()
+    {
+        try
+        {
+            var transient=data.GetExcelSheet<Lumina.Excel.Sheets.ActionTransient>();
+            var rows=data.GetExcelSheet<Lumina.Excel.Sheets.Action>().Where(row=>!row.Name.IsEmpty)
+                .Select(row=>new ChatActionRow(row.RowId,row.Name.ExtractText(),row.Icon,row.IsPlayerAction,row.IsPvP,transient.GetRowOrDefault(row.RowId)?.Description.ExtractText().Trim() ?? "")).ToList();
+            var tips=ChatActionTips.Build(rows);
+            log.Information("Chat window, the actions' names read for their tooltips: {0} rows, {1} names of the player's actions, {2} names in all.",rows.Count,tips.Players.Count,tips.All.Count);
+            return tips;
+        }
+        catch(Exception error)
+        {
+            log.Warning(error,"Chat window, the actions could not be read (maybe after a game update): no action tooltip.");
+            return (new Dictionary<string,ChatStatusTip>(),new Dictionary<string,ChatStatusTip>());
+        }
+    }
+
     /// <summary>The character of that player in range (name and home world), or null.</summary>
     public IPlayerCharacter? InRange(ChatSource source)
         =>objects.OfType<IPlayerCharacter>().FirstOrDefault(character=>character.Name.TextValue==source.Name && character.HomeWorld.RowId==source.World);

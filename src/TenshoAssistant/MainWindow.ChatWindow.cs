@@ -1870,6 +1870,7 @@ internal sealed partial class MainWindow
         ChatSegmentKind.QuestLink=>quests.State.ById?.GetValueOrDefault(link.QuestId)?.Name,
         ChatSegmentKind.MapLink=>link.Place.Length>0 ? link.Place:maps.State.Catalog?.Find(link.MapId)?.Zone,
         ChatSegmentKind.StatusLink=>ChatPlayers?.Status(link.StatusId)?.Name,
+        ChatSegmentKind.ActionName=>link.Action,
         _=>null,
     } is { Length:>0 } name ? name:localization.Get("ChatWindow.LinkNoName");
 
@@ -1925,6 +1926,9 @@ internal sealed partial class MainWindow
                     if(!chatLinesBlocked && run.Link is { Kind:ChatSegmentKind.DalamudLink })TipText(localization.Get("ChatWindow.DalamudLinkGameTip"));
                     // X-473 (0.1715): a status the game linked: its icon, name and description, as the game's tooltip.
                     if(!chatLinesBlocked && run.Link is { Kind:ChatSegmentKind.StatusLink } statusLink && ImGui.IsItemHovered())DrawChatStatusTip(statusLink.StatusId);
+                    // X-473 (0.1720): an action a combat line names: its icon, name and description, as the game's tooltip; none when the name is
+                    // not one action for sure (the line's subject: a player's action or any).
+                    if(!chatLinesBlocked && run.Link is { Kind:ChatSegmentKind.ActionName } actionName && ImGui.IsItemHovered())DrawChatActionTip(actionName.Action,ChatActionTips.ByPlayer(record.Source));
                     // 0.1442: a right click on a message's text: its menu (copy). X-482 M2: not under the « back to the bottom » button.
                     if(!chatLinesBlocked && ImGui.IsItemClicked(ImGuiMouseButton.Right)){chatWindowLine=record;ImGui.OpenPopup("###TenshoChatLine");}
                 }
@@ -2024,6 +2028,7 @@ internal sealed partial class MainWindow
     {
         ChatSegmentKind.DalamudLink=>DalamudLinkKnown?.Invoke(link.Plugin,link.CommandId)==true,
         ChatSegmentKind.StatusLink=>false,
+        ChatSegmentKind.ActionName=>false,
         _=>true,
     };
 
@@ -2032,14 +2037,28 @@ internal sealed partial class MainWindow
     private void DrawChatStatusTip(uint id)
     {
         if(ChatPlayers?.Status(id) is not { } status)return;
+        DrawChatGameTip(status,new Vector2(24,32));
+    }
+
+    /// <summary>X-473 (0.1720): an action's tooltip, as the game's: its icon, its name, its description (Action and ActionTransient sheets);
+    /// none for a name that is not one action for sure.</summary>
+    private void DrawChatActionTip(string name,bool byPlayer)
+    {
+        if(ChatPlayers?.Action(name,byPlayer) is not { } action)return;
+        DrawChatGameTip(action,new Vector2(32,32));
+    }
+
+    /// <summary>X-473 (0.1715, 0.1720): a tooltip of the game's data: its icon (<paramref name="icon"/> at the interface's scale), name and description.</summary>
+    private void DrawChatGameTip(ChatStatusTip tip,Vector2 icon)
+    {
         using(TooltipScope.Begin())
         {
-            DrawGameIcon(status.Icon,new Vector2(24,32)*Dalamud.Interface.Utility.ImGuiHelpers.GlobalScale);
+            DrawGameIcon(tip.Icon,icon*Dalamud.Interface.Utility.ImGuiHelpers.GlobalScale);
             ImGui.SameLine();
-            ImGui.TextColored(Accent,status.Name);
-            if(status.Description.Length==0)return;
+            ImGui.TextColored(Accent,tip.Name);
+            if(tip.Description.Length==0)return;
             ImGui.PushTextWrapPos(ImGui.GetFontSize()*28);
-            try{ImGui.Separator();ImGui.TextColored(Muted,status.Description);}
+            try{ImGui.Separator();ImGui.TextColored(Muted,tip.Description);}
             finally{ImGui.PopTextWrapPos();}
         }
     }

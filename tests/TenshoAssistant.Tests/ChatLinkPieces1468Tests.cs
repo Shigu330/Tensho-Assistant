@@ -151,7 +151,7 @@ internal static class ChatLinkPieces1468Tests
             Check(ChatPayloads.Pieces([new(ChatPayloadKind.Map, "MapLink")]).Single() is { Start: null, End: true }, "an unreadable map link: an end, no start");
             Check(ChatPayloads.Pieces([new(ChatPayloadKind.Icon, "IconPayload", Icon: 88)]).Single() == new ChatPiece("@"), "the world icon: « @ »");
             var reader = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Chat/ChatReader.Dalamud.cs"));
-            Check(reader.Contains("ChatPayloads.Segments(payloads)", StringComparison.Ordinal) && reader.Contains("ChatPayloads.Describe(payloads)", StringComparison.Ordinal)
+            Check(reader.Contains("ChatPayloads.Segments(payloads,", StringComparison.Ordinal) && reader.Contains("ChatPayloads.Describe(payloads)", StringComparison.Ordinal)
                   && reader.Contains("piecesSaid.Take(kind)", StringComparison.Ordinal) && reader.Contains("ChatPayloads.Bare(body)>0", StringComparison.Ordinal)
                   && !reader.Contains("PiecesSaidMax", StringComparison.Ordinal), "the reader uses the pure steps");
         }),
