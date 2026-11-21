@@ -35,6 +35,7 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 | `(ModuleSettings.MacroBook)` | — | — | Settings › Panels › CraftMacros | **Game macros used** — Where macros are copied in the game: individual (this character) or shared (all characters). Default: individual macros. |
 | `(ModuleSettings.MacroChain)` | — | — | Settings › Panels › CraftMacros | **Chain the pages (Tensho Macro Chain: /tenshonext as the last line)** — Ends each page with /tenshonext so Tensho's Macro chain starts the next page (long rotations). Default: on. |
 | `(ModuleSettings.MacroOverwrite)` | — | — | Settings › Panels › CraftMacros | **Allow overwriting existing macros in the range** — On: the copy may replace any macro in the chosen slots. Off: only empty slots or slots Tensho copied before. Default: off. |
+| `(Settings.TabOrderReset)` | — | — | Settings › General › Appearance | **Put the pages' tabs back in order** — The tabs at the top of a family of pages (crafting, gathering, collections, the world…) can be dragged with the mouse; their order is kept. This puts every family back in the list's order. Default: the list's order. |
 | `(Settings.TipActionDescription)` | — | — | Settings › General › OtherTooltips | **The game's description** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
 | `(Settings.TipActionDetail)` | — | — | Settings › General › OtherTooltips | **Level, cost and other details** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
 | `(Settings.TipDutyKind)` | — | — | Settings › General › OtherTooltips | **Kind and level** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
@@ -384,7 +385,7 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 | `WishlistSaleAlert` | bool | false | page Wishlist | **Alert when a wish is on sale under my price** — When on: at most once every 30 minutes, Tensho asks Universalis for the wishes that have a price (20 a check) and writes a chat line when one is listed under your price, once each time it goes under. Needs Universalis on (Settings › Data and sources). Default: off. |
 | `WorkshopPanel` | bool | false | `MainWindow.WorkshopProjects.cs` | **Show this project on screen** — A small panel with the materials of your followed projects together, in stock over needed; when no project is followed, those of the project chosen here. Default: off. |
 
-Settings reset by « Restore every setting » without a control in the interface (35): state of the interface, choices written by a page or migration marks.
+Settings reset by « Restore every setting » without a control in the interface (36): state of the interface, choices written by a page or migration marks.
 
 | Setting | Type | Default |
 |---|---|---|
@@ -416,6 +417,7 @@ Settings reset by « Restore every setting » without a control in the interface
 | `ReminderBarHidden` | List<string>? | null |
 | `SortPreviewDescending` | bool | false |
 | `SortPreviewField` | int | 0 |
+| `TabOrders` | Dictionary<string,List<string>> | (object) |
 | `ThemeMode` | int | 0 |
 | `ThemeModeBeforeTool` | int? | null |
 | `TooltipPartsHidden` | List<string> | (empty) |
@@ -424,7 +426,7 @@ Settings reset by « Restore every setting » without a control in the interface
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Counted: 367 controls (312 linked to `Configuration`, 55 to another file), 35 settings without a control.
+Counted: 368 controls (312 linked to `Configuration`, 56 to another file), 36 settings without a control.
 <!-- /docgen:settings -->
 
 ---
@@ -465,6 +467,7 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 | `(ModuleSettings.MacroBook)` | — | — | Paramètres › Panneaux à côté du jeu › Macros d'artisanat | **Macros du jeu utilisées** — Où copier les macros dans le jeu : macros individuelles (ce personnage) ou partagées (tous les personnages). Par défaut : macros individuelles. |
 | `(ModuleSettings.MacroChain)` | — | — | Paramètres › Panneaux à côté du jeu › Macros d'artisanat | **Chaîner les pages (Macro Chain de Tensho : /tenshonext en dernière ligne)** — Termine chaque page par /tenshonext, pour que l'Enchaînement de macros de Tensho lance la page suivante (rotations longues). Par défaut : activé. |
 | `(ModuleSettings.MacroOverwrite)` | — | — | Paramètres › Panneaux à côté du jeu › Macros d'artisanat | **Autoriser l'écrasement de macros existantes dans la plage** — Coché : la copie peut remplacer n'importe quelle macro dans les emplacements choisis. Décoché : seulement les emplacements vides ou déjà copiés par Tensho. Par défaut : désactivé. |
+| `(Settings.TabOrderReset)` | — | — | Paramètres › Général › Langue et thème | **Remettre les onglets des pages dans l'ordre** — Les onglets en haut d'une famille de pages (artisanat, récolte, collections, le monde…) se déplacent à la souris ; leur ordre est gardé. Ceci remet chaque famille dans l'ordre de la liste. Par défaut : l'ordre de la liste. |
 | `(Settings.TipActionDescription)` | — | — | Paramètres › Général › Autres infobulles | **Description du jeu** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
 | `(Settings.TipActionDetail)` | — | — | Paramètres › Général › Autres infobulles | **Niveau, coût et autres détails** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
 | `(Settings.TipDutyKind)` | — | — | Paramètres › Général › Autres infobulles | **Genre et niveau** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
@@ -814,7 +817,7 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 | `WishlistSaleAlert` | bool | false | page Souhaits | **Alerte quand un souhait est en vente sous mon prix** — Activée : au plus une fois toutes les 30 minutes, Tensho demande à Universalis les souhaits qui ont un prix (20 par vérification) et écrit une ligne dans le chat quand l'un est en vente sous votre prix, une fois à chaque passage sous ce prix. Il faut qu'Universalis soit activé (Paramètres › Données et sources). Par défaut : désactivé. |
 | `WorkshopPanel` | bool | false | `MainWindow.WorkshopProjects.cs` | **Afficher ce projet à l'écran** — Un petit panneau avec les matériaux de vos projets suivis, ensemble, en stock sur requis ; quand aucun projet n'est suivi, ceux du projet choisi ici. Par défaut : désactivé. |
 
-Réglages remis par « Tout remettre par défaut » sans case dans l'interface (35) : état de l'interface, choix écrits par une page ou marques de migration.
+Réglages remis par « Tout remettre par défaut » sans case dans l'interface (36) : état de l'interface, choix écrits par une page ou marques de migration.
 
 | Réglage | Type | Défaut |
 |---|---|---|
@@ -846,6 +849,7 @@ Réglages remis par « Tout remettre par défaut » sans case dans l'interface (
 | `ReminderBarHidden` | List<string>? | null |
 | `SortPreviewDescending` | bool | false |
 | `SortPreviewField` | int | 0 |
+| `TabOrders` | Dictionary<string,List<string>> | (object) |
 | `ThemeMode` | int | 0 |
 | `ThemeModeBeforeTool` | int? | null |
 | `TooltipPartsHidden` | List<string> | (empty) |
@@ -854,5 +858,5 @@ Réglages remis par « Tout remettre par défaut » sans case dans l'interface (
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Compté : 367 cases (312 reliées à `Configuration`, 55 à un autre fichier), 35 réglages sans case.
+Compté : 368 cases (312 reliées à `Configuration`, 56 à un autre fichier), 36 réglages sans case.
 <!-- /docgen:settings-fr -->

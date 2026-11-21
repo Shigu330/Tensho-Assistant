@@ -106,6 +106,10 @@ internal sealed partial class MainWindow
         ComboSetting("Settings.NavigationMode","Settings.NavigationModeTip",()=>Math.Clamp(configuration.NavigationMode,0,2),value=>configuration.NavigationMode=value,
             [(TenshoAssistant.UI.NavigationLayout.Auto,localization.Get("Settings.NavigationModeAuto")),(TenshoAssistant.UI.NavigationLayout.AlwaysShown,localization.Get("Settings.NavigationModeShown")),
              (TenshoAssistant.UI.NavigationLayout.AlwaysFolded,localization.Get("Settings.NavigationModeFolded"))],DefaultConfiguration.NavigationMode,220);
+        // X-605 (0.1697): the families' tabs, dragged with the mouse, back in the list's order (greyed while none was moved).
+        ImGui.BeginDisabled(configuration.TabOrders.Count==0);
+        try{if(SettingButton("Settings.TabOrderReset","Settings.TabOrderResetTip"))ResetTabOrders();}
+        finally{ImGui.EndDisabled();}
         // X-157 (0.1272): the standard controls in Dalamud's active style, Tensho's identity kept in titles and accent.
         BoolSetting("Settings.FollowDalamud","Settings.FollowDalamudTip",()=>configuration.FollowDalamudStyle,value=>configuration.FollowDalamudStyle=value,c=>c.FollowDalamudStyle);
     }

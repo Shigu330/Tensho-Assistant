@@ -155,6 +155,7 @@
     <Compile Include="../../src/TenshoAssistant/Gathering/FishNow.cs" Link="Gathering/FishNow.cs" />
     <Compile Include="../../src/TenshoAssistant/Gathering/Notebooks.cs" Link="Gathering/Notebooks.cs" />
     <Compile Include="../../src/TenshoAssistant/UI/FontSettings.cs" Link="UI/FontSettings.cs" />
+    <Compile Include="../../src/TenshoAssistant/UI/TabOrder.cs" Link="UI/TabOrder.cs" />
     <Compile Include="../../src/TenshoAssistant/UI/TooltipParts.cs" Link="UI/TooltipParts.cs" />
     <Compile Include="../../src/TenshoAssistant/UI/SettingSave.cs" Link="UI/SettingSave.cs" />
     <Compile Include="../../src/TenshoAssistant/UI/SettingFocus.cs" Link="UI/SettingFocus.cs" />

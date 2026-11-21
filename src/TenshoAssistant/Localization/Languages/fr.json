@@ -1047,6 +1047,8 @@
     "ItemSearchLimit": "Nombre d'objets que la recherche liste au plus : page Objets, et choix de l'objet dans Butin des monstres et PNJ marchands. Plus haut = liste plus longue à parcourir ; au-delà, précisez la recherche (10 à 100).\nPar défaut : 30."
   },
   "Settings": {
+    "TabOrderReset": "Remettre les onglets des pages dans l'ordre",
+    "TabOrderResetTip": "Les onglets en haut d'une famille de pages (artisanat, récolte, collections, le monde…) se déplacent à la souris ; leur ordre est gardé. Ceci remet chaque famille dans l'ordre de la liste.\nPar défaut : l'ordre de la liste.",
     "TipPartsHelp": "Chaque partie des infobulles de Tensho, par genre, dans les pages et le chat (l'infobulle des objets a sa propre catégorie).",
     "TipPartTip": "Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté.\nPar défaut : activé.",
     "TipKindPlace": "Lieux",
