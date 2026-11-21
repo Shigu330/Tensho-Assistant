@@ -62,6 +62,12 @@ internal sealed partial class MainWindow
                 var (needsLook,detail)=GameDataChanges.Summary(report);
                 return needsLook ? Diagnostics.SelfCheck.Suspect("game data",detail):Diagnostics.SelfCheck.Ok("game data",detail);
             }),
+            // X-606 (0.1710): the quest list's givers, places, end NPCs and jobs from the sheets (the probe of 0.1708 found 5265 givers named of 5374).
+            Page("quest givers",()=>Task.FromResult(quests.State.Entries is not { Count:>0 } read
+                ? Diagnostics.SelfCheck.NotRead("quest givers","quest list not read yet")
+                :read.Count(entry=>entry.IssuerName.Length>0) is var named && named*2<read.Count
+                    ? Diagnostics.SelfCheck.Suspect("quest givers",$"{named} givers named of {read.Count} quests")
+                    :Diagnostics.SelfCheck.Ok("quest givers",$"{read.Count} quests: {named} givers named, {read.Count(TenshoAssistant.Quests.QuestPlaces.HasGiverPlace)} placed, {read.Count(entry=>entry.EndName.Length>0)} end NPCs, {read.Count(entry=>entry.Jobs.Length>0)} with jobs, {read.Count(entry=>entry.Society.Length>0)} allied society"))),
             Page("lexicon",()=>Task.FromResult(LexiconLoad?.Invoke() is { Count:>0 } words
                 ? Diagnostics.SelfCheck.Ok("lexicon",$"{words.Count} words, {words.Select(word=>word.Kind).Distinct().Count()} kinds")
                 :Diagnostics.SelfCheck.Failed("lexicon","nothing read"))),

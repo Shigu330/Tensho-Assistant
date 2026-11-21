@@ -399,6 +399,15 @@ internal static class Headless
         return true;
     }
 
+    /// <summary>X-606 (0.1710): the trial quests of the « Quests-details » picture on (true) or taken back (false). False when the method cannot be reached.</summary>
+    public static bool QuestTrial(Host host,bool on)
+    {
+        var method=host.Window.GetType().GetMethod("DesktopQuestTrial",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic);
+        if(method is null)return false;
+        method.Invoke(host.Window,[on]);
+        return true;
+    }
+
     /// <summary>X-430 (0.1415): the trial retainers taken back (no character in the application, as before the picture).</summary>
     public static void RetainerTrialEnd(Host host)
         =>host.Window.GetType().GetField("desktopCharacters",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic)?.SetValue(host.Window,null);

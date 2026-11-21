@@ -25,6 +25,18 @@ public sealed record QuestEntry(uint Id, string Name, string Category, uint Icon
     public uint IssuerId { get; init; }
     public uint IssuerMapId { get; init; }
     public uint IssuerTerritoryId { get; init; }
+    /// <summary>
+    /// X-606 (0.1710): the giver's name (Quest.IssuerStart → ENpcResident.Singular) and place in its map (the Level row of Quest.IssuerLocation:
+    /// world X and Z), the NPC the quest ends with (Quest.TargetEnd), the jobs it asks (ClassJobCategory0), its allied society (BeastTribe) and
+    /// grand company; empty when the sheet has none (docs/evidence/0.1708-quest-info.md).
+    /// </summary>
+    public string IssuerName { get; init; } = "";
+    public float IssuerX { get; init; }
+    public float IssuerZ { get; init; }
+    public string EndName { get; init; } = "";
+    public string Jobs { get; init; } = "";
+    public string Society { get; init; } = "";
+    public string Company { get; init; } = "";
     public QuestRewardSnapshot? Rewards {get;init;}
     public string? RewardsError {get;init;}
 }

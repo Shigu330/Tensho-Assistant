@@ -92,6 +92,8 @@
     <Compile Include="../../src/TenshoAssistant/Character/CharacterJobsData.cs" Link="Character/CharacterJobsData.cs" />
     <Compile Include="../../src/TenshoAssistant/Quests/QuestService.cs" Link="Quests/QuestService.cs" />
     <Compile Include="../../src/TenshoAssistant/Quests/QuestList.cs" Link="Quests/QuestList.cs" />
+    <Compile Include="../../src/TenshoAssistant/Quests/QuestPlaces.cs" Link="Quests/QuestPlaces.cs" />
+    <Compile Include="../../src/TenshoAssistant/Quests/QuestTrial.cs" Link="Quests/QuestTrial.cs" />
     <Compile Include="../../src/TenshoAssistant/Quests/QuestStartCities.cs" Link="Quests/QuestStartCities.cs" />
     <Compile Include="../../src/TenshoAssistant/Quests/QuestAlternatives.cs" Link="Quests/QuestAlternatives.cs" />
     <Compile Include="../../src/TenshoAssistant/Quests/ExpansionOrigin.cs" Link="Quests/ExpansionOrigin.cs" />

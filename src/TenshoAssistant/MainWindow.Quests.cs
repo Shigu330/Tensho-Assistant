@@ -254,22 +254,15 @@ internal sealed partial class MainWindow
         if(entry.AdditionalLevel!=0)ImGui.TextUnformatted(localization.Format("QuestDetails.OtherLevel",entry.AdditionalLevel));
         if (!string.IsNullOrWhiteSpace(entry.Zone)) ImGui.TextUnformatted(localization.Format("QuestDetails.Zone",entry.Zone));
         if (!string.IsNullOrWhiteSpace(entry.Expansion)) ImGui.TextUnformatted(localization.Format("QuestDetails.Expansion",entry.Expansion));
+        // X-606 (0.1710): what the sheets say beyond the kind and level (docs/evidence/0.1708-quest-info.md): the jobs it asks, an allied
+        // society or grand company, the giver and its place, the NPC it ends with; an accepted quest's current step (X-57).
+        if (entry.Jobs.Length > 0) ImGui.TextUnformatted(localization.Format("QuestDetails.Jobs",entry.Jobs));
+        if (entry.Society.Length > 0) ImGui.TextUnformatted(localization.Format("QuestDetails.Society",Capitalized(entry.Society)));
+        if (entry.Company.Length > 0) ImGui.TextUnformatted(localization.Format("QuestDetails.Company",entry.Company));
         if (developerMode && entry.IssuerId != 0) ImGui.TextDisabled(localization.Format("DevMode.IssuerId",entry.IssuerId));
-        if (entry.IssuerMapId != 0 && entry.IssuerTerritoryId != 0)
-        {
-            var issuerMap = maps.State.Catalog?.Find(entry.IssuerMapId);
-            if (issuerMap is not null && issuerMap.TerritoryId == entry.IssuerTerritoryId)
-            {
-                // Tensho map (0.118): centred on the quest giver with the flag (cached position index), else the whole map.
-                if (ImGui.SmallButton(localization.Get("QuestDetails.Map")+"###QuestMap"))
-                {
-                    if (mapLocal?.State.Index?.Quest(entry.Id) is { } giver && giver.MapId == issuerMap.MapId) ShowOnTenshoMap(issuerMap, new Vector3(giver.X, 0, giver.Z));
-                    else ShowMapOnTenshoMap(issuerMap.MapId);
-                }
-                Tip("QuestDetails.MapHelp");
-            }
-            else ImGui.TextDisabled(localization.Get("QuestDetails.NoMap"));
-        }
+        DrawQuestGiver(entry);
+        if (entry.EndName.Length > 0) ImGui.TextUnformatted(localization.Format("QuestDetails.End",Capitalized(entry.EndName)));
+        if (entry.Progress == QuestProgress.Active) DrawQuestStep(entry);
         if (ImGui.TreeNodeEx(localization.Get("QuestDetails.Previous")+"###QuestPrevious", ImGuiTreeNodeFlags.DefaultOpen))
         {
             try
@@ -295,6 +288,54 @@ internal sealed partial class MainWindow
         }
         if (entry.IsRepeatable) ImGui.TextWrapped(localization.Get("QuestDetails.RepeatHelp"));
         ImGui.Separator();
+    }
+
+    /// <summary>
+    /// X-606 (0.1710): the giver's name and place (the Level row of Quest.IssuerLocation, as map coordinates), and a button that puts the flag on it
+    /// on Tensho's map (before: only when the local index knew the giver, else the whole map). The giver's place is fixed; an accepted quest's
+    /// step is elsewhere (DrawQuestStep, X-57).
+    /// </summary>
+    private void DrawQuestGiver(QuestEntry entry)
+    {
+        var name = entry.IssuerName.Length > 0 ? Capitalized(entry.IssuerName) : "";
+        var placed = QuestPlaces.HasGiverPlace(entry);
+        var issuerMap = placed ? maps.State.Catalog?.Find(entry.IssuerMapId) : null;
+        if (issuerMap is null || issuerMap.TerritoryId != entry.IssuerTerritoryId)
+        {
+            if (name.Length > 0) ImGui.TextUnformatted(localization.Format("QuestDetails.GiverName",name));
+            if (placed) ImGui.TextDisabled(localization.Get("QuestDetails.NoMap"));
+            return;
+        }
+        var world = new Vector3(entry.IssuerX, 0, entry.IssuerZ);
+        var coordinate = TenshoAssistant.Maps.MapProjection.CoordinateFromWorld(world, issuerMap);
+        var where = $"{MapName(issuerMap)} {TenshoAssistant.Maps.MapProjection.CoordinateText(coordinate)}";
+        ImGui.TextUnformatted(name.Length > 0 ? localization.Format("QuestDetails.Giver",name,where) : localization.Format("QuestDetails.GiverPlace",where));
+        // X-111: the common place menu on a position (flag, nearest aetheryte, map, weather), on a right click.
+        PlaceMenu($"QuestGiverPlace{entry.Id}", issuerMap, coordinate, name.Length > 0 ? name : entry.Name);
+        Tip("EntityMenu.RightClickPlace");
+        if (ImGui.SmallButton(localization.Get("QuestDetails.Map")+"###QuestMap")) ShowOnTenshoMap(issuerMap, world);
+        Tip("QuestDetails.MapHelp");
+    }
+
+    /// <summary>
+    /// X-606 (0.1710, X-57): an accepted quest's current step, from the game's own quest markers (the live map reader's quest points, read with
+    /// or without the game's map open), with a button that puts the flag on it; none shown by the game: said.
+    /// </summary>
+    private void DrawQuestStep(QuestEntry entry)
+    {
+        var points = mapLive?.State?.QuestPoints?.Select(point => (point.Quest, point.MapId, point.X, point.Z));
+        if (QuestPlaces.Step(points, entry.Id) is not { } step || maps.State.Catalog?.Find(step.MapId) is not { } map)
+        {
+            ImGui.TextDisabled(localization.Get("QuestDetails.StepNone"));
+            return;
+        }
+        var world = new Vector3(step.X, 0, step.Z);
+        var coordinate = TenshoAssistant.Maps.MapProjection.CoordinateFromWorld(world, map);
+        ImGui.TextUnformatted(localization.Format("QuestDetails.CurrentStep",$"{MapName(map)} {TenshoAssistant.Maps.MapProjection.CoordinateText(coordinate)}"));
+        PlaceMenu($"QuestStepPlace{entry.Id}", map, coordinate, entry.Name);
+        Tip("EntityMenu.RightClickPlace");
+        if (ImGui.SmallButton(localization.Get("QuestDetails.StepMap")+"###QuestStepMap")) ShowOnTenshoMap(map, world);
+        Tip("QuestDetails.StepMapTip");
     }
 
     private void DrawQuestLink(uint id, string direction)
