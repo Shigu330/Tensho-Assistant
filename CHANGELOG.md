@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1819.0
+- Plan global, X-808 : Correction de 0.1818 (X-808 repris) : l'outil de fusion écartait le lieu de l'ensemble commun de tous les faits d'un joueur signalé, même quand ce joueur n'avait jamais été compté (le lieu venait alors d'un joueur compté) ; son auto-test tombait sur 5 cas (X-357, N13, X-796 M1). Retour au comportement de 0.1817 ; DEC-052 et README rendus tels qu'avant ; X-808 reste ouvert (il faut savoir si le joueur était compté avant). Auto-test de l'outil de nouveau entier.
+- Tests : DiscoveryExcluded1818Tests. Verify.ps1 (agent) : 3998/3998, 0 avertissement, 0 erreur ; DLL 0.1819.0.0. Rien à essayer en jeu.
+### English
+- Correction of 0.1818 (X-808 taken back): the merge tool set aside the common set's place of every fact of a flagged player, even when that player had never been counted (the place then came from a counted player); its selftest fell on 5 cases (X-357, N13, X-796 M1). Back to the behaviour of 0.1817; DEC-052 and README as before; X-808 stays open (it needs to know whether the player was counted before). The tool's selftest whole again.
+
 ## 0.1818.0
 - Plan global, X-808 : Relecture du bloc 0.1803 à 0.1806, M5 (X-808), selon le choix D-224 a de l'utilisateur : le lieu exact de l'ensemble commun d'un fait que tient un joueur laissé de côté (signalé très loin des niveaux des autres, ou un ticket plus ancien du même compte pour les faits que son fichier plus récent n'a pas) ne compte plus, puisque depuis X-772 ce lieu n'a plus de propriétaire connu : une source comptée lue dans le même passage (gist, fichier d'avant) donne le lieu, sinon il retombe au centre de sa case de 50 yalms ; le fait et ses jours restent. Rien ne passe « en attente » (la garde contre git HEAD ne s'arrête pas). Un retrait volontaire ne change rien (D-220 b). DEC-052 et README complétés. Tests de comportement dans l'auto-test de l'outil (Alice et Bob comptés, lieu de Bob ; Bob signalé : centre de la case, jours gardés ; reconstruit : pareil ; gist d'Alice lu : son lieu ; ticket plus ancien du même compte : lieu gardé).
 - Tests : DiscoveryExcluded1818Tests. Verify.ps1 (agent) : 3998/3998, 0 avertissement, 0 erreur ; DLL 0.1818.0.0. Rien à essayer en jeu.

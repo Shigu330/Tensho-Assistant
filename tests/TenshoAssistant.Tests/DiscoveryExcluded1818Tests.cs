@@ -1,7 +1,6 @@
-// 0.1818 (X-808, review of the block 0.1803 to 0.1806, M5; user choice D-224 a): the common set's place of a fact a player left out holds
-// (flagged, or an older issue of the same account) no longer counts. The behaviour (Ann and Bob counted, Bob flagged later: the middle of the
-// cell, the fact and its days kept; rebuilt again the same; a counted gist read gives the place; an older issue keeps the same player's place)
-// is in the merge tool's selftest (run before each version); here, the wiring and the documents.
+// 0.1818 (X-808) taken back in 0.1819: setting aside the common place of every fact a flagged player holds also dropped the place a counted
+// player had brought when the flagged one was never counted (the merge tool's selftest fell on X-357, N13 and X-796 M1). X-808 stays open:
+// only a player counted before can have brought the common place. Here: the behaviour of 0.1817 is back, and its cases are in the selftest.
 internal static class DiscoveryExcluded1818Tests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
@@ -9,15 +8,15 @@ internal static class DiscoveryExcluded1818Tests
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
-        ("Discovery excluded 1818: the tool sets aside the common place of a left-out player's facts, with its behaviour cases",() =>
+        ("Discovery excluded 1819: the common place of a flagged player's facts is no longer set aside for every such player (X-808 open)",() =>
         {
             var tool=Read("tools/discoveries-merge.py");
-            Check(tool.Contains("if owner is None and key(f) in tainted:common.setdefault(key(f),f);continue",StringComparison.Ordinal),"the common set's place of a tainted key set aside");
-            Check(tool.Contains("places[k]={\"X\":(f[\"CellX\"]+0.5)*CELL,\"Z\":(f[\"CellZ\"]+0.5)*CELL,\"First\":f[\"First\"],\"Last\":f[\"Last\"]}",StringComparison.Ordinal),"the middle of the cell, the days kept");
-            foreach(var name in new[]{"X-808: Bob flagged: the place is no longer his","X-808: rebuilt again: the same","X-808: a counted player's gist read now gives the place","X-808: an older issue of the same account"})
-                Check(tool.Contains(name,StringComparison.Ordinal),"the tool's behaviour case: "+name);
-            Check(Read("docs/project/DECISIONS.md").Contains("Completed in 0.1818 (X-808",StringComparison.Ordinal) && Read("docs/project/DECISIONS.md").Contains("Complétée en 0.1818 (X-808",StringComparison.Ordinal),"DEC-052, both halves");
-            Check(Read("community-discoveries/README.md").Contains("since Tensho 0.1818 the place `v3/` holds",StringComparison.Ordinal),"the README");
+            Check(!tool.Contains("tainted=frozenset(key(f) for p in placed",StringComparison.Ordinal) && tool.Contains("if any(owner in excluded for owner,_ in sources):placed=placed_with(places_of(excluded))",StringComparison.Ordinal),
+                "no key set aside: the behaviour of 0.1817");
+            foreach(var name in new[]{"X-357: the same facts again: the v3 set unchanged","N13: one file per account, the newest issue's","X-796 M1: the gist of a player left out gives neither place nor day"})
+                Check(tool.Contains(name,StringComparison.Ordinal),"the tool's case kept: "+name);
+            Check(!Read("docs/project/DECISIONS.md").Contains("Completed in 0.1818 (X-808",StringComparison.Ordinal) && !Read("community-discoveries/README.md").Contains("since Tensho 0.1818 the place",StringComparison.Ordinal),
+                "DEC-052 and the README no longer say it");
         }),
     ];
 }

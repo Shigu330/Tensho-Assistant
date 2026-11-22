@@ -592,13 +592,9 @@ def rebuild(say=print,fresh=(),skip=(),history=None,pending=None):
         if alone>=FAR_FACTS and alone*20>shared:left.add(name)
     # X-796 M1: the places and days a left-out player brought (a file of before, a gist read now) are taken again without them.
     excluded=left|{p[0] for p in placed if p[0] not in counted}
-    # X-808: and the common set's place of the facts they hold no longer counts (an older issue of an account: only the facts its newer,
-    # counted file lacks; the same player's place is kept for the others).
-    own_keys={}
-    for p in placed:
-        if p[0] in counted and p[0] not in left and p[2]:own_keys.setdefault(p[2],set()).update(key(f) for f in p[4])
-    tainted=frozenset(key(f) for p in placed if p[0] in excluded for f in p[4] if p[0] in left or key(f) not in own_keys.get(p[2],set()))
-    if tainted or any(owner in excluded for owner,_ in sources):placed=placed_with(places_of(excluded,tainted))
+    # X-808 (open): the common set's place of a fact a player left out holds may be theirs only if they were counted before; taken back in
+    # 0.1819 (0.1818 set it aside for players never counted too). places_of takes the keys to set aside (tainted), none for now.
+    if any(owner in excluded for owner,_ in sources):placed=placed_with(places_of(excluded))
     for name,issue,login,shown,facts,kept,kept_held,waiting in placed:
         if len(kept_held)<len(facts):
             say(f"{name}: {len(facts)-len(kept_held)} facts refused by the current rules")
@@ -1094,26 +1090,6 @@ def selftest():
               f"X-796 M1: nor their file of before (converted all the same) ({got}, {said})")
         rebuild(say,fresh=early);got={(g["X"],g["First"][:10]) for g in common()}
         check(got=={(70.0,"2026-11-01")},f"X-796 M1: a place from a counted source still takes the earliest day ({got})")
-        # X-808 (D-224 a): Ann and Bob counted, the common place Bob's (the earliest day); Bob flagged later: his place no longer counts.
-        for folder in (PLAYERS,V3_DIR):
-            for n in os.listdir(folder):os.remove(os.path.join(folder,n))
-        put(43,[dict(g) for g in first],"Ann");put(100,[dict(g) for g in early],"Bob");rebuild(say)
-        check({(g["X"],g["Z"],g["Imported"]) for g in common()}=={(70.0,130.0,2)},"X-808: both counted, the place of the earliest day (Bob's)")
-        write_player(100,"Bob",[{**without_place(g),"LevelMax":100000} for g in first])
-        said.clear();rebuild(say);got={(g["X"],g["Z"],g["First"][:10],g["Last"][:10],g["Imported"]) for g in common()}
-        check(got=={(75.0,125.0,"2026-11-01","2026-11-20",1)} and any(l.startswith("100.jsonl.gz: FLAG") for l in said),
-              f"X-808: Bob flagged: the place is no longer his, the middle of its 50-yalm cell; the fact and its days stay ({got})")
-        said.clear();rebuild(say);check({(g["X"],g["Z"]) for g in common()}=={(75.0,125.0)},"X-808: rebuilt again: the same, the place not taken back")
-        rebuild(say,fresh=[("43.jsonl.gz",g) for g in first]);got={(g["X"],g["Z"]) for g in common()}
-        check(got=={(60.0,140.0)},f"X-808: a counted player's gist read now gives the place ({got})")
-        # an older issue of the same account: its facts the newer file holds keep their place (the same player)
-        for folder in (PLAYERS,V3_DIR):
-            for n in os.listdir(folder):os.remove(os.path.join(folder,n))
-        put(43,[dict(g) for g in first],"Ann");rebuild(say)
-        write_player(44,"Ann",[without_place(g) for g in first]);write_player(45,"Ann",[without_place(g) for g in first[:2]])
-        said.clear();rebuild(say);got={g["Subject"]:(g["X"],g["Z"]) for g in common()}
-        check(got[first[0]["Subject"]]==(60.0,140.0) and got[first[1]["Subject"]]==(60.0,140.0),
-              f"X-808: an older issue of the same account: the facts the newer file holds keep the place ({got}, {said})")
         # X-807 M1 (review of 0.1806): the player files sync read are written by rebuild after the common set; a stop leaves them as they were.
         for folder in (PLAYERS,V3_DIR):
             for n in os.listdir(folder):os.remove(os.path.join(folder,n))
