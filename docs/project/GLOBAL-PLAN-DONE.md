@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (834 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (837 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -902,12 +902,15 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-812 | Tool (R13.3, R32.1), follow-up of the natures tool: user's request of 11/22… | Done in 0.1812.0 |
 | X-819 | Review of block 0.1813 to 0.1819 (review 0.1819, 22/11), I1: finding in… | Done in 0.1820.0 |
 | X-820 | Review of block 0.1813 to 0.1819 (review 0.1819, 22/11), minor M1, M2, M3: M1… | Done in 0.1822.0 |
+| X-822 | Finding of the user's local AI (Roslyn audit of Devloppement, 11/22 around… | Done in 0.1825.0 |
+| X-823 | Review of block 0.1820 to 0.1823 (review 0.1823, 22/11), I1: finding in… | Done in 0.1824.0 |
+| X-824 | Review of block 0.1820 to 0.1823 (review 0.1823, 22/11), minor M1, M2: M1 in… | Done in 0.1826.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (834 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (837 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1807,3 +1810,6 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-812 | Outil (R13.3, R32.1), suite de l'outil des natures : demande de l'utilisateur… | Fait en 0.1812.0 |
 | X-819 | Relecture du bloc 0.1813 à 0.1819 (relecture 0.1819, 22/11), I1 : Un gist créé… | Fait en 0.1820.0 |
 | X-820 | Relecture du bloc 0.1813 à 0.1819 (relecture 0.1819, 22/11), mineurs M1, M2, M3… | Fait en 0.1822.0 |
+| X-822 | Constat de l'IA locale de l'utilisateur (audit Roslyn de Devloppement, 22/11… | Fait en 0.1825.0 |
+| X-823 | Relecture du bloc 0.1820 à 0.1823 (relecture 0.1823, 22/11), I1 : La fusion… | Fait en 0.1824.0 |
+| X-824 | Relecture du bloc 0.1820 à 0.1823 (relecture 0.1823, 22/11), mineurs M1, M2… | Fait en 0.1826.0 |
