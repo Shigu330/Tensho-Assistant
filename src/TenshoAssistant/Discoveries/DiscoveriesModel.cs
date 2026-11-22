@@ -251,8 +251,25 @@ public sealed class DiscoveryStore
     /// <summary>
     /// X-93 (0.939, user: never forget a discovery): the bound applies to the shared facts held in memory only (imported, not seen by you), per kind since 0.943. Your own sightings are
     /// never refused, and nothing already held is ever removed to make room; a shared fact left out is counted (<see cref="LeftOut"/>) and the page says so.
+    /// X-468 (0.1805, the user's choice D-216 a): raised from 200 000 to a high safety bound (the merge tool's MAX_FACTS, the bound of an index
+    /// entry); a kind's file also stays within the format's byte bounds (ExchangeV3). When a file brings more than there is room for, the facts
+    /// seen by the most players (Imported) come in first, then the most recent (<see cref="Weighed"/>), no longer the first ones in key order.
     /// </summary>
-    public const int MaxFacts=200_000;
+    public const int MaxFacts=2_000_000;
+
+    /// <summary>
+    /// X-468 (0.1805, D-172, D-216 a): « a fact verified several times by several people counts more ». When the shared facts a list brings for a kind
+    /// pass the room left (<see cref="MaxFacts"/> less <paramref name="shared"/>, the shared facts held), the list in the order they are put in: the
+    /// most players first (Imported), then the most recent (Last); the same list otherwise (nothing reordered, nothing written differently).
+    /// Stable: equal facts keep their order. Called outside the lock.
+    /// </summary>
+    public static List<DiscoveryFact> Weighed(List<DiscoveryFact> ready,IReadOnlyDictionary<DiscoveryKind,int> shared)
+    {
+        var offered=new Dictionary<DiscoveryKind,int>();
+        foreach(var fact in ready)if(fact.Seen==0)offered[fact.Kind]=offered.GetValueOrDefault(fact.Kind)+1;
+        if(!offered.Any(pair=>(long)shared.GetValueOrDefault(pair.Key)+pair.Value>MaxFacts))return ready;
+        return [..ready.OrderByDescending(fact=>fact.Imported).ThenByDescending(fact=>fact.Last)];
+    }
     /// <summary>
     /// X-93 (0.941): shared kinds loaded on demand. With a source set (<see cref="UseSharedSource"/>), a kind whose shared file exists is read the first time
     /// something asks for it (a search in the background: the answer comes a moment later, the page refreshes on the next revision; an import at once), so
@@ -583,6 +600,7 @@ public sealed class DiscoveryStore
         }
         Dictionary<DiscoveryKind,int> shared;
         lock(gate)shared=SharedHeld();
+        ready=Weighed(ready,shared);   // X-468: over the bound, the most players then the most recent first
         for(var start=0;start<ready.Count;start+=Slice)
         {
         if(start>0)LetOthersIn();
@@ -692,6 +710,7 @@ public sealed class DiscoveryStore
     // X-93 part 2 (0.1040): a file's facts moved to their 50-yalm cells and checked, outside the lock.
     // X-172 (0.1136): Gone, the keys of facts refused or moved to another cell (their rows go); MovedTo, the keys they moved to (their rows are written).
     private sealed record Prepared(List<DiscoveryFact> Facts,int Refused,bool Moved,List<string> Gone,List<string> MovedTo);
+    private static readonly Dictionary<DiscoveryKind,int> EmptyShared=[];
     private static Prepared Prepare(DiscoveryFile file)
     {
         var ready=new List<DiscoveryFact>(file.Facts.Count);var refused=0;var moved=false;List<string> gone=[],movedTo=[];
@@ -706,7 +725,9 @@ public sealed class DiscoveryStore
             if(fact.Key!=original.Key){gone.Add(original.Key);movedTo.Add(fact.Key);}
             ready.Add(fact);
         }
-        return new(ready,refused,moved,gone,movedTo);
+        // X-468 (0.1805): a file bringing more shared facts of a kind than the bound (a base read at start, a shared kind's file: none of that kind
+        // held yet) puts the most players' and the most recent first.
+        return new(Weighed(ready,EmptyShared),refused,moved,gone,movedTo);
     }
     // Under the lock: prepared facts from start to end put in; « shared » counts the shared facts held per kind.
     private void PutRange(List<DiscoveryFact> ready,int start,int end,Dictionary<DiscoveryKind,int> shared,bool sharedFile=false)

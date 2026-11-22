@@ -115,6 +115,8 @@ public sealed class GitHubExchange : IDisposable
     private string CommonV3Marker=>Path.Combine(folder,"community-v3.json");
 
     public GitHubExchange(string folder):this(folder,null){}
+    /// <summary>X-468 (0.1805): the log's line of each exchange that read the common set's index (the download and the merge timed), in English.</summary>
+    public Action<string>? Log{get;init;}
     /// <summary>
     /// X-174: <paramref name="handler"/> answers the requests instead of the network (behaviour tests). X-175: <paramref name="signIn"/> (default
     /// GitHubSignIn.Current) and <paramref name="clock"/> (default the UTC time) given by the behaviour tests.
@@ -433,22 +435,38 @@ public sealed class GitHubExchange : IDisposable
         try{index=ExchangeV3.ParseIndex(await Community.BoundedHttp.ReadAsync(client,new Uri(CommunityDiscoveries.AddressV3+ExchangeV3.IndexName),ExchangeV3.MaxIndexBytes,stop.Token).ConfigureAwait(false));}
         catch(Exception error) when(CommonUnreadable(error)){return CommonUnreachable(error) ? ("CommonUnreachable",0,0):null;}
         if(index is null)return null;
-        var noted=CommonV3Marks();int added=0,joined=0,taken=0,unreadable=0,unreachable=0;
+        var noted=CommonV3Marks();int added=0,joined=0,taken=0,unreadable=0,unreachable=0,facts=0;long size=0;
+        // X-468 (0.1805, D-216 a): the download (with the check of each file against the index) and the merge timed apart, said in the log.
+        var fetching=new System.Diagnostics.Stopwatch();var merging=new System.Diagnostics.Stopwatch();
         foreach(var entry in index.Files)
         {
             var kind=(int)entry.Kind;var hash=entry.Sha256.ToUpperInvariant();var key=$"common-v3:{kind}:{hash}";
             if(noted.GetValueOrDefault(kind)==hash || store.ImportWaiting(key))continue;
             try
             {
-                var bytes=await Community.BoundedHttp.ReadBytesAsync(client,new Uri(CommunityDiscoveries.AddressV3+entry.Name),(int)entry.Bytes,stop.Token).ConfigureAwait(false);
-                var read=ExchangeV3.ReadKind(new MemoryStream(bytes),entry);
-                var result=store.Merge(read.Facts,common:true);added+=result.Added;joined+=result.Joined;taken++;
+                fetching.Start();
+                ExchangeV3Kind read;
+                try
+                {
+                    var bytes=await Community.BoundedHttp.ReadBytesAsync(client,new Uri(CommunityDiscoveries.AddressV3+entry.Name),(int)entry.Bytes,stop.Token).ConfigureAwait(false);
+                    read=ExchangeV3.ReadKind(new MemoryStream(bytes),entry);size+=bytes.Length;
+                }
+                finally{fetching.Stop();}
+                merging.Start();
+                try{var result=store.Merge(read.Facts,common:true);added+=result.Added;joined+=result.Joined;taken++;facts+=read.Facts.Count;}
+                finally{merging.Stop();}
                 store.WhenImportSaved(key,()=>NoteCommonV3(kind,hash));
             }
             catch(Exception error) when(CommonUnreadable(error)){if(CommonUnreachable(error))unreachable++;else unreadable++;}
         }
+        Log?.Invoke(CommonTimes(index.Files.Count,taken,facts,size,fetching.ElapsedMilliseconds,merging.ElapsedMilliseconds,added,joined,unreadable,unreachable));
         return (taken>0 ? "CommonTaken":unreadable>0 ? "CommonUnreadable":unreachable>0 ? "CommonUnreachable":"CommonSame",added,joined);
     }
+    /// <summary>X-468 (0.1805): the log's line of a common set read: kind files taken of those listed, facts and bytes, the download and the merge.</summary>
+    internal static string CommonTimes(int listed,int taken,int facts,long bytes,long fetchMs,long mergeMs,int added,int joined,int unreadable,int unreachable)=>
+        string.Create(System.Globalization.CultureInfo.InvariantCulture,
+            $"Discoveries: common set: {taken} of {listed} kind file(s) taken ({facts} facts, {bytes} bytes): download {fetchMs} ms, merge {mergeMs} ms; {added} added, {joined} joined")
+        +(unreadable+unreachable>0 ? string.Create(System.Globalization.CultureInfo.InvariantCulture,$"; {unreadable} unreadable, {unreachable} not reached"):"")+".";
     private Dictionary<int,string> CommonV3Marks()
     {
         lock(marks)

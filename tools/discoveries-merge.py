@@ -72,7 +72,7 @@ V3_DIR=os.path.join(ROOT,"community-discoveries","v3")
 QUEST_ASKED_FIXED=datetime(2026,11,8,15,42,29,tzinfo=timezone.utc)
 QUEST_ASKED_FIXED_DAY=datetime(2026,11,9,tzinfo=timezone.utc)  # 0.1012: a date kept to the day only passes the fix if it is on a later day
 KINDS=set(range(1,39))-{26,27};PLACED={1,2,3,8,10,19,22,23,28,29,30}  # 26, 27: 0.890's and 0.891's wrong spearfishing shadows
-CELL=50;MAX_FACTS=200_000;VERSIONS={1,2,3};VERSION=2
+CELL=50;MAX_FACTS=2_000_000;VERSIONS={1,2,3};VERSION=2  # X-468 (0.1805, D-216 a): 200 000 raised to a high safety bound
 FIELDS={"Kind","Subject","Detail","Territory","Map","CellX","CellZ","X","Z","LevelMin","LevelMax","Seen","Imported","First","Last","Hq","Values"}
 MAX_VALUES=32;MAX_VALUE=100_000;MAX_COUNT=100_000_000
 # X-183 (N12): the plugin's types (DiscoveryFact: uint ids, int cells, levels and counts). (N5): no sighting before the plugin noted any (0.807, 2026-11-07);
@@ -170,19 +170,46 @@ def v3_kind_bytes(kind,facts,producer):
     text="".join(v3_line(o)+"\n" for o in [header]+[{k:f[k] for k in ORDER if k in f} for f in facts])
     return gzip.compress(text.encode("utf-8"),compresslevel=9,mtime=0)
 
-def bounded(facts,limit=None,say=print):
+def weight(f):return (-f["Imported"],-when(f["Last"]).timestamp(),sort_key(f))
+
+def bounded(facts,limit=None,say=print,max_compressed=None,max_decompressed=None):
     """X-406: each kind kept to `limit` facts (MAX_FACTS: the plugin's DiscoveryStore.MaxFacts, the bound of an index entry). Over it, the
-    facts the most players saw are kept (Imported), then the most recent (Last), then the fixed order; the others are said, never written."""
+    facts the most players saw are kept (Imported), then the most recent (Last), then the fixed order; the others are said, never written.
+    X-468 (0.1805, D-216 a): MAX_FACTS raised to 2 000 000; a kind's file is also kept within the format's byte bounds (MAX_COMPRESSED,
+    MAX_DECOMPRESSED: its index entry, or the plugin's reader, would refuse it), by the same order."""
     limit=MAX_FACTS if limit is None else limit
-    counts=collections.Counter(f["Kind"] for f in facts)
-    over=sorted(k for k,n in counts.items() if n>limit)
-    if not over:return facts
-    kept=[f for f in facts if f["Kind"] not in over]
-    for kind in over:
-        mine=sorted((f for f in facts if f["Kind"]==kind),key=lambda f:(-f["Imported"],-when(f["Last"]).timestamp(),sort_key(f)))
-        kept.extend(mine[:limit])
-        say(f"kind {kind}: {counts[kind]} facts over the bound of {limit}: {counts[kind]-limit} left out (the least seen, then the oldest)")
-    return sorted(kept,key=sort_key)
+    max_compressed=MAX_COMPRESSED if max_compressed is None else max_compressed
+    max_decompressed=MAX_DECOMPRESSED if max_decompressed is None else max_decompressed
+    by=collections.defaultdict(list)
+    for f in facts:by[f["Kind"]].append(f)
+    kept=[];cut=False
+    for kind in sorted(by):
+        mine=by[kind]
+        if len(mine)>limit:
+            mine=sorted(mine,key=lambda f:(-f["Imported"],-when(f["Last"]).timestamp(),sort_key(f)))[:limit];cut=True
+            say(f"kind {kind}: {len(by[kind])} facts over the bound of {limit}: {len(by[kind])-limit} left out (the least seen, then the oldest)")
+        mine=fit_bytes(kind,mine,max_compressed,max_decompressed,say)
+        cut=cut or len(mine)<len(by[kind])
+        kept.extend(mine)
+    return sorted(kept,key=sort_key) if cut else facts
+
+def fit_bytes(kind,facts,max_compressed,max_decompressed,say=print):
+    """X-468: the facts of one kind whose file stays within the byte bounds; over them, the least seen then the oldest left out (said)."""
+    header=1024   # the header line, with room
+    sizes=[len(v3_line({k:f[k] for k in ORDER if k in f}).encode("utf-8"))+1 for f in facts]
+    if sum(sizes)+header<=min(max_decompressed,max_compressed-header):return facts   # compressed never larger than this: nothing to measure
+    ordered=sorted(range(len(facts)),key=lambda n:weight(facts[n]))
+    total=header;count=0
+    for n in ordered:
+        if total+sizes[n]>max_decompressed:break
+        total+=sizes[n];count+=1
+    keep=[facts[n] for n in ordered[:count]]
+    while keep and len(v3_kind_bytes(kind,keep,"t"))>max_compressed:
+        keep=keep[:max(0,min(len(keep)-1,int(len(keep)*max_compressed/len(v3_kind_bytes(kind,keep,"t"))*0.98)))]
+    if len(keep)<len(facts):
+        say(f"kind {kind}: {len(facts)} facts over the format's byte bounds: {len(facts)-len(keep)} left out (the least seen, then the oldest)")
+        return keep
+    return facts
 
 def v3_build(facts,producer):
     """(index.json text, {name: gzip bytes}) of a v3 set. X-406: a kind over MAX_FACTS is refused (its index entry would refuse the whole set)."""
@@ -1014,8 +1041,23 @@ def selftest():
         with tempfile.TemporaryDirectory(prefix="tensho-x406-") as tmp:
             check(write_v3(bounded(many,say=lambda s:None),tmp,lambda s:None) and len(v3_index(open(os.path.join(tmp,V3_INDEX),encoding="utf-8").read()))==2,
                   "X-406: the set written in a folder reads back")
+        # X-468 (0.1805, D-216 a): a kind's file kept within the format's byte bounds, the most seen then the most recent kept (behaviour).
+        MAX_FACTS=bound
+        wide=[g(s,1+(s%7==0)+(s%11==0),f"2026-11-{1+s%20:02d}T00:00:00+00:00") for s in range(1,401)]
+        line=len(v3_line({k:wide[0][k] for k in ORDER if k in wide[0]}).encode("utf-8"))+1
+        said=[];kept=bounded(wide,say=said.append,max_decompressed=1024+100*line)
+        heavy=sorted(wide,key=lambda x:(-x["Imported"],-when(x["Last"]).timestamp(),sort_key(x)))
+        check(90<=len(kept)<=100 and {key(x) for x in kept}=={key(x) for x in heavy[:len(kept)]} and {key(x) for x in wide if x["Imported"]>=2}<={key(x) for x in kept}
+              and len(gzip.decompress(v3_kind_bytes(1,kept,"t")))<=1024+100*line and said and "over the format's byte bounds" in said[0],
+              f"X-468: over the decompressed bound, the most seen then the most recent kept ({len(kept)}, {said})")
+        squeezed=bounded(wide,say=said.append,max_compressed=1200)
+        check(0<len(squeezed)<len(wide) and len(v3_kind_bytes(1,squeezed,"t"))<=1200 and {key(x) for x in squeezed}=={key(x) for x in heavy[:len(squeezed)]},
+              f"X-468: over the compressed bound, the file written fits it ({len(squeezed)}, {len(v3_kind_bytes(1,squeezed,'t'))} bytes)")
+        said.clear();check(bounded(wide,say=said.append) is wide and not said,"X-468: within every bound: the same list, nothing said")
     finally:MAX_FACTS=bound
-    check(MAX_FACTS==200_000,"X-406: the bound is the plugin's DiscoveryStore.MaxFacts")
+    plugin=open(os.path.join(ROOT,"src","TenshoAssistant","Discoveries","DiscoveriesModel.cs"),encoding="utf-8").read()
+    found=re.search(r"public const int MaxFacts=([0-9_]+);",plugin)
+    check(found and MAX_FACTS==int(found.group(1).replace("_","")) and MAX_FACTS==2_000_000,"X-406, X-468: the bound is the plugin's DiscoveryStore.MaxFacts (2 000 000)")
     if os.path.isfile(os.path.join(V3_DIR,V3_INDEX)):
         # X-357 (0.1349): was « v3 holds the facts of discoveries.json »; the v2 file is gone: the repository's set reads whole and clean.
         repo=from_v3_dir(V3_DIR);facts,report=clean(repo)
