@@ -97,6 +97,27 @@ public sealed class ChatTabView
     /// that opened a conversation's tab is not seen yet); the older ones are taken as read, as in any new view. After it: nothing changes.</summary>
     public void CountFrom(long id){if(!started)countFrom=id;}
 
+    /// <summary>
+    /// X-773 M1 (review of 0.1775): the view made again when the history is read back (ChatStore.Restore numbers every line again). Since
+    /// 0.1775 a tab not shown takes its messages a few frames later; a view made new took everything as read at that first refresh, so the
+    /// messages come meanwhile had no unread count and no « ! ». Here the messages this view had not taken yet (this session's lines, found by
+    /// their new number in <paramref name="ids"/>) and every one after the read-back (<paramref name="next"/> on) count at its first refresh, as
+    /// they would have in this view; its unread count and its alerts are carried over (the alerts by their new numbers). A view that had
+    /// never taken a message counts from the read-back on.
+    /// </summary>
+    public ChatTabView Again(IReadOnlyDictionary<long,long> ids,long next)
+    {
+        // The first message this view had not taken: this session's lines after its last one (or from its own CountFrom), by their new number.
+        var from=next;
+        if(started || countFrom>0)
+            foreach(var (old,renumbered) in ids)
+                if((started ? old>lastId:old>=countFrom) && renumbered<from)from=renumbered;
+        var view=new ChatTabView{countFrom=from,Unread=Unread,Alerts=Alerts};
+        foreach(var id in alertIds)
+            if(ids.TryGetValue(id,out var renumbered))view.alertIds.Add(renumbered);
+        return view;
+    }
+
     /// <summary>The tab is shown at its bottom: nothing unread any more.</summary>
     public void MarkSeen(){Unread=0;Alerts=0;alertIds.Clear();}
 

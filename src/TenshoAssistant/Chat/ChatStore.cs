@@ -185,7 +185,8 @@ public sealed class ChatStore
 
     /// <summary>X-475: messages kept on disk from before (oldest first), put before this session's lines: only those older than the oldest
     /// line kept (a line of this session is never twice), the bounds kept as for new lines. Every line is numbered again after the last
-    /// number given, and each tab's view is made again from them (taken as read). Returns how many were put back.
+    /// number given, and each tab's view is made again from them (the lines put back taken as read; since X-773 M1, what the view had not taken
+    /// yet and what comes after stay new). Returns how many were put back.
     /// X-515 M4: a message's time is to the second; those of the same second as the oldest line kept (a fight or a loot at the reload) are put
     /// back too, except the ones this session holds already (same time, kind, sender and text, counted: two equal lines stay two).</summary>
     public int Restore(IReadOnlyList<ChatRecord> older,int cap)
@@ -231,7 +232,10 @@ public sealed class ChatStore
             var limit=Bounded(cap);
             while(combat>limit)RemoveOldest(ChatChannel.Combat,true);
             while(records.Count-combat>limit)RemoveOldest(ChatChannel.Combat,false);
-            views.Clear();DropSearch();
+            // X-773 M1 (review of 0.1775): each view made again keeps what it had not taken yet and what comes after the read-back as new
+            // (ChatTabView.Again): a tab refreshed a few frames later still counts them unread.
+            foreach(var tab in views.Keys.ToArray())views[tab]=views[tab].Again(ids,nextId);
+            DropSearch();
             return back.Count;
         }
     }

@@ -110,7 +110,8 @@ public sealed unsafe class GilWatcher : IDisposable
                 foreach(var name in open)seenAny[name]=now;
                 if(seenAny.Count>200)foreach(var old in seenAny.Where(pair=>now-pair.Value>GilJournal.ContextWindow).Select(pair=>pair.Key).ToArray())seenAny.Remove(old);
                 // X-557 (0.1774): the windows for the « Other » context, the character's own names for its messages, and the lines now due.
-                Volatile.Write(ref personal,GilOtherContext.PersonalNames((OwnNames?.Invoke() ?? []).Concat(retainerNames)));
+                // X-773 M2 (review of 0.1775): the company's whole name too, not only its tag (kept whole: its words are often common ones).
+                Volatile.Write(ref personal,GilOtherContext.PersonalNames((OwnNames?.Invoke() ?? []).Concat(retainerNames),[player.IsLoaded ? CompanyName():null]));
                 IReadOnlyList<string> due;
                 lock(context){context.Windows(now,open);due=context.Due(now);}
                 // The game's texts go as a value, never as the log's template (a brace in them would be read as a placeholder).
@@ -156,7 +157,8 @@ public sealed unsafe class GilWatcher : IDisposable
                     if(retainer.RetainerId!=0)
                     {
                         sum+=RetainerPurse.Gil(retainer.RetainerId,retainer.Gil,livePurse);
-                        // X-557 (0.1774, R25): the retainers' names, kept out of the « Other » context (developer mode only, at most ten).
+                        // X-557 (0.1774, R25): the retainers' names, kept out of the « Other » context (developer mode only, at most ten: the
+                        // character's; X-773 M2: emptied at each change of character, so a second character's are added too).
                         if(developerMode() && retainerNames.Count<10 && retainer.NameString is { Length:>0 } name)retainerNames.Add(name);
                     }
                 newRetainers=sum;
@@ -194,10 +196,22 @@ public sealed unsafe class GilWatcher : IDisposable
         Saves.Changed();
     }
 
+    /// <summary>X-773 M2 (review of 0.1775): the character's company's whole name (InfoProxyFreeCompany, read on the framework thread with the
+    /// player loaded; its UI module checked first); null when there is none or it cannot be read.</summary>
+    private static string? CompanyName()
+    {
+        var game=FFXIVClientStructs.FFXIV.Client.System.Framework.Framework.Instance();
+        if(game==null || game->UIModule==null)return null;
+        var company=FFXIVClientStructs.FFXIV.Client.UI.Info.InfoProxyFreeCompany.Instance();
+        return company==null || company->Id==0 ? null:company->NameString;
+    }
+
     private Task<List<GilEntry>>? loading;
     private void Switch(ulong id,DateTimeOffset now)
     {
         character=id;recorder.Reset();loadFailed=false;entries=[];
+        // X-773 M2 (review of 0.1775): the retainers' names are the character's: the next one's are read again (its ten places free).
+        retainerNames.Clear();
         Saves.Switch();
         // X-587 (external audit A14 of 18/11): a journal of this character whose write failed is newer than the data file's: the one used.
         if(id!=0 && Saves.Failed(id) is { } kept)loading=Task.FromResult(GilJournal.Prune(kept,now));

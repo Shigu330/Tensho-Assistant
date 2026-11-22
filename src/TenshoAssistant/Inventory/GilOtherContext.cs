@@ -11,12 +11,17 @@ namespace TenshoAssistant.Inventory;
 /// player payload) and when it holds none of the character's own names (the character, its first or last name, its worlds, its retainers):
 /// such a message is left out whole, never masked (a masked name was once followed by the same name in plain text). Windows are addon names
 /// and rows are numbers: no player data. Pure, so the decisions are tested; the watcher feeds it on the framework thread.
+/// X-773 M3 (review of 0.1775): without a sender nor a player payload, another player's name in plain text still passed (another plugin's
+/// Print, /echo), over every kind and up to 80 messages. Now only the game's own lines that may go with a gil change are kept (<see
+/// cref="KindKept"/>: system, error, items obtained, progress, retainer sales), never the kinds plugins print with by default (Dalamud's
+/// Print and PrintError: 1 and 2), the echo, the players' channels, combat (never read, DEC-053), nor the kinds that name other players
+/// (rolls, the company's announcements, others' crafting and gathering); at most 20 messages.
 /// </summary>
 public sealed class GilOtherContext
 {
     public static readonly TimeSpan Around=TimeSpan.FromSeconds(3);
     /// <summary>What is kept at most: messages and rows heard, window readings (one a second), changes waiting for their 3 seconds after.</summary>
-    public const int MaxMessages=80,MaxRows=80,MaxReadings=30,MaxPending=20,MaxText=200;
+    public const int MaxMessages=20,MaxRows=80,MaxReadings=30,MaxPending=20,MaxText=200;
     private readonly List<(DateTimeOffset At,int Kind,string Text)> messages=[];
     private readonly List<(DateTimeOffset At,uint Row)> rows=[];
     private readonly List<(DateTimeOffset At,string[] Windows)> readings=[];
@@ -43,8 +48,10 @@ public sealed class GilOtherContext
     /// <summary>
     /// The character's own names to keep out of the log (its name, worlds, company tag, retainers' names): each one whole and each of its
     /// words (« First Last » gives « First » and « Last » too); fewer than two letters left out. A message holding one is left out whole.
+    /// X-773 M2 (review of 0.1775): <paramref name="whole"/> are kept whole only (the company's name: its words are often common ones, « of »,
+    /// « de », which would leave out nearly every message).
     /// </summary>
-    public static IReadOnlyList<string> PersonalNames(IEnumerable<string?> owned)
+    public static IReadOnlyList<string> PersonalNames(IEnumerable<string?> owned,IEnumerable<string?>? whole=null)
     {
         var names=new List<string>();
         foreach(var name in owned)
@@ -53,13 +60,22 @@ public sealed class GilOtherContext
             names.Add(name.Trim());
             names.AddRange(name.Split(' ',StringSplitOptions.RemoveEmptyEntries|StringSplitOptions.TrimEntries));
         }
+        foreach(var name in whole ?? [])
+            if(!string.IsNullOrWhiteSpace(name))names.Add(name.Trim());
         return names.Where(name=>name.Length>=2).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
     }
 
-    /// <summary>A game message heard (see <see cref="Safe"/>); whether it was kept.</summary>
+    /// <summary>X-773 M3: the kinds whose messages may be kept: 57 system, 60 error, 62 items obtained, 64 progress (experience, quests), 71
+    /// retainer sales (docs/evidence/0.1434-chat-logfilter.md for the kinds). Any other kind is left out whole.</summary>
+    public static readonly IReadOnlySet<int> KeptKinds=new HashSet<int>{57,60,62,64,71};
+
+    /// <summary>X-773 M3: whether a message of this kind may be kept (<see cref="KeptKinds"/>).</summary>
+    public static bool KindKept(int kind)=>KeptKinds.Contains(kind);
+
+    /// <summary>A game message heard (see <see cref="KindKept"/> and <see cref="Safe"/>); whether it was kept.</summary>
     public bool Message(DateTimeOffset at,int kind,bool hasSender,bool namesPlayer,string text,IEnumerable<string> personal)
     {
-        if(Safe(hasSender,namesPlayer,text,personal) is not { } kept)return false;
+        if(!KindKept(kind) || Safe(hasSender,namesPlayer,text,personal) is not { } kept)return false;
         messages.Add((at,kind,kept));
         if(messages.Count>MaxMessages)messages.RemoveAt(0);
         return true;
