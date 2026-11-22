@@ -22,6 +22,10 @@ player files with `rebuild` (each player counts as one import of a fact); then t
 `withdraw`) stops before writing anything when `v3/` is missing or cut short (no `index.json`, an index listing fewer files than the folder holds,
 a file that does not read whole, or a fact a player holds that the committed `v3/` has but the one read now lacks): the places and days live there
 only, so `v3/` is restored from git first. The places and days a player left out brings (flagged, or an older issue of the same account) never count.
+Since Tensho 0.1821, a player flagged after a rebuild counted them (the header of their player file says `"Counted":true` or `false`, as the last
+rebuild left it) no longer leaves their place in `v3/` either: the place `v3/` holds for their facts falls back to the middle of its 50-yalm cell,
+unless a counted player's gist read in the same run gives it (the fact and its days stay). A player never counted brought no place; an older
+issue replaced by a newer one of the same account is the same player, whose place stays.
 **Player files (since Tensho 0.1801).** A file of `players/` keeps no exact place (`X`, `Z`) nor day (`First`, `Last`): beside the issue, they told
 where that GitHub account was on that day. It keeps what the merge needs (the fact's identity, its levels, its HQ sightings and values), compressed:
 `<issue>.jsonl.gz`, gzip of UTF-8 lines, a header `{"Format":"tensho-discoveries-player","Version":1,"Issue":n,"Login":…,"Count":n}` then one fact
@@ -86,6 +90,10 @@ puis le résultat est enregistré dans le dépôt. Depuis Tensho 0.1803, `rebuil
 manque ou est tronqué (pas d'`index.json`, un index qui liste moins de fichiers que le dossier n'en a, un fichier qui ne se lit pas en entier, ou un
 fait qu'un joueur a, présent dans le `v3/` enregistré mais absent de celui lu) : les lieux et les jours ne sont que là, donc `v3/` se remet d'abord
 depuis git. Les lieux et les jours qu'apporte un joueur laissé de côté (signalé, ou un ticket plus ancien du même compte) ne comptent jamais.
+Depuis Tensho 0.1821, un joueur signalé après avoir été compté par une reconstruction (l'en-tête de son fichier de joueur dit `"Counted":true` ou
+`false`, comme la dernière reconstruction l'a laissé) ne laisse plus non plus son lieu dans `v3/` : le lieu que `v3/` garde pour ses faits retombe au
+centre de sa case de 50 yalms, sauf si le gist d'un joueur compté lu dans le même passage le donne (le fait et ses jours restent). Un joueur jamais
+compté n'a apporté aucun lieu ; un ticket plus ancien remplacé par un plus récent du même compte est le même joueur, son lieu reste.
 Les fichiers arrivent chez les joueurs avec la release suivante (lus sur `main`).
 **Fichiers de joueur (depuis Tensho 0.1801).** Un fichier de `players/` ne garde aucun lieu exact (`X`, `Z`) ni aucun jour (`First`, `Last`) : à côté
 du ticket, ils disaient où était ce compte GitHub ce jour-là. Il garde ce que la fusion demande (l'identité du fait, ses niveaux, ses observations HQ

@@ -389,11 +389,13 @@ def without_place(f):
     """A fact as a player file keeps it: PLAYER_ORDER only (no X, Z, First, Last; Seen 0 and Imported 1 are the same for every share)."""
     return {k:f[k] for k in PLAYER_ORDER if k in f}
 
-def player_bytes(issue,author,facts,noted=None):
+def player_bytes(issue,author,facts,noted=None,counted=None):
     """A player file: gzip (mtime 0) of UTF-8 lines, a header then one fact per line (without_place, sorted): the same facts give the same bytes.
-    X-804: noted: {"Gist","Revision"} of the gist merged last (the plugin reads it from main and then deletes that gist)."""
+    X-804: noted: {"Gist","Revision"} of the gist merged last (the plugin reads it from main and then deletes that gist). X-808: counted:
+    whether the rebuild that writes it counted its player (« Counted »; None: not said, read as « not counted »)."""
     facts=sorted((without_place(f) for f in facts),key=sort_key)
-    header={"Format":PLAYER_FORMAT,"Version":PLAYER_VERSION,"Issue":issue,**({"Login":author} if author else {}),**merged_note(noted),"Count":len(facts)}
+    header={"Format":PLAYER_FORMAT,"Version":PLAYER_VERSION,"Issue":issue,**({"Login":author} if author else {}),**merged_note(noted),
+            **({"Counted":counted} if counted is not None else {}),"Count":len(facts)}
     return gzip.compress("".join(v3_line(o)+"\n" for o in [header]+facts).encode("utf-8"),compresslevel=9,mtime=0)
 
 def read_player(path):
@@ -410,7 +412,20 @@ def read_player(path):
     facts=[json.loads(line) for line in lines[1:] if line]
     if header.get("Count")!=len(facts) or not all(isinstance(f,dict) and not set(f)-set(PLAYER_ORDER) for f in facts):
         raise ValueError(f"{os.path.basename(path)}: its facts differ from its header or hold a field it never keeps")
-    return {"Issue":header.get("Issue"),"Login":header.get("Login"),"Facts":facts,"Old":False,"Noted":merged_note(header)}
+    return {"Issue":header.get("Issue"),"Login":header.get("Login"),"Facts":facts,"Old":False,"Noted":merged_note(header),"Counted":header.get("Counted")}
+
+def was_counted(path):
+    """X-808: whether the player file on disk says the last rebuild counted its player (no file, a file of before, no field, unreadable: no)."""
+    try:return path.endswith(PLAYER_SUFFIX) and os.path.isfile(path) and read_player(path).get("Counted") is True
+    except (OSError,ValueError):return False
+
+def keys_of(facts):
+    """X-808: the keys of these facts (a fact the current rules cannot key is skipped, as placed_with does)."""
+    found=[]
+    for f in facts:
+        try:found.append(key(f))
+        except (KeyError,TypeError):continue
+    return found
 
 def merged_note(noted):
     """X-804: the gist and revision a player file notes as merged ({} without both)."""
@@ -428,9 +443,9 @@ def union(held,given):
     for f in given:facts[key(f)]=f
     return list(facts.values())
 
-def write_player(issue,author,facts,noted=None):
+def write_player(issue,author,facts,noted=None,counted=None):
     """The player's file written whole (<issue>.jsonl.gz), then the <issue>.json of before removed."""
-    write_atomic(os.path.join(PLAYERS,f"{issue}{PLAYER_SUFFIX}"),player_bytes(int(issue) if str(issue).isdigit() else issue,author,facts,noted))
+    write_atomic(os.path.join(PLAYERS,f"{issue}{PLAYER_SUFFIX}"),player_bytes(int(issue) if str(issue).isdigit() else issue,author,facts,noted,counted))
     old=os.path.join(PLAYERS,f"{issue}.json")
     if os.path.exists(old):os.remove(old)
 
@@ -525,25 +540,29 @@ def rebuild(say=print,fresh=(),skip=(),history=None,pending=None):
     names=[n for n in player_names() if n not in set(skip)]
     names=sorted(names+[n for n in pending if n not in names],key=name_order);renewed={stem(n) for n in names if n.endswith(PLAYER_SUFFIX)}
     files=[];later=[];notes={}   # later: the player files' writes, done once the common set is written (a stop before it leaves every file as it was); notes: X-804
+    # X-808: was: « Counted » as the file on disk says (the last rebuild counted its player); now: counted by this rebuild, written in every
+    # player file this run writes, and a file written again when it changed; written: the files this run writes anyway.
+    was={};now={};written=set()
     for name in names:
         path=os.path.join(PLAYERS,name);issue=stem(name)
         if name in pending:
             author,given=pending[name][1],pending[name][2];noted=pending[name][3] if len(pending[name])>3 else {}
             player={"Issue":issue,"Login":author,"Facts":[without_place(f) for f in given],"Old":False,"Noted":noted}
-            later.append(lambda issue=issue,author=author,given=given,noted=noted:write_player(issue,author,given,noted))
-        else:player=read_player(path)
+            was[name]=was_counted(path);written.add(name)
+            later.append(lambda issue=issue,author=author,given=given,noted=noted,name=name:write_player(issue,author,given,noted,now.get(name)))
+        else:player=read_player(path);was[name]=player.get("Counted")
         notes[issue]=player.get("Noted") or {}
         if player["Old"]:
             # 0.1005, 0.1012: a file of before follows the current rules and keeps the day only; X-772: its places and days kept for the
             # common set, then the file written again without them (or, beside its new file after a conversion cut short, removed).
             kept=[f for f in player["Facts"] if valid(dict(f))]
             kept=[daily(f) for f in kept]
-            sources+=[(issue+PLAYER_SUFFIX,f) for f in kept]
+            sources+=[(issue+PLAYER_SUFFIX,f) for f in kept];written.add(name)
             if issue in renewed:
                 later.append(lambda path=path,name=name,issue=issue:(os.path.exists(path) and os.remove(path),say(f"{name}: removed (its {issue}{PLAYER_SUFFIX} is there: a conversion cut short)")))
                 continue
             if len(kept)<len(player["Facts"]):say(f"{name}: {len(player['Facts'])-len(kept)} facts refused by the current rules")
-            later.append(lambda issue=issue,player=player,kept=kept,name=name:(write_player(issue,player.get("Login"),kept),
+            later.append(lambda issue=issue,player=player,kept=kept,name=name:(write_player(issue,player.get("Login"),kept,None,now.get(name)),
                          say(f"{name}: written again as {issue}{PLAYER_SUFFIX}, without exact places nor days (X-772)")))
         files.append((issue+PLAYER_SUFFIX,issue,(player.get("Login") or "").lower(),player.get("Login"),
                       [without_place(f) for f in kept] if player["Old"] else player["Facts"]))
@@ -592,17 +611,25 @@ def rebuild(say=print,fresh=(),skip=(),history=None,pending=None):
         if alone>=FAR_FACTS and alone*20>shared:left.add(name)
     # X-796 M1: the places and days a left-out player brought (a file of before, a gist read now) are taken again without them.
     excluded=left|{p[0] for p in placed if p[0] not in counted}
-    # X-808 (open): the common set's place of a fact a player left out holds may be theirs only if they were counted before; taken back in
-    # 0.1819 (0.1818 set it aside for players never counted too). places_of takes the keys to set aside (tainted), none for now.
-    if any(owner in excluded for owner,_ in sources):placed=placed_with(places_of(excluded))
+    now.update({p[0]:p[0] in counted and p[0] not in left for p in placed})
+    # X-808 (M5 of the review of 0.1806, D-224 a as the master set it on 22/11): a player flagged now whom the last rebuild counted (« Counted »
+    # in their file) may have brought the place the common set holds for their facts: those keys are set aside (places_of: a counted source
+    # read now gives the place, else the middle of the 50-yalm cell; the fact and its days kept). A player never counted brought none (0.1818
+    # set those aside too and dropped a counted player's place); an older issue of the same account is the same player, whose place stays good.
+    tainted=frozenset(k for p in placed if p[0] in left and was.get(p[0]) is True for k in keys_of(p[4]))
+    if tainted or any(owner in excluded for owner,_ in sources):placed=placed_with(places_of(excluded,tainted))
     for name,issue,login,shown,facts,kept,kept_held,waiting in placed:
         if len(kept_held)<len(facts):
             say(f"{name}: {len(facts)-len(kept_held)} facts refused by the current rules")
-            later.append(lambda issue=issue,shown=shown,kept_held=kept_held:write_player(issue,shown,kept_held,notes.get(issue)))
+            later.append(lambda issue=issue,shown=shown,kept_held=kept_held,name=name:write_player(issue,shown,kept_held,notes.get(issue),now.get(name)))
+        elif name not in written and was.get(name)!=now[name]:
+            # X-808: « Counted » changed: the file written again with the same facts and note.
+            later.append(lambda issue=issue,shown=shown,facts=facts,name=name:write_player(issue,shown,facts,notes.get(issue),now[name]))
         if waiting:say(f"{name}: {len(waiting)} facts whose place is in no common file nor gist read now: kept in the player file, left out of the common set")
         if login and newest[login]!=name:say(f"{name}: same author as {newest[login]} (a newer issue): not counted")
     for name,(alone,shared) in sorted(outliers(held).items()):
         if name in left:say(f"{name}: FLAG: alone far outside the other players' levels on {alone} of the {shared} facts it shares: not counted, check it by hand")
+        if name in left and was.get(name) is True:say(f"{name}: counted before: the common set's place of its facts no longer counts (a counted share read now gives it, else the middle of its 50-yalm cell)")
     # X-795: a fact a counted player holds, in the common set of git HEAD, with no place now: the common set read was incomplete; nothing written.
     past=head_v3_keys() if history is None else history()
     if past:
@@ -1001,12 +1028,12 @@ def selftest():
         check(sorted(os.listdir(PLAYERS))==["43.jsonl.gz"] and "43.json: written again as 43.jsonl.gz, without exact places nor days (X-772)" in said,
               f"X-772: the file of before written again in the new format, the old one removed ({os.listdir(PLAYERS)}, {said})")
         head,*rows=lines("43.jsonl.gz")
-        check(head=={"Format":PLAYER_FORMAT,"Version":PLAYER_VERSION,"Issue":43,"Login":"Ann","Count":3} and len(rows)==3
+        check(head=={"Format":PLAYER_FORMAT,"Version":PLAYER_VERSION,"Issue":43,"Login":"Ann","Counted":True,"Count":3} and len(rows)==3
               and all(set(r)<=set(PLAYER_ORDER) and not set(r)&{"X","Z","First","Last","Seen","Imported"} for r in rows),
               f"X-772: behaviour: the player file produced holds neither place nor day ({head}, {rows[:1]})")
         said.clear();check(rebuild(say) is False and open(os.path.join(V3_DIR,v3_name(1)),"rb").read()==before and not [l for l in said if "written again" in l],
               f"X-772: rebuilt from the new file: the common set the same bytes, nothing converted again ({said})")
-        check(player_bytes(43,"Ann",list(reversed(spots)))==open(os.path.join(PLAYERS,"43.jsonl.gz"),"rb").read(),"X-772: the same facts give the same bytes")
+        check(player_bytes(43,"Ann",list(reversed(spots)),None,True)==open(os.path.join(PLAYERS,"43.jsonl.gz"),"rb").read(),"X-772: the same facts give the same bytes")
         # sync's gists bring places and days (fresh): an earlier day takes the place, a later one the last day; the player file stays without them
         rebuild(say,fresh=[{**spots[0],"X":70.0,"Z":130.0,"First":"2026-11-02T00:00:00+00:00","Last":"2026-11-02T00:00:00+00:00"},
                            {**spots[1],"X":99.0,"First":"2026-11-04T00:00:00+00:00","Last":"2026-11-09T00:00:00+00:00"}])
@@ -1090,6 +1117,32 @@ def selftest():
               f"X-796 M1: nor their file of before (converted all the same) ({got}, {said})")
         rebuild(say,fresh=early);got={(g["X"],g["First"][:10]) for g in common()}
         check(got=={(70.0,"2026-11-01")},f"X-796 M1: a place from a counted source still takes the earliest day ({got})")
+        # X-808 (D-224 a as the master set it on 22/11): only a player flagged after being counted makes the common place fall back.
+        def heads():return {n:lines(n)[0].get("Counted") for n in sorted(os.listdir(PLAYERS))}
+        for folder in (PLAYERS,V3_DIR):
+            for n in os.listdir(folder):os.remove(os.path.join(folder,n))
+        put(43,[dict(g) for g in first],"Ann");rebuild(say)
+        write_player(100,"Bob",[without_place(g) for g in first]);rebuild(say,fresh=[("100.jsonl.gz",g) for g in early])
+        got={(g["X"],g["Z"],g["First"][:10],g["Last"][:10],g["Imported"]) for g in common()}
+        check(got=={(70.0,130.0,"2026-11-01","2026-11-20",2)} and heads()=={"100.jsonl.gz":True,"43.jsonl.gz":True},f"X-808: Ann and Bob counted, Bob's place and days ({got}, {heads()})")
+        said.clear()
+        rebuild(say,fresh=[("100.jsonl.gz",{**g,"X":80.0,"First":"2026-11-01T00:00:00+00:00"}) for g in early],
+                pending={"100.jsonl.gz":(100,"Bob",[{**g,"LevelMax":100000} for g in early],{})})
+        got={(g["X"],g["Z"],g["First"][:10],g["Last"][:10],g["Imported"]) for g in common()}
+        check(got=={(75.0,125.0,"2026-11-01","2026-11-20",1)} and heads()=={"100.jsonl.gz":False,"43.jsonl.gz":True}
+              and any(l.startswith("100.jsonl.gz: counted before") for l in said),
+              f"X-808: Bob flagged after being counted: the middle of the cell, the days kept, his new gist gives nothing; « Counted » false ({got}, {heads()}, {said})")
+        said.clear();check(rebuild(say) is False and not any("counted before" in l for l in said) and heads()=={"100.jsonl.gz":False,"43.jsonl.gz":True},
+                           f"X-808: rebuilt again: the same set, Bob no longer « counted before » ({said})")
+        for folder in (PLAYERS,V3_DIR):
+            for n in os.listdir(folder):os.remove(os.path.join(folder,n))
+        put(43,[dict(g) for g in first],"Ann");rebuild(say)
+        write_player(100,"Bob",[without_place(g) for g in first]);rebuild(say,fresh=[("100.jsonl.gz",g) for g in early])
+        write_player(101,"bob",[without_place(g) for g in first[:1]]);said.clear();rebuild(say)
+        got={(g["X"],g["First"][:10]) for g in common()}
+        check(got=={(70.0,"2026-11-01")} and heads()=={"100.jsonl.gz":False,"101.jsonl.gz":True,"43.jsonl.gz":True}
+              and "100.jsonl.gz: same author as 101.jsonl.gz (a newer issue): not counted" in said and not any("counted before" in l for l in said),
+              f"X-808: an older issue of the same account is the same player: Bob's place stays ({got}, {heads()}, {said})")
         # X-807 M1 (review of 0.1806): the player files sync read are written by rebuild after the common set; a stop leaves them as they were.
         for folder in (PLAYERS,V3_DIR):
             for n in os.listdir(folder):os.remove(os.path.join(folder,n))

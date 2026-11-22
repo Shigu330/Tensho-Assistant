@@ -46,7 +46,7 @@ internal static class DiscoveryPlayers1801Tests
                 "the fields a player file keeps");
             Check(tool.Contains("write_atomic(os.path.join(PLAYERS,f\"{issue}{PLAYER_SUFFIX}\"),player_bytes(",StringComparison.Ordinal)
                 && !tool.Contains("write_json(path,{\"Issue\"",StringComparison.Ordinal) && !tool.Contains("write_json(path,player)",StringComparison.Ordinal),"written through player_bytes only");
-            Check(tool.Contains("if not path.endswith(PLAYER_SUFFIX):",StringComparison.Ordinal) && tool.Contains("write_player(issue,player.get(\"Login\"),kept)",StringComparison.Ordinal),
+            Check(tool.Contains("if not path.endswith(PLAYER_SUFFIX):",StringComparison.Ordinal) && tool.Contains("write_player(issue,player.get(\"Login\"),kept,None,now.get(name))",StringComparison.Ordinal),
                 "a file of before still read, then written again in the new format");
             Check(tool.Contains("X-772: behaviour: the player file produced holds neither place nor day",StringComparison.Ordinal)
                 && tool.Contains("X-772: rebuilt from the new file: the common set the same bytes",StringComparison.Ordinal),"the tool's behaviour cases");
