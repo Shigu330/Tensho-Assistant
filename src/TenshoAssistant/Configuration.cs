@@ -19,6 +19,8 @@ public static class ConfigurationReset
         "GraceCounts",
         // X-213 (0.1781): the shared FATE ranks read from the game's window, per character (the player's data).
         "SharedFates",
+        // X-229 (0.1784): the meal chosen in the gear planner, per job (the player's data).
+        "GearMeals",
         // 0.321: interface state, not a setting (which navigation groups are folded).
         "NavigationCollapsed",
         // X-521 M2 (D-180): interface state, not a setting (the category chosen in each tab of the Settings page).
@@ -536,6 +538,8 @@ public sealed partial class Configuration
     public bool GearOwnedOnly { get; set; }
     // 0.312: planned materia per job and slot (MeldedMateria codes); a slot listed here overrides the worn piece's materia.
     public Dictionary<uint,Dictionary<TenshoAssistant.Gear.GearSlot,List<uint>>>? GearMateria { get; set; }
+    // X-229 (0.1784): per job, the meal chosen in the gear planner (its stats shown with it).
+    public Dictionary<uint,TenshoAssistant.Gear.GearMealChoice>? GearMeals { get; set; }
     // Header and advanced settings (0.206).
     public bool ShowHeaderClock { get; set; } = true;
     /// <summary>0.728: a frame on the hotbar slot of the next action of a node's plan.</summary>

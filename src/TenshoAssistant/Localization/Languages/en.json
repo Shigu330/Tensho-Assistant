@@ -8780,7 +8780,16 @@
     "OvermeldRate": "{0}% success ({1})",
     "OvermeldRateUnknown": "rate unknown",
     "OvermeldRateTip": "Chance that melding succeeds in this overmeld slot: it depends on the grade, the slot's rank and the piece's quality (NQ or HQ). Grades I to X: read from the game data. Grades XI and XII: the game data has none; the rate comes from FFXIV Teamcraft (« per Teamcraft »), whose rates I to X are the same as the game's. A failure consumes the materia.",
-    "OvermeldRateCommunity": "{0}% success ({1}, per Teamcraft)"
+    "OvermeldRateCommunity": "{0}% success ({1}, per Teamcraft)",
+    "ColumnMeal": "With meal",
+    "MealColumnTip": "The planned stats with the meal chosen: each bonus is its percent of the planned value, up to its cap (the HQ values for an HQ meal), or a flat value. At a synced level: unknown, the game's formula is not proved.",
+    "MealBonus": "Meal: +{0}",
+    "MealNone": "No meal",
+    "MealTip": "A meal for this job's plan: its stats are shown in a « With meal » column. From the game's sheets (meals giving Well Fed). Nothing is eaten.",
+    "MealSearch": "Search a meal",
+    "MealSearchTip": "Two letters at least: filters the meals by name (200 shown at most).",
+    "MealHq": "HQ",
+    "MealHqTip": "The high-quality meal: its own percents and caps.\nDefault: on"
   },
   "VesselBuilds": {
     "Searching": "Searching builds…",

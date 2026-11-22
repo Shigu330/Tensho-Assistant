@@ -1202,6 +1202,25 @@ public sealed partial class Plugin : IDalamudPlugin
                 catch(Exception error){log.Warning(error,"Crafting food and medicine unavailable.");return [];}
             });
             mainWindow.CraftConsumableList=()=>craftConsumables.Value;
+            // X-229 (0.1784): every meal (Well Fed, Status 48, with an ItemFood row) and all its bonuses, for the gear planner, built on first use.
+            var gearMeals=new Lazy<IReadOnlyList<Craft.CraftConsumable>>(()=>
+            {
+                try
+                {
+                    var foods=data.GetExcelSheet<Lumina.Excel.Sheets.ItemFood>();var list=new List<Craft.CraftConsumable>();
+                    foreach(var item in data.GetExcelSheet<Lumina.Excel.Sheets.Item>().Where(row=>row.ItemAction.RowId!=0 && !row.Name.IsEmpty))
+                    {
+                        if(item.ItemAction.ValueNullable is not { } action || action.Data.Count<2 || (uint)action.Data[0]!=Craft.CraftConsumables.WellFed
+                           || foods.GetRowOrDefault(action.Data[1]) is not { } food)continue;
+                        var bonuses=food.Params.Where(param=>param.BaseParam.RowId!=0)
+                            .Select(param=>new Craft.CraftBonus(param.BaseParam.RowId,param.IsRelative,param.Value,param.Max,param.ValueHQ,param.MaxHQ)).ToArray();
+                        if(bonuses.Length>0)list.Add(new(item.RowId,item.Name.ExtractText(),false,bonuses,action.Data[1]));
+                    }
+                    return list.OrderBy(item=>item.Name,StringComparer.CurrentCultureIgnoreCase).ToArray();
+                }
+                catch(Exception error){log.Warning(error,"Meals for the gear planner unavailable.");return [];}
+            });
+            mainWindow.GearMealList=()=>gearMeals.Value;
             // 0.464: food, medicine and specialist read from the game for the simulator; a failure leaves them unknown.
             var craftDetectionWarned=false;
             mainWindow.CraftDetectedNow=job=>
