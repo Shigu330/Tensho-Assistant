@@ -3884,7 +3884,11 @@
     "NpcSale": "Vente au PNJ (NQ) : {0} gils l'unité",
     "NpcSaleStack": "Vente au PNJ (NQ) : {0} gils l'unité, pile de {1} : {2} gils",
     "MarketOverNpc": "Le marché paie {0} fois le prix du PNJ.",
-    "NpcOverMarket": "Le PNJ paie plus que le marché."
+    "NpcOverMarket": "Le PNJ paie plus que le marché.",
+    "SameLookHeld": "Même apparence déjà détenue : {0}",
+    "SameLookMore": "et {0} de plus",
+    "SameLookNone": "Aucune pièce de même apparence dans vos rangements lus.",
+    "SameLookTip": "Pièces aux mêmes modèles et au même emplacement d'équipement (teintures à part) dans votre coiffeuse mirage, votre bahut personnel, vos sacs, votre arsenal, vos sacoches et vos servants, tels que Tensho les a lus pour ce personnage."
   },
   "MapView": {
     "IconsNoMap": "Ouvrez une carte pour voir la liste de ses icônes.",

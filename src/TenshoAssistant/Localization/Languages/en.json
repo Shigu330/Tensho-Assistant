@@ -3884,7 +3884,11 @@
     "NpcSale": "NPC sale (NQ): {0} gil each",
     "NpcSaleStack": "NPC sale (NQ): {0} gil each, stack of {1}: {2} gil",
     "MarketOverNpc": "The market pays {0}× the NPC's price.",
-    "NpcOverMarket": "The NPC pays more than the market."
+    "NpcOverMarket": "The NPC pays more than the market.",
+    "SameLookHeld": "Same look held: {0}",
+    "SameLookMore": "and {0} more",
+    "SameLookNone": "No piece of the same look in your storages read.",
+    "SameLookTip": "Pieces with the same models and the same equipment slot (dyes aside) in your glamour dresser, armoire, bags, armoury, saddlebags and retainers, as Tensho last read them for this character."
   },
   "MapView": {
     "IconsNoMap": "Open a map to list the icons of that map.",

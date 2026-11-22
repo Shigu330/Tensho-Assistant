@@ -387,6 +387,8 @@ internal sealed partial class MainWindow
         DrawItemExpansion(id);
         // X-95 (0.951): the parts of the item panel timed in developer mode (the panel reached 173 ms in the slow frame log).
         if(!hoverPanel || configuration.HoverShowCollection)MeasureMap("hover collection",()=>DrawItemCollection(item));
+        // X-216 (0.1783): a piece of the same look already held, and where (with the collection part).
+        if(!hoverPanel || configuration.HoverShowCollection)MeasureMap("hover same look",()=>DrawItemSameLook(id));
         if(!hoverPanel || configuration.HoverShowStock)MeasureMap("hover stock",()=>DrawHoveredStock(id));
         // 0.346 (g, I-06): NPC sale price (Item.PriceLow, game data), and the hovered stack's when the game tooltip is for one of the
         // player's slots; for NQ (the HQ price is not in the sheet); nothing when the item does not sell to NPCs (price 0).
