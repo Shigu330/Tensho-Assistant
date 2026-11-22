@@ -83,7 +83,8 @@ public sealed unsafe class PrepReminderWatcher : IDisposable
             {
                 var info=ui->Buddy.CompanionInfo;
                 var outNow=info.Companion!=null && info.Companion->EntityId is not (0 or NoEntity);
-                Say(chocobo.Read(now,outNow ? info.TimeLeft:null,options.ChocoboThreshold,busy,!outNow && Held(now,territory)));
+                // X-798: mounted, the game's timer of the companion is frozen (the user's reading of 22/11).
+                Say(chocobo.Read(now,outNow ? info.TimeLeft:null,options.ChocoboThreshold,busy,!outNow && Held(now,territory),!outNow && Mounted()));
             }
             else if(!options.Chocobo)chocobo.Reset();
             warned=false;
@@ -122,10 +123,14 @@ public sealed unsafe class PrepReminderWatcher : IDisposable
         }
     }
 
+    // X-798: mounted (riding, pillion, getting on, flying): the game freezes the companion's timer meanwhile (the user's reading of 22/11).
+    private bool Mounted()=>
+        condition[ConditionFlag.Mounted] || condition[ConditionFlag.RidingPillion] || condition[ConditionFlag.Mounting]
+        || condition[ConditionFlag.Mounting71] || condition[ConditionFlag.MountOrOrnamentTransition] || condition[ConditionFlag.MountImmobile] || condition[ConditionFlag.InFlight];
+
     // X-774: out of sight for a reason that is not the player's choice.
     private bool Held(DateTimeOffset now,uint territory)=>
-        condition[ConditionFlag.Mounted] || condition[ConditionFlag.RidingPillion] || condition[ConditionFlag.Mounting]
-        || condition[ConditionFlag.Mounting71] || condition[ConditionFlag.MountOrOrnamentTransition] || condition[ConditionFlag.MountImmobile] || condition[ConditionFlag.InFlight]
+        Mounted()
         || condition[ConditionFlag.Swimming] || condition[ConditionFlag.Diving]
         || condition[ConditionFlag.BoundByDuty] || condition[ConditionFlag.BoundByDuty56] || condition[ConditionFlag.BoundByDuty95]
         || condition[ConditionFlag.WatchingCutscene] || condition[ConditionFlag.WatchingCutscene78] || condition[ConditionFlag.OccupiedInCutSceneEvent]

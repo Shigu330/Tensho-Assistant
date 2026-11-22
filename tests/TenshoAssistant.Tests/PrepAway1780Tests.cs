@@ -113,7 +113,7 @@ internal static class PrepAway1780Tests
         ("Prep away 1780: the watcher holds the companion while mounted, swimming, in a duty or a cutscene, just after a load, or where mounts are not allowed", () =>
         {
             var watcher = Read("src/TenshoAssistant/Reminders/PrepReminderWatcher.Dalamud.cs");
-            Check(watcher.Contains("Say(chocobo.Read(now,outNow ? info.TimeLeft:null,options.ChocoboThreshold,busy,!outNow && Held(now,territory)));", StringComparison.Ordinal), "held given when out of sight");
+            Check(watcher.Contains("Say(chocobo.Read(now,outNow ? info.TimeLeft:null,options.ChocoboThreshold,busy,!outNow && Held(now,territory),!outNow && Mounted()));", StringComparison.Ordinal), "held given when out of sight (X-798: and frozen while mounted)");
             foreach (var flag in new[] { "Mounted", "RidingPillion", "Mounting", "InFlight", "Diving", "BoundByDuty", "WatchingCutscene", "OccupiedInCutSceneEvent" })
                 Check(watcher.Contains($"condition[ConditionFlag.{flag}]", StringComparison.Ordinal), "held: " + flag);
             Check(watcher.Contains("|| settling.Holds(now) || MountAllowed?.Invoke(territory)==false", StringComparison.Ordinal), "held just after a load (X-781: until it is seen back, PrepSettling) and where mounts are not allowed");
