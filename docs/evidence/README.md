@@ -13,7 +13,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 |---|---|---|
 | [0.1004-discoveries-check.md](0.1004-discoveries-check.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `tests/TenshoAssistant.Tests/Evidence1069Tests.cs` | `docs/changelog/CHANGELOG-0.1000-0.1099.md` |
 | [0.1006-submarine-functions.md](0.1006-submarine-functions.md) | `src/TenshoAssistant/FreeCompany/SubmarineVoyageProbe.Dalamud.cs` | `docs/changelog/CHANGELOG-0.1000-0.1099.md` |
-| [0.1008-game-update-inventory.md](0.1008-game-update-inventory.md) | `tests/TenshoAssistant.Tests/GameUpdateInventory1008Tests.cs` | `docs/changelog/CHANGELOG-0.1000-0.1099.md`, `docs/project/TESTING-ROUTE.md` |
+| [0.1008-game-update-inventory.md](0.1008-game-update-inventory.md) | `tests/TenshoAssistant.Tests/GameUpdateInventory1008Tests.cs`, `tests/TenshoAssistant.Tests/SharedFate1781Tests.cs` | `docs/changelog/CHANGELOG-0.1000-0.1099.md`, `docs/project/TESTING-ROUTE.md` |
 | [0.103.0-maps-probe.log](0.103.0-maps-probe.log) | `src/TenshoAssistant/Maps/MapMarkerSource.Dalamud.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.1038-game-font-glyphs.md](0.1038-game-font-glyphs.md) | `tests/TenshoAssistant.Tests/FontGlyphs1038Tests.cs`, `tools/README.md` | — |
 | [0.105.0-zones-probe.log](0.105.0-zones-probe.log) | `src/TenshoAssistant/Maps/MapCatalog.cs`, `tests/TenshoAssistant.Tests/MapProjectionTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
@@ -153,6 +153,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1777-chat-others-teleport.md](0.1777-chat-others-teleport.md) | `src/TenshoAssistant/Chat/ChatFilters.cs`, `tests/TenshoAssistant.Tests/ChatTravel1777Tests.cs` | `CHANGELOG.md` |
 | [0.1778-prep-reminder.md](0.1778-prep-reminder.md) | — | `CHANGELOG.md` |
 | [0.1780-companion-away.md](0.1780-companion-away.md) | — | `CHANGELOG.md` |
+| [0.1781-shared-fates.md](0.1781-shared-fates.md) | — | `CHANGELOG.md` |
 | [0.180.0-achievement-probe.log](0.180.0-achievement-probe.log) | `src/TenshoAssistant/Collections/CollectionReader.Completion.Dalamud.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.182.0-paramgrow-probe.log](0.182.0-paramgrow-probe.log) | `src/TenshoAssistant/Character/StatFormulas.cs`, `tests/TenshoAssistant.Tests/StatFormulaTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md`, `docs/evidence/0.320-credits.json`, `docs/project/REFERENCES.md`, `docs/project/ROADMAP.md` |
 | [0.199-adenium-shop.md](0.199-adenium-shop.md) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
@@ -374,5 +375,5 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [x91-parsers-check.md](x91-parsers-check.md) | `src/TenshoAssistant/MainWindow.SRankConditions.cs`, `tests/TenshoAssistant.Tests/ParsersCheck971Tests.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md`, `docs/project/GLOBAL-PLAN-DONE.md` |
 | [x93-load-test.md](x93-load-test.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `tests/TenshoAssistant.Tests/Evidence1069Tests.cs`, `tests/TenshoAssistant.Tests/LoadTest1036Tests.cs`, `tools/DiscoveryLoadProbe/Program.cs`, `tools/README.md`, `tools/discoveries-load.py` | `docs/changelog/CHANGELOG-0.1300-0.1399.md`, `docs/evidence/x172-sqlite-trial.md` |
 
-Counted · compté : 362 files · fichiers ; 314 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
+Counted · compté : 363 files · fichiers ; 314 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
 <!-- /docgen:evidence -->

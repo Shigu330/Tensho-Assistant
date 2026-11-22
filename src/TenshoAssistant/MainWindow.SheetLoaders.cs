@@ -42,6 +42,8 @@ internal sealed partial class MainWindow
         DeliveryClientsLoad=()=>Read("Custom delivery sheets",()=>Deliveries.DeliveryClientLoader.Read(data));
         // W-14b (0.721): every FATE's place, from the game's zone layouts, off the frame.
         FatesLoad=()=>Read("FATE places",()=>Fields.FieldCatalogLoader.ReadOpenZones(data,log));
+        // X-213 (0.1781): the shared FATE zones, their ranks and their gemstone traders' articles by rank, off the frame.
+        SharedFatesLoad=()=>Read("Shared FATE sheets",()=>Fields.SharedFateLoader.Read(data));
         // W-16 (0.719): the lexicon, from the sheets, off the frame.
         LexiconLoad=()=>Read("Lexicon sheets",()=>Lexicon.LexiconLoader.Read(data));
         // W-15 (0.718): the deep dungeons, from the sheets, off the frame.

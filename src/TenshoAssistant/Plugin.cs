@@ -685,6 +685,10 @@ public sealed partial class Plugin : IDalamudPlugin
             Gear.GraceWatcher? graceWatcher=null;
             registrations.Register(()=>graceWatcher=new Gear.GraceWatcher(framework,client,player,objects,chat,log,expIndex,()=>configuration.GraceCounts??=[],()=>SaveTimed("grace"),
                 status=>data.GetExcelSheet<Lumina.Excel.Sheets.Status>().GetRowOrDefault(status)?.Name.ExtractText() ?? status.ToString(System.Globalization.CultureInfo.InvariantCulture)),()=>graceWatcher?.Dispose());
+            // X-213 (0.1781, the user's request of 12/11, K-23): the shared FATE ranks, read when the player opens the game's Shared FATE window, per character.
+            Fields.SharedFateReader? sharedFates=null;
+            registrations.Register(()=>sharedFates=new Fields.SharedFateReader(framework,client,player,gameGui,log,()=>configuration.SharedFates??=[],()=>SaveTimed("shared FATEs")),()=>sharedFates?.Dispose());
+            mainWindow.SharedFatesNow=()=>sharedFates?.Shown;
             mainWindow.GraceSource=()=>graceWatcher?.Shown;
             // X-197 (0.1761): an item's desynthesis (Item sheet) and your desynthesis levels (PlayerState, read on the framework thread).
             mainWindow.ItemDesynthOf=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Item>().GetRowOrDefault(id) is { } desynthItem

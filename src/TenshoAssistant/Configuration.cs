@@ -17,6 +17,8 @@ public static class ConfigurationReset
         "AetherialWheels",
         // X-221 (0.1760): the bonus points of a manual counted per character (the player's data).
         "GraceCounts",
+        // X-213 (0.1781): the shared FATE ranks read from the game's window, per character (the player's data).
+        "SharedFates",
         // 0.321: interface state, not a setting (which navigation groups are folded).
         "NavigationCollapsed",
         // X-521 M2 (D-180): interface state, not a setting (the category chosen in each tab of the Settings page).
@@ -661,6 +663,8 @@ public sealed partial class Configuration
     public Dictionary<ulong,Dictionary<uint,TenshoAssistant.Craft.CraftJobStats>>? LastCraftStats { get; set; }
     // X-221 (0.1760): per character, what Tensho counted of each manual's Grace (statuses 45 and 46): the player's data, kept by « reset all ».
     public Dictionary<ulong,List<TenshoAssistant.Gear.GraceCount>>? GraceCounts { get; set; }
+    // X-213 (0.1781): per character, what the game's Shared FATE window showed of each zone (rank, progress), when it was last opened: the player's data, kept by « reset all ».
+    public Dictionary<ulong,Dictionary<uint,TenshoAssistant.Fields.SharedFateRead>>? SharedFates { get; set; }
     // 0.552 (C2): the crafting log panel also tries the sequences saved for other recipes.
     public bool CraftLogTryAllPresets { get; set; } = true;
     public int SortPreviewField { get; set; }

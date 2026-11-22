@@ -862,6 +862,42 @@ if(Environment.GetEnvironmentVariable("PROBE_GRACE") is { Length:>0 })
         Console.WriteLine($"DESC {id} {itemsEn.GetRowOrDefault(id)?.Description.ExtractText().Replace((char)10,' ')}");
     return;
 }
+// PROBE_SHAREDFATE (X-213, 0.1781): the shared FATE ranks (FateProgressUI: the zone, the FATEs needed for ranks 2 to 4, the order) and the
+// gemstone traders (FateShop, keyed like the NPC: its special shops, their names and items). Read-only.
+if(Environment.GetEnvironmentVariable("PROBE_SHAREDFATE") is { Length:>0 })
+{
+    foreach(var row in data.Excel.GetSheet<FateProgressUI>())
+        Console.WriteLine($"PROGRESS {row.RowId} territory {row.Location.RowId} '{row.Location.ValueNullable?.PlaceName.ValueNullable?.Name.ExtractText()}' rank2 {row.ReqFatesToRank2} rank3 {row.ReqFatesToRank3} rank4 {row.ReqFatesToRank4} order {row.DisplayOrder} u0 {row.Unknown0}");
+    // Shops whose entries need a shared FATE rank achievement (« Free Market Friend »), and the achievements' data.
+    var achievements=data.Excel.GetSheet<Achievement>();
+    foreach(var shop in data.Excel.GetSheet<SpecialShop>())
+    {
+        var gated=shop.Item.Where(entry=>entry.AchievementUnlock.RowId is >= 2343 and <= 2348 or >= 3022 and <= 3027 or >= 3559 and <= 3564).ToArray();
+        if(gated.Length>0)Console.WriteLine($"GATED shop {shop.RowId} entries {shop.Item.Count(entry=>entry.ReceiveItems.Any(receive=>receive.Item.RowId!=0))}, gated {gated.Length} by [{string.Join(",",gated.Select(entry=>entry.AchievementUnlock.RowId).Distinct())}]");
+    }
+    foreach(var id in new uint[]{2343,2344,2348,3022,3027,3559,3564})
+        if(achievements.TryGetRow(id,out var achievement))
+            Console.WriteLine($"ACHIEVEMENT {id} '{achievement.Name.ExtractText()}' type {achievement.Type} key {achievement.Key.RowId} data [{string.Join(",",achievement.Data.Select(value=>value.RowId))}] category {achievement.AchievementCategory.RowId}");
+    var fateResidents=data.Excel.GetSheet<ENpcResident>();
+    var specials=data.Excel.GetSheet<SpecialShop>();
+    var fateItems=data.Excel.GetSheet<Item>();
+    var levels=data.Excel.GetSheet<Level>().Where(level=>level.Type==8).GroupBy(level=>level.Object.RowId).ToDictionary(group=>group.Key,group=>group.Select(level=>level.Territory.RowId).Distinct().ToArray());
+    foreach(var fate in data.Excel.GetSheet<FateShop>())
+    {
+        var ids=fate.SpecialShop.Select(shop=>shop.RowId).ToArray();
+        if(Environment.GetEnvironmentVariable("PROBE_SHAREDFATE")=="talk" && fate.RowId is 1037484 or 1048628)
+            foreach(var (talk,index) in fate.DefaultTalk.Select((talk,index)=>(talk,index)).Where(pair=>pair.talk.RowId!=0))
+                Console.WriteLine($"  TALK {index} {talk.RowId}: "+string.Join(" / ",talk.Value.Text.Select(text=>text.ExtractText()).Where(text=>text.Length>0)));
+        Console.WriteLine($"FATESHOP {fate.RowId} '{(fateResidents.TryGetRow(fate.RowId,out var who) ? who.Singular.ExtractText():"")}' levels [{string.Join(",",levels.GetValueOrDefault(fate.RowId) ?? [])}] shops [{string.Join(",",ids)}] talks [{string.Join(",",fate.DefaultTalk.Select(talk=>talk.RowId))}]");
+        foreach(var id in ids.Where(id=>id!=0))
+            if(specials.TryGetRow(id,out var shop))
+            {
+                var entries=shop.Item.Where(entry=>entry.ReceiveItems.Any(receive=>receive.Item.RowId!=0)).ToArray();
+                Console.WriteLine($"  SHOP {id} '{shop.Name.ExtractText()}' entries {entries.Length} currency type {shop.UseCurrencyType}: "+string.Join(" | ",entries.Take(40).Select(entry=>string.Join("+",entry.ReceiveItems.Where(receive=>receive.Item.RowId!=0).Select(receive=>$"{receive.Item.RowId} '{(fateItems.TryGetRow(receive.Item.RowId,out var item) ? item.Name.ExtractText():"")}'"))+$" for {string.Join("+",entry.ItemCosts.Where(cost=>cost.CurrencyCost>0).Select(cost=>$"{cost.CurrencyCost}x{cost.ItemCost.RowId}"))} q{entry.Quest.RowId} ach{entry.AchievementUnlock.RowId} u0[{string.Join(",",entry.Unknown0)}] u1[{string.Join(",",entry.Unknown1)}] u2 {entry.Unknown2} patch {entry.PatchNumber} order {entry.Order}")));
+            }
+    }
+    return;
+}
 // PROBE_TERRMOUNT (X-774, 0.1780): the TerritoryType sheet's Mount column (mounts allowed), by intended use, with named examples; the
 // chocobo companion can only be out where it can be ridden (HowToPage row 361). Read-only.
 if(Environment.GetEnvironmentVariable("PROBE_TERRMOUNT") is { Length:>0 })

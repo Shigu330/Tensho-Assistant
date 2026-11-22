@@ -51,6 +51,10 @@ internal sealed partial class MainWindow
             Page("FATEs",()=>Task.FromResult(FatesLoad?.Invoke() is { Count:>0 } zones
                 ? Diagnostics.SelfCheck.Ok("FATEs",$"{zones.Count} zones, {zones.Sum(zone=>zone.Events.Count)} FATEs")
                 :Diagnostics.SelfCheck.Failed("FATEs","nothing read"))),
+            // X-213 (0.1781): the shared FATE zones and their gemstone traders' items by rank, from the sheets.
+            Page("shared FATEs",()=>Task.FromResult(SharedFatesLoad?.Invoke() is { Count:>0 } sharedZones
+                ? Diagnostics.SelfCheck.Ok("shared FATEs",$"{sharedZones.Count} zones, {sharedZones.Count(zone=>zone.TraderKnown)} with a trader, {sharedZones.Sum(zone=>zone.Rewards.Count)} items, highest ranks {string.Join("/",sharedZones.Select(zone=>zone.MaxRank).Distinct())}")
+                :Diagnostics.SelfCheck.Failed("shared FATEs","nothing read"))),
             Page("deep dungeons",()=>Task.FromResult(DeepDungeonLoad?.Invoke() is { Count:>0 } dungeons
                 ? (dungeons.SelectMany(dungeon=>dungeon.Pomanders.Concat(dungeon.Others)).Any(thing=>thing.Tooltip.Contains('<'))
                     ? Diagnostics.SelfCheck.Suspect("deep dungeons","a text kept a macro")
