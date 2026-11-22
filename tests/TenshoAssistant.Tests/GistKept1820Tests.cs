@@ -27,13 +27,11 @@ internal static class GistKept1820Tests
             var address=request.RequestUri!.ToString();var method=request.Method.Method;
             var body=request.Content is null ? "":await request.Content.ReadAsStringAsync(token);
             lock(Asked)Asked.Add((method,address,body));
-            if(method=="GET" && address==GistRotation.NotesAddress+"7.jsonl.gz")
+            if(method=="GET" && address==GistRotation.NotesAddress)
             {
                 if(Note is not { } note)return new HttpResponseMessage(HttpStatusCode.NotFound);
-                var header=$"{{\"Format\":\"tensho-discoveries-player\",\"Version\":1,\"Issue\":7,\"Login\":\"tester\",\"Gist\":\"{note.Gist}\",\"Revision\":\"{note.Revision}\",\"Count\":0}}\n";
-                using var memory=new MemoryStream();
-                using(var zip=new System.IO.Compression.GZipStream(memory,System.IO.Compression.CompressionLevel.Optimal,true))zip.Write(Encoding.UTF8.GetBytes(header));
-                return new HttpResponseMessage(HttpStatusCode.OK){Content=new ByteArrayContent(memory.ToArray())};
+                // X-830: the list of gists merged (merged.txt), no longer a player file
+                return new HttpResponseMessage(HttpStatusCode.OK){Content=new ByteArrayContent(Encoding.UTF8.GetBytes(GistRotation.NotesText([note])))};
             }
             if(method=="POST" && address==Gists)
             {

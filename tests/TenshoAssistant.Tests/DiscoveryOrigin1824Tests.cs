@@ -12,7 +12,7 @@ internal static class DiscoveryOrigin1824Tests
     private static string Read(string path)=>File.ReadAllText(Path.GetFullPath(path)).Replace("\r\n","\n");
 
     private const string Origin="if pr.get(\"cross\") is not False or (pr.get(\"head_repo\") or \"\").lower()!=REPOSITORY.lower() \\\n        or (pr.get(\"author\") or \"\").lower()!=WORKER.lower():return \"doubt\",\"pr-origin\"";
-    private const string Content="if share.get(\"content\")!=\"same\":return \"doubt\",\"content\"";
+    private const string Content="if batch.get(\"content\")!=\"same\":return \"doubt\",\"content\"";   // X-830: a batch's content
 
     public static readonly (string Name, Action Run)[] Cases =
     [
@@ -21,10 +21,10 @@ internal static class DiscoveryOrigin1824Tests
             var tool=Read("tools/discoveries-trust.py");
             Check(tool.Contains(Origin,StringComparison.Ordinal),"a branch of this repository, opened by the worker's account");
             Check(tool.Contains("isCrossRepository,headRepository,headRepositoryOwner,author",StringComparison.Ordinal),"the origin asked of GitHub");
-            Check(tool.Contains(Content,StringComparison.Ordinal) && tool.Contains("expected=replay(base,number,m.login(issue),facts,{\"Gist\":gist,\"Revision\":revision})",StringComparison.Ordinal),
+            Check(tool.Contains(Content,StringComparison.Ordinal) && tool.Contains("expected,read=replay(base,issues,links,listing,reader)",StringComparison.Ordinal),
                 "the content replayed by value");
-            foreach(var name in new[]{"X-823: {name}: a doubt, never merged","\"a fork\"","\"another author\"","\"a file out of scope\"","\"the common set changed by value\"",
-                "\"the player file changed by value\"","\"a kind file more\"","\"an index naming other bytes\"","the worker's own pull request, a share replayed whole: merged"})
+            foreach(var name in new[]{"X-823, X-830: {name}: a doubt, never merged","\"a fork\"","\"another author\"","\"a file out of scope\"","\"the common set changed by value\"",
+                "\"the player file changed by value\"","\"a kind file more\"","\"an index naming other bytes\"","the worker's own batch, replayed whole: merged"})
                 Check(tool.Contains(name,StringComparison.Ordinal),"selftest case: "+name);
             Check(Read("tools/README.md").Contains("since 0.1824, X-823: a branch of this repository itself, never a fork",StringComparison.Ordinal)
                 && Read("community-discoveries/README.md").Contains("since Tensho 0.1824, among them a pull request from a branch of this repository",StringComparison.Ordinal),
@@ -69,8 +69,8 @@ internal static class DiscoveryOrigin1824Tests
                 Check(now.Code==0 && now.Output.Contains("discoveries-trust selftest:",StringComparison.Ordinal) && !now.Output.Contains("FAIL",StringComparison.Ordinal),
                     "the tool's selftest passes ("+now.Code+"): "+now.Output);
                 var old=Run(before);
-                foreach(var name in new[]{"X-823: a fork: a doubt, never merged","X-823: another author: a doubt, never merged","X-823: the common set changed by value: a doubt, never merged",
-                    "X-823: the player file changed by value: a doubt, never merged"})
+                foreach(var name in new[]{"X-823, X-830: a fork: a doubt, never merged","X-823, X-830: another author: a doubt, never merged","X-823, X-830: the common set changed by value: a doubt, never merged",
+                    "X-823, X-830: the player file changed by value: a doubt, never merged"})
                     Check(old.Code!=0 && old.Output.Contains("FAIL "+name,StringComparison.Ordinal),"without the fix, the selftest fails on: "+name+" ("+old.Code+"): "+old.Output);
             }
             finally { try { Directory.Delete(folder,true); } catch(IOException){} }

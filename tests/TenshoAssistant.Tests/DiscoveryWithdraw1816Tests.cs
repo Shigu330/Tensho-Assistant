@@ -31,8 +31,8 @@ internal static class DiscoveryWithdraw1816Tests
         ("Discovery withdraw 1816: the tool keeps a withdrawn player's facts in an anonymous file, written after the common set",() =>
         {
             var tool=Read("tools/discoveries-merge.py");
-            Check(tool.Contains("name=f\"{WITHDRAWN}{secrets.token_hex(8)}{PLAYER_SUFFIX}\"",StringComparison.Ordinal),"a random name, never the issue");
-            Check(tool.Contains("pending={name:(name,None,facts)}",StringComparison.Ordinal),"no login, written by rebuild after the common set");
+            Check(tool.Contains("fresh_id=new_file_id({v[\"File\"] for v in links.values()});new=fresh_id+PLAYER_SUFFIX",StringComparison.Ordinal),"a random name, never the issue (X-830: a new one)");
+            Check(tool.Contains("pending={new:(fresh_id,facts)}",StringComparison.Ordinal) && tool.Contains("if drop:del links[drop];write_links(links,links_path)",StringComparison.Ordinal),"no login, written by rebuild after the common set; the private link forgotten (X-830)");
             foreach(var name in new[]{"X-803: withdrawn: the numbered file removed, every fact kept","X-803: the anonymous file holds the facts, without login nor issue","X-803: rebuilt again"})
                 Check(tool.Contains(name,StringComparison.Ordinal),"the tool's behaviour case: "+name);
             Check(!tool.Contains("the facts no other player has gone",StringComparison.Ordinal),"the old case, its facts gone, is no more");

@@ -57,10 +57,10 @@ internal static class MergeTool1210Tests
         {
             var tool=Read("tools/discoveries-merge.py");
             Check(tool.Contains("if set(f)-FIELDS or not typed(f) or f[\"Kind\"] not in KINDS") && tool.Contains("if cell_of(f[\"X\"],f[\"Z\"])!=(f[\"CellX\"],f[\"CellZ\"]):return False"),"N12: types, cell in single precision");
-            Check(tool.Contains("return FIRST_DAY<=when(f[\"First\"])") && tool.Contains("clean(from_gist_files(files,fetch_gist_raw),player=True)") && tool.Contains("g=capped(daily(dict(f)))"),"N5: dates, sightings, cap");
+            Check(tool.Contains("return FIRST_DAY<=when(f[\"First\"])") && tool.Contains("reader=reader or (lambda files:from_gist_files(files,fetch_gist_raw))") && tool.Contains("facts,report=clean(reader(files),player=True)") && tool.Contains("g=capped(daily(dict(f)))"),"N5: dates, sightings, cap");
             Check(tool.Contains("known[\"First\"]=f[\"First\"];known[\"X\"]=f[\"X\"];known[\"Z\"]=f[\"Z\"]") && tool.Contains("FLAG: alone far outside the other players' levels"),"N5: earliest place, far player left out");
-            Check(tool.Contains("same author as {newest[login]} (a newer issue): not counted") && tool.Contains("pending[f\"{issue['number']}{PLAYER_SUFFIX}\"]=(issue[\"number\"],login(issue),facts,noted)")   // 0.1801 (X-772): the player file in its new format, its author noted; 0.1814 (X-807 M1): written by rebuild after the common set
-                && tool.Contains("def withdraw(issue,dry):"),"N13: one file per account, withdraw");
+            Check(tool.Contains("same author as {newest[login]} (a newer issue): not counted") && tool.Contains("pending[name]=(entry[\"File\"],facts)")   // 0.1801 (X-772): the player file in its new format, its author noted; 0.1814 (X-807 M1): written by rebuild after the common set
+                && tool.Contains("def withdraw(target,dry,links_path=None):") && tool.Contains("say(f\"#{issue['number']}: same account as #{older}: its player file goes on with this issue\")"),"N13: one file per account (X-830: through the private link), withdraw");
             Check(!tool.Contains("open(path,\"w\"") && !tool.Contains("open(COMMON,\"w\"") && !tool.Contains(".write(data);changed+=1") && tool.Contains("os.replace(temporary,path)"),"N16: every write atomic");
             Check(tool.Contains("\"?\" if unicodedata.category(c) in (\"Cc\",\"Cf\") else c"),"N17: clean titles");
             foreach(var name in new[]{"N12: wrong types accepted","N5: a player far outside","N13: one file per account","N16: a failed write","N17: control and format"})

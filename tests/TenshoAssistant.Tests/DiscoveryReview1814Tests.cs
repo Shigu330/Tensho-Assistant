@@ -19,11 +19,11 @@ internal static class DiscoveryReview1814Tests
         ("Discovery review 1814 M1: sync writes no player file itself: they go to rebuild, written after the common set",() =>
         {
             var tool=Read("tools/discoveries-merge.py");
-            var sync=Between(tool,"def sync(dry):","def withdraw(");
+            var sync=Between(tool,"def sync(dry,links_path=None):","def withdraw(");   // X-830: the private link's path
             Check(sync.Length>0 && !sync.Contains("write_player(",StringComparison.Ordinal),"no write_player in sync");
-            Check(sync.Contains("if not dry:rebuild(fresh=fresh,pending=pending)",StringComparison.Ordinal),"the pending files given to rebuild");
+            Check(sync.Contains("rebuild(fresh=done[\"fresh\"],pending=done[\"pending\"],owners=owners_of(links),notes=merged)",StringComparison.Ordinal),"the pending files given to rebuild");
             var rebuild=Between(tool,"def rebuild(","def write_v3(");
-            Check(rebuild.Contains("later.append(lambda issue=issue,author=author,given=given,noted=noted,name=name:write_player(issue,author,given,noted,now.get(name)))",StringComparison.Ordinal)
+            Check(rebuild.Contains("later.append(lambda issue=issue,given=given,name=name:write_player(issue,given,now.get(name)))",StringComparison.Ordinal)
                 && rebuild.Contains("changed=write_v3(bounded(common[\"Facts\"],say=say),V3_DIR,say)\n    for write in later:write()",StringComparison.Ordinal),
                 "written in later, after the common set");
             Check(tool.Contains("X-807 M1: a stop in the rebuild of sync leaves every player file as it was",StringComparison.Ordinal),"the tool's behaviour case");

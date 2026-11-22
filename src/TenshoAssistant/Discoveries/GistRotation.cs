@@ -1,4 +1,3 @@
-using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -33,20 +32,22 @@ public sealed class GistRotationState
 
 /// <summary>
 /// X-804 (user decision of 22/11 around 14 h 35, after the risks were explained): the gist a player's issue links keeps their sightings with
-/// the exact place and day; once the merge tool has put them in the common base, it is deleted. The merge tool notes in the player file of the
-/// repository (players/&lt;issue&gt;.jsonl.gz, header « Gist » and « Revision ») the gist revision it merged; the plugin reads that header from
-/// main without any account, compares it with its last upload, and when they match: the facts of that upload are known merged, the gist is
+/// the exact place and day; once the merge tool has put them in the common base, it is deleted. X-830 (D-226 a): the merge tool lists the gist
+/// revisions it merged in community-discoveries/merged.txt, each as a hash of « gist:revision » (NoteHash), never in a player file (those are
+/// anonymous); the plugin reads that list from main without any account, looks for the hash of its last upload, and when it is there: the facts
+/// of that upload are known merged, the gist is
 /// deleted whole (not only emptied: GitHub keeps a gist's old revisions), and a new gist holds only what is new (a new fact, or one whose
 /// levels, values, HQ sightings or days changed since). Pure: the requests are GitHubExchange's.
 /// </summary>
 public static class GistRotation
 {
     public const string FileName="github-merged.json";
-    /// <summary>The player files of the repository, read from main like the common set (CommunityDiscoveries.AddressV3).</summary>
-    public const string NotesAddress="https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/community-discoveries/players/";
-    /// <summary>A player file read within this size (the merge tool's MAX_COMPRESSED); its header line within this many bytes.</summary>
-    public const int MaxNoteFileBytes=32*1024*1024,MaxHeaderBytes=64*1024;
-    private const string NoteFormat="tensho-discoveries-player";
+    /// <summary>X-830: the list of the gists merged, read from main like the common set (CommunityDiscoveries.AddressV3).</summary>
+    public const string NotesAddress="https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/community-discoveries/merged.txt";
+    /// <summary>The list read within this size (the merge tool's MAX_INDEX: 1 MiB, some 15 000 gists merged).</summary>
+    public const int MaxNoteFileBytes=1024*1024;
+    /// <summary>X-830: its first line (tools/discoveries-merge.py MERGED_HEADER), then one hash per line.</summary>
+    public const string NotesHeader="# tensho-discoveries-merged 1";
 
     /// <summary>A fact's hash as the gist would carry it (any change of what is sent changes it).</summary>
     public static string Hash(DiscoveryFact fact)=>Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(fact,TenshoJson.Plain))))[..32];
@@ -57,30 +58,27 @@ public static class GistRotation
         return hashes;
     }
 
-    /// <summary>The gist and revision a player file notes as merged (its header line), or null: no note, or a file this version cannot read.</summary>
-    public static (string Gist,string Revision)? Note(byte[] compressed)
+    /// <summary>X-830: what merged.txt lists for a gist revision merged: SHA-256 of « gist:revision », lower-case hex (the merge tool's note_hash).</summary>
+    public static string NoteHash(string gist,string revision)=>Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes($"{gist}:{revision}"))).ToLowerInvariant();
+
+    /// <summary>X-830: the text of a list of gists merged (what the merge tool writes): its header, then the hashes sorted, one per line.</summary>
+    public static string NotesText(IEnumerable<(string Gist,string Revision)> notes)
+        =>string.Concat(new[]{NotesHeader}.Concat(notes.Select(note=>NoteHash(note.Gist,note.Revision)).Distinct().Order(StringComparer.Ordinal)).Select(line=>line+"\n"));
+
+    /// <summary>X-830: this gist and revision when the list of gists merged holds their hash; null: not listed, or a list this version cannot read.</summary>
+    public static (string Gist,string Revision)? Note(byte[] list,string gist,string revision)
     {
-        try
-        {
-            using var stream=new GZipStream(new MemoryStream(compressed),CompressionMode.Decompress);
-            var line=new List<byte>();
-            for(var read=stream.ReadByte();read>=0 && read!='\n';read=stream.ReadByte())
-            {
-                if(line.Count>=MaxHeaderBytes)return null;
-                line.Add((byte)read);
-            }
-            using var document=JsonDocument.Parse(line.ToArray());
-            var root=document.RootElement;
-            if(root.ValueKind!=JsonValueKind.Object || !root.TryGetProperty("Format",out var format) || format.ValueKind!=JsonValueKind.String || format.GetString()!=NoteFormat)return null;
-            if(root.TryGetProperty("Gist",out var gist) && gist.ValueKind==JsonValueKind.String && gist.GetString() is { Length:>0 } id
-                && root.TryGetProperty("Revision",out var revision) && revision.ValueKind==JsonValueKind.String && revision.GetString() is { Length:>0 } version)
-                return (id,version);
-            return null;
-        }
-        catch(Exception error) when(error is InvalidDataException or JsonException or IOException){return null;}
+        if(gist.Length==0 || revision.Length==0 || list.Length>MaxNoteFileBytes)return null;
+        string text;
+        try{text=new UTF8Encoding(false,true).GetString(list);}
+        catch(DecoderFallbackException){return null;}
+        var lines=text.Split('\n');
+        if(lines.Length==0 || lines[0].TrimEnd('\r')!=NotesHeader)return null;
+        var wanted=NoteHash(gist,revision);
+        return lines.Skip(1).Any(line=>line.TrimEnd('\r')==wanted) ? (gist,revision):null;
     }
 
-    /// <summary>Whether the player file is worth asking: a gist and an issue, and an upload of that gist whose revision is known.</summary>
+    /// <summary>Whether the list is worth asking: a gist and an issue, and an upload of that gist whose revision is known.</summary>
     public static bool Asks(GistRotationState state,string gist,int issue)=>gist.Length>0 && issue>0 && state.Issue==issue && state.SentGist==gist && state.SentRevision.Length>0;
 
     /// <summary>The merge tool merged the last upload: the same gist and the same revision.</summary>

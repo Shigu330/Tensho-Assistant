@@ -26,10 +26,8 @@ internal static class GistOwner1822Tests
             lock(Asked)Asked.Add((method,address));
             if(method=="GET" && address.StartsWith(GistRotation.NotesAddress,StringComparison.Ordinal) && Note is { } note)
             {
-                var header=$"{{\"Format\":\"tensho-discoveries-player\",\"Version\":1,\"Issue\":7,\"Gist\":\"{note.Gist}\",\"Revision\":\"{note.Revision}\",\"Count\":0}}\n";
-                using var memory=new MemoryStream();
-                using(var zip=new System.IO.Compression.GZipStream(memory,System.IO.Compression.CompressionLevel.Optimal,true))zip.Write(Encoding.UTF8.GetBytes(header));
-                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK){Content=new ByteArrayContent(memory.ToArray())});
+                // X-830: the list of gists merged (merged.txt), no longer a player file
+                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK){Content=new ByteArrayContent(Encoding.UTF8.GetBytes(GistRotation.NotesText([note])))});
             }
             if(method=="POST" && address==Gists)
             {

@@ -3,8 +3,9 @@
 Usage:
   python tools/discoveries-merge.py sync [--dry-run]
       Reads every open « Discoveries » issue through the GitHub CLI, fetches the gist it points to, keeps the player's valid facts
-      in community-discoveries/players/<issue>.jsonl.gz (replacing that player's previous file: an updated gist is never counted twice), then rebuilds
-      the common v3 set from all player files. --dry-run: report only, nothing written.
+      in community-discoveries/players/<id>.jsonl.gz (X-830: a random id, linked to the issue in the private link file only; replacing that
+      player's previous file: an updated gist is never counted twice), then rebuilds the common v3 set from all player files. --dry-run: report
+      only, nothing written. --links PATH: the private link file.
       X-168 (0.1146): GitHub drops the « discoveries » label of an issue opened by a player without rights on the repository, so issues are found
       by the label, or by their title « Discoveries: <login> », or by their content (« Shared from Tensho Assistant » with a gist link). Before
       anything is read, each one must hold one gist link only, the CC0-1.0 sharing ticked, a title naming its author (when it names one), and a gist
@@ -16,7 +17,17 @@ Usage:
       since X-772 the places and days of the facts are in v3/ only (and in the gists sync reads). X-795: v3/index.json missing (while player
       files of the new format exist), an index listing fewer kind files than the folder holds, a set that does not read whole, or a fact a
       counted player holds that is in the common set of git HEAD but has no place now: STOP (exit 2), nothing written; restore v3/ from git first.
-  python tools/discoveries-merge.py withdraw <issue> [--dry-run]
+  python tools/discoveries-merge.py anonymize [--links PATH] [--dry-run]
+      X-830 (D-226 a, user's choice of 22/11): the player files still named after their issue written again under a random id, without
+      issue, login, gist nor revision; the link issue ↔ file goes to the private link file (default ~/.tensho/discoveries-links.json, the
+      worker's, refused inside the repository); a gist noted as merged goes to community-discoveries/merged.txt. The common set is unchanged.
+      sync and rebuild stop while a numbered file is left.
+  python tools/discoveries-merge.py link <issue> <file id> <login> [--links PATH]
+      X-830: writes one link to the private link file (the worker's copy of a link made on another PC).
+  python tools/discoveries-merge.py pr-text
+      X-830 (D-227 B+C): the branch, title, body and commit message of the pull request of a batch: no issue number nor login. sync reads
+      every open share at once: one pull request per batch (for example once a week), never one per issue.
+  python tools/discoveries-merge.py withdraw <issue|file> [--links PATH] [--dry-run]
       X-183: removes players/<issue>.jsonl.gz, or the <issue>.json of before (a player who closed their issue or asked to be taken out), then
       rebuilds. X-803 (user decision of 22/11): their facts stay in the common set, without any name: written again first as
       players/withdrawn-<random>.jsonl.gz, a file with neither issue nor login, which still counts like a player file.
@@ -66,7 +77,15 @@ player file of before (<issue>.json, still read, written again by rebuild in the
 first day, the first met keeps its place. A fact whose place is in none of them waits in its player file (said) until a share brings it.
 X-803 (user decision of 22/11, after D-220): withdrawing a player removes the link with their account (their numbered file, its issue and
 login) and keeps their facts in the common set, without any name: an anonymous file players/withdrawn-<random>.jsonl.gz holds them and counts
-like any player file (one import of each fact; still left out when far outside the others' levels)."""
+like any player file (one import of each fact; still left out when far outside the others' levels).
+X-830 (security review X-810, I2; D-226 a and D-227 B+C, user's choices of 22/11): a player file (version 2) names neither issue, login, gist nor
+revision, and its name is a random id; the link issue ↔ file lives in a file kept by the worker outside the repository (LINKS_PATH), which serves
+withdraw, « one file per account », the closed-issue report and the gist read last; lost, nothing of the common set is lost (D-220 b), but an
+account then shares into a new file and counts twice until its old file is withdrawn by name. The gists merged are listed apart, hashed
+(community-discoveries/merged.txt), so the plugin deletes its gist without any player file being named. The limit, written honestly: the common
+set keeps each fact's exact place and days (the user kept that precision, D-227); a fact one player alone shares gives their place and day, and a
+pull request that merges few shares can still be tied to them by its date; so a sync reads every open share at once and the worker opens one pull
+request per batch, naming no issue nor account (pr-text); the pull requests of before (#54 included) stay in GitHub's history."""
 import base64,collections,gzip,hashlib,importlib.util,io,json,math,os,re,secrets,struct,subprocess,sys,tempfile,time,unicodedata,urllib.request,zipfile
 from datetime import datetime,timezone,timedelta
 ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -96,10 +115,17 @@ PRODUCER="Tensho Assistant community"
 OLD_PLUGIN_FACTS=200_000
 ORDER=["Kind","Subject","Detail","Territory","Map","CellX","CellZ","X","Z","LevelMin","LevelMax","Seen","Imported","First","Last","Hq","Values"]
 # X-772 (0.1801, D-217): a player file keeps only what the merge needs, compressed like the common files: no exact place nor day.
-PLAYER_FORMAT="tensho-discoveries-player";PLAYER_VERSION=1;PLAYER_SUFFIX=".jsonl.gz"
+# X-830 (D-226 a, D-227 B+C, user's choices of 22/11): version 2, anonymous: named by a random id (FILE_ID), its header without issue, login,
+# gist nor revision; the link issue ↔ file is kept outside the repository (LINKS_PATH, the worker's), the gists merged in MERGED_PATH.
+PLAYER_FORMAT="tensho-discoveries-player";PLAYER_VERSION=2;PLAYER_SUFFIX=".jsonl.gz"
 # X-826: the only fields of a player file's header, in the order player_bytes writes them; read_player refuses any other, and
 # DiscoveryPlayers1801Tests checks the repository's player files against this list (never a character name, world, place nor day).
-PLAYER_HEADER=("Format","Version","Issue","Login","Gist","Revision","Counted","Count")
+# X-830: no more Issue, Login, Gist nor Revision (OLD_HEADER: version 1, read only to migrate it, by anonymize).
+PLAYER_HEADER=("Format","Version","Counted","Count")
+OLD_HEADER=("Format","Version","Issue","Login","Gist","Revision","Counted","Count")
+FILE_ID=re.compile(r"[0-9a-f]{16}")   # X-830: a player file's name: 16 random hex digits (secrets), plus PLAYER_SUFFIX
+MERGED_PATH=os.path.join(ROOT,"community-discoveries","merged.txt");MERGED_HEADER="# tensho-discoveries-merged 1"
+LINKS_PATH=os.path.join(os.path.expanduser("~"),".tensho","discoveries-links.json");LINKS_FORMAT="tensho-discoveries-links"
 PLAYER_ORDER=["Kind","Subject","Detail","Territory","Map","CellX","CellZ","LevelMin","LevelMax","Hq","Values"]
 PLACE=("X","Z","First","Last")
 
@@ -409,32 +435,34 @@ def without_place(f):
     """A fact as a player file keeps it: PLAYER_ORDER only (no X, Z, First, Last; Seen 0 and Imported 1 are the same for every share)."""
     return {k:f[k] for k in PLAYER_ORDER if k in f}
 
-def player_bytes(issue,author,facts,noted=None,counted=None):
+def player_bytes(facts,counted=None):
     """A player file: gzip (mtime 0) of UTF-8 lines, a header then one fact per line (without_place, sorted): the same facts give the same bytes.
-    X-804: noted: {"Gist","Revision"} of the gist merged last (the plugin reads it from main and then deletes that gist). X-808: counted:
-    whether the rebuild that writes it counted its player (« Counted »; None: not said, read as « not counted »)."""
+    X-808: counted: whether the rebuild that writes it counted its player (« Counted »; None: not said, read as « not counted »).
+    X-830 (D-226 a): version 2, anonymous: neither issue, login, gist nor revision (the link is LINKS_PATH's, the merged gists MERGED_PATH's)."""
     facts=sorted((without_place(f) for f in facts),key=sort_key)
-    header={"Format":PLAYER_FORMAT,"Version":PLAYER_VERSION,"Issue":issue,**({"Login":author} if author else {}),**merged_note(noted),
-            **({"Counted":counted} if counted is not None else {}),"Count":len(facts)}
+    header={"Format":PLAYER_FORMAT,"Version":PLAYER_VERSION,**({"Counted":counted} if counted is not None else {}),"Count":len(facts)}
     if list(header)!=[k for k in PLAYER_HEADER if k in header]:raise ValueError(f"a player file's header outside PLAYER_HEADER: {list(header)}")
     return gzip.compress("".join(v3_line(o)+"\n" for o in [header]+facts).encode("utf-8"),compresslevel=9,mtime=0)
 
 def read_player(path):
-    """A player file: {"Issue","Login","Facts","Old"}; Old: an <issue>.json of before 0.1801 (v2 JSON, its facts with place and days). A file that
-    does not read whole raises (a rebuild then stops before writing anything)."""
+    """A player file: {"Issue","Login","Facts","Old","Noted","Counted"}; Old: an <issue>.json of before 0.1801 (v2 JSON, its facts with place and
+    days). X-830: version 2 (anonymous, PLAYER_HEADER only: Issue, Login and Noted empty) or version 1 (OLD_HEADER: read to be migrated by
+    anonymize). A file that does not read whole raises (a rebuild then stops before writing anything)."""
     if not path.endswith(PLAYER_SUFFIX):
         player=json.load(open(path,encoding="utf-8"))
         return {"Issue":player.get("Issue"),"Login":player.get("Login"),"Facts":player.get("Facts") or [],"Old":True}
     if os.path.getsize(path)>MAX_COMPRESSED:raise ValueError(f"{os.path.basename(path)}: too large")
     lines=gunzip_bounded(open(path,"rb").read(),MAX_DECOMPRESSED).decode("utf-8").splitlines()
     header=json.loads(lines[0]) if lines else None
-    if not isinstance(header,dict) or header.get("Format")!=PLAYER_FORMAT or header.get("Version")!=PLAYER_VERSION:
-        raise ValueError(f"{os.path.basename(path)}: not a player file of version {PLAYER_VERSION}")
-    if set(header)-set(PLAYER_HEADER):raise ValueError(f"{os.path.basename(path)}: its header holds a field it never keeps: {sorted(set(header)-set(PLAYER_HEADER))}")
+    if not isinstance(header,dict) or header.get("Format")!=PLAYER_FORMAT or header.get("Version") not in (1,PLAYER_VERSION):
+        raise ValueError(f"{os.path.basename(path)}: not a player file of version 1 or {PLAYER_VERSION}")
+    fields=PLAYER_HEADER if header.get("Version")==PLAYER_VERSION else OLD_HEADER
+    if set(header)-set(fields):raise ValueError(f"{os.path.basename(path)}: its header holds a field it never keeps: {sorted(set(header)-set(fields))}")
     facts=[json.loads(line) for line in lines[1:] if line]
     if header.get("Count")!=len(facts) or not all(isinstance(f,dict) and not set(f)-set(PLAYER_ORDER) for f in facts):
         raise ValueError(f"{os.path.basename(path)}: its facts differ from its header or hold a field it never keeps")
-    return {"Issue":header.get("Issue"),"Login":header.get("Login"),"Facts":facts,"Old":False,"Noted":merged_note(header),"Counted":header.get("Counted")}
+    return {"Issue":header.get("Issue"),"Login":header.get("Login"),"Facts":facts,"Old":False,"Noted":merged_note(header),"Counted":header.get("Counted"),
+            "Version":header.get("Version")}
 
 def was_counted(path):
     """X-808: whether the player file on disk says the last rebuild counted its player (no file, a file of before, no field, unreadable: no)."""
@@ -450,13 +478,69 @@ def keys_of(facts):
     return found
 
 def merged_note(noted):
-    """X-804: the gist and revision a player file notes as merged ({} without both)."""
+    """X-804: the gist and revision a player file of version 1 notes as merged ({} without both)."""
     noted=noted or {}
     return {"Gist":noted["Gist"],"Revision":noted["Revision"]} if isinstance(noted.get("Gist"),str) and noted.get("Gist") and isinstance(noted.get("Revision"),str) and noted.get("Revision") else {}
 
-def already_merged(held,gist,revision):
-    """X-804: the gist revision an issue links is the one its player file notes as merged: never read again."""
-    return bool(gist and revision) and held is not None and (held.get("Noted") or {})=={"Gist":gist,"Revision":revision}
+# ---------- X-830 (D-226 a, D-227 B+C): the gists merged, and the private link issue ↔ player file ----------
+def note_hash(gist,revision):
+    """X-830: what MERGED_PATH lists for a gist revision merged: SHA-256 of « gist:revision » (lower-case hex). The plugin computes the same
+    for its last upload (GistRotation.NoteHash) and deletes that gist once it is listed. Nothing in it names a player file."""
+    return hashlib.sha256(f"{gist}:{revision}".encode("utf-8")).hexdigest()
+
+def merged_bytes(hashes):
+    """X-830: the list of the gists merged: a header line, then one hash per line, sorted (the same set gives the same bytes)."""
+    return ("".join(line+"\n" for line in [MERGED_HEADER]+sorted(hashes))).encode("utf-8")
+
+def read_merged(path=None):
+    """X-830: the hashes MERGED_PATH lists (a set; empty without the file); ValueError on a line that is not a hash, or another header."""
+    path=path or MERGED_PATH
+    if not os.path.isfile(path):return set()
+    lines=open(path,encoding="utf-8").read(MAX_INDEX+1).splitlines()
+    if not lines or lines[0]!=MERGED_HEADER or not all(re.fullmatch(r"[0-9a-f]{64}",l) for l in lines[1:]):raise ValueError(f"{os.path.basename(path)}: not a list of merged gists")
+    return set(lines[1:])
+
+def already_merged(merged,gist,revision):
+    """X-804, X-830: the gist revision an issue links is listed as merged (MERGED_PATH): never read again."""
+    return bool(gist and revision) and note_hash(gist,revision) in (merged or set())
+
+def inside_repository(path):
+    real=os.path.normcase(os.path.realpath(path));top=os.path.normcase(os.path.realpath(ROOT))
+    return real==top or real.startswith(top.rstrip(os.sep)+os.sep)
+
+def read_links(path=None):
+    """X-830 (D-226 a): the private link issue ↔ player file, kept by the worker outside the repository (refused inside it, like the list of
+    trusted accounts): {"<issue>": {"File": 16 hex digits, "Login": the issue's author, "Gist": the gist read last (said only)}}. None without
+    the file; ValueError when it is inside the repository or does not read. Lost, nothing of the common set is lost (D-220 b)."""
+    path=path or LINKS_PATH
+    if inside_repository(path):raise ValueError(f"{path} is inside the repository: the link stays outside it")
+    if not os.path.isfile(path):return None
+    data=json.load(open(path,encoding="utf-8"))
+    links=data.get("Links") if isinstance(data,dict) and data.get("Format")==LINKS_FORMAT and data.get("Version")==1 else None
+    if not isinstance(links,dict) or not all(isinstance(k,str) and k.isdigit() and isinstance(v,dict) and FILE_ID.fullmatch(str(v.get("File")))
+                                             and isinstance(v.get("Login",""),str) for k,v in links.items()):raise ValueError(f"{path}: not a link file")
+    files=[v["File"] for v in links.values()]
+    if len(files)!=len(set(files)):raise ValueError(f"{path}: two issues link the same player file")
+    return links
+
+def write_links(links,path=None):
+    path=path or LINKS_PATH
+    if inside_repository(path):raise ValueError(f"{path} is inside the repository: the link stays outside it")
+    os.makedirs(os.path.dirname(path) or ".",exist_ok=True)
+    write_atomic(path,json.dumps({"Format":LINKS_FORMAT,"Version":1,"Links":{k:links[k] for k in sorted(links,key=int)}},ensure_ascii=False,indent=1)+"\n")
+
+def owners_of(links):
+    """X-830: {player file name: (login lower-case, issue)} from the link, what rebuild needs for « one file per account »."""
+    return {v["File"]+PLAYER_SUFFIX:((v.get("Login") or "").lower(),int(k)) for k,v in (links or {}).items()}
+
+def new_file_id(taken=()):
+    while True:
+        found=secrets.token_hex(8)
+        if found not in taken and not os.path.exists(os.path.join(PLAYERS,found+PLAYER_SUFFIX)):return found
+
+def numbered(name):
+    """X-830: a player file named after its issue (before the migration): <issue>.jsonl.gz or <issue>.json."""
+    return stem(name).isdigit()
 
 def union(held,given):
     """X-804: a player's facts by key: those of their file, replaced by the gist's for the same key. Since a gist once merged is deleted and a new
@@ -465,16 +549,17 @@ def union(held,given):
     for f in given:facts[key(f)]=f
     return list(facts.values())
 
-def write_player(issue,author,facts,noted=None,counted=None):
-    """The player's file written whole (<issue>.jsonl.gz), then the <issue>.json of before removed."""
-    write_atomic(os.path.join(PLAYERS,f"{issue}{PLAYER_SUFFIX}"),player_bytes(int(issue) if str(issue).isdigit() else issue,author,facts,noted,counted))
-    old=os.path.join(PLAYERS,f"{issue}.json")
+def write_player(name,facts,counted=None):
+    """The player's file written whole (<name>.jsonl.gz, X-830: name a random id), then a <name>.json of before removed."""
+    write_atomic(os.path.join(PLAYERS,f"{name}{PLAYER_SUFFIX}"),player_bytes(facts,counted))
+    old=os.path.join(PLAYERS,f"{name}.json")
     if os.path.exists(old):os.remove(old)
 
-def player_of(issue):
-    """The player file of an issue (the new one, else the one of before), read; None without one."""
-    for name in (f"{issue}{PLAYER_SUFFIX}",f"{issue}.json"):
-        path=os.path.join(PLAYERS,name)
+def player_of(name):
+    """The player file of this name (X-830: a random id; an issue number before the migration; the new one, else the one of before), read;
+    None without one."""
+    for file in (f"{name}{PLAYER_SUFFIX}",f"{name}.json"):
+        path=os.path.join(PLAYERS,file)
         if os.path.isfile(path):return read_player(path)
     return None
 
@@ -546,7 +631,7 @@ def head_v3_keys():
         return {key(f) for f in got["Facts"] if isinstance(f,dict) and all(n in f for n in ("Kind","Subject","Detail","Territory","Map","CellX","CellZ"))}
     except (ValueError,UnicodeDecodeError):return None
 
-def rebuild(say=print,fresh=(),skip=(),history=None,pending=None):
+def rebuild(say=print,fresh=(),skip=(),history=None,pending=None,owners=None,notes=None):
     # X-772 (0.1801, D-217): the place (X, Z) and days (First, Last) of a fact are no longer in the player files: per fact, the earliest day's
     # exact place and the latest day seen, from the common set as it is (v3/), from the player files of before (each written again here without
     # them) and from the gists just read (fresh, sync); on the same first day, the first met keeps its place.
@@ -556,24 +641,26 @@ def rebuild(say=print,fresh=(),skip=(),history=None,pending=None):
     # X-807 M1 (review of 0.1806): pending: {player file name: (issue, login, facts)}, the player files sync has read from the gists: taken here
     # instead of the disk, and written in `later` like every other player file, once the common set is written. Before, sync wrote them before
     # rebuild, whose stop then left them rewritten beside a common set that was not.
-    pending=dict(pending or {})
+    # X-830 (D-226 a): pending: {player file name: (its name without suffix, facts)}; owners: {player file name: (login, issue)} from the
+    # private link (owners_of), for « one file per account » (a file of version 1 or before still says its login); notes: the gists merged
+    # (note_hash), MERGED_PATH written with the player files when it changes (None: left as it is).
+    pending=dict(pending or {});owners=dict(owners or {})
     current=v3_guard()
     sources=[(None,f) for f in clean(current)[0]] if current is not None else []
     names=[n for n in player_names() if n not in set(skip)]
     names=sorted(names+[n for n in pending if n not in names],key=name_order);renewed={stem(n) for n in names if n.endswith(PLAYER_SUFFIX)}
-    files=[];later=[];notes={}   # later: the player files' writes, done once the common set is written (a stop before it leaves every file as it was); notes: X-804
+    files=[];later=[]   # later: the player files' writes, done once the common set is written (a stop before it leaves every file as it was)
     # X-808: was: « Counted » as the file on disk says (the last rebuild counted its player); now: counted by this rebuild, written in every
     # player file this run writes, and a file written again when it changed; written: the files this run writes anyway.
     was={};now={};written=set()
     for name in names:
         path=os.path.join(PLAYERS,name);issue=stem(name)
         if name in pending:
-            author,given=pending[name][1],pending[name][2];noted=pending[name][3] if len(pending[name])>3 else {}
-            player={"Issue":issue,"Login":author,"Facts":[without_place(f) for f in given],"Old":False,"Noted":noted}
+            given=pending[name][1]
+            player={"Issue":None,"Login":None,"Facts":[without_place(f) for f in given],"Old":False}
             was[name]=was_counted(path);written.add(name)
-            later.append(lambda issue=issue,author=author,given=given,noted=noted,name=name:write_player(issue,author,given,noted,now.get(name)))
+            later.append(lambda issue=issue,given=given,name=name:write_player(issue,given,now.get(name)))
         else:player=read_player(path);was[name]=player.get("Counted")
-        notes[issue]=player.get("Noted") or {}
         if player["Old"]:
             # 0.1005, 0.1012: a file of before follows the current rules and keeps the day only; X-772: its places and days kept for the
             # common set, then the file written again without them (or, beside its new file after a conversion cut short, removed).
@@ -584,9 +671,11 @@ def rebuild(say=print,fresh=(),skip=(),history=None,pending=None):
                 later.append(lambda path=path,name=name,issue=issue:(os.path.exists(path) and os.remove(path),say(f"{name}: removed (its {issue}{PLAYER_SUFFIX} is there: a conversion cut short)")))
                 continue
             if len(kept)<len(player["Facts"]):say(f"{name}: {len(player['Facts'])-len(kept)} facts refused by the current rules")
-            later.append(lambda issue=issue,player=player,kept=kept,name=name:(write_player(issue,player.get("Login"),kept,None,now.get(name)),
+            later.append(lambda issue=issue,kept=kept,name=name:(write_player(issue,kept,now.get(name)),
                          say(f"{name}: written again as {issue}{PLAYER_SUFFIX}, without exact places nor days (X-772)")))
-        files.append((issue+PLAYER_SUFFIX,issue,(player.get("Login") or "").lower(),player.get("Login"),
+        # X-830: the account from the private link; a file of version 1 or before still says it
+        owner=owners.get(issue+PLAYER_SUFFIX,((player.get("Login") or "").lower(),int(issue) if issue.isdigit() else -1))
+        files.append((issue+PLAYER_SUFFIX,issue,owner[0],owner[1],
                       [without_place(f) for f in kept] if player["Old"] else player["Facts"]))
     sources+=[pair if isinstance(pair,tuple) else (None,pair) for pair in fresh]
     def places_of(excluded,tainted=frozenset()):
@@ -621,7 +710,8 @@ def rebuild(say=print,fresh=(),skip=(),history=None,pending=None):
     placed=placed_with(places_of(set()))
     # X-183 (N13): one file per GitHub account: the newest issue of a login counts, an older one is reported and left out (a file without its login,
     # written before 0.1210, counts as it is until sync notes it).
-    newest={p[2]:p[0] for p in placed if p[2]}
+    # X-830: the newest issue by its number (the link's; a numbered file's own), never by a random file name
+    newest={p[2]:p[0] for p in sorted(placed,key=lambda p:p[3]) if p[2]}
     counted=[p[0] for p in placed if not (p[2] and newest[p[2]]!=p[0])]
     # X-183 (N5): a player alone far outside the others' levels on over 5 % of the facts they share is left out, never allowed to widen everyone's facts.
     held=collections.defaultdict(list)
@@ -643,10 +733,10 @@ def rebuild(say=print,fresh=(),skip=(),history=None,pending=None):
     for name,issue,login,shown,facts,kept,kept_held,waiting in placed:
         if len(kept_held)<len(facts):
             say(f"{name}: {len(facts)-len(kept_held)} facts refused by the current rules")
-            later.append(lambda issue=issue,shown=shown,kept_held=kept_held,name=name:write_player(issue,shown,kept_held,notes.get(issue),now.get(name)))
+            later.append(lambda issue=issue,kept_held=kept_held,name=name:write_player(issue,kept_held,now.get(name)))
         elif name not in written and was.get(name)!=now[name]:
             # X-808: « Counted » changed: the file written again with the same facts and note.
-            later.append(lambda issue=issue,shown=shown,facts=facts,name=name:write_player(issue,shown,facts,notes.get(issue),now[name]))
+            later.append(lambda issue=issue,facts=facts,name=name:write_player(issue,facts,now[name]))
         if waiting:say(f"{name}: {len(waiting)} facts whose place is in no common file nor gist read now: kept in the player file, left out of the common set")
         if login and newest[login]!=name:say(f"{name}: same author as {newest[login]} (a newer issue): not counted")
     for name,(alone,shared) in sorted(outliers(held).items()):
@@ -678,6 +768,8 @@ def rebuild(say=print,fresh=(),skip=(),history=None,pending=None):
     say(f"common: {len(common['Facts'])} facts from {players} players")
     changed=write_v3(bounded(common["Facts"],say=say),V3_DIR,say)
     for write in later:write()
+    # X-830: the gists merged, written once the common set and the player files are (the plugin deletes a gist listed there)
+    if notes is not None and set(notes)!=read_merged():write_atomic(MERGED_PATH,merged_bytes(notes));say(f"merged gists: {len(notes)} listed");changed=True
     return changed
 
 def write_v3(facts,folder,say=print):
@@ -737,91 +829,194 @@ def short(text,limit=60):
     text="".join("?" if unicodedata.category(c) in ("Cc","Cf") else c for c in " ".join((text or "").split()))
     return text if len(text)<=limit else text[:limit-1]+"…"
 
+class Numbered(ValueError):
+    """X-830: player files still named after their issue (version 1 or before): anonymize first; nothing read nor written."""
+
+def no_numbered():
+    found=[n for n in player_names() if numbered(n)]
+    if found:raise Numbered(f"{len(found)} player file(s) still named after their issue ({', '.join(found[:3])}): run « anonymize » first (X-830)")
+
+def plan(issues,links,merged,listing=None,reader=None,say=print):
+    """X-830: what a sync of these open issues does, without writing anything. links: the private link (changed here: a new share gets a
+    random file id, a newer issue of the same account takes over its older issue's file: « one file per account »); merged: the gists merged
+    (a revision listed there is never read again; added here for each share read). → {"pending": {player file name: (id, facts)}, "fresh":
+    [(player file name, fact)], "read": [{"number","login","gist","revision","facts","refused","kinds","new"}], "shares": {numbers}}.
+    listing(gist) → (owner, files, revision); reader(files) → the gist's data. discoveries-trust.py replays the same, offline."""
+    listing=listing or gist_listing;reader=reader or (lambda files:from_gist_files(files,fetch_gist_raw))
+    by_login={(v.get("Login") or "").lower():k for k,v in links.items() if v.get("Login")}
+    taken={};shares=set();fresh=[];pending={};read=[]
+    # X-183 (N13): the newest issue of an account first; an older one of the same account (a gist made again, a second issue) is not read.
+    for issue in sorted(issues,key=lambda i:-i["number"]):
+        if not is_share(issue):continue
+        shares.add(issue["number"]);author=login(issue).lower();number=str(issue["number"])
+        issue["title"]=short(issue.get("title"))
+        if author in taken:say(f"#{issue['number']} {issue['title']}: same author as #{taken[author]} (a newer issue): not read, not counted");continue
+        def manual(doubt):
+            say(f"#{issue['number']} {issue['title']}: MANUAL ({DOUBTS[doubt]}): not merged; tell the player: "
+                f"python -I -X utf8 tools/discoveries-merge.py notice {issue['number']} manual {doubt}")
+        gist,doubt=triage(issue)
+        if doubt:manual(doubt);continue
+        # X-830: the issue's player file from the private link; a newer issue of a linked account takes over the older one's file
+        entry=links.get(number)
+        if entry is None and author in by_login and by_login[author]!=number:
+            older=by_login[author];entry=links.pop(older)
+            say(f"#{issue['number']}: same account as #{older}: its player file goes on with this issue")
+        if entry is None:entry={"File":new_file_id({v["File"] for v in links.values()}),"Login":login(issue)}
+        entry["Login"]=login(issue);links[number]=entry;by_login[author]=number
+        name=entry["File"]+PLAYER_SUFFIX
+        try:held=player_of(entry["File"])
+        except (OSError,ValueError):held=None
+        try:owner,files,revision=listing(gist)
+        except Exception as error:
+            # X-804: the merged gist deleted by the plugin (its issue still links it until a new gist comes): nothing to read, its facts stay.
+            if held is not None and entry.get("Gist")==gist:
+                taken[author]=issue["number"];say(f"#{issue['number']} {issue['title']}: its merged gist was deleted by the plugin (X-804): nothing new to read");continue
+            say(f"#{issue['number']} {issue['title']}: gist unreadable ({type(error).__name__}), skipped");continue
+        doubt=owner_doubt(owner,issue)
+        if doubt:manual(doubt);continue
+        if already_merged(merged,gist,revision):
+            taken[author]=issue["number"];say(f"#{issue['number']} {issue['title']}: gist revision already merged (X-804): not read again");continue
+        try:facts,report=clean(reader(files),player=True)
+        except Exception as error:say(f"#{issue['number']} {issue['title']}: gist unreadable ({type(error).__name__}), skipped");continue
+        taken[author]=issue["number"];entry["Gist"]=gist
+        gist_facts=facts;facts=union((held or {}).get("Facts") or [],facts)   # X-804: a gist of news only loses nothing
+        total=report["facts"]+report["refused"];flag=" FLAG: refusals over 5 %" if total and report["refused"]/total>0.05 else ""
+        added,gone=news(entry["File"],facts)
+        what=" nothing new (same facts as its player file): no write, no « Merged » comment" if (added,gone)==(0,0) else f" {added} new or changed, {gone} gone"
+        say(f"#{issue['number']} {issue['title']} (author {short(login(issue))}): {report['facts']} facts, {report['refused']} refused, kinds {report['kinds']};{what}{flag}")
+        read.append({"number":issue["number"],"login":login(issue),"gist":gist,"revision":revision,"owner":owner,"facts":report["facts"],"refused":report["refused"],
+                     "kinds":list(report["kinds"]),"new":(added,gone)!=(0,0),"flag":bool(flag)})
+        if flag:continue
+        fresh.extend((name,f) for f in gist_facts)   # X-772: their places and days go to the common set (rebuild), never to the player file; X-796 M1: with their player
+        # X-804, X-830: the revision read is listed as merged (the plugin then deletes that gist); nothing new: the list alone changes
+        merged.add(note_hash(gist,revision))
+        if (added,gone)==(0,0):say(f"#{issue['number']}: its gist noted as merged");continue
+        pending[name]=(entry["File"],facts)
+    return {"pending":pending,"fresh":fresh,"read":read,"shares":shares}
+
 ISSUE_LIMIT=500
-def sync(dry):
+def sync(dry,links_path=None):
     # X-168: every open issue is listed (no label filter), then is_share picks the shares.
     issues=json.loads(subprocess.run(["gh","issue","list","-R","Shigu330/Tensho-Assistant","--state","open","--limit",str(ISSUE_LIMIT),
         "--json","number,title,body,author,labels"],capture_output=True,text=True,check=True,timeout=REMOTE_TIMEOUT).stdout)
     os.makedirs(PLAYERS,exist_ok=True)
-    # X-807 M1: the player files to write (issue file name: (issue, login, facts)), given to rebuild, which writes them after the common set.
-    pending={}
+    # X-830: the private link read first (missing: a first share, or a link lost: said); files still named after their issue: anonymize first
+    links=read_links(links_path)
+    if links is None:print(f"no link file ({links_path or LINKS_PATH}): every share gets a new player file (a link lost: an account may count twice until withdrawn by file name)");links={}
+    no_numbered()
     # X-795: the common set read whole before any player file is written (a stop here leaves everything as it was).
     try:v3_guard()
     except Lossy as error:
         if not dry:raise
         print(f"STOP at the write: {error}")
-    taken={};shares=set();fresh=[]
-    # X-183 (N13): the newest issue of an account first; an older one of the same account (a gist made again, a second issue) is not read.
-    for issue in sorted(issues,key=lambda i:-i["number"]):
-        if not is_share(issue):continue
-        shares.add(issue["number"]);author=login(issue).lower()
-        issue["title"]=short(issue.get("title"))
-        if author in taken:print(f"#{issue['number']} {issue['title']}: same author as #{taken[author]} (a newer issue): not read, not counted");continue
-        def manual(doubt):
-            print(f"#{issue['number']} {issue['title']}: MANUAL ({DOUBTS[doubt]}): not merged; tell the player: "
-                  f"python -I -X utf8 tools/discoveries-merge.py notice {issue['number']} manual {doubt}")
-        gist,doubt=triage(issue)
-        if doubt:manual(doubt);continue
-        try:held=player_of(issue["number"])
-        except (OSError,ValueError):held=None
-        try:owner,files,revision=gist_listing(gist)
-        except Exception as error:
-            # X-804: the merged gist deleted by the plugin (its issue still links it until a new gist comes): nothing to read, its facts stay.
-            if held is not None and (held.get("Noted") or {}).get("Gist")==gist:
-                taken[author]=issue["number"];print(f"#{issue['number']} {issue['title']}: its merged gist was deleted by the plugin (X-804): nothing new to read");continue
-            print(f"#{issue['number']} {issue['title']}: gist unreadable ({type(error).__name__}), skipped");continue
-        doubt=owner_doubt(owner,issue)
-        if doubt:manual(doubt);continue
-        if already_merged(held,gist,revision):
-            taken[author]=issue["number"];print(f"#{issue['number']} {issue['title']}: gist revision already merged (X-804): not read again");continue
-        try:facts,report=clean(from_gist_files(files,fetch_gist_raw),player=True)
-        except Exception as error:print(f"#{issue['number']} {issue['title']}: gist unreadable ({type(error).__name__}), skipped");continue
-        taken[author]=issue["number"]
-        noted=merged_note({"Gist":gist,"Revision":revision})
-        gist_facts=facts;facts=union((held or {}).get("Facts") or [],facts)   # X-804: a gist of news only loses nothing
-        total=report["facts"]+report["refused"];flag=" FLAG: refusals over 5 %" if total and report["refused"]/total>0.05 else ""
-        added,gone=news(issue["number"],facts)
-        what=" nothing new (same facts as its player file): no write, no « Merged » comment" if (added,gone)==(0,0) else f" {added} new or changed, {gone} gone"
-        print(f"#{issue['number']} {issue['title']} (author {short(login(issue))}): {report['facts']} facts, {report['refused']} refused, kinds {report['kinds']};{what}{flag}")
-        if dry or flag:continue
-        fresh.extend((f"{issue['number']}{PLAYER_SUFFIX}",f) for f in gist_facts)   # X-772: their places and days go to the common set (rebuild), never to the player file; X-796 M1: with their player
-        if (added,gone)==(0,0):
-            # X-183 (N13): a file written before 0.1210 gets its author noted (the facts unchanged), so rebuild counts one file per account.
-            # X-804: and a gist revision merged is noted, so the plugin deletes that gist.
-            if held is not None and (held.get("Login")!=login(issue) or (noted and held.get("Noted")!=noted)):
-                pending[f"{issue['number']}{PLAYER_SUFFIX}"]=(issue["number"],login(issue),facts,noted or held.get("Noted"));print(f"#{issue['number']}: author and merged gist noted in its player file")
-            continue
-        pending[f"{issue['number']}{PLAYER_SUFFIX}"]=(issue["number"],login(issue),facts,noted)
+    merged=read_merged()
+    done=plan(issues,links,merged)
     # X-183 (N13): a player file whose issue is no longer an open share (closed by the player, or deleted) still counts until it is withdrawn.
     if len(issues)<ISSUE_LIMIT:
-        for name in player_names():
-            if stem(name).isdigit() and int(stem(name)) not in shares:
-                print(f"players/{name}: issue #{stem(name)} is no longer an open share (closed or deleted): its facts still count; "
-                      f"python -I -X utf8 tools/discoveries-merge.py withdraw {stem(name)} removes them")
-    if not dry:rebuild(fresh=fresh,pending=pending)
+        for number,entry in sorted(links.items(),key=lambda kv:int(kv[0])):
+            if int(number) not in done["shares"] and os.path.isfile(os.path.join(PLAYERS,entry["File"]+PLAYER_SUFFIX)):
+                print(f"issue #{number} is no longer an open share (closed or deleted): its facts still count; "
+                      f"python -I -X utf8 tools/discoveries-merge.py withdraw {number} removes the link")
+    if not dry:
+        # X-830: the link written before the player files (a stop after it: the next sync gives the same names)
+        write_links(links,links_path)
+        rebuild(fresh=done["fresh"],pending=done["pending"],owners=owners_of(links),notes=merged)
+        print(f"batch: {len([r for r in done['read'] if not r['flag']])} share(s) read; open ONE pull request for all of them: python -I -X utf8 tools/discoveries-merge.py pr-text")
     else:
         print();print(recheck_report())
 
-WITHDRAWN="withdrawn-"   # X-803: the name of an anonymous file: WITHDRAWN + 16 random hex digits + PLAYER_SUFFIX
+WITHDRAWN="withdrawn-"   # X-803: the name of an anonymous file before X-830 (since X-830 every player file is named by a random id)
 
-def withdraw(issue,dry):
-    """X-183 (N13): a player withdrawn (their issue closed, or asked): players/<issue>.jsonl.gz (X-772; or the <issue>.json of before) removed.
-    X-803 (user decision of 22/11): their facts stay in the common set, without any name: rebuild gets them as an anonymous file
-    players/withdrawn-<random>.jsonl.gz (no issue, no login; a file of before gives its places and days too), written once the common set is,
-    then the numbered files are removed. A stop (X-795) leaves everything as it was."""
-    paths=[os.path.join(PLAYERS,f"{issue}{suffix}") for suffix in (PLAYER_SUFFIX,".json")] if issue.isdigit() else []
+def withdraw(target,dry,links_path=None):
+    """X-183 (N13), X-803, X-830 (D-226 a): a player withdrawn (their issue closed, or asked). target: an issue (its player file through the
+    private link; or a file still named after it, before anonymize) or a player file's name (a link lost). Their facts stay in the common set,
+    without any name: written again under a new random id, the old file removed once the common set is, then the link forgotten. A stop
+    (X-795) leaves everything as it was."""
+    links=read_links(links_path) or {}
+    name=target[:-len(PLAYER_SUFFIX)] if target.endswith(PLAYER_SUFFIX) else target
+    drop=None
+    if name.isdigit() and name in links:paths=[os.path.join(PLAYERS,links[name]["File"]+PLAYER_SUFFIX)];drop=name
+    elif name.isdigit():paths=[os.path.join(PLAYERS,f"{name}{suffix}") for suffix in (PLAYER_SUFFIX,".json")]
+    elif FILE_ID.fullmatch(name) or re.fullmatch(WITHDRAWN+r"[0-9a-f]{16}",name):paths=[os.path.join(PLAYERS,name+PLAYER_SUFFIX)]
+    else:paths=[]
     present=[path for path in paths if os.path.isfile(path)]
-    if not present:print(f"players/{issue}: no such player file");return 2
+    if not present:
+        if drop and not dry:del links[drop];write_links(links,links_path);print(f"issue #{drop}: its player file is not there; the link forgotten");return 0
+        print(f"players/{target}: no such player file");return 2
     shown=", ".join("players/"+os.path.basename(path) for path in present)
-    if dry:print(f"{shown} would be removed; its facts kept in the common set without any name (players/{WITHDRAWN}….jsonl.gz), then the common files rebuilt");return 0
+    if dry:print(f"{shown} would be written again under a new name, its facts kept in the common set without any name, then the common files rebuilt");return 0
     # The new file when there is one (a conversion cut short leaves both), else the file of before under the current rules (as rebuild reads it).
     player=read_player(present[0])
     facts=[daily(f) for f in player["Facts"] if valid(dict(f))] if player["Old"] else player["Facts"]
-    name=f"{WITHDRAWN}{secrets.token_hex(8)}{PLAYER_SUFFIX}"
+    fresh_id=new_file_id({v["File"] for v in links.values()});new=fresh_id+PLAYER_SUFFIX
+    owners={k:v for k,v in owners_of(links).items() if k not in {os.path.basename(p) for p in present}}
     # X-795: rebuilt without them first; the files removed once the common set is written (a stop leaves them, and the set, as they were)
-    rebuild(skip=[os.path.basename(path) for path in present],fresh=[(name,f) for f in facts if all(n in f for n in PLACE)],pending={name:(name,None,facts)})
+    rebuild(skip=[os.path.basename(path) for path in present],fresh=[(new,f) for f in facts if all(n in f for n in PLACE)],pending={new:(fresh_id,facts)},owners=owners)
     for path in present:os.remove(path)
-    print(f"{shown} removed; {len(facts)} facts kept without any name in players/{name}");return 0
+    if drop:del links[drop];write_links(links,links_path)
+    print(f"{shown} removed; {len(facts)} facts kept without any name in players/{new}"+(f"; the link of issue #{drop} forgotten" if drop else ""));return 0
+
+def anonymize(dry,links_path=None):
+    """X-830 (D-226 a): the player files still named after their issue (<issue>.jsonl.gz of version 1, <issue>.json of before) written again
+    under a random id, in version 2 (neither issue, login, gist nor revision); the link issue ↔ file written first to the private link file;
+    a gist a file of version 1 notes as merged listed in MERGED_PATH; then the numbered files removed. The common set does not change
+    (the same facts, counted the same: « one file per account » from the link). A stop leaves the numbered files; run again: the same ids."""
+    links=read_links(links_path) or {}
+    names=[n for n in player_names() if numbered(n)]
+    if not names:print("no player file named after its issue: nothing to do");return 0
+    merged=read_merged();pending={};fresh=[];taken={v["File"] for v in links.values()}
+    for name in names:
+        player=read_player(os.path.join(PLAYERS,name));number=stem(name)
+        entry=links.get(number) or {"File":new_file_id(taken)};taken.add(entry["File"])
+        entry["Login"]=player.get("Login") or entry.get("Login") or "";links[number]=entry
+        facts=[daily(f) for f in player["Facts"] if valid(dict(f))] if player["Old"] else player["Facts"]
+        new=entry["File"]+PLAYER_SUFFIX;pending[new]=(entry["File"],facts)
+        if player["Old"]:fresh+=[(new,f) for f in facts if all(n in f for n in PLACE)]
+        if player.get("Noted"):merged.add(note_hash(player["Noted"]["Gist"],player["Noted"]["Revision"]))
+        print(f"players/{name} → players/{new}" if dry else f"players/{name}: becomes players/{new}")
+    if dry:return 0
+    write_links(links,links_path)
+    rebuild(skip=names,fresh=fresh,pending=pending,owners=owners_of(links),notes=merged)
+    if not os.path.isfile(MERGED_PATH):write_atomic(MERGED_PATH,merged_bytes(merged))   # the plugin reads it from main: there from the start
+    for name in names:
+        path=os.path.join(PLAYERS,name)
+        if os.path.exists(path):os.remove(path)
+    print(f"{len(names)} player file(s) anonymized; the link is in {links_path or LINKS_PATH} (keep it outside the repository)");return 0
+
+def link(number,file_id,author,links_path=None):
+    """X-830: one link issue ↔ player file written to the private link file (the worker's copy of a link made elsewhere)."""
+    if not number.isdigit() or not FILE_ID.fullmatch(file_id) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9-]{0,38}",author):print(__doc__);return 2
+    if not os.path.isfile(os.path.join(PLAYERS,file_id+PLAYER_SUFFIX)):print(f"players/{file_id}{PLAYER_SUFFIX}: no such player file");return 2
+    links=read_links(links_path) or {}
+    if any(v["File"]==file_id for k,v in links.items() if k!=number):print(f"{file_id}: already linked to another issue");return 2
+    links[number]={**links.get(number,{}),"File":file_id,"Login":author};write_links(links,links_path)
+    print(f"issue #{number} linked to players/{file_id}{PLAYER_SUFFIX}");return 0
+
+# ---------- X-830 (D-227 B+C): one pull request per batch of shares, naming no issue nor account ----------
+BATCH_BRANCH=re.compile(r"travailleur/discoveries-batch-[0-9a-f]{8}")
+BATCH_TITLE="Discoveries: merge a batch of shares"
+def batch_text(batch=None):
+    """X-830: the branch, title, body and commit message of a batch's pull request: no issue number, no login, no count of shares."""
+    sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
+    from bilingual import compose
+    batch=batch or secrets.token_hex(4)
+    body=compose("The shared discoveries waiting in open issues, merged together by tools/discoveries-merge.py sync (one pull request per batch; "
+                 "it names no issue nor account).",
+                 "Les découvertes partagées en attente dans les tickets ouverts, fusionnées ensemble par tools/discoveries-merge.py sync (une demande "
+                 "de fusion par lot ; elle ne nomme aucun ticket ni compte).")
+    return {"branch":f"travailleur/discoveries-batch-{batch}","title":BATCH_TITLE,"body":body,"commit":BATCH_TITLE}
+
+def names_in(texts,issues):
+    """X-830: the issue numbers (« #43 » or the bare number) and logins of these share issues found in these texts (a pull request's branch,
+    title, body, commits): [] when none."""
+    found=[]
+    for issue in issues:
+        number=str(issue.get("number") or "");author=login(issue)
+        for text in texts:
+            text=text or ""
+            if number and re.search(rf"(?<![0-9A-Za-z]){re.escape(number)}(?![0-9A-Za-z])",text):found.append(f"#{number}")
+            if author and re.search(rf"(?<![A-Za-z0-9-]){re.escape(author)}(?![A-Za-z0-9-])",text,re.I):found.append(author)
+    return sorted(set(found))
 
 # ---------- X-116: facts to recheck after a game patch ----------
 CELL_KINDS=PLACED  # every fact with a place: a changed layout cell can change what was seen there
@@ -927,8 +1122,8 @@ def selftest():
     # X-829: a share's Eorzea minutes (vista, fish weather, weather before) kept to the hour; another kind's values untouched.
     minute={"Kind":11,"Subject":5,"Detail":2,"Territory":0,"Map":0,"CellX":0,"CellZ":0,"X":0,"Z":0,"LevelMin":1023,"LevelMax":1079,"Seen":3,"Imported":0,
             "First":"2026-11-20T00:00:00+00:00","Last":"2026-11-21T00:00:00+00:00","Values":{"1023":1,"1050":1,"1079":1}}
-    other={**minute,"Kind":5,"Values":{"1023":1,"1050":1,"1079":1}}
-    got={f["Kind"]:f for f in clean({"Version":2,"Facts":[minute,other]},player=True)[0]}
+    untimed={**minute,"Kind":5,"Values":{"1023":1,"1050":1,"1079":1}}
+    got={f["Kind"]:f for f in clean({"Version":2,"Facts":[minute,untimed]},player=True)[0]}
     check(got[11]["LevelMin"]==1020 and got[11]["LevelMax"]==1020 and got[11]["Values"]=={"1020":3} and got[5]["Values"]=={"1023":1,"1050":1,"1079":1}
           and clean({"Version":2,"Facts":[minute]})[0][0]["Values"]=={"1023":1,"1050":1,"1079":1},
           f"X-829: a share keeps the Eorzea hour only ({got[11]}), another kind and the common set as they are")
@@ -1015,10 +1210,10 @@ def selftest():
           f"N5: a histogram capped, its shape and HQ share kept, the same when capped twice ({big})")
     check(not any(unicodedata.category(c) in ("Cc","Cf") for c in short("a\x1b[2Kb‮c\r\nd")) and short("a\x1b[2Kb")=="a?[2Kb","N17: control and format characters shown as ?")
     # X-183 (N5, N13, N16): rebuild on made-up player files.
-    global V3_DIR
-    saved=(PLAYERS,V3_DIR)
+    global V3_DIR,MERGED_PATH
+    saved=(PLAYERS,V3_DIR,MERGED_PATH)
     with tempfile.TemporaryDirectory() as tmp:
-        PLAYERS=os.path.join(tmp,"players");os.makedirs(PLAYERS);V3_DIR=os.path.join(tmp,"v3")
+        PLAYERS=os.path.join(tmp,"players");os.makedirs(PLAYERS);V3_DIR=os.path.join(tmp,"v3");MERGED_PATH=os.path.join(tmp,"merged.txt")
         said=[];say=said.append
         def put(n,facts,author=None):write_json(os.path.join(PLAYERS,f"{n}.json"),{"Issue":n,**({"Login":author} if author else {}),"Facts":facts})
         def common():return sorted(from_v3_dir(V3_DIR)["Facts"],key=sort_key)
@@ -1034,7 +1229,8 @@ def selftest():
         rebuild(say);got=common()[0]
         check(got["X"]==62.0 and got["First"].startswith("2026-11-02") and got["Imported"]==2,f"N5: the exact place of the earliest day (« 100.json » read after « 43.json ») {got}")
         said.clear();put(101,[dict(first[1])],"ann");put(7,[dict(first[2])])
-        rebuild(say);got={g["Subject"]:(g["Imported"],g["X"]) for g in common()}
+        # X-830: the accounts come from the private link (a converted file no longer says its login)
+        rebuild(say,owners={"43.jsonl.gz":("ann",43),"100.jsonl.gz":("bob",100),"101.jsonl.gz":("ann",101)});got={g["Subject"]:(g["Imported"],g["X"]) for g in common()}
         check(got=={1:(1,62.0),2:(1,60.0),3:(1,60.0)} and "43.jsonl.gz: same author as 101.jsonl.gz (a newer issue): not counted" in said,f"N13: one file per account, the newest issue's ({got}, {said})")
         target=os.path.join(tmp,"held.json");write_atomic(target,"old");real=os.replace
         def broken(*_):raise OSError("disk full")
@@ -1058,12 +1254,12 @@ def selftest():
         check(sorted(os.listdir(PLAYERS))==["43.jsonl.gz"] and "43.json: written again as 43.jsonl.gz, without exact places nor days (X-772)" in said,
               f"X-772: the file of before written again in the new format, the old one removed ({os.listdir(PLAYERS)}, {said})")
         head,*rows=lines("43.jsonl.gz")
-        check(head=={"Format":PLAYER_FORMAT,"Version":PLAYER_VERSION,"Issue":43,"Login":"Ann","Counted":True,"Count":3} and len(rows)==3
+        check(head=={"Format":PLAYER_FORMAT,"Version":PLAYER_VERSION,"Counted":True,"Count":3} and len(rows)==3
               and all(set(r)<=set(PLAYER_ORDER) and not set(r)&{"X","Z","First","Last","Seen","Imported"} for r in rows),
               f"X-772: behaviour: the player file produced holds neither place nor day ({head}, {rows[:1]})")
         said.clear();check(rebuild(say) is False and open(os.path.join(V3_DIR,v3_name(1)),"rb").read()==before and not [l for l in said if "written again" in l],
               f"X-772: rebuilt from the new file: the common set the same bytes, nothing converted again ({said})")
-        check(player_bytes(43,"Ann",list(reversed(spots)),None,True)==open(os.path.join(PLAYERS,"43.jsonl.gz"),"rb").read(),"X-772: the same facts give the same bytes")
+        check(player_bytes(list(reversed(spots)),True)==open(os.path.join(PLAYERS,"43.jsonl.gz"),"rb").read(),"X-772: the same facts give the same bytes")
         # sync's gists bring places and days (fresh): an earlier day takes the place, a later one the last day; the player file stays without them
         rebuild(say,fresh=[{**spots[0],"X":70.0,"Z":130.0,"First":"2026-11-02T00:00:00+00:00","Last":"2026-11-02T00:00:00+00:00"},
                            {**spots[1],"X":99.0,"First":"2026-11-04T00:00:00+00:00","Last":"2026-11-09T00:00:00+00:00"}])
@@ -1071,7 +1267,7 @@ def selftest():
         check(got[1]==(70.0,130.0,"2026-11-02","2026-11-05") and got[2]==(62.0,138.0,"2026-11-03","2026-11-09"),f"X-772: places and days from the gists read ({got})")
         check(all(not set(r)&set(PLACE) for r in lines("43.jsonl.gz")[1:]),"X-772: the player file still without them")
         # a fact whose place is known nowhere waits in its player file; a new share brings it
-        write_player(100,"Bob",[*[without_place(s) for s in spots[:1]],without_place(f(1,9,128,10.0,10.0,"2026-11-03T00:00:00+00:00"))])
+        write_player("100",[*[without_place(s) for s in spots[:1]],without_place(f(1,9,128,10.0,10.0,"2026-11-03T00:00:00+00:00"))])
         said.clear();rebuild(say);got={g["Subject"]:g["Imported"] for g in common()}
         check(got=={1:2,2:1,3:1} and "100.jsonl.gz: 1 facts whose place is in no common file nor gist read now: kept in the player file, left out of the common set" in said
               and len(lines("100.jsonl.gz"))==3,f"X-772: a fact without a place known waits ({got}, {said})")
@@ -1090,7 +1286,7 @@ def selftest():
         import contextlib
         before={g["Subject"]:g["Imported"] for g in common()}
         with contextlib.redirect_stdout(io.StringIO()):gone=withdraw("100",False)   # its lines are the tool's report, not the selftest's
-        names=sorted(os.listdir(PLAYERS));anonymous=[n for n in names if n.startswith(WITHDRAWN)]
+        names=sorted(os.listdir(PLAYERS));anonymous=[n for n in names if FILE_ID.fullmatch(stem(n))]
         check(gone==0 and [n for n in names if n not in anonymous]==["43.jsonl.gz"] and len(anonymous)==1
               and {g["Subject"]:g["Imported"] for g in common()}==before and 9 in before,
               f"X-803: withdrawn: the numbered file removed, every fact kept, the one only that player had (9) too, each counted as before ({names}, {before})")
@@ -1126,7 +1322,7 @@ def selftest():
         check(stops(lambda:rebuild(say)),"X-795: a kind file listed in the index but missing: rebuild stops")
         write_atomic(os.path.join(V3_DIR,v3_name(1)),whole_set[(V3_DIR,v3_name(1))])
         said.clear();check(not rebuild(say,history=lambda:keys) and snapshot()==whole_set,f"X-795: the set whole again: rebuilt, nothing changed ({said})")
-        write_player(45,"Di",[without_place(f(1,9,128,10.0,10.0,"2026-11-03T00:00:00+00:00"))])
+        write_player("45",[without_place(f(1,9,128,10.0,10.0,"2026-11-03T00:00:00+00:00"))])
         said.clear();rebuild(say,history=lambda:keys)
         check("45.jsonl.gz: 1 facts whose place is in no common file nor gist read now: kept in the player file, left out of the common set" in said,
               f"X-795: a fact never in the common set still waits, without a stop ({said})")
@@ -1135,7 +1331,7 @@ def selftest():
         for folder in (PLAYERS,V3_DIR):
             for n in os.listdir(folder):os.remove(os.path.join(folder,n))
         put(43,[dict(g) for g in first],"Ann");rebuild(say)
-        write_player(100,"Bob",[{**without_place(g),"LevelMax":100000} for g in first])
+        write_player("100",[{**without_place(g),"LevelMax":100000} for g in first])
         early=[{**g,"X":70.0,"Z":130.0,"First":"2026-11-01T00:00:00+00:00","Last":"2026-11-20T00:00:00+00:00"} for g in first]
         said.clear();rebuild(say,fresh=[("100.jsonl.gz",g) for g in early])
         got={(g["X"],g["First"][:10],g["Last"][:10]) for g in common()}
@@ -1152,12 +1348,12 @@ def selftest():
         for folder in (PLAYERS,V3_DIR):
             for n in os.listdir(folder):os.remove(os.path.join(folder,n))
         put(43,[dict(g) for g in first],"Ann");rebuild(say)
-        write_player(100,"Bob",[without_place(g) for g in first]);rebuild(say,fresh=[("100.jsonl.gz",g) for g in early])
+        write_player("100",[without_place(g) for g in first]);rebuild(say,fresh=[("100.jsonl.gz",g) for g in early])
         got={(g["X"],g["Z"],g["First"][:10],g["Last"][:10],g["Imported"]) for g in common()}
         check(got=={(70.0,130.0,"2026-11-01","2026-11-20",2)} and heads()=={"100.jsonl.gz":True,"43.jsonl.gz":True},f"X-808: Ann and Bob counted, Bob's place and days ({got}, {heads()})")
         said.clear()
         rebuild(say,fresh=[("100.jsonl.gz",{**g,"X":80.0,"First":"2026-11-01T00:00:00+00:00"}) for g in early],
-                pending={"100.jsonl.gz":(100,"Bob",[{**g,"LevelMax":100000} for g in early],{})})
+                pending={"100.jsonl.gz":("100",[{**g,"LevelMax":100000} for g in early])})
         got={(g["X"],g["Z"],g["First"][:10],g["Last"][:10],g["Imported"]) for g in common()}
         check(got=={(75.0,125.0,"2026-11-01","2026-11-20",1)} and heads()=={"100.jsonl.gz":False,"43.jsonl.gz":True}
               and any(l.startswith("100.jsonl.gz: counted before") for l in said),
@@ -1167,8 +1363,8 @@ def selftest():
         for folder in (PLAYERS,V3_DIR):
             for n in os.listdir(folder):os.remove(os.path.join(folder,n))
         put(43,[dict(g) for g in first],"Ann");rebuild(say)
-        write_player(100,"Bob",[without_place(g) for g in first]);rebuild(say,fresh=[("100.jsonl.gz",g) for g in early])
-        write_player(101,"bob",[without_place(g) for g in first[:1]]);said.clear();rebuild(say)
+        write_player("100",[without_place(g) for g in first]);rebuild(say,fresh=[("100.jsonl.gz",g) for g in early])
+        write_player("101",[without_place(g) for g in first[:1]]);said.clear();rebuild(say,owners={"100.jsonl.gz":("bob",100),"101.jsonl.gz":("bob",101),"43.jsonl.gz":("ann",43)})
         got={(g["X"],g["First"][:10]) for g in common()}
         check(got=={(70.0,"2026-11-01")} and heads()=={"100.jsonl.gz":False,"101.jsonl.gz":True,"43.jsonl.gz":True}
               and "100.jsonl.gz: same author as 101.jsonl.gz (a newer issue): not counted" in said and not any("counted before" in l for l in said),
@@ -1182,15 +1378,15 @@ def selftest():
         index_text=open(os.path.join(V3_DIR,V3_INDEX),encoding="utf-8").read()
         cut=json.loads(index_text);cut["Files"]=[];write_atomic(os.path.join(V3_DIR,V3_INDEX),json.dumps(cut));os.remove(os.path.join(V3_DIR,v3_name(1)))
         newer=[*[dict(s) for s in spots],{**spots[0],"Subject":7}]
-        pending={"44.jsonl.gz":(44,"Cy",newer),"45.jsonl.gz":(45,"Di",[dict(spots[2])])}
-        gists=[(n,g) for n,(_,_,given) in pending.items() for g in given]
+        pending={"44.jsonl.gz":("44",newer),"45.jsonl.gz":("45",[dict(spots[2])])}
+        gists=[(n,g) for n,(_,given) in pending.items() for g in given]
         before=snapshot()
         check(stops(lambda:rebuild(say,fresh=gists,history=lambda:keys,pending=pending)) and snapshot()==before,
               "X-807 M1: a stop in the rebuild of sync leaves every player file as it was (none rewritten, none created)")
         write_atomic(os.path.join(V3_DIR,V3_INDEX),index_text);write_atomic(os.path.join(V3_DIR,v3_name(1)),whole_set[(V3_DIR,v3_name(1))])
         said.clear();rebuild(say,fresh=gists,history=lambda:keys,pending=pending)
         check(read_player(os.path.join(PLAYERS,"44.jsonl.gz"))["Facts"]==sorted([without_place(g) for g in newer],key=sort_key)
-              and read_player(os.path.join(PLAYERS,"45.jsonl.gz"))["Login"]=="Di" and 7 in {g["Subject"] for g in common()},
+              and read_player(os.path.join(PLAYERS,"45.jsonl.gz"))["Login"] is None and 7 in {g["Subject"] for g in common()},
               f"X-807 M1: the set whole: the player files of sync written after it, their facts in the common set ({said})")
         # X-804 (user decision of 22/11): the merged gist noted in the player file, never read again; a gist of news only loses nothing.
         for folder in (PLAYERS,V3_DIR):
@@ -1198,20 +1394,22 @@ def selftest():
         put(43,[dict(s) for s in spots],"Ann");rebuild(say)
         held=read_player(os.path.join(PLAYERS,"43.jsonl.gz"))
         brought=[f(1,6,128,30.0,30.0,"2026-11-05T00:00:00+00:00")]
-        pending={"43.jsonl.gz":(43,"Ann",union(held["Facts"],brought),{"Gist":"g2","Revision":"r2"})}
-        said.clear();rebuild(say,fresh=[("43.jsonl.gz",g) for g in brought],pending=pending)
-        again=read_player(os.path.join(PLAYERS,"43.jsonl.gz"))
-        check({g["Subject"] for g in common()}=={1,2,3,6} and again["Noted"]=={"Gist":"g2","Revision":"r2"} and len(again["Facts"])==4,
-              f"X-804: a new gist holding only what is new: the facts merged before stay in the common set, the revision noted ({again['Noted']})")
-        check(already_merged(again,"g2","r2") and not already_merged(again,"g2","r3") and not already_merged(again,"g3","r2") and not already_merged(None,"g2","r2")
-              and not already_merged(again,"g2",""),"X-804: only the very revision noted is never read again")
+        pending={"43.jsonl.gz":("43",union(held["Facts"],brought))}
+        said.clear();rebuild(say,fresh=[("43.jsonl.gz",g) for g in brought],pending=pending,notes={note_hash("g2","r2")})
+        again=read_player(os.path.join(PLAYERS,"43.jsonl.gz"));noted=read_merged()
+        check({g["Subject"] for g in common()}=={1,2,3,6} and noted=={note_hash("g2","r2")} and len(again["Facts"])==4 and again["Noted"]=={},
+              f"X-804, X-830: a new gist holding only what is new: the facts merged before stay in the common set, the revision listed apart ({noted})")
+        check(already_merged(noted,"g2","r2") and not already_merged(noted,"g2","r3") and not already_merged(noted,"g3","r2") and not already_merged(None,"g2","r2")
+              and not already_merged(noted,"g2",""),"X-804: only the very revision listed is never read again")
+        check(open(MERGED_PATH,"rb").read()==merged_bytes({note_hash("g2","r2")}) and "g2" not in open(MERGED_PATH,encoding="utf-8").read(),"X-830: merged.txt lists hashes only")
         check(union([spots[0],spots[1]],[{**spots[1],"LevelMax":40}])==[spots[0],{**spots[1],"LevelMax":40}],"X-804: union by key, the gist's copy replacing the file's")
-        write_atomic(os.path.join(PLAYERS,"7.jsonl.gz"),gzip.compress("".join(v3_line(o)+"\n" for o in [{"Format":PLAYER_FORMAT,"Version":PLAYER_VERSION,"Issue":7,"Login":"Di","Gist":"g7","Revision":"r7","Count":1},{**without_place(spots[2]),"LevelMin":90,"LevelMax":10}]).encode("utf-8"),mtime=0))
+        write_atomic(os.path.join(PLAYERS,"7.jsonl.gz"),gzip.compress("".join(v3_line(o)+"\n" for o in [{"Format":PLAYER_FORMAT,"Version":1,"Issue":7,"Login":"Di","Gist":"g7","Revision":"r7","Count":1},{**without_place(spots[2]),"LevelMin":90,"LevelMax":10}]).encode("utf-8"),mtime=0))
         said.clear();rebuild(say)
-        check(read_player(os.path.join(PLAYERS,"7.jsonl.gz"))["Noted"]=={"Gist":"g7","Revision":"r7"},f"X-804: a file written again (a fact refused) keeps its note ({said})")
+        check(read_player(os.path.join(PLAYERS,"7.jsonl.gz"))["Version"]==PLAYER_VERSION and read_player(os.path.join(PLAYERS,"7.jsonl.gz"))["Noted"]=={},
+              f"X-830: a file of version 1 written again (a fact refused) is of version 2, without its note ({said})")
         os.remove(os.path.join(PLAYERS,"7.jsonl.gz"))
         # X-826: the header holds PLAYER_HEADER only: what player_bytes writes (note and « Counted » too), and a header with anything else refused.
-        written=gzip.decompress(player_bytes(43,"Ann",[dict(spots[0])],{"Gist":"g2","Revision":"r2"},True)).decode("utf-8").split("\n")[0]
+        written=gzip.decompress(player_bytes([dict(spots[0])],True)).decode("utf-8").split("\n")[0]
         check(list(json.loads(written))==list(PLAYER_HEADER),f"X-826: a player file's header: exactly PLAYER_HEADER, in its order ({written})")
         for field,value in (("World","Alpha"),("Name","Ann Doe"),("X",10.0),("First","2026-11-01T00:00:00+00:00")):
             write_atomic(os.path.join(PLAYERS,"8.jsonl.gz"),gzip.compress("".join(v3_line(o)+"\n" for o in [{"Format":PLAYER_FORMAT,"Version":PLAYER_VERSION,"Issue":8,field:value,"Count":1},without_place(spots[2])]).encode("utf-8"),mtime=0))
@@ -1219,30 +1417,77 @@ def selftest():
             except ValueError:kept_bad=False
             check(not kept_bad,f"X-826: a header holding {field}: refused")
         os.remove(os.path.join(PLAYERS,"8.jsonl.gz"))
-        # X-825: sync on a share merged before X-804 (its player file without a note) whose gist brings nothing new: the player file's note
-        # alone written (what a « note only » pull request carries: the same fact lines, the common set the same bytes), so the plugin deletes that gist.
+        # X-830 (D-226 a, D-227 B+C): the numbered files anonymized (the common set the same bytes), then one sync of a batch of shares through
+        # the private link; a newer issue of the same account takes over its file; withdraw through the link (behaviour).
         for folder in (PLAYERS,V3_DIR):
             for n in os.listdir(folder):os.remove(os.path.join(folder,n))
-        put(43,[dict(s) for s in spots],"Ann");rebuild(say)
-        before=snapshot();gid="0123456789abcdef0123";revision="ab"*20;mine=(PLAYERS,"43.jsonl.gz")
-        shared={"number":43,"title":"Discoveries: Ann","author":{"login":"Ann"},"labels":[],
-                "body":f"Shared from Tensho Assistant 0.1826.0\n\nGist: https://gist.github.com/{gid}\n\n- [x] I share these discoveries under CC0-1.0 (public domain).\n"}
-        class Listed:stdout=json.dumps([shared])
-        real=(subprocess.run,gist_listing,from_gist_files);names=globals();out=io.StringIO()
-        try:
-            subprocess.run=lambda *a,**k:Listed()
-            names["gist_listing"]=lambda gist:("Ann",{},revision)
-            names["from_gist_files"]=lambda files,fetch:{"Version":2,"Facts":[{**s,"Seen":3,"Imported":0} for s in spots]}
-            stdout=sys.stdout;sys.stdout=out
-            try:sync(False)
-            finally:sys.stdout=stdout
-        finally:subprocess.run,names["gist_listing"],names["from_gist_files"]=real
-        after=snapshot();lines=lambda data:gzip.decompress(data).decode("utf-8").split("\n")
-        check(set(after)==set(before) and {k for k in after if after[k]!=before[k]}=={mine} and lines(after[mine])[1:]==lines(before[mine])[1:]
-              and "Gist" not in json.loads(lines(before[mine])[0]) and read_player(os.path.join(PLAYERS,"43.jsonl.gz"))["Noted"]=={"Gist":gid,"Revision":revision}
-              and "noted in its player file" in out.getvalue(),
-              f"X-825: sync, a share merged before X-804 with nothing new: its player file's note alone written ({out.getvalue()[-240:]})")
-    PLAYERS,V3_DIR=saved
+        if os.path.exists(MERGED_PATH):os.remove(MERGED_PATH)
+        links_file=os.path.join(tmp,"outside","links.json");gid="0123456789abcdef0123"
+        put(43,[dict(s) for s in spots],"Ann");put(44,[dict(s) for s in spots[:2]],"Cy");put(41,[dict(spots[2])],"ann");put(45,[dict(spots[0])],"Di");rebuild(say)
+        for n,who,note in ((43,"Ann",{}),(44,"Cy",{}),(41,"ann",{}),(45,"Di",{"Gist":"g5","Revision":"r5"})):   # as the repository's files are: version 1, the login in the header
+            kept=read_player(os.path.join(PLAYERS,f"{n}.jsonl.gz"))["Facts"]
+            write_atomic(os.path.join(PLAYERS,f"{n}.jsonl.gz"),gzip.compress("".join(v3_line(o)+chr(10) for o in [{"Format":PLAYER_FORMAT,"Version":1,"Issue":n,"Login":who,**note,"Count":len(kept)},*kept]).encode("utf-8"),mtime=0))
+        v3_before={k:v for k,v in snapshot().items() if k[0]==V3_DIR}
+        with contextlib.redirect_stdout(io.StringIO()):code=anonymize(False,links_file)
+        names=sorted(os.listdir(PLAYERS));links=read_links(links_file)
+        check(code==0 and len(names)==4 and all(FILE_ID.fullmatch(stem(n)) for n in names) and {k:v for k,v in snapshot().items() if k[0]==V3_DIR}==v3_before,
+              f"X-830: anonymize: every file under a random id, the common set the same bytes ({names})")
+        raw=[gzip.decompress(open(os.path.join(PLAYERS,n),"rb").read()) for n in names]
+        check(all(list(json.loads(r.split(b"\n")[0]))==[k for k in PLAYER_HEADER if k in json.loads(r.split(b"\n")[0])] for r in raw)
+              and not any(w in r for r in raw for w in (b'"Ann"',b'"ann"',b'"Cy"',b'"Di"',b'"Issue"',b'"Login"',b'"Gist"',b'"Revision"',b'"g5"')),
+              "X-830: behaviour: no login, issue nor gist in any player file")
+        check(set(links)=={"41","43","44","45"} and {v["File"]+PLAYER_SUFFIX for v in links.values()}==set(names) and links["43"]["Login"]=="Ann"
+              and read_merged()=={note_hash("g5","r5")},f"X-830: the link outside the repository, a version 1 note listed apart ({links})")
+        said.clear();check(rebuild(say,owners=owners_of(links)) is False,f"X-830: rebuilt through the link: unchanged (41 and 43 one account) ({said})")
+        with contextlib.redirect_stdout(io.StringIO()):again=anonymize(False,links_file)
+        check(again==0 and sorted(os.listdir(PLAYERS))==names,"X-830: anonymize again: nothing to do")
+        bodies=lambda g:f"Shared from Tensho Assistant 0.1832.0\n\nGist: https://gist.github.com/{g}\n\n- [x] I share these discoveries under CC0-1.0 (public domain).\n"
+        s43={"number":43,"title":"Discoveries: Ann","author":{"login":"Ann"},"labels":[],"body":bodies(gid)}
+        s50={"number":50,"title":"Discoveries: Eve","author":{"login":"Eve"},"labels":[],"body":bodies("5"*20)}
+        news7=f(1,7,128,20.0,20.0,"2026-11-06T00:00:00+00:00")
+        given={gid:[{**s,"Seen":3,"Imported":0} for s in spots],"5"*20:[{**news7,"Seen":1,"Imported":0},{**spots[0],"Seen":3,"Imported":0}],
+               "6"*20:[{**f(1,8,128,20.0,20.0,"2026-11-07T00:00:00+00:00"),"Seen":1,"Imported":0}]}
+        owners={gid:"Ann","5"*20:"Eve","6"*20:"ann"}
+        def synced(issues):
+            class Listed:stdout=json.dumps(issues)
+            real=(subprocess.run,gist_listing,from_gist_files);names_=globals();out=io.StringIO()
+            try:
+                subprocess.run=lambda *a,**k:Listed()
+                names_["gist_listing"]=lambda gist:(owners[gist],{"id":gist},"rev-"+gist[:4])
+                names_["from_gist_files"]=lambda files,fetch:{"Version":2,"Facts":given[files["id"]]}
+                with contextlib.redirect_stdout(out):sync(False,links_file)
+            finally:subprocess.run,names_["gist_listing"],names_["from_gist_files"]=real
+            return out.getvalue()
+        before=snapshot();said_=synced([s43,s50]);after=snapshot();links=read_links(links_file)
+        mine=(PLAYERS,links["43"]["File"]+PLAYER_SUFFIX);eve=(PLAYERS,links["50"]["File"]+PLAYER_SUFFIX)
+        check(after[mine]==before[mine] and eve in after and eve not in before and FILE_ID.fullmatch(links["50"]["File"]) and links["50"]["Login"]=="Eve"
+              and read_merged()=={note_hash("g5","r5"),note_hash(gid,"rev-"+gid[:4]),note_hash("5"*20,"rev-5555")}
+              and {g["Subject"]:g["Imported"] for g in common()}=={1:4,2:2,3:1,7:1} and "batch: 2 share(s) read" in said_
+              and "issue #44 is no longer an open share" in said_ and "gist noted as merged" in said_,
+              f"X-830: one sync, a batch of two shares: Ann's gist with nothing new listed as merged, Eve's facts in a new anonymous file ({said_[:900]})")
+        check(b'"Eve"' not in gzip.decompress(after[eve]) and json.loads(gzip.decompress(after[eve]).split(b"\n")[0])=={"Format":PLAYER_FORMAT,"Version":PLAYER_VERSION,"Counted":True,"Count":2},
+              "X-830: the new file names no account")
+        pr=batch_text("0a1b2c3d")
+        check(BATCH_BRANCH.fullmatch(pr["branch"]) and names_in(list(pr.values()),[s43,s50])==[] and not re.search(r"\d",pr["title"]+pr["commit"]),
+              f"X-830: behaviour: the batch's pull request names no issue nor account ({pr['branch']}, {pr['title']})")
+        check(names_in(["Discoveries: merge issue #43 (Ann)"],[s43,s50])==["#43","Ann"] and names_in(["travailleur/discoveries-43"],[s43])==["#43"]
+              and names_in(["travailleur/discoveries-batch-a43fa43f","Eve-like eveline"],[s43,s50])==[],"X-830: names_in finds an issue or a login, not a part of a word")
+        s60={"number":60,"title":"Discoveries: ann","author":{"login":"ann"},"labels":[],"body":bodies("6"*20)}
+        said_=synced([s60,s50]);links=read_links(links_file)
+        check("43" not in links and links["60"]["File"]+PLAYER_SUFFIX==mine[1] and "same account as #43" in said_ and len(read_player(os.path.join(*mine))["Facts"])==4,
+              f"X-830: a newer issue of the same account takes over its file (one file per account) ({said_[-300:]})")
+        v3_now={k:v for k,v in snapshot().items() if k[0]==V3_DIR};old_file=links["44"]["File"]
+        with contextlib.redirect_stdout(io.StringIO()):gone=withdraw("44",False,links_file)
+        links=read_links(links_file)
+        check(gone==0 and "44" not in links and not os.path.exists(os.path.join(PLAYERS,old_file+PLAYER_SUFFIX)) and len(os.listdir(PLAYERS))==5
+              and {k:v for k,v in snapshot().items() if k[0]==V3_DIR}==v3_now,"X-830: withdraw through the private link: the link forgotten, the facts under a new id, the common set the same")
+        check(refused(lambda:read_links(os.path.join(ROOT,"links.json"))) and refused(lambda:write_links({},os.path.join(ROOT,"links.json"))),"X-830: the link never inside the repository")
+        put(46,[dict(spots[0])],"Fa")
+        try:no_numbered();stopped=False
+        except Numbered:stopped=True
+        check(stopped,"X-830: a file named after its issue left: sync and rebuild stop (anonymize first)")
+        os.remove(os.path.join(PLAYERS,"46.json"))
+    PLAYERS,V3_DIR,MERGED_PATH=saved
     # X-146: a gist file read within its bound and its time, a slow trickle stopped.
     class Answer:
         def __init__(self,data,pause=0.0):self.data=data;self.pause=pause
@@ -1355,12 +1600,24 @@ if __name__=="__main__":
     utf8_output(sys.stdout);utf8_output(sys.stderr)
     if len(sys.argv)<2:print(__doc__);sys.exit(2)
     command=sys.argv[1]
+    # X-830: --links PATH: the private link file (default LINKS_PATH, outside the repository)
+    links_path=None;argv=sys.argv[2:]
+    if "--links" in argv:
+        at=argv.index("--links")
+        if at+1>=len(argv):print(__doc__);sys.exit(2)
+        links_path=argv[at+1];del argv[at:at+2]
+    dry="--dry-run" in argv;args=[a for a in argv if a!="--dry-run"]
     try:
-        if command=="sync":sync("--dry-run" in sys.argv);sys.exit(0)
-        if command=="rebuild":rebuild();sys.exit(0)
-        if command=="withdraw" and len([a for a in sys.argv[2:] if a!="--dry-run"])==1:
-            sys.exit(withdraw([a for a in sys.argv[2:] if a!="--dry-run"][0],"--dry-run" in sys.argv))
+        if command=="sync":sync(dry,links_path);sys.exit(0)
+        if command=="rebuild":
+            no_numbered();rebuild(owners=owners_of(read_links(links_path)));sys.exit(0)
+        if command=="withdraw" and len(args)==1:sys.exit(withdraw(args[0],dry,links_path))
+        if command=="anonymize" and not args:sys.exit(anonymize(dry,links_path))
+        if command=="link" and len(args)==3:sys.exit(link(*args,links_path=links_path))
+        if command=="pr-text" and not args:print(json.dumps(batch_text(),ensure_ascii=False,indent=1));sys.exit(0)
     except Lossy as error:   # X-795
+        print(f"STOP: {error}; nothing written");sys.exit(2)
+    except (Numbered,ValueError) as error:   # X-830: numbered files left, or a link file that does not read
         print(f"STOP: {error}; nothing written");sys.exit(2)
     if command=="check" and len(sys.argv)==3:print(clean(read(sys.argv[2]))[1])
     elif command=="notice":sys.exit(notice(sys.argv[2:]))

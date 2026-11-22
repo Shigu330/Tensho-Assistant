@@ -564,7 +564,7 @@ public sealed class GitHubExchange : IDisposable
         AdoptGist();
         string gist;int issue;lock(gate){gist=meta.GistId;issue=meta.Issue;}
         var state=GistRotation.Read(RotationPath,issue);
-        if(GistRotation.Asks(state,gist,issue) && GistRotation.Confirmed(await MergedNote(issue).ConfigureAwait(false),state,gist))
+        if(GistRotation.Asks(state,gist,issue) && GistRotation.Confirmed(await MergedNote(state.SentGist,state.SentRevision).ConfigureAwait(false),state,gist))
         {
             string login;lock(gate)login=meta.Login;
             state=GistRotation.AfterMerge(state,login);
@@ -625,10 +625,10 @@ public sealed class GitHubExchange : IDisposable
         return (sent,replaced);
     }
 
-    /// <summary>X-804: the gist and revision the merge tool notes in this issue's player file on main (no account), or null (none, not reached).</summary>
-    private async Task<(string Gist,string Revision)?> MergedNote(int issue)
+    /// <summary>X-804, X-830: this gist and revision when the list of gists merged on main holds them (no account; it names no player file), or null (not listed, not reached).</summary>
+    private async Task<(string Gist,string Revision)?> MergedNote(string gist,string revision)
     {
-        try{return GistRotation.Note(await Community.BoundedHttp.ReadBytesAsync(client,new Uri($"{GistRotation.NotesAddress}{issue}.jsonl.gz"),GistRotation.MaxNoteFileBytes,stop.Token).ConfigureAwait(false));}
+        try{return GistRotation.Note(await Community.BoundedHttp.ReadBytesAsync(client,new Uri(GistRotation.NotesAddress),GistRotation.MaxNoteFileBytes,stop.Token).ConfigureAwait(false),gist,revision);}
         catch(Exception error) when(CommonUnreadable(error)){return null;}
     }
 
@@ -684,8 +684,11 @@ public sealed class GitHubExchange : IDisposable
 
     /// <summary>X-804: the text of a player's issue: its gist, the CC0 sharing, what becomes of the gist and of what is shared (English then French).</summary>
     internal static string IssueBody(string version,string gist)=>
-        $"Shared from Tensho Assistant {version} (World › Discoveries › automatic exchange).\n\nGist: https://gist.github.com/{gist}\n\n- [x] I share these discoveries under CC0-1.0 (public domain, https://creativecommons.org/publicdomain/zero/1.0/).\n\n{IssueGist}\n{IssueGistFrench}\n\n{IssueStays}\n{IssueStaysFrench}";
+        $"Shared from Tensho Assistant {version} (World › Discoveries › automatic exchange).\n\nGist: https://gist.github.com/{gist}\n\n- [x] I share these discoveries under CC0-1.0 (public domain, https://creativecommons.org/publicdomain/zero/1.0/).\n\n{IssueGist}\n{IssueGistFrench}\n\n{IssueBatch}\n{IssueBatchFrench}\n\n{IssueStays}\n{IssueStaysFrench}";
     internal const string IssueGist="Once its discoveries are in the common base, the gist is deleted and a new one holds only what is new; this issue is then edited to link it.";
+    // X-830 (D-227 B+C): merged in batches, into anonymous files; the limit said
+    internal const string IssueBatch="Discoveries are merged in batches, into player files that name no account; with few players, a batch can still be tied to this account by its date.";
+    internal const string IssueBatchFrench="Français : les découvertes sont fusionnées par lots, dans des fichiers de joueur qui ne nomment aucun compte ; avec peu de joueurs, un lot peut encore être relié à ce compte par sa date.";
     internal const string IssueGistFrench="Français : une fois ses découvertes dans la base commune, le gist est supprimé et un nouveau ne garde que les nouveautés ; ce ticket est alors modifié pour y renvoyer.";
 
     /// <summary>

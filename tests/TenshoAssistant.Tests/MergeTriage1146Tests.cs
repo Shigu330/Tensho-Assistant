@@ -13,13 +13,13 @@ internal static class MergeTriage1146Tests
         ("Merge triage: shares found without their label, checked before anything is read, the player told otherwise",() =>
         {
             var tool=Read("tools/discoveries-merge.py");
-            var sync=tool.IndexOf("def sync(dry):",StringComparison.Ordinal);
+            var sync=tool.IndexOf("def plan(issues,links,merged,",StringComparison.Ordinal);   // X-830: sync's reading is plan, which the trusted merge replays
             Check(sync>0 && !tool.Contains("\"--label\",\"discoveries\""),"no label filter: a player's issue loses its label");
             Check(tool.Contains("\"--json\",\"number,title,body,author,labels\"") && tool.Contains("if not is_share(issue):continue"),"every open issue listed, shares picked");
             var triage=tool.IndexOf("gist,doubt=triage(issue)",sync,StringComparison.Ordinal);
-            var listing=tool.IndexOf("owner,files,revision=gist_listing(gist)",sync,StringComparison.Ordinal);
+            var listing=tool.IndexOf("owner,files,revision=listing(gist)",sync,StringComparison.Ordinal);
             var owner=tool.IndexOf("doubt=owner_doubt(owner,issue)",sync,StringComparison.Ordinal);
-            var read=tool.IndexOf("clean(from_gist_files(files,fetch_gist_raw),player=True)",sync,StringComparison.Ordinal);
+            var read=tool.IndexOf("clean(reader(files),player=True)",sync,StringComparison.Ordinal);
             Check(triage>sync && listing>triage && owner>listing && read>owner,"triage, then the owner, and only then the gist's content");
             Check(tool.Contains("MANUAL ({DOUBTS[doubt]}): not merged; tell the player: ") && tool.Contains("notice {issue['number']} manual {doubt}"),"manual triage says how to tell the player");
             foreach(var doubt in new[]{"\"gist\":(","\"cc0\":(","\"title\":(","\"owner\":("})Check(tool.Contains(doubt),"notice "+doubt);

@@ -29,6 +29,16 @@ internal static class DiscoveryPlayers1801Tests
                 var extra = facts.SelectMany(fact => fact.EnumerateObject().Select(member => member.Name)).Where(name => !Kept.Contains(name)).Distinct().ToList();
                 Check(extra.Count == 0,file + ": fields a player file no longer keeps (X, Z, First, Last…): " + string.Join(", ",extra));
             }
+            // X-830 (D-226 a): no file named after an issue (players/43.json of before X-772 and 43.jsonl.gz of before X-830 gone), the gists
+            // merged listed apart (hashed), and the private link issue ↔ file never in the repository.
+            var folder = Path.GetFullPath("community-discoveries");
+            Check(!Directory.GetFiles(Path.Combine(folder,"players")).Any(path => char.IsDigit(Path.GetFileName(path)[0]) && Path.GetFileName(path).Split('.')[0].All(char.IsDigit)),
+                "no player file named after its issue");
+            Check(File.ReadAllText(Path.Combine(folder,"merged.txt")).Replace("\r\n","\n").Split('\n',StringSplitOptions.RemoveEmptyEntries) is { Length:>0 } merged
+                && merged[0] == TenshoAssistant.Discoveries.GistRotation.NotesHeader && merged.Skip(1).All(line => System.Text.RegularExpressions.Regex.IsMatch(line,"^[0-9a-f]{64}$")),
+                "merged.txt: its header, then hashes only");
+            Check(!Directory.GetFiles(Path.GetFullPath("."),"*links*.json",SearchOption.AllDirectories).Any(path => !path.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}") && !path.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}") && File.ReadAllText(path).Contains("tensho-discoveries-links",StringComparison.Ordinal)),
+                "the private link file is never in the repository");
         }),
         ("Discovery players 1801: the common set still has a place and days for each fact the players hold",() =>
         {
@@ -44,17 +54,20 @@ internal static class DiscoveryPlayers1801Tests
             var tool = Read("tools/discoveries-merge.py");
             Check(tool.Contains("PLAYER_ORDER=[\"Kind\",\"Subject\",\"Detail\",\"Territory\",\"Map\",\"CellX\",\"CellZ\",\"LevelMin\",\"LevelMax\",\"Hq\",\"Values\"]",StringComparison.Ordinal),
                 "the fields a player file keeps");
-            Check(tool.Contains("write_atomic(os.path.join(PLAYERS,f\"{issue}{PLAYER_SUFFIX}\"),player_bytes(",StringComparison.Ordinal)
+            Check(tool.Contains("write_atomic(os.path.join(PLAYERS,f\"{name}{PLAYER_SUFFIX}\"),player_bytes(",StringComparison.Ordinal)
                 && !tool.Contains("write_json(path,{\"Issue\"",StringComparison.Ordinal) && !tool.Contains("write_json(path,player)",StringComparison.Ordinal),"written through player_bytes only");
-            Check(tool.Contains("if not path.endswith(PLAYER_SUFFIX):",StringComparison.Ordinal) && tool.Contains("write_player(issue,player.get(\"Login\"),kept,None,now.get(name))",StringComparison.Ordinal),
+            Check(tool.Contains("if not path.endswith(PLAYER_SUFFIX):",StringComparison.Ordinal) && tool.Contains("write_player(issue,kept,now.get(name))",StringComparison.Ordinal),
                 "a file of before still read, then written again in the new format");
             Check(tool.Contains("X-772: behaviour: the player file produced holds neither place nor day",StringComparison.Ordinal)
                 && tool.Contains("X-772: rebuilt from the new file: the common set the same bytes",StringComparison.Ordinal),"the tool's behaviour cases");
             var sources = Directory.GetFiles(Path.GetFullPath("src/TenshoAssistant"),"*.cs",SearchOption.AllDirectories)
                 .Where(path => File.ReadAllText(path).Contains("community-discoveries/players",StringComparison.Ordinal)).ToList();
-            // 0.1817 (X-804, user decision of 22/11): the plugin reads the header line of its own issue's player file (the gist merged), nothing else.
-            Check(sources.Select(Path.GetFileName).SequenceEqual(["GistRotation.cs"]) && File.ReadAllText(sources[0]).Contains("public static (string Gist,string Revision)? Note(byte[] compressed)",StringComparison.Ordinal),
-                "the plugin reads the common set (v3/), and of a player file only its own issue's header (X-804): " + string.Join(", ",sources.Select(Path.GetFileName)));
+            // 0.1817 (X-804): the plugin read the header line of its own issue's player file (the gist merged). X-830: it reads no player file at
+            // all, only the list of gists merged (merged.txt), where it looks for the hash of its own last upload.
+            var rotation = Read("src/TenshoAssistant/Discoveries/GistRotation.cs");
+            Check(sources.Count == 0 && rotation.Contains("community-discoveries/merged.txt",StringComparison.Ordinal)
+                && rotation.Contains("public static (string Gist,string Revision)? Note(byte[] list,string gist,string revision)",StringComparison.Ordinal),
+                "the plugin reads the common set (v3/) and merged.txt, never a player file: " + string.Join(", ",sources.Select(Path.GetFileName)));
         }),
     ];
 }

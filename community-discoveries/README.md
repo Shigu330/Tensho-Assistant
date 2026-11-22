@@ -41,6 +41,15 @@ with only what is new, the issue edited to link it (its history keeps the old li
 missing from a newer gist is never taken out (a gist holds news only). A fact found wrong later (a plugin bug, a rule tightened) is taken out
 of every player file by a rule of the tool: `rebuild` applies the current rules to each file and writes it again without the facts they refuse;
 `withdraw` takes out a whole player.
+**Anonymous player files and batches (since Tensho 0.1832).** A player file is now named by a random id (`players/<16 hex digits>.jsonl.gz`)
+and its header names no issue, login, gist nor revision (`{"Format":"tensho-discoveries-player","Version":2,"Counted":…,"Count":n}`). The link
+between an issue and its file is kept by the maintainer's worker, outside this repository; it serves `withdraw`, « one file per account » and the
+report of closed issues; lost, nothing of `v3/` is lost (a player who shares again only counts twice until the old file is withdrawn by its name).
+The gists merged are listed in `merged.txt`, each as the SHA-256 of « gist:revision », which the plugin reads from `main` to delete its own gist.
+A `sync` reads every open share at once, and the worker opens one pull request per batch (for example once a week) whose branch, title, body and
+commits name no issue nor account (`python tools/discoveries-merge.py pr-text`). The limit, said plainly: `v3/` keeps each fact's exact place and
+days, so a fact one player alone shares tells where they were that day; with few players, a batch can still be tied to a player by its date; and
+the pull requests and files of before (the issue-numbered player files among them) stay in the git history.
 The files reach players with the next release (they are read from `main`).
 Since Tensho 0.1210: one issue per GitHub account counts (the newest; an older one by the same author is left out); each field must have the
 plugin's type; a player counts for at most 1,000 sightings of a fact in the common histograms (the shape of theirs kept); the exact place kept is the one
@@ -118,6 +127,17 @@ nouveau avec seulement les nouveautés, le ticket modifié pour y renvoyer (son 
 d'un joueur par clé : un fait absent d'un gist plus récent n'est jamais retiré (un gist ne garde que les nouveautés). Un fait reconnu faux plus
 tard (bogue du plugin, règle resserrée) sort de chaque fichier de joueur par une règle de l'outil : `rebuild` applique les règles du moment à chaque
 fichier et le réécrit sans les faits qu'elles refusent ; `withdraw` retire un joueur entier.
+**Fichiers de joueur anonymes et lots (depuis Tensho 0.1832).** Un fichier de joueur porte maintenant un nom au hasard
+(`players/<16 chiffres hexadécimaux>.jsonl.gz`) et son en-tête ne nomme ni ticket, ni identifiant, ni gist, ni révision
+(`{"Format":"tensho-discoveries-player","Version":2,"Counted":…,"Count":n}`). Le lien entre un ticket et son fichier est gardé par le travailleur du
+mainteneur, hors de ce dépôt ; il sert à `withdraw`, à « un fichier par compte » et au relevé des tickets fermés ; perdu, rien de `v3/` n'est perdu
+(un joueur qui partage de nouveau compte seulement deux fois jusqu'au retrait de l'ancien fichier par son nom). Les gists fusionnés sont listés dans
+`merged.txt`, chacun par le SHA-256 de « gist:révision », que le plugin lit sur `main` pour supprimer son propre gist. Un `sync` lit tous les
+partages ouverts à la fois, et le travailleur ouvre une seule demande de fusion par lot (par exemple une fois par semaine), dont la branche, le titre,
+le corps et les commits ne nomment aucun ticket ni compte (`python tools/discoveries-merge.py pr-text`). La limite, dite franchement : `v3/` garde le
+lieu exact et les jours de chaque fait, donc un fait qu'un seul joueur partage dit où il était ce jour-là ; avec peu de joueurs, un lot peut encore
+être relié à un joueur par sa date ; et les demandes de fusion et les fichiers d'avant (dont les fichiers de joueur nommés par leur ticket) restent dans
+l'historique git.
 Depuis Tensho 0.1210 : un seul ticket par compte GitHub compte (le plus récent ; un plus ancien du même auteur est laissé de côté) ; chaque champ
 doit avoir le type du plugin ; un joueur compte pour 1 000 observations d'un fait au plus dans les histogrammes communs (la forme des siens gardée) ; le
 lieu exact gardé est celui du jour le plus ancien ; un joueur seul très loin des niveaux des autres joueurs sur plus de 5 % des faits qu'il partage avec

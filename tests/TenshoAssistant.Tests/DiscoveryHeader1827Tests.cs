@@ -8,12 +8,15 @@ using System.Text.RegularExpressions;
 // its own shape (an issue number or the name of an anonymous withdrawn file, a GitHub login, a gist id and its revision in hex, a yes/no, a count),
 // never a character name, a world, a place nor a day. Checked on the repository's player files (DiscoveryPlayers1801Tests) and on files the current
 // tool writes (a share merged with its gist noted, and the anonymous file of a withdrawn player, X-803).
+// X-830 (D-226 a, user's choice of 22/11): version 2, anonymous: PLAYER_HEADER is Format, Version, Counted and Count; the file is named by a
+// random id (16 hex digits); no issue, login, gist nor revision (the link is the worker's, outside the repository; the gists merged are in
+// merged.txt, hashed).
 internal static class DiscoveryHeader1827Tests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
     private static string Read(string path)=>File.ReadAllText(Path.GetFullPath(path)).Replace("\r\n","\n");
 
-    private static readonly string[] Expected=["Format","Version","Issue","Login","Gist","Revision","Counted","Count"];
+    private static readonly string[] Expected=["Format","Version","Counted","Count"];
 
     /// <summary>The fields a player file's header may hold: PLAYER_HEADER of the merge tool, the one source.</summary>
     public static IReadOnlyList<string> ToolHeader()
@@ -32,21 +35,10 @@ internal static class DiscoveryHeader1827Tests
             +string.Join(", ",names.Where(name=>!allowed.Contains(name))));
         Check(names.SequenceEqual(allowed.Where(names.Contains)),file+": the header's fields in the tool's order: "+string.Join(", ",names));
         Check(header.GetProperty("Format").GetString()=="tensho-discoveries-player" && header.GetProperty("Version").ValueKind==JsonValueKind.Number
-            && header.GetProperty("Version").GetInt32()==1,file+": format and version");
-        var issue=header.GetProperty("Issue");
-        var withdrawn=Regex.IsMatch(file,"^withdrawn-[0-9a-f]{16}\\.jsonl\\.gz$");
-        if(withdrawn)
-            Check(issue.ValueKind==JsonValueKind.String && issue.GetString()+".jsonl.gz"==file && !header.TryGetProperty("Login",out _)
-                && !header.TryGetProperty("Gist",out _),file+": an anonymous file (X-803): its own random name, no login, no gist");
-        else
-            Check(issue.ValueKind==JsonValueKind.Number && issue.GetInt32()>0 && issue.GetInt32()+".jsonl.gz"==file,file+": its issue number names the file");
-        if(header.TryGetProperty("Login",out var login))
-            Check(login.ValueKind==JsonValueKind.String && Regex.IsMatch(login.GetString()!,"^[A-Za-z0-9-]{1,39}$"),file+": a GitHub login, nothing else");
-        var gist=header.TryGetProperty("Gist",out var id);
-        Check(gist==header.TryGetProperty("Revision",out var revision),file+": a gist and its revision together");
-        if(gist)
-            Check(id.ValueKind==JsonValueKind.String && Regex.IsMatch(id.GetString()!,"^[0-9a-f]{20,40}$") && revision.ValueKind==JsonValueKind.String
-                && Regex.IsMatch(revision.GetString()!,"^[0-9a-f]{40}$"),file+": a gist id and a revision, in hex");
+            && header.GetProperty("Version").GetInt32()==2,file+": format and version");
+        // X-830: named by a random id, never by an issue; nothing in the header ties it to an account
+        Check(Regex.IsMatch(file,"^[0-9a-f]{16}\\.jsonl\\.gz$"),file+": named by a random id (16 hex digits), never by an issue");
+        foreach(var name in new[]{"Issue","Login","Gist","Revision"})Check(!header.TryGetProperty(name,out _),file+": no "+name+" (X-830)");
         if(header.TryGetProperty("Counted",out var counted))
             Check(counted.ValueKind is JsonValueKind.True or JsonValueKind.False,file+": Counted is a yes or no");
         Check(header.GetProperty("Count").ValueKind==JsonValueKind.Number && header.GetProperty("Count").GetInt32()==facts,file+": the count of its facts");
@@ -54,25 +46,31 @@ internal static class DiscoveryHeader1827Tests
 
     private static bool Refused(string json)
     {
-        try { Header("43.jsonl.gz",JsonDocument.Parse(json).RootElement,1,Expected); return false; }
-        catch(Exception error) when(error.Message.StartsWith("43.jsonl.gz",StringComparison.Ordinal)) { return true; }
+        try { Header("0123456789abcdef.jsonl.gz",JsonDocument.Parse(json).RootElement,1,Expected); return false; }
+        catch(Exception error) when(error.Message.StartsWith("0123456789abcdef.jsonl.gz",StringComparison.Ordinal)) { return true; }
     }
 
-    // Writes, with the tool given, the player files of a share merged with its gist noted (43) and of a withdrawn player (from a file of before, 44).
+    // Writes, with the tool given, the player files of a share merged with its gist listed as merged (43, through the private link) and of a
+    // withdrawn player (from a file of before, 44); X-830: the numbered file of before anonymized first.
     private const string Maker="""
 import importlib.util,json,os,sys
 spec=importlib.util.spec_from_file_location("discoveries_merge",sys.argv[1]);m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
-root=sys.argv[2];m.PLAYERS=os.path.join(root,"players");m.V3_DIR=os.path.join(root,"v3");os.makedirs(m.PLAYERS);os.makedirs(m.V3_DIR)
+root=sys.argv[2];m.PLAYERS=os.path.join(root,"players");m.V3_DIR=os.path.join(root,"v3");m.MERGED_PATH=os.path.join(root,"merged.txt");os.makedirs(m.PLAYERS);os.makedirs(m.V3_DIR)
+links=os.path.join(root,"..","private","links.json")
 m.head_v3_keys=lambda:set()
 def fact(subject,x,z,day):
     return {"Kind":1,"Subject":subject,"Detail":0,"Territory":128,"Map":1,"CellX":int(x//m.CELL),"CellZ":int(z//m.CELL),"X":x,"Z":z,
             "LevelMin":1,"LevelMax":1,"Seen":0,"Imported":1,"First":day,"Last":day}
 old=[fact(1,10.0,10.0,"2026-11-01T00:00:00+00:00"),fact(2,60.0,10.0,"2026-11-02T00:00:00+00:00")]
 json.dump({"Issue":44,"Login":"Bo","Facts":old},open(os.path.join(m.PLAYERS,"44.json"),"w",encoding="utf-8"))
+m.anonymize(False,links)
 shared=[fact(3,110.0,10.0,"2026-11-03T00:00:00+00:00")]
-m.rebuild(fresh=[("43.jsonl.gz",f) for f in shared],history=lambda:set(),
-          pending={"43.jsonl.gz":(43,"Ann",shared,{"Gist":"0123456789abcdef0123456789abcdef","Revision":"0123456789abcdef0123456789abcdef01234567"})})
-m.withdraw("44",False)
+mine=m.read_links(links);mine["43"]={"File":m.new_file_id(),"Login":"Ann"};m.write_links(mine,links)
+name=mine["43"]["File"]+m.PLAYER_SUFFIX
+m.rebuild(fresh=[(name,f) for f in shared],history=lambda:set(),pending={name:(mine["43"]["File"],shared)},owners=m.owners_of(mine),
+          notes={m.note_hash("0123456789abcdef0123456789abcdef","0123456789abcdef0123456789abcdef01234567")})
+m.withdraw("44",False,links)
+print(json.dumps({"share":name}))
 """;
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
@@ -82,7 +80,8 @@ m.withdraw("44",False)
             Check(ToolHeader().SequenceEqual(Expected),"PLAYER_HEADER: "+string.Join(", ",ToolHeader()));
             var tool=Read("tools/discoveries-merge.py");
             Check(tool.Contains("if list(header)!=[k for k in PLAYER_HEADER if k in header]:raise ValueError(",StringComparison.Ordinal),"player_bytes writes nothing else");
-            Check(tool.Contains("if set(header)-set(PLAYER_HEADER):raise ValueError(",StringComparison.Ordinal),"read_player refuses anything else");
+            Check(tool.Contains("fields=PLAYER_HEADER if header.get(\"Version\")==PLAYER_VERSION else OLD_HEADER",StringComparison.Ordinal)
+                && tool.Contains("if set(header)-set(fields):raise ValueError(",StringComparison.Ordinal),"read_player refuses anything else (version 1: read to be anonymized only)");
             Check(tool.Contains("X-826: a player file's header: exactly PLAYER_HEADER, in its order",StringComparison.Ordinal)
                 && tool.Contains("X-826: a header holding {field}: refused",StringComparison.Ordinal),"the tool's selftest cases");
             Check(Read("tests/TenshoAssistant.Tests/DiscoveryPlayers1801Tests.cs").Contains("DiscoveryHeader1827Tests.Header(file,header!.Value,facts.Count,allowed)",StringComparison.Ordinal),
@@ -90,21 +89,21 @@ m.withdraw("44",False)
         }),
         ("Discovery header 1827: the rule: the tool's fields pass, a player's data or a field of another shape is refused",() =>
         {
-            Check(!Refused("""{"Format":"tensho-discoveries-player","Version":1,"Issue":43,"Login":"Shigu330","Gist":"6966b8a6642b8373160064c7fe5b2626","Revision":"95f59bb5f690cdfdc1adcc6412c184b707eeac54","Counted":true,"Count":1}"""),
-                "the header PR #54 carries passes");
-            Check(!Refused("""{"Format":"tensho-discoveries-player","Version":1,"Issue":43,"Login":"Shigu330","Count":1}"""),"a header of before X-804 passes");
+            Check(!Refused("""{"Format":"tensho-discoveries-player","Version":2,"Counted":true,"Count":1}""") && !Refused("""{"Format":"tensho-discoveries-player","Version":2,"Count":1}"""),
+                "the header the tool writes passes");
             foreach(var (what,json) in new[]
             {
-                ("a character name","""{"Format":"tensho-discoveries-player","Version":1,"Issue":43,"Login":"Ann","Name":"Ann Doe","Count":1}"""),
-                ("a world","""{"Format":"tensho-discoveries-player","Version":1,"Issue":43,"World":"Alpha","Count":1}"""),
-                ("an exact place","""{"Format":"tensho-discoveries-player","Version":1,"Issue":43,"X":10.5,"Z":3.0,"Count":1}"""),
-                ("a day","""{"Format":"tensho-discoveries-player","Version":1,"Issue":43,"First":"2026-11-01T00:00:00+00:00","Count":1}"""),
-                ("a login holding a name","""{"Format":"tensho-discoveries-player","Version":1,"Issue":43,"Login":"Ann Doe of Alpha","Count":1}"""),
-                ("a gist holding text","""{"Format":"tensho-discoveries-player","Version":1,"Issue":43,"Gist":"Ann Doe","Revision":"95f59bb5f690cdfdc1adcc6412c184b707eeac54","Count":1}"""),
-                ("a gist without its revision","""{"Format":"tensho-discoveries-player","Version":1,"Issue":43,"Gist":"6966b8a6642b8373160064c7fe5b2626","Count":1}"""),
-                ("Counted holding text","""{"Format":"tensho-discoveries-player","Version":1,"Issue":43,"Counted":"Alpha","Count":1}"""),
-                ("fields out of order","""{"Format":"tensho-discoveries-player","Version":1,"Issue":43,"Count":1,"Login":"Ann"}"""),
-                ("another issue than the file's","""{"Format":"tensho-discoveries-player","Version":1,"Issue":44,"Count":1}"""),
+                ("an issue (X-830)","""{"Format":"tensho-discoveries-player","Version":2,"Issue":43,"Count":1}"""),
+                ("a login (X-830)","""{"Format":"tensho-discoveries-player","Version":2,"Login":"Shigu330","Count":1}"""),
+                ("a gist and its revision (X-830)","""{"Format":"tensho-discoveries-player","Version":2,"Gist":"6966b8a6642b8373160064c7fe5b2626","Revision":"95f59bb5f690cdfdc1adcc6412c184b707eeac54","Count":1}"""),
+                ("the header of before X-830 (PR #54)","""{"Format":"tensho-discoveries-player","Version":1,"Issue":43,"Login":"Shigu330","Gist":"6966b8a6642b8373160064c7fe5b2626","Revision":"95f59bb5f690cdfdc1adcc6412c184b707eeac54","Counted":true,"Count":1}"""),
+                ("a character name","""{"Format":"tensho-discoveries-player","Version":2,"Name":"Ann Doe","Count":1}"""),
+                ("a world","""{"Format":"tensho-discoveries-player","Version":2,"World":"Alpha","Count":1}"""),
+                ("an exact place","""{"Format":"tensho-discoveries-player","Version":2,"X":10.5,"Z":3.0,"Count":1}"""),
+                ("a day","""{"Format":"tensho-discoveries-player","Version":2,"First":"2026-11-01T00:00:00+00:00","Count":1}"""),
+                ("Counted holding text","""{"Format":"tensho-discoveries-player","Version":2,"Counted":"Alpha","Count":1}"""),
+                ("fields out of order","""{"Format":"tensho-discoveries-player","Version":2,"Count":1,"Counted":true}"""),
+                ("another count","""{"Format":"tensho-discoveries-player","Version":2,"Count":2}"""),
             })
                 Check(Refused(json),"refused: "+what);
         }),
@@ -140,12 +139,17 @@ m.withdraw("44",False)
                 Check(players.Count==2 && players.All(player=>player.Header is not null),"two files of the current format: "+string.Join(", ",players.Select(player=>player.File)));
                 var allowed=ToolHeader();
                 foreach(var (file,header,facts) in players)Header(file,header!.Value,facts.Count,allowed);
-                var share=players.Single(player=>player.File=="43.jsonl.gz").Header!.Value;
-                Check(share.GetProperty("Login").GetString()=="Ann" && share.GetProperty("Gist").GetString()=="0123456789abcdef0123456789abcdef"
-                    && share.GetProperty("Revision").GetString()=="0123456789abcdef0123456789abcdef01234567" && share.GetProperty("Counted").GetBoolean(),
-                    "the share's header holds its login, its gist noted and Counted: "+share);
-                var gone=players.Single(player=>player.File.StartsWith("withdrawn-",StringComparison.Ordinal));
-                Check(gone.Facts.Count==2 && !gone.Header!.Value.TryGetProperty("Login",out _),"the withdrawn player's facts kept without any name: "+gone.Header);
+                var shareName=JsonDocument.Parse(output.Result.Trim().Split('\n').Last()).RootElement.GetProperty("share").GetString();
+                var share=players.Single(player=>player.File==shareName);
+                Check(share.Header!.Value.GetProperty("Counted").GetBoolean() && share.Facts.Count==1,"the share's file: counted, its facts, no login nor gist: "+share.Header);
+                var gone=players.Single(player=>player.File!=shareName);
+                Check(gone.Facts.Count==2,"the withdrawn player's facts kept without any name: "+gone.Header);
+                var merged=File.ReadAllText(Path.Combine(folder,"out","merged.txt"));
+                Check(merged.StartsWith("# tensho-discoveries-merged 1\n",StringComparison.Ordinal) && !merged.Contains("0123456789abcdef0123456789abcdef",StringComparison.Ordinal)
+                    && merged.Contains(TenshoAssistant.Discoveries.GistRotation.NoteHash("0123456789abcdef0123456789abcdef","0123456789abcdef0123456789abcdef01234567"),StringComparison.Ordinal),
+                    "the gist merged listed apart, hashed as the plugin computes it: "+merged);
+                var link=File.ReadAllText(Path.Combine(folder,"private","links.json"));
+                Check(link.Contains("\"Ann\"",StringComparison.Ordinal) && !link.Contains("\"44\"",StringComparison.Ordinal),"the private link outside the repository: 43 linked, 44 forgotten once withdrawn");
             }
             finally { try { Directory.Delete(folder,true); } catch(IOException){} }
         }),

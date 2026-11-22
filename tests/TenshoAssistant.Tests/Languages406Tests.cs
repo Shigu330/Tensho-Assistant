@@ -20,7 +20,9 @@ internal static class Languages406Tests
         // X-803 (0.1816): the French half of the player's issue on GitHub (GitHub in two languages, R20.1), never shown in the plugin
         "Français : ce que vous partagez reste dans la base commune même si vous arrêtez de partager. Fermez ce ticket (ou demandez-le dedans) et le mainteneur retire votre fichier de joueur, qui relie votre nom GitHub à vos découvertes ; le titre de ce ticket et l'historique du dépôt montrent encore ce nom.",
         // X-804 (0.1817): the French half of the issue's line about the gist deleted once merged
-        "Français : une fois ses découvertes dans la base commune, le gist est supprimé et un nouveau ne garde que les nouveautés ; ce ticket est alors modifié pour y renvoyer."];
+        "Français : une fois ses découvertes dans la base commune, le gist est supprimé et un nouveau ne garde que les nouveautés ; ce ticket est alors modifié pour y renvoyer.",
+        // X-830 (0.1832, D-227): the French half of the issue's line about the merges in batches, into anonymous files
+        "Français : les découvertes sont fusionnées par lots, dans des fichiers de joueur qui ne nomment aucun compte ; avec peu de joueurs, un lot peut encore être relié à ce compte par sa date."];
 
     private static readonly Regex Literal = new(@"\$?""((?:[^""\\\n]|\\.)*)""", RegexOptions.Compiled);
     private static readonly Regex Accented = new("[éèàêçôîûùÉÈÀÊÇœ]", RegexOptions.Compiled);

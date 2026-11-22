@@ -29,13 +29,11 @@ internal static class GistRotation1817Tests
             var address=request.RequestUri!.ToString();var method=request.Method.Method;
             var body=request.Content is null ? "":await request.Content.ReadAsStringAsync(token);
             lock(Asked)Asked.Add((method,address,body));
-            if(method=="GET" && address==GistRotation.NotesAddress+"7.jsonl.gz")
+            if(method=="GET" && address==GistRotation.NotesAddress)
             {
                 if(Note is not { } note)return new HttpResponseMessage(HttpStatusCode.NotFound);
-                var header=$"{{\"Format\":\"tensho-discoveries-player\",\"Version\":1,\"Issue\":7,\"Login\":\"tester\",\"Gist\":\"{note.Gist}\",\"Revision\":\"{note.Revision}\",\"Count\":0}}\n";
-                using var memory=new MemoryStream();
-                using(var zip=new GZipStream(memory,CompressionLevel.Optimal,true))zip.Write(Encoding.UTF8.GetBytes(header));
-                return new HttpResponseMessage(HttpStatusCode.OK){Content=new ByteArrayContent(memory.ToArray())};
+                // X-830: the list of gists merged (merged.txt), no longer a player file
+                return new HttpResponseMessage(HttpStatusCode.OK){Content=new ByteArrayContent(Encoding.UTF8.GetBytes(GistRotation.NotesText([note])))};
             }
             if(method=="POST" && address=="https://api.github.com/gists")
             {
@@ -167,11 +165,12 @@ internal static class GistRotation1817Tests
         })),
         ("Gist rotation 1817: the player file's note read from its header only; a file of another format or without both fields gives none",() =>
         {
-            byte[] Zip(string text){using var memory=new MemoryStream();using(var zip=new GZipStream(memory,CompressionLevel.Optimal,true))zip.Write(Encoding.UTF8.GetBytes(text));return memory.ToArray();}
-            Check(GistRotation.Note(Zip("{\"Format\":\"tensho-discoveries-player\",\"Version\":1,\"Gist\":\"g1\",\"Revision\":\"r1\",\"Count\":1}\n{\"Kind\":1}\n"))==("g1","r1"),"the note");
-            Check(GistRotation.Note(Zip("{\"Format\":\"tensho-discoveries-player\",\"Version\":1,\"Gist\":\"g1\",\"Count\":0}\n")) is null,"no revision: none");
-            Check(GistRotation.Note(Zip("{\"Format\":\"other\",\"Gist\":\"g1\",\"Revision\":\"r1\"}\n")) is null && GistRotation.Note([1,2,3]) is null,"another format, or not gzip: none");
-            Check(GistRotation.Note(Zip("{\"Format\":\"tensho-discoveries-player\",\"Gist\":\""+new string('a',GistRotation.MaxHeaderBytes)+"\",\"Revision\":\"r\"}\n")) is null,"a header past its bound: none");
+            // X-830: the note is the list of gists merged (merged.txt: hashes of « gist:revision »), no longer a player file's header
+            byte[] List(params (string,string)[] notes)=>Encoding.UTF8.GetBytes(GistRotation.NotesText(notes));
+            Check(GistRotation.Note(List(("g0","r0"),("g1","r1")),"g1","r1")==("g1","r1") && GistRotation.NoteHash("g1","r1")==Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(Encoding.UTF8.GetBytes("g1:r1"))).ToLowerInvariant(),"the note");
+            Check(GistRotation.Note(List(("g1","r0")),"g1","r1") is null && GistRotation.Note(List(("g1","r1")),"g1","") is null && GistRotation.Note(List(),"g1","r1") is null,"another revision, no revision, or an empty list: none");
+            Check(GistRotation.Note(Encoding.UTF8.GetBytes("# other\n"+GistRotation.NoteHash("g1","r1")+"\n"),"g1","r1") is null && GistRotation.Note([0xff,0xfe,1],"g1","r1") is null,"another header, or not UTF-8: none");
+            Check(GistRotation.Note(new byte[GistRotation.MaxNoteFileBytes+1],"g1","r1") is null && !GistRotation.NotesText([("g1","r1")]).Contains("g1",StringComparison.Ordinal),"a list past its bound: none; the list names no gist");
             var state=new GistRotationState{Issue=7,SentGist="g1",SentRevision="r1",Sent=new(){["a"]="1"},Merged=new(){["b"]="2"}};
             Check(GistRotation.Confirmed(("g1","r1"),state,"g1") && !GistRotation.Confirmed(("g1","r1"),state,"g2") && !GistRotation.Confirmed(null,state,"g1"),"confirmed only for the gist in use and its revision");
             var after=GistRotation.AfterMerge(state);

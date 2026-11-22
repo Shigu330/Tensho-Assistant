@@ -14,7 +14,8 @@ internal static class DiscoveryTrust1823Tests
             Check(tool.Contains("\"--squash\",\"--match-head-commit\",pr[\"sha\"]",StringComparison.Ordinal),"squash pinned on the checked commit");
             Check(tool.Contains("if inside(path):raise ValueError(",StringComparison.Ordinal) && tool.Contains("DEFAULT_LIST=os.path.join(os.path.expanduser(\"~\"),\".tensho\",\"trusted-accounts.txt\")",StringComparison.Ordinal),
                 "the list outside the repository");
-            Check(tool.Contains("author=m.login(issue)",StringComparison.Ordinal) && tool.Contains("if m.owner_doubt(share.get(\"owner\") or \"\",issue):return \"doubt\",\"owner\"",StringComparison.Ordinal),
+            // X-830: a batch: each share's ticket author must be on the list, and own its gist
+            Check(tool.Contains("if any((r.get(\"login\") or \"\").lower() not in trusted for r in read):return \"skip\"",StringComparison.Ordinal) && tool.Contains("if m.owner_doubt(r.get(\"owner\") or \"\",issue):return \"doubt\",\"owner\"",StringComparison.Ordinal),
                 "the ticket's author, the gist's owner");
             foreach(var name in new[]{"a trusted account, every check green: merged","an account not on the list: nothing done","the ticket's author decides, never the pull request's",
                 "its CI still runs: wait","a red check gives a doubt, never a merge","init writes the owner's account once, never over","the list never inside the repository"})

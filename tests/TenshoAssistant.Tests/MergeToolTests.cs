@@ -29,7 +29,7 @@ internal static class MergeToolTests
             var common=new DiscoveryFile{Facts=RepositoryCommon.Facts()};
             Check(common.Facts.Count==counts.Count && common.Facts.All(fact=>counts[fact.Key.Replace(((int)fact.Kind).ToString()+":",((int)fact.Kind).ToString()+":")]==fact.Imported),"rebuilt");
             var tool=File.ReadAllText(Path.GetFullPath("tools/discoveries-merge.py"));
-            Check(tool.Contains("def sync(dry)") && tool.Contains("FLAG: refusals over 5 %"),"sync with its check");
+            Check(tool.Contains("def sync(dry,links_path=None)") && tool.Contains("FLAG: refusals over 5 %"),"sync with its check");
         }),
     ];
 }

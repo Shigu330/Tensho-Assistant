@@ -17,7 +17,7 @@ internal static class MergeTimeouts1214Tests
             var calls=tool.Split("subprocess.run([\"gh\"").Length-1;
             var timed=tool.Split("timeout=REMOTE_TIMEOUT)").Length-1;
             Check(calls==4 && timed==4,$"each GitHub CLI call has the deadline ({timed} of {calls})");
-            Check(tool.Contains("except Exception as error:print(f\"#{issue['number']} {issue['title']}: gist unreadable ({type(error).__name__}), skipped\");continue"),"reported for its issue, the batch goes on");
+            Check(tool.Contains("except Exception as error:say(f\"#{issue['number']} {issue['title']}: gist unreadable ({type(error).__name__}), skipped\");continue"),"reported for its issue, the batch goes on");
             Check(tool.Contains("X-146: a byte at a time past the deadline: stopped"),"selftest case");
         }),
     ];
