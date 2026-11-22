@@ -132,7 +132,11 @@ public static class DesktopInstall
     /// <summary>The wait of a change asked from a window (a checkbox, a button): short, a busy lock says « not saved » instead of freezing a frame.</summary>
     public const int ClickWaitMs=500;
 
-    public static UpdateState Load(string own)=>LoadReadable(own) ?? new();
+    /// <summary>The state to show and to follow. X-592 (A21): update.json there but unreadable gives <see cref="UnreadableState"/>,
+    /// automatic update off (never the default « on » of a new install); a missing file is a new install.</summary>
+    public static UpdateState Load(string own)=>LoadReadable(own) ?? UnreadableState;
+    /// <summary>X-592 (A21): what an unreadable update.json counts as: no copy known, automatic update off.</summary>
+    public static readonly UpdateState UnreadableState=new(AutoUpdate:false);
 
     /// <summary>
     /// X-170 (0.1143, GPT audit): the state, or null when update.json is there but cannot be read (damaged, or refused by Windows). An

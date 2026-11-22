@@ -29,7 +29,7 @@ internal static class DesktopInstall1143Tests
             var current=Copy(versions,"0.1142.0",true,true);var previous=Copy(versions,"0.1141.0",true,true);var running=Copy(versions,"0.1140.0",true,true);
             Directory.CreateDirectory(own);File.WriteAllText(DesktopInstall.StatePath(own),"{ \"Current\": { damaged");
             var bytes=File.ReadAllBytes(DesktopInstall.StatePath(own));
-            Check(DesktopInstall.LoadReadable(own) is null && DesktopInstall.Load(own).Current is null,"unreadable: null (Load still gives an empty state to show)");
+            Check(DesktopInstall.LoadReadable(own) is null && DesktopInstall.Load(own).Current is null && !DesktopInstall.Load(own).AutoUpdate,"unreadable: null (Load gives an empty state to show, automatic update off: X-592)");
             var refused=false;
             try{DesktopInstall.Update(own,state=>state with {AutoUpdate=false});}catch(UpdateStateUnreadableException){refused=true;}
             Check(refused && File.ReadAllBytes(DesktopInstall.StatePath(own)).SequenceEqual(bytes),"not written over");

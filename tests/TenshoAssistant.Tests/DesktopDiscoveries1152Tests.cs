@@ -86,7 +86,7 @@ internal static class DesktopDiscoveries1152Tests
             var data = Read("src/TenshoAssistant/MainWindow.DesktopData.cs");
             var use = data.IndexOf("private void UseDesktopDiscoveries(",StringComparison.Ordinal);
             Check(use > 0 && data.IndexOf("DiscoveriesWriteBlocked=true;",use,StringComparison.Ordinal) < data.IndexOf("_=Task.Run(()=>",use,StringComparison.Ordinal)
-                && data.Contains("if(Volatile.Read(ref desktopDiscoveriesGeneration)!=generation)return;\n            DiscoveryFolder=discoveries;DiscoveryStore=store;DiscoveriesLoaded=true;",StringComparison.Ordinal),
+                && data.Contains("desktopDiscoveries.Publish(generation,()=>ShowDesktopDiscoveries(store,discoveries,null));",StringComparison.Ordinal),
                 "writing blocked before anything is shown; the newest reading kept");
             Check(Read("src/TenshoAssistant/MainWindow.Discoveries.cs").Contains("|| DiscoveriesWriteBlocked ||",StringComparison.Ordinal),"a blocked base is never saved");
             var bar = Read("src/TenshoAssistant.Desktop/StatusBar.cs");

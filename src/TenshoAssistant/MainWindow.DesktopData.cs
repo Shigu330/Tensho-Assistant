@@ -222,14 +222,24 @@ internal sealed partial class MainWindow
 
     // X-119 (0.1152): the discoveries (the Discoveries page, an item's sources) from the application's copy of Discoveries.db (SQLite's backup of the
     // plugin's file, never the folder's other files), read off the frame into a new store, then shown; a newer reading replaces an older one. Never
-    // written: the copy is not the plugin's base (DiscoveriesWriteBlocked; no GitHub exchange in the application). No copy: « loading », as before.
-    private int desktopDiscoveriesGeneration;
+    // written: the copy is not the plugin's base (DiscoveriesWriteBlocked; no GitHub exchange in the application).
+    // X-592 (external audit A22 of 18/11): no copy, or a copy that does not read, clears the old reading (nothing shown from it) and says so on
+    // the page; through DesktopCopySlot, so a late older reading never comes back over it.
+    private readonly Link.DesktopCopySlot desktopDiscoveries=new();
+    /// <summary>X-592 (A22): why the copy's discoveries are not shown (a language key of DiscoveriesUi), or null.</summary>
+    internal volatile string? DesktopDiscoveriesProblem;
+    private void ShowDesktopDiscoveries(Discoveries.DiscoveryStore? store,string folder,string? problem)
+    {
+        DiscoveriesLoaded=false;
+        DiscoveryFolder=folder;DiscoveryStore=store;DesktopDiscoveriesProblem=problem;
+        DiscoveriesLoaded=store is not null;
+    }
     private void UseDesktopDiscoveries(string folder,Action<Exception,string> warn)
     {
-        var generation=Interlocked.Increment(ref desktopDiscoveriesGeneration);
+        var generation=desktopDiscoveries.Begin();
         var discoveries=Path.Combine(folder,"Discoveries");var file=Path.Combine(discoveries,Discoveries.DiscoveryDatabase.FileName);
         DiscoveriesWriteBlocked=true;
-        if(!File.Exists(file))return;
+        if(!File.Exists(file)){desktopDiscoveries.Publish(generation,()=>ShowDesktopDiscoveries(null,discoveries,"DiscoveriesUi.DesktopCopyMissing"));return;}
         _=Task.Run(()=>
         {
             var store=new Discoveries.DiscoveryStore();
@@ -239,9 +249,13 @@ internal sealed partial class MainWindow
                 store.Load(database.ReadMine((_,error)=>warn(error,"A discovery row of the copy could not be read; it is left out.")));
                 store.UseSharedSource(kind=>database.ReadShared(kind,(_,error)=>warn(error,"A discovery row of the copy could not be read; it is left out.")),database.SharedKinds());
             }
-            catch(Exception error){warn(error,"The discoveries could not be read from the copy.");return;}
-            if(Volatile.Read(ref desktopDiscoveriesGeneration)!=generation)return;
-            DiscoveryFolder=discoveries;DiscoveryStore=store;DiscoveriesLoaded=true;
+            catch(Exception error)
+            {
+                warn(error,"The discoveries could not be read from the copy.");
+                desktopDiscoveries.Publish(generation,()=>ShowDesktopDiscoveries(null,discoveries,"DiscoveriesUi.DesktopCopyUnreadable"));
+                return;
+            }
+            desktopDiscoveries.Publish(generation,()=>ShowDesktopDiscoveries(store,discoveries,null));
         });
     }
 

@@ -384,6 +384,7 @@ internal sealed partial class MainWindow
             ImGui.TextWrapped(localization.Format(DiscoveriesLoaded ? "DiscoveriesUi.ReadGaveUp":"DiscoveriesUi.ReadRetrying",readFailed,Discoveries.DiscoveryStart.Tries));
             ImGui.PopStyleColor();
         }
+        if(DesktopDiscoveriesProblem is { } copyProblem){ImGui.TextColored(Warning,localization.Get(copyProblem));return;}
         if(DiscoveryStore is not { } store || DiscoveryFolder is not { } folder || !DiscoveriesLoaded){ImGui.TextDisabled(LoadingText("DiscoveriesUi.Loading"));return;}
         BoolSetting("DiscoveriesUi.Enabled","DiscoveriesUi.EnabledTip",()=>configuration.Discovery.Enabled,value=>configuration.Discovery.Enabled=value,c=>c.Discovery.Enabled);
         if(configuration.Discovery.Enabled)
