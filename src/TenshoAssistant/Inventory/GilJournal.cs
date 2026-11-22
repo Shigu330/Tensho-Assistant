@@ -10,7 +10,8 @@ public enum GilSource { Character, Retainers, Company }
 // 0.1102: OceanFishing: the gil of an ocean fishing voyage's missions (IKDMission, IKDFishingLog), added last too.
 // 0.1319 (X-320): Fate (the FATE's reward window), Defeat (the gil a defeated monster gives), ChallengeLog (an entry of the challenge log
 // done), added last too.
-public enum GilCategory { Other, NpcShop, Market, Repair, Teleport, Retainer, Company, Mail, OceanFishing, Fate, Defeat, ChallengeLog, Quest, CustomDeliveries, Beastmaster }
+// X-557 (0.1774): Duty, a gain inside a duty that no window or message explains (the end of a dungeon: dalamud.log of 21/11), added last too.
+public enum GilCategory { Other, NpcShop, Market, Repair, Teleport, Retainer, Company, Mail, OceanFishing, Fate, Defeat, ChallengeLog, Quest, CustomDeliveries, Beastmaster, Duty }
 
 /// <summary>One change of a gil balance: when, by how much, the balance after it, whose, and its category.</summary>
 public sealed record GilEntry(DateTimeOffset At,long Delta,long Balance,GilSource Source,GilCategory Category);
@@ -85,6 +86,14 @@ public static class GilJournal
         GilCategory.Quest or GilCategory.CustomDeliveries or GilCategory.Beastmaster when delta<0=>GilCategory.Other,
         _=>category,
     };
+
+    /// <summary>
+    /// X-557 (0.1774, docs/evidence/0.1774-gil-duty.md): a gain left « Other » while the character is in a duty is the duty's (dalamud.log of
+    /// 21/11 13:22:58 and 15:36:34: a large gain at the end of duties 171 and 238, with the experience and tomestones of the end, then a
+    /// smaller one at the coffers, each « Other » because the loading screen's teleport only counts a spending and a defeat only counts
+    /// alone; the amounts, the user's, are not copied). A spending stays « Other »; outside a duty nothing changes.
+    /// </summary>
+    public static GilCategory InDuty(GilCategory category,long delta,bool duty)=>category==GilCategory.Other && delta>0 && duty ? GilCategory.Duty:category;
 
     /// <summary>0.769 (X-19, user report): gil moved between the character and their retainers or the company chest is neither earned nor spent: shown apart, out of the net.</summary>
     public static bool IsTransfer(GilCategory category)=>category is GilCategory.Retainer or GilCategory.Company;

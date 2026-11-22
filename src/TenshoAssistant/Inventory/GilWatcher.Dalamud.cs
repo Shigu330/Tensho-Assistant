@@ -45,15 +45,57 @@ public sealed unsafe class GilWatcher : IDisposable
     {
         this.framework=framework;this.player=player;this.gui=gui;this.store=store;this.log=log;this.windowsOpen=windowsOpen;this.developerMode=developerMode ?? (()=>false);this.chat=chat;
         if(chat is not null)chat.LogMessage+=OnLogMessage;
+        if(chat is not null)chat.ChatMessageUnhandled+=OnChatMessage;
         try{TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);}
-        catch{if(chat is not null)chat.LogMessage-=OnLogMessage;throw;}
+        catch{if(chat is not null){chat.LogMessage-=OnLogMessage;chat.ChatMessageUnhandled-=OnChatMessage;}throw;}
     }
+
+    /// <summary>X-557 (0.1774): whether the character is in a duty (a gain no window or message explains is then the duty's, GilJournal.InDuty).</summary>
+    public Func<bool>? InDuty{get;set;}
+    /// <summary>X-557 (0.1774, R25): the character's own names (character, worlds, company tag) kept out of the « Other » context; retainers' names added here.</summary>
+    public Func<IEnumerable<string?>>? OwnNames{get;set;}
+    // X-557 (0.1774): what surrounds an « Other » change, in developer mode only (GilOtherContext); messages may come off the framework thread.
+    private readonly GilOtherContext context=new();
+    private readonly HashSet<string> retainerNames=new(StringComparer.OrdinalIgnoreCase);
+    private IReadOnlyList<string> personal=[];
 
     private void OnLogMessage(Dalamud.Game.Chat.ILogMessage message)
     {
         if(disposed)return;
         // X-350 (0.1334, R03.2, DEC-038): nothing noted while Tensho is cut (PvP, ranked content, Triple Triad, Mahjong).
         lock(messagesGate)GilJournal.NoteMessage(messages,message.LogMessageId,DateTimeOffset.UtcNow,TenshoAssistant.Competitive.CompetitiveGate.Cut);
+        // X-557 (0.1774): every log message row (a number), for the « Other » context.
+        if(!TenshoAssistant.Competitive.CompetitiveGate.Cut && developerMode())lock(context)context.Row(DateTimeOffset.UtcNow,message.LogMessageId);
+    }
+
+    /// <summary>
+    /// X-557 (0.1774): a chat message, for the « Other » context: its kind and text (items written as their row), only when the game speaks
+    /// and no player nor the character's own names are in it (GilOtherContext.Safe, R25); never while Tensho is cut (R03.2).
+    /// </summary>
+    private void OnChatMessage(Dalamud.Game.Chat.IChatMessage message)
+    {
+        if(TenshoAssistant.Competitive.CompetitiveGate.Cut)return;
+        if(disposed || !developerMode())return;
+        try
+        {
+            var text=new System.Text.StringBuilder();
+            var namesPlayer=false;
+            foreach(var payload in message.Message.Payloads)
+                switch(payload)
+                {
+                    case Dalamud.Game.Text.SeStringHandling.Payloads.PlayerPayload:namesPlayer=true;break;
+                    case Dalamud.Game.Text.SeStringHandling.Payloads.ItemPayload item:text.Append(System.Globalization.CultureInfo.InvariantCulture,$"[item {item.ItemId}]");break;
+                    case Dalamud.Game.Text.SeStringHandling.Payloads.TextPayload words:text.Append(words.Text);break;
+                }
+            var own=Volatile.Read(ref personal);
+            // The character's names not known yet (before the first reading): nothing kept, never a message that might name it.
+            if(own.Count==0)return;
+            lock(context)context.Message(DateTimeOffset.UtcNow,(int)message.LogKind,message.Sender.TextValue.Trim().Length!=0,namesPlayer,text.ToString(),own);
+        }
+        catch(Exception error)
+        {
+            if(!warned){warned=true;log.Warning(error,"Gil journal: a game message could not be noted.");}
+        }
     }
 
     private void OnUpdate(IFramework _)
@@ -67,6 +109,12 @@ public sealed unsafe class GilWatcher : IDisposable
             {
                 foreach(var name in open)seenAny[name]=now;
                 if(seenAny.Count>200)foreach(var old in seenAny.Where(pair=>now-pair.Value>GilJournal.ContextWindow).Select(pair=>pair.Key).ToArray())seenAny.Remove(old);
+                // X-557 (0.1774): the windows for the « Other » context, the character's own names for its messages, and the lines now due.
+                Volatile.Write(ref personal,GilOtherContext.PersonalNames((OwnNames?.Invoke() ?? []).Concat(retainerNames)));
+                IReadOnlyList<string> due;
+                lock(context){context.Windows(now,open);due=context.Due(now);}
+                // The game's texts go as a value, never as the log's template (a brace in them would be read as a placeholder).
+                foreach(var line in due)log.Information("{0}",line);
             }
             foreach(var (addon,_) in GilJournal.Windows)
             {
@@ -105,7 +153,12 @@ public sealed unsafe class GilWatcher : IDisposable
                 // which the game updates at once; the list keeps the others'. X-431 M2 (0.1416): one reading, shared with the retainers' table (RetainerPurse).
                 var livePurse=RetainerPurse.Open(manager);
                 foreach(ref var retainer in manager->Retainers)
-                    if(retainer.RetainerId!=0)sum+=RetainerPurse.Gil(retainer.RetainerId,retainer.Gil,livePurse);
+                    if(retainer.RetainerId!=0)
+                    {
+                        sum+=RetainerPurse.Gil(retainer.RetainerId,retainer.Gil,livePurse);
+                        // X-557 (0.1774, R25): the retainers' names, kept out of the « Other » context (developer mode only, at most ten).
+                        if(developerMode() && retainerNames.Count<10 && retainer.NameString is { Length:>0 } name)retainerNames.Add(name);
+                    }
                 newRetainers=sum;
             }
             // The messages heard lately, copied once per reading and only when a change of the character's gil needs them.
@@ -113,7 +166,8 @@ public sealed unsafe class GilWatcher : IDisposable
             GilCategory Category(long delta)
             {
                 if(heard is null)lock(messagesGate)heard=new(messages);
-                return GilJournal.ForDelta(GilJournal.Classify(seen,now,heard),delta);
+                // X-557 (0.1774): a gain no window or message explains, inside a duty, is the duty's.
+                return GilJournal.InDuty(GilJournal.ForDelta(GilJournal.Classify(seen,now,heard),delta),delta,InDuty?.Invoke()==true);
             }
             var changed=recorder.Read(newGil,newRetainers,newCompany,now,entries,Category,(category,change)=>Changed(category,change,now,heard));
             if(entries.Count>GilJournal.MaximumEntries+500)entries=GilJournal.Prune(entries,now);
@@ -135,6 +189,8 @@ public sealed unsafe class GilWatcher : IDisposable
             log.Information("Gil other: {0:+#,0;-#,0}, windows seen in the last 15 s: {1}; log messages: {2}",change,
                 string.Join(", ",seenAny.Where(pair=>at-pair.Value<=GilJournal.ContextWindow).OrderByDescending(pair=>pair.Value).Select(pair=>pair.Key)),
                 string.Join(", ",(heard ?? []).Where(pair=>at-pair.Value<=GilJournal.ContextWindow).Select(pair=>pair.Key)));
+        // X-557 (0.1774): its context (messages, rows and windows 3 s before and after) written once, 3 s later.
+        if(category==GilCategory.Other && developerMode())lock(context)context.Other(at,change);
         Saves.Changed();
     }
 
@@ -166,6 +222,7 @@ public sealed unsafe class GilWatcher : IDisposable
     {
         if(disposed)return;
         disposed=true;
+        if(chat is not null)chat.ChatMessageUnhandled-=OnChatMessage;
         if(chat is not null)chat.LogMessage-=OnLogMessage;
         TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
         Save(DateTimeOffset.UtcNow);

@@ -797,6 +797,12 @@ public sealed partial class Plugin : IDalamudPlugin
             registrations.Register(()=>gilWatcher=new Inventory.GilWatcher(framework,player,gameGui,gilStore,log,
                 ()=>mainWindow.GameWindowSource?.Invoke().Select(window=>window.Name).ToArray() ?? [],()=>mainWindow.DeveloperMode,chatGui),()=>gilWatcher?.Dispose());
             mainWindow.GilJournalState=()=>gilWatcher?.State;
+            // X-557 (0.1774): a gain in a duty that nothing else explains is the duty's; the character's own names kept out of the « Other » context (R25).
+            if(gilWatcher is not null)
+            {
+                gilWatcher.InDuty=()=>condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty];
+                gilWatcher.OwnNames=()=>[player.CharacterName,player.HomeWorld.ValueNullable?.Name.ExtractText(),player.CurrentWorld.ValueNullable?.Name.ExtractText(),objects.LocalPlayer?.CompanyTag.TextValue];
+            }
             // The server bar's entries (alarms, reminders, currencies, gil, X-217's optional entries), once the services they show exist:
             // the server bar family (X-153, 0.1240: Plugin.ServerBar.cs), in the order they were created before.
             RegisterServerBar(dtrBar,framework,gameGui,player,client,inventory,configuration,localization,()=>currencies?.State,()=>gilWatcher?.State?.Entries,()=>gear?.Equipped ?? []);

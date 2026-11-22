@@ -149,6 +149,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1770-crucible-spaces.md](0.1770-crucible-spaces.md) | `src/TenshoAssistant/Beastmaster/BeastCatalogLoader.Dalamud.cs`, `src/TenshoAssistant/Beastmaster/BeastSpaces.cs`, `tests/TenshoAssistant.Tests/BeastSpaces1770Tests.cs` | — |
 | [0.1771-beast-result-rewards.md](0.1771-beast-result-rewards.md) | `src/TenshoAssistant/Beastmaster/BeastResult.cs`, `tests/TenshoAssistant.Tests/BeastResultRewards1771Tests.cs`, `tests/TenshoAssistant.Tests/BeastReview1773Tests.cs` | — |
 | [0.1772-housing-furniture.md](0.1772-housing-furniture.md) | `src/TenshoAssistant/Maps/HousingFurnitureProbe.Dalamud.cs`, `tests/TenshoAssistant.Tests/HousingProbe1772Tests.cs` | — |
+| [0.1774-gil-duty.md](0.1774-gil-duty.md) | `src/TenshoAssistant/Inventory/GilJournal.cs`, `tests/TenshoAssistant.Tests/GilOther1774Tests.cs` | — |
 | [0.180.0-achievement-probe.log](0.180.0-achievement-probe.log) | `src/TenshoAssistant/Collections/CollectionReader.Completion.Dalamud.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.182.0-paramgrow-probe.log](0.182.0-paramgrow-probe.log) | `src/TenshoAssistant/Character/StatFormulas.cs`, `tests/TenshoAssistant.Tests/StatFormulaTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md`, `docs/evidence/0.320-credits.json`, `docs/project/REFERENCES.md`, `docs/project/ROADMAP.md` |
 | [0.199-adenium-shop.md](0.199-adenium-shop.md) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
@@ -370,5 +371,5 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [x91-parsers-check.md](x91-parsers-check.md) | `src/TenshoAssistant/MainWindow.SRankConditions.cs`, `tests/TenshoAssistant.Tests/ParsersCheck971Tests.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md`, `docs/project/GLOBAL-PLAN-DONE.md` |
 | [x93-load-test.md](x93-load-test.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `tests/TenshoAssistant.Tests/Evidence1069Tests.cs`, `tests/TenshoAssistant.Tests/LoadTest1036Tests.cs`, `tools/DiscoveryLoadProbe/Program.cs`, `tools/README.md`, `tools/discoveries-load.py` | `docs/changelog/CHANGELOG-0.1300-0.1399.md`, `docs/evidence/x172-sqlite-trial.md` |
 
-Counted · compté : 358 files · fichiers ; 312 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
+Counted · compté : 359 files · fichiers ; 313 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
 <!-- /docgen:evidence -->
