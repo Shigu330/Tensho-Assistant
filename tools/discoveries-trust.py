@@ -31,6 +31,10 @@ Checks, all needed for a merge:
   - the player file of the pull request: that issue and that login, the gist and revision just read noted as merged, a fact file the merge
     tool reads (fields of a player file only: nothing of the player), every fact of the gist and of the file on Devloppement kept, no fact
     from anywhere else, and something new;
+  - X-825: a « note only » pull request (a player file merged before X-804, whose gist brings nothing new: sync notes the gist and
+    revision merged, so the plugin deletes that gist): its player file is the only file changed, its fact lines are byte for byte those of
+    Devloppement's file (of the current format), and its header differs only by Gist, Revision and Counted. Anything more (a fact changed, a
+    common file, another header field): a doubt, for the maintainer's word. Its ticket is not commented « merged » (nothing new was merged);
   - X-823: the content, by value: a sync of this share alone is replayed offline on Devloppement's community-discoveries (the commit read
     then), with the gist just read (discoveries-merge.py: union, rebuild); every file of the pull request's players/ and v3/ must hold what
     that replay writes (gzip files compared once unpacked, index.json without its byte counts and hashes, which must name the pull
@@ -147,7 +151,9 @@ def decide(trusted,pr,ticket,share):
     if not held or held.get("Issue")!=number or (held.get("Login") or "").lower()!=author.lower() \
         or held.get("Noted")!={"Gist":gist,"Revision":share.get("revision")} or not share.get("revision"):return "doubt","player-file"
     keys,given,before=held.get("keys") or set(),share.get("gist_keys") or set(),share.get("base_keys") or set()
-    if not given<=keys or not before<=keys or not keys<=given|before or held.get("same"):return "doubt","facts"
+    if not given<=keys or not before<=keys or not keys<=given|before:return "doubt","facts"
+    # X-825: nothing new: safe only as a « note only » pull request (the player file alone, its header's note alone changed)
+    if held.get("same") and not (share.get("note_only") is True and paths==[f"community-discoveries/players/{number}.jsonl.gz"]):return "doubt","facts"
     if share.get("content")!="same":return "doubt","content"   # X-823: by value, replayed (never read: a doubt)
     checks=pr.get("checks") or []
     failed=[c for c in checks if c[1]=="COMPLETED" and c[2] not in ("SUCCESS","SKIPPED","NEUTRAL") and c[0]]
@@ -185,6 +191,22 @@ def replay(base,number,author,gist_facts,noted):
             m.rebuild(say=lambda *_:None,fresh=[(name,f) for f in gist_facts],pending={name:(number,author,facts,m.merged_note(noted))},history=lambda:past)
         finally:m.PLAYERS,m.V3_DIR=saved
         return {f"{sub}/{name}":open(os.path.join(root,name),"rb").read() for sub,root in roots.items() for name in sorted(os.listdir(root))}
+
+NOTE_FIELDS=("Gist","Revision","Counted")   # X-825: what a « note only » pull request may change in a player file's header
+
+def note_only(before,after):
+    """X-825, pure. Whether the player file after (the pull request's bytes) differs from before (Devloppement's) by its header's note only:
+    both of the current format and read whole, every fact line byte for byte the same, the header's other fields the same, its fields those of
+    the merge tool (PLAYER_HEADER), and the note (Gist, Revision, Counted) changed. Anything that does not read: False (never a merge)."""
+    m=tool()
+    try:
+        old=m.gunzip_bounded(before,m.MAX_DECOMPRESSED).decode("utf-8").split("\n")
+        new=m.gunzip_bounded(after,m.MAX_DECOMPRESSED).decode("utf-8").split("\n")
+        was,now=json.loads(old[0]),json.loads(new[0])
+    except Exception:return False   # zlib.error is no OSError: any failure is no « note only »
+    if not isinstance(was,dict) or not isinstance(now,dict) or old[1:]!=new[1:]:return False
+    rest=lambda header:{k:v for k,v in header.items() if k not in NOTE_FIELDS}
+    return was!=now and rest(was)==rest(now) and was.get("Format")==m.PLAYER_FORMAT and not set(now)-set(m.PLAYER_HEADER)
 
 def index_entries(data):
     """An index.json's text without what depends on the compressor (each entry's Bytes and Sha256), and its entries."""
@@ -336,6 +358,8 @@ def gather(n):
             data=expected.get(path)
             head[path]=data if data is not None and blob_sha(data)==sha else blob(sha)
         found=content_doubt(expected,head)
+        mine=f"{FOLDERS[0]}/{number}{m.PLAYER_SUFFIX}"
+        share["note_only"]=mine in base and mine in head and note_only(base[mine],head[mine])   # X-825
     except Exception as error:   # a replay that stops (Lossy, a file that does not read) is a doubt, never a merge
         found=f"not replayed ({type(error).__name__}: {str(error)[:120]})"
     if found:print(f"content: {found}")
@@ -374,12 +398,16 @@ def merge(n,path,dry):
         print(f"TELL THE MAINTAINER: pull request #{n} (ticket #{ticket.get('number')}) not merged automatically: {REASONS[reason][0]}")
         return 3
     number,author=ticket["number"],tool().login(ticket["issue"])
-    subject=f"Discoveries of #{number} {AUTOMATIC} (trusted account {author})"
-    body=compose(f"Every check of tools/discoveries-trust.py passed: {share['facts']} facts from gist revision {share['revision'][:12]}.",
-                 f"Toutes les vérifications de tools/discoveries-trust.py sont passées : {share['facts']} faits de la révision {share['revision'][:12]} du gist.")
+    noted=(share.get("file") or {}).get("same") is True   # X-825: a « note only » pull request (decide let it through only as such)
+    subject=f"Discoveries of #{number} {AUTOMATIC} (trusted account {author}{', gist noted only' if noted else ''})"
+    if noted:body=compose(f"Every check of tools/discoveries-trust.py passed: the player file notes gist revision {share['revision'][:12]} as merged (nothing new), so the plugin deletes that gist.",
+                          f"Toutes les vérifications de tools/discoveries-trust.py sont passées : le fichier du joueur note la révision {share['revision'][:12]} du gist comme fusionnée (rien de neuf), le plugin supprime donc ce gist.")
+    else:body=compose(f"Every check of tools/discoveries-trust.py passed: {share['facts']} facts from gist revision {share['revision'][:12]}.",
+                      f"Toutes les vérifications de tools/discoveries-trust.py sont passées : {share['facts']} faits de la révision {share['revision'][:12]} du gist.")
     if dry:print(f"#{n} would be merged (squash, head {pr['sha'][:7]}): {subject}");return 0
     gh("pr","merge",str(n),"--repo",REPOSITORY,"--squash","--match-head-commit",pr["sha"],"--subject",subject,"--body",body)
     print(f"#{n} merged (head {pr['sha'][:7]}): {subject}")
+    if noted:print(f"#{number}: nothing new merged: no « Merged » comment on the ticket (as sync does)");return 0
     out=subprocess.run([sys.executable,"-I","-X","utf8",os.path.join(ROOT,"tools","discoveries-merge.py"),"notice",str(number),"merged",version_on_base(),str(share["facts"])],
                        capture_output=True,text=True,timeout=TIMEOUT)
     print((out.stdout+out.stderr).strip() or f"#{number}: notice gave nothing")
@@ -462,6 +490,13 @@ def selftest():
     reds["facts (lost)"]=(pr(),ticket(),share(file=held(keys={"a","c"})))
     reds["facts (from elsewhere)"]=(pr(),ticket(),share(file=held(keys={"a","b","c","z"})))
     reds["facts (nothing new)"]=(pr(),ticket(),share(file=held(same=True)))
+    # X-825: a « note only » pull request: the player file alone, nothing new, its header's note alone changed
+    alone=[("community-discoveries/players/43.jsonl.gz","")]
+    check(decide(trusted,pr(files=alone,changed=1),ticket(),share(file=held(same=True),note_only=True))==("merge","every check passed"),
+          "X-825: a note only (the player file alone, its note alone changed): merged")
+    reds["facts (a note with a common file)"]=(pr(),ticket(),share(file=held(same=True),note_only=True))
+    reds["facts (nothing new, more than the note)"]=(pr(files=alone,changed=1),ticket(),share(file=held(same=True),note_only=False))
+    reds["facts (nothing new, note not said)"]=(pr(files=alone,changed=1),ticket(),share(file=held(same=True)))
     reds["content"]=(pr(),ticket(),share(content="community-discoveries/v3/kind-01.jsonl.gz: differs"))
     reds["content (never replayed)"]=(pr(),ticket(),{k:v for k,v in share().items() if k!="content"})
     reds["ci"]=(pr(checks=[("Build and test","COMPLETED","FAILURE")]),ticket(),share())
@@ -487,6 +522,15 @@ def selftest():
         with contextlib.redirect_stdout(io.StringIO()):init(path)
         check(read_list(path)=={"friend"},"init leaves a list as the maintainer wrote it")
     check(allowed("community-discoveries/v3/kind-07.jsonl.gz",43) and not allowed("community-discoveries/v3/../x",43) and not allowed("community-discoveries/players/430.jsonl.gz",43),"allowed paths")
+    import gzip
+    def packed(header,*lines):return gzip.compress(("".join(json.dumps(o,separators=(",",":"))+"\n" for o in [header])+"".join(l+"\n" for l in lines)).encode("utf-8"),mtime=0)
+    plain={"Format":m.PLAYER_FORMAT,"Version":1,"Issue":43,"Login":"Shigu330","Count":1};fact='{"Kind":1,"Subject":2}'
+    noted={"Format":m.PLAYER_FORMAT,"Version":1,"Issue":43,"Login":"Shigu330","Gist":gist,"Revision":"r2","Counted":True,"Count":1}
+    check(note_only(packed(plain,fact),packed(noted,fact)),"X-825: the header's note alone: a note only")
+    for what,after in (("a fact changed",packed(noted,'{"Kind":1,"Subject":3}')),("a fact more",packed({**noted,"Count":2},fact,fact)),
+                       ("the login changed",packed({**noted,"Login":"Bob"},fact)),("nothing changed",packed(plain,fact)),
+                       ("a field the tool never writes",packed({**noted,"World":"Alpha"},fact)),("bytes that do not read",b"not gzip")):
+        check(not note_only(packed(plain,fact),after),f"X-825: {what}: no note only")
     end_to_end(check)
     print(f"discoveries-trust selftest: {ok}/{total} ok");return 0 if ok==total else 1
 
@@ -524,10 +568,11 @@ def end_to_end(check):
     def pr_info(**k):return {"headRefName":"travailleur/discoveries-43","baseRefName":BASE,"isDraft":False,"mergeable":"MERGEABLE","headRefOid":head_sha,
                              "state":"OPEN","isCrossRepository":False,"headRepository":{"name":"Tensho-Assistant"},"headRepositoryOwner":{"login":"Shigu330"},
                              "author":{"login":WORKER},"statusCheckRollup":[{"workflowName":REQUIRED,"status":"COMPLETED","conclusion":"SUCCESS"}],**k}
-    def run(head,info=None,extra=(),dry=True):
-        """merge() on this head ({path: bytes}); → (exit code, printed text, the gh calls made)."""
-        trees={base_sha:base,head_sha:head};store={blob_sha(d):d for t in trees.values() for d in t.values()}
-        changed=sorted(p for p in set(base)|set(head) if base.get(p)!=head.get(p))+list(extra)
+    def run(head,info=None,extra=(),dry=True,start=None):
+        """merge() on this head ({path: bytes}), Devloppement holding start (base by default); → (exit code, printed text, the gh calls made)."""
+        base_=start or base
+        trees={base_sha:base_,head_sha:head};store={blob_sha(d):d for t in trees.values() for d in t.values()}
+        changed=sorted(p for p in set(base_)|set(head) if base_.get(p)!=head.get(p))+list(extra)
         calls=[]
         def fake(*args,raw=False):
             calls.append(args);a=list(args)
@@ -578,6 +623,22 @@ def end_to_end(check):
         code,said,calls=run(head,info,extra,dry=False)
         check(code==3 and REASONS[reason][0] in said and not merged_call(calls) and any(c[:2]==("pr","comment") for c in calls),
               f"X-823: {name}: a doubt, never merged ({code}: {said[-240:]})")
+    # X-825: a share merged before X-804 (its player file without a note) whose gist brings nothing new: sync's « note only » pull request
+    # (replayed by the merge tool) merged; a fact changed or a common file changed beside the note: a doubt.
+    merged=replay(base,43,login,cleaned(raw(2)),{"Gist":gist,"Revision":"r2"})
+    lines=gzip.decompress(merged[mine]).decode("utf-8").split("\n");header=json.loads(lines[0])
+    old={**merged,mine:gzip.compress(("\n".join([json.dumps({k:v for k,v in header.items() if k not in NOTE_FIELDS},separators=(",",":"))]+lines[1:])).encode("utf-8"),compresslevel=9,mtime=0)}
+    note=replay(old,43,login,cleaned(raw(2)),{"Gist":gist,"Revision":"r2"})
+    check(note_only(old[mine],note[mine]) and {p for p in note if note[p]!=old.get(p)}=={mine},
+          f"X-825: the replay of a share with nothing new changes the player file's note only ({sorted(p for p in note if note[p]!=old.get(p))})")
+    code,said,calls=run(note,dry=False,start=old)
+    check(code=="merged" and not any(c[:2]==("pr","comment") for c in calls),f"X-825: a note only, the player file alone: merged, nothing commented ({code}: {said[-240:]})")
+    code,said,calls=run(note,start=old)
+    check(code==0 and "gist noted only" in said,f"X-825: said as a note only ({code}: {said[-200:]})")
+    for name,head,reason in (("a note and a fact changed",{**note,mine:repacked(note[mine],level99)},"content"),
+                             ("a note and the common set changed",reindexed({**note,kind:repacked(note[kind],level99)}),"facts")):
+        code,said,calls=run(head,dry=False,start=old)
+        check(code==3 and REASONS[reason][0] in said and not merged_call(calls),f"X-825: {name}: a doubt, never merged ({code}: {said[-240:]})")
 
 if __name__=="__main__":
     for stream in (sys.stdout,sys.stderr):

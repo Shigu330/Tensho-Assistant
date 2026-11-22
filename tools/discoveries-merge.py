@@ -1194,6 +1194,29 @@ def selftest():
             except ValueError:kept_bad=False
             check(not kept_bad,f"X-826: a header holding {field}: refused")
         os.remove(os.path.join(PLAYERS,"8.jsonl.gz"))
+        # X-825: sync on a share merged before X-804 (its player file without a note) whose gist brings nothing new: the player file's note
+        # alone written (what a « note only » pull request carries: the same fact lines, the common set the same bytes), so the plugin deletes that gist.
+        for folder in (PLAYERS,V3_DIR):
+            for n in os.listdir(folder):os.remove(os.path.join(folder,n))
+        put(43,[dict(s) for s in spots],"Ann");rebuild(say)
+        before=snapshot();gid="0123456789abcdef0123";revision="ab"*20;mine=(PLAYERS,"43.jsonl.gz")
+        shared={"number":43,"title":"Discoveries: Ann","author":{"login":"Ann"},"labels":[],
+                "body":f"Shared from Tensho Assistant 0.1826.0\n\nGist: https://gist.github.com/{gid}\n\n- [x] I share these discoveries under CC0-1.0 (public domain).\n"}
+        class Listed:stdout=json.dumps([shared])
+        real=(subprocess.run,gist_listing,from_gist_files);names=globals();out=io.StringIO()
+        try:
+            subprocess.run=lambda *a,**k:Listed()
+            names["gist_listing"]=lambda gist:("Ann",{},revision)
+            names["from_gist_files"]=lambda files,fetch:{"Version":2,"Facts":[{**s,"Seen":3,"Imported":0} for s in spots]}
+            stdout=sys.stdout;sys.stdout=out
+            try:sync(False)
+            finally:sys.stdout=stdout
+        finally:subprocess.run,names["gist_listing"],names["from_gist_files"]=real
+        after=snapshot();lines=lambda data:gzip.decompress(data).decode("utf-8").split("\n")
+        check(set(after)==set(before) and {k for k in after if after[k]!=before[k]}=={mine} and lines(after[mine])[1:]==lines(before[mine])[1:]
+              and "Gist" not in json.loads(lines(before[mine])[0]) and read_player(os.path.join(PLAYERS,"43.jsonl.gz"))["Noted"]=={"Gist":gid,"Revision":revision}
+              and "noted in its player file" in out.getvalue(),
+              f"X-825: sync, a share merged before X-804 with nothing new: its player file's note alone written ({out.getvalue()[-240:]})")
     PLAYERS,V3_DIR=saved
     # X-146: a gist file read within its bound and its time, a slow trickle stopped.
     class Answer:
