@@ -101,6 +101,11 @@ public sealed class DiscoveryDatabase
     /// read-back of a copy (<see cref="RestoreAside"/>), was taken as missing and written over without a word. Its text is now copied into
     /// facts_aside first (kept, never erased), settled at once (facts_aside_done, nothing restored: the row written now is this client's whole
     /// fact, so no copy is read back on top of it; the read-back settles its key itself), and said once in the log.
+    /// X-828 M2 (review of 0.1826): with one client, the row written holds everything. With two clients of one profile, the other client's
+    /// sightings that were in the damaged row are not in it: its text stays in facts_aside, and that client still holds them and sends them with
+    /// its next upload, but this client's next send replaces the gist without them. Leaving the key unsettled would not help: the read-back joins
+    /// a copy by adding it (DiscoveryStore.Join), so this client's own sightings, already in the row, would count twice; and it would come only
+    /// at the next start, after this session's sends. Left as it is (decision of the relay, reason in the CHANGELOG of 0.1830).
     /// </summary>
     private void SetAsideDamaged(SqliteConnection open,SqliteTransaction transaction,string key,DateTimeOffset now,bool settle)
     {

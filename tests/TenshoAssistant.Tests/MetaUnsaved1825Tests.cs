@@ -93,15 +93,16 @@ internal static class MetaUnsaved1825Tests
             var store=Store(1,2);
             Block(root);
             Check(Run(exchange,store) is { Key:"ExchangeMetaUnsaved" },"stopped, said on the page");
-            Check(server.Count("POST",Gists)==1 && server.Count("POST",Issues)==0,"the gist made (noted in the rotation's state), no issue opened");
+            // X-828 M1 (review of 0.1826): github.json is written before the gist is made: no gist at all (before: one, noted in the rotation's state)
+            Check(server.Count("POST",Gists)==0 && server.Count("POST",Issues)==0,"no gist made, no issue opened");
             Check(Run(exchange,store) is { Key:"ExchangeMetaUnsaved" } && Run(exchange,store) is { Key:"ExchangeMetaUnsaved" },"stopped again at the next exchanges");
-            Check(server.Count("POST",Gists)==1 && server.Count("PATCH")==0 && server.Count("POST",Issues)==0,"nothing more made nor written on GitHub");
+            Check(server.Count("POST",Gists)==0 && server.Count("PATCH")==0 && server.Count("POST",Issues)==0,"nothing more made nor written on GitHub");
             Check(Said(log,"github.json could not be written")==1,$"said once in the log ({string.Join(" | ",log)})");
             Free(root);
             var said=Run(exchange,store);
             Check(said is { Key:"ExchangeDone" } && said.Args[3]=="Sent",$"written again: sent ({said.Key} {string.Join(", ",said.Args)})");
-            Check(server.Count("POST",Gists)==1 && server.Count("PATCH",Gists+"/g2")==1 && server.Count("POST",Issues)==1 && Said(log,"github.json written again")==1,
-                "the same gist written again, never a second one; one issue");
+            Check(server.Count("POST",Gists)==1 && server.Count("PATCH",Gists+"/g2")==0 && server.Count("POST",Issues)==1 && Said(log,"github.json written again")==1,
+                "one gist made once it can be noted, one issue");
             var meta=JsonSerializer.Deserialize<GitHubExchangeMeta>(File.ReadAllText(Path.Combine(root,"github.json")))!;
             Check(meta is { GistId:"g2", Issue:8 },"the gist and issue noted");
         })),

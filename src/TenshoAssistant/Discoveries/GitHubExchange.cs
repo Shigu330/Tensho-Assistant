@@ -715,6 +715,11 @@ public sealed class GitHubExchange : IDisposable
         }
         if(gist.Length==0)
         {
+            // X-828 M1 (review of 0.1826): github.json written first, so a profile whose file cannot be written (disk full, no rights) makes no gist
+            // at all. Before, the failure was known only after the gist was made; if the rotation's state could not be written either (the same
+            // folder), that gist was left behind, unlinked, and a second one made after a reload. Safe for another client's sign-in (GitHubToken1171,
+            // N2): the same copy is written by KeepMeta just below, once the gist is made; here a few moments earlier, and only when a gist is made.
+            KeepMeta();
             written=await Api(HttpMethod.Post,"https://api.github.com/gists",
                 new JsonObject{["description"]="Tensho Assistant discoveries",["public"]=false,["files"]=files.DeepClone()}).ConfigureAwait(false);
             gist=written?["id"]?.GetValue<string>() ?? throw new InvalidDataException("No gist id.");
