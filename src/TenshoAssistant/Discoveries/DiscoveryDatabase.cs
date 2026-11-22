@@ -277,7 +277,8 @@ public sealed class DiscoveryDatabase
 
     /// <summary>X-784 (0.1797): a consistent copy of the whole base, the journal's saves included (SQLite's VACUUM INTO, one read transaction:
     /// a save running meanwhile is in it whole or not at all), written in <paramref name="folder"/> and read once: the file goes when the
-    /// stream is closed. The live file, held open by the kept connection and maybe being saved, is never read as bytes.</summary>
+    /// stream is closed. The live file, held open by the kept connection and maybe being saved, is never read as bytes.
+    /// X-793 (0.1800): left behind when the process dies before the stream is closed; BackupZip.Sweep removes it later (its name: BackupZip.Leftover).</summary>
     public Stream Snapshot(string folder)
     {
         Directory.CreateDirectory(folder);

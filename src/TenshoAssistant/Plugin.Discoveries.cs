@@ -60,6 +60,14 @@ public sealed partial class Plugin
                 if(held)_=ReadSeenPricesLater(seenPath,seenPrices);
             }
             catch(Exception error){log.Warning(error,"The market prices seen could not be read.");}
+            // X-793 (0.1800, review of 0.1799, M2): what a copy cut short by a killed or crashed game left in Backups (a whole snapshot of the
+            // base, a zip half written) removed once an hour old.
+            try
+            {
+                var removed=BackupZip.Sweep(Discoveries.DiscoveryBackup.Folder(discoveryFolder),DateTime.UtcNow);
+                if(removed>0)log.Information("Backups: {0} file(s) left by a copy cut short (the game closed or crashed during it) removed.",removed);
+            }
+            catch(Exception error){log.Warning(error,"The Backups folder could not be looked through for copies cut short.");}
             var saved=Path.Combine(discoveryFolder,"Discoveries.json");
             // X-172 (0.1136, trial docs/evidence/x172-sqlite-trial.md): the discoveries in Discoveries.db (SQLite). A database that exists but cannot
             // be opened (SQLite not loaded, damaged, newer layout) is never replaced: nothing is saved this session; without a database (it could not

@@ -118,11 +118,15 @@ internal static class DiscoveryClear1797Tests
         ("Discovery clear 1797: wiring: the button copies through DiscoveryBackup, then empties; a failed copy removes nothing",() =>
         {
             var window = Read("src/TenshoAssistant/MainWindow.Discoveries.cs");
-            var copy = window.IndexOf("try{DiscoveryBackup.Create(folder,DiscoveryDatabase,DateTimeOffset.UtcNow);}",StringComparison.Ordinal);
-            var refused = window.IndexOf("catch(Exception error){log.Warning(error,\"The discoveries copy before emptying failed; nothing was removed.\");discoveryClearAsked=false;return;}",StringComparison.Ordinal);
-            var emptied = window.IndexOf("store.Clear();SaveDiscoveries(false);discoveryClearAsked=false;",StringComparison.Ordinal);
-            Check(copy > 0 && refused > copy && emptied > refused,"copy, refusal, then emptying");
+            // 0.1800 (X-794, review of 0.1799, M1): the copy started off the game's thread by the button; the base emptied once a second
+            // (EndDiscoveryClear) once it ended well; a failed copy removes nothing.
+            var copy = window.IndexOf("discoveryClearCopy=DiscoveryBackup.Start(folder,DiscoveryDatabase,DateTimeOffset.UtcNow);",StringComparison.Ordinal);
+            var outcome = window.IndexOf("var (ended,empty,error)=DiscoveryBackup.Outcome(copy);",StringComparison.Ordinal);
+            var emptied = window.IndexOf("if(empty){store.Clear();SaveDiscoveries(false);return;}",StringComparison.Ordinal);
+            var refused = window.IndexOf("log.Warning(error,\"The discoveries copy before emptying failed; nothing was removed.\");",StringComparison.Ordinal);
+            Check(copy > 0 && outcome > 0 && emptied > outcome && refused > emptied,"copy, then emptying once it ended well, else nothing removed");
             Check(!window.Contains("BackupZip.Create(folder",StringComparison.Ordinal),"no copy of the live file left");
+            Check(!window.Contains("DiscoveryBackup.Create(",StringComparison.Ordinal),"no copy made in Draw any more");
         }),
     ];
 }

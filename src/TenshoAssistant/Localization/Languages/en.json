@@ -1008,7 +1008,9 @@
     "ClearTip": "Removes every discovery, yours and imported. A zip copy of the Discoveries folder is taken first in the Backups folder (never the GitHub key).",
     "ClearSure": "Remove every discovery? This cannot be undone (export first to keep a copy).",
     "ClearYes": "Yes, empty it",
-    "ClearNo": "No"
+    "ClearNo": "No",
+    "ClearCopying": "Copying the base before emptying it…",
+    "ClearFailed": "The copy before emptying failed: nothing was removed (details in the Dalamud log)."
   },
   "Navigation": {
     "Duty": "Duty",
