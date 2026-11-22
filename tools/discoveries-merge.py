@@ -18,7 +18,8 @@ Usage:
       counted player holds that is in the common set of git HEAD but has no place now: STOP (exit 2), nothing written; restore v3/ from git first.
   python tools/discoveries-merge.py withdraw <issue> [--dry-run]
       X-183: removes players/<issue>.jsonl.gz, or the <issue>.json of before (a player who closed their issue or asked to be taken out), then
-      rebuilds.
+      rebuilds. X-803 (user decision of 22/11): their facts stay in the common set, without any name: written again first as
+      players/withdrawn-<random>.jsonl.gz, a file with neither issue nor login, which still counts like a player file.
   python tools/discoveries-merge.py check <file.json|file.zip|v3 folder|gist:ID>
       Validates one file (or a v3 set) and prints its report, without writing.
   python tools/discoveries-merge.py recheck [--changes FILE] [--local] [--limit N]
@@ -63,8 +64,10 @@ issue, they said where that GitHub account was on that day (a fish is noted at t
 The place and days of a common fact (the earliest day's exact place, the latest day seen) come from the common set as it is (v3/), from a
 player file of before (<issue>.json, still read, written again by rebuild in the new format) and from the gists read by sync; on the same
 first day, the first met keeps its place. A fact whose place is in none of them waits in its player file (said) until a share brings it.
-Withdrawing a player removes their facts that no other player has; a fact others have keeps the place and days of the common set."""
-import base64,collections,gzip,hashlib,importlib.util,io,json,math,os,re,struct,subprocess,sys,tempfile,time,unicodedata,urllib.request,zipfile
+X-803 (user decision of 22/11, after D-220): withdrawing a player removes the link with their account (their numbered file, its issue and
+login) and keeps their facts in the common set, without any name: an anonymous file players/withdrawn-<random>.jsonl.gz holds them and counts
+like any player file (one import of each fact; still left out when far outside the others' levels)."""
+import base64,collections,gzip,hashlib,importlib.util,io,json,math,os,re,secrets,struct,subprocess,sys,tempfile,time,unicodedata,urllib.request,zipfile
 from datetime import datetime,timezone,timedelta
 ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PLAYERS=os.path.join(ROOT,"community-discoveries","players")
@@ -713,18 +716,26 @@ def sync(dry):
     else:
         print();print(recheck_report())
 
+WITHDRAWN="withdrawn-"   # X-803: the name of an anonymous file: WITHDRAWN + 16 random hex digits + PLAYER_SUFFIX
+
 def withdraw(issue,dry):
-    """X-183 (N13): a player's facts taken out of the common files (their issue closed, or asked): players/<issue>.jsonl.gz (X-772; or the
-    <issue>.json of before) removed, then rebuild: their facts no other player has leave the common set."""
+    """X-183 (N13): a player withdrawn (their issue closed, or asked): players/<issue>.jsonl.gz (X-772; or the <issue>.json of before) removed.
+    X-803 (user decision of 22/11): their facts stay in the common set, without any name: rebuild gets them as an anonymous file
+    players/withdrawn-<random>.jsonl.gz (no issue, no login; a file of before gives its places and days too), written once the common set is,
+    then the numbered files are removed. A stop (X-795) leaves everything as it was."""
     paths=[os.path.join(PLAYERS,f"{issue}{suffix}") for suffix in (PLAYER_SUFFIX,".json")] if issue.isdigit() else []
     present=[path for path in paths if os.path.isfile(path)]
     if not present:print(f"players/{issue}: no such player file");return 2
     shown=", ".join("players/"+os.path.basename(path) for path in present)
-    if dry:print(f"{shown} would be removed, then the common files rebuilt");return 0
+    if dry:print(f"{shown} would be removed; its facts kept in the common set without any name (players/{WITHDRAWN}….jsonl.gz), then the common files rebuilt");return 0
+    # The new file when there is one (a conversion cut short leaves both), else the file of before under the current rules (as rebuild reads it).
+    player=read_player(present[0])
+    facts=[daily(f) for f in player["Facts"] if valid(dict(f))] if player["Old"] else player["Facts"]
+    name=f"{WITHDRAWN}{secrets.token_hex(8)}{PLAYER_SUFFIX}"
     # X-795: rebuilt without them first; the files removed once the common set is written (a stop leaves them, and the set, as they were)
-    rebuild(skip=[os.path.basename(path) for path in present])
+    rebuild(skip=[os.path.basename(path) for path in present],fresh=[(name,f) for f in facts if all(n in f for n in PLACE)],pending={name:(name,None,facts)})
     for path in present:os.remove(path)
-    print(f"{shown} removed");return 0
+    print(f"{shown} removed; {len(facts)} facts kept without any name in players/{name}");return 0
 
 # ---------- X-116: facts to recheck after a game patch ----------
 CELL_KINDS=PLACED  # every fact with a place: a changed layout cell can change what was seen there
@@ -983,9 +994,18 @@ def selftest():
         os.remove(bad)
         check(news(43,[{**s,"X":1.0,"First":"2026-11-01T00:00:00+00:00"} for s in spots])==(0,0),"X-772: another place or day alone is nothing new for the player file")
         import contextlib
+        before={g["Subject"]:g["Imported"] for g in common()}
         with contextlib.redirect_stdout(io.StringIO()):gone=withdraw("100",False)   # its lines are the tool's report, not the selftest's
-        check(gone==0 and sorted(os.listdir(PLAYERS))==["43.jsonl.gz"] and {g["Subject"] for g in common()}=={1,2,3},
-              "X-772: withdrawn: the file removed, the facts no other player has gone")
+        names=sorted(os.listdir(PLAYERS));anonymous=[n for n in names if n.startswith(WITHDRAWN)]
+        check(gone==0 and [n for n in names if n not in anonymous]==["43.jsonl.gz"] and len(anonymous)==1
+              and {g["Subject"]:g["Imported"] for g in common()}==before and 9 in before,
+              f"X-803: withdrawn: the numbered file removed, every fact kept, the one only that player had (9) too, each counted as before ({names}, {before})")
+        held=read_player(os.path.join(PLAYERS,anonymous[0]))
+        head=lines(anonymous[0])[0]
+        check(held["Login"] is None and "Login" not in head and not str(head.get("Issue")).isdigit()
+              and held["Facts"]==sorted([without_place(spots[0]),without_place(f(1,9,128,10.0,10.0,"2026-11-03T00:00:00+00:00"))],key=sort_key),
+              f"X-803: the anonymous file holds the facts, without login nor issue ({anonymous[0]}, {head})")
+        said.clear();check(rebuild(say) is False,f"X-803: rebuilt again: the common set unchanged, the anonymous file counted ({said})")
         # X-795 (review of 0.1802, I1): a rebuild that reads the common set missing or cut short stops before writing anything (behaviour).
         for folder in (PLAYERS,V3_DIR):
             for n in os.listdir(folder):os.remove(os.path.join(folder,n))

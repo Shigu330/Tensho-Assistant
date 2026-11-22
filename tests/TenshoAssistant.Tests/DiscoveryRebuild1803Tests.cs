@@ -26,7 +26,7 @@ internal static class DiscoveryRebuild1803Tests
             Check(tool.Contains("    current=v3_guard()\n    sources=",StringComparison.Ordinal),"rebuild starts by reading the common set whole");
             Check(tool.Contains("past=head_v3_keys() if history is None else history()",StringComparison.Ordinal),"compared with the common set of git HEAD");
             Check(tool.Contains("    try:v3_guard()\n    except Lossy as error:",StringComparison.Ordinal),"sync checks it before writing a player file");
-            Check(tool.Contains("    rebuild(skip=[os.path.basename(path) for path in present])\n    for path in present:os.remove(path)",StringComparison.Ordinal),
+            Check(tool.Contains("    rebuild(skip=[os.path.basename(path) for path in present],fresh=[(name,f) for f in facts if all(n in f for n in PLACE)],pending={name:(name,None,facts)})\n    for path in present:os.remove(path)",StringComparison.Ordinal),
                 "withdraw removes the player file once the common set is written");
             Check(tool.Contains("changed=write_v3(bounded(common[\"Facts\"],say=say),V3_DIR,say)\n    for write in later:write()",StringComparison.Ordinal),"the player files written after the common set");
             Check(tool.Contains("print(f\"STOP: {error}; nothing written\");sys.exit(2)",StringComparison.Ordinal),"the stop said, exit 2");

@@ -32,9 +32,11 @@ The files reach players with the next release (they are read from `main`).
 Since Tensho 0.1210: one issue per GitHub account counts (the newest; an older one by the same author is left out); each field must have the
 plugin's type; a player counts for at most 1,000 sightings of a fact in the common histograms (the shape of theirs kept); the exact place kept is the one
 of the earliest day; a player alone far outside the other players' levels on over 5 % of the facts they share is left out and checked by hand.
-**Withdrawing.** Close your « Discoveries » issue (or ask in it): the maintainer removes `players/<issue>.jsonl.gz` with
-`python tools/discoveries-merge.py withdraw <issue>`, and your facts leave the common files at the next release (a fact other players have stays,
-with the place and days of `v3/`).
+**Withdrawing.** What you share stays in the common base, without your name, even if you stop sharing. Close your « Discoveries » issue (or
+ask in it): the maintainer removes `players/<issue>.jsonl.gz`, the link with your GitHub account, with `python tools/discoveries-merge.py withdraw <issue>`;
+since Tensho 0.1816 your facts stay in `v3/`, held by an anonymous file `players/withdrawn-<random>.jsonl.gz` (no issue, no login) that counts like a
+player file (before, the facts no other player had left the common files). The git history keeps the files as they were; if you share again later,
+your facts kept this way count once more.
 
 **File format (version 2, since Tensho 0.916).** `{"Version":2,"Producer":…,"Written":…,"Facts":[…]}`. A fact is identified by `Kind`, `Subject`, `Detail`,
 `Territory`, `Map`, `CellX`, `CellZ`; it holds the exact first place (`X`, `Z`), the widest values seen (`LevelMin`, `LevelMax`), `Seen`, `Imported`,
@@ -92,9 +94,12 @@ Depuis Tensho 0.1210 : un seul ticket par compte GitHub compte (le plus récent 
 doit avoir le type du plugin ; un joueur compte pour 1 000 observations d'un fait au plus dans les histogrammes communs (la forme des siens gardée) ; le
 lieu exact gardé est celui du jour le plus ancien ; un joueur seul très loin des niveaux des autres joueurs sur plus de 5 % des faits qu'il partage avec
 eux est laissé de côté et regardé à la main.
-**Se retirer.** Fermez votre ticket « Discoveries » (ou demandez-le dedans) : le mainteneur retire `players/<ticket>.jsonl.gz` avec
-`python tools/discoveries-merge.py withdraw <ticket>`, et vos faits quittent les fichiers communs à la release suivante (un fait que d'autres joueurs
-ont reste, avec le lieu et les jours de `v3/`).
+**Se retirer.** Ce que vous partagez reste dans la base commune, sans votre nom, même si vous arrêtez de partager. Fermez votre ticket
+« Discoveries » (ou demandez-le dedans) : le mainteneur retire `players/<ticket>.jsonl.gz`, le lien avec votre compte GitHub, avec
+`python tools/discoveries-merge.py withdraw <ticket>` ; depuis Tensho 0.1816, vos faits restent dans `v3/`, portés par un fichier anonyme
+`players/withdrawn-<aléatoire>.jsonl.gz` (sans ticket ni identifiant) qui compte comme un fichier de joueur (avant, les faits qu'aucun autre joueur
+n'avait quittaient les fichiers communs). L'historique git garde les fichiers tels qu'ils étaient ; si vous partagez de nouveau plus tard, vos faits
+gardés ainsi comptent une fois de plus.
 
 **Format du fichier (version 2, depuis Tensho 0.916).** `{"Version":2,"Producer":…,"Written":…,"Facts":[…]}`. Un fait est identifié par `Kind`, `Subject`,
 `Detail`, `Territory`, `Map`, `CellX`, `CellZ` ; il contient le premier lieu exact (`X`, `Z`), les valeurs extrêmes vues (`LevelMin`, `LevelMax`), `Seen`,

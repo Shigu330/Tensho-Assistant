@@ -68,6 +68,10 @@ internal sealed class ExchangeRefused(string key,bool forget):Exception(key)
 public sealed class GitHubExchange : IDisposable
 {
     public const string Repository="Shigu330/Tensho-Assistant",GistFile="tensho-discoveries.b64";
+    /// <summary>X-803 (user decision of 22/11): said in each player's issue, in English then French (GitHub in two languages, R20.1): what is shared
+    /// stays in the common base without the player's name, even after they stop sharing. The French half is listed in Languages406Tests.AllowedLiterals.</summary>
+    internal const string IssueStays="What you share stays in the common base, without your name, even if you stop sharing (closing this issue removes your name, not your discoveries).";
+    internal const string IssueStaysFrench="Français : ce que vous partagez reste dans la base commune, sans votre nom, même si vous arrêtez de partager (fermer ce ticket retire votre nom, pas vos découvertes).";
     /// <summary>X-175: the files that hold a secret, never put in a backup copy.</summary>
     public static readonly IReadOnlySet<string> SecretFiles=new HashSet<string>(StringComparer.OrdinalIgnoreCase){"github.token","github.refresh"};
     public static readonly TimeSpan Every=TimeSpan.FromHours(20),Retry=TimeSpan.FromMinutes(15);
@@ -591,7 +595,7 @@ public sealed class GitHubExchange : IDisposable
                 opened=await Api(HttpMethod.Post,$"https://api.github.com/repos/{Repository}/issues",new JsonObject
                 {
                     ["title"]=$"Discoveries: {Login}",
-                    ["body"]=$"Shared from Tensho Assistant {version} (World › Discoveries › automatic exchange).\n\nGist: https://gist.github.com/{gist}\n\n- [x] I share these discoveries under CC0-1.0 (public domain, https://creativecommons.org/publicdomain/zero/1.0/).\n\nThe gist is updated at each exchange; this issue stays the same.",
+                    ["body"]=$"Shared from Tensho Assistant {version} (World › Discoveries › automatic exchange).\n\nGist: https://gist.github.com/{gist}\n\n- [x] I share these discoveries under CC0-1.0 (public domain, https://creativecommons.org/publicdomain/zero/1.0/).\n\nThe gist is updated at each exchange; this issue stays the same.\n\n{IssueStays}\n{IssueStaysFrench}",
                     ["labels"]=new JsonArray("discoveries"),
                 }).ConfigureAwait(false);
             }
