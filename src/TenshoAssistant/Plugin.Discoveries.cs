@@ -75,8 +75,6 @@ public sealed partial class Plugin
                 if(Discoveries.DiscoveryFiles.OldFiles(saved) is { Length:>0 } old)
                     log.Information(old.Length==1 ? "Discoveries: a file of an old format ({0}) was left aside, not read (X-574)."
                         : "Discoveries: files of an old format ({0}) were left aside, not read (X-574).",string.Join(", ",old));
-                // X-750 (0.1794): kept open while the plugin runs (this load runs off the frame); closed at unload (FlushDiscoveries).
-                database.KeepOpen();
             }
             catch(Exception error)
             {
@@ -95,6 +93,17 @@ public sealed partial class Plugin
                 log.Error(error,"The discoveries database could not be created: the JSON files stay in use this session.");
             }
             mainWindow.DiscoveryDatabase=database;
+            if(database is not null)
+            {
+                // X-750 (0.1794): kept open while the plugin runs (this load runs off the frame); closed at unload (FlushDiscoveries).
+                // X-785 M2 (0.1798, review of 0.1795): kept only once given to the window, whose unload closes what it holds; an unload that came
+                // before (its close found no base) is seen here and the base closed again, so no connection outlives the plugin. A failure to
+                // keep it open is said and the base used as before (each save opens its own connection): it was taken for a base that cannot
+                // be opened (nothing saved this session, nothing sent to the gist).
+                try{database.KeepOpen();}
+                catch(Exception error){log.Warning(error,"The discoveries database could not be kept open; each save opens it again (X-750).");}
+                if(gameDataCancel.IsCancellationRequested)database.Close();
+            }
             if(database is { } opened)
             {
                 // X-588 (external audit A01 of 18/11): your facts and the shared kinds' list read inside a retry (outside any try before: an error
