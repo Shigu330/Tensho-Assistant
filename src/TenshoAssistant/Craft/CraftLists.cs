@@ -84,16 +84,61 @@ public static class CraftLists
             .Select(list=>list with {Entries=list.Entries.Where(entry=>entry.ItemId!=0 && entry.Quantity is >0 and <=MaxQuantity).Take(MaxEntries).ToArray()}).ToArray();
     }
 
+    /// <summary>
+    /// X-832 (security review I4): two game clients on one profile each kept the lists read at their start and wrote their whole copy back: a
+    /// list added in one was erased by any change in the other. Three-way, by name (a name met twice: by its rank among that name): a list this
+    /// client did not change is the file's (or stays removed when the file removed it); one it added or changed is its own; one it removed stays
+    /// removed; one only the file has, never seen here, is kept. Mine's order first, then the file's other lists.
+    /// </summary>
+    public static IReadOnlyList<CraftList> Merge(IReadOnlyList<CraftList>? before,IReadOnlyList<CraftList> mine,IReadOnlyList<CraftList> theirs)
+    {
+        var old=Keyed(before ?? []);var file=Keyed(theirs);var own=Keyed(mine);
+        var result=new List<CraftList>();
+        foreach(var (key,list) in own)
+        {
+            var had=old.TryGetValue(key,out var was);
+            var there=file.TryGetValue(key,out var other);
+            if(had && Same(was!,list)){if(there)result.Add(other!);continue;}
+            result.Add(list);
+        }
+        foreach(var (key,list) in file)
+            if(!own.ContainsKey(key) && !old.ContainsKey(key))result.Add(list);
+        return result;
+    }
+
+    private static List<KeyValuePair<string,CraftList>> KeyedList(IReadOnlyList<CraftList> lists)
+    {
+        var seen=new Dictionary<string,int>(StringComparer.Ordinal);
+        return lists.Select(list=>{var rank=seen[list.Name]=seen.GetValueOrDefault(list.Name)+1;return KeyValuePair.Create(rank+":"+list.Name,list);}).ToList();
+    }
+    private static OrderedKeys Keyed(IReadOnlyList<CraftList> lists)=>new(KeyedList(lists));
+    private sealed class OrderedKeys(List<KeyValuePair<string,CraftList>> pairs):IEnumerable<KeyValuePair<string,CraftList>>
+    {
+        private readonly Dictionary<string,CraftList> byKey=pairs.ToDictionary(pair=>pair.Key,pair=>pair.Value,StringComparer.Ordinal);
+        public bool TryGetValue(string key,out CraftList? list)=>byKey.TryGetValue(key,out list);
+        public bool ContainsKey(string key)=>byKey.ContainsKey(key);
+        public IEnumerator<KeyValuePair<string,CraftList>> GetEnumerator()=>pairs.GetEnumerator();
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()=>GetEnumerator();
+    }
+    private static bool Same(CraftList a,CraftList b)=>a.Name==b.Name && a.Entries.SequenceEqual(b.Entries);
+
     public static void Write(string path,IReadOnlyList<CraftList> lists)
     {
         AtomicFile.Write(path,JsonSerializer.SerializeToUtf8Bytes(new FileDto(1,lists.Take(MaxLists).ToArray()),Json),keep:true);
     }
 }
 
-/// <summary>Owner of the lists file (window thread). A file that cannot be read is never written over.</summary>
+/// <summary>
+/// Owner of the lists file (window thread). A file that cannot be read is never written over. X-832: each save holds the profile's lock
+/// (« CraftLists.json.lock », FairFileLock, shared by the game clients of the profile), reads the file again and merges it with this client's
+/// change (CraftLists.Merge); the lists in memory become the merged ones (another client's lists shown from then on).
+/// </summary>
 public sealed class CraftListStore(string path,Action<Exception,string> warn,bool readOnly=false)
 {
+    /// <summary>X-832: the wait for another game client's save (a save takes milliseconds); past it, this save is refused and said.</summary>
+    public const int LockWaitMs=2000;
     private List<CraftList>? lists;
+    private IReadOnlyList<CraftList>? before;
     private bool failed;
     /// <summary>X-180 (0.1168): read-only (the desktop application's copy, overwritten from the game): Set changes and writes nothing.</summary>
     public bool ReadOnly=>readOnly;
@@ -109,14 +154,26 @@ public sealed class CraftListStore(string path,Action<Exception,string> warn,boo
         if(list is null){if(index==next.Count)return false;next.RemoveAt(index);}
         else if(index==next.Count){if(next.Count>=CraftLists.MaxLists)return false;next.Add(list);}
         else next[index]=list;
-        try{CraftLists.Write(path,next);lists=next;return true;}
+        try
+        {
+            using(FairFileLock.Hold(path+".lock",LockWaitMs,error=>new IOException("The crafting lists' lock is held by another game client.",error)))
+            {
+                var onDisk=CraftLists.Read(path,Recovered);
+                var merged=CraftLists.Merge(before,next,onDisk).Take(CraftLists.MaxLists).ToList();
+                CraftLists.Write(path,merged);
+                lists=merged;before=merged;
+            }
+            return true;
+        }
         catch(Exception error){warn(error,"Crafting lists could not be saved.");return false;}
     }
 
     private void Load()
     {
         if(lists is not null)return;
-        try{lists=CraftLists.Read(path,(aside,error)=>warn(error,$"Crafting lists did not read; their previous version (.bak) was read, the damaged file kept as {Path.GetFileName(aside)}.")).ToList();}
+        try{lists=CraftLists.Read(path,Recovered).ToList();before=lists.ToArray();}
         catch(Exception error){lists=[];failed=true;warn(error,"Crafting lists could not be read; the file is not written over.");}
     }
+
+    private void Recovered(string aside,Exception error)=>warn(error,$"Crafting lists did not read; their previous version (.bak) was read, the damaged file kept as {Path.GetFileName(aside)}.");
 }

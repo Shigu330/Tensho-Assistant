@@ -33,8 +33,13 @@ public static class ToolProgress
 public sealed class ToolTemplateStore:IDisposable
 {
     public const int MaxTools=50;
-    private sealed record SavedTool(string Json,Dictionary<string,DateTimeOffset>? Done,Dictionary<string,int>? Counts);
-    private sealed record FileDto(int Schema,SavedTool[] Tools);
+    internal sealed record SavedTool(string Json,Dictionary<string,DateTimeOffset>? Done,Dictionary<string,int>? Counts);
+    internal sealed record FileDto(int Schema,SavedTool[] Tools);
+    /// <summary>X-832: the wait for another game client's save of this file (a save takes milliseconds; off the draw).</summary>
+    public const int LockWaitMs=10_000;
+    // X-832: the tools as this instance last read or wrote them (its own, never another client's): the base of the three-way merge. Written
+    // by the constructor, then only by the writes' chain (one at a time).
+    private FileDto? before;
     private static readonly JsonSerializerOptions Options=TenshoJson.Own(new(){WriteIndented=true});
     private readonly object gate=new();
     private readonly string path;
@@ -57,7 +62,8 @@ public sealed class ToolTemplateStore:IDisposable
         {
             // X-833: the file, or its previous version (« .bak ») when it is missing or does not read.
             if(!File.Exists(path) && !File.Exists(AtomicFile.BackupOf(path)))return;
-            var dto=AtomicFile.ReadKept(path,ReadFile,(aside,error)=>warn(error,$"My tools did not read; their previous version (.bak) was read, the damaged file kept as {Path.GetFileName(aside)}."));
+            var dto=AtomicFile.ReadKept(path,ReadFile,Recovered);
+            before=new FileDto(1,dto.Tools.Take(MaxTools).ToArray());
             foreach(var saved in dto.Tools.Take(MaxTools))
             {
                 if(saved?.Json is not null && ToolTemplateFormat.Parse(saved.Json).Template is { } template && tools.All(tool=>tool.Template.Id!=template.Id))
@@ -68,6 +74,60 @@ public sealed class ToolTemplateStore:IDisposable
         catch(Exception error) when(error is IOException or UnauthorizedAccessException or JsonException or InvalidDataException or NotSupportedException)
         {Unavailable=true;tools=[];warn(error,"My tools could not be read; the file is left as it is.");}
     }
+    private void Recovered(string aside,Exception error)=>warn(error,$"My tools did not read; their previous version (.bak) was read, the damaged file kept as {Path.GetFileName(aside)}.");
+
+    /// <summary>
+    /// X-832 (security review I4): two game clients on one profile each wrote their whole copy at every tick or counter: one client's tool or
+    /// ticks were erased by the other's next change. Three-way, by the tool's id (a tool the format refuses: by its text): a tool this client
+    /// did not change is the file's (or stays removed when the file removed it); one it removed stays removed; one only the file has, never
+    /// seen here, is kept; one it changed is its own, and when the file holds the same tool (same text) its ticks and counters are merged key
+    /// by key the same way (each client's ticks of the day kept). Mine's order first, then the file's other tools.
+    /// </summary>
+    internal static FileDto Merge(FileDto? before,FileDto mine,FileDto theirs)
+    {
+        var old=ByKey(before?.Tools ?? []);var file=ByKey(theirs.Tools);var own=ByKey(mine.Tools);
+        var result=new List<SavedTool>();
+        foreach(var tool in mine.Tools)
+        {
+            var key=KeyOf(tool);
+            var had=old.TryGetValue(key,out var was);
+            var there=file.TryGetValue(key,out var other);
+            if(had && Same(was!,tool)){if(there)result.Add(other!);continue;}
+            if(there && other!.Json==tool.Json && (!had || was!.Json==tool.Json))
+                result.Add(tool with {Done=MergeMap(was?.Done,tool.Done,other.Done),Counts=MergeMap(was?.Counts,tool.Counts,other.Counts)});
+            else result.Add(tool);
+        }
+        foreach(var tool in theirs.Tools)
+            if(!own.ContainsKey(KeyOf(tool)) && !old.ContainsKey(KeyOf(tool)))result.Add(tool);
+        return new FileDto(1,result.ToArray());
+    }
+    private static string KeyOf(SavedTool tool)=>ToolTemplateFormat.Parse(tool.Json).Template?.Id is { } id ? "id:"+id : "text:"+tool.Json;
+    private static Dictionary<string,SavedTool> ByKey(IEnumerable<SavedTool> tools)
+    {
+        var byKey=new Dictionary<string,SavedTool>(StringComparer.Ordinal);
+        foreach(var tool in tools)byKey.TryAdd(KeyOf(tool),tool);
+        return byKey;
+    }
+    private static bool Same(SavedTool a,SavedTool b)=>a.Json==b.Json && SameMap(a.Done,b.Done) && SameMap(a.Counts,b.Counts);
+    private static bool SameMap<TValue>(Dictionary<string,TValue>? a,Dictionary<string,TValue>? b)
+        =>(a?.Count ?? 0)==(b?.Count ?? 0) && (a ?? []).All(pair=>b is not null && b.TryGetValue(pair.Key,out var value) && EqualityComparer<TValue>.Default.Equals(value,pair.Value));
+    private static Dictionary<string,TValue> MergeMap<TValue>(Dictionary<string,TValue>? before,Dictionary<string,TValue>? mine,Dictionary<string,TValue>? theirs)
+    {
+        var result=new Dictionary<string,TValue>(StringComparer.Ordinal);
+        foreach(var (key,value) in mine ?? [])
+        {
+            if(before is not null && before.TryGetValue(key,out var was) && EqualityComparer<TValue>.Default.Equals(was,value))
+            {
+                if(theirs is not null && theirs.TryGetValue(key,out var other))result[key]=other;
+                continue;
+            }
+            result[key]=value;
+        }
+        foreach(var (key,value) in theirs ?? [])
+            if(!result.ContainsKey(key) && !(mine?.ContainsKey(key) ?? false) && !(before?.ContainsKey(key) ?? false))result[key]=value;
+        return result;
+    }
+
     private static FileDto ReadFile(string file)
     {
         if(new FileInfo(file).Length>8*1024*1024)throw new InvalidDataException("My tools file too large.");
@@ -129,9 +189,18 @@ public sealed class ToolTemplateStore:IDisposable
     {
         try
         {
-            AtomicFile.Write(path,JsonSerializer.SerializeToUtf8Bytes(snapshot,Options),keep:true);
+            // X-832: under the profile's lock (« MyTools.json.lock »), the file read again and merged with this client's change; a file that
+            // does not read (nor its .bak) is never written over.
+            using(FairFileLock.Hold(path+".lock",LockWaitMs,error=>new IOException("My tools' lock is held by another game client.",error)))
+            {
+                var onDisk=File.Exists(path) || File.Exists(AtomicFile.BackupOf(path)) ? AtomicFile.ReadKept(path,ReadFile,Recovered) : null;
+                var merged=onDisk is null ? snapshot : Merge(before,snapshot,onDisk);
+                AtomicFile.Write(path,JsonSerializer.SerializeToUtf8Bytes(merged,Options),keep:true);
+                before=snapshot;
+            }
         }
-        catch(Exception error) when(error is IOException or UnauthorizedAccessException){warn(error,"My tools could not be saved.");}
+        catch(Exception error) when(error is IOException or UnauthorizedAccessException or JsonException or InvalidDataException or NotSupportedException)
+        {warn(error,"My tools could not be saved.");}
     }
     public Task FlushAsync(){lock(gate)return writes;}
     public void Dispose()
