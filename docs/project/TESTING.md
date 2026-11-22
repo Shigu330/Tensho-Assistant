@@ -2726,6 +2726,18 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1789) Collections › Mirage : vos pièces de la coiffeuse mirage, du bahut personnel, des sacs et des servants sont listées une fois chacune, avec où elles sont ; une pièce que vous avez en double, ou deux pièces de même apparence, montre « n autre(s) » dans « Même apparence » ; essayez la recherche et le filtre d'emplacement.
 
+- [ ] (0.1790) Planificateur d'équipement, un repas choisi : mangez un repas (ou laissez-le finir) : la colonne « Avec le repas » montre « — » une à deux secondes, puis la bonne valeur, jamais une valeur trop basse ou deux repas additionnés.
+
+- [ ] (0.1790) Compagnon chocobo dehors : téléportez-vous, attendez qu'il revienne, renvoyez-le, puis montez plus longtemps que le temps qu'il lui restait : aucun « est parti » à la descente.
+
+- [ ] (0.1793) Rechargement du plugin : vos données sont toutes là (banque et inventaires, journal des gils, avancement des hauts faits, historique des voyages, découvertes, onglets et apparence de la fenêtre de discussion, alarmes et leur envoi Discord) ; aucune ligne « left aside » attendue dans le journal pour vos fichiers.
+
+- [ ] (0.1794) Après un rechargement : dans dalamud.log, la ligne « Tensho data: a save took … ms with the journal folded in at its close (each save before X-750), … ms with the file kept open (X-750). » ; vos données toutes là après un second rechargement (banque, gils, découvertes).
+
+- [ ] (0.1795) Magie bleue : cochez quelques sorts pas encore appris ; « n sort(s) voulu(s), m pas encore appris » s'affiche ; « Copier les sorts voulus, par lieu » colle une ligne par lieu ; la case « Par lieu » trie la liste par lieu (le lieu après chaque sort).
+
+- [ ] (0.1795) Magie bleue : ouvrez la fiche d'un sort appris dans une zone (ex. une zone de La Noscea) : le bouton « Carte » ouvre la bonne carte de Tensho ; un sort appris dans une mission : le bouton « Mission » ouvre sa page ; un lieu partagé par plusieurs cartes : aucun bouton.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.

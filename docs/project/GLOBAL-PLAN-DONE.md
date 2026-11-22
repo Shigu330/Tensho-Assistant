@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (795 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (800 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -340,6 +340,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-144 | Audit A13 (GPT audit of 11/11, checked in the code by the master, order… | Done in 0.1126 |
 | X-146 | Audit A10 (GPT audit of 11/11, checked in the code by the master, order… | Done in 0.1214 |
 | X-147 | Audit A14 (GPT audit of 11/11, checked in the code by the master, order… | Done in 0.1217 |
+| X-148 | Partly | Done in 0.1791.0 |
 | X-149 | GPT review of 11/11, checked in the code by the master, accepted by the user… | Done in 0.1119 |
 | X-150 | GPT review of 11/11, checked in the code by the master, accepted by the user… | Done in 0.1120 |
 | X-151 | GPT review of 11/11, checked in the code by the master, accepted by the user… | Done in 0.1238 |
@@ -673,6 +674,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-571 | Flaky test « Fair lock 1309 » (two bank stores on one file, 2 s lock wait)… | Done in 0.1541 |
 | X-572 | Review of block 0.1535 to 0.1539 (review 0.1539, 17/11), I1: finding in… | Done in 0.1540 |
 | X-573 | Review of block 0.1535 to 0.1539 (review 0.1539, 17/11), minor M1, M2, M3, M4… | Done in 0.1542 |
+| X-574 | User decision of 17/11 around 15:40 (« yes remove it, I am the only one using… | Done in 0.1793.0 |
 | X-575 | Bug seen by the user in the Beastmaster labyrinth on 17/11 around 23:00 (two… | Done in 0.1545 |
 | X-576 | User reading of 18/11 around 00:05 (capture of the window before entering the… | Done in 0.1546 |
 | X-577 | Tool: a decision added through the master's queue (decisions.py add, replayed… | Done in 0.1551 |
@@ -835,6 +837,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-745 | Idea I-027 chosen by the user on 21/11 around 16:00 (idea box): Beastmaster… | Done in 0.1767.0 |
 | X-746 | Idea I-029 chosen by the user on 21/11 around 16:00 (idea box): Beastmaster… | Done in 0.1766.0 |
 | X-748 | Idea I-022 chosen by the user on 21/11 around 16:00 (idea box): Vendors: hide… | Done in 0.1738.0 |
+| X-750 | Idea I-024 chosen by the user on 21/11 around 16:00 (idea box): SQLite: saves… | Done in 0.1794.0 |
 | X-751 | Idea I-049 chosen by the user on 21/11 around 16:00 (idea box): Tool: mutation… | Done in 0.1742.0 |
 | X-752 | Idea I-043 chosen by the user on 21/11 around 16:00 (idea box): Sources… | Done in 0.1763.0 |
 | X-753 | Idea I-044 chosen by the user on 21/11 around 16:00 (idea box): Sources… | Done in 0.1764.0 |
@@ -863,12 +866,14 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-777 | Review of block 0.1780 to 0.1784 (review 0.1784, 22/11), I1: finding in… | Done in 0.1786.0 |
 | X-778 | Review of block 0.1780 to 0.1784 (review 0.1784, 22/11), I2: finding in… | Done in 0.1787.0 |
 | X-779 | Review of block 0.1780 to 0.1784 (review 0.1784, 22/11), minor M1: M1 in… | Done in 0.1788.0 |
+| X-780 | Review of block 0.1785 to 0.1789 (review 0.1789, 22/11), minor M2: M2 in… | Done in 0.1790.0 |
+| X-781 | Review of block 0.1785 to 0.1789 (review 0.1789, 22/11), pre-existing before… | Done in 0.1790.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (795 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (800 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1206,6 +1211,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-144 | Audit A13 (audit GPT du 11/11… | Fait en 0.1126 |
 | X-146 | Audit A10 (audit GPT du 11/11… | Fait en 0.1214 |
 | X-147 | Audit A14 (audit GPT du 11/11… | Fait en 0.1217 |
+| X-148 | Fait en partie en 0.1215 : actions des workflows épinglées par empreinte (A16)… | Fait en 0.1791.0 |
 | X-149 | revue GPT du 11/11 (C:\Plugins-ff14-plan-2026-11-11-2dddccb), vérifiée dans le… | Fait en 0.1119 |
 | X-150 | revue GPT du 11/11 (C:\Plugins-ff14-plan-2026-11-11-2dddccb), vérifiée dans le… | Fait en 0.1120 |
 | X-151 | revue GPT du 11/11 (C:\Plugins-ff14-plan-2026-11-11-2dddccb), vérifiée dans le… | Fait en 0.1238 |
@@ -1539,6 +1545,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-571 | Test fragile « Fair lock 1309 » (deux magasins de banque sur un fichier… | Fait en 0.1541 |
 | X-572 | Relecture du bloc 0.1535 à 0.1539 (relecture 0.1539, 17/11), I1 : Le rejeu peut… | Fait en 0.1540 |
 | X-573 | Relecture du bloc 0.1535 à 0.1539 (relecture 0.1539, 17/11), mineurs M1, M2… | Fait en 0.1542 |
+| X-574 | Décision de l'utilisateur du 17/11 vers 15 h 40 (« oui retire, je suis seul à… | Fait en 0.1793.0 |
 | X-575 | Bug vu par l'utilisateur au Dédale bestial le 17/11 vers 23 h (deux captures du… | Fait en 0.1545 |
 | X-576 | Relevé de l'utilisateur du 18/11 vers 0 h 05 (capture de la fenêtre d'avant… | Fait en 0.1546 |
 | X-577 | Outil : une décision ajoutée par la file de la maître (decisions.py add… | Fait en 0.1551 |
@@ -1701,6 +1708,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-745 | Idée I-027 choisie par l'utilisateur le 21/11 vers 16 h (boîte à idées)… | Fait en 0.1767.0 |
 | X-746 | Idée I-029 choisie par l'utilisateur le 21/11 vers 16 h (boîte à idées)… | Fait en 0.1766.0 |
 | X-748 | Idée I-022 choisie par l'utilisateur le 21/11 vers 16 h (boîte à idées) : Essai… | Fait en 0.1738.0 |
+| X-750 | Idée I-024 choisie par l'utilisateur le 21/11 vers 16 h (boîte à idées) : Base… | Fait en 0.1794.0 |
 | X-751 | Idée I-049 choisie par l'utilisateur le 21/11 vers 16 h (boîte à idées) : Outil… | Fait en 0.1742.0 |
 | X-752 | Idée I-043 choisie par l'utilisateur le 21/11 vers 16 h (boîte à idées)… | Fait en 0.1763.0 |
 | X-753 | Idée I-044 choisie par l'utilisateur le 21/11 vers 16 h (boîte à idées)… | Fait en 0.1764.0 |
@@ -1729,3 +1737,5 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-777 | Relecture du bloc 0.1780 à 0.1784 (relecture 0.1784, 22/11), I1 : Un compagnon… | Fait en 0.1786.0 |
 | X-778 | Relecture du bloc 0.1780 à 0.1784 (relecture 0.1784, 22/11), I2 : La colonne «… | Fait en 0.1787.0 |
 | X-779 | Relecture du bloc 0.1780 à 0.1784 (relecture 0.1784, 22/11), mineurs M1 : M1… | Fait en 0.1788.0 |
+| X-780 | Relecture du bloc 0.1785 à 0.1789 (relecture 0.1789, 22/11), mineurs M2 : M2… | Fait en 0.1790.0 |
+| X-781 | Relecture du bloc 0.1785 à 0.1789 (relecture 0.1789, 22/11), déjà là avant le… | Fait en 0.1790.0 |
