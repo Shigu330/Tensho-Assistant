@@ -8400,7 +8400,19 @@
     "Unpriced": "{0} items",
     "UnpricedTip": "Items the market takes but with no price known on your world: left out of the value, never counted as 0.",
     "Old": "{0} items, since {1}",
-    "OldTip": "Prices whose market data is more than a day old: the value may have moved."
+    "OldTip": "Prices whose market data is more than a day old: the value may have moved.",
+    "SleepersTitle": "Sits and sells ({0})",
+    "SleepersHelp": "Items of your storages (all your characters) that sell on your world, by what the market moves of them each day: the price they really sold for (the lower of the last and the average sale) × the units sold a day. The NPC's price beside. Advice only: nothing is sold or moved.",
+    "SleepersUnknown": "{0} items not listed: no sold price or sales speed known",
+    "SleepersUnknownTip": "Items the market takes, but whose sold price or sales a day Universalis did not give: left out, never taken as 0.",
+    "SleepersNone": "No item of your storages sells on your world, as far as the prices asked tell.",
+    "ColumnItem": "Item",
+    "ColumnQuantity": "Held",
+    "ColumnWhere": "Where",
+    "ColumnSold": "Sold (gil)",
+    "ColumnPerDay": "Sales a day",
+    "ColumnPerDayGil": "Gil a day",
+    "ColumnNpc": "NPC (gil)"
   },
   "Island": {
     "TabWorkshop": "Workshop",

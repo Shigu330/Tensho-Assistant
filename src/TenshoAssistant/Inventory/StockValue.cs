@@ -15,6 +15,14 @@ public readonly record struct StockPrice(long Unit,DateTimeOffset? At);
 public sealed record StockValueLine(string Place,long Value,int Priced,int Unpriced,int NotSold,int Stale,DateTimeOffset? Oldest);
 
 /// <summary>
+/// X-207 (part 2): one item (and quality) that sits in the storages and sells on the world: <paramref name="Quantity"/> held in all,
+/// <paramref name="Places"/> where (in the order met), <paramref name="Sold"/> what one unit really sold for (MarketQuote.Sold: the lower
+/// of the last and the average sale), <paramref name="PerDay"/> the units sold a day, <paramref name="PerDayGil"/> sold price × sales a
+/// day (what the market moves of it each day), <paramref name="NpcPrice"/> what an NPC pays for one (0: none known).
+/// </summary>
+public sealed record StockSleeper(uint ItemId,bool Hq,long Quantity,IReadOnlyList<string> Places,long Sold,decimal PerDay,long PerDayGil,uint NpcPrice);
+
+/// <summary>
 /// X-207 (the user's request of 12/11, the comparison with other plugins K-14): the estimated value of the stocks, per storage and per
 /// character, at the market prices asked on the player's click only (DEC-048). Advice only: an estimate at the lowest listing, nothing sold.
 /// Pure (tests).
@@ -69,6 +77,33 @@ public static class StockValue
         if(quality.Minimum is > 0 and var minimum)return new((long)Math.Round(minimum),quote.UploadedAt);
         if(quality.Average is > 0 and var average)return new((long)Math.Round(average),quality.SaleAt ?? quote.UploadedAt);
         return null;
+    }
+
+    /// <summary>
+    /// X-207 (part 2): « sits and sells »: the items held in the storages that the market takes and that sell on the world, the first
+    /// <paramref name="most"/> by sold price × sales a day, then by sold price. An item that does not sell (0 a day) is not listed; one whose
+    /// sold price or speed is not known is counted apart (<c>Unknown</c>), never taken as 0 (R06). Advice only.
+    /// </summary>
+    public static (IReadOnlyList<StockSleeper> Lines,int Unknown) Sleepers(IEnumerable<(string Place,InventoryStack Stack)> stacks,Func<uint,bool> marketable,
+        Func<uint,bool,(decimal Price,decimal? PerDay)?> sold,Func<uint,uint> npcPrice,int most)
+    {
+        var held=new Dictionary<(uint Id,bool Hq),(long Quantity,List<string> Places)>();
+        foreach(var (place,stack) in stacks)
+        {
+            if(stack.Quantity<=0 || stack.Item.Id.Value==0 || !marketable(stack.Item.Id.Value))continue;
+            var key=(stack.Item.Id.Value,stack.Item.IsHighQuality);
+            var (quantity,places)=held.TryGetValue(key,out var known) ? known:(0L,new List<string>());
+            if(!places.Contains(place))places.Add(place);
+            held[key]=(checked(quantity+stack.Quantity),places);
+        }
+        var lines=new List<StockSleeper>();var unknown=0;
+        foreach(var ((id,hq),(quantity,places)) in held)
+        {
+            if(sold(id,hq) is not { Price:>0 } price || price.PerDay is not { } perDay){unknown++;continue;}
+            if(perDay<=0)continue;
+            lines.Add(new(id,hq,quantity,places,(long)Math.Round(price.Price),perDay,(long)Math.Round(price.Price*perDay),npcPrice(id)));
+        }
+        return ([..lines.OrderByDescending(line=>line.PerDayGil).ThenByDescending(line=>line.Sold).ThenBy(line=>line.ItemId).ThenBy(line=>line.Hq).Take(Math.Max(0,most))],unknown);
     }
 
     /// <summary>

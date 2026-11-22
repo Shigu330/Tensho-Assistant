@@ -8400,7 +8400,19 @@
     "Unpriced": "{0} objets",
     "UnpricedTip": "Objets que le marché accepte mais sans prix connu sur votre monde : laissés hors de la valeur, jamais comptés 0.",
     "Old": "{0} objets, depuis le {1}",
-    "OldTip": "Prix dont les données du marché ont plus d'un jour : la valeur a pu bouger."
+    "OldTip": "Prix dont les données du marché ont plus d'un jour : la valeur a pu bouger.",
+    "SleepersTitle": "Dort et se vend ({0})",
+    "SleepersHelp": "Les objets de vos rangements (tous vos personnages) qui se vendent sur votre monde, par ce que le marché en écoule chaque jour : le prix auquel ils se sont vraiment vendus (le plus bas de la dernière vente et de la vente moyenne) × les ventes par jour. Le prix du PNJ à côté. Conseil seulement : rien n'est vendu ni déplacé.",
+    "SleepersUnknown": "{0} objets non listés : prix vendu ou ventes par jour inconnus",
+    "SleepersUnknownTip": "Objets que le marché prend, mais dont Universalis n'a pas donné le prix vendu ou les ventes par jour : laissés de côté, jamais comptés comme 0.",
+    "SleepersNone": "Aucun objet de vos rangements ne se vend sur votre monde, d'après les prix demandés.",
+    "ColumnItem": "Objet",
+    "ColumnQuantity": "Détenus",
+    "ColumnWhere": "Où",
+    "ColumnSold": "Vendu (gils)",
+    "ColumnPerDay": "Ventes par jour",
+    "ColumnPerDayGil": "Gils par jour",
+    "ColumnNpc": "PNJ (gils)"
   },
   "Island": {
     "TabWorkshop": "Atelier",
