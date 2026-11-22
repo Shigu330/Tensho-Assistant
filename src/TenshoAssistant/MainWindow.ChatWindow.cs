@@ -955,6 +955,8 @@ internal sealed partial class MainWindow
         ListSetting("ChatWindow.HideWords","ChatWindow.HideWordsTip",()=>tab.HideWords,value=>{tab.HideWords=value;ChatTabChanged(tab);},300,()=>tab.WordsMatchCase);
         CheckSetting("ChatWindow.WordsMatchCase","ChatWindow.WordsMatchCaseTip",()=>tab.WordsMatchCase,value=>{tab.WordsMatchCase=value;ChatTabChanged(tab);});
         CheckSetting("ChatWindow.FoldRepeats","ChatWindow.FoldRepeatsTip",()=>tab.FoldRepeats,value=>{tab.FoldRepeats=value;ChatTabChanged(tab);});
+        // X-484 (0.1777, beyond the game): others' Teleport and Return left out of this tab (ChatTravel).
+        CheckSetting("ChatWindow.HideOthersTravel","ChatWindow.HideOthersTravelTip",()=>tab.HideOthersTravel,value=>{tab.HideOthersTravel=value;ChatTabChanged(tab);});
     }
 
     /// <summary>X-484 (0.1482, beyond the game): players hidden from every tab, players whose name stands out.</summary>

@@ -6715,6 +6715,8 @@
     "WordsMatchCaseTip": "The words above match only with the same capitals.\nDefault: off.",
     "FoldRepeats": "Fold repeated messages",
     "FoldRepeatsTip": "A message that comes again right after itself (same channel, same sender, same text, within a minute) is not shown again: the first one shows how many times it came (« ×3 »). Only in Tensho's window.\nDefault: off.",
+    "HideOthersTravel": "Hide others' teleports",
+    "HideOthersTravelTip": "The lines in which another player (of your party or not) readies or uses Teleport or Return are not shown in this tab. No line about another player's mount has been seen in the game's log: nothing to hide for mounts. Only in Tensho's window.\nDefault: off.",
     "Repeats": " ×{0}",
     "RepeatsTip": "This message came {0} times in a row; the repeats are folded (the tab's « Fold repeated messages »).",
     "HiddenPlayers": "Hidden players",

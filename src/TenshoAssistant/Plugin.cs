@@ -290,6 +290,9 @@ public sealed partial class Plugin : IDalamudPlugin
             // X-484 (0.1482): the game's log filters, in the client's language (docs/evidence/0.1482-chat-log-filters.md).
             mainWindow.ChatFilterSource=()=>data.GetExcelSheet<Lumina.Excel.Sheets.LogFilter>()
                 .Select(row=>new Chat.ChatFilterRow(row.RowId,row.LogKind,row.Caster,row.Target,row.Category,row.DisplayOrder,row.Preset,row.Name.ExtractText(),row.Example.ExtractText())).ToList();
+            // X-484 (0.1777): the names of Teleport and Return in the client's language (Action rows 5 and 6), for the tabs that hide others' teleports.
+            try{Chat.ChatTravel.Names=Chat.ChatTravel.From(Chat.ChatTravel.Actions.Select(id=>data.GetExcelSheet<Lumina.Excel.Sheets.Action>().GetRowOrDefault(id)?.Name.ExtractText()));}
+            catch(Exception error){log.Warning(error,"Chat window: the names of Teleport and Return could not be read (maybe after a game update): others' teleports are not hidden.");}
             mainWindow.OpenDalamudLink=(plugin,command,data,text)=>
             {
                 if(!chatGui.RegisteredLinkHandlers.TryGetValue((plugin,command),out var handler))return false;

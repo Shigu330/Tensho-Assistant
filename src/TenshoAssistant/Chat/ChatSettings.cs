@@ -20,6 +20,9 @@ public sealed class ChatTabSettings
     /// <summary>X-484 (0.1519, beyond the game; the « duplicates » of the chat study, X-447): a message repeated right after itself (same channel,
     /// same sender, same text, within <see cref="ChatRepeat.Window"/>) is not shown again: the first one counts the repeats (« ×3 »).</summary>
     public bool FoldRepeats{get;set;}
+    /// <summary>X-484 (0.1777, beyond the game; the user's request of 15/11, reading R-X-484 of 20/11): the combat lines in which another player
+    /// readies or uses Teleport or Return are not shown in this tab (<see cref="ChatTravel"/>).</summary>
+    public bool HideOthersTravel{get;set;}
     /// <summary>X-455 E7 (0.1617): when the player cleared this tab: the messages before are no longer shown in it (the other tabs keep them);
     /// null: never cleared, or shown again.</summary>
     public DateTimeOffset? ClearedAt{get;set;}

@@ -23,6 +23,7 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 | `(ChatWindow.ContextUseLook)` | — | — | Settings › Panels › ChatTabs | **Use the current look here** — This context takes the window's look as it is now (background, text, margins, colours…); change it while there to adjust it. Default: the window's own look. |
 | `(ChatWindow.FiltersUse)` | — | — | Settings › Panels › ChatTabs | **Use the game's filters** — Shows this tab with the filters of the game's log window, finer than channels (combat lines by who does what to whom). They start from the channels chosen here. Default: by channels. |
 | `(ChatWindow.FoldRepeats)` | — | — | Settings › Panels › ChatTabs | **Fold repeated messages** — A message that comes again right after itself (same channel, same sender, same text, within a minute) is not shown again: the first one shows how many times it came (« ×3 »). Only in Tensho's window. Default: off. |
+| `(ChatWindow.HideOthersTravel)` | — | — | Settings › Panels › ChatTabs | **Hide others' teleports** — The lines in which another player (of your party or not) readies or uses Teleport or Return are not shown in this tab. No line about another player's mount has been seen in the game's log: nothing to hide for mounts. Only in Tensho's window. Default: off. |
 | `(ChatWindow.HideWords)` | — | — | Settings › Panels › ChatTabs | **Hide with** — Hides the messages that hold one of these words (one per line: type it in the box and press Enter or « Add »). Default: empty. |
 | `(ChatWindow.HistoryDaysUnlimited)` | — | — | Settings › Panels › ChatHistory | **No limit** — Keeps the messages of every day, however old; the number beside it is kept for when this is unticked (unticking asks first: the older messages are then deleted). The place on disk keeps growing. Default: off. |
 | `(ChatWindow.HistoryMessagesUnlimited)` | — | — | Settings › Panels › ChatHistory | **No limit** — Keeps every message, however many; the number beside it is kept for when this is unticked (unticking asks first: the messages past it are then deleted). The window still shows its own number of lines; the place on disk keeps growing. Default: off. |
@@ -429,7 +430,7 @@ Settings reset by « Restore every setting » without a control in the interface
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Counted: 371 controls (315 linked to `Configuration`, 56 to another file), 36 settings without a control.
+Counted: 372 controls (315 linked to `Configuration`, 57 to another file), 36 settings without a control.
 <!-- /docgen:settings -->
 
 ---
@@ -458,6 +459,7 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 | `(ChatWindow.ContextUseLook)` | — | — | Paramètres › Panneaux à côté du jeu › Onglets du chat | **Prendre l'aspect actuel ici** — Ce contexte prend l'aspect actuel de la fenêtre (fond, texte, marges, couleurs…) ; changez-le sur place pour l'ajuster. Par défaut : l'aspect de la fenêtre. |
 | `(ChatWindow.FiltersUse)` | — | — | Paramètres › Panneaux à côté du jeu › Onglets du chat | **Utiliser les filtres du jeu** — Cet onglet se règle avec les filtres de la fenêtre de discussion du jeu, plus fins que les canaux (lignes de combat selon qui fait quoi à qui). Ils partent des canaux choisis ici. Par défaut : par canaux. |
 | `(ChatWindow.FoldRepeats)` | — | — | Paramètres › Panneaux à côté du jeu › Onglets du chat | **Replier les messages répétés** — Un message qui revient juste après lui-même (même canal, même auteur, même texte, à moins d'une minute) n'est pas montré de nouveau : le premier dit combien de fois il est venu (« ×3 »). Seulement dans la fenêtre Tensho. Par défaut : non. |
+| `(ChatWindow.HideOthersTravel)` | — | — | Paramètres › Panneaux à côté du jeu › Onglets du chat | **Cacher les téléportations des autres** — Les lignes où un autre joueur (de votre équipe ou non) prépare ou utilise Téléportation ou Retour ne sont pas montrées dans cet onglet. Aucune ligne sur la monture d'un autre joueur n'a été vue dans le journal du jeu : rien à cacher pour les montures. Seulement dans la fenêtre Tensho. Par défaut : non. |
 | `(ChatWindow.HideWords)` | — | — | Paramètres › Panneaux à côté du jeu › Onglets du chat | **Cacher avec** — Cache les messages qui contiennent l'un de ces mots (un par ligne : tapez-le dans la case puis Entrée ou « Ajouter »). Par défaut : vide. |
 | `(ChatWindow.HistoryDaysUnlimited)` | — | — | Paramètres › Panneaux à côté du jeu › Historique du chat | **Sans limite** — Garde les messages de tous les jours, aussi anciens soient-ils ; le nombre à côté est gardé pour quand la case est décochée (la décocher demande d'abord : les messages plus anciens sont alors supprimés). La place sur le disque continue de grandir. Par défaut : désactivé. |
 | `(ChatWindow.HistoryMessagesUnlimited)` | — | — | Paramètres › Panneaux à côté du jeu › Historique du chat | **Sans limite** — Garde tous les messages, quel que soit leur nombre ; le nombre à côté est gardé pour quand la case est décochée (la décocher demande d'abord : les messages au-delà sont alors supprimés). La fenêtre montre toujours son propre nombre de lignes ; la place sur le disque continue de grandir. Par défaut : désactivé. |
@@ -864,5 +866,5 @@ Réglages remis par « Tout remettre par défaut » sans case dans l'interface (
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Compté : 371 cases (315 reliées à `Configuration`, 56 à un autre fichier), 36 réglages sans case.
+Compté : 372 cases (315 reliées à `Configuration`, 57 à un autre fichier), 36 réglages sans case.
 <!-- /docgen:settings-fr -->

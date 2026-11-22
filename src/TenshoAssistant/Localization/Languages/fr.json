@@ -6715,6 +6715,8 @@
     "WordsMatchCaseTip": "Les mots ci-dessus ne comptent qu'avec les mêmes majuscules.\nPar défaut : désactivé.",
     "FoldRepeats": "Replier les messages répétés",
     "FoldRepeatsTip": "Un message qui revient juste après lui-même (même canal, même auteur, même texte, à moins d'une minute) n'est pas montré de nouveau : le premier dit combien de fois il est venu (« ×3 »). Seulement dans la fenêtre Tensho.\nPar défaut : non.",
+    "HideOthersTravel": "Cacher les téléportations des autres",
+    "HideOthersTravelTip": "Les lignes où un autre joueur (de votre équipe ou non) prépare ou utilise Téléportation ou Retour ne sont pas montrées dans cet onglet. Aucune ligne sur la monture d'un autre joueur n'a été vue dans le journal du jeu : rien à cacher pour les montures. Seulement dans la fenêtre Tensho.\nPar défaut : non.",
     "Repeats": " ×{0}",
     "RepeatsTip": "Ce message est venu {0} fois de suite ; les répétitions sont repliées (« Replier les messages répétés » de l'onglet).",
     "HiddenPlayers": "Joueurs cachés",
