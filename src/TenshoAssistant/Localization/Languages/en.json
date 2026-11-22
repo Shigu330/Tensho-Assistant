@@ -7238,7 +7238,7 @@
     "GraceLeft": "about {0} bonus points left",
     "GraceUnknown": "Points left unknown",
     "GraceTip": "Counted by Tensho from your experience lines since the manual was used: the manual's part of each bonus (+150% below level {0}, then +75%), against the cap of {1} points written in its description. Approximate when other bonuses (a meal, rested experience…) add up with it.",
-    "GraceUnknownTip": "Tensho did not see this manual being used, or experience was gained while Tensho was not running: its points left cannot be counted. They will be from the next manual used while Tensho runs.",
+    "GraceUnknownTip": "Tensho did not see this manual being used, or experience was gained while Tensho was not counting it (not running, or the status not seen for a moment): its points left cannot be counted. They will be from the next manual used while Tensho runs.",
     "GraceManualTip": "A manual whose cap Tensho does not know: its points left are not shown.",
     "Unavailable": "The gear sets could not be read (perhaps after a game update).",
     "Random": "Random job",

@@ -26,6 +26,7 @@ public sealed unsafe class GraceWatcher : IDisposable
     private readonly object gate=new();
     private readonly List<(uint Job,long Gained,int Percent)> gains=[];
     private readonly Dictionary<uint,(uint Job,int Level)> levels=[];
+    private readonly HashSet<uint> seenBefore=[];
     private ulong character;
     private bool firstLook=true,disposed,failed,mismatchSaid,gainSaid;
     private long nextLook=-100_000;
@@ -68,31 +69,25 @@ public sealed unsafe class GraceWatcher : IDisposable
         {
             if(!client.IsLoggedIn || !player.IsLoaded || objects.LocalPlayer is not { } me || player.ContentId==0)
             {
+                // X-769: a line dropped here (a loading screen) makes the next sighting check the jobs' experience (seenBefore emptied).
                 lock(gate)gains.Clear();
+                seenBefore.Clear();
                 if(!client.IsLoggedIn){character=0;firstLook=true;Volatile.Write(ref shown,[]);}
                 return;
             }
-            if(player.ContentId!=character){character=player.ContentId;firstLook=true;levels.Clear();}
+            if(player.ContentId!=character){character=player.ContentId;firstLook=true;levels.Clear();seenBefore.Clear();}
             var all=store();
             var counts=all.GetValueOrDefault(character) ?? [];
-            var changed=false;
-            var next=new List<GraceCount>();
             var held=new Dictionary<uint,(ushort Param,float Remaining)>();
             foreach(var status in me.StatusList)
                 if(status.StatusId is ManualGrace.CrafterGrace or ManualGrace.GathererGrace && !held.ContainsKey(status.StatusId))
                     held[status.StatusId]=(status.Param,status.RemainingTime);
-            var state=PlayerState.Instance();
-            foreach(var grace in new[]{ManualGrace.CrafterGrace,ManualGrace.GathererGrace})
-            {
-                var saved=counts.FirstOrDefault(count=>count.Status==grace);
-                if(!held.TryGetValue(grace,out var status)){if(saved is not null)changed=true;continue;}
-                var count=ManualGrace.Observe(saved,grace,status.Param,status.Remaining,Snapshot(state,grace),firstLook,out var moved);
-                if(moved || !ReferenceEquals(count,saved))changed=true;
-                if(saved is null || !ReferenceEquals(count,saved))
-                    log.Information("Grace: {0} (Param {1}, {2:F0} s left) {3}.",grace,status.Param,status.Remaining,
-                        count.StartSeen ? "seen from its start: its bonus points are counted":"held without its start seen: its points left are unknown");
-                next.Add(count);
-            }
+            // X-769 (0.1765): a Grace not seen at this reading keeps its saved count (not shown); one seen again checks the jobs' experience.
+            var next=ManualGrace.Read(counts,held,grace=>Snapshot(PlayerState.Instance(),grace),firstLook,seenBefore,out var current,out var changed);
+            foreach(var count in current)
+                if(!counts.Any(saved=>ReferenceEquals(saved,count)))
+                    log.Information("Grace: {0} (Param {1}, {2:F0} s left) {3}.",count.Status,count.Param,count.Remaining,
+                        count.StartSeen ? "seen from its start: its bonus points are counted":"held without its start seen (or experience gained while not counted): its points left are unknown");
             firstLook=false;
             // The level of the job worn as last read before the line (a line that raises the level is counted at the level it was earned at).
             var worn=me.ClassJob.RowId;
@@ -108,13 +103,13 @@ public sealed unsafe class GraceWatcher : IDisposable
                 }
                 if(ManualGrace.StatusFor(job)==0)continue;
                 var known=levels.TryGetValue(ManualGrace.StatusFor(job),out var last) && last.Job==job ? last.Level:level;
-                if(next.FirstOrDefault(count=>count.Status==ManualGrace.StatusFor(job)) is not { } count)continue;
+                if(current.FirstOrDefault(count=>count.Status==ManualGrace.StatusFor(job)) is not { } count)continue;
                 if(ManualGrace.Gain(count,gained,percent,known))changed=true;
                 if(!gainSaid){gainSaid=true;log.Information("Grace: an experience line read: {0} points (+{1}%) at level {2}, the manual's part counted; {3} bonus points left.",gained,percent,known,ManualGrace.Left(count)?.ToString() ?? "unknown");}
             }
             if(ManualGrace.StatusFor(worn) is var boosted and not 0)levels[boosted]=(worn,level);
             if(next.Count>0)all[character]=next;else if(all.Remove(character))changed=true;
-            Volatile.Write(ref shown,next.Select(count=>new GraceShown(count.Status,statusName(count.Status),ManualGrace.Left(count),ManualGrace.Cap(count.Param),count.Param)).ToArray());
+            Volatile.Write(ref shown,current.Select(count=>new GraceShown(count.Status,statusName(count.Status),ManualGrace.Left(count),ManualGrace.Cap(count.Param),count.Param)).ToArray());
             if(changed)save();
         }
         catch(Exception error)

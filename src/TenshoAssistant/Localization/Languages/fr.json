@@ -7238,7 +7238,7 @@
     "GraceLeft": "environ {0} points de bonus restants",
     "GraceUnknown": "Points restants inconnus",
     "GraceTip": "Compté par Tensho depuis vos lignes d'expérience depuis l'utilisation du manuel : la part du manuel dans chaque bonus (+150 % sous le niveau {0}, puis +75 %), contre le plafond de {1} points écrit dans sa description. Approché quand d'autres bonus (un repas, l'expérience reposée…) s'y ajoutent.",
-    "GraceUnknownTip": "Tensho n'a pas vu l'utilisation de ce manuel, ou de l'expérience a été gagnée pendant que Tensho ne tournait pas : ses points restants ne peuvent pas être comptés. Ils le seront à partir du prochain manuel utilisé pendant que Tensho tourne.",
+    "GraceUnknownTip": "Tensho n'a pas vu l'utilisation de ce manuel, ou de l'expérience a été gagnée pendant que Tensho ne la comptait pas (Tensho arrêté, ou le statut pas vu un instant) : ses points restants ne peuvent pas être comptés. Ils le seront à partir du prochain manuel utilisé pendant que Tensho tourne.",
     "GraceManualTip": "Un manuel dont Tensho ne connaît pas le plafond : ses points restants ne sont pas montrés.",
     "Unavailable": "Les tenues n'ont pas pu être lues (peut-être après une mise à jour du jeu).",
     "Random": "Job au hasard",

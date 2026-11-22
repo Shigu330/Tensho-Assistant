@@ -38,6 +38,14 @@ public static class ManualGrace
     /// <summary>A new manual: the status's seconds left grew by more than this since the last reading.</summary>
     public const float RefreshSeconds=60;
 
+    /// <summary>X-769 (0.1765): a manual's Grace lasts 18 hours from its use (each manual's description: « Duration: 18 hours », « Durée
+    /// maximum d'effet : 18 heures », Item 4632 to 26554 column 8; 64,774 s read in game 26 s after a use on 15/11).</summary>
+    public const float FullSeconds=64_800;
+
+    /// <summary>X-769 (0.1765): a new count is from the manual's start only when its seconds left are within this of the full 18 hours (one
+    /// reading each second, a loading screen in between, during which no experience is gained); later, its points left are unknown.</summary>
+    public const float StartSeconds=120;
+
     /// <summary>The Grace that boosts this job: crafters (ClassJob 8 to 15) status 45, gatherers (16 to 18) status 46; none else.</summary>
     public static uint StatusFor(uint job)=>job is >= 8 and <= 15 ? CrafterGrace:job is >= 16 and <= 18 ? GathererGrace:0;
 
@@ -62,19 +70,54 @@ public static class ManualGrace
     /// else its points left are unknown. A new manual (another Param, or its time started again) starts a count while Tensho watches.
     /// </summary>
     /// <param name="changed">Whether something worth saving changed (the seconds left alone are not).</param>
-    public static GraceCount Observe(GraceCount? saved,uint status,ushort param,float remaining,string jobs,bool firstLook,out bool changed)
+    public static GraceCount Observe(GraceCount? saved,uint status,ushort param,float remaining,string jobs,bool firstLook,out bool changed)=>
+        Observe(saved,status,param,remaining,jobs,firstLook,firstLook,out changed);
+
+    /// <summary>
+    /// X-769 (0.1765): as above, <paramref name="resumed"/> telling a status seen again after a reading that did not see it (or after a
+    /// load, a login or a loading screen): the saved count goes on only when the jobs' experience did not move in between (lines read
+    /// while the status was not seen are not counted), else its points left are unknown. A new count is from the manual's start only when
+    /// Tensho watches and the status's seconds left are within <see cref="StartSeconds"/> of the full 18 hours: a status first seen later
+    /// (its count lost, or a manual used while Tensho was not watching) is unknown, never the whole cap.
+    /// </summary>
+    public static GraceCount Observe(GraceCount? saved,uint status,ushort param,float remaining,string jobs,bool firstLook,bool resumed,out bool changed)
     {
         changed=false;
         var same=saved is not null && saved.Status==status && saved.Param==param && remaining<=saved.Remaining+RefreshSeconds;
-        if(!same || firstLook && saved!.Jobs!=jobs && saved.StartSeen)
+        if(!same || resumed && saved!.Jobs!=jobs && saved.StartSeen)
         {
             changed=true;
-            return new GraceCount{Status=status,Param=param,StartSeen=same ? false:!firstLook,Remaining=remaining,Jobs=jobs};
+            return new GraceCount{Status=status,Param=param,StartSeen=!same && !firstLook && remaining>=FullSeconds-StartSeconds,Remaining=remaining,Jobs=jobs};
         }
         if(saved!.Jobs!=jobs)changed=true;
         saved.Remaining=remaining;
         saved.Jobs=jobs;
         return saved;
+    }
+
+    /// <summary>
+    /// X-769 (0.1765): one reading of your statuses (once a second). Returns the counts to keep in the settings: those of the Graces held
+    /// (<paramref name="current"/>, in the order 45, 46), then the saved ones not held at this reading, kept as they are: one reading that
+    /// does not see a status no longer wipes its count. <paramref name="seenBefore"/>: the Graces held at the previous reading (updated here;
+    /// emptied by the caller after a load, a login or a loading screen), so that one seen again is <c>resumed</c>.
+    /// </summary>
+    public static List<GraceCount> Read(IReadOnlyList<GraceCount> saved,IReadOnlyDictionary<uint,(ushort Param,float Remaining)> held,Func<uint,string> jobs,
+        bool firstLook,HashSet<uint> seenBefore,out List<GraceCount> current,out bool changed)
+    {
+        changed=false;
+        current=[];
+        var kept=new List<GraceCount>();
+        foreach(var grace in new[]{CrafterGrace,GathererGrace})
+        {
+            var last=saved.FirstOrDefault(count=>count.Status==grace);
+            if(!held.TryGetValue(grace,out var status)){if(last is not null)kept.Add(last);continue;}
+            var count=Observe(last,grace,status.Param,status.Remaining,jobs(grace),firstLook,firstLook || !seenBefore.Contains(grace),out var moved);
+            if(moved || !ReferenceEquals(count,last))changed=true;
+            current.Add(count);
+        }
+        seenBefore.Clear();
+        foreach(var count in current)seenBefore.Add(count.Status);
+        return [..current,..kept];
     }
 
     /// <summary>The manual's part of one experience line: gained × rate ÷ (100 + percent); none without a percent.</summary>
