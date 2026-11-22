@@ -153,7 +153,7 @@ internal static class ConversionRaces1197Tests
         ("Conversion races 1197: wiring: the plugin opens the database without converting and says the files of before once; the JSON base read only without a database (X-574)", () =>
         {
             var plugin = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Discoveries.cs")).ReplaceLineEndings("\n"); // X-153 (0.1250): the discoveries family
-            Check(!plugin.Contains("ConvertFiles(", StringComparison.Ordinal) && plugin.Contains("database=new Discoveries.DiscoveryDatabase(databasePath);", StringComparison.Ordinal), "the database opened, nothing converted");
+            Check(!plugin.Contains("ConvertFiles(", StringComparison.Ordinal) && plugin.Contains("database=new Discoveries.DiscoveryDatabase(databasePath){Log=message=>log.Warning(message)};", StringComparison.Ordinal), "the database opened, nothing converted");
             Check(plugin.Contains("if(Discoveries.DiscoveryFiles.OldFiles(saved) is { Length:>0 } old)", StringComparison.Ordinal)
                 && plugin.Contains("\"Discoveries: a file of an old format ({0}) was left aside, not read (X-574).\"", StringComparison.Ordinal), "the files of before said in the log");
             Check(plugin.IndexOf("mainWindow.DiscoveryDatabase=database;", StringComparison.Ordinal) < plugin.IndexOf("var read=Discoveries.DiscoveryFiles.ReadBase(saved,", StringComparison.Ordinal)

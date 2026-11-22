@@ -94,6 +94,34 @@ public sealed class DiscoveryDatabase
         transaction.Commit();
         return moved;
     }
+    /// <summary>X-822 (22/11): said in the log (English) when a row that could not be read is set aside before a save writes its key again.</summary>
+    public Action<string>? Log { get; init; }
+    /// <summary>
+    /// X-822 (audit of 22/11): a row that cannot be read, met by a save (<see cref="Write"/> with the facts seen since the last save) or by the
+    /// read-back of a copy (<see cref="RestoreAside"/>), was taken as missing and written over without a word. Its text is now copied into
+    /// facts_aside first (kept, never erased), settled at once (facts_aside_done, nothing restored: the row written now is this client's whole
+    /// fact, so no copy is read back on top of it; the read-back settles its key itself), and said once in the log.
+    /// </summary>
+    private void SetAsideDamaged(SqliteConnection open,SqliteTransaction transaction,string key,DateTimeOffset now,bool settle)
+    {
+        Run(open,"CREATE TABLE IF NOT EXISTS facts_aside(key TEXT NOT NULL,kind INTEGER NOT NULL,shared INTEGER NOT NULL,fact TEXT NOT NULL,at TEXT NOT NULL);",transaction);
+        Run(open,AsideDoneTable,transaction);
+        using var copy=open.CreateCommand();copy.Transaction=transaction;
+        copy.CommandText="INSERT INTO facts_aside(key,kind,shared,fact,at) SELECT key,kind,shared,fact,$at FROM facts WHERE key=$key;"
+            +(settle ? "INSERT OR IGNORE INTO facts_aside_done(key,at,restored) VALUES($key,$at,0);":"");
+        copy.Parameters.AddWithValue("$key",key);copy.Parameters.AddWithValue("$at",now.ToString("O"));
+        copy.ExecuteNonQuery();
+        Log?.Invoke($"Discoveries: a row that could not be read ({key}) was set aside in the table facts_aside of {FileName} (kept, never erased) before its key was written again.");
+    }
+    /// <summary>X-822: a row's text read (null: no row, or one that cannot be read, set aside first by <see cref="SetAsideDamaged"/>).</summary>
+    private DiscoveryFact? ReadRow(SqliteConnection open,SqliteTransaction transaction,SqliteCommand select,string key,DateTimeOffset now,bool settle=true)
+    {
+        if(select.ExecuteScalar() is not string text)return null;
+        try{if(JsonSerializer.Deserialize<DiscoveryFact>(text,Options) is { } row)return row;}
+        catch(JsonException){}
+        SetAsideDamaged(open,transaction,key,now,settle);
+        return null;
+    }
     private static bool Readable(string text)
     {
         try{JsonSerializer.Deserialize<DiscoveryFact>(text,Options);return true;}
@@ -170,8 +198,7 @@ public sealed class DiscoveryDatabase
             if(copy is not null)
             {
                 selectKey.Value=key;
-                DiscoveryFact? row=null;
-                if(select.ExecuteScalar() is string text)try{row=JsonSerializer.Deserialize<DiscoveryFact>(text,Options);}catch(JsonException){}
+                var row=ReadRow(open,transaction,select,key,now,settle:false);
                 if(row is null)write.Add(copy.Copy());
                 else{DiscoveryStore.Join(row,copy);write.Add(row);}
                 joined.Add(copy.Copy());
@@ -239,19 +266,19 @@ public sealed class DiscoveryDatabase
         if(write.Count>0)Upsert(open,transaction,write);
         transaction.Commit();
     }
-    // X-171 (0.1313): each fact seen by this client since its last save, added to its row as saved now (a row that cannot be read is replaced as before).
-    private static List<DiscoveryFact> AddedToSaved(SqliteConnection open,SqliteTransaction transaction,IReadOnlyCollection<DiscoveryFact> write,IReadOnlyDictionary<string,DiscoveryFact?> before)
+    // X-171 (0.1313): each fact seen by this client since its last save, added to its row as saved now. X-822: a row that cannot be read is
+    // set aside first (its text kept in facts_aside, said in the log), then replaced by this client's fact.
+    private List<DiscoveryFact> AddedToSaved(SqliteConnection open,SqliteTransaction transaction,IReadOnlyCollection<DiscoveryFact> write,IReadOnlyDictionary<string,DiscoveryFact?> before)
     {
         using var select=open.CreateCommand();select.Transaction=transaction;
         select.CommandText="SELECT fact FROM facts WHERE key=$key;";
         var key=select.Parameters.Add("$key",SqliteType.Text);
-        var result=new List<DiscoveryFact>(write.Count);
+        var result=new List<DiscoveryFact>(write.Count);var now=DateTimeOffset.UtcNow;
         foreach(var fact in write)
         {
             if(!before.TryGetValue(fact.Key,out var was)){result.Add(fact);continue;}
             key.Value=fact.Key;
-            DiscoveryFact? stored=null;
-            if(select.ExecuteScalar() is string text)try{stored=JsonSerializer.Deserialize<DiscoveryFact>(text,Options);}catch(JsonException){}
+            var stored=ReadRow(open,transaction,select,fact.Key,now);
             result.Add(stored is null ? fact:DiscoveryStore.AddMine(stored,fact,was));
         }
         return result;

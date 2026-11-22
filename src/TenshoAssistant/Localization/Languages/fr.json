@@ -904,6 +904,7 @@
     "ExchangeUnauthorized": "GitHub a refusé l'autorisation (retirée ?) : reconnectez-vous.",
     "ExchangeAppMissing": "L'application GitHub de Tensho n'est pas installée sur son dépôt : le ticket qui renvoie à votre gist n'a pas pu être ouvert. Le mainteneur doit l'installer ; vous restez connecté et le prochain échange réessaiera.",
     "ExchangeExpired": "Votre connexion à GitHub a expiré et n'a pas pu être renouvelée : connectez-vous à nouveau.",
+    "ExchangeMetaUnsaved": "Échange arrêté : Tensho n'a pas pu écrire github.json, sa note de votre gist et de votre ticket, dans son dossier des découvertes (disque plein, fichier verrouillé ou droits manquants). Plus rien n'est envoyé tant qu'il ne peut pas l'écrire, pour qu'aucun second gist ni ticket ne soit créé et que votre ancien gist ne reste pas oublié sans être supprimé ; voyez le journal, libérez le fichier ou le disque, puis relancez l'échange.",
     "ExchangeSignInChanged": "Tensho se connecte maintenant à GitHub par son application GitHub, avec moins de droits : l'ancienne autorisation a été oubliée sur ce PC ; connectez-vous à nouveau. Vous pouvez retirer l'ancienne sur github.com › Settings › Applications.",
     "ExchangeFailed": "L'échange a échoué ({0}) ; voir le journal.",
     "CommonSame": "Déjà à jour : le fichier commun n'a pas changé.",

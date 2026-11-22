@@ -88,6 +88,8 @@ public sealed class GitHubExchange : IDisposable
     private readonly CancellationTokenSource stop=new();
     private readonly object gate=new(),marks=new();
     private string? token,refresh;private GitHubExchangeMeta meta=new();private DateTimeOffset tried;private bool busy;
+    // X-822: github.json could not be written at the last try (said once in the log until a write succeeds).
+    private bool metaUnsaved;
     // X-181 (0.1171, night review N2, N7, N8): Disconnect changes the generation: a work started before keeps nothing and sends nothing after it.
     // The secrets are written under their own gate (never after a Disconnect removed them); a write that failed is tried again (the pair stays in
     // memory). A renewal runs under a lock file shared by every client of this profile, not tied to the plugin's stop.
@@ -404,7 +406,10 @@ public sealed class GitHubExchange : IDisposable
         {
             var mine=CommunityDiscoveries.Mine(store.Snapshot(DateTimeOffset.UtcNow,false));
             if(mine.Facts.Count==0)sent="ShareEmpty";
-            else sent=await Rotate(mine).ConfigureAwait(false);
+            // X-822: after a write of github.json that failed, written again first, or nothing made (a send whose gist and issue cannot be
+            // noted would make new ones at each exchange). Not written when the last write held: another client of this profile may have
+            // renewed the sign-in since, and this client's older copy would hide it (GitHubToken1171Tests, N2).
+            else{if(MetaUnsaved)KeepMeta();sent=await Rotate(mine).ConfigureAwait(false);}
         }
         // X-656 M2 (review of 0.1598): an exchange « blocked » or « not reached » breaks the row of refusals (« 3 exchanges in a row »).
         if(sent is "ShareBlocked" or "ShareAsideWaiting")ClearRefused();
@@ -562,7 +567,7 @@ public sealed class GitHubExchange : IDisposable
             string login;lock(gate)login=meta.Login;
             state=GistRotation.AfterMerge(state,login);
             lock(gate){meta.GistId="";meta.GistFiles=[];meta.UploadHash="";}
-            Save(state);SaveMeta();
+            Save(state);KeepMeta();
         }
         var news=GistRotation.News(mine.Facts,state.Merged);
         var sent="ShareMerged";
@@ -594,7 +599,7 @@ public sealed class GitHubExchange : IDisposable
                 // A new issue is a new player file: nothing of it merged yet.
                 if(state.Issue!=issue)state.Merged=[];
                 state.Issue=issue;state.SentGist=gist;state.SentRevision=revision ?? "";state.Sent=GistRotation.Hashes(news);state.Rotated=false;
-                Save(state);SaveMeta();
+                Save(state);KeepMeta();
                 sent="Sent";
             }
         }
@@ -714,8 +719,9 @@ public sealed class GitHubExchange : IDisposable
             lock(gate){meta.GistId=gist;if(!rotated)meta.Issue=0;}
         }
         lock(gate){meta.GistFiles=[..contents.Keys];if(meta.Login.Length>0)meta.GistLogin=meta.Login;}
-        // X-175: the gist kept before the issue, so a refused issue does not make a second gist at the next exchange.
-        SaveMeta();
+        // X-175: the gist kept before the issue, so a refused issue does not make a second gist at the next exchange. X-822: not kept (github.json
+        // not written): stopped here, no issue opened (the rotation's state notes the gist, Rotate's catch).
+        KeepMeta();
         int issue;lock(gate)issue=meta.Issue;
         var version=typeof(GitHubExchange).Assembly.GetName().Version?.ToString(3) ?? "?";
         // X-804: a new gist after a merge: the issue edited to link it; an issue gone (404, 410) is opened again below. X-819: at every
@@ -743,7 +749,7 @@ public sealed class GitHubExchange : IDisposable
             {throw new ExchangeRefused("ExchangeAppMissing",false);}
             lock(gate)meta.Issue=opened?["number"]?.GetValue<int>() ?? 0;
         }
-        SaveMeta();
+        KeepMeta();
         return written?["history"]?[0]?["version"]?.GetValue<string>();
     }
 
@@ -796,14 +802,33 @@ public sealed class GitHubExchange : IDisposable
         return text.Length==0 ? null:JsonNode.Parse(text);
     }
 
-    private void SaveMeta()
+    /// <summary>
+    /// github.json written. X-822 (audit of 22/11): a write that fails (disk full, file locked, no rights) was swallowed without a word; since
+    /// X-804 this file holds the gist in use and the issue, so the next exchange could make a new gist and issue and leave the old gist, with its
+    /// places and days, never deleted. Now false, said once in the log (until a write succeeds again); <see cref="KeepMeta"/> stops the exchange.
+    /// </summary>
+    private bool SaveMeta()
     {
         try
         {
             string json;lock(gate)json=JsonSerializer.Serialize(meta,TenshoJson.Plain);
             AtomicFile.Write(MetaPath,json);
         }
-        catch(Exception){}
+        catch(Exception error)
+        {
+            bool first;lock(gate){first=!metaUnsaved;metaUnsaved=true;}
+            if(first)Log?.Invoke($"Discoveries: {Path.GetFileName(MetaPath)} could not be written ({error.GetType().Name}); no gist nor issue is made until it is.");
+            return false;
+        }
+        bool again;lock(gate){again=metaUnsaved;metaUnsaved=false;}
+        if(again)Log?.Invoke($"Discoveries: {Path.GetFileName(MetaPath)} written again.");
+        return true;
+    }
+    private bool MetaUnsaved{get{lock(gate)return metaUnsaved;}}
+    /// <summary>X-822: github.json written, or the exchange stopped (« ExchangeMetaUnsaved », said on the Discoveries page) before any gist or issue is made.</summary>
+    private void KeepMeta()
+    {
+        if(!SaveMeta())throw new ExchangeRefused("ExchangeMetaUnsaved",false);
     }
 
     /// <summary>X-181 (0.1171, night review N8): a renewal in flight is given a few seconds to finish and be kept before the client closes.</summary>
