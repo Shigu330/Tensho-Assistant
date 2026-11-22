@@ -1,5 +1,6 @@
 using System.IO.Compression;
 using System.Text;
+using System.Text.Json;
 using TenshoAssistant.Discoveries;
 
 // X-357 (0.1349): the repository's common discoveries, read from the v3 set community-discoveries/v3/ (the v2 discoveries.json is gone).
@@ -35,5 +36,28 @@ internal static class RepositoryCommon
             for(var line=reader.ReadLine();line is not null;line=reader.ReadLine())if(line.Length>0)lines.Add((entry.Name,line));
         }
         return lines;
+    }
+
+    /// <summary>X-772 (0.1801, D-217): the player files of community-discoveries/players, as the merge tool reads them: <c>&lt;issue&gt;.jsonl.gz</c>
+    /// (gzip of a header line, then one fact per line, without place nor day), or an <c>&lt;issue&gt;.json</c> of before (v2 JSON, its facts with
+    /// place and days): (file, header or null for a file of before, the facts as JSON).</summary>
+    public static List<(string File,JsonElement? Header,List<JsonElement> Facts)> Players()
+    {
+        var players=new List<(string,JsonElement?,List<JsonElement>)>();
+        foreach(var path in Directory.GetFiles(Path.GetFullPath("community-discoveries/players")).Order(StringComparer.Ordinal))
+        {
+            var name=Path.GetFileName(path);
+            if(name.EndsWith(".jsonl.gz",StringComparison.Ordinal))
+            {
+                using var reader=new StreamReader(new GZipStream(File.OpenRead(path),CompressionMode.Decompress),Encoding.UTF8);
+                var header=JsonDocument.Parse(reader.ReadLine() ?? "null").RootElement.Clone();
+                var facts=new List<JsonElement>();
+                for(var line=reader.ReadLine();line is not null;line=reader.ReadLine())if(line.Length>0)facts.Add(JsonDocument.Parse(line).RootElement.Clone());
+                players.Add((name,header,facts));
+            }
+            else if(name.EndsWith(".json",StringComparison.Ordinal))
+                players.Add((name,null,JsonDocument.Parse(File.ReadAllText(path)).RootElement.GetProperty("Facts").EnumerateArray().Select(fact=>fact.Clone()).ToList()));
+        }
+        return players;
     }
 }

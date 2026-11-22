@@ -221,7 +221,12 @@ internal static class GitHubApp1138Tests
             Check(exchange.Contains("[\"public\"]=false") && !exchange.Contains("[\"public\"]=true"),"a gist is never made public");
             Check(exchange.Contains("await Fresh().ConfigureAwait(false);") && exchange.Contains("try{await Upload(files).ConfigureAwait(false);}"),"renewed before the upload (0.1171: once more after a 401)");
             Check(!Read("src/TenshoAssistant/Discoveries/GitHubSignIn.cs").Contains("client_secret"),"no client secret");
-            Check(Read("src/TenshoAssistant/MainWindow.Discoveries.cs").Contains("\"discoveries\",DateTimeOffset.UtcNow,GitHubExchange.SecretFiles);"),"the copy before emptying skips both tokens");
+            // 0.1797 (X-784): the copy before emptying made by DiscoveryBackup (its behaviour test: DiscoveryClear1797Tests, both tokens left out).
+            // 0.1800 (X-794): started on a worker (DiscoveryBackup.Start runs Create).
+            Check(Read("src/TenshoAssistant/MainWindow.Discoveries.cs").Contains("discoveryClearCopy=DiscoveryBackup.Start(folder,DiscoveryDatabase,DateTimeOffset.UtcNow);")
+                && Read("src/TenshoAssistant/Discoveries/DiscoveryBackup.cs").Contains("=>Task.Run(()=>Create(folder,database,at));")
+                && Read("src/TenshoAssistant/Discoveries/DiscoveryBackup.cs").Contains("new HashSet<string>(GitHubExchange.SecretFiles,StringComparer.OrdinalIgnoreCase){")
+                && Read("src/TenshoAssistant/Discoveries/DiscoveryBackup.cs").Contains(": GitHubExchange.SecretFiles;"),"the copy before emptying skips both tokens");
             foreach(var language in new[]{"en","fr"})
             {
                 var ui=JsonNode.Parse(Read($"src/TenshoAssistant/Localization/Languages/{language}.json"))!["DiscoveriesUi"]!.AsObject();

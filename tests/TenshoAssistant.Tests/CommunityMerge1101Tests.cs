@@ -24,8 +24,9 @@ internal static class CommunityMerge1101Tests
                 var kind = fact.GetProperty("Kind").GetInt32();
                 Check(kind is >= 1 and <= 38 and not 26 and not 27,"known kind (" + kind + ")");
             }
-            using var player = JsonDocument.Parse(File.ReadAllText(Path.GetFullPath("community-discoveries/players/43.json")));
-            Check(player.RootElement.GetProperty("Issue").GetInt32() == 43 && player.RootElement.GetProperty("Facts").GetArrayLength() >= 1967,
+            // 0.1801 (X-772): the player file of ticket #43 read in its new format (43.jsonl.gz, without place nor day) or the one of before.
+            var player = RepositoryCommon.Players().Single(file => file.File is "43.jsonl.gz" or "43.json");
+            Check((player.Header is not { } header || header.GetProperty("Issue").GetInt32() == 43) && player.Facts.Count >= 1967,
                   "the player file of ticket #43 holds at least its 1967 facts of 0.1101 (2421 since the merge of 12/11)");
         }),
     ];

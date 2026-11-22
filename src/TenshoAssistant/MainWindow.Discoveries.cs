@@ -43,6 +43,8 @@ internal sealed partial class MainWindow
     private long discoveriesAt=-100_000,discoveriesSavedAt;private int discoverySaving,discoveryBusy;
     private string discoverySearch="",discoverySearched="\u0001";private int discoveryShownRevision=-1;
     private IReadOnlyList<DiscoveryFact> discoveryRows=[];private string? discoveryMessage;private bool discoveryClearAsked;
+    // X-794 (0.1800, review of 0.1799, M1): the copy before emptying, running off the frame (null: none); its failure said until the next try.
+    private Task<string?>? discoveryClearCopy;private bool discoveryClearFailed;
     private readonly Dictionary<uint,string> discoveryNames=[];
     private string DiscoveryBase=>Path.Combine(DiscoveryFolder ?? "","Discoveries.json");
     private readonly Dictionary<DiscoveryKind,string> sharedWritten=[];
@@ -53,6 +55,7 @@ internal sealed partial class MainWindow
         var now=Environment.TickCount64;
         if(now-discoveriesAt<1000 || windowDisposed || DiscoveryStore is not { } store || !DiscoveriesLoaded)return;
         discoveriesAt=now;
+        EndDiscoveryClear(store);
         var settings=configuration.Discovery;
         if(settings.Enabled && settings.MonsterPlaces && mapLive?.State is { Monsters:{ Count:>0 } monsters, MapId:not 0 } live)
         {
@@ -408,7 +411,7 @@ internal sealed partial class MainWindow
         foreach(var (kind,total,seen,importedOnly) in summary)ImGui.TextUnformatted(localization.Format("DiscoveriesUi.Summary"+kind,total.ToString("N0",Numbers),seen.ToString("N0",Numbers),importedOnly.ToString("N0",Numbers)));
         DrawDiscoveryFiles(store,folder);
         DrawDiscoveryPlaces(store);
-        if(developerMode)DrawDiscoveryDebug(store,folder);
+        if(developerMode)DrawDiscoveryDebug(folder);
     }
 
     // Export: a dated copy in « Export »; import: every .json put in « Import », joined to the base, each file once.
@@ -559,22 +562,41 @@ internal sealed partial class MainWindow
     }
 
     // Developer mode: a line in the log for each new fact, where the files are, and emptying the base (asked twice).
-    private void DrawDiscoveryDebug(DiscoveryStore store,string folder)
+    private void DrawDiscoveryDebug(string folder)
     {
         ImGui.Separator();
         ImGui.TextColored(Accent,localization.Get("DiscoveriesUi.Debug"));
         BoolSetting("DiscoveriesUi.DebugLog","DiscoveriesUi.DebugLogTip",()=>configuration.Discovery.DebugLog,value=>configuration.Discovery.DebugLog=value,c=>c.Discovery.DebugLog);
         ImGui.TextDisabled(folder);
+        // X-794 (0.1800): while the copy before emptying runs, only that is said; EndDiscoveryClear empties the base once it ended well.
+        if(discoveryClearCopy is not null){ImGui.TextDisabled(localization.Get("DiscoveriesUi.ClearCopying"));return;}
+        if(discoveryClearFailed)ImGui.TextColored(UI.FfxivTheme.Warning,localization.Get("DiscoveriesUi.ClearFailed"));
         if(!discoveryClearAsked){if(ImGui.SmallButton(localization.Get("DiscoveriesUi.Clear")))discoveryClearAsked=true;Tip("DiscoveriesUi.ClearTip");return;}
         ImGui.TextColored(UI.FfxivTheme.Warning,localization.Get("DiscoveriesUi.ClearSure"));
         if(ImGui.SmallButton(localization.Get("DiscoveriesUi.ClearYes")))
         {
             // X-76 step 3 (0.945, user request): a zip copy of the Discoveries folder first (never the GitHub token nor its refresh token, X-175), then the base emptied.
-            try{DiscoveryDatabase?.Checkpoint();BackupZip.Create(folder,Path.Combine(Path.GetDirectoryName(folder) ?? folder,"Backups"),"discoveries",DateTimeOffset.UtcNow,GitHubExchange.SecretFiles);}
-            catch(Exception error){log.Warning(error,"The discoveries copy before emptying failed; nothing was removed.");discoveryClearAsked=false;return;}
-            store.Clear();SaveDiscoveries(false);discoveryClearAsked=false;
+            // X-784 (0.1797): the base copied by SQLite (it is kept open since 0.1794: reading the file failed every time).
+            // X-794 (0.1800, review of 0.1799, M1): the copy (VACUUM INTO of the whole base, then the zip) on a worker; made here, in Draw, it
+            // froze the game for seconds with a big base. The base is emptied by EndDiscoveryClear, on the game's thread, once it ended well.
+            discoveryClearAsked=false;discoveryClearFailed=false;
+            discoveryClearCopy=DiscoveryBackup.Start(folder,DiscoveryDatabase,DateTimeOffset.UtcNow);
         }
         ImGui.SameLine();
         if(ImGui.SmallButton(localization.Get("DiscoveriesUi.ClearNo")))discoveryClearAsked=false;
+    }
+
+    /// <summary>X-794 (0.1800): once a second, on the game's thread (CollectDiscoveries, so also with the page closed): the copy started by the
+    /// button ended well, the base is emptied and saved; it failed, nothing is removed and the page says so. A fact noted while the copy ran is
+    /// emptied with the rest (the player asked to empty the base). An unloaded plugin never empties it (CollectDiscoveries no longer runs).</summary>
+    private void EndDiscoveryClear(DiscoveryStore store)
+    {
+        if(discoveryClearCopy is not { } copy)return;
+        var (ended,empty,error)=DiscoveryBackup.Outcome(copy);
+        if(!ended)return;
+        discoveryClearCopy=null;
+        if(empty){store.Clear();SaveDiscoveries(false);return;}
+        discoveryClearFailed=true;
+        log.Warning(error,"The discoveries copy before emptying failed; nothing was removed.");
     }
 }

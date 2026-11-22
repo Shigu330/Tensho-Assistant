@@ -184,6 +184,9 @@ public sealed class TenshoDataDatabase
         return (folded,System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds);
     }
 
+    /// <summary>X-785 M3 (0.1798): whether a save was already timed in this file (its row of save_probe).</summary>
+    public bool SavesTimed(){using var open=Open();return Convert.ToInt64(Scalar(open,"SELECT COUNT(*) FROM save_probe;"))>0;}
+
     private void ProbeSave()
     {
         using var open=Open();using var transaction=open.BeginTransaction();using var command=open.CreateCommand();
@@ -341,7 +344,8 @@ public sealed class TenshoDataFile
 
     /// <summary>
     /// X-750 (0.1794): the plugin's data file opened and kept open (<see cref="TenshoDataDatabase.KeepOpen"/>), off the frame, at the plugin's
-    /// start; one save timed both ways said in the log. Nothing when the JSON files are in use, the file is unusable, or after <see cref="Close"/>.
+    /// start; the first time for this file (X-785 M3, 0.1798), one save timed both ways said in the log. Nothing when the JSON files are in
+    /// use, the file is unusable, or after <see cref="Close"/>.
     /// </summary>
     public void KeepOpen()
     {
@@ -351,6 +355,10 @@ public sealed class TenshoDataFile
         if(opened is null || !opened.KeepOpen())return;
         try
         {
+            // X-785 M3 (0.1798, review of 0.1795): timed once per data file (its first load since X-750), no longer at each load: each one wrote
+            // a row and forced a full checkpoint, which with two clients on one profile (X-141) waits for the other's readers and holds its
+            // saves meanwhile (up to busy_timeout, 5 s). The measure served X-750 (86 ms → 5 ms in game, 22/11).
+            if(opened.SavesTimed())return;
             var (folded,kept)=opened.SaveTimes();
             info?.Invoke($"Tensho data: a save took {folded:0} ms with the journal folded in at its close (each save before X-750), {kept:0} ms with the file kept open (X-750).");
         }

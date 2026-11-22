@@ -10,8 +10,6 @@ internal static class CollectablesTests
     // their order, so a failure says the same case as before. Nothing is taken from the tests: 17 s to a few for this file.
     internal static TResult[] Each<T,TResult>(IEnumerable<T> cases,Func<T,TResult> work)=>cases.AsParallel().AsOrdered().Select(work).ToArray();
     private static CollectableRule Rule(uint id,string name,int level,int high,int reward,string group="G")=>new(id,name,level,level+1,high/2,high*3/4,high,1,2,reward,true,group);
-    private static GpActionCatalog Catalog()=>new(GpActionCatalog.Specs.Select(spec=>new GpAction(spec,$"Action {spec.Id}",0,"Text")),"fixture");
-    private static GpOptimization Node(int budget,string forbidden="",int attempts=4,int success=100)=>GpOptimizer.Solve(new(16,90,budget,attempts,1,success,0,1,MoreActions:true,Forbidden:forbidden),Catalog());
 
     // The window's values, as logged in game (docs/evidence/0.479-collectable-window-values.md).
     private static string[] Raw(int current,int scour,int low,int high,int meticulous,bool scrutinyBox,bool intuitionBox=false)

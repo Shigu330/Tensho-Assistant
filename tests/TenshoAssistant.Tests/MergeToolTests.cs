@@ -15,11 +15,12 @@ internal static class MergeToolTests
         // From MergeTool886Tests: 0.886 (X-77): the common file is rebuilt from one file per player, so an updated gist is never counted twice.
         ("Merge tool: one file per player; each common fact counted by the players who have it",() =>
         {
-            var players=Directory.GetFiles(Path.GetFullPath("community-discoveries/players"),"*.json");
-            Check(players.Length>0,"player files");
+            // 0.1801 (X-772): the player files read in both formats (<issue>.jsonl.gz, or the <issue>.json of before).
+            var players=RepositoryCommon.Players();
+            Check(players.Count>0,"player files");
             var counts=new Dictionary<string,int>();
-            foreach(var path in players)
-                foreach(var fact in JsonDocument.Parse(File.ReadAllText(path)).RootElement.GetProperty("Facts").EnumerateArray())
+            foreach(var (_,_,facts) in players)
+                foreach(var fact in facts)
                 {
                     var key=string.Join(":",new[]{"Kind","Subject","Detail","Territory","Map","CellX","CellZ"}.Select(name=>fact.GetProperty(name).GetRawText()));
                     counts[key]=counts.GetValueOrDefault(key)+1;

@@ -12,12 +12,6 @@ internal static class LinkCategories1119Tests
     private static string Read(string path)=>File.ReadAllText(Path.GetFullPath(path)).Replace("\r\n","\n");
     private static LinkSnapshot Sample(IReadOnlyList<LinkChange>? changes=null)
         => new(LocalLinkProtocol.Version,"0.1119.0",true,false,132,"New Gridania",7,null,changes);
-    private static bool Wait(Func<bool> done)
-    {
-        var until=Environment.TickCount64+10_000;
-        while(Environment.TickCount64<until){if(done())return true;Thread.Sleep(50);}
-        return done();
-    }
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [

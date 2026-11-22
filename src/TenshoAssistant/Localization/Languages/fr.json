@@ -1008,7 +1008,9 @@
     "ClearTip": "Retire toutes les découvertes, les vôtres et les importées. Une copie zip du dossier Discoveries est faite avant dans le dossier Backups (jamais la clé GitHub).",
     "ClearSure": "Retirer toutes les découvertes ? C'est définitif (exportez d'abord pour garder une copie).",
     "ClearYes": "Oui, vider",
-    "ClearNo": "Non"
+    "ClearNo": "Non",
+    "ClearCopying": "Copie de la base avant de la vider…",
+    "ClearFailed": "La copie avant le vidage a échoué : rien n'a été retiré (détails dans le journal de Dalamud)."
   },
   "Navigation": {
     "Duty": "Missions",
