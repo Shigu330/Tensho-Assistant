@@ -80,9 +80,7 @@ in-game readings through GitHub, on the player's click or the opt-in daily excha
 <!-- gen:decisions:en -->
 Open points, produced by script from the agent's source of decisions. Choices already taken: [DECISIONS](DECISIONS.md); the former tables: [archive](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/archive/DECISIONS-EN-ATTENTE-2026-11-09.md).
 
-| No. | Point | Choice applied, or record awaited | Where |
-|---|---|---|---|
-| D-220 | Shared discoveries: when a player withdraws their discoveries while another player saw the same fact, the common set today keeps the exact place and days the leaving player brought (without their name; their gist keeps that data anyway) | Recompute the place and days from the remaining players' gists at withdrawal (as before 0.1801); when one cannot be read, the place goes to the centre of its 50-yalm cell (recommended) |  |
+Nothing open.
 <!-- /gen:decisions:en -->
 
 ## In-game tests
@@ -179,9 +177,7 @@ donnée prise sur des sites web).
 <!-- gen:decisions:fr -->
 Points ouverts, produits par script depuis la source des décisions de l'agent. Choix déjà faits : [DECISIONS](DECISIONS.md) ; anciens tableaux : [archive](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/archive/DECISIONS-EN-ATTENTE-2026-11-09.md).
 
-| N° | Point | Choix appliqué, ou relevé attendu | Où |
-|---|---|---|---|
-| D-220 | Découvertes partagées : quand un joueur retire ses découvertes alors qu'un autre joueur a vu le même fait, l'ensemble commun garde aujourd'hui le lieu exact et les jours apportés par celui qui part (sans son nom ; son gist garde de toute façon ces données) | Recalculer le lieu et les jours depuis les gists des joueurs restants au retrait (comme avant 0.1801) ; si l'un d'eux ne se lit pas, le lieu passe au centre de sa case de 50 yalms (recommandé) |  |
+Aucune en attente.
 <!-- /gen:decisions:fr -->
 
 ## Tests en jeu

@@ -1633,7 +1633,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1261) Accueil › Aujourd'hui : première ligne « Prochaine échéance : …, dans … » (alarme, retour de vaisseau ou jardin, la plus proche) ; un clic ouvre l'outil ; sous une heure le temps avance à la seconde ; « Personnaliser » permet de la masquer
 
-- [ ] (0.1261) Accueil : chaque tuile réagit d'un seul bloc au survol et au clic (icône, nom et ligne ensemble) ; au clavier ou à la manette, un seul arrêt par tuile
+- [x] (0.1261) Accueil : chaque tuile réagit d'un seul bloc au survol et au clic (icône, nom et ligne ensemble) ; au clavier ou à la manette, un seul arrêt par tuile
 
 - [x] (0.1261) Fiche d'un objet (page Objets) : bouton « Ajouter à mes souhaits » sous le nom ; clic : il devient « ✓ Dans mes souhaits » sans changer de largeur, avec un contour vert très bref, et le pied de page dit « ajouté » ; nouveau clic : l'objet est retiré
 
@@ -2741,6 +2741,26 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] (0.1797) Mode développeur, page Découvertes : « Vider la base », puis confirmez : la base est vidée, une copie backup-…-discoveries.zip apparaît dans le dossier Backups du plugin (avec Discoveries.db, sans jeton GitHub ni fichier -wal) ; rien dans le journal sur « nothing was removed ».
 
 - [ ] (0.1806) Monde › Découvertes : cherchez un monstre ou un objet que vous avez noté ; la dernière colonne s'appelle « Joueurs » et dit « vu par un seul joueur » (ou « vu par N joueurs » pour un fait partagé par plusieurs) ; survolez ensuite cet objet ailleurs dans Tensho : sa ligne « vu en jeu » le dit aussi.
+
+- [ ] (0.1807) Aide › Questions fréquentes › « Comment changer la langue ? » › « Ouvrir cette page » : Paramètres s'ouvre sur Général › Langue et thème (même si une autre catégorie était ouverte avant).
+
+- [ ] (0.1807) Avec un sous-marin en voyage : Accueil › Aujourd'hui, cliquer « Prochaine échéance » (retour du sous-marin) : la page Compagnie libre s'ouvre sur l'onglet des sous-marins, pas Alarmes › Horloges.
+
+- [ ] (0.1807) Accueil › Aujourd'hui : cliquer la ligne des alarmes ouvre Alarmes sur l'onglet de la première (par classe ou autres) ; Rappels › Minuteurs › voyages « Détails » ouvre l'onglet des sous-marins.
+
+- [ ] (0.1808) Dédale bestial (ou avant d'y entrer), fenêtre « Formation de l'équipe » ouverte : le panneau Tensho a trois onglets « Les 10 à emmener », « Équipe actuelle », « Meilleure équipe », chacun avec sa ligne d'explication ; « Équipe actuelle » montre l'équipe lue et, par combat, ses trois bêtes et « Sans X (conseillée) » ; « Meilleure équipe » marque « pas encore à vous » les bêtes que vous n'avez pas ; campements, marchands et coffres restent repliables en dessous.
+
+- [ ] (0.1809) Fenêtre de chat Tensho, onglet Combat, pendant un combat : vos dégâts en rouge clair, les dégâts subis en rouge soutenu, vos soins en vert clair, les soins reçus en vert soutenu ; l'icône du type de dégâts (physique, magique) devant le nombre, comme dans le chat du jeu ; Paramètres › Panneaux › Couleurs du chat › « Lignes de combat en couleur » décoché : la couleur unique revient.
+
+- [ ] (0.1809) Fenêtre de chat Tensho : une ligne « Vous bénéficiez de l'effet ·Prospecteur » (ou un autre effet) montre la petite icône du statut à la place du « · » ; au survol, l'info-bulle du statut.
+
+- [ ] (0.1809) Fenêtre de chat Tensho : en utilisant un objet (une potion, un repas), la ligne « Vous utilisez <objet>. » montre au survol du nom l'info-bulle commune de l'objet.
+
+- [ ] (0.1810) Survol de la Matière sombre grade VI (ou d'un autre objet vendu par un PNJ) avec les prix du marché : « Vendu par les PNJ : … gils » (120 gils pour la matière sombre) et « Moins cher chez un PNJ que sur le marché : … gils de moins l'unité » ; la ligne « Le marché paie N fois le prix de vente au PNJ » dit bien « vente au PNJ ».
+
+- [ ] (0.1810) Stockage › valeur, liste « Dort et se vend » : colonnes « Vente au PNJ » et « Achat au PNJ » ; un objet moins cher chez un PNJ a son prix d'achat en vert, la différence au survol.
+
+- [ ] (0.1811) Compagnon chocobo sorti avec peu de temps (moins de 5 minutes), rappel du compagnon activé : monter et chevaucher plus longtemps que ce temps, puis descendre : le compagnon revient avec son temps, et aucun « est parti » ni « finit » faux n'est dit.
 
 **0.535 : interfaces** — à voir en jouant
 
