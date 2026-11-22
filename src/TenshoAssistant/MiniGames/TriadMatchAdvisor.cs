@@ -21,6 +21,21 @@ public static class TriadMatchAdvisor
     /// </summary>
     public static bool Competitive(uint territory) => territory is 940 or 941;
 
+    /// <summary>
+    /// X-835 (security review I7, DEC-033, Dalamud's rules): the advice is for a match against an NPC only, never against a player. The match
+    /// and challenge windows name the opponent (match value 4, challenge value 7: docs/evidence/0.160.0-triad-match-capture.log); the NPC is
+    /// the one targeted, with a TripleTriad row (npcHasMatch). Both names must be the same (case and the sheet's grammar marks such as « [a] »
+    /// ignored); a name not read, an NPC without a match, or another name (a player, another NPC): no advice.
+    /// </summary>
+    public static bool OpponentIsNpc(string? shownOpponent, string npcName, bool npcHasMatch)
+    {
+        if (!npcHasMatch) return false;
+        var shown = PlainName(shownOpponent); var npc = PlainName(npcName);
+        return shown.Length > 0 && string.Equals(shown, npc, StringComparison.OrdinalIgnoreCase);
+    }
+    private static string PlainName(string? name) =>
+        System.Text.RegularExpressions.Regex.Replace(name ?? string.Empty, @"\[[a-z]\]", string.Empty).Trim().Trim('"').Trim();
+
     private const uint SyntheticBase = 1_000_000;
     // TripleTriadRule rows (docs/evidence/0.159.0-triad-npc-probe.log) the solver plays; the others change visibility, the deck or a
     // draw, not the move value. Chaos (9) and Order (8) impose the card: handled through the imposed slot.

@@ -28,6 +28,9 @@ internal sealed class TriadObservationReader : IDisposable
     private uint deckNpc;
     private string deckNpcName = string.Empty;
     private uint[] deckFixed = [], deckVariable = [];
+    // X-835 (security review I7): the NPC's deck comes from a TripleTriad row (deckHasMatch); a match window seen since the last frame without
+    // it (matchOpen) takes the NPC again from the target, never from an earlier match.
+    private bool deckHasMatch, matchOpen;
     private bool disposed;
     private long nextRead;
     private ulong owner;
@@ -58,7 +61,7 @@ internal sealed class TriadObservationReader : IDisposable
                 ReadRequest(ticket, character);
                 ReadEditDeck(ticket, character);
                 var handle = gui.GetAddonByName("TripleTriad");
-                if (handle.IsNull) { if (service.Request is null) { deckNpc = 0; deckFixed = deckVariable = []; } service.Missing(ticket,character,TriadObservationStatus.AddonAbsent); return; }
+                if (handle.IsNull) { matchOpen = false; if (service.Request is null) ClearDeck(); service.Missing(ticket,character,TriadObservationStatus.AddonAbsent); return; }
                 if (gui.GameUiHidden || !handle.IsReady || !handle.IsVisible)
                 { service.Missing(ticket,character,TriadObservationStatus.NotReady); return; }
                 var addon = (AddonTripleTriad*)handle.Address;
@@ -175,8 +178,19 @@ internal sealed class TriadObservationReader : IDisposable
         int? forced = null;
         if (phase == 2 && unit->AtkValuesCount > 25 && unit->AtkValues != null && unit->AtkValues[25].Type == AtkValueType.Int) forced = unit->AtkValues[25].Int;
         var target = targetBaseId();
-        if (deckNpc == 0 && target != 0) LoadDeck(target);
-        return new(rules, forced, deckNpc, deckFixed, deckVariable, Rects(addon->BlueDeck, unit->Scale), Rects(addon->Board, unit->Scale), known, !TriadMatchAdvisor.Competitive(client.TerritoryType));
+        // X-835 (security review I7): a new match takes its NPC from the target as the window opens (or from the challenge just shown), never
+        // from an earlier match; the advice then needs the opponent the window names (value 4, docs/evidence/0.160.0-triad-match-capture.log)
+        // to be that NPC, one with a TripleTriad row: a player, an object or another NPC targeted gets no advice.
+        if (!matchOpen)
+        {
+            matchOpen = true;
+            if (target != 0) LoadDeck(target);
+            else if (service.Request is not { } challenge || challenge.NpcId == 0 || challenge.NpcId != deckNpc) ClearDeck();
+        }
+        else if (deckNpc == 0 && target != 0) LoadDeck(target);
+        var opponent = unit->AtkValues != null && unit->AtkValuesCount > 4 && AtkValueRead.IsText(unit->AtkValues[4].Type) ? Bounded(unit->AtkValues[4].String) : null;
+        var named = TriadMatchAdvisor.OpponentIsNpc(opponent, deckNpcName, deckHasMatch);
+        return new(rules, forced, named ? deckNpc : 0, deckFixed, deckVariable, Rects(addon->BlueDeck, unit->Scale), Rects(addon->Board, unit->Scale), known, !TriadMatchAdvisor.Competitive(client.TerritoryType) && named);
     }
     // 0.491 (R-14): the rule names in their own guard: an unreadable sheet costs the rules, not the whole observation. Tried once.
     private void LoadRuleIds()
@@ -239,7 +253,14 @@ internal sealed class TriadObservationReader : IDisposable
         }
         if (rawRules != loggedRequestRules) { loggedRequestRules = rawRules; log.Information("Triad request rule values: {0} (known: {1}).", rawRules, rulesKnown); }
         var target = targetBaseId();
-        if (target != 0 && target != deckNpc) LoadDeck(target);
+        // X-835: no target (a player's BaseId is 0) is no NPC: never the deck of an NPC met before.
+        if (target == 0) ClearDeck();
+        else if (target != deckNpc) LoadDeck(target);
+        // X-835: the challenge names its opponent (value 7, docs/evidence/0.160.0-triad-match-capture.log): an NPC's deck and odds only for that NPC.
+        var challenger = unit->AtkValues != null && unit->AtkValuesCount > 7 && AtkValueRead.IsText(unit->AtkValues[7].Type) ? Bounded(unit->AtkValues[7].String) : null;
+        var npcConfirmed = TriadMatchAdvisor.OpponentIsNpc(challenger, deckNpcName, deckHasMatch);
+        var npcId = npcConfirmed ? deckNpc : 0;
+        IReadOnlyList<uint> npcFixed = npcConfirmed ? deckFixed : [], npcVariable = npcConfirmed ? deckVariable : [];
         var root = unit->RootNode;
         var window = root == null ? default : new TriadRect(unit->X, unit->Y, root->Width * unit->Scale, root->Height * unit->Scale);
         var decks = new List<TriadGameDeck>();
@@ -253,12 +274,12 @@ internal sealed class TriadObservationReader : IDisposable
                 if (cards.Any(card => card != 0)) decks.Add(new(index, deck.NameString, Array.AsReadOnly(cards)));
             }
         var previous = service.Request;
-        if (previous is not null && previous.NpcId == deckNpc && previous.RuleIds.SequenceEqual(rules) && previous.RulesKnown == rulesKnown && previous.Window == window
+        if (previous is not null && previous.NpcId == npcId && previous.RuleIds.SequenceEqual(rules) && previous.RulesKnown == rulesKnown && previous.Window == window
             && previous.Decks.Count == decks.Count && previous.Decks.Zip(decks).All(pair => pair.First.Name == pair.Second.Name && pair.First.Cards.SequenceEqual(pair.Second.Cards)))
             return;
         var names = rules.Select(rule => ruleIds?.FirstOrDefault(pair => pair.Value == rule).Key ?? rule.ToString()).ToArray();
-        service.PublishRequest(ticket, character, new(deckNpc, rules.AsReadOnly(), deckFixed, deckVariable, window, decks.AsReadOnly(), DateTimeOffset.UtcNow,
-            deckNpcName, Array.AsReadOnly(names), rulesKnown));
+        service.PublishRequest(ticket, character, new(npcId, rules.AsReadOnly(), npcFixed, npcVariable, window, decks.AsReadOnly(), DateTimeOffset.UtcNow,
+            npcConfirmed ? deckNpcName : string.Empty, Array.AsReadOnly(names), rulesKnown));
     }
     private unsafe void ReadEditDeck(int ticket, ulong character)
     {
@@ -369,9 +390,10 @@ internal sealed class TriadObservationReader : IDisposable
         }
         return true;
     }
+    private void ClearDeck() { deckNpc = 0; deckNpcName = string.Empty; deckFixed = deckVariable = []; deckHasMatch = false; }
     private void LoadDeck(uint npc)
     {
-        deckNpc = npc; deckFixed = deckVariable = [];
+        deckNpc = npc; deckFixed = deckVariable = []; deckHasMatch = false;
         deckNpcName = data is not null && data.GetExcelSheet<ENpcResident>().TryGetRow(npc, out var resident) ? resident.Singular.ExtractText() : string.Empty;
         if (data is null || !data.GetExcelSheet<ENpcBase>().TryGetRow(npc, out var row)) return;
         var matches = data.GetExcelSheet<TripleTriad>();
@@ -380,6 +402,7 @@ internal sealed class TriadObservationReader : IDisposable
             {
                 deckFixed = match.TripleTriadCardFixed.Select(card => card.RowId).Where(card => card != 0).ToArray();
                 deckVariable = match.TripleTriadCardVariable.Select(card => card.RowId).Where(card => card != 0).ToArray();
+                deckHasMatch = true;
                 return;
             }
     }
