@@ -1161,6 +1161,31 @@ internal sealed partial class MainWindow
     {
         DrawChatProfileWorn(options);
         EmptyState("ChatWindow.ColorsHelp");
+        // X-801 (0.1809, the user's request of 22/11): the combat lines coloured by kind and side, each colour changeable; off: one colour.
+        BoolSetting("ChatWindow.CombatTones","ChatWindow.CombatTonesTip",()=>configuration.Chat.CombatTones,value=>configuration.Chat.CombatTones=value,c=>c.Chat.CombatTones);
+        ImGui.BeginDisabled(!configuration.Chat.CombatTones);
+        try
+        {
+            foreach(var tone in ChatCombatTones.All)
+            {
+                ImGui.PushID("Tone"+tone);
+                try
+                {
+                    var (red,green,blue)=ChatChannels.Unpack(options.ColorOf(tone));var rgb=new Vector3(red,green,blue);
+                    if(ImGui.ColorEdit3(localization.Get("ChatWindow.Tone"+tone)+"###ChatToneColor",ref rgb,ImGuiColorEditFlags.NoInputs))
+                    {
+                        options.ToneColors??=[];
+                        options.ToneColors[tone]=ChatChannels.Pack(rgb.X,rgb.Y,rgb.Z);
+                        chatSettingsPending=true;
+                    }
+                    Tip("ChatWindow.ToneColorTip");
+                    if(DefaultButton("ChatToneColor",options.ToneColors?.ContainsKey(tone)==true)){options.ToneColors?.Remove(tone);chatSettingsPending=true;}
+                }
+                finally{ImGui.PopID();}
+            }
+        }
+        finally{ImGui.EndDisabled();}
+        ImGui.Separator();
         foreach(var channel in ChatChannels.All)
         {
             ImGui.PushID((int)channel);
@@ -1944,7 +1969,13 @@ internal sealed partial class MainWindow
         =>ChatSenders is { } senders && senders.Jobs.ColourFor(options,record.Channel,Chat.ChatJobs.JobOf(record,senders.For(record.Id))) is { } argb ? Chat.ChatJobs.Rgb(argb):null;
 
     /// <summary>X-447 B14 (0.1641): the icon of an item link's item, from Tensho's item list (0: not loaded, or not an item).</summary>
-    private uint ChatLinkIcon(ChatLink link)=>link.Kind==ChatSegmentKind.ItemLink ? itemCatalog.State.Catalog?.Find(link.ItemId)?.IconId ?? 0:0;
+    // X-788 (0.1809): a status link's icon too (Status sheet), drawn in place of the game's glyph before its name.
+    private uint ChatLinkIcon(ChatLink link)=>link.Kind switch
+    {
+        ChatSegmentKind.ItemLink=>itemCatalog.State.Catalog?.Find(link.ItemId)?.IconId ?? 0,
+        ChatSegmentKind.StatusLink=>ChatPlayers?.Status(link.StatusId)?.Icon ?? 0,
+        _=>0,
+    };
 
     /// <summary>X-461 (0.1463): the name of what a link without text of its own points to: an item (Tensho's item list), a quest, a place; else
     /// a word for a link (never empty: the link keeps its place in the message).</summary>
@@ -1960,7 +1991,8 @@ internal sealed partial class MainWindow
 
     private void DrawChatRecord(ChatRecord record,IReadOnlyList<IReadOnlyList<ChatRun>> lines,float y,float height,ChatSettings options,int repeats=0,bool alert=false)
     {
-        var color=ChatColor(options.ColorOf(record.Channel));
+        // X-801 (0.1809): a combat line in its tone's colour (damage, healing; done or taken), else the channel's.
+        var color=ChatColor(options.ColorOf(record));
         // X-505 (0.1488): the lines after the first indented, as laid out (LayOutChatLine).
         var left=ImGui.GetCursorPosX();
         // X-484 (0.1519, the user's request of 17/11: the player put forward more visible): a band in the warning colour behind the whole message.
@@ -1992,7 +2024,19 @@ internal sealed partial class MainWindow
                     ImGui.SameLine(0,0);
                     ImGui.Dummy(new Vector2(ChatLook.IconWidth(side)-side,side));
                 }
-                // X-447 B14 (0.1641): an item's icon, a square as high as the line, then its gap.
+                // X-801 (0.1809): the type of damage's icon of the game's font, in the same place as an item's icon; « · » when it cannot be drawn.
+                else if(run.Role==ChatRole.GameIcon && run.Link is { } glyph)
+                {
+                    var side=ImGui.GetTextLineHeight();
+                    if(DrawFontIcon(glyph.CommandId))ImGui.Dummy(new Vector2(ChatLook.IconWidth(side),side));
+                    else
+                    {
+                        ImGui.TextColored(color,ChatGlyphs.Icon(glyph.CommandId));
+                        ImGui.SameLine(0,0);
+                        ImGui.Dummy(new Vector2(Math.Max(0,ChatLook.IconWidth(side)-ImGui.CalcTextSize(ChatGlyphs.Icon(glyph.CommandId)).X),side));
+                    }
+                }
+                // X-447 B14 (0.1641): an item's icon, a square as high as the line, then its gap. X-788 (0.1809): a status's icon too.
                 else if(run.Role==ChatRole.ItemIcon && run.Link is { } item)
                 {
                     var side=ImGui.GetTextLineHeight();
@@ -2114,6 +2158,7 @@ internal sealed partial class MainWindow
         ChatSegmentKind.DalamudLink=>DalamudLinkKnown?.Invoke(link.Plugin,link.CommandId)==true,
         ChatSegmentKind.StatusLink=>false,
         ChatSegmentKind.ActionName=>false,
+        ChatSegmentKind.FontIcon=>false,
         _=>true,
     };
 

@@ -34,6 +34,8 @@ public static class ReferencePlan
         if(shown.Contains("FreeCompany"))plan.Add(new("FreeCompany-routes","FreeCompany",0,1280,860,"fc-routes"));
         // X-606 (0.1710): Quests with a trial quest's details open (giver and place, end NPC, jobs, the two map buttons).
         if(shown.Contains("Quests"))plan.Add(new("Quests-details","Quests",0,1280,860,"quest-trial"));
+        // X-807 M4 (review of 0.1806): World › Discoveries with a trial base: the « Players » column (seen by N players, by one only) and its order.
+        if(shown.Contains("Discoveries"))plan.Add(new("Discoveries-trial","Discoveries",0,1280,860,"discoveries-trial"));
         // X-520 (0.1536): every other tab of the Settings page (« Settings » shows General), last: the tab and category they open stay chosen.
         if(shown.Contains("Settings"))
             foreach(var (id,tab,category,width) in SettingsShots)plan.Add(new($"Settings-{id}","Settings",0,width,860,$"{SettingsPrefix}{tab}:{category}"));

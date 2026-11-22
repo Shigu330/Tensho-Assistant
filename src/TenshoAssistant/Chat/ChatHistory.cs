@@ -117,7 +117,7 @@ public static class ChatHistory
         // X-514: a link of Dalamud or of a plugin is kept as its text (its command is valid in this session only). X-473 (0.1715): a status
         // link too (its row is not in the format; its name stays).
         // X-473 (0.1720): an action's name too (it is no link of the game).
-        Body=record.Body.Select(segment=>new PieceLine{Text=Empty(segment.Text),Link=segment.Link is { Kind:not (ChatSegmentKind.DalamudLink or ChatSegmentKind.StatusLink or ChatSegmentKind.ActionName) } link ? Link(link):null}).ToList(),
+        Body=record.Body.Select(segment=>new PieceLine{Text=Empty(segment.Text),Link=segment.Link is { Kind:not (ChatSegmentKind.DalamudLink or ChatSegmentKind.StatusLink or ChatSegmentKind.ActionName or ChatSegmentKind.FontIcon) } link ? Link(link):null}).ToList(),
     },Json);
 
     private static string? Empty(string? text)=>string.IsNullOrEmpty(text) ? null:text;

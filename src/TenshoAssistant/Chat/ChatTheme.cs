@@ -50,6 +50,9 @@ public static class ChatTheme
         public bool? JobIcons{get;set;}
         public Dictionary<string,uint>? Colors{get;set;}
         public Dictionary<string,string>? Names{get;set;}
+        // X-801 (0.1809): the combat lines' tones.
+        public bool? CombatTones{get;set;}
+        public Dictionary<string,uint>? ToneColors{get;set;}
     }
 
     /// <summary>The code of <paramref name="settings"/>'s look.</summary>
@@ -65,6 +68,8 @@ public static class ChatTheme
             HourLeadingZero=settings.HourLeadingZero,ShowChannel=settings.ShowChannel,SenderBrackets=settings.SenderBrackets,NameColors=settings.NameColors,
             ItemIcons=settings.ItemIcons,RoleColors=settings.RoleColors,JobIcons=settings.JobIcons,
             Colors=settings.Colors is { Count:>0 } colors ? colors.ToDictionary(pair=>pair.Key.ToString(),pair=>pair.Value&0xFFFFFF):null,
+            CombatTones=settings.CombatTones,
+            ToneColors=settings.ToneColors is { Count:>0 } tones ? tones.ToDictionary(pair=>pair.Key.ToString(),pair=>pair.Value&0xFFFFFF):null,
             Names=ChatChannels.All.Where(ChatChannels.Spoken).Select(channel=>(channel,name:settings.ShortNameOf(channel))).Where(pair=>pair.name is not null)
                 .ToDictionary(pair=>pair.channel.ToString(),pair=>pair.name!) is { Count:>0 } names ? names:null,
         };
@@ -107,6 +112,10 @@ public static class ChatTheme
         var colors=new Dictionary<ChatChannel,uint>();
         foreach(var (key,color) in look.Colors ?? [])if(Channel(key) is { } channel)colors[channel]=color&0xFFFFFF;
         settings.Colors=colors.Count>0 ? colors:null;
+        settings.CombatTones=look.CombatTones ?? fresh.CombatTones;
+        var tones=new Dictionary<ChatCombatTone,uint>();
+        foreach(var (key,color) in look.ToneColors ?? [])if(Enum.TryParse<ChatCombatTone>(key,out var tone) && ChatCombatTones.All.Contains(tone))tones[tone]=color&0xFFFFFF;
+        settings.ToneColors=tones.Count>0 ? tones:null;
         var names=new Dictionary<ChatChannel,string>();
         foreach(var (key,name) in look.Names ?? [])
         {

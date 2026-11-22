@@ -68,6 +68,10 @@ internal sealed class ExchangeRefused(string key,bool forget):Exception(key)
 public sealed class GitHubExchange : IDisposable
 {
     public const string Repository="Shigu330/Tensho-Assistant",GistFile="tensho-discoveries.b64";
+    /// <summary>X-803 (user decision of 22/11): said in each player's issue, in English then French (GitHub in two languages, R20.1): what is shared
+    /// stays in the common base without the player's name, even after they stop sharing. The French half is listed in Languages406Tests.AllowedLiterals.</summary>
+    internal const string IssueStays="What you share stays in the common base even if you stop sharing. Close this issue (or ask in it) and the maintainer removes your player file, which links your GitHub name to your discoveries; this issue's title and the repository's history still show that name.";
+    internal const string IssueStaysFrench="Français : ce que vous partagez reste dans la base commune même si vous arrêtez de partager. Fermez ce ticket (ou demandez-le dedans) et le mainteneur retire votre fichier de joueur, qui relie votre nom GitHub à vos découvertes ; le titre de ce ticket et l'historique du dépôt montrent encore ce nom.";
     /// <summary>X-175: the files that hold a secret, never put in a backup copy.</summary>
     public static readonly IReadOnlySet<string> SecretFiles=new HashSet<string>(StringComparer.OrdinalIgnoreCase){"github.token","github.refresh"};
     public static readonly TimeSpan Every=TimeSpan.FromHours(20),Retry=TimeSpan.FromMinutes(15);
@@ -111,10 +115,15 @@ public sealed class GitHubExchange : IDisposable
     private string RefreshPath=>Path.Combine(folder,"github.refresh");
     private string MetaPath=>Path.Combine(folder,"github.json");
     private string LockPath=>Path.Combine(folder,"github.lock");
+    /// <summary>X-804: what is known of the gist's merges (GistRotation), and the lock around its rotation (separate from the renewal's lock).</summary>
+    private string RotationPath=>Path.Combine(folder,GistRotation.FileName);
+    private string RotationLockPath=>Path.Combine(folder,"github.rotate.lock");
     /// <summary>X-174 (0.1137): the hash of each v3 kind file taken, by kind number ({"10":"HEX",…}), noted once a save holds its facts.</summary>
     private string CommonV3Marker=>Path.Combine(folder,"community-v3.json");
 
     public GitHubExchange(string folder):this(folder,null){}
+    /// <summary>X-468 (0.1805): the log's line of each exchange that read the common set's index (the download and the merge timed), in English.</summary>
+    public Action<string>? Log{get;init;}
     /// <summary>
     /// X-174: <paramref name="handler"/> answers the requests instead of the network (behaviour tests). X-175: <paramref name="signIn"/> (default
     /// GitHubSignIn.Current) and <paramref name="clock"/> (default the UTC time) given by the behaviour tests.
@@ -394,23 +403,8 @@ public sealed class GitHubExchange : IDisposable
         else if(upload && Connected)
         {
             var mine=CommunityDiscoveries.Mine(store.Snapshot(DateTimeOffset.UtcNow,false));
-            // X-174 (0.1137, DEC-052): sent as a v3 set: index.json and one kind-NN.jsonl.gz.b64 per kind (base64: a gist holds text). The index holds each
-            // file's hash, so the same facts give the same index and nothing is sent again.
-            var files=ExchangeV3.GistFiles(ExchangeV3.Build(mine));var hash=CommunityDiscoveries.Hash(files[ExchangeV3.IndexName]);
-            string known;lock(gate)known=meta.UploadHash;
             if(mine.Facts.Count==0)sent="ShareEmpty";
-            else if(hash==known)sent="SentSame";
-            else
-            {
-                // X-181 (0.1171): a pair whose write failed before is written again first (night review N8).
-                WriteSecrets();
-                await Fresh().ConfigureAwait(false);
-                // N29: a 401 with a refresh token in hand (a PC clock late, a token ended early): renewed once, sent once more, before forgetting.
-                try{await Upload(files).ConfigureAwait(false);}
-                catch(HttpRequestException error) when(error.StatusCode==HttpStatusCode.Unauthorized && HasRefresh)
-                {await Fresh(force:true).ConfigureAwait(false);await Upload(files).ConfigureAwait(false);}
-                lock(gate)meta.UploadHash=hash;sent="Sent";
-            }
+            else sent=await Rotate(mine).ConfigureAwait(false);
         }
         // X-656 M2 (review of 0.1598): an exchange « blocked » or « not reached » breaks the row of refusals (« 3 exchanges in a row »).
         if(sent is "ShareBlocked" or "ShareAsideWaiting")ClearRefused();
@@ -433,22 +427,38 @@ public sealed class GitHubExchange : IDisposable
         try{index=ExchangeV3.ParseIndex(await Community.BoundedHttp.ReadAsync(client,new Uri(CommunityDiscoveries.AddressV3+ExchangeV3.IndexName),ExchangeV3.MaxIndexBytes,stop.Token).ConfigureAwait(false));}
         catch(Exception error) when(CommonUnreadable(error)){return CommonUnreachable(error) ? ("CommonUnreachable",0,0):null;}
         if(index is null)return null;
-        var noted=CommonV3Marks();int added=0,joined=0,taken=0,unreadable=0,unreachable=0;
+        var noted=CommonV3Marks();int added=0,joined=0,taken=0,unreadable=0,unreachable=0,facts=0;long size=0;
+        // X-468 (0.1805, D-216 a): the download (with the check of each file against the index) and the merge timed apart, said in the log.
+        var fetching=new System.Diagnostics.Stopwatch();var merging=new System.Diagnostics.Stopwatch();
         foreach(var entry in index.Files)
         {
             var kind=(int)entry.Kind;var hash=entry.Sha256.ToUpperInvariant();var key=$"common-v3:{kind}:{hash}";
             if(noted.GetValueOrDefault(kind)==hash || store.ImportWaiting(key))continue;
             try
             {
-                var bytes=await Community.BoundedHttp.ReadBytesAsync(client,new Uri(CommunityDiscoveries.AddressV3+entry.Name),(int)entry.Bytes,stop.Token).ConfigureAwait(false);
-                var read=ExchangeV3.ReadKind(new MemoryStream(bytes),entry);
-                var result=store.Merge(read.Facts,common:true);added+=result.Added;joined+=result.Joined;taken++;
+                fetching.Start();
+                ExchangeV3Kind read;
+                try
+                {
+                    var bytes=await Community.BoundedHttp.ReadBytesAsync(client,new Uri(CommunityDiscoveries.AddressV3+entry.Name),(int)entry.Bytes,stop.Token).ConfigureAwait(false);
+                    read=ExchangeV3.ReadKind(new MemoryStream(bytes),entry);size+=bytes.Length;
+                }
+                finally{fetching.Stop();}
+                merging.Start();
+                try{var result=store.Merge(read.Facts,common:true);added+=result.Added;joined+=result.Joined;taken++;facts+=read.Facts.Count;}
+                finally{merging.Stop();}
                 store.WhenImportSaved(key,()=>NoteCommonV3(kind,hash));
             }
             catch(Exception error) when(CommonUnreadable(error)){if(CommonUnreachable(error))unreachable++;else unreadable++;}
         }
+        Log?.Invoke(CommonTimes(index.Files.Count,taken,facts,size,fetching.ElapsedMilliseconds,merging.ElapsedMilliseconds,added,joined,unreadable,unreachable));
         return (taken>0 ? "CommonTaken":unreadable>0 ? "CommonUnreadable":unreachable>0 ? "CommonUnreachable":"CommonSame",added,joined);
     }
+    /// <summary>X-468 (0.1805): the log's line of a common set read: kind files taken of those listed, facts and bytes, the download and the merge.</summary>
+    internal static string CommonTimes(int listed,int taken,int facts,long bytes,long fetchMs,long mergeMs,int added,int joined,int unreadable,int unreachable)=>
+        string.Create(System.Globalization.CultureInfo.InvariantCulture,
+            $"Discoveries: common set: {taken} of {listed} kind file(s) taken ({facts} facts, {bytes} bytes): download {fetchMs} ms, merge {mergeMs} ms; {added} added, {joined} joined")
+        +(unreadable+unreachable>0 ? string.Create(System.Globalization.CultureInfo.InvariantCulture,$"; {unreadable} unreadable, {unreachable} not reached"):"")+".";
     private Dictionary<int,string> CommonV3Marks()
     {
         lock(marks)
@@ -534,46 +544,196 @@ public sealed class GitHubExchange : IDisposable
         }
     }
 
-    private async Task Upload(IReadOnlyDictionary<string,string> contents)
+    /// <summary>
+    /// X-804 (user decision of 22/11 around 14 h 35): the upload, under the rotation lock of this profile. The gist fields are first taken as
+    /// another client left them on disk; when the merge tool notes in the player file of main the revision of the last upload (GistRotation), its
+    /// facts are known merged and that gist is to delete; only the facts the common base does not hold as they are are sent, to a new gist then,
+    /// which keeps the issue (edited to link it); the merged gist is deleted once no issue links it any more. A fact not merged yet is never
+    /// left out: it is sent again until a merge notes it. Nothing new: « ShareMerged », the gist deleted, the issue kept for the next one.
+    /// </summary>
+    private async Task<string> Rotate(DiscoveryFile mine)
+    {
+        using var held=await HoldRotation().ConfigureAwait(false);
+        AdoptGist();
+        string gist;int issue;lock(gate){gist=meta.GistId;issue=meta.Issue;}
+        var state=GistRotation.Read(RotationPath,issue);
+        if(GistRotation.Asks(state,gist,issue) && GistRotation.Confirmed(await MergedNote(issue).ConfigureAwait(false),state,gist))
+        {
+            string login;lock(gate)login=meta.Login;
+            state=GistRotation.AfterMerge(state,login);
+            lock(gate){meta.GistId="";meta.GistFiles=[];meta.UploadHash="";}
+            Save(state);SaveMeta();
+        }
+        var news=GistRotation.News(mine.Facts,state.Merged);
+        var sent="ShareMerged";
+        if(news.Count>0)
+        {
+            // X-174 (0.1137, DEC-052): sent as a v3 set: index.json and one kind-NN.jsonl.gz.b64 per kind (base64: a gist holds text). The index holds each
+            // file's hash, so the same facts give the same index and nothing is sent again.
+            var files=ExchangeV3.GistFiles(ExchangeV3.Build(new DiscoveryFile{Version=mine.Version,Producer=mine.Producer,Written=mine.Written,Facts=news}));
+            var hash=CommunityDiscoveries.Hash(files[ExchangeV3.IndexName]);
+            string known;lock(gate)known=meta.UploadHash;
+            if(hash==known)sent="SentSame";
+            else
+            {
+                // X-181 (0.1171): a pair whose write failed before is written again first (night review N8).
+                WriteSecrets();
+                await Fresh().ConfigureAwait(false);
+                // N29: a 401 with a refresh token in hand (a PC clock late, a token ended early): renewed once, sent once more, before forgetting.
+                string? revision;
+                try
+                {
+                    try{revision=await Upload(files,state.Rotated).ConfigureAwait(false);}
+                    catch(HttpRequestException error) when(error.StatusCode==HttpStatusCode.Unauthorized && HasRefresh)
+                    {await Fresh(force:true).ConfigureAwait(false);revision=await Upload(files,state.Rotated).ConfigureAwait(false);}
+                }
+                // X-819 (review of 0.1819, I1): a gist made, then the issue step failing: the rotation's state takes it at once, so the
+                // next exchange writes that gist again instead of making another (X-175), and no gist is left behind unlinked.
+                catch{KeepGist(state);throw;}
+                lock(gate){meta.UploadHash=hash;gist=meta.GistId;issue=meta.Issue;}
+                // A new issue is a new player file: nothing of it merged yet.
+                if(state.Issue!=issue)state.Merged=[];
+                state.Issue=issue;state.SentGist=gist;state.SentRevision=revision ?? "";state.Sent=GistRotation.Hashes(news);state.Rotated=false;
+                Save(state);SaveMeta();
+                sent="Sent";
+            }
+        }
+        string current,account;lock(gate){current=meta.GistId;account=meta.Login;}
+        if(state.OldGist.Length>0 && state.OldGist!=current)
+        {
+            // X-820 M1 (review of 0.1819): another account's gist is answered 404 (« already gone ») though it stays: kept noted, said, deleted
+            // once that account is connected again.
+            if(!GistRotation.Deletes(state,account))
+            {
+                Log?.Invoke("Discoveries: the merged gist of the GitHub account used before on this PC is kept: only that account can delete it.");
+                sent="ShareOldGistKept";
+            }
+            else
+            {
+                WriteSecrets();
+                await Fresh().ConfigureAwait(false);
+                if(await DeleteGist(state.OldGist).ConfigureAwait(false)){state.OldGist="";state.OldLogin="";Save(state);}
+            }
+        }
+        return sent;
+    }
+
+    /// <summary>X-804: the gist and revision the merge tool notes in this issue's player file on main (no account), or null (none, not reached).</summary>
+    private async Task<(string Gist,string Revision)?> MergedNote(int issue)
+    {
+        try{return GistRotation.Note(await Community.BoundedHttp.ReadBytesAsync(client,new Uri($"{GistRotation.NotesAddress}{issue}.jsonl.gz"),GistRotation.MaxNoteFileBytes,stop.Token).ConfigureAwait(false));}
+        catch(Exception error) when(CommonUnreadable(error)){return null;}
+    }
+
+    /// <summary>X-804: a merged gist deleted whole (true, or already gone); false when GitHub refused or was not reached: tried again at the next exchange.</summary>
+    private async Task<bool> DeleteGist(string gist)
+    {
+        try{await Api(HttpMethod.Delete,$"https://api.github.com/gists/{gist}",null).ConfigureAwait(false);return true;}
+        catch(HttpRequestException error) when(error.StatusCode==HttpStatusCode.NotFound){return true;}
+        catch(Exception error) when(error is HttpRequestException or IOException or TaskCanceledException)
+        {Log?.Invoke($"Discoveries: the merged gist could not be deleted ({error.GetType().Name}); tried again at the next exchange.");return false;}
+    }
+
+    /// <summary>X-804: the gist, its issue, files and last upload's hash as the last rotation of this profile left them (another client may have
+    /// rotated the gist meanwhile). Read from the rotation's state, written under the rotation lock only: github.json is written by every client
+    /// outside it too, and an older copy of it there would bring back a deleted gist. The same account only.</summary>
+    private void AdoptGist()
+    {
+        if(GistRotation.Load(RotationPath) is not { Known:true } held)return;
+        lock(gate)
+            if(meta.Login.Length>0 && held.Login==meta.Login){meta.GistId=held.Gist;meta.Issue=held.Issue;meta.GistFiles=[..held.GistFiles];meta.UploadHash=held.UploadHash;}
+    }
+    /// <summary>
+    /// X-819 (review of 0.1819, I1): an upload that failed after its gist was made (or after the issue was found gone): the rotation's state
+    /// written with the gist and issue as they are now, so AdoptGist does not bring back the gist before. An issue changed (0: to open again)
+    /// is a new player file: nothing of it merged yet, as after an upload that ends.
+    /// </summary>
+    private void KeepGist(GistRotationState state)
+    {
+        int issue;lock(gate)issue=meta.Issue;
+        if(state.Issue!=issue){state.Issue=issue;state.Merged=[];}
+        try{Save(state);}
+        catch(Exception error) when(error is IOException or UnauthorizedAccessException)
+        {Log?.Invoke($"Discoveries: the gist in use could not be noted ({error.GetType().Name}).");}
+    }
+    /// <summary>X-804: the rotation's state written, with the gist fields as they are now (read back by <see cref="AdoptGist"/>).</summary>
+    private void Save(GistRotationState state)
+    {
+        lock(gate){state.Login=meta.Login;state.Gist=meta.GistId;state.GistFiles=[..meta.GistFiles];state.UploadHash=meta.UploadHash;state.Known=true;}
+        GistRotation.Write(RotationPath,state);
+    }
+
+    /// <summary>X-804: the lock file around a gist's rotation, shared by every client of this profile; IOException past <see cref="LockWait"/>.</summary>
+    private async Task<FileStream> HoldRotation()
+    {
+        Directory.CreateDirectory(folder);
+        var until=DateTime.UtcNow+LockWait;
+        while(true)
+        {
+            try{return new FileStream(RotationLockPath,FileMode.OpenOrCreate,FileAccess.ReadWrite,FileShare.None);}
+            catch(IOException) when(DateTime.UtcNow<until){await Task.Delay(50).ConfigureAwait(false);}
+        }
+    }
+
+    /// <summary>X-804: the text of a player's issue: its gist, the CC0 sharing, what becomes of the gist and of what is shared (English then French).</summary>
+    internal static string IssueBody(string version,string gist)=>
+        $"Shared from Tensho Assistant {version} (World › Discoveries › automatic exchange).\n\nGist: https://gist.github.com/{gist}\n\n- [x] I share these discoveries under CC0-1.0 (public domain, https://creativecommons.org/publicdomain/zero/1.0/).\n\n{IssueGist}\n{IssueGistFrench}\n\n{IssueStays}\n{IssueStaysFrench}";
+    internal const string IssueGist="Once its discoveries are in the common base, the gist is deleted and a new one holds only what is new; this issue is then edited to link it.";
+    internal const string IssueGistFrench="Français : une fois ses découvertes dans la base commune, le gist est supprimé et un nouveau ne garde que les nouveautés ; ce ticket est alors modifié pour y renvoyer.";
+
+    /// <summary>
+    /// The gist written: the one in use patched, else a new one; its revision (history[0].version: what the merge tool notes once merged), or
+    /// null when GitHub gives none. X-804: <paramref name="rotated"/>: the gist was deleted after a merge: a new gist keeps the issue, whose text is
+    /// edited to link it (a new issue only when that one is gone).
+    /// </summary>
+    private async Task<string?> Upload(IReadOnlyDictionary<string,string> contents,bool rotated=false)
     {
         var files=new JsonObject();
         foreach(var (name,content) in contents)files[name]=new JsonObject{["content"]=content};
         string gist;List<string> before;lock(gate){gist=meta.GistId;before=meta.GistFiles.Count>0 ? [..meta.GistFiles]:[GistFile];}
+        JsonNode? written=null;
         if(gist.Length>0)
         {
             // X-174 (0.1137): the files of before that this upload does not hold (the v2 file GistFile, a kind gone) are removed from the gist: GitHub
             // removes a file set to null. Refused (a file already gone by hand): sent again without the removals.
             var patch=(JsonObject)files.DeepClone();var removed=0;
             foreach(var name in before.Where(name=>!contents.ContainsKey(name))){patch[name]=null;removed++;}
-            try{await Api(HttpMethod.Patch,$"https://api.github.com/gists/{gist}",new JsonObject{["files"]=patch}).ConfigureAwait(false);}
+            try{written=await Api(HttpMethod.Patch,$"https://api.github.com/gists/{gist}",new JsonObject{["files"]=patch}).ConfigureAwait(false);}
             catch(HttpRequestException error) when(error.StatusCode==HttpStatusCode.UnprocessableEntity && removed>0)
             {
-                try{await Api(HttpMethod.Patch,$"https://api.github.com/gists/{gist}",new JsonObject{["files"]=files.DeepClone()}).ConfigureAwait(false);}
+                try{written=await Api(HttpMethod.Patch,$"https://api.github.com/gists/{gist}",new JsonObject{["files"]=files.DeepClone()}).ConfigureAwait(false);}
                 catch(HttpRequestException missing) when(missing.StatusCode==HttpStatusCode.NotFound){gist="";}
             }
             catch(HttpRequestException error) when(error.StatusCode==HttpStatusCode.NotFound){gist="";}
         }
         if(gist.Length==0)
         {
-            var created=await Api(HttpMethod.Post,"https://api.github.com/gists",
+            written=await Api(HttpMethod.Post,"https://api.github.com/gists",
                 new JsonObject{["description"]="Tensho Assistant discoveries",["public"]=false,["files"]=files.DeepClone()}).ConfigureAwait(false);
-            gist=created?["id"]?.GetValue<string>() ?? throw new InvalidDataException("No gist id.");
-            lock(gate){meta.GistId=gist;meta.Issue=0;}
+            gist=written?["id"]?.GetValue<string>() ?? throw new InvalidDataException("No gist id.");
+            lock(gate){meta.GistId=gist;if(!rotated)meta.Issue=0;}
         }
         lock(gate){meta.GistFiles=[..contents.Keys];if(meta.Login.Length>0)meta.GistLogin=meta.Login;}
         // X-175: the gist kept before the issue, so a refused issue does not make a second gist at the next exchange.
         SaveMeta();
         int issue;lock(gate)issue=meta.Issue;
+        var version=typeof(GitHubExchange).Assembly.GetName().Version?.ToString(3) ?? "?";
+        // X-804: a new gist after a merge: the issue edited to link it; an issue gone (404, 410) is opened again below. X-819: at every
+        // upload until the rotation ends (a gist made at a try whose issue edit failed is written again, not made again).
+        if(issue>0 && rotated)
+        {
+            try{await Api(HttpMethod.Patch,$"https://api.github.com/repos/{Repository}/issues/{issue}",new JsonObject{["body"]=IssueBody(version,gist)}).ConfigureAwait(false);}
+            catch(HttpRequestException error) when(error.StatusCode is HttpStatusCode.NotFound or HttpStatusCode.Gone){lock(gate)meta.Issue=issue=0;}
+        }
         if(issue==0)
         {
-            var version=typeof(GitHubExchange).Assembly.GetName().Version?.ToString(3) ?? "?";
             JsonNode? opened;
             try
             {
                 opened=await Api(HttpMethod.Post,$"https://api.github.com/repos/{Repository}/issues",new JsonObject
                 {
                     ["title"]=$"Discoveries: {Login}",
-                    ["body"]=$"Shared from Tensho Assistant {version} (World › Discoveries › automatic exchange).\n\nGist: https://gist.github.com/{gist}\n\n- [x] I share these discoveries under CC0-1.0 (public domain, https://creativecommons.org/publicdomain/zero/1.0/).\n\nThe gist is updated at each exchange; this issue stays the same.",
+                    ["body"]=IssueBody(version,gist),
                     ["labels"]=new JsonArray("discoveries"),
                 }).ConfigureAwait(false);
             }
@@ -584,6 +744,7 @@ public sealed class GitHubExchange : IDisposable
             lock(gate)meta.Issue=opened?["number"]?.GetValue<int>() ?? 0;
         }
         SaveMeta();
+        return written?["history"]?[0]?["version"]?.GetValue<string>();
     }
 
     private bool HasRefresh{get{lock(gate)return refresh is not null;}}

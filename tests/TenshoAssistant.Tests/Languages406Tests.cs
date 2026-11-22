@@ -16,7 +16,11 @@ internal static class Languages406Tests
         "Events/Festivals.cs",              // French event names built from the guide NPC (French client only)
         "Alarms/GameAlarmCommand.cs",       // the game's own /alarm command syntax
     };
-    private static readonly HashSet<string> AllowedLiterals = ["pêche","récolte"]; // « /tensho pêche », « /tensho récolte », typed by players
+    private static readonly HashSet<string> AllowedLiterals = ["pêche","récolte", // « /tensho pêche », « /tensho récolte », typed by players
+        // X-803 (0.1816): the French half of the player's issue on GitHub (GitHub in two languages, R20.1), never shown in the plugin
+        "Français : ce que vous partagez reste dans la base commune même si vous arrêtez de partager. Fermez ce ticket (ou demandez-le dedans) et le mainteneur retire votre fichier de joueur, qui relie votre nom GitHub à vos découvertes ; le titre de ce ticket et l'historique du dépôt montrent encore ce nom.",
+        // X-804 (0.1817): the French half of the issue's line about the gist deleted once merged
+        "Français : une fois ses découvertes dans la base commune, le gist est supprimé et un nouveau ne garde que les nouveautés ; ce ticket est alors modifié pour y renvoyer."];
 
     private static readonly Regex Literal = new(@"\$?""((?:[^""\\\n]|\\.)*)""", RegexOptions.Compiled);
     private static readonly Regex Accented = new("[éèàêçôîûùÉÈÀÊÇœ]", RegexOptions.Compiled);

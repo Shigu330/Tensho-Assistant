@@ -76,16 +76,9 @@ public static class MarketBoardMath
         var invariant=System.Globalization.CultureInfo.InvariantCulture;
         var text=new System.Text.StringBuilder("ItemId,Item,Date,World,UnitPrice,Quantity,Quality\n");
         foreach(var sale in sales)
-            text.Append(string.Join(",",item.ToString(invariant),CsvQuote(name),sale.At.ToString("yyyy-MM-ddTHH:mm:sszzz",invariant),CsvQuote(sale.World),
+            text.Append(string.Join(",",item.ToString(invariant),CsvText.Field(name),sale.At.ToString("yyyy-MM-ddTHH:mm:sszzz",invariant),CsvText.Field(sale.World),
                 sale.UnitPrice.ToString(invariant),sale.Quantity.ToString(invariant),sale.Hq ? "HQ":"NQ")).Append('\n');
         return text.ToString();
-    }
-
-    // Quoted, inner quotes doubled; a leading = + - @ is prefixed so a spreadsheet never reads a field as a formula (as BankList, VoyageHistory).
-    private static string CsvQuote(string value)
-    {
-        var safe=value.Length>0 && "=+-@".Contains(value[0]) ? "'"+value:value;
-        return "\""+safe.Replace("\"","\"\"")+"\"";
     }
 
     public const int MaximumWanted=9999;

@@ -27,12 +27,7 @@ public static class Notebooks
     {
         var text=new StringBuilder("Notebook,ItemId,Item,Done\n");
         foreach(var entry in entries.OrderBy(entry=>entry.Kind).ThenBy(entry=>entry.ItemId))
-            text.Append(string.Join(",",Quote(entry.Kind.ToString()),entry.ItemId.ToString(CultureInfo.InvariantCulture),Quote(itemName(entry.ItemId)),entry.Done ? "yes":"no")).Append('\n');
+            text.Append(string.Join(",",CsvText.Field(entry.Kind.ToString()),entry.ItemId.ToString(CultureInfo.InvariantCulture),CsvText.Field(itemName(entry.ItemId)),entry.Done ? "yes":"no")).Append('\n');
         return text.ToString();
-    }
-    private static string Quote(string value)
-    {
-        var safe=value.Length>0 && "=+-@".Contains(value[0]) ? "'"+value:value;
-        return "\""+safe.Replace("\"","\"\"")+"\"";
     }
 }

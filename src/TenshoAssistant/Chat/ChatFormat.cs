@@ -5,7 +5,7 @@ namespace TenshoAssistant.Chat;
 
 /// <remarks>X-505 (0.1488): LinkMark, the game's arrow before a link (part of the link: a click on it opens it).</remarks>
 /// <remarks>X-447 B14 (0.1641): ItemIcon, an item link's icon before it (no text: a block as wide as the line is high, ChatFormat.Wrap).</remarks>
-public enum ChatRole { Timestamp,Channel,Sender,Body,Link,LinkMark,ItemIcon,JobIcon }
+public enum ChatRole { Timestamp,Channel,Sender,Body,Link,LinkMark,ItemIcon,JobIcon,GameIcon }
 /// <param name="Link">X-403 phase 2 (0.1441): what the run's text links to (role Link); null otherwise.</param>
 /// <param name="Underlined">X-510 (review of 0.1490): with the game's look, a link that has no arrow of the game (a web address found by Tensho,
 /// a link named by Tensho, a link of Dalamud without arrow): drawn underlined in the accent colour, as every link before 0.1488, so that it is
@@ -221,6 +221,12 @@ public static class ChatFormat
             if(segment.Link is not { } current || !Equals(current,iconed))iconed=null;
             if(settings.ItemIcons && iconed is null && segment.Link is { Kind:ChatSegmentKind.ItemLink } item && (linkIcon?.Invoke(item) ?? 0)>0)
             {runs.Add(new("",ChatRole.ItemIcon,item));iconed=item;}
+            // X-801 (0.1809): the type of damage's icon of the game's font, drawn (the copy keeps its « · »).
+            if(linkIcon is not null && segment.Link is { Kind:ChatSegmentKind.FontIcon } glyph){runs.Add(new("",ChatRole.GameIcon,glyph));continue;}
+            // X-788 (0.1809): the glyph the game puts before a status's name (a piece of its own in the status's link) becomes the status's
+            // icon, as the game's chat draws it; kept as it is when the icon is not known (the copy too).
+            if(segment.Link is { Kind:ChatSegmentKind.StatusLink } status && StatusGlyph(segment.Text) && (linkIcon?.Invoke(status) ?? 0)>0)
+            {runs.Add(new("",ChatRole.ItemIcon,status));continue;}
             // X-461 (0.1463): a link with no text of its own (ChatPieces keeps its place empty): the name of what it points to.
             if(segment.Text.Length==0 && segment.Link is { } named)
             {
@@ -238,6 +244,9 @@ public static class ChatFormat
         }
         return runs;
     }
+
+    /// <summary>X-788 (0.1809): a status link's piece that is only the game's glyph before its name (« ·Prospect »), not the link's own glyph.</summary>
+    public static bool StatusGlyph(string text)=>text.Trim() is [var letter] && ChatGlyphs.IsGlyph(letter) && letter!=ChatGlyphs.LinkMarker;
 
     /// <summary>X-690 (0.1666): the sender's job icon (<paramref name="icon"/>, 0: none) as a <see cref="ChatRole.JobIcon"/> run just before the
     /// sender's name (capture mode too: the name is replaced, the icon stays, R25); the runs unchanged without a name or an icon. The copy
@@ -280,7 +289,7 @@ public static class ChatFormat
         }
         foreach(var run in runs)
         {
-            if(run.Role is ChatRole.ItemIcon or ChatRole.JobIcon)
+            if(run.Role is ChatRole.ItemIcon or ChatRole.JobIcon or ChatRole.GameIcon)
             {
                 if(used>0 && used+icon>width)Flush();
                 line.Add(run);used+=icon;

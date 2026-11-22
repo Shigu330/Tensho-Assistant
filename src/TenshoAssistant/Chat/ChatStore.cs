@@ -1,7 +1,7 @@
 namespace TenshoAssistant.Chat;
 
 /// <remarks>X-474 (0.1477): DalamudLink, a link of Dalamud or of a plugin (its plugin and command).</remarks>
-public enum ChatSegmentKind { Text,MapLink,ItemLink,QuestLink,WebLink,DalamudLink,StatusLink,ActionName }
+public enum ChatSegmentKind { Text,MapLink,ItemLink,QuestLink,WebLink,DalamudLink,StatusLink,ActionName,FontIcon }
 /// <summary>X-403 phase 2 (0.1441): what a link of a message points to: a place (territory, map, coordinate, place name) or an item (id, high
 /// quality); 0.1442: or a quest (its row in the game's Quest sheet).</summary>
 /// <param name="Url">X-403 phase 2 (0.1453): a web address's absolute form (ChatWeb.Address), for a WebLink.</param>

@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (804 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (834 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -331,6 +331,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-130 | Request of 2026-11-11: garden, crossbreed forecasts from the planted garden… | Done in 0.1109 |
 | X-132 | Request of 2026-11-11: garden alarms (ripe, tending, from the Gardening tool's… | Done in 0.1160 |
 | X-133 | Request of 2026-11-11: reminder alarms in an « Alarms » tab of the Reminders… | Done in 0.1159 |
+| X-136 | Request of 2026-11-11: more coherent Beast labyrinth help: team chosen from the… | Done in 0.1599.0 |
 | X-137 | User's choice of 2026-11-11 (« oui mais en pvp et classement »): Tensho is no… | Done in 0.1115 |
 | X-138 | Request of 2026-11-11 (screenshot, Central Shroud): Tensho map, right-click… | Done in 0.1166 |
 | X-140 | Audit A01 and A03 (GPT audit of 11/11, checked in the code by the master, order… | Done in 0.1117 |
@@ -584,6 +585,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-464 | Review of block 0.1455 to 0.1461 (review 0.1461, 15/11), minor M1, M2, M3, M4… | Done in 0.1466 |
 | X-465 | Bug seen in the Beastmaster labyrinth by the user on 11/15 around 9:56 pm… | Done in 0.1465 |
 | X-466 | User request of 11/15 around 10:15 pm (Tensho chat window): the chat should… | Done in 0.1476 |
+| X-468 | User decision of 11/15 around 10:30 pm (D-172, shared discoveries beyond… | Done in 0.1806.0 |
 | X-469 | User decision of 11/15 around 10:30 pm (D-174, retainer table X-196): « items… | Done in 0.1762.0 |
 | X-470 | Tool, idea I-015 put on the plan by the user on 11/15 around 10:35 pm… | Done in 0.1467.0 |
 | X-471 | Tool, idea I-014 put on the plan by the user on 11/15 around 10:35 pm: the same… | Done in 0.1467.0 |
@@ -644,6 +646,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-532 | Tool (defect seen by the user on 16/11 around 23:00): after a clear (R28.8) the… | Done in 0.1508 |
 | X-533 | User's request (16/11 around 23:15, two screenshots in the master's notes)… | Done in 0.1509 |
 | X-534 | Review of block 0.1505 to 0.1507 (review 0.1507, 16/11), minor M1, M2: M1 in… | Done in 0.1510 |
+| X-535 | In-game test T-0.546-1 (test page, 17/11 around 00:04): problem reported by the… | Done in 0.1806.0 |
 | X-536 | Tool (R13.3), test page of 17/11 around midnight: 29 tests commented « I don't… | Done in 0.1511 |
 | X-537 | Tool (R13.3), idea box defect (idees.py, called by page_essais.py import on… | Done in 0.1511 |
 | X-538 | Tool (R13.3), relay statistics skewed, seen on 17/11 around 0:40 comparing… | Done in 0.1511 |
@@ -692,6 +695,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-589 | External audit of 18/11, family « network sources »: A08, A09, A10, A26, A11… | Done in 0.1556 |
 | X-590 | External audit of 18/11, family « native reads » (R08): A05 (map marker count… | Done in 0.1610.0 |
 | X-591 | External audit of 18/11, texts and tests: A13 (SECURITY says once a day at… | Done in 0.1611.0 |
+| X-592 | External audit of 18/11, desktop app (frozen, D-149): A21 (unreadable… | Done in 0.1813.0 |
 | X-593 | External audit of 18/11, A04 (user's choice of 18/11: fix the text, not the… | Done in 0.1553 |
 | X-594 | Method audit of 18/11, backup of the agent's files: M27, M14, M28, M29, M30… | Done in 0.1550 |
 | X-595 | Method audit of 18/11, tools that hide an error: M11, M12, M24, M26, M18, M22… | Done in 0.1550 |
@@ -859,6 +863,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-769 | Review of block 0.1759 to 0.1764 (review 0.1764, 22/11), minor M1, M2, M3: M1… | Done in 0.1765.0 |
 | X-770 | Review of block 0.1765 to 0.1768 (review 0.1768, 22/11), minor M1, M2: M1 in… | Done in 0.1769.0 |
 | X-771 | Review of block 0.1769 to 0.1772 (review 0.1772, 22/11), minor M1, M2, M3, M4… | Done in 0.1773.0 |
+| X-772 | Privacy of the shared discoveries (found by study X-468, relay 173, 22/11): the… | Done in 0.1801.0 |
 | X-773 | Review of block 0.1773 to 0.1775 (review 0.1775, 22/11), minor M1, M2, M3: M1… | Done in 0.1776.0 |
 | X-774 | Review of block 0.1776 to 0.1779 (review 0.1779, 22/11), I1: finding in… | Done in 0.1780.0 |
 | X-775 | Flaky CI test: SettingsFile1745Tests (two clients saving at once); its reader… | Done in 0.1785.0 |
@@ -872,12 +877,37 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-783 | Test process crashed once (quick test check: « tests exit 127 », trace « at… | Done in 0.1796.0 |
 | X-784 | Review of block 0.1790 to 0.1795 (review 0.1795, 22/11), I1: finding in… | Done in 0.1797.0 |
 | X-785 | Review of block 0.1790 to 0.1795 (review 0.1795, 22/11), minor M1, M2, M3, M4… | Done in 0.1798.0 |
+| X-786 | Master tools (11/22): the user's exception to the quota floor (R26.2, until… | Done in 0.1800.0 |
+| X-787 | Idea I-052: Tensho chat window, « … uses <item>. » lines (kind 44): the item… | Done in 0.1809.0 |
+| X-788 | Idea I-053: Tensho chat window, the glyph the game puts before an effect name… | Done in 0.1809.0 |
+| X-789 | Idea I-058: fallback mode of the player's data (TenshoData.db missing and… | Done in 0.1802.0 |
+| X-790 | Idea I-054: one shared CSV escaping (doubled quotes, prefixed formula sign) for… | Done in 0.1812.0 |
+| X-793 | Review of block 0.1796 to 0.1799 (review 0.1799, 22/11), minor M2, M3: M2 in… | Done in 0.1800.0 |
+| X-794 | Review of block 0.1796 to 0.1799 (review 0.1799, 22/11), pre-existing before… | Done in 0.1800.0 |
+| X-795 | Review of block 0.1800 to 0.1802 (review 0.1802, 22/11), I1: finding in… | Done in 0.1803.0 |
+| X-796 | Review of block 0.1800 to 0.1802 (review 0.1802, 22/11), minor M1, M2, M3: M1… | Done in 0.1804.0 |
+| X-797 | User request (test T-0.1782-2, 11/22 around 13:03, capture read: Dark Matter… | Done in 0.1810.0 |
+| X-798 | User's reading (test T-0.1786-2, 11/22 around 13:11): the chocobo companion… | Done in 0.1811.0 |
+| X-799 | Tests' tool (11/22): importing the page's answers stops on an « I don't… | Done in 0.1803.0 |
+| X-800 | User request of 11/22 around 13:25 (Beastmaster's Crucible, Tensho panel beside… | Done in 0.1808.0 |
+| X-801 | User request of 11/22 around 13:40 (capture read: top the Tensho chat window… | Done in 0.1809.0 |
+| X-803 | User decision of 11/22 around 14:20 (follows D-220: the goal is a complete… | Done in 0.1816.0 |
+| X-804 | User decision of 11/22 around 14:35 (after the risks and the PlayerScope and… | Done in 0.1817.0 |
+| X-805 | User decision of 11/22 around 14:45 (rules R12.2 and R20.6 completed, journal… | Done in 0.1823.0 |
+| X-806 | Tool (R13.3), test text to rewrite: T-0.1780-1 (test page, 22/11 around 13:12)… | Done in 0.1806.0 |
+| X-807 | Review of block 0.1803 to 0.1806 (review 0.1806, 22/11), minor M1, M2, M3, M4… | Done in 0.1814.0 |
+| X-808 | Review of block 0.1803 to 0.1806 (review 0.1806, 22/11), pre-existing before… | Done in 0.1821.0 |
+| X-809 | Bug reported by the user on 11/22 around 15:00 (D-221 piloting): since the… | Done in 0.1807.0 |
+| X-811 | Tool (R13.3): method of natures (user's decision of 11/22 around 15:40). Done… | Done in 0.1812.0 |
+| X-812 | Tool (R13.3, R32.1), follow-up of the natures tool: user's request of 11/22… | Done in 0.1812.0 |
+| X-819 | Review of block 0.1813 to 0.1819 (review 0.1819, 22/11), I1: finding in… | Done in 0.1820.0 |
+| X-820 | Review of block 0.1813 to 0.1819 (review 0.1819, 22/11), minor M1, M2, M3: M1… | Done in 0.1822.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (804 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (834 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1206,6 +1236,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-130 | Demande du 2026-11-11 : jardin, prévisions de croisement à partir du jardin… | Fait en 0.1109 |
 | X-132 | Demande du 2026-11-11 : alarmes du jardin (maturité, entretien, d'après le… | Fait en 0.1160 |
 | X-133 | Demande du 2026-11-11 : alarmes de rappel dans un onglet « Alarmes » de l'outil… | Fait en 0.1159 |
+| X-136 | Demande du 2026-11-11 : aide du Dédale bestial plus cohérente : équipe choisie… | Fait en 0.1599.0 |
 | X-137 | Choix de l'utilisateur du 2026-11-11 (« oui mais en pvp et classement »)… | Fait en 0.1115 |
 | X-138 | Demande du 2026-11-11 (capture, Forêt centrale) : carte de Tensho, menu du clic… | Fait en 0.1166 |
 | X-140 | Audit A01 et A03 (audit GPT du 11/11… | Fait en 0.1117 |
@@ -1459,6 +1490,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-464 | Relecture du bloc 0.1455 à 0.1461 (relecture 0.1461, 15/11), mineurs M1, M2… | Fait en 0.1466 |
 | X-465 | Bug vu au Dédale bestial par l'utilisateur le 15/11 vers 21 h 56 (mode… | Fait en 0.1465 |
 | X-466 | Demande de l'utilisateur du 15/11 vers 22 h 15 (fenêtre de chat Tensho) : « il… | Fait en 0.1476 |
+| X-468 | Décision de l'utilisateur du 15/11 vers 22 h 30 (D-172, découvertes partagées… | Fait en 0.1806.0 |
 | X-469 | Décision de l'utilisateur du 15/11 vers 22 h 30 (D-174, tableau des servants… | Fait en 0.1762.0 |
 | X-470 | Outil, idée I-015 mise au plan par l'utilisateur le 15/11 vers 22 h 35… | Fait en 0.1467.0 |
 | X-471 | Outil, idée I-014 mise au plan par l'utilisateur le 15/11 vers 22 h 35 : la… | Fait en 0.1467.0 |
@@ -1519,6 +1551,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-532 | Outil (défaut vu par l'utilisateur le 16/11 vers 23 h : « quand tu es vidé tu… | Fait en 0.1508 |
 | X-533 | Demande de l'utilisateur (16/11 vers 23 h 15, deux captures dans les notes de… | Fait en 0.1509 |
 | X-534 | Relecture du bloc 0.1505 à 0.1507 (relecture 0.1507, 16/11), mineurs M1, M2… | Fait en 0.1510 |
+| X-535 | Essai T-0.546-1 en jeu (page des essais, 17/11 vers 0 h 04) : problème signalé… | Fait en 0.1806.0 |
 | X-536 | Outil (R13.3), page des essais du 17/11 vers 0 h : 29 essais commentés « je… | Fait en 0.1511 |
 | X-537 | Outil (R13.3), défaut de la boîte à idées (idees.py, appelé par page_essais.py… | Fait en 0.1511 |
 | X-538 | Outil (R13.3), statistiques des relais faussées, vu le 17/11 vers 0 h 40 en… | Fait en 0.1511 |
@@ -1567,6 +1600,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-589 | Audit externe du 18/11, famille « sources réseau » : A08 (délai dépassé de… | Fait en 0.1556 |
 | X-590 | Audit externe du 18/11, famille « lectures natives » (R08) : A05 (nombre de… | Fait en 0.1610.0 |
 | X-591 | Audit externe du 18/11, textes et tests : A13 (SECURITY dit « une fois par jour… | Fait en 0.1611.0 |
+| X-592 | Audit externe du 18/11, application de bureau (gelée, D-149) : A21 (update.json… | Fait en 0.1813.0 |
 | X-593 | Audit externe du 18/11, A04 (choix de l'utilisateur le 18/11 : corriger le… | Fait en 0.1553 |
 | X-594 | Audit de méthode du 18/11, sauvegarde des fichiers de l'agent : M27 (une source… | Fait en 0.1550 |
 | X-595 | Audit de méthode du 18/11, outils qui mentent sur une erreur : M11 (state.py… | Fait en 0.1550 |
@@ -1734,6 +1768,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-769 | Relecture du bloc 0.1759 à 0.1764 (relecture 0.1764, 22/11), mineurs M1, M2, M3… | Fait en 0.1765.0 |
 | X-770 | Relecture du bloc 0.1765 à 0.1768 (relecture 0.1768, 22/11), mineurs M1, M2… | Fait en 0.1769.0 |
 | X-771 | Relecture du bloc 0.1769 à 0.1772 (relecture 0.1772, 22/11), mineurs M1, M2… | Fait en 0.1773.0 |
+| X-772 | Confidentialité des découvertes partagées (trouvé par l'étude X-468, relais… | Fait en 0.1801.0 |
 | X-773 | Relecture du bloc 0.1773 à 0.1775 (relecture 0.1775, 22/11), mineurs M1, M2, M3… | Fait en 0.1776.0 |
 | X-774 | Relecture du bloc 0.1776 à 0.1779 (relecture 0.1779, 22/11), I1 : Le compagnon… | Fait en 0.1780.0 |
 | X-775 | Test fragile en CI : SettingsFile1745Tests (« deux clients qui enregistrent… à… | Fait en 0.1785.0 |
@@ -1747,3 +1782,28 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-783 | Processus des tests tombé une fois (contrôle rapide des tests : « tests exit… | Fait en 0.1796.0 |
 | X-784 | Relecture du bloc 0.1790 à 0.1795 (relecture 0.1795, 22/11), I1 : Depuis 0.1794… | Fait en 0.1797.0 |
 | X-785 | Relecture du bloc 0.1790 à 0.1795 (relecture 0.1795, 22/11), mineurs M1, M2… | Fait en 0.1798.0 |
+| X-786 | Outils de la maître (22/11) : la dérogation de l'utilisateur au plancher de… | Fait en 0.1800.0 |
+| X-787 | Idée I-052 : fenêtre de chat Tensho, lignes « … utilise <objet>. » (genre 44)… | Fait en 0.1809.0 |
+| X-788 | Idée I-053 : fenêtre de chat Tensho, le glyphe que le jeu met devant le nom… | Fait en 0.1809.0 |
+| X-789 | Idée I-058 : mode de secours des données du joueur (TenshoData.db absent et… | Fait en 0.1802.0 |
+| X-790 | Idée I-054 : un seul échappement CSV commun (guillemets doublés, signe de… | Fait en 0.1812.0 |
+| X-793 | Relecture du bloc 0.1796 à 0.1799 (relecture 0.1799, 22/11), mineurs M2, M3… | Fait en 0.1800.0 |
+| X-794 | Relecture du bloc 0.1796 à 0.1799 (relecture 0.1799, 22/11), déjà là avant le… | Fait en 0.1800.0 |
+| X-795 | Relecture du bloc 0.1800 à 0.1802 (relecture 0.1802, 22/11), I1 : Depuis X-772… | Fait en 0.1803.0 |
+| X-796 | Relecture du bloc 0.1800 à 0.1802 (relecture 0.1802, 22/11), mineurs M1, M2, M3… | Fait en 0.1804.0 |
+| X-797 | Demande de l'utilisateur (essai T-0.1782-2, 22/11 vers 13 h 03, capture lue… | Fait en 0.1810.0 |
+| X-798 | Relevé de l'utilisateur (essai T-0.1786-2, 22/11 vers 13 h 11) : « non le… | Fait en 0.1811.0 |
+| X-799 | Outil des essais (22/11) : l'import des réponses de la page s'arrête sur une… | Fait en 0.1803.0 |
+| X-800 | Demande de l'utilisateur du 22/11 vers 13 h 25 (Dédale bestial, panneau Tensho… | Fait en 0.1808.0 |
+| X-801 | Demande de l'utilisateur du 22/11 vers 13 h 40 (capture lue : en haut la… | Fait en 0.1809.0 |
+| X-803 | Décision de l'utilisateur du 22/11 vers 14 h 20 (suite de D-220 : « le but est… | Fait en 0.1816.0 |
+| X-804 | Décision de l'utilisateur du 22/11 vers 14 h 35 (après l'explication des… | Fait en 0.1817.0 |
+| X-805 | Décision de l'utilisateur du 22/11 vers 14 h 45 (règles R12.2 et R20.6… | Fait en 0.1823.0 |
+| X-806 | Outil (R13.3), texte d'essai à réécrire : T-0.1780-1 (page des essais, 22/11… | Fait en 0.1806.0 |
+| X-807 | Relecture du bloc 0.1803 à 0.1806 (relecture 0.1806, 22/11), mineurs M1, M2… | Fait en 0.1814.0 |
+| X-808 | Relecture du bloc 0.1803 à 0.1806 (relecture 0.1806, 22/11), déjà là avant le… | Fait en 0.1821.0 |
+| X-809 | Bug signalé par l'utilisateur le 22/11 vers 15 h (pilotage D-221) : depuis la… | Fait en 0.1807.0 |
+| X-811 | Outil (R13.3) : méthode des natures (décision de l'utilisateur du 22/11 vers 15… | Fait en 0.1812.0 |
+| X-812 | Outil (R13.3, R32.1), suite de l'outil des natures : demande de l'utilisateur… | Fait en 0.1812.0 |
+| X-819 | Relecture du bloc 0.1813 à 0.1819 (relecture 0.1819, 22/11), I1 : Un gist créé… | Fait en 0.1820.0 |
+| X-820 | Relecture du bloc 0.1813 à 0.1819 (relecture 0.1819, 22/11), mineurs M1, M2, M3… | Fait en 0.1822.0 |

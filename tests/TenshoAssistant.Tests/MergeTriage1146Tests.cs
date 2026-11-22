@@ -17,7 +17,7 @@ internal static class MergeTriage1146Tests
             Check(sync>0 && !tool.Contains("\"--label\",\"discoveries\""),"no label filter: a player's issue loses its label");
             Check(tool.Contains("\"--json\",\"number,title,body,author,labels\"") && tool.Contains("if not is_share(issue):continue"),"every open issue listed, shares picked");
             var triage=tool.IndexOf("gist,doubt=triage(issue)",sync,StringComparison.Ordinal);
-            var listing=tool.IndexOf("owner,files=gist_listing(gist)",sync,StringComparison.Ordinal);
+            var listing=tool.IndexOf("owner,files,revision=gist_listing(gist)",sync,StringComparison.Ordinal);
             var owner=tool.IndexOf("doubt=owner_doubt(owner,issue)",sync,StringComparison.Ordinal);
             var read=tool.IndexOf("clean(from_gist_files(files,fetch_gist_raw),player=True)",sync,StringComparison.Ordinal);
             Check(triage>sync && listing>triage && owner>listing && read>owner,"triage, then the owner, and only then the gist's content");
@@ -31,7 +31,7 @@ internal static class MergeTriage1146Tests
             var tool=Read("tools/discoveries-merge.py");
             var exchange=Read("src/TenshoAssistant/Discoveries/GitHubExchange.cs");
             Check(exchange.Contains("[\"title\"]=$\"Discoveries: {Login}\"") && tool.Contains("DISCOVERIES_TITLE=re.compile(r\"^\\s*Discoveries:\\s*(\\S+)\\s*$\",re.I)"),"title");
-            Check(exchange.Contains("[\"body\"]=$\"Shared from Tensho Assistant {version}") && tool.Contains("SHARED_FROM=\"Shared from Tensho Assistant\""),"content");
+            Check(exchange.Contains("[\"body\"]=IssueBody(version,gist)") && exchange.Contains("$\"Shared from Tensho Assistant {version}") && tool.Contains("SHARED_FROM=\"Shared from Tensho Assistant\""),"content");
             Check(exchange.Contains("Gist: https://gist.github.com/{gist}") && tool.Contains("GIST_LINK=re.compile(r\"https://gist\\.github\\.com/"),"gist link");
             Check(exchange.Contains("\\n\\n- [x] I share these discoveries under CC0-1.0 (public domain") && tool.Contains("I share these discoveries under CC0-1\\.0\\b\",re.M)"),"ticked CC0 line");
         }),

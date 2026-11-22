@@ -280,7 +280,7 @@ internal static class ExchangeV31137Tests
             // X-357 (0.1349): the v2 discoveries.json is gone (it held the same 3007 facts, checked by the relay before its removal).
             Check(keys.Count==index!.Files.Sum(entry=>entry.Count) && !File.Exists(Path.GetFullPath("community-discoveries/discoveries.json")),$"one fact per line, no double ({keys.Count}); the v2 file gone");
             var tool=File.ReadAllText(Path.GetFullPath("tools/discoveries-merge.py"));
-            Check(tool.Contains("def v3_kind(") && tool.Contains("def from_gist_files(") && tool.Contains("return write_v3(bounded(common[\"Facts\"],say=say),V3_DIR,say)")
+            Check(tool.Contains("def v3_kind(") && tool.Contains("def from_gist_files(") && tool.Contains("changed=write_v3(bounded(common[\"Facts\"],say=say),V3_DIR,say)")
                 && !tool.Contains("COMMON=") && !tool.Contains("write_json(COMMON"),"the merge tool reads v3 gists and writes the v3 set only");
             var exchange=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Discoveries/GitHubExchange.cs"));
             Check(exchange.Contains("store.WhenImportSaved(key,()=>NoteCommonV3(kind,hash));") && exchange.Contains("await TakeCommonV3(store).ConfigureAwait(false) ?? (\"CommonUnreadable\",0,0);")

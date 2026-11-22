@@ -129,7 +129,7 @@ internal static class DiscoveriesFormat916Tests
         {
             var tool=Source("tools/discoveries-merge.py");
             // X-174 (0.1137): version 3 (the v3 gists) is read too; the common file is still written as version 2 beside the v3 set.
-            Check(tool.Contains("CELL=50;MAX_FACTS=200_000;VERSIONS={1,2,3};VERSION=2") && tool.Contains("\"First\",\"Last\",\"Hq\",\"Values\"}") && tool.Contains("MAX_VALUES=32;MAX_VALUE=100_000;MAX_COUNT=100_000_000"),"fields and bounds");
+            Check(tool.Contains("CELL=50;MAX_FACTS=2_000_000;VERSIONS={1,2,3};VERSION=2") && tool.Contains("\"First\",\"Last\",\"Hq\",\"Values\"}") && tool.Contains("MAX_VALUES=32;MAX_VALUE=100_000;MAX_COUNT=100_000_000"),"fields and bounds");
             Check(tool.Contains("if data.get(\"Version\") not in VERSIONS:") && tool.Contains("common={\"Version\":VERSION,"),"versions");
             Check(tool.Contains("min(values,key=lambda v:(abs(v-value),v))") && tool.Contains("known[\"Values\"]=histogram_sum(known.get(\"Values\"),f[\"Values\"])"),"sum, nearest value");
             Check(tool.Contains("0<=f[\"Hq\"]<=sum(f.get(\"Values\",{}).values())") && tool.Contains("f.pop(\"ImportedHq\",None);f.pop(\"ImportedValues\",None)"),"HQ checked, imported parts dropped");

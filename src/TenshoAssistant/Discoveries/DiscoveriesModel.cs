@@ -127,6 +127,14 @@ public sealed class DiscoveryFact
     public static OwnPart? OwnOf(DiscoveryFact fact)=>fact.Seen==0 ? null:fact.Own?.Copy() ?? new(){First=fact.First,Last=fact.Last,LevelMin=fact.LevelMin,LevelMax=fact.LevelMax,X=fact.X,Z=fact.Z};
     /// <summary>X-76 (0.908): how many times a fact was seen in game, yours and imported together (static: nothing more is written in the files).</summary>
     public static int TimesOf(DiscoveryFact fact)=>fact.Seen+fact.Imported;
+    /// <summary>
+    /// X-468 (0.1806, D-216 a): how many players saw a fact, as far as is known: the common set's count (Imported: one per player's file, yours
+    /// counted when you shared it), at least 1 when you saw it yourself. Never more than known (your sightings and the common count may be the same
+    /// player).
+    /// </summary>
+    public static int WitnessesOf(DiscoveryFact fact)=>Math.Max(fact.Imported,fact.Seen>0 ? 1:0);
+    /// <summary>X-468 (0.1806, D-172): the facts most confirmed first: seen by the most players, then the most seen.</summary>
+    public static IOrderedEnumerable<DiscoveryFact> MostConfirmed(IEnumerable<DiscoveryFact> facts)=>facts.OrderByDescending(WitnessesOf).ThenByDescending(TimesOf);
 }
 
 /// <summary>X-167 (0.1134, audit R03): the dates, levels and exact place of a fact as you read them yourself, apart from any import.</summary>
@@ -251,8 +259,25 @@ public sealed class DiscoveryStore
     /// <summary>
     /// X-93 (0.939, user: never forget a discovery): the bound applies to the shared facts held in memory only (imported, not seen by you), per kind since 0.943. Your own sightings are
     /// never refused, and nothing already held is ever removed to make room; a shared fact left out is counted (<see cref="LeftOut"/>) and the page says so.
+    /// X-468 (0.1805, the user's choice D-216 a): raised from 200 000 to a high safety bound (the merge tool's MAX_FACTS, the bound of an index
+    /// entry); a kind's file also stays within the format's byte bounds (ExchangeV3). When a file brings more than there is room for, the facts
+    /// seen by the most players (Imported) come in first, then the most recent (<see cref="Weighed"/>), no longer the first ones in key order.
     /// </summary>
-    public const int MaxFacts=200_000;
+    public const int MaxFacts=2_000_000;
+
+    /// <summary>
+    /// X-468 (0.1805, D-172, D-216 a): « a fact verified several times by several people counts more ». When the shared facts a list brings for a kind
+    /// pass the room left (<see cref="MaxFacts"/> less <paramref name="shared"/>, the shared facts held), the list in the order they are put in: the
+    /// most players first (Imported), then the most recent (Last); the same list otherwise (nothing reordered, nothing written differently).
+    /// Stable: equal facts keep their order. Called outside the lock.
+    /// </summary>
+    public static List<DiscoveryFact> Weighed(List<DiscoveryFact> ready,IReadOnlyDictionary<DiscoveryKind,int> shared)
+    {
+        var offered=new Dictionary<DiscoveryKind,int>();
+        foreach(var fact in ready)if(fact.Seen==0)offered[fact.Kind]=offered.GetValueOrDefault(fact.Kind)+1;
+        if(!offered.Any(pair=>(long)shared.GetValueOrDefault(pair.Key)+pair.Value>MaxFacts))return ready;
+        return [..ready.OrderByDescending(fact=>fact.Imported).ThenByDescending(fact=>fact.Last)];
+    }
     /// <summary>
     /// X-93 (0.941): shared kinds loaded on demand. With a source set (<see cref="UseSharedSource"/>), a kind whose shared file exists is read the first time
     /// something asks for it (a search in the background: the answer comes a moment later, the page refreshes on the next revision; an import at once), so
@@ -583,6 +608,7 @@ public sealed class DiscoveryStore
         }
         Dictionary<DiscoveryKind,int> shared;
         lock(gate)shared=SharedHeld();
+        ready=Weighed(ready,shared);   // X-468: over the bound, the most players then the most recent first
         for(var start=0;start<ready.Count;start+=Slice)
         {
         if(start>0)LetOthersIn();
@@ -692,6 +718,7 @@ public sealed class DiscoveryStore
     // X-93 part 2 (0.1040): a file's facts moved to their 50-yalm cells and checked, outside the lock.
     // X-172 (0.1136): Gone, the keys of facts refused or moved to another cell (their rows go); MovedTo, the keys they moved to (their rows are written).
     private sealed record Prepared(List<DiscoveryFact> Facts,int Refused,bool Moved,List<string> Gone,List<string> MovedTo);
+    private static readonly Dictionary<DiscoveryKind,int> EmptyShared=[];
     private static Prepared Prepare(DiscoveryFile file)
     {
         var ready=new List<DiscoveryFact>(file.Facts.Count);var refused=0;var moved=false;List<string> gone=[],movedTo=[];
@@ -706,7 +733,9 @@ public sealed class DiscoveryStore
             if(fact.Key!=original.Key){gone.Add(original.Key);movedTo.Add(fact.Key);}
             ready.Add(fact);
         }
-        return new(ready,refused,moved,gone,movedTo);
+        // X-468 (0.1805): a file bringing more shared facts of a kind than the bound (a base read at start, a shared kind's file: none of that kind
+        // held yet) puts the most players' and the most recent first.
+        return new(Weighed(ready,EmptyShared),refused,moved,gone,movedTo);
     }
     // Under the lock: prepared facts from start to end put in; « shared » counts the shared facts held per kind.
     private void PutRange(List<DiscoveryFact> ready,int start,int end,Dictionary<DiscoveryKind,int> shared,bool sharedFile=false)
@@ -895,26 +924,26 @@ public sealed class DiscoveryStore
     }
     private ((int,long) At,(DiscoveryKind Kind,int Total,int Seen,int ImportedOnly)[] Rows)? summary;
 
-    /// <summary>The facts of a kind whose subject passes the filter, most seen first.</summary>
+    /// <summary>The facts of a kind whose subject passes the filter, the most confirmed first (X-468: the most players, then the most seen).</summary>
     public IReadOnlyList<DiscoveryFact> Find(DiscoveryKind kind,Func<uint,bool> subject,int max)
     {
         lock(gate)
         {
             Want(kind);
             if(!index.TryGetValue(kind,out var bySubject))return [];
-            return bySubject.Where(pair=>subject(pair.Key)).SelectMany(pair=>pair.Value).OrderByDescending(DiscoveryFact.TimesOf).ThenBy(fact=>fact.Subject)
+            return DiscoveryFact.MostConfirmed(bySubject.Where(pair=>subject(pair.Key)).SelectMany(pair=>pair.Value)).ThenBy(fact=>fact.Subject)
                 .Take(max).Select(fact=>fact.Copy()).ToArray();
         }
     }
 
-    /// <summary>X-93 (0.938): the facts of a kind about one subject, most seen first, straight from the index.</summary>
+    /// <summary>X-93 (0.938): the facts of a kind about one subject, the most confirmed first (X-468), straight from the index.</summary>
     public IReadOnlyList<DiscoveryFact> Find(DiscoveryKind kind,uint subject,int max)
     {
         lock(gate)
         {
             Want(kind);
             if(!index.TryGetValue(kind,out var bySubject) || !bySubject.TryGetValue(subject,out var list))return [];
-            return list.OrderByDescending(DiscoveryFact.TimesOf).Take(max).Select(fact=>fact.Copy()).ToArray();
+            return DiscoveryFact.MostConfirmed(list).Take(max).Select(fact=>fact.Copy()).ToArray();
         }
     }
 
@@ -942,12 +971,12 @@ public static class QuestItemAsks
     public static bool IsOf(uint subject,uint item)=>item!=0 && subject!=0 && Item(subject)==ItemGains.BaseItem(item);
 }
 
-/// <summary>X-72 A (0.854): the places of a monster for the tools: per map, its most seen place; the most seen maps first.</summary>
+/// <summary>X-72 A (0.854): the places of a monster for the tools: per map, its most confirmed place (X-468: the most players, then the most
+/// seen); the most confirmed maps first.</summary>
 public static class SeenPlaces
 {
     public static DiscoveryFact[] ByMap(IEnumerable<DiscoveryFact> facts,int maps)=>
-        facts.GroupBy(fact=>fact.Map).Select(group=>group.OrderByDescending(DiscoveryFact.TimesOf).First())
-            .OrderByDescending(DiscoveryFact.TimesOf).Take(maps).ToArray();
+        DiscoveryFact.MostConfirmed(facts.GroupBy(fact=>fact.Map).Select(group=>DiscoveryFact.MostConfirmed(group).First())).Take(maps).ToArray();
 }
 
 /// <summary>X-43 (0.807): the files: the base, the exports (a dated copy) and the imports (every .json of the import folder, read once, then renamed).</summary>

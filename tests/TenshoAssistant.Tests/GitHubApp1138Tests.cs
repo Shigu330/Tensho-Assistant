@@ -219,7 +219,7 @@ internal static class GitHubApp1138Tests
             Check(exchange.Contains("signIn.DeviceCodeFields()") && exchange.Contains("signIn.PollFields(device)") && !exchange.Contains(GitHubSignIn.OAuthClientId) && !exchange.Contains("\"scope\""),
                 "the client id and scopes come from GitHubSignIn only");
             Check(exchange.Contains("[\"public\"]=false") && !exchange.Contains("[\"public\"]=true"),"a gist is never made public");
-            Check(exchange.Contains("await Fresh().ConfigureAwait(false);") && exchange.Contains("try{await Upload(files).ConfigureAwait(false);}"),"renewed before the upload (0.1171: once more after a 401)");
+            Check(exchange.Contains("await Fresh().ConfigureAwait(false);") && exchange.Contains("try{revision=await Upload(files,state.Rotated).ConfigureAwait(false);}"),"renewed before the upload (0.1171: once more after a 401)");
             Check(!Read("src/TenshoAssistant/Discoveries/GitHubSignIn.cs").Contains("client_secret"),"no client secret");
             // 0.1797 (X-784): the copy before emptying made by DiscoveryBackup (its behaviour test: DiscoveryClear1797Tests, both tokens left out).
             // 0.1800 (X-794): started on a worker (DiscoveryBackup.Start runs Create).

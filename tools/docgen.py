@@ -572,12 +572,14 @@ NETWORK = [
      "community tool gallery and help videos, on a click, data only, never code",
      "galerie d'outils de la communauté et vidéos d'aide, sur un clic, des données seulement, jamais de code"),
     ("Shared discoveries exchange", ["raw.githubusercontent.com", "api.github.com", "github.com", "gist.github.com", "gist.githubusercontent.com"], "Discovery.AutoExchange",
-     ["Discoveries/GitHubExchange.cs", "Discoveries/CommunityDiscoveries.cs", "Discoveries/GistAside.cs"],
+     ["Discoveries/GitHubExchange.cs", "Discoveries/CommunityDiscoveries.cs", "Discoveries/GistAside.cs", "Discoveries/GistRotation.cs"],
      "the common files of this repository; after « Connect GitHub » only, the player's own sightings to an unlisted gist and one issue that links it "
-     "(described below); on « Exchange now » or with « Automatic exchange »; and, on « Send now » of Help › « Report a problem or help » only, the "
+     "(described below), the gist deleted once merged (the player file of this repository says which) and a new one holding only what is new; on "
+     "« Exchange now » or with « Automatic exchange »; and, on « Send now » of Help › « Report a problem or help » only, the "
      "player's ticket, whose exact text is shown first",
      "les fichiers communs de ce dépôt ; seulement après « Connecter GitHub », les observations du joueur vers un gist non répertorié et un ticket qui y renvoie "
-     "(décrit plus bas) ; sur « Échanger maintenant » ou avec « Échange automatique » ; et, seulement sur « Envoyer maintenant » "
+     "(décrit plus bas), le gist supprimé une fois fusionné (le fichier du joueur de ce dépôt dit lequel) et un nouveau avec seulement les nouveautés ; "
+     "sur « Échanger maintenant » ou avec « Échange automatique » ; et, seulement sur « Envoyer maintenant » "
      "d'Aide › « Signaler un problème ou aider », le ticket du joueur, dont le texte exact est montré d'abord"),
     ("Discord webhook", ["discord.com", "discordapp.com", "ptb.discord.com", "canary.discord.com"], "Discord.Enabled",
      ["Alarms/DiscordNotifier.cs", "Alarms/DiscordWebhook.cs"],

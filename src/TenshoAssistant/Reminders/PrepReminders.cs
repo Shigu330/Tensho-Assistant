@@ -43,6 +43,9 @@ public enum PrepSight{Same,Went,Back}
 /// held (mounted, a teleport and its load, a city, a duty) is still sent away, and its time ending during that absence is never told. The
 /// watcher calls <see cref="Watch"/> every frame: the frame it goes, whether something holds it then, or within <see cref="HeldWithin"/>
 /// after (the game may hide it a frame before the mount or the load shows); without it, the first reading without it decides.
+/// X-798 (0.1811, the user's reading of 22/11, test T-0.1786-2: « the timer stops »): while the player is mounted (<c>frozen</c>) the game's
+/// companion timer does not run: the time spent mounted is not taken off what was left (before, a ride longer than the time it had gave a
+/// false « has left » at the dismount). Only the mount freezes it (the other holds are not known to: the time goes on for them, as before).
 /// </summary>
 public sealed class PrepTracker(PrepKind kind)
 {
@@ -62,6 +65,9 @@ public sealed class PrepTracker(PrepKind kind)
     // X-774: since the first reading without it; whether something held it since; since when nothing holds it.
     private DateTimeOffset? goneAt,unheldAt;
     private bool goneHeld;
+    // X-798: since when the timer is frozen (mounted) while it is gone, and how long it was frozen before.
+    private DateTimeOffset? frozenSince;
+    private TimeSpan frozenFor;
     // X-777: seen by Watch every frame: out at the last frame; when it went; whether something held it then (null: not seen going).
     private bool seenOut;
     private DateTimeOffset? wentAt;
@@ -92,14 +98,15 @@ public sealed class PrepTracker(PrepKind kind)
     /// <param name="busy">In a fight or a duty: nothing said now.</param>
     /// <param name="held">X-774: out of sight for a reason that is not the player's choice (mounted, a place without mounts, a duty, a
     /// cutscene, just after a zone change): nothing decided now, for a companion that went for such a reason (X-777).</param>
-    public PrepNotice? Read(DateTimeOffset now,double? left,int thresholdMinutes,bool busy,bool held=false)
+    /// <param name="frozen">X-798: the player is mounted: the game's timer of the companion is frozen meanwhile.</param>
+    public PrepNotice? Read(DateTimeOffset now,double? left,int thresholdMinutes,bool busy,bool held=false,bool frozen=false)
     {
         if(left is > 0 and var seconds)
         {
             PrepNotice? notice=null;
             if(seconds>thresholdMinutes*60.0 || seconds>lastLeft+Grown.TotalSeconds)told=false;
             if(seconds<=thresholdMinutes*60.0 && !told && !busy){told=true;notice=new(kind,false,Math.Max(1,(int)Math.Ceiling(seconds/60)));}
-            lastAt=now;lastLeft=seconds;waiting=true;goneAt=null;unheldAt=null;goneHeld=false;
+            lastAt=now;lastLeft=seconds;waiting=true;goneAt=null;unheldAt=null;goneHeld=false;frozenSince=null;frozenFor=TimeSpan.Zero;
             return notice;
         }
         if(!waiting || lastAt is not { } at)return null;
@@ -107,11 +114,15 @@ public sealed class PrepTracker(PrepKind kind)
         // does not make a companion sent away a held one.
         if(goneAt is null){goneAt=now;goneHeld=wentHeld ?? held;}
         else if(wentHeld==true)goneHeld=true;
+        // X-798: the time mounted while it is gone, taken off the time measured.
+        if(frozen)frozenSince??=now;
+        else if(frozenSince is { } since){frozenFor+=now-since;frozenSince=null;}
         if(goneHeld && held){unheldAt=null;return null;}
         unheldAt??=now;
         if(now-unheldAt.Value<grace)return null;
-        // Out of sight for something that held it: the time went on meanwhile (measured now); else, what was left when it went.
-        var measuredAt=goneHeld ? now:goneAt.Value;
+        // Out of sight for something that held it: the time went on meanwhile (measured now), except while mounted (X-798: frozen); else,
+        // what was left when it went.
+        var measuredAt=goneHeld ? now-frozenFor-(frozenSince is { } still ? now-still:TimeSpan.Zero):goneAt.Value;
         if(lastLeft-(measuredAt-at).TotalSeconds>ExpiredWithin.TotalSeconds){waiting=false;return null;}
         if(busy)return null;
         waiting=false;
@@ -120,7 +131,7 @@ public sealed class PrepTracker(PrepKind kind)
         return new(kind,true,0);
     }
 
-    public void Reset(){lastAt=null;lastLeft=0;told=false;waiting=false;goneAt=null;unheldAt=null;goneHeld=false;seenOut=false;wentAt=null;wentHeld=null;}
+    public void Reset(){lastAt=null;lastLeft=0;told=false;waiting=false;goneAt=null;unheldAt=null;goneHeld=false;seenOut=false;wentAt=null;wentHeld=null;frozenSince=null;frozenFor=TimeSpan.Zero;}
 }
 
 /// <summary>

@@ -83,12 +83,13 @@ internal sealed partial class MainWindow
         ImGui.TextWrapped(localization.Get("StockValue.SleepersHelp"));
         if(stockSleepersUnknown>0){ImGui.TextColored(Warning,localization.Format("StockValue.SleepersUnknown",stockSleepersUnknown));Tip("StockValue.SleepersUnknownTip");}
         if(stockSleepers.Count==0){EmptyState("StockValue.SleepersNone");return;}
-        if(!TenshoAssistant.UI.UiComponents.BeginDataTable("StockSleepers",7))return;
+        if(!TenshoAssistant.UI.UiComponents.BeginDataTable("StockSleepers",8))return;
         try
         {
             TenshoAssistant.UI.UiComponents.HeadersRow([localization.Get("StockValue.ColumnItem"),localization.Get("StockValue.ColumnQuantity"),localization.Get("StockValue.ColumnWhere"),
-                localization.Get("StockValue.ColumnSold"),localization.Get("StockValue.ColumnPerDay"),localization.Get("StockValue.ColumnPerDayGil"),localization.Get("StockValue.ColumnNpc")],
-                column=>column is 1 or 3 or 4 or 5 or 6);
+                localization.Get("StockValue.ColumnSold"),localization.Get("StockValue.ColumnPerDay"),localization.Get("StockValue.ColumnPerDayGil"),localization.Get("StockValue.ColumnNpc"),
+                localization.Get("StockValue.ColumnNpcBuy")],
+                column=>column is 1 or 3 or 4 or 5 or 6 or 7);
             var items=itemCatalog.State.Catalog;
             foreach(var line in stockSleepers)
             {
@@ -106,6 +107,18 @@ internal sealed partial class MainWindow
                 {
                     TenshoAssistant.UI.UiComponents.NumberCell(line.NpcPrice.ToString("N0",Numbers));
                     if(line.Sold<line.NpcPrice)TipText(localization.Get("HoverUi.NpcOverMarket"));
+                }
+                else ImGui.TextDisabled("—");
+                // X-797 (0.1810): what an NPC sells it for, in the success colour when that is cheaper than the market's sold price.
+                ImGui.TableNextColumn();
+                if(line.NpcBuy is { } buy)
+                {
+                    if(Inventory.StockValue.MarketOverNpcBuy(buy,line.Sold) is > 0 and var less)
+                    {
+                        ImGui.TextColored(Success,buy.ToString("N0",Numbers));
+                        TipText(localization.Format("HoverUi.NpcBuyCheaper",less.ToString("N0",Numbers)));
+                    }
+                    else TenshoAssistant.UI.UiComponents.NumberCell(buy.ToString("N0",Numbers));
                 }
                 else ImGui.TextDisabled("—");
             }
@@ -156,7 +169,7 @@ internal sealed partial class MainWindow
         string Where(ulong owner,string place)=>owner==character ? place
             :(names.TryGetValue(owner,out var name) ? name:names[owner]=CharacterName(bank.State.Entries,owner))+" · "+place;
         (stockSleepers,stockSleepersUnknown)=StockValue.Sleepers(places.SelectMany(place=>place.Stacks.Select(stack=>(Where(place.Character,place.Place),stack))),
-            Marketable,(id,hq)=>Quote(id)?.Sold(hq),id=>items?.Find(id)?.SellPrice ?? 0,StockSleepersShown);
+            Marketable,(id,hq)=>Quote(id)?.Sold(hq),id=>items?.Find(id)?.SellPrice ?? 0,StockSleepersShown,id=>npcVendors?.State.Catalog?.GilPrice(id));
         stockValueAt=now;
     }
 

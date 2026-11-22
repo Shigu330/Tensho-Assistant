@@ -37,14 +37,16 @@ internal sealed partial class MainWindow
         // X-709 (0.1700): a tab that comes, or another order shown, settles the same bar (one frame without Reorderable), never a new bar.
         if(!ImGui.BeginTabBar(id+"/"+drag.Generation,flags|(drag.Settle(arranged,tab=>tab.Key) ? ImGuiTabBarFlags.None:ImGuiTabBarFlags.Reorderable)))return false;
         var dragged=false;var fresh=drag.TakeFresh();
-        var asked=false;
+        // X-809 (0.1807): a link's tab (MainWindow.Open), asked of this bar once.
+        var linked=TakeNavTab(id);
+        var asked=linked is not null && arranged.Any(tab=>tab.Key==linked);
         foreach(var tab in arranged)asked|=tab.Select;
         drag.Places.Clear();
         try
         {
             foreach(var (key,label,draw,select) in arranged)
             {
-                var open=ImGui.BeginTabItem(label+"###"+id+key,select || fresh && !asked && key==drag.Shown ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None);
+                var open=ImGui.BeginTabItem(label+"###"+id+key,select || key==linked || fresh && !asked && key==drag.Shown ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None);
                 drag.Places.Add((key,ImGui.GetItemRectMin().X));
                 if(ImGui.IsItemActive() && ImGui.IsMouseDragging(ImGuiMouseButton.Left))dragged=true;
                 if(!open)continue;

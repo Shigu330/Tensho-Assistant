@@ -55,8 +55,12 @@ internal sealed class DesktopUpdater
     public DesktopUpdater(string own,Version running,string runningFolder,string[] args,DesktopVersionResult plugin,IReleaseSource source)
     {
         this.own=own;this.running=running;this.runningFolder=runningFolder;this.args=args;this.plugin=plugin;this.source=source;
-        State=Load(own);
+        State=Read();
     }
+
+    /// <summary>X-592 (A21): whether update.json read at the last look (false: the state shown is DesktopInstall.UnreadableState).</summary>
+    private volatile bool readable=true;
+    private UpdateState Read(){var read=DesktopInstall.LoadReadable(own);readable=read is not null;return read ?? DesktopInstall.UnreadableState;}
 
     public UpdateState State { get; private set; }
     /// <summary>Set once a restart into another copy was started: the window closes.</summary>
@@ -79,23 +83,31 @@ internal sealed class DesktopUpdater
     /// <summary>Starts a check in the background (at start when the setting is on, or on the button); one at a time.</summary>
     public void Check(bool manual)
     {
-        if(!Busy)State=Load(own); // X-140: the plugin may have changed the setting since
+        if(!Busy)State=Read(); // X-140: the plugin may have changed the setting since
         lock(gate)
         {
             if(work is { IsCompleted: false } || pending is not null)return;
-            if(!State.AutoUpdate && !manual){status=("Desktop.UpdateOff",[],false);return;}
+            if(DesktopUpdate.CheckRefusal(readable,State.AutoUpdate,manual) is { } refusal)
+            {
+                status=refusal=="Desktop.UpdateUnreadable" ? (refusal,[StatePath(own)],true) : (refusal,[],false);
+                return;
+            }
             work=Task.Run(()=>Run(CancellationToken.None));
         }
     }
 
     public Task? Work{get{lock(gate)return work;}}
 
-    public void SetAuto(bool on)
+    /// <summary>« Automatic update » clicked; false when update.json could not be written (busy, refused, or unreadable: X-592, A21),
+    /// then the status says « not saved » and the setting stays as it was.</summary>
+    public bool SetAuto(bool on)
     {
-        try{Change(state=>state with {AutoUpdate=on},DesktopInstall.ClickWaitMs);}
-        catch(IOException){}
-        catch(UnauthorizedAccessException){}
-        if(!on && !Busy && Pending is null)Set("Desktop.UpdateOff");
+        var saved=true;
+        try{Change(state=>state with {AutoUpdate=on},DesktopInstall.ClickWaitMs);readable=true;}
+        catch(IOException){saved=false;}
+        catch(UnauthorizedAccessException){saved=false;}
+        if(DesktopUpdate.AutoStatus(on,saved,Busy || Pending is not null) is { } key)Set(key,!saved);
+        return saved;
     }
 
     private async Task Run(CancellationToken cancel)

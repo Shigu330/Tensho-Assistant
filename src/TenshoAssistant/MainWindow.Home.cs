@@ -68,7 +68,8 @@ internal sealed partial class MainWindow
     private (TenshoAlarm Alarm,DateTimeOffset At)? NextAlarm()
     {
         var now=DateTimeOffset.UtcNow;
-        return (configuration.Alarms ?? []).Where(alarm=>alarm.Enabled).Select(alarm=>(alarm,NextAlarm(alarm,now)))
+        // X-809 (0.1807): the Alarms tool's alarms only; a reminder's alarm (a vessel back, a task) is not listed there and has its own line.
+        return (configuration.Alarms ?? []).Where(alarm=>alarm.Enabled && !IsReminderAlarm(alarm)).Select(alarm=>(alarm,NextAlarm(alarm,now)))
             .Where(pair=>pair.Item2 is not null).Select(pair=>((TenshoAlarm,DateTimeOffset)?)(pair.alarm,pair.Item2!.Value)).OrderBy(pair=>pair!.Value.Item2).FirstOrDefault();
     }
 

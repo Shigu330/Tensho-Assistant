@@ -151,6 +151,18 @@ public static class DesktopUpdate
 
     public static UpdateState ReadState(string? json)=>TryReadState(json,out var state) ? state : new();
 
+    /// <summary>
+    /// X-592 (external audit A21 of 18/11): whether a check starts. A check asked by the button always starts; the one at start only when
+    /// update.json reads (an unreadable file never turns the automatic update back on) and the setting is on. Null: start; else the status key.
+    /// </summary>
+    public static string? CheckRefusal(bool readable,bool autoUpdate,bool manual)
+        => manual ? null : !readable ? "Desktop.UpdateUnreadable" : !autoUpdate ? "Desktop.UpdateOff" : null;
+
+    /// <summary>X-592 (A21): the status after « Automatic update » was clicked: « not saved » when update.json could not be written (the
+    /// setting is unchanged), else « off » or « on »; null while a check runs or a version waits (its status stays).</summary>
+    public static string? AutoStatus(bool on,bool saved,bool busy)
+        => !saved ? "Desktop.UpdateNotSaved" : busy ? null : on ? "Desktop.UpdateOn" : "Desktop.UpdateOff";
+
     /// <summary>X-170 (0.1143, GPT audit): false when there is a text that is not a state (damaged): never to be taken for a new install.</summary>
     public static bool TryReadState(string? json,out UpdateState state)
     {

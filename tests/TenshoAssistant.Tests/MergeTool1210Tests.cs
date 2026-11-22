@@ -59,7 +59,7 @@ internal static class MergeTool1210Tests
             Check(tool.Contains("if set(f)-FIELDS or not typed(f) or f[\"Kind\"] not in KINDS") && tool.Contains("if cell_of(f[\"X\"],f[\"Z\"])!=(f[\"CellX\"],f[\"CellZ\"]):return False"),"N12: types, cell in single precision");
             Check(tool.Contains("return FIRST_DAY<=when(f[\"First\"])") && tool.Contains("clean(from_gist_files(files,fetch_gist_raw),player=True)") && tool.Contains("g=capped(daily(dict(f)))"),"N5: dates, sightings, cap");
             Check(tool.Contains("known[\"First\"]=f[\"First\"];known[\"X\"]=f[\"X\"];known[\"Z\"]=f[\"Z\"]") && tool.Contains("FLAG: alone far outside the other players' levels"),"N5: earliest place, far player left out");
-            Check(tool.Contains("same author as {newest[login]} (a newer issue): not counted") && tool.Contains("write_player(issue[\"number\"],login(issue),facts)")   // 0.1801 (X-772): the player file in its new format, its author noted
+            Check(tool.Contains("same author as {newest[login]} (a newer issue): not counted") && tool.Contains("pending[f\"{issue['number']}{PLAYER_SUFFIX}\"]=(issue[\"number\"],login(issue),facts,noted)")   // 0.1801 (X-772): the player file in its new format, its author noted; 0.1814 (X-807 M1): written by rebuild after the common set
                 && tool.Contains("def withdraw(issue,dry):"),"N13: one file per account, withdraw");
             Check(!tool.Contains("open(path,\"w\"") && !tool.Contains("open(COMMON,\"w\"") && !tool.Contains(".write(data);changed+=1") && tool.Contains("os.replace(temporary,path)"),"N16: every write atomic");
             Check(tool.Contains("\"?\" if unicodedata.category(c) in (\"Cc\",\"Cf\") else c"),"N17: clean titles");

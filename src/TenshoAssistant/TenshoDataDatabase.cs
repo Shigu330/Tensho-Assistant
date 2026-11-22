@@ -298,6 +298,11 @@ public sealed class TenshoDataFile
     private bool tried;
     private TenshoDataDatabase? database;
     private Exception? blocked;
+    // X-796 M3 (review of 0.1802): the outcome of the first open, written once it is known and read without the lock (Volatile): 0 not
+    // known yet (never tried, or opening), Json the « json » mode. JsonFallback, read in Draw, never waits for the open (journal, tables
+    // with busy_timeout, quick_check) that Database() does under the lock.
+    private const int Json=2;
+    private int outcome;
 
     public TenshoDataFile(string path,Action<Exception,string> warn,Action<string>? info=null){this.path=path;this.warn=warn;this.info=info;}
 
@@ -320,11 +325,18 @@ public sealed class TenshoDataFile
                     if(File.Exists(path)){blocked=error;warn(error,"The Tensho data file could not be opened: the gil journal, the achievement progress, the voyage history and the bank are not written this session.");}
                     else warn(error,"The Tensho data file could not be created: the JSON files stay in use this session.");
                 }
+                Volatile.Write(ref outcome,database is not null ? 1 : blocked is not null ? 3 : Json);
             }
             if(blocked is not null)throw new IOException("The Tensho data file could not be opened.",blocked);
             return database;
         }
     }
+
+    /// <summary>X-789 (0.1802, idea I-058): the data file could not be created and the JSON files of before are written instead (« json »
+    /// mode), known once a family opened it; never opens the file (read in Draw by the main window's banner). What is written meanwhile is
+    /// not taken into the data file once it can be created (X-574: the files of before are no longer converted). X-796 M3: read without the
+    /// lock, so it never waits for a first open running off the frame (false until that open is over).</summary>
+    public bool JsonFallback=>Volatile.Read(ref outcome)==Json;
 
     /// <summary>« sqlite », « json » (file could not be created) or « blocked » (file there but unusable); opens it on first use.</summary>
     public string Mode

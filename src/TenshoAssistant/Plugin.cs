@@ -250,6 +250,7 @@ public sealed partial class Plugin : IDalamudPlugin
             mainWindow = new MainWindow(configuration, () => SaveTimed("window"), log, localization,
                 inventoryService, itemCatalog, recipeCatalog, gatheringCatalog, collections, market, itemHover, quests, characterStats, maps, macroObservations, macroChain, triadObservation, bank, bankBridge, textures, gameGui, duties, dutyLoot, monsterLoot,gpActions,fashionHints,fashionData,craftActions,craftLive,weather,cactpotObservation,gatheringObservation,itemUses,visualSort) { IsOpen = configuration.OpenOnLoad };
             registrations.Register(() => { }, mainWindow.Dispose);
+            mainWindow.TenshoData=tenshoData;   // X-789 (0.1802): its « json » mode said by a banner
             mainWindow.ConfigureDataCache(dataCache);
             UI.GameThemeReader? themeReader=null;
             registrations.Register(()=>themeReader=new UI.GameThemeReader(gameConfig,log),()=>themeReader?.Dispose());

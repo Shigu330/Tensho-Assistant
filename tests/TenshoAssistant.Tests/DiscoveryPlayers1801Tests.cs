@@ -46,13 +46,15 @@ internal static class DiscoveryPlayers1801Tests
                 "the fields a player file keeps");
             Check(tool.Contains("write_atomic(os.path.join(PLAYERS,f\"{issue}{PLAYER_SUFFIX}\"),player_bytes(",StringComparison.Ordinal)
                 && !tool.Contains("write_json(path,{\"Issue\"",StringComparison.Ordinal) && !tool.Contains("write_json(path,player)",StringComparison.Ordinal),"written through player_bytes only");
-            Check(tool.Contains("if not path.endswith(PLAYER_SUFFIX):",StringComparison.Ordinal) && tool.Contains("write_player(issue,player.get(\"Login\"),kept)",StringComparison.Ordinal),
+            Check(tool.Contains("if not path.endswith(PLAYER_SUFFIX):",StringComparison.Ordinal) && tool.Contains("write_player(issue,player.get(\"Login\"),kept,None,now.get(name))",StringComparison.Ordinal),
                 "a file of before still read, then written again in the new format");
             Check(tool.Contains("X-772: behaviour: the player file produced holds neither place nor day",StringComparison.Ordinal)
                 && tool.Contains("X-772: rebuilt from the new file: the common set the same bytes",StringComparison.Ordinal),"the tool's behaviour cases");
             var sources = Directory.GetFiles(Path.GetFullPath("src/TenshoAssistant"),"*.cs",SearchOption.AllDirectories)
                 .Where(path => File.ReadAllText(path).Contains("community-discoveries/players",StringComparison.Ordinal)).ToList();
-            Check(sources.Count == 0,"the plugin reads the common set only (v3/), never a player file: " + string.Join(", ",sources.Select(Path.GetFileName)));
+            // 0.1817 (X-804, user decision of 22/11): the plugin reads the header line of its own issue's player file (the gist merged), nothing else.
+            Check(sources.Select(Path.GetFileName).SequenceEqual(["GistRotation.cs"]) && File.ReadAllText(sources[0]).Contains("public static (string Gist,string Revision)? Note(byte[] compressed)",StringComparison.Ordinal),
+                "the plugin reads the common set (v3/), and of a player file only its own issue's header (X-804): " + string.Join(", ",sources.Select(Path.GetFileName)));
         }),
     ];
 }

@@ -20,7 +20,7 @@ public sealed partial class Plugin
         mainWindow.DiscoveryStore=discoveries;mainWindow.DiscoveryFolder=discoveryFolder;
         // X-77.1 (0.883): the exchange of discoveries through GitHub (connection by code, opt-in).
         Discoveries.GitHubExchange? discoveryExchange=null;
-        registrations.Register(()=>mainWindow.DiscoveryExchange=discoveryExchange=new Discoveries.GitHubExchange(discoveryFolder),()=>discoveryExchange?.Dispose());
+        registrations.Register(()=>mainWindow.DiscoveryExchange=discoveryExchange=new Discoveries.GitHubExchange(discoveryFolder){Log=message=>log.Information(message)},()=>discoveryExchange?.Dispose());
         return (discoveries,discoveryFolder);
     }
 
