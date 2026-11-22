@@ -91,6 +91,12 @@ from datetime import datetime,timezone,timedelta
 ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PLAYERS=os.path.join(ROOT,"community-discoveries","players")
 V3_DIR=os.path.join(ROOT,"community-discoveries","v3")
+def shown(path):
+    """X-838: a path for a message, relative to the repository when it can be; absolute when it cannot (os.path.relpath raises ValueError across
+    two Windows drives: GitHub's runner keeps the repository on D: and the temporary folder on C:). Every message of this tool that names a path
+    goes through here."""
+    try:return os.path.relpath(path,ROOT)
+    except ValueError:return os.path.abspath(path)
 QUEST_ASKED_FIXED=datetime(2026,11,8,15,42,29,tzinfo=timezone.utc)
 QUEST_ASKED_FIXED_DAY=datetime(2026,11,9,tzinfo=timezone.utc)  # 0.1012: a date kept to the day only passes the fix if it is on a later day
 KINDS=set(range(1,39))-{26,27};PLACED={1,2,3,8,10,19,22,23,28,29,30}  # 26, 27: 0.890's and 0.891's wrong spearfishing shadows
@@ -599,12 +605,12 @@ def v3_guard(folder=None):
     index=os.path.join(folder,V3_INDEX)
     renewed=[n for n in player_names() if n.endswith(PLAYER_SUFFIX)]
     if not os.path.isfile(index):
-        if renewed:raise Lossy(f"{os.path.relpath(index,ROOT)} is missing while {len(renewed)} player file(s) of the new format exist "
+        if renewed:raise Lossy(f"{shown(index)} is missing while {len(renewed)} player file(s) of the new format exist "
                                f"({', '.join(renewed[:3])}): their facts' places and days are only in the common set; restore community-discoveries/v3 "
                                "from git history first")
         return None
     try:entries=v3_index(open(index,"rb").read(MAX_INDEX+1).decode("utf-8"))
-    except (OSError,ValueError,UnicodeDecodeError) as error:raise Lossy(f"{os.path.relpath(index,ROOT)} unreadable ({error}): restore community-discoveries/v3 from git history first")
+    except (OSError,ValueError,UnicodeDecodeError) as error:raise Lossy(f"{shown(index)} unreadable ({error}): restore community-discoveries/v3 from git history first")
     listed={e["Name"] for e in entries}
     unlisted=sorted(n for n in os.listdir(folder) if re.fullmatch(r"kind-\d+\.jsonl\.gz(\.b64)?",n) and n.split(".b64")[0] not in listed)
     if unlisted:raise Lossy(f"the index lists {len(listed)} kind file(s) and the folder holds {', '.join(unlisted[:5])} besides: an index cut short; "
@@ -1310,6 +1316,21 @@ def selftest():
         check(stops(lambda:rebuild(say)) and snapshot()=={k:v for k,v in whole_set.items() if k[1]!=V3_INDEX},
               "X-795: v3/index.json missing: rebuild stops, no kind file removed, no player file written")
         check(stops(lambda:withdraw("44",False)) and os.path.isfile(os.path.join(PLAYERS,"44.jsonl.gz")),"X-795: withdraw stops too, the player file kept")
+        # X-838/X-839: GitHub's runner keeps the repository on D: and the temporary folder on C:, where os.path.relpath raises ValueError; simulated
+        # here (one drive in local runs): the stop is still Lossy, its message names the absolute path, and nothing is written.
+        real_relpath=os.path.relpath
+        def other_drive(path,start=os.curdir):raise ValueError(f"path is on mount 'C:', start on mount 'D:'")
+        os.path.relpath=other_drive
+        try:
+            try:rebuild(say);drive_stop=None
+            except Lossy as error:drive_stop=str(error)
+            except ValueError as error:drive_stop=f"not Lossy: {error}"
+            check(shown(os.path.join(V3_DIR,V3_INDEX))==os.path.abspath(os.path.join(V3_DIR,V3_INDEX)),"X-838: shown falls back to the absolute path across drives")
+        finally:os.path.relpath=real_relpath
+        check(drive_stop is not None and drive_stop.startswith(os.path.abspath(os.path.join(V3_DIR,V3_INDEX))+" is missing")
+              and snapshot()=={k:v for k,v in whole_set.items() if k[1]!=V3_INDEX},
+              f"X-838: the repository and the temporary folder on two drives: rebuild still stops on Lossy, absolute path, nothing written ({drive_stop})")
+        check(shown(os.path.join(ROOT,"community-discoveries","v3"))==os.path.join("community-discoveries","v3"),"X-838: shown stays relative inside the repository")
         write_atomic(os.path.join(V3_DIR,V3_INDEX),index_text);check(snapshot()==whole_set,"X-795: restored, the same set")
         entry=json.loads(index_text);entry["Files"]=[];write_atomic(os.path.join(V3_DIR,V3_INDEX),json.dumps(entry))
         check(stops(lambda:rebuild(say)) and open(os.path.join(V3_DIR,v3_name(1)),"rb").read()==whole_set[(V3_DIR,v3_name(1))],
