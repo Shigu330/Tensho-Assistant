@@ -26,4 +26,36 @@ public static class CommunitySources
         c.GameDataOnly=on;
     }
 
+    /// <summary>
+    /// X-834 (security review I6): the switch of each network service the game and the desktop application both build, by its type's name (no
+    /// compile-time link, so the desktop application reads the same table through the plugin): its source's switch and, for a use, its own.
+    /// Before, only Plugin.cs set them; the desktop application built these services without, and a service reads « no switch » as allowed:
+    /// with every source off in the game, a « Fetch » in the application still asked Garland Tools or the fashion data. Null: not in the table.
+    /// </summary>
+    public static Func<bool>? SwitchFor(string typeName,Configuration c)=>typeName switch
+    {
+        "TenshoAssistant.Community.GarlandClient"=>()=>c.CommunityGarland,
+        "TenshoAssistant.Market.MarketService" or "TenshoAssistant.Market.MarketBoardService"=>()=>c.CommunityUniversalis,
+        "TenshoAssistant.Duties.DutyLootService"=>()=>Allowed(c,SourceUse.GarlandDutyLoot),
+        "TenshoAssistant.Monsters.MonsterLootService"=>()=>Allowed(c,SourceUse.GarlandMonsterLoot),
+        "TenshoAssistant.Fashion.FashionDataService"=>()=>c.CommunityFashion,
+        "TenshoAssistant.Community.GarlandItemSourceService"=>()=>Allowed(c,SourceUse.GarlandItemSources),
+        "TenshoAssistant.Community.GatherBuddyFishService"=>()=>c.CommunityGatherBuddy,
+        "TenshoAssistant.Community.FishBiteTimeService"=>()=>c.CommunityTeamcraftBites,
+        _=>null,
+    };
+
+    /// <summary>
+    /// X-834: the service's « Enabled » (a Func&lt;bool&gt; property) set from <see cref="SwitchFor"/>; false when the service has no such property
+    /// or its type no row (the desktop application then turns it off: a network service it does not know never asks).
+    /// </summary>
+    public static bool Wire(object service,Configuration c)
+    {
+        var property=service.GetType().GetProperty("Enabled");
+        if(property is null || property.PropertyType!=typeof(Func<bool>) || !property.CanWrite)return false;
+        if(SwitchFor(service.GetType().FullName ?? "",c) is not { } on)return false;
+        property.SetValue(service,on);
+        return true;
+    }
+
 }

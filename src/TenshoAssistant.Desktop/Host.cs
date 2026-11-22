@@ -79,6 +79,30 @@ internal sealed class Host
         // the allied societies, the Grand Companies, the island, the deliveries, the carnivale, the relics, ocean fishing, FATEs, field
         // content, deep dungeons). Before, only the lexicon was given here: the others drew an error or a load that never ended.
         mainType.GetMethod("UseSheetLoaders",BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic)?.Invoke(Window,[DataStub,LogProxy.Create()]);
+        WireSources();
+    }
+
+    /// <summary>X-834: the network services this application built with no switch of their own, turned off (none expected).</summary>
+    public readonly List<string> SourcesOff=[];
+
+    /// <summary>
+    /// X-834 (security review I6): every service built here that asks the network (an « Enabled » switch) follows the plugin's settings as the
+    /// game does (CommunitySources.Wire: the source's switch, « game data and what you observed only » included, and the use's own); one the
+    /// table does not know is turned off. Before, they were built without a switch, read as « allowed »: with every source off in the game,
+    /// « Fetch » in the application still asked Garland Tools, or GitHub for the fashion data. The settings object is the one the window got,
+    /// refreshed in place when the settings are read again (ReadSettingsAgain), so the switches follow it.
+    /// </summary>
+    private void WireSources()
+    {
+        var configuration=Make(configurationType,0);
+        var wire=Plugin.GetType("TenshoAssistant.CommunitySources",true)!.GetMethod("Wire",BindingFlags.Public|BindingFlags.Static)!;
+        foreach(var service in made.Values.ToArray())
+        {
+            if(service is null || service.GetType().GetProperty("Enabled") is not { CanWrite:true } property || property.PropertyType!=typeof(Func<bool>))continue;
+            if(configuration is not null && wire.Invoke(null,[service,configuration]) is true)continue;
+            property.SetValue(service,(Func<bool>)(()=>false));
+            SourcesOff.Add(service.GetType().Name);
+        }
     }
 
     /// <summary>

@@ -229,6 +229,7 @@ public sealed partial class Plugin : IDalamudPlugin
             marketBoard.ConfigureCache(()=>configuration.Cache.Duration(CacheArea.Prices),dataCache);
             garland.ConfigureCache(()=>configuration.Cache.Duration(CacheArea.Sources),dataCache);
             // 0.324: each source switch stops every request of its source (it used to cover part of it only).
+            // X-834: the desktop application sets the same switches from CommunitySources.SwitchFor (SourceSwitches1839Tests keeps both alike).
             garland.Enabled=()=>configuration.CommunityGarland;
             market.Enabled=()=>configuration.CommunityUniversalis;
             // X-122, D-101: duty and monster loot follow their own use of Garland Tools too.
