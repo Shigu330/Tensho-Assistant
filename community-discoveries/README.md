@@ -20,7 +20,8 @@ The maintainer merges the gists with `python tools/discoveries-merge.py sync` (G
 in `players/<issue>.jsonl.gz`, facts that do not hold refused, a player whose refusals pass 5 % flagged and left out, then the `v3/` set rebuilt from the
 player files with `rebuild` (each player counts as one import of a fact); then the result is committed (since Tensho 0.1823, the share of an account on
 the maintainer's own list of trusted accounts, kept outside the repository, is committed without waiting when every check of `tools/discoveries-trust.py`
-passes; any other share, or any doubt, waits for the maintainer). Since Tensho 0.1803, `rebuild` (and `sync`,
+passes: since Tensho 0.1824, among them a pull request from a branch of this repository opened by the worker's account, never a fork, whose
+`players/` and `v3/` files are exactly what a sync of that share alone writes; any other share, or any doubt, waits for the maintainer). Since Tensho 0.1803, `rebuild` (and `sync`,
 `withdraw`) stops before writing anything when `v3/` is missing or cut short (no `index.json`, an index listing fewer files than the folder holds,
 a file that does not read whole, or a fact a player holds that the committed `v3/` has but the one read now lacks): the places and days live there
 only, so `v3/` is restored from git first. The places and days a player left out brings (flagged, or an older issue of the same account) never count.
@@ -92,7 +93,9 @@ Le mainteneur fusionne les gists avec `python tools/discoveries-merge.py sync` (
 valides de chaque joueur gardés dans `players/<ticket>.jsonl.gz`, les faits invalides refusés, un joueur dont les refus dépassent 5 % signalé et laissé de côté,
 puis l'ensemble `v3/` reconstruit à partir des fichiers des joueurs avec `rebuild` (chaque joueur compte comme un import d'un fait) ;
 puis le résultat est enregistré dans le dépôt (depuis Tensho 0.1823, le partage d'un compte de la liste de confiance du mainteneur, tenue hors du
-dépôt, est enregistré sans attendre quand toutes les vérifications de `tools/discoveries-trust.py` passent ; tout autre partage, ou le moindre doute,
+dépôt, est enregistré sans attendre quand toutes les vérifications de `tools/discoveries-trust.py` passent : depuis Tensho 0.1824, parmi elles
+une demande venue d'une branche de ce dépôt ouverte par le compte du travailleur, jamais d'un fork, dont les fichiers `players/` et `v3/` sont
+exactement ce qu'écrit un sync de ce seul partage ; tout autre partage, ou le moindre doute,
 attend le mainteneur). Depuis Tensho 0.1803, `rebuild` (et `sync`, `withdraw`) s'arrête avant de rien écrire quand `v3/`
 manque ou est tronqué (pas d'`index.json`, un index qui liste moins de fichiers que le dossier n'en a, un fichier qui ne se lit pas en entier, ou un
 fait qu'un joueur a, présent dans le `v3/` enregistré mais absent de celui lu) : les lieux et les jours ne sont que là, donc `v3/` se remet d'abord
