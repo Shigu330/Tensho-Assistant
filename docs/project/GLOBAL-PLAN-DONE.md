@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (841 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (844 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -898,6 +898,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-807 | Review of block 0.1803 to 0.1806 (review 0.1806, 22/11), minor M1, M2, M3, M4… | Done in 0.1814.0 |
 | X-808 | Review of block 0.1803 to 0.1806 (review 0.1806, 22/11), pre-existing before… | Done in 0.1821.0 |
 | X-809 | Bug reported by the user on 11/22 around 15:00 (D-221 piloting): since the… | Done in 0.1807.0 |
+| X-810 | Security review before the alpha (user's decision of 11/22 around 15:30: a… | Done in 0.1830.0 |
 | X-811 | Tool (R13.3): method of natures (user's decision of 11/22 around 15:40). Done… | Done in 0.1812.0 |
 | X-812 | Tool (R13.3, R32.1), follow-up of the natures tool: user's request of 11/22… | Done in 0.1812.0 |
 | X-819 | Review of block 0.1813 to 0.1819 (review 0.1819, 22/11), I1: finding in… | Done in 0.1820.0 |
@@ -909,12 +910,14 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-826 | Seen by the laptop worker on 11/22 around 20:15 (PR #54… | Done in 0.1827.0 |
 | X-827 | Review of block 0.1824 to 0.1826 (review 0.1826, 22/11), minor M3: M3 in… | Done in 0.1829.0 |
 | X-828 | Review of block 0.1824 to 0.1826 (review 0.1826, 22/11), pre-existing before… | Done in 0.1830.0 |
+| X-829 | Review  (revue-securite-alpha.md, 22/11), I1: finding in… | Done in 0.1831.0 |
+| X-830 | Review  (revue-securite-alpha.md, 22/11), I2: finding in… | Done in 0.1832.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (841 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (844 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1810,6 +1813,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-807 | Relecture du bloc 0.1803 à 0.1806 (relecture 0.1806, 22/11), mineurs M1, M2… | Fait en 0.1814.0 |
 | X-808 | Relecture du bloc 0.1803 à 0.1806 (relecture 0.1806, 22/11), déjà là avant le… | Fait en 0.1821.0 |
 | X-809 | Bug signalé par l'utilisateur le 22/11 vers 15 h (pilotage D-221) : depuis la… | Fait en 0.1807.0 |
+| X-810 | Revue de sécurité avant l'alpha (décision de l'utilisateur du 22/11 vers 15 h… | Fait en 0.1830.0 |
 | X-811 | Outil (R13.3) : méthode des natures (décision de l'utilisateur du 22/11 vers 15… | Fait en 0.1812.0 |
 | X-812 | Outil (R13.3, R32.1), suite de l'outil des natures : demande de l'utilisateur… | Fait en 0.1812.0 |
 | X-819 | Relecture du bloc 0.1813 à 0.1819 (relecture 0.1819, 22/11), I1 : Un gist créé… | Fait en 0.1820.0 |
@@ -1821,3 +1825,5 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-826 | Vu par le travailleur du portable le 22/11 vers 20 h 15 (PR #54… | Fait en 0.1827.0 |
 | X-827 | Relecture du bloc 0.1824 à 0.1826 (relecture 0.1826, 22/11), mineurs M3 : M3… | Fait en 0.1829.0 |
 | X-828 | Relecture du bloc 0.1824 à 0.1826 (relecture 0.1826, 22/11), déjà là avant le… | Fait en 0.1830.0 |
+| X-829 | Relecture  (revue-securite-alpha.md, 22/11), I1 : Le partage promet « le jour… | Fait en 0.1831.0 |
+| X-830 | Relecture  (revue-securite-alpha.md, 22/11), I2 : Les fichiers joueurs publics… | Fait en 0.1832.0 |
