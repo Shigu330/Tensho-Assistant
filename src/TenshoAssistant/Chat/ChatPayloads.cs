@@ -46,6 +46,12 @@ public static class ChatPayloads
                     if(found.Start+found.Length<text.Length)yield return new(text[(found.Start+found.Length)..]);
                     break;
                 case ChatPayloadKind.Text:yield return new(payload.Text);break;
+                // X-801 (0.1809): the icon of a type of damage (a combat line) kept as such, the window draws it (its text « · » for the copy).
+                case ChatPayloadKind.Icon when ChatCombatTones.IsDamageIcon(payload.Icon):
+                    yield return new(null,new ChatLink(ChatSegmentKind.FontIcon,CommandId:payload.Icon));
+                    yield return new(ChatGlyphs.Icon(payload.Icon));
+                    yield return new(null,End:true);
+                    break;
                 // X-472 (0.1471): an icon of the game's font keeps its place, written readably (the world icon « @ »).
                 case ChatPayloadKind.Icon:yield return new(ChatGlyphs.Icon(payload.Icon));break;
             }

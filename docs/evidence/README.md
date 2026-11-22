@@ -155,6 +155,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1780-companion-away.md](0.1780-companion-away.md) | — | `docs/changelog/CHANGELOG-0.1700-0.1799.md` |
 | [0.1781-shared-fates.md](0.1781-shared-fates.md) | — | `docs/changelog/CHANGELOG-0.1700-0.1799.md` |
 | [0.180.0-achievement-probe.log](0.180.0-achievement-probe.log) | `src/TenshoAssistant/Collections/CollectionReader.Completion.Dalamud.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
+| [0.1809-chat-combat-tones.md](0.1809-chat-combat-tones.md) | `src/TenshoAssistant/Chat/ChatCombatTones.cs`, `tests/TenshoAssistant.Tests/ChatTones1809Tests.cs` | — |
 | [0.182.0-paramgrow-probe.log](0.182.0-paramgrow-probe.log) | `src/TenshoAssistant/Character/StatFormulas.cs`, `tests/TenshoAssistant.Tests/StatFormulaTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md`, `docs/evidence/0.320-credits.json`, `docs/project/REFERENCES.md`, `docs/project/ROADMAP.md` |
 | [0.199-adenium-shop.md](0.199-adenium-shop.md) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.201-agent-alarm.md](0.201-agent-alarm.md) | — | `docs/changelog/CHANGELOG-0.200-0.299.md` |
@@ -375,5 +376,5 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [x91-parsers-check.md](x91-parsers-check.md) | `src/TenshoAssistant/MainWindow.SRankConditions.cs`, `tests/TenshoAssistant.Tests/ParsersCheck971Tests.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md`, `docs/project/GLOBAL-PLAN-DONE.md` |
 | [x93-load-test.md](x93-load-test.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `tests/TenshoAssistant.Tests/Evidence1069Tests.cs`, `tests/TenshoAssistant.Tests/LoadTest1036Tests.cs`, `tools/DiscoveryLoadProbe/Program.cs`, `tools/README.md`, `tools/discoveries-load.py` | `docs/changelog/CHANGELOG-0.1300-0.1399.md`, `docs/evidence/x172-sqlite-trial.md` |
 
-Counted · compté : 363 files · fichiers ; 314 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
+Counted · compté : 364 files · fichiers ; 315 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
 <!-- /docgen:evidence -->

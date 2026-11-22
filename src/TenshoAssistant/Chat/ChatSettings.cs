@@ -165,6 +165,11 @@ public sealed class ChatSettings
     public bool TextOutline{get;set;}=true;
     public List<ChatTabSettings>? Tabs{get;set;}
     public Dictionary<ChatChannel,uint>? Colors{get;set;}
+    /// <summary>X-801 (0.1809, the user's request of 22/11): the combat lines coloured by kind and side (damage and healing, done by you or to
+    /// you: ChatCombatTones); off: the channel's single colour.</summary>
+    public bool CombatTones{get;set;}=true;
+    /// <summary>X-801 (0.1809): the colours chosen for the combat lines' tones; absent: ChatCombatTones.DefaultColor.</summary>
+    public Dictionary<ChatCombatTone,uint>? ToneColors{get;set;}
     /// <summary>X-447 B4 (0.1621): a short name chosen per channel, shown in brackets before its messages instead of the game's own short name;
     /// empty or absent: the game's.</summary>
     public Dictionary<ChatChannel,string>? ChannelNames{get;set;}
@@ -201,6 +206,10 @@ public sealed class ChatSettings
     public int BoundedTextOpacity=>Math.Clamp(TextOpacity,20,100);
     public int BoundedMaxLines=>ChatStore.Bounded(MaxLines);
     public uint ColorOf(ChatChannel channel)=>Colors?.TryGetValue(channel,out var color)==true ? color&0xFFFFFF:ChatChannels.DefaultColor(channel);
+    /// <summary>X-801 (0.1809): a combat line's tone's colour (chosen, else its default).</summary>
+    public uint ColorOf(ChatCombatTone tone)=>ToneColors?.TryGetValue(tone,out var color)==true ? color&0xFFFFFF:ChatCombatTones.DefaultColor(tone);
+    /// <summary>X-801 (0.1809): a message's colour: its combat tone's when the tones are on and it has one, else its channel's.</summary>
+    public uint ColorOf(ChatRecord record)=>CombatTones && ChatCombatTones.Of(record.Kind,record.Source,record.Target) is var tone and not ChatCombatTone.None ? ColorOf(tone):ColorOf(record.Channel);
     /// <summary>The tabs, made at first use. X-445 (0.1458): the game's three default log tabs (General: everything but the combat lines and the
     /// NPC dialogue; Battle: the combat lines; Event: the NPC dialogue), then Social (only what people say to you or your groups). Tabs saved
     /// stay as they are (X-574, 0.1793: no upgrade of tabs saved before 0.1466 any more).</summary>
