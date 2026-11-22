@@ -2768,6 +2768,14 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1822) Monde › Découvertes, sans être connecté à GitHub : l'avertissement avant de connecter et l'aide de déconnexion disent que le mainteneur retire le lien avec votre nom GitHub sur demande, et que le titre du ticket et l'historique du dépôt le montrent encore.
 
+- [ ] (0.1835) Triple Triade contre un PNJ (par exemple Munglig au Gold Saucer), avec la surimpression du conseil : le défi montre le nom du PNJ, son deck et les chances ; pendant le match, le meilleur coup est encadré comme avant
+
+- [ ] (0.1835) Triple Triade contre un PNJ en ciblant autre chose (un autre PNJ ou personne) au moment où le match s'ouvre : aucun coup encadré, sans erreur dans le journal
+
+- [ ] (0.1836) Après quelques changements dans les listes d'artisanat et Mes outils, le dossier de Tensho contient CraftLists.json.bak et le fichier de Mes outils avec .bak ; les pages s'affichent comme avant après un rechargement du plugin
+
+- [ ] (0.1839) Application de bureau : dans le jeu, activer « Données du jeu et ce que vous avez observé seulement » ; dans l'application, relire les réglages puis cliquer « Fetch » sur un donjon ou la mode : la page dit que la source est coupée, aucune donnée n'arrive
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.

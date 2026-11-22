@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (844 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (852 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -912,12 +912,20 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-828 | Review of block 0.1824 to 0.1826 (review 0.1826, 22/11), pre-existing before… | Done in 0.1830.0 |
 | X-829 | Review  (revue-securite-alpha.md, 22/11), I1: finding in… | Done in 0.1831.0 |
 | X-830 | Review  (revue-securite-alpha.md, 22/11), I2: finding in… | Done in 0.1832.0 |
+| X-831 | Review  (revue-securite-alpha.md, 22/11), I3: finding in… | Done in 0.1837.0 |
+| X-832 | Review  (revue-securite-alpha.md, 22/11), I4: finding in… | Done in 0.1838.0 |
+| X-833 | Review  (revue-securite-alpha.md, 22/11), I5: finding in… | Done in 0.1836.0 |
+| X-834 | Review  (revue-securite-alpha.md, 22/11), I6: finding in… | Done in 0.1839.0 |
+| X-835 | Review  (revue-securite-alpha.md, 22/11), I7: finding in… | Done in 0.1835.0 |
+| X-838 | Red CI on 0.1832 (Build and test, Verify and New tool skeleton): the… | Done in 0.1833.0 |
+| X-839 | Review of block 0.1831 to 0.1832 (review 0.1832, 22/11), I1: finding in… | Done in 0.1833.0 |
+| X-841 | Review of block 0.1831 to 0.1832 (review 0.1832, 22/11), pre-existing before… | Done in 0.1834.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (844 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (852 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1827,3 +1835,11 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-828 | Relecture du bloc 0.1824 à 0.1826 (relecture 0.1826, 22/11), déjà là avant le… | Fait en 0.1830.0 |
 | X-829 | Relecture  (revue-securite-alpha.md, 22/11), I1 : Le partage promet « le jour… | Fait en 0.1831.0 |
 | X-830 | Relecture  (revue-securite-alpha.md, 22/11), I2 : Les fichiers joueurs publics… | Fait en 0.1832.0 |
+| X-831 | Relecture  (revue-securite-alpha.md, 22/11), I3 : Deux clients du jeu sur un… | Fait en 0.1837.0 |
+| X-832 | Relecture  (revue-securite-alpha.md, 22/11), I4 : Avec deux clients sur un même… | Fait en 0.1838.0 |
+| X-833 | Relecture  (revue-securite-alpha.md, 22/11), I5 : L'écriture « atomique » fait… | Fait en 0.1836.0 |
+| X-834 | Relecture  (revue-securite-alpha.md, 22/11), I6 : L'application de bureau… | Fait en 0.1839.0 |
+| X-835 | Relecture  (revue-securite-alpha.md, 22/11), I7 : Le conseil de coup à la… | Fait en 0.1835.0 |
+| X-838 | CI rouge sur 0.1832 (Build and test, Verify et New tool skeleton) : le test… | Fait en 0.1833.0 |
+| X-839 | Relecture du bloc 0.1831 à 0.1832 (relecture 0.1832, 22/11), I1 : La CI « Build… | Fait en 0.1833.0 |
+| X-841 | Relecture du bloc 0.1831 à 0.1832 (relecture 0.1832, 22/11), déjà là avant le… | Fait en 0.1834.0 |
