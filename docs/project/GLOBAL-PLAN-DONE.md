@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (804 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (810 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -331,6 +331,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-130 | Request of 2026-11-11: garden, crossbreed forecasts from the planted garden… | Done in 0.1109 |
 | X-132 | Request of 2026-11-11: garden alarms (ripe, tending, from the Gardening tool's… | Done in 0.1160 |
 | X-133 | Request of 2026-11-11: reminder alarms in an « Alarms » tab of the Reminders… | Done in 0.1159 |
+| X-136 | Request of 2026-11-11: more coherent Beast labyrinth help: team chosen from the… | Done in 0.1599.0 |
 | X-137 | User's choice of 2026-11-11 (« oui mais en pvp et classement »): Tensho is no… | Done in 0.1115 |
 | X-138 | Request of 2026-11-11 (screenshot, Central Shroud): Tensho map, right-click… | Done in 0.1166 |
 | X-140 | Audit A01 and A03 (GPT audit of 11/11, checked in the code by the master, order… | Done in 0.1117 |
@@ -859,6 +860,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-769 | Review of block 0.1759 to 0.1764 (review 0.1764, 22/11), minor M1, M2, M3: M1… | Done in 0.1765.0 |
 | X-770 | Review of block 0.1765 to 0.1768 (review 0.1768, 22/11), minor M1, M2: M1 in… | Done in 0.1769.0 |
 | X-771 | Review of block 0.1769 to 0.1772 (review 0.1772, 22/11), minor M1, M2, M3, M4… | Done in 0.1773.0 |
+| X-772 | Privacy of the shared discoveries (found by study X-468, relay 173, 22/11): the… | Done in 0.1801.0 |
 | X-773 | Review of block 0.1773 to 0.1775 (review 0.1775, 22/11), minor M1, M2, M3: M1… | Done in 0.1776.0 |
 | X-774 | Review of block 0.1776 to 0.1779 (review 0.1779, 22/11), I1: finding in… | Done in 0.1780.0 |
 | X-775 | Flaky CI test: SettingsFile1745Tests (two clients saving at once); its reader… | Done in 0.1785.0 |
@@ -872,12 +874,16 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-783 | Test process crashed once (quick test check: « tests exit 127 », trace « at… | Done in 0.1796.0 |
 | X-784 | Review of block 0.1790 to 0.1795 (review 0.1795, 22/11), I1: finding in… | Done in 0.1797.0 |
 | X-785 | Review of block 0.1790 to 0.1795 (review 0.1795, 22/11), minor M1, M2, M3, M4… | Done in 0.1798.0 |
+| X-786 | Master tools (11/22): the user's exception to the quota floor (R26.2, until… | Done in 0.1800.0 |
+| X-789 | Idea I-058: fallback mode of the player's data (TenshoData.db missing and… | Done in 0.1802.0 |
+| X-793 | Review of block 0.1796 to 0.1799 (review 0.1799, 22/11), minor M2, M3: M2 in… | Done in 0.1800.0 |
+| X-794 | Review of block 0.1796 to 0.1799 (review 0.1799, 22/11), pre-existing before… | Done in 0.1800.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (804 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (810 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1206,6 +1212,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-130 | Demande du 2026-11-11 : jardin, prévisions de croisement à partir du jardin… | Fait en 0.1109 |
 | X-132 | Demande du 2026-11-11 : alarmes du jardin (maturité, entretien, d'après le… | Fait en 0.1160 |
 | X-133 | Demande du 2026-11-11 : alarmes de rappel dans un onglet « Alarmes » de l'outil… | Fait en 0.1159 |
+| X-136 | Demande du 2026-11-11 : aide du Dédale bestial plus cohérente : équipe choisie… | Fait en 0.1599.0 |
 | X-137 | Choix de l'utilisateur du 2026-11-11 (« oui mais en pvp et classement »)… | Fait en 0.1115 |
 | X-138 | Demande du 2026-11-11 (capture, Forêt centrale) : carte de Tensho, menu du clic… | Fait en 0.1166 |
 | X-140 | Audit A01 et A03 (audit GPT du 11/11… | Fait en 0.1117 |
@@ -1734,6 +1741,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-769 | Relecture du bloc 0.1759 à 0.1764 (relecture 0.1764, 22/11), mineurs M1, M2, M3… | Fait en 0.1765.0 |
 | X-770 | Relecture du bloc 0.1765 à 0.1768 (relecture 0.1768, 22/11), mineurs M1, M2… | Fait en 0.1769.0 |
 | X-771 | Relecture du bloc 0.1769 à 0.1772 (relecture 0.1772, 22/11), mineurs M1, M2… | Fait en 0.1773.0 |
+| X-772 | Confidentialité des découvertes partagées (trouvé par l'étude X-468, relais… | Fait en 0.1801.0 |
 | X-773 | Relecture du bloc 0.1773 à 0.1775 (relecture 0.1775, 22/11), mineurs M1, M2, M3… | Fait en 0.1776.0 |
 | X-774 | Relecture du bloc 0.1776 à 0.1779 (relecture 0.1779, 22/11), I1 : Le compagnon… | Fait en 0.1780.0 |
 | X-775 | Test fragile en CI : SettingsFile1745Tests (« deux clients qui enregistrent… à… | Fait en 0.1785.0 |
@@ -1747,3 +1755,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-783 | Processus des tests tombé une fois (contrôle rapide des tests : « tests exit… | Fait en 0.1796.0 |
 | X-784 | Relecture du bloc 0.1790 à 0.1795 (relecture 0.1795, 22/11), I1 : Depuis 0.1794… | Fait en 0.1797.0 |
 | X-785 | Relecture du bloc 0.1790 à 0.1795 (relecture 0.1795, 22/11), mineurs M1, M2… | Fait en 0.1798.0 |
+| X-786 | Outils de la maître (22/11) : la dérogation de l'utilisateur au plancher de… | Fait en 0.1800.0 |
+| X-789 | Idée I-058 : mode de secours des données du joueur (TenshoData.db absent et… | Fait en 0.1802.0 |
+| X-793 | Relecture du bloc 0.1796 à 0.1799 (relecture 0.1799, 22/11), mineurs M2, M3… | Fait en 0.1800.0 |
+| X-794 | Relecture du bloc 0.1796 à 0.1799 (relecture 0.1799, 22/11), déjà là avant le… | Fait en 0.1800.0 |
