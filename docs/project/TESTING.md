@@ -2762,6 +2762,10 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1811) Compagnon chocobo sorti avec peu de temps (moins de 5 minutes), rappel du compagnon activé : monter et chevaucher plus longtemps que ce temps, puis descendre : le compagnon revient avec son temps, et aucun « est parti » ni « finit » faux n'est dit.
 
+- [ ] (0.1816) Monde › Découvertes, avant de connecter GitHub : l'avertissement en rouge finit par « Ce que vous partagez reste dans la base commune, sans votre nom, même si vous arrêtez de partager. »
+
+- [ ] (0.1817) Monde › Découvertes, connecté à GitHub, après la prochaine release qui fusionne votre ticket : « Échanger maintenant » ; sur github.com, votre ancien gist est supprimé, un nouveau ne contient que vos nouveautés et votre ticket « Discoveries » renvoie vers lui (ou, sans nouveauté, le message « Tout ce que vous avez vu est dans la base commune »).
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.

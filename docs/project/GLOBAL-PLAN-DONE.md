@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (824 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (831 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -695,6 +695,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-589 | External audit of 18/11, family « network sources »: A08, A09, A10, A26, A11… | Done in 0.1556 |
 | X-590 | External audit of 18/11, family « native reads » (R08): A05 (map marker count… | Done in 0.1610.0 |
 | X-591 | External audit of 18/11, texts and tests: A13 (SECURITY says once a day at… | Done in 0.1611.0 |
+| X-592 | External audit of 18/11, desktop app (frozen, D-149): A21 (unreadable… | Done in 0.1813.0 |
 | X-593 | External audit of 18/11, A04 (user's choice of 18/11: fix the text, not the… | Done in 0.1553 |
 | X-594 | Method audit of 18/11, backup of the agent's files: M27, M14, M28, M29, M30… | Done in 0.1550 |
 | X-595 | Method audit of 18/11, tools that hide an error: M11, M12, M24, M26, M18, M22… | Done in 0.1550 |
@@ -890,14 +891,20 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-799 | Tests' tool (11/22): importing the page's answers stops on an « I don't… | Done in 0.1803.0 |
 | X-800 | User request of 11/22 around 13:25 (Beastmaster's Crucible, Tensho panel beside… | Done in 0.1808.0 |
 | X-801 | User request of 11/22 around 13:40 (capture read: top the Tensho chat window… | Done in 0.1809.0 |
+| X-803 | User decision of 11/22 around 14:20 (follows D-220: the goal is a complete… | Done in 0.1816.0 |
+| X-804 | User decision of 11/22 around 14:35 (after the risks and the PlayerScope and… | Done in 0.1817.0 |
 | X-806 | Tool (R13.3), test text to rewrite: T-0.1780-1 (test page, 22/11 around 13:12)… | Done in 0.1806.0 |
+| X-807 | Review of block 0.1803 to 0.1806 (review 0.1806, 22/11), minor M1, M2, M3, M4… | Done in 0.1814.0 |
+| X-808 | Review of block 0.1803 to 0.1806 (review 0.1806, 22/11), pre-existing before… | Done in 0.1818.0 |
 | X-809 | Bug reported by the user on 11/22 around 15:00 (D-221 piloting): since the… | Done in 0.1807.0 |
+| X-811 | Tool (R13.3): method of natures (user's decision of 11/22 around 15:40). Done… | Done in 0.1812.0 |
+| X-812 | Tool (R13.3, R32.1), follow-up of the natures tool: user's request of 11/22… | Done in 0.1812.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (824 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (831 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1590,6 +1597,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-589 | Audit externe du 18/11, famille « sources réseau » : A08 (délai dépassé de… | Fait en 0.1556 |
 | X-590 | Audit externe du 18/11, famille « lectures natives » (R08) : A05 (nombre de… | Fait en 0.1610.0 |
 | X-591 | Audit externe du 18/11, textes et tests : A13 (SECURITY dit « une fois par jour… | Fait en 0.1611.0 |
+| X-592 | Audit externe du 18/11, application de bureau (gelée, D-149) : A21 (update.json… | Fait en 0.1813.0 |
 | X-593 | Audit externe du 18/11, A04 (choix de l'utilisateur le 18/11 : corriger le… | Fait en 0.1553 |
 | X-594 | Audit de méthode du 18/11, sauvegarde des fichiers de l'agent : M27 (une source… | Fait en 0.1550 |
 | X-595 | Audit de méthode du 18/11, outils qui mentent sur une erreur : M11 (state.py… | Fait en 0.1550 |
@@ -1785,5 +1793,11 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-799 | Outil des essais (22/11) : l'import des réponses de la page s'arrête sur une… | Fait en 0.1803.0 |
 | X-800 | Demande de l'utilisateur du 22/11 vers 13 h 25 (Dédale bestial, panneau Tensho… | Fait en 0.1808.0 |
 | X-801 | Demande de l'utilisateur du 22/11 vers 13 h 40 (capture lue : en haut la… | Fait en 0.1809.0 |
+| X-803 | Décision de l'utilisateur du 22/11 vers 14 h 20 (suite de D-220 : « le but est… | Fait en 0.1816.0 |
+| X-804 | Décision de l'utilisateur du 22/11 vers 14 h 35 (après l'explication des… | Fait en 0.1817.0 |
 | X-806 | Outil (R13.3), texte d'essai à réécrire : T-0.1780-1 (page des essais, 22/11… | Fait en 0.1806.0 |
+| X-807 | Relecture du bloc 0.1803 à 0.1806 (relecture 0.1806, 22/11), mineurs M1, M2… | Fait en 0.1814.0 |
+| X-808 | Relecture du bloc 0.1803 à 0.1806 (relecture 0.1806, 22/11), déjà là avant le… | Fait en 0.1818.0 |
 | X-809 | Bug signalé par l'utilisateur le 22/11 vers 15 h (pilotage D-221) : depuis la… | Fait en 0.1807.0 |
+| X-811 | Outil (R13.3) : méthode des natures (décision de l'utilisateur du 22/11 vers 15… | Fait en 0.1812.0 |
+| X-812 | Outil (R13.3, R32.1), suite de l'outil des natures : demande de l'utilisateur… | Fait en 0.1812.0 |
