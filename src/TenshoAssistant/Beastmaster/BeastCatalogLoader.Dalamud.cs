@@ -15,6 +15,8 @@ internal sealed class BeastCatalogLoader : IDisposable
 {
     // Addon rows of the eight families: 17741 « Thériens » for family 1 (the game's sheet of Cu sith).
     private const uint FamilyAddonBase = 17740;
+    // X-746 (0.1766): Addon 17749 « Assimilation (Nv 22) » / « Borrow (Lv. 22) », right after the eight families.
+    private const uint BorrowLabelAddon = 17749;
     private readonly BeastService service;
     private readonly IFramework framework;
     private readonly IClientState client;
@@ -69,6 +71,12 @@ internal sealed class BeastCatalogLoader : IDisposable
         var elementMacros = new Dictionary<uint, string>();
         foreach (var row in data.Excel.GetSheet<RawRow>(null, "XBMElement"))
             if (row.ReadColumn(0) is ReadOnlySeString name) elementMacros[row.RowId] = name.ToMacroString();
+        // X-746 (0.1766): the actions Borrow gives, one per family: their condition is the familiar's Kinship (Action.PrimaryCostType 125,
+        // PrimaryCostValue the family); their effect from ActionTransient (docs/evidence/0.1766-beast-borrow.md).
+        var transient = data.GetExcelSheet<ActionTransient>();
+        var borrowActions = actions.Where(action => action.PrimaryCostType == BeastCatalog.KinshipCost)
+            .Select(action => (action.RowId, (int)action.PrimaryCostType, (int)action.PrimaryCostValue, action.Name.ExtractText(), (uint)action.Icon,
+                transient.TryGetRow(action.RowId, out var text) ? text.Description.ExtractText() : "")).ToArray();
         return BeastCatalog.Build(sheets,
             id => pets.TryGetRow(id, out var pet) ? pet.Name.ExtractText() : "",
             family => addon.TryGetRow(FamilyAddonBase + (uint)Math.Max(family, 0), out var text) ? text.Text.ExtractText() : "",
@@ -91,6 +99,9 @@ internal sealed class BeastCatalogLoader : IDisposable
             statusCategory: id => data.GetExcelSheet<Lumina.Excel.Sheets.Status>().GetRowOrDefault(id)?.StatusCategory ?? 0,
             // X-755 (0.1750): the names of the effects a beast inflicts, the game's own (Addon 12472 to 12481 and 17755).
             effectName: row => addon.TryGetRow(row, out var text) ? text.Text.ExtractText() : "",
+            // X-746 (0.1766): « Assimilation (Nv 22) », the game's label beside the families' names (Addon 17741 to 17748).
+            borrowActions: borrowActions,
+            borrowLabel: addon.TryGetRow(BorrowLabelAddon, out var borrow) ? borrow.Text.ExtractText() : "",
             elementMacro: row => elementMacros.GetValueOrDefault(row, ""));
     }
 

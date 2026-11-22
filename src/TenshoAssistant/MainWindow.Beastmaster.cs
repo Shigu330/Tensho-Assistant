@@ -79,7 +79,11 @@ internal sealed partial class MainWindow
             {
                 if (ImGui.Selectable(localization.Get("BeastUi.AllFamilies"), beastFamily is null)) beastFamily = null;
                 foreach (var family in catalog.Beasts.Select(beast => beast.Family).Where(name => name.Length > 0).Distinct().Order())
-                    if (ImGui.Selectable(family, beastFamily == family)) beastFamily = family;
+                {
+                    // X-746 (0.1766): each family with the action Borrow gives with it (the game's name).
+                    var borrowed = catalog.Beasts.FirstOrDefault(beast => beast.Family == family) is { } member ? catalog.BorrowOf(member) : null;
+                    if (ImGui.Selectable(borrowed is null ? family : $"{family} · {borrowed.Name}##{family}", beastFamily == family)) beastFamily = family;
+                }
             }
             finally { ImGui.EndCombo(); }
         }
@@ -88,6 +92,9 @@ internal sealed partial class MainWindow
         ImGui.SetNextItemWidth(90); if (ImGui.InputInt(localization.Get("BeastUi.Rank") + "##BeastRank", ref beastRank)) beastRank = Math.Clamp(beastRank, 1, Math.Max(1, catalog.Beasts.Max(beast => beast.Ranks.Count))); Tip("BeastUi.RankTip");
         ImGui.SameLine();
         ImGui.Checkbox(localization.Get("BeastUi.OnlyObtained"), ref beastOnlyObtained); Tip("BeastUi.OnlyObtainedTip");
+        // X-746 (0.1766): the family chosen: the action Borrow gives with its beasts, its icon, name and effect (the game's texts).
+        if (beastFamily is not null && catalog.Beasts.FirstOrDefault(beast => beast.Family == beastFamily) is { } chosen && catalog.BorrowOf(chosen) is { } borrow)
+            DrawBeastBorrowLine(catalog, borrow);
         var key = ((object?)catalog, (object?)obtained, beastQuery, beastFamily, beastOnlyObtained, beastRank, beastSort.Sort, beastSort.Descending);
         if (key != beastViewKey) { beastViewKey = key; beastView = catalog.View(beastQuery, beastFamily, beastOnlyObtained, obtained, beastRank, beastSort.Sort, beastSort.Descending); }
         var flags = ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Sortable | ImGuiTableFlags.SizingStretchProp;
@@ -116,6 +123,7 @@ internal sealed partial class MainWindow
                 // X-135 (0.1163): the beast's rank when read (team window or board result).
                 if (BeastRanks?.TryGetValue(beast.Id, out var rankKnown) == true) { ImGui.SameLine(); ImGui.TextDisabled(localization.Format("BeastUi.KnownRank", rankKnown)); }
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(beast.Family);
+                DrawBeastBorrowIcon(catalog, beast);
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(beast.AutoAttack.Length > 0 ? beast.AutoAttack : localization.Get("BeastUi.Magical"));
                 DrawBeastEffects(catalog, beast);
                 var stats = beast.At(beastRank);
@@ -514,6 +522,31 @@ internal sealed partial class MainWindow
             if (at < catalog.EffectNames.Count && catalog.EffectNames[at].Length > 0) TipText(catalog.EffectNames[at]);
         }
     }
+
+    // X-746 (0.1766): after a beast's family, the icon of the action Borrow gives with it, its name and effect on hover.
+    private void DrawBeastBorrowIcon(BeastCatalog catalog, Beast beast)
+    {
+        if (catalog.BorrowOf(beast) is not { } borrow) return;
+        ImGui.SameLine();
+        DrawGameIcon(borrow.Icon, new Vector2(ImGui.GetTextLineHeight()));
+        TipText(() => localization.Format("BeastUi.BorrowTip", BorrowLabel(catalog), borrow.Name, borrow.Effect));
+    }
+
+    // X-746 (0.1766): under the filter, the action Borrow gives with the family chosen.
+    private void DrawBeastBorrowLine(BeastCatalog catalog, BeastBorrow borrow)
+    {
+        DrawGameIcon(borrow.Icon, new Vector2(ImGui.GetTextLineHeight() * 1.5f));
+        ImGui.SameLine();
+        ImGui.BeginGroup();
+        try
+        {
+            ImGui.TextUnformatted(localization.Format("BeastUi.BorrowLine", BorrowLabel(catalog), borrow.Name));
+            if (borrow.Effect.Length > 0) { ImGui.PushStyleColor(ImGuiCol.Text, Muted); try { ImGui.TextWrapped(borrow.Effect); } finally { ImGui.PopStyleColor(); } }
+        }
+        finally { ImGui.EndGroup(); }
+    }
+
+    private string BorrowLabel(BeastCatalog catalog) => catalog.BorrowLabel.Length > 0 ? catalog.BorrowLabel : localization.Get("BeastUi.Borrow");
 
     private void DrawBeastElementIcon(BeastCatalog catalog, string element)
     {
