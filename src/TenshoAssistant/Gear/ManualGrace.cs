@@ -16,6 +16,11 @@ public sealed class GraceCount
     public bool StartSeen { get; set; }
     public float Remaining { get; set; }
     public string Jobs { get; set; } = "";
+
+    /// <summary>X-770 (0.1769): the readings in a row, while you were loaded, that did not see the status (not saved: it starts again at
+    /// a reload; internal, so that no serializer writes it). At <see cref="ManualGrace.GoneReadings"/>, the game took the status away and
+    /// its count is dropped.</summary>
+    internal int Missed { get; set; }
 }
 
 /// <summary>
@@ -45,6 +50,11 @@ public static class ManualGrace
     /// <summary>X-769 (0.1765): a new count is from the manual's start only when its seconds left are within this of the full 18 hours (one
     /// reading each second, a loading screen in between, during which no experience is gained); later, its points left are unknown.</summary>
     public const float StartSeconds=120;
+
+    /// <summary>X-770 (0.1769): a Grace not seen at this many readings in a row while you are loaded (about half a minute, one reading a
+    /// second; the status missed at the first readings after a load or a loading screen comes back well before) was taken away by the game
+    /// (its cap reached, removed by hand, or ended): its count is dropped, so that a manual used later is never taken for it.</summary>
+    public const int GoneReadings=30;
 
     /// <summary>The Grace that boosts this job: crafters (ClassJob 8 to 15) status 45, gatherers (16 to 18) status 46; none else.</summary>
     public static uint StatusFor(uint job)=>job is >= 8 and <= 15 ? CrafterGrace:job is >= 16 and <= 18 ? GathererGrace:0;
@@ -99,7 +109,9 @@ public static class ManualGrace
     /// X-769 (0.1765): one reading of your statuses (once a second). Returns the counts to keep in the settings: those of the Graces held
     /// (<paramref name="current"/>, in the order 45, 46), then the saved ones not held at this reading, kept as they are: one reading that
     /// does not see a status no longer wipes its count. <paramref name="seenBefore"/>: the Graces held at the previous reading (updated here;
-    /// emptied by the caller after a load, a login or a loading screen), so that one seen again is <c>resumed</c>.
+    /// emptied by the caller after a load, a login or a loading screen), so that one seen again is <c>resumed</c>. X-770 (0.1769): a saved
+    /// count whose status is not seen at <see cref="GoneReadings"/> readings in a row is dropped (the game took the status away); until
+    /// then it is kept, and the status seen again starts the readings in a row again.
     /// </summary>
     public static List<GraceCount> Read(IReadOnlyList<GraceCount> saved,IReadOnlyDictionary<uint,(ushort Param,float Remaining)> held,Func<uint,string> jobs,
         bool firstLook,HashSet<uint> seenBefore,out List<GraceCount> current,out bool changed)
@@ -110,8 +122,15 @@ public static class ManualGrace
         foreach(var grace in new[]{CrafterGrace,GathererGrace})
         {
             var last=saved.FirstOrDefault(count=>count.Status==grace);
-            if(!held.TryGetValue(grace,out var status)){if(last is not null)kept.Add(last);continue;}
+            if(!held.TryGetValue(grace,out var status))
+            {
+                if(last is null)continue;
+                if(++last.Missed>=GoneReadings){changed=true;continue;}
+                kept.Add(last);
+                continue;
+            }
             var count=Observe(last,grace,status.Param,status.Remaining,jobs(grace),firstLook,firstLook || !seenBefore.Contains(grace),out var moved);
+            count.Missed=0;
             if(moved || !ReferenceEquals(count,last))changed=true;
             current.Add(count);
         }

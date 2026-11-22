@@ -67,7 +67,9 @@ public sealed unsafe class GraceWatcher : IDisposable
         nextLook=now;
         try
         {
-            if(!client.IsLoggedIn || !player.IsLoaded || objects.LocalPlayer is not { } me || player.ContentId==0)
+            // X-770 (0.1769): in a competitive content (Tensho cut, R03.2) nothing is read either, so that a status the game hides there is
+            // not taken for one it took away; it is checked again when the content ends (seenBefore emptied).
+            if(!client.IsLoggedIn || !player.IsLoaded || objects.LocalPlayer is not { } me || player.ContentId==0 || TenshoAssistant.Competitive.CompetitiveGate.Cut)
             {
                 // X-769: a line dropped here (a loading screen) makes the next sighting check the jobs' experience (seenBefore emptied).
                 lock(gate)gains.Clear();
@@ -88,6 +90,10 @@ public sealed unsafe class GraceWatcher : IDisposable
                 if(!counts.Any(saved=>ReferenceEquals(saved,count)))
                     log.Information("Grace: {0} (Param {1}, {2:F0} s left) {3}.",count.Status,count.Param,count.Remaining,
                         count.StartSeen ? "seen from its start: its bonus points are counted":"held without its start seen (or experience gained while not counted): its points left are unknown");
+            // X-770 (0.1769): a saved count dropped because its status was not seen for half a minute (the game took it away).
+            foreach(var count in counts)
+                if(!held.ContainsKey(count.Status) && !next.Any(kept=>ReferenceEquals(kept,count)))
+                    log.Information("Grace: {0} not held at {1} readings in a row (the game took it away: cap reached, removed or ended): its count is dropped.",count.Status,ManualGrace.GoneReadings);
             firstLook=false;
             // The level of the job worn as last read before the line (a line that raises the level is counted at the level it was earned at).
             var worn=me.ClassJob.RowId;

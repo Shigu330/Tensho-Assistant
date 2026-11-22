@@ -634,6 +634,9 @@ internal sealed partial class MainWindow
             if (!TenshoAssistant.UI.UiComponents.Header($"{title} ({shown.Count})##BeastItemKind{kind}", kind == BeastItems.Feed ? ImGuiTreeNodeFlags.DefaultOpen : ImGuiTreeNodeFlags.None)) continue;
             var guideKey = kind == BeastItems.Gear ? "Gear" : kind == BeastItems.CrucibleItem ? "CrucibleItem" : "Feed";
             if (catalog.Rules.FirstOrDefault(rule => rule.Key == guideKey) is { } guide) DrawBeastRule(guide);
+            // X-770 (0.1769): with a family chosen, the feeds whose families were not read are kept, and the page says how many.
+            if (kind == BeastItems.Feed && beastItemFamily > 0 && shown.Count(BeastItems.FamiliesUnread) is var unread and > 0)
+                ImGui.TextColored(Warning, localization.Format("BeastUi.ItemFamiliesUnreadKept", unread));
             foreach (var item in shown) DrawBeastItem(item);
         }
     }

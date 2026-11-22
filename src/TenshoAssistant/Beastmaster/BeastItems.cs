@@ -61,9 +61,15 @@ public static class BeastItems
     /// <summary>Whether a feed can be given to a beast of this family (false when its families are not known).</summary>
     public static bool UsableBy(BeastItem item, int family) => item.Kind == Feed && item.Families.Contains(family);
 
-    /// <summary>The items of one kind, in the sheet's order; feeds of one family only when one is given.</summary>
+    /// <summary>X-770 (0.1769): a feed whose families were not read in its description (unknown, R06: never taken for « no family »).</summary>
+    public static bool FamiliesUnread(BeastItem item) => item.Kind == Feed && item.Families.Count == 0;
+
+    /// <summary>
+    /// The items of one kind, in the sheet's order; feeds of one family only when one is given. X-770 (0.1769): the feeds whose families
+    /// were not read stay in a family's list (marked « Families not read » by the page): unknown is not « cannot eat it ».
+    /// </summary>
     public static IReadOnlyList<BeastItem> Of(IEnumerable<BeastItem> items, int kind, int family, string query) =>
-        items.Where(item => item.Kind == kind && (family <= 0 || kind != Feed || UsableBy(item, family))
+        items.Where(item => item.Kind == kind && (family <= 0 || kind != Feed || UsableBy(item, family) || FamiliesUnread(item))
             && (query.Length == 0 || SearchText.Contains(item.Name, query, StringComparison.CurrentCultureIgnoreCase) || SearchText.Contains(item.Effect, query, StringComparison.CurrentCultureIgnoreCase)))
             .ToArray();
 
