@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (778 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (780 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -824,6 +824,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-733 | In-game test T-0.1715-1 (test page, 21/11 around 15:51): problem reported by… | Done in 0.1734.0 |
 | X-734 | In-game test T-0.1720-1 (test page, 21/11 around 15:49): problem reported by… | Done in 0.1734.0 |
 | X-735 | Review of block 0.1727 to 0.1733 (review 0.1733, 21/11), minor M1: M1 in… | Done in 0.1735.0 |
+| X-744 | Idea I-026 chosen by the user on 21/11 around 16:00 (idea box): Labyrinth… | Done in 0.1770.0 |
 | X-745 | Idea I-027 chosen by the user on 21/11 around 16:00 (idea box): Beastmaster… | Done in 0.1767.0 |
 | X-746 | Idea I-029 chosen by the user on 21/11 around 16:00 (idea box): Beastmaster… | Done in 0.1766.0 |
 | X-748 | Idea I-022 chosen by the user on 21/11 around 16:00 (idea box): Vendors: hide… | Done in 0.1738.0 |
@@ -846,12 +847,13 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-767 | Review of block 0.1752 to 0.1756 (review 0.1756, 21/11), minor M1, M2: M1 in… | Done in 0.1758.0 |
 | X-768 | Review of block 0.1757 to 0.1758 (review 0.1758, 21/11), minor M1, M2: M1 in… | Done in 0.1759.0 |
 | X-769 | Review of block 0.1759 to 0.1764 (review 0.1764, 22/11), minor M1, M2, M3: M1… | Done in 0.1765.0 |
+| X-770 | Review of block 0.1765 to 0.1768 (review 0.1768, 22/11), minor M1, M2: M1 in… | Done in 0.1769.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (778 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (780 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1673,6 +1675,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-733 | Essai T-0.1715-1 en jeu (page des essais, 21/11 vers 15 h 51) : problème… | Fait en 0.1734.0 |
 | X-734 | Essai T-0.1720-1 en jeu (page des essais, 21/11 vers 15 h 49) : problème… | Fait en 0.1734.0 |
 | X-735 | Relecture du bloc 0.1727 à 0.1733 (relecture 0.1733, 21/11), mineurs M1 : M1… | Fait en 0.1735.0 |
+| X-744 | Idée I-026 choisie par l'utilisateur le 21/11 vers 16 h (boîte à idées)… | Fait en 0.1770.0 |
 | X-745 | Idée I-027 choisie par l'utilisateur le 21/11 vers 16 h (boîte à idées)… | Fait en 0.1767.0 |
 | X-746 | Idée I-029 choisie par l'utilisateur le 21/11 vers 16 h (boîte à idées)… | Fait en 0.1766.0 |
 | X-748 | Idée I-022 choisie par l'utilisateur le 21/11 vers 16 h (boîte à idées) : Essai… | Fait en 0.1738.0 |
@@ -1695,3 +1698,4 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-767 | Relecture du bloc 0.1752 à 0.1756 (relecture 0.1756, 21/11), mineurs M1, M2… | Fait en 0.1758.0 |
 | X-768 | Relecture du bloc 0.1757 à 0.1758 (relecture 0.1758, 21/11), mineurs M1, M2… | Fait en 0.1759.0 |
 | X-769 | Relecture du bloc 0.1759 à 0.1764 (relecture 0.1764, 22/11), mineurs M1, M2, M3… | Fait en 0.1765.0 |
+| X-770 | Relecture du bloc 0.1765 à 0.1768 (relecture 0.1768, 22/11), mineurs M1, M2… | Fait en 0.1769.0 |

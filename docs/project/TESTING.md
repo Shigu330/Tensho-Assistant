@@ -2668,6 +2668,18 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1768) Page Dresseur, onglet « Objets temporaires » : le guide du jeu sur les cases du plateau, puis l'équipement de dressage, les objets du Dédale et les aliments, chacun avec son icône, son nom et son effet ; chaque aliment dit les familles qui peuvent le manger. Choisissez une famille : seuls ses aliments restent. Au Dédale bestial, comparez avec un marchand ou un coffre au trésor.
 
+- [ ] (0.1769) Avec un manuel compté (page Équipement, « environ N points de bonus restants »), si le jeu retire l'effet (plafond atteint) ou si vous le retirez : une demi-minute après, la ligne n'est plus montrée et le journal dit « Grace: 45 not held at 30 readings in a row … its count is dropped » (46 pour un manuel de récolte) ; un manuel utilisé ensuite repart de son plafond entier s'il est utilisé pendant que Tensho tourne.
+
+- [ ] (0.1770) Au Dédale bestial, panneau à côté du plateau, « Plateau entier » puis « Campements, marchands et coffres du plateau » : les cases et leurs étapes (« Étape N ») doivent correspondre à la fenêtre « Disposition du plateau » du jeu, les campements avec le même nombre de bêtes.
+
+- [ ] (0.1770) Sur une case de campement, après un combat (fenêtre de l'équipe ouverte une fois) : le panneau dit « À reposer : … » ; comparez avec « Vous et N de vos bêtes » du jeu et les PV de la fenêtre de l'équipe (les plus blessées d'abord, pas plus que N).
+
+- [ ] (0.1770) Ouvrez dans le bestiaire du jeu la page de trois bêtes de familles différentes : le journal dit « Beastmaster satiety checked » pour chacune (à rapporter s'il dit « differs ») ; la satiété du panneau (« Aliments de l'équipe ») est celle du bestiaire (« Satiété 0/N »).
+
+- [ ] (0.1771) Finissez un plateau du Dédale bestial : page Dresseur, onglet de l'équipe, « Dernier plateau » : la ligne « Récompenses » (objet, icône, ×N) doit être celle de la fenêtre de résultat du jeu ; le journal dit « Beastmaster board result, rewards: item … xN » (à rapporter si la quantité diffère de la fenêtre).
+
+- [ ] (0.1772) Mode développeur actif, entrez dans votre maison (où sont vos sonnettes) et attendez 10 s : le journal (dalamud.log) a une ligne « Housing furniture probe (X-747, developer mode): … » ; notez où sont les sonnettes dans la pièce. Rien ne change encore sur la carte.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
