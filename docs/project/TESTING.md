@@ -2700,6 +2700,22 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1778) En combat ou dans une mission, laissez le repas passer sous 5 minutes : rien pendant le combat ou la mission ; le rappel vient une fois sorti, si l'effet tient encore.
 
+- [ ] (0.1780) Compagnon chocobo sorti, rappel à 5 min : quand « Votre compagnon chocobo part dans 5 min » a été dit, montez puis descendez deux fois (le compagnon revient) : l'avis n'est pas redit.
+
+- [ ] (0.1780) Réglez le rappel du compagnon à 0 min, appelez-le et montez sur une monture quand il lui reste 1 ou 2 minutes ; restez monté plus longtemps, puis descendez : « Votre compagnon chocobo est parti » une fois, une vingtaine de secondes après la descente.
+
+- [ ] (0.1781) Ouvrez la fenêtre ALÉA du jeu (menu principal › Déplacements › ALÉA) puis la page ALÉA de Tensho, section « Rangs de réussite des ALÉA » : chaque zone vue dans la fenêtre du jeu a le même rang et le même compte « x/y ALÉA » que la fenêtre ; les zones jamais montrées disent « inconnu ». Dans dalamud.log, la ligne « Shared FATE window read (X-213) » (à rapporter si les comptes diffèrent).
+
+- [ ] (0.1781) Survolez « n objets » d'une zone d'Endwalker ou de Dawntrail dont vous n'avez pas le rang maximal : les articles du comptoir de la zone que vous ne pouvez pas encore acheter, avec leur rang et leur prix, et le haut fait « Héros de grand chemin » ; comparez avec ce que le comptoir de la zone vous propose.
+
+- [ ] (0.1782) Rangements › Rapport, section « Valeur estimée des stocks », Universalis activé : cliquez « Estimer avec les prix du marché » : l'avancement « Prix demandés : n objets sur m » monte, puis un tableau par rangement de ce personnage et un par personnage ; les objets sans prix sont comptés à part, jamais dans la valeur ; Arrêter coupe les demandes.
+
+- [ ] (0.1782) Survolez dans un sac un objet vendable au PNJ et sur le marché, après que son prix a été lu : sous les prix du marché, « Le marché paie n fois le prix du PNJ » ou « Le PNJ paie plus que le marché ».
+
+- [ ] (0.1783) Survolez une pièce d'équipement dont vous avez la même apparence dans la coiffeuse mirage ou le bahut personnel (après les avoir ouverts une fois) : sous la partie collection, une coche « Même apparence déjà détenue : Coiffeuse mirage (nom de la pièce) » ; une pièce dont vous n'avez aucune apparence : une croix « Aucune pièce de même apparence dans vos rangements lus ».
+
+- [ ] (0.1784) Planificateur d'équipement d'un job de combat : choisissez un repas que vous connaissez (bouton HQ ou NQ comme le vôtre) : une colonne « Avec repas » apparaît ; mangez ce repas en jeu et comparez la colonne aux stats de la fenêtre Personnage du jeu avec le même équipement (à rapporter si une stat diffère).
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
