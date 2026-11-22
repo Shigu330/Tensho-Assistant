@@ -580,9 +580,15 @@ public sealed class GitHubExchange : IDisposable
                 await Fresh().ConfigureAwait(false);
                 // N29: a 401 with a refresh token in hand (a PC clock late, a token ended early): renewed once, sent once more, before forgetting.
                 string? revision;
-                try{revision=await Upload(files,state.Rotated).ConfigureAwait(false);}
-                catch(HttpRequestException error) when(error.StatusCode==HttpStatusCode.Unauthorized && HasRefresh)
-                {await Fresh(force:true).ConfigureAwait(false);revision=await Upload(files,state.Rotated).ConfigureAwait(false);}
+                try
+                {
+                    try{revision=await Upload(files,state.Rotated).ConfigureAwait(false);}
+                    catch(HttpRequestException error) when(error.StatusCode==HttpStatusCode.Unauthorized && HasRefresh)
+                    {await Fresh(force:true).ConfigureAwait(false);revision=await Upload(files,state.Rotated).ConfigureAwait(false);}
+                }
+                // X-819 (review of 0.1819, I1): a gist made, then the issue step failing: the rotation's state takes it at once, so the
+                // next exchange writes that gist again instead of making another (X-175), and no gist is left behind unlinked.
+                catch{KeepGist(state);throw;}
                 lock(gate){meta.UploadHash=hash;gist=meta.GistId;issue=meta.Issue;}
                 // A new issue is a new player file: nothing of it merged yet.
                 if(state.Issue!=issue)state.Merged=[];
@@ -625,6 +631,19 @@ public sealed class GitHubExchange : IDisposable
         if(GistRotation.Load(RotationPath) is not { Known:true } held)return;
         lock(gate)
             if(meta.Login.Length>0 && held.Login==meta.Login){meta.GistId=held.Gist;meta.Issue=held.Issue;meta.GistFiles=[..held.GistFiles];meta.UploadHash=held.UploadHash;}
+    }
+    /// <summary>
+    /// X-819 (review of 0.1819, I1): an upload that failed after its gist was made (or after the issue was found gone): the rotation's state
+    /// written with the gist and issue as they are now, so AdoptGist does not bring back the gist before. An issue changed (0: to open again)
+    /// is a new player file: nothing of it merged yet, as after an upload that ends.
+    /// </summary>
+    private void KeepGist(GistRotationState state)
+    {
+        int issue;lock(gate)issue=meta.Issue;
+        if(state.Issue!=issue){state.Issue=issue;state.Merged=[];}
+        try{Save(state);}
+        catch(Exception error) when(error is IOException or UnauthorizedAccessException)
+        {Log?.Invoke($"Discoveries: the gist in use could not be noted ({error.GetType().Name}).");}
     }
     /// <summary>X-804: the rotation's state written, with the gist fields as they are now (read back by <see cref="AdoptGist"/>).</summary>
     private void Save(GistRotationState state)
@@ -676,13 +695,11 @@ public sealed class GitHubExchange : IDisposable
             }
             catch(HttpRequestException error) when(error.StatusCode==HttpStatusCode.NotFound){gist="";}
         }
-        var made=false;
         if(gist.Length==0)
         {
             written=await Api(HttpMethod.Post,"https://api.github.com/gists",
                 new JsonObject{["description"]="Tensho Assistant discoveries",["public"]=false,["files"]=files.DeepClone()}).ConfigureAwait(false);
             gist=written?["id"]?.GetValue<string>() ?? throw new InvalidDataException("No gist id.");
-            made=true;
             lock(gate){meta.GistId=gist;if(!rotated)meta.Issue=0;}
         }
         lock(gate){meta.GistFiles=[..contents.Keys];if(meta.Login.Length>0)meta.GistLogin=meta.Login;}
@@ -690,8 +707,9 @@ public sealed class GitHubExchange : IDisposable
         SaveMeta();
         int issue;lock(gate)issue=meta.Issue;
         var version=typeof(GitHubExchange).Assembly.GetName().Version?.ToString(3) ?? "?";
-        // X-804: a new gist after a merge: the issue edited to link it; an issue gone (404, 410) is opened again below.
-        if(issue>0 && made && rotated)
+        // X-804: a new gist after a merge: the issue edited to link it; an issue gone (404, 410) is opened again below. X-819: at every
+        // upload until the rotation ends (a gist made at a try whose issue edit failed is written again, not made again).
+        if(issue>0 && rotated)
         {
             try{await Api(HttpMethod.Patch,$"https://api.github.com/repos/{Repository}/issues/{issue}",new JsonObject{["body"]=IssueBody(version,gist)}).ConfigureAwait(false);}
             catch(HttpRequestException error) when(error.StatusCode is HttpStatusCode.NotFound or HttpStatusCode.Gone){lock(gate)meta.Issue=issue=0;}

@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1820.0
+- Plan global, X-819 : Relecture 0.1819, I1 : un gist créé pendant l'échange, suivi d'un échec du ticket (refus 403 ou 5xx, réseau coupé, application GitHub absente), était oublié : l'état de la rotation gardait le gist d'avant, l'échange suivant en créait un autre et le premier restait sur GitHub, jamais lié ni supprimé, avec les lieux exacts et les jours du joueur. L'état de la rotation note maintenant le gist dès que l'envoi échoue après sa création (et le ticket, s'il est à rouvrir) ; l'échange suivant réécrit ce gist au lieu d'en créer un, et un gist neuf après une fusion modifie le ticket à chaque essai jusqu'au bout. Tests de comportement contre un faux GitHub (modification du ticket refusée, ouverture refusée après un gist disparu, échec avant tout gist).
+- Pour les joueurs : un échec de GitHub pendant le partage de vos découvertes ne laisse plus de copie oubliée en ligne : l'échange suivant la reprend.
+- Tests : GistKept1820Tests. Verify.ps1 (agent) : 4002/4002, 0 avertissement, 0 erreur ; DLL 0.1820.0.0. Rien à essayer en jeu.
+### English
+- Review of 0.1819, I1: a gist made during the exchange, then a failure at the issue step (403 or 5xx refusal, network cut, GitHub App missing), was forgotten: the rotation's state kept the gist before, the next exchange made another and the first stayed on GitHub, never linked nor deleted, with the player's exact places and days. The rotation's state now notes the gist as soon as the upload fails after making it (and the issue, when it is to open again); the next exchange writes that gist again instead of making one, and a new gist after a merge edits the issue at every try until it is done. Behaviour tests against a fake GitHub (issue edit refused, issue opening refused after a gist gone, failure before any gist).
+- For players: A GitHub failure while sharing your discoveries no longer leaves a forgotten copy of them online: the next exchange reuses it.
+
 ## 0.1819.0
 - Plan global, X-808 : Correction de 0.1818 (X-808 repris) : l'outil de fusion écartait le lieu de l'ensemble commun de tous les faits d'un joueur signalé, même quand ce joueur n'avait jamais été compté (le lieu venait alors d'un joueur compté) ; son auto-test tombait sur 5 cas (X-357, N13, X-796 M1). Retour au comportement de 0.1817 ; DEC-052 et README rendus tels qu'avant ; X-808 reste ouvert (il faut savoir si le joueur était compté avant). Auto-test de l'outil de nouveau entier.
 - Tests : DiscoveryExcluded1818Tests. Verify.ps1 (agent) : 3998/3998, 0 avertissement, 0 erreur ; DLL 0.1819.0.0. Rien à essayer en jeu.
