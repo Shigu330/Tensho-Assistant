@@ -113,7 +113,7 @@ internal static class PrepGone1786Tests
             Check(frame > 0 && throttle > frame, "every frame, before the 5 s readings");
             Check(watcher.Contains("var held=chocobo.WantsHeld(now,outNow) && (loading || Held(now,territory));", StringComparison.Ordinal)
                   && watcher.Contains("var sight=chocobo.Watch(now,outNow,held);", StringComparison.Ordinal), "Watch, with the holds only when asked");
-            Check(watcher.Contains("if(loading)loadedAt=now;", StringComparison.Ordinal), "a load seen at once");
+            Check(watcher.Contains("if(loading)settling.Loaded(now);", StringComparison.Ordinal), "a load seen at once (X-781: PrepSettling)");
             Check(watcher.Contains("sightLogs>=SightLogs", StringComparison.Ordinal), "a few log lines per load of the plugin");
         }),
     ];

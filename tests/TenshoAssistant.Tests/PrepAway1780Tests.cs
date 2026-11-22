@@ -116,8 +116,8 @@ internal static class PrepAway1780Tests
             Check(watcher.Contains("Say(chocobo.Read(now,outNow ? info.TimeLeft:null,options.ChocoboThreshold,busy,!outNow && Held(now,territory)));", StringComparison.Ordinal), "held given when out of sight");
             foreach (var flag in new[] { "Mounted", "RidingPillion", "Mounting", "InFlight", "Diving", "BoundByDuty", "WatchingCutscene", "OccupiedInCutSceneEvent" })
                 Check(watcher.Contains($"condition[ConditionFlag.{flag}]", StringComparison.Ordinal), "held: " + flag);
-            Check(watcher.Contains("now-loadedAt<Settling || MountAllowed?.Invoke(territory)==false", StringComparison.Ordinal), "held just after a load and where mounts are not allowed");
-            Check(watcher.Contains("if(territory!=lastTerritory){lastTerritory=territory;loadedAt=now;}", StringComparison.Ordinal), "a zone change starts the settling time");
+            Check(watcher.Contains("|| settling.Holds(now) || MountAllowed?.Invoke(territory)==false", StringComparison.Ordinal), "held just after a load (X-781: until it is seen back, PrepSettling) and where mounts are not allowed");
+            Check(watcher.Contains("if(territory!=lastTerritory){lastTerritory=territory;settling.Loaded(now);}", StringComparison.Ordinal), "a zone change starts the settling time");
             Check(Read("src/TenshoAssistant/Plugin.cs").Contains("MountAllowed=territory=>territory==0 ? null:data.GetExcelSheet<Lumina.Excel.Sheets.TerritoryType>().GetRowOrDefault(territory)?.Mount}", StringComparison.Ordinal), "TerritoryType.Mount");
         }),
     ];

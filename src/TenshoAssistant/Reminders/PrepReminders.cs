@@ -122,3 +122,36 @@ public sealed class PrepTracker(PrepKind kind)
 
     public void Reset(){lastAt=null;lastLeft=0;told=false;waiting=false;goneAt=null;unheldAt=null;goneHeld=false;seenOut=false;wentAt=null;wentHeld=null;}
 }
+
+/// <summary>
+/// X-781 (the review of 0.1789, M1): whether a loading screen or a zone change still explains the chocobo companion out of sight. After one
+/// it takes a few seconds to come back (X-774: up to <see cref="Settling"/>); once it has been seen back, out for <see cref="Back"/> without a
+/// break after the load, it going again is no longer the load's doing: sent away by the player within the settling time, it is not taken
+/// for held (before, it was, and a mount just after kept it held for the whole ride, then a false « has left »). Out for less than
+/// <see cref="Back"/> right after the load (what the game may still show of it then) does not end the settling. The watcher calls
+/// <see cref="Loaded"/> every frame of a load and at a zone change, <see cref="Seen"/> every frame. Pure (tests).
+/// </summary>
+public sealed class PrepSettling
+{
+    /// <summary>X-774: after a loading screen or a zone change, the companion takes a few seconds to come back.</summary>
+    public static readonly TimeSpan Settling=TimeSpan.FromSeconds(20);
+    /// <summary>X-781: out this long without a break after the load: it is back.</summary>
+    public static readonly TimeSpan Back=TimeSpan.FromSeconds(2);
+    private DateTimeOffset loadedAt=DateTimeOffset.MinValue;
+    private DateTimeOffset? outSince;
+    private bool back;
+
+    /// <summary>A frame of a loading screen, or a zone change.</summary>
+    public void Loaded(DateTimeOffset now){loadedAt=now;back=false;}
+
+    /// <summary>Every frame: whether the companion is out.</summary>
+    public void Seen(DateTimeOffset now,bool outNow)
+    {
+        if(!outNow){outSince=null;return;}
+        if(outSince is not { } since || since<=loadedAt)outSince=since=now;
+        if(since>loadedAt && now-since>=Back)back=true;
+    }
+
+    /// <summary>Whether the load still explains the companion out of sight now.</summary>
+    public bool Holds(DateTimeOffset now)=>!back && now-loadedAt<Settling;
+}

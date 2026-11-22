@@ -7,6 +7,7 @@ namespace TenshoAssistant;
 // X-229 (0.1784, the user's request of 12/11, K-31, R04 agreement given): the meal of the gear planner, chosen per job among the meals of the
 // sheets (Well Fed with an ItemFood row), NQ or HQ; the stats with it in a fifth column. At a synced level: unknown (formula not proved, R06).
 // X-778 (0.1787, the review of 0.1784, I2): the meal eaten taken out of the values read before the meal chosen is added.
+// X-780 (the review of 0.1789, M2): unknown until the stats read follow a change of the meal eaten (GearMealWatch).
 internal sealed partial class MainWindow
 {
     private void DrawGearMealPicker(uint job)
@@ -41,7 +42,8 @@ internal sealed partial class MainWindow
         Tip("Gear.MealHqTip");
     }
 
-    private ((GearModel Model,uint Meal,bool Hq,int Language,int Eaten) Key,GearModel Result)? gearMealCache;
+    private ((GearModel Model,uint Meal,bool Hq,int Language,int Eaten,bool Waiting) Key,GearModel Result)? gearMealCache;
+    private readonly GearMealWatch gearMealWatch=new();
     private DateTimeOffset gearMealEatenAt;
     private int gearMealEaten;
 
@@ -54,6 +56,7 @@ internal sealed partial class MainWindow
         {
             gearMealEatenAt=now;
             gearMealEaten=CraftDetectedNow?.Invoke(characterStats.State.JobId) is { } detected ? detected.Food ?? 0:-1;
+            gearMealWatch.Seen(gearMealEaten,now);
         }
         return gearMealEaten;
     }
@@ -65,15 +68,18 @@ internal sealed partial class MainWindow
     {
         var choice=configuration.GearMeals?.GetValueOrDefault(state.JobId);
         var fromGame=state.JobId==characterStats.State.JobId;
-        var key=(model,choice?.ItemId ?? 0,choice?.Hq==true,localization.Revision,choice is { ItemId:not 0 } && fromGame ? GearMealEaten():0);
+        var eatenNow=choice is { ItemId:not 0 } && fromGame ? GearMealEaten():0;
+        // X-780: the stats read must follow the meal seen (read after it changed), else the column is unknown for that second.
+        var waiting=choice is { ItemId:not 0 } && fromGame && !gearMealWatch.Settled(characterStats.State.ObservedAt);
+        var key=(model,choice?.ItemId ?? 0,choice?.Hq==true,localization.Revision,eatenNow,waiting);
         if(gearMealCache is { } cached && ReferenceEquals(cached.Key.Model,model) && cached.Key.Meal==key.Item2 && cached.Key.Hq==key.Item3 && cached.Key.Language==key.Item4
-           && cached.Key.Eaten==key.Item5)return cached.Result;
+           && cached.Key.Eaten==key.Item5 && cached.Key.Waiting==key.Item6)return cached.Result;
         var result=model;
         var meals=GearMealList?.Invoke();
         if(GearMeals.Chosen(meals,choice) is { } meal)
         {
-            IReadOnlyDictionary<string,int> values=model.PlannedValues;string? eatenName=null;var unknown=false;
-            if(key.Item5!=0)
+            IReadOnlyDictionary<string,int> values=model.PlannedValues;string? eatenName=null;var unknown=key.Item6;
+            if(!unknown && key.Item5!=0)
             {
                 if(key.Item5>0 && Craft.CraftConsumables.FromStatus(meals,(ushort)key.Item5,false) is { } eaten
                    && GearMeals.WithoutActive(state.Values,model.PlannedValues,eaten.Item,eaten.Hq) is { } without)

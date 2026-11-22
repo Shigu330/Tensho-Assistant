@@ -40,9 +40,10 @@ public static class GearMeals
     /// X-778 (the review of 0.1784, I2): the planned values without the meal the player has eaten. The values read from the game (the
     /// Character window's) already hold its bonus, and in the game a new meal replaces the one eaten: the bonus is taken out before the meal
     /// chosen is added. Its bonus was computed from the real value without it (worn gear), so that value is found back exactly: the one
-    /// value whose value plus its bonus is the value read (value plus bonus only grows). Null when one of its stats has no such value (the
-    /// stats read not yet up to date, or another bonus in them): then the meal column is unknown, never two meals added up (R06). A stat not
-    /// read is left out.
+    /// value whose value plus its bonus is the value read (value plus bonus only grows). Null when one of its stats has no such value
+    /// (another bonus in them): then the meal column is unknown, never two meals added up (R06). A stat not read is left out. Such a value
+    /// nearly always exists even when the stats read do not hold the meal yet (at the cap, the value read less the cap): X-780, the caller
+    /// waits for stats read after the meal seen changed (<see cref="GearMealWatch"/>) before it trusts this.
     /// </summary>
     public static (Dictionary<string,int> Values,Dictionary<string,int> Removed)? WithoutActive(IReadOnlyDictionary<string,int> real,
         IReadOnlyDictionary<string,int> planned,CraftConsumable eaten,bool hq)
@@ -65,4 +66,27 @@ public static class GearMeals
     /// <summary>The meal chosen for a job in the list read from the sheets; null when none is chosen or the item is no longer a meal.</summary>
     public static (CraftConsumable Meal,bool Hq)? Chosen(IReadOnlyList<CraftConsumable>? meals,GearMealChoice? choice)=>
         choice is { ItemId:not 0 } && meals?.FirstOrDefault(meal=>meal.ItemId==choice.ItemId) is { } found ? (found,choice.Hq):null;
+}
+
+/// <summary>
+/// X-780 (the review of 0.1789, M2): the meal eaten (Well Fed) and the stats are each read once a second, each at its own pace. Just after
+/// the meal seen changes (eaten, ended, another one), the stats read may not follow it yet: a value is still found back (one nearly always
+/// is) and the meal column would show a wrong value for a second, or two meals added up when it ends. The column waits for stats read at
+/// least <see cref="Settle"/> after the change was seen. The first meal seen is not a change. Pure (tests).
+/// </summary>
+public sealed class GearMealWatch
+{
+    public static readonly TimeSpan Settle=TimeSpan.FromSeconds(1);
+    private int? last;
+    private DateTimeOffset changedAt=DateTimeOffset.MinValue;
+
+    /// <summary>The meal eaten read now (the Well Fed's Param; 0: none; -1: not read).</summary>
+    public void Seen(int eaten,DateTimeOffset now)
+    {
+        if(last is { } before && before!=eaten)changedAt=now;
+        last=eaten;
+    }
+
+    /// <summary>Whether stats read at <paramref name="statsAt"/> follow the meal seen: no change seen, or read at least <see cref="Settle"/> after it.</summary>
+    public bool Settled(DateTimeOffset? statsAt)=>changedAt==DateTimeOffset.MinValue || statsAt is { } at && at-changedAt>=Settle;
 }

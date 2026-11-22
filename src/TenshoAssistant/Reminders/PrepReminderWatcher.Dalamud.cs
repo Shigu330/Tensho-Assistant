@@ -10,18 +10,18 @@ namespace TenshoAssistant.Reminders;
 /// TimeLeft, the companion's EntityId not 0 nor 0xE0000000), each through its <see cref="PrepTracker"/>; a fight (InCombat) or a duty
 /// (BoundByDuty, 56, 95) holds the reminders back (R03.1). Read only; an unreadable state says nothing (never a false « has left »).
 /// X-774: the companion out of sight while the player is mounted (Mounted, RidingPillion, Mounting…, InFlight), swimming or diving,
-/// in a duty, in a cutscene, loading or within <see cref="Settling"/> of it, or in a place without mounts (TerritoryType.Mount, through
+/// in a duty, in a cutscene, loading or within <see cref="PrepSettling.Settling"/> of it, or in a place without mounts (TerritoryType.Mount, through
 /// <see cref="MountAllowed"/>: it can only be out where it can be ridden, HowToPage row 361) is held: not taken for a companion sent away.
 /// X-777: loads, zone changes and the companion going out of sight are seen every frame (a few reads), so that what made it go is known
 /// when it goes (<see cref="PrepTracker.Watch"/>); the first few goings and comings after the plugin loads are written to the log with the game's timer
 /// (whether the game keeps it while the companion is out of sight is not known: the log is there to see it in the game).
+/// X-781 (the review of 0.1789, M1): the settling after a load ends once the companion has been seen back (<see cref="PrepSettling"/>): sent
+/// away then, it is not taken for held.
 /// </summary>
 public sealed unsafe class PrepReminderWatcher : IDisposable
 {
     public const uint WellFed=Craft.CraftConsumables.WellFed;
     private const uint NoEntity=0xE0000000;
-    /// <summary>X-774: after a loading screen or a zone change, the companion takes a few seconds to come back.</summary>
-    public static readonly TimeSpan Settling=TimeSpan.FromSeconds(20);
     private readonly IFramework framework;
     private readonly IClientState client;
     private readonly IObjectTable objects;
@@ -29,7 +29,9 @@ public sealed unsafe class PrepReminderWatcher : IDisposable
     private readonly Func<PrepReminderSettings> settings;
     private readonly IPluginLog log;
     private readonly PrepTracker meal=new(PrepKind.Meal),chocobo=new(PrepKind.Chocobo);
-    private DateTimeOffset nextRead,loadedAt;
+    private DateTimeOffset nextRead;
+    // X-781: whether a load still explains the companion out of sight (not once it has been seen back).
+    private readonly PrepSettling settling=new();
     private uint lastTerritory;
     private bool disposed,warned;
     // X-777: the log lines of the companion's goings and comings, a few per load of the plugin; when it went and the timer then.
@@ -56,8 +58,8 @@ public sealed unsafe class PrepReminderWatcher : IDisposable
         // X-777: every frame, a few reads: a load or a zone change seen at once, and the moment the companion goes out of sight.
         var loading=objects.LocalPlayer is null || condition[ConditionFlag.BetweenAreas] || condition[ConditionFlag.BetweenAreas51];
         var territory=client.TerritoryType;
-        if(loading)loadedAt=now;
-        else if(territory!=lastTerritory){lastTerritory=territory;loadedAt=now;}
+        if(loading)settling.Loaded(now);
+        else if(territory!=lastTerritory){lastTerritory=territory;settling.Loaded(now);}
         if(client.IsLoggedIn)WatchCompanion(now,territory,loading);
         if(now<nextRead)return;
         nextRead=now.AddSeconds(5);
@@ -102,6 +104,7 @@ public sealed unsafe class PrepReminderWatcher : IDisposable
             if(ui==null)return;
             var info=ui->Buddy.CompanionInfo;
             var outNow=info.Companion!=null && info.Companion->EntityId is not (0 or NoEntity);
+            settling.Seen(now,outNow);
             var held=chocobo.WantsHeld(now,outNow) && (loading || Held(now,territory));
             var sight=chocobo.Watch(now,outNow,held);
             if(sight==PrepSight.Same || sightLogs>=SightLogs)return;
@@ -126,7 +129,7 @@ public sealed unsafe class PrepReminderWatcher : IDisposable
         || condition[ConditionFlag.Swimming] || condition[ConditionFlag.Diving]
         || condition[ConditionFlag.BoundByDuty] || condition[ConditionFlag.BoundByDuty56] || condition[ConditionFlag.BoundByDuty95]
         || condition[ConditionFlag.WatchingCutscene] || condition[ConditionFlag.WatchingCutscene78] || condition[ConditionFlag.OccupiedInCutSceneEvent]
-        || now-loadedAt<Settling || MountAllowed?.Invoke(territory)==false;
+        || settling.Holds(now) || MountAllowed?.Invoke(territory)==false;
 
     private void Say(PrepNotice? notice)
     {
