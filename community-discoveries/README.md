@@ -17,14 +17,21 @@ https://creativecommons.org/publicdomain/zero/1.0/): anyone may reuse them for a
 GitHub in the plugin (the warning says so) and the issue of each player states it.
 
 The maintainer merges the gists with `python tools/discoveries-merge.py sync` (GitHub CLI needed; `--dry-run` reports only): each player's valid facts kept
-in `players/<issue>.json`, facts that do not hold refused, a player whose refusals pass 5 % flagged and left out, then the `v3/` set rebuilt from the
+in `players/<issue>.jsonl.gz`, facts that do not hold refused, a player whose refusals pass 5 % flagged and left out, then the `v3/` set rebuilt from the
 player files with `rebuild` (each player counts as one import of a fact); then the result is committed.
+**Player files (since Tensho 0.1801).** A file of `players/` keeps no exact place (`X`, `Z`) nor day (`First`, `Last`): beside the issue, they told
+where that GitHub account was on that day. It keeps what the merge needs (the fact's identity, its levels, its HQ sightings and values), compressed:
+`<issue>.jsonl.gz`, gzip of UTF-8 lines, a header `{"Format":"tensho-discoveries-player","Version":1,"Issue":n,"Login":…,"Count":n}` then one fact
+per line. `v3/` keeps, without any name, each fact's earliest exact place and its days (from `v3/` as it is, the gists read by `sync`, and the
+`players/<issue>.json` files of before, which `rebuild` writes again in the new format). The gist an issue links still holds the player's own sightings
+with their day and place, as the player shared them.
 The files reach players with the next release (they are read from `main`).
 Since Tensho 0.1210: one issue per GitHub account counts (the newest; an older one by the same author is left out); each field must have the
 plugin's type; a player counts for at most 1,000 sightings of a fact in the common histograms (the shape of theirs kept); the exact place kept is the one
 of the earliest day; a player alone far outside the other players' levels on over 5 % of the facts they share is left out and checked by hand.
-**Withdrawing.** Close your « Discoveries » issue (or ask in it): the maintainer removes `players/<issue>.json` with
-`python tools/discoveries-merge.py withdraw <issue>`, and your facts leave the common files at the next release.
+**Withdrawing.** Close your « Discoveries » issue (or ask in it): the maintainer removes `players/<issue>.jsonl.gz` with
+`python tools/discoveries-merge.py withdraw <issue>`, and your facts leave the common files at the next release (a fact other players have stays,
+with the place and days of `v3/`).
 
 **File format (version 2, since Tensho 0.916).** `{"Version":2,"Producer":…,"Written":…,"Facts":[…]}`. A fact is identified by `Kind`, `Subject`, `Detail`,
 `Territory`, `Map`, `CellX`, `CellZ`; it holds the exact first place (`X`, `Z`), the widest values seen (`LevelMin`, `LevelMax`), `Seen`, `Imported`,
@@ -63,15 +70,23 @@ https://creativecommons.org/publicdomain/zero/1.0/deed.fr) : chacun peut les rep
 GitHub dans le plugin (l'avertissement le dit) et le ticket de chaque joueur l'indique.
 
 Le mainteneur fusionne les gists avec `python tools/discoveries-merge.py sync` (GitHub CLI nécessaire ; `--dry-run` fait seulement le rapport) : les faits
-valides de chaque joueur gardés dans `players/<ticket>.json`, les faits invalides refusés, un joueur dont les refus dépassent 5 % signalé et laissé de côté,
+valides de chaque joueur gardés dans `players/<ticket>.jsonl.gz`, les faits invalides refusés, un joueur dont les refus dépassent 5 % signalé et laissé de côté,
 puis l'ensemble `v3/` reconstruit à partir des fichiers des joueurs avec `rebuild` (chaque joueur compte comme un import d'un fait) ;
 puis le résultat est enregistré dans le dépôt. Les fichiers arrivent chez les joueurs avec la release suivante (lus sur `main`).
+**Fichiers de joueur (depuis Tensho 0.1801).** Un fichier de `players/` ne garde aucun lieu exact (`X`, `Z`) ni aucun jour (`First`, `Last`) : à côté
+du ticket, ils disaient où était ce compte GitHub ce jour-là. Il garde ce que la fusion demande (l'identité du fait, ses niveaux, ses observations HQ
+et ses valeurs), compressé : `<ticket>.jsonl.gz`, gzip de lignes UTF-8, un en-tête
+`{"Format":"tensho-discoveries-player","Version":1,"Issue":n,"Login":…,"Count":n}` puis un fait par ligne. `v3/` garde, sans aucun nom, le premier
+lieu exact de chaque fait et ses jours (venus de `v3/` tel qu'il est, des gists lus par `sync` et des fichiers `players/<ticket>.json` d'avant, que
+`rebuild` réécrit au nouveau format). Le gist lié par un ticket contient toujours les observations du joueur avec leur jour et leur lieu, telles qu'il
+les a partagées.
 Depuis Tensho 0.1210 : un seul ticket par compte GitHub compte (le plus récent ; un plus ancien du même auteur est laissé de côté) ; chaque champ
 doit avoir le type du plugin ; un joueur compte pour 1 000 observations d'un fait au plus dans les histogrammes communs (la forme des siens gardée) ; le
 lieu exact gardé est celui du jour le plus ancien ; un joueur seul très loin des niveaux des autres joueurs sur plus de 5 % des faits qu'il partage avec
 eux est laissé de côté et regardé à la main.
-**Se retirer.** Fermez votre ticket « Discoveries » (ou demandez-le dedans) : le mainteneur retire `players/<ticket>.json` avec
-`python tools/discoveries-merge.py withdraw <ticket>`, et vos faits quittent les fichiers communs à la release suivante.
+**Se retirer.** Fermez votre ticket « Discoveries » (ou demandez-le dedans) : le mainteneur retire `players/<ticket>.jsonl.gz` avec
+`python tools/discoveries-merge.py withdraw <ticket>`, et vos faits quittent les fichiers communs à la release suivante (un fait que d'autres joueurs
+ont reste, avec le lieu et les jours de `v3/`).
 
 **Format du fichier (version 2, depuis Tensho 0.916).** `{"Version":2,"Producer":…,"Written":…,"Facts":[…]}`. Un fait est identifié par `Kind`, `Subject`,
 `Detail`, `Territory`, `Map`, `CellX`, `CellZ` ; il contient le premier lieu exact (`X`, `Z`), les valeurs extrêmes vues (`LevelMin`, `LevelMax`), `Seen`,

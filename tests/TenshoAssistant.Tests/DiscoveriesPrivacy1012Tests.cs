@@ -10,7 +10,8 @@ internal static class DiscoveriesPrivacy1012Tests
     [
         ("Discoveries privacy 1012: every published fact has First and Last at 00:00 UTC",() =>
         {
-            var files=Directory.GetFiles(Path.GetFullPath("community-discoveries/players"),"*.json").ToList();
+            // 0.1801 (X-772): the player files read in both formats; one of the new format holds no day at all (DiscoveryPlayers1801Tests).
+            var files=RepositoryCommon.Players();
             var facts=0;
             // X-357 (0.1349): the common facts are the lines of the v3 set (the v2 discoveries.json is gone).
             foreach(var (file,line) in RepositoryCommon.FactLines())
@@ -23,16 +24,16 @@ internal static class DiscoveriesPrivacy1012Tests
                     Check(text.EndsWith("T00:00:00+00:00",StringComparison.Ordinal),$"v3/{file} {name} {text[..10]} keeps a time");
                 }
             }
-            foreach(var file in files)
+            foreach(var (file,_,list) in files)
             {
-                using var document=JsonDocument.Parse(File.ReadAllText(file));
-                foreach(var fact in document.RootElement.GetProperty("Facts").EnumerateArray())
+                foreach(var fact in list)
                 {
                     facts++;
                     foreach(var name in new[]{"First","Last"})
                     {
-                        var text=fact.GetProperty(name).GetString()!;
-                        Check(text.EndsWith("T00:00:00+00:00",StringComparison.Ordinal),$"{Path.GetFileName(file)} {name} {text[..10]} keeps a time");
+                        if(!fact.TryGetProperty(name,out var date))continue;
+                        var text=date.GetString()!;
+                        Check(text.EndsWith("T00:00:00+00:00",StringComparison.Ordinal),$"{file} {name} {text[..10]} keeps a time");
                     }
                 }
             }
