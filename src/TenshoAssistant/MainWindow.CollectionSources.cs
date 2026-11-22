@@ -18,6 +18,8 @@ internal sealed partial class MainWindow
     private int collectionSourceRevision,collectionViewSourceRevision;
     // 0.395: blue magic list order and the wiki index revision it was sorted with.
     private int collectionViewBlueOrder,collectionViewBlueRevision;
+    // X-742 (0.1795): the blue magic list by place (a view choice, not saved).
+    private bool collectionViewBlueByPlace,blueSpellByPlace;
 
     private static bool HasSourceFilter(CollectionKind kind)=>kind is CollectionKind.Mount or CollectionKind.Companion or CollectionKind.Orchestrion;
 

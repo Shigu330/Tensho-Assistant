@@ -12,7 +12,7 @@ public static class ConfigurationReset
         "Version", "Alarms", "ReminderDone", "TreasureMapAt", "MacroChainPlan", "MapBookmarks", "PlaceDirectory", "CraftPresets", "CraftLogTargets", "GcSupplySeen", "GpRegenBase", "CollectableScrutinyGain", "CollectableIntuitionGain", "TripleTriadDeck",
         "TripleTriadDecks", "FollowedQuests", "Observations", "InventorySortProfiles", "InventorySortTemplates", "LanguageCode",
         // 0.315: saved data added since 0.258 (vessels, gear and materia plans).
-        "Voyages", "OceanSightings", "WeatherStoryZones", "GearPlans", "SRankKills", "DutyNotes", "GearPlanSets", "CollectionMemories", "LastCraftStats", "FashionOutfit", "WeatherFavorites", "GearMateria", "SubmarineUnlocked", "VesselPlans",
+        "Voyages", "OceanSightings", "WeatherStoryZones", "GearPlans", "SRankKills", "BlueSpellsWanted", "DutyNotes", "GearPlanSets", "CollectionMemories", "LastCraftStats", "FashionOutfit", "WeatherFavorites", "GearMateria", "SubmarineUnlocked", "VesselPlans",
         // X-225 (0.1719): the aetherial wheels on the company's stand, as last read.
         "AetherialWheels",
         // X-221 (0.1760): the bonus points of a manual counted per character (the player's data).
@@ -706,6 +706,8 @@ public sealed partial class Configuration
     // 0.360 (g, C-09): wishlist item ids, in the order they were added (replaced whole on every change).
     private List<uint>? wishlist;
     public List<uint>? Wishlist { get=>Volatile.Read(ref wishlist); set=>Volatile.Write(ref wishlist,value); }
+    /// <summary>X-742 (0.1795): the blue magic spells the player wants (AozAction rows), checked on the Blue magic page.</summary>
+    public List<uint>? BlueSpellsWanted { get; set; }
     // X-101 (0.1000, DEC-048): the player's price for each wish, and the sale alert (off by default).
     public Dictionary<uint,long>? WishlistPrices { get; set; }
     public bool WishlistSaleAlert { get; set; }

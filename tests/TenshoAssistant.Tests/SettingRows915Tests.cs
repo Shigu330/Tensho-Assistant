@@ -102,6 +102,8 @@ internal static class SettingRows915Tests
         // Ticks in saved lists (one entry per achievement, tune, home line or tile, reminder row), not on/off settings.
         "MainWindow.AchievementProgress.cs|tracked","MainWindow.OrchestrionPlayer.cs|favorite","MainWindow.HomeToday.cs|shown",
         "MainWindow.Reminders.cs|inBar","MainWindow.Reminders.cs|toDiscord",
+        // 0.1795 (X-742): a tick per blue magic spell in the list of spells wanted.
+        "MainWindow.Collections.cs|wanted",
         // The gathering help also saves the gathering observation, in one save rolled back together (SaveGatheringChoice).
         "MainWindow.Settings.cs|gatheringPanel",
         // 0.1222 (X-256): the same gathering help row in the guide's Panels step (one save with its observation, SaveGatheringChoice).

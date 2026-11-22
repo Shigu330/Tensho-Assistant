@@ -2450,6 +2450,16 @@
     "Location": "Reported location: {0}",
     "Learned": "Confirmed learned",
     "Copy": "Copy spell name",
+    "WantTip": "Checked: a spell you want. The spells checked and not learned yet are copied above the list, grouped by the place the game gives for learning them.",
+    "Wanted": "{0} spell(s) wanted, {1} not learned yet",
+    "CopyWanted": "Copy the spells wanted, by place",
+    "NoPlace": "Place not given by the game",
+    "ByPlace": "By place",
+    "ByPlaceTip": "Sorts the spells by the place the game gives for learning them, to learn several on one outing; the place is shown after each spell.",
+    "OpenMap": "Map",
+    "OpenMapTip": "Opens this place's map in Tensho's map (the one map the game gives for this place).",
+    "OpenDuty": "Duty",
+    "OpenDutyTip": "Opens this duty on Tensho's duties page.",
     "Close": "Close"
   },
   "OrchestrionDetails": {

@@ -121,7 +121,7 @@ internal sealed partial class MainWindow
         if(kind is CollectionKind.Mount or CollectionKind.Companion or CollectionKind.Orchestrion)
             BoolSetting("MapView.ShowCollectionMonsters","CollectionsBrowser.NearbyTip",()=>configuration.MapView.ShowCollectionMonsters,value=>configuration.MapView.ShowCollectionMonsters=value,c=>c.MapView.ShowCollectionMonsters);
         // 0.395 (user request): the blue magic list sorted by the lowest level of the monsters that teach each spell (wiki, read on opening).
-        if(blueMagic){DrawBlueSpellOrder();DrawBlueSpellNearby();}
+        if(blueMagic){DrawBlueSpellWanted(state);DrawBlueSpellOrder();DrawBlueSpellNearby();}
         var blueOrder=blueMagic ? blueSpellOrder:0;var blueRevision=blueMagic && blueSpellOrder!=0 ? BlueSpellIndex?.Revision ?? 0:0;
         var sourceFilter=HasSourceFilter(kind) ? collectionSourceFilter:-1;
         var musicCategory=kind==CollectionKind.Orchestrion ? orchestrionCategoryFilter:null;
@@ -129,8 +129,9 @@ internal sealed partial class MainWindow
         if (!ReferenceEquals(collectionViewState, state) || !ReferenceEquals(collectionViewExtra, extra) || collectionViewKind != kind
             || collectionViewFilter != collectionFilter || collectionViewQuery != collectionQuery || collectionViewMusicCategory!=musicCategory || collectionViewAchievementCategory!=achievementCategory
             || collectionViewSourceFilter!=sourceFilter || collectionViewSourceRevision!=collectionSourceRevision
-            || collectionViewBlueOrder!=blueOrder || collectionViewBlueRevision!=blueRevision)
+            || collectionViewBlueOrder!=blueOrder || collectionViewBlueRevision!=blueRevision || collectionViewBlueByPlace!=(blueMagic && blueSpellByPlace))
         {
+            collectionViewBlueByPlace=blueMagic && blueSpellByPlace;
             collectionViewBlueOrder=blueOrder;collectionViewBlueRevision=blueRevision;
             collectionViewSourceFilter=sourceFilter;collectionViewSourceRevision=collectionSourceRevision;
             collectionViewState = state; collectionViewKind = kind; collectionViewExtra = extra;
@@ -145,6 +146,8 @@ internal sealed partial class MainWindow
                 .ThenBy(entry => blueMagic || kind is CollectionKind.Ornament or CollectionKind.McGuffin or CollectionKind.Folklore ? entry.Number:kind==CollectionKind.Orchestrion ? entry.Music?.Order ?? int.MaxValue:kind==CollectionKind.Title ? entry.Title?.Order ?? int.MaxValue:kind==CollectionKind.Achievement ? entry.Achievement?.Order ?? int.MaxValue:0)
                 .ThenBy(entry => entry.Name, StringComparer.OrdinalIgnoreCase).ToArray();
             if(blueOrder!=0)collectionViewEntries=Monsters.BlueSpellSources.SortByMonsterLevel(collectionViewEntries,entry=>BlueSpellLevel(entry.Number),blueOrder);
+            // X-742 (0.1795): by place, to learn several on one outing (the level order kept within a place when chosen: a stable sort).
+            if(collectionViewBlueByPlace)collectionViewEntries=Monsters.BlueSpellPlan.ByPlace(collectionViewEntries);
             collectionViewAcquired=collectionViewEntries.Count(entry=>entry.ConfirmedUnlocked);
             collectionViewNotAcquired=collectionViewEntries.Count(entry=>entry.Acquisition==CollectionAcquisition.NotAcquired);
             collectionViewUnknown=collectionViewEntries.Count(entry=>entry.Acquisition==CollectionAcquisition.Unknown);
@@ -204,8 +207,14 @@ internal sealed partial class MainWindow
                 ImGui.SameLine();
                 if (blueMagic)
                 {
+                    // X-742 (0.1795): the spell wanted or not (the player's list, copied by place above the table).
+                    var wanted=configuration.BlueSpellsWanted?.Contains(entry.Id)==true;
+                    if(ImGui.Checkbox($"##BlueWant{entry.Id}",ref wanted)){Monsters.BlueSpellPlan.Toggle(configuration.BlueSpellsWanted??=[],entry.Id);blueWantedVersion++;save();}
+                    Tip("BlueSpell.WantTip");
+                    ImGui.SameLine();
                     var teachingLevel=BlueSpellLevel(entry.Number);
-                    if (ImGui.Selectable($"{entry.Card?.Label ?? entry.Number.ToString()} · {entry.Name}"+(teachingLevel is { } spellLevel ? " · "+localization.Format("BlueSpellSources.LevelShort",spellLevel):"")+$"##{entry.Id}"))
+                    if (ImGui.Selectable($"{entry.Card?.Label ?? entry.Number.ToString()} · {entry.Name}"+(teachingLevel is { } spellLevel ? " · "+localization.Format("BlueSpellSources.LevelShort",spellLevel):"")
+                        +(collectionViewBlueByPlace && entry.Location.Length>0 ? " · "+entry.Location:"")+$"##{entry.Id}"))
                     { selectedBlueSpell = entry.Id; openDetails = true; }
                 }
                 else if(kind==CollectionKind.Orchestrion)
@@ -261,6 +270,7 @@ internal sealed partial class MainWindow
                     ImGui.TextUnformatted(localization.Format("BlueSpell.Rank",spell.Rank));
                     ImGui.TextWrapped(spell.Description);
                     ImGui.TextWrapped(string.IsNullOrWhiteSpace(spell.Location) ? localization.Get("BlueSpell.MissingLocation") : localization.Format("BlueSpell.Location",spell.Location)+(spell.DutyLevel>0 ? " "+localization.Format("BlueSpell.DutyLevel",spell.DutyLevel):""));
+                    DrawBlueSpellPlaceLink(spell);
                     ImGui.TextColored(spell.ConfirmedUnlocked ? Success : Muted,localization.Get(spell.ConfirmedUnlocked ? "BlueSpell.Learned":"CollectionState.Unknown"));
                     CopyButton(localization.Get("BlueSpell.Copy"),()=>spell.Name);
                     DrawBlueSpellMonsters(spell.Id);

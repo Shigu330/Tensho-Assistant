@@ -152,4 +152,42 @@ internal sealed partial class MainWindow
         if(document.Monsters.Count>40)ImGui.TextDisabled(localization.Format("Events.More",document.Monsters.Count-40));
         ImGui.TextDisabled(document.Url);
     }
+
+    // X-742 (0.1795, idea I-035 chosen by the user on 21/11): the list by place, and the spells wanted, counted and copied by place
+    // (Monsters.BlueSpellPlan); the counts made again only when the collections or the list change, never each frame.
+    private (TenshoAssistant.Collections.CollectionState? State,int Version,int Wanted,int Missing) blueWantedView;
+    private int blueWantedVersion;
+
+    private void DrawBlueSpellWanted(TenshoAssistant.Collections.CollectionState state)
+    {
+        ImGui.Checkbox(localization.Get("BlueSpell.ByPlace")+"##BlueByPlace",ref blueSpellByPlace);
+        Tip("BlueSpell.ByPlaceTip");
+        if(configuration.BlueSpellsWanted is not { Count:>0 } wanted)return;
+        if(!ReferenceEquals(blueWantedView.State,state) || blueWantedView.Version!=blueWantedVersion)
+        {
+            var spells=state.Entries.Where(entry=>entry.Kind==TenshoAssistant.Collections.CollectionKind.BlueMagic && wanted.Contains(entry.Id)).ToArray();
+            blueWantedView=(state,blueWantedVersion,spells.Length,spells.Count(spell=>!spell.ConfirmedUnlocked));
+        }
+        ImGui.SameLine();
+        ImGui.TextDisabled(localization.Format("BlueSpell.Wanted",blueWantedView.Wanted,blueWantedView.Missing));
+        if(blueWantedView.Missing==0)return;
+        ImGui.SameLine();
+        CopyButton(localization.Get("BlueSpell.CopyWanted"),()=>Monsters.BlueSpellPlan.CopyText(state.Entries,wanted,localization.Get("BlueSpell.NoPlace")));
+    }
+
+    // X-742: the place's map in Tensho's map, or its duty on the duties page, only when the game's sheets name one (the reader's PlaceMap
+    // and PlaceDuty: never guessed).
+    private void DrawBlueSpellPlaceLink(TenshoAssistant.Collections.CollectionEntry spell)
+    {
+        if(spell.PlaceMap!=0)
+        {
+            if(ImGui.SmallButton(localization.Get("BlueSpell.OpenMap")+"##BlueSpellMap")){ShowMapOnTenshoMap(spell.PlaceMap);ImGui.CloseCurrentPopup();}
+            Tip("BlueSpell.OpenMapTip");
+        }
+        else if(spell.PlaceDuty!=0 && duties.State.Catalog?.Entries.FirstOrDefault(duty=>duty.DutyId==spell.PlaceDuty) is { } duty)
+        {
+            if(ImGui.SmallButton(localization.Get("BlueSpell.OpenDuty")+"##BlueSpellDuty")){dutyLoot.Select(duty);showDutyDetails=true;dutyItemQuery="";page=Page.DutyLoot;ImGui.CloseCurrentPopup();}
+            Tip("BlueSpell.OpenDutyTip");
+        }
+    }
 }

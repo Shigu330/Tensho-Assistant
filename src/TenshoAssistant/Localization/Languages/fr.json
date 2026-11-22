@@ -2450,6 +2450,16 @@
     "Location": "Lieu indiqué : {0}",
     "Learned": "Appris confirmé",
     "Copy": "Copier le nom du sort",
+    "WantTip": "Coché : un sort que vous voulez. Les sorts cochés et pas encore appris se copient au-dessus de la liste, groupés par le lieu d'apprentissage donné par le jeu.",
+    "Wanted": "{0} sort(s) voulu(s), {1} pas encore appris",
+    "CopyWanted": "Copier les sorts voulus, par lieu",
+    "NoPlace": "Lieu non donné par le jeu",
+    "ByPlace": "Par lieu",
+    "ByPlaceTip": "Trie les sorts par le lieu d'apprentissage donné par le jeu, pour en apprendre plusieurs d'une sortie ; le lieu s'affiche après chaque sort.",
+    "OpenMap": "Carte",
+    "OpenMapTip": "Ouvre la carte de ce lieu dans la carte de Tensho (la seule carte que le jeu donne pour ce lieu).",
+    "OpenDuty": "Mission",
+    "OpenDutyTip": "Ouvre cette mission dans la page des missions de Tensho.",
     "Close": "Fermer"
   },
   "OrchestrionDetails": {
