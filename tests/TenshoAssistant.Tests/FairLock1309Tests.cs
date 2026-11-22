@@ -34,15 +34,21 @@ internal static class FairLock1309Tests
 
     // A client that takes the lock again as soon as it released it, for `seconds` (or until stopped); `held` counts the times it held it.
     // Its own thread (not the pool's, which Verify keeps busy with the other tests): it starts at once.
-    private static Thread Greedy(Func<IDisposable> hold,int holdMs,int seconds,CancellationToken stop,StrongBox<int> held)
+    // 0.1796 (X-783): its exception (a lock not given within its 10 s under load) kept in `error` for the test: on a raw thread it ended the
+    // whole test process.
+    private static Thread Greedy(Func<IDisposable> hold,int holdMs,int seconds,CancellationToken stop,StrongBox<int> held,StrongBox<Exception?> error)
     {
         var thread = new Thread(() =>
         {
-            var until = Environment.TickCount64 + seconds * 1000L;
-            while (Environment.TickCount64 < until && !stop.IsCancellationRequested)
+            try
             {
-                using (hold()) { Interlocked.Increment(ref held.Value); Thread.Sleep(holdMs); }
+                var until = Environment.TickCount64 + seconds * 1000L;
+                while (Environment.TickCount64 < until && !stop.IsCancellationRequested)
+                {
+                    using (hold()) { Interlocked.Increment(ref held.Value); Thread.Sleep(holdMs); }
+                }
             }
+            catch (Exception failure) { error.Value = failure; }
         }) { IsBackground = true };
         thread.Start();
         return thread;
@@ -79,7 +85,8 @@ internal static class FairLock1309Tests
             var path = Path.Combine(root,"Profile.lock");
             using var stop = new CancellationTokenSource();
             var held = new StrongBox<int>();
-            var greedy = Greedy(() => FairFileLock.Hold(path,10_000,error => error),20,30,stop.Token,held);
+            var greedyError = new StrongBox<Exception?>();
+            var greedy = Greedy(() => FairFileLock.Hold(path,10_000,error => error),20,30,stop.Token,held,greedyError);
             Started(held);
             var rounds = new List<string>();
             var released = -1;
@@ -108,6 +115,7 @@ internal static class FairLock1309Tests
             }
             stop.Cancel();
             Check(greedy.Join(TimeSpan.FromSeconds(30)),"the greedy client stopped");
+            Check(greedyError.Value is null,"the greedy client's holds: " + greedyError.Value);
             Check(wentFirst >= 1,"the greedy client kept saving between the waiting client's turns: " + wentFirst + " of 4 (" + string.Join("; ",rounds) + ")");
             Check(Marks(root).Length == 0,"no waiting mark left: " + string.Join(", ",Marks(root)));
         })),

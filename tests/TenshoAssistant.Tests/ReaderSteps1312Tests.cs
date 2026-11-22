@@ -23,9 +23,11 @@ internal static class ReaderSteps1312Tests
         ("Reader steps 1312: no step named, or steps named on another thread: nothing said",() =>
         {
             CompetitiveGate.StepsStart();
-            var other = new Thread(() => { Thread.Sleep(30); CompetitiveGate.Step("other thread"); });
+            Exception? kept = null;   // 0.1796 (X-783): kept for the test, never left to end the test process
+            var other = new Thread(() => { try { Thread.Sleep(30); CompetitiveGate.Step("other thread"); } catch (Exception error) { kept = error; } });
             other.Start();
             other.Join();
+            Check(kept is null,"the other thread: " + kept);
             Check(CompetitiveGate.StepsEnd() == "","another thread's step is not this pass's");
         }),
         ("Reader steps 1312: wiring: the gate starts and ends the steps around each measured reader; the item watcher names its steps",() =>
