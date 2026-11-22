@@ -42,7 +42,8 @@ internal static class ReviewMinor1302Tests
                 Check(warnings.Count == 0, "no write failed: " + string.Join("; ", warnings));
                 var saved = BeastTeams.Read(File.ReadAllText(file));
                 Check(saved?.Ranks?[1] == 3, "the last plans asked are on disk, in order");
-                Check(Directory.GetFiles(folder).Length == 1, "no temporary file left");
+                // X-833: the plans are kept: the file and the version before the last write (.bak), no temporary file.
+                Check(Directory.GetFiles(folder, "*.tmp").Length == 0 && Directory.GetFiles(folder).Select(Path.GetFileName).Order().SequenceEqual(["BeastTeams.json", "BeastTeams.json.bak"]), "no temporary file left");
             }
             finally { try { Directory.Delete(folder, true); } catch (IOException) { } }
         }),

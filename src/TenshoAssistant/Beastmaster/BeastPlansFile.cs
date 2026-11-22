@@ -27,8 +27,10 @@ public sealed class BeastPlansFile
         Exception error;
         try
         {
-            if(!File.Exists(file)){Blocked=false;return null;}
-            var plans=BeastTeams.Read(File.ReadAllText(file)) ?? throw new InvalidDataException("Beast team plans unreadable.");
+            if(!File.Exists(file) && !File.Exists(AtomicFile.BackupOf(file))){Blocked=false;return null;}
+            // X-833: the file, or its previous version (« .bak ») when it is missing or does not read; the damaged file kept aside.
+            var plans=AtomicFile.ReadKept(file,path=>BeastTeams.Read(File.ReadAllText(path)) ?? throw new InvalidDataException("Beast team plans unreadable."),
+                (aside,error)=>{if(aside!=file){SetAside=aside;broken?.Invoke(aside,error);}},now);
             Blocked=false;
             return plans;
         }

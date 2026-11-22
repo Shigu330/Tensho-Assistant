@@ -549,7 +549,7 @@ public static class BeastTeams
     public static void SaveLater(BackgroundWriter writer, string file, SavedPlans plans)
     {
         var text = Write(plans);
-        writer.Enqueue("Beast team plans could not be saved.", () => AtomicFile.Write(file, text));
+        writer.Enqueue("Beast team plans could not be saved.", () => AtomicFile.Write(file, text, keep: true));
     }
     public static SavedPlans? Read(string text)
     {

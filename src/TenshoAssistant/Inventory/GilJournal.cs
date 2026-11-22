@@ -164,8 +164,10 @@ public static class GilJournal
     private static readonly JsonSerializerOptions Json=TenshoJson.Own(new(){MaxDepth=8});
     private sealed record FileDto(int Schema,GilEntry[] Entries);
 
-    /// <summary>Reads a journal file (a missing file is an empty journal; a bad one throws, so it is never overwritten by mistake).</summary>
-    public static List<GilEntry> Read(string path)
+    /// <summary>Reads a journal file (a missing file is an empty journal; a bad one throws, so it is never overwritten by mistake). X-833: or its previous version (« .bak ») when it is missing or does not read (AtomicFile.ReadKept).</summary>
+    public static List<GilEntry> Read(string path)=>AtomicFile.ReadKept(path,ReadFile);
+
+    private static List<GilEntry> ReadFile(string path)
     {
         if(!File.Exists(path))return [];
         var info=new FileInfo(path);
@@ -178,6 +180,6 @@ public static class GilJournal
     /// <summary>Writes a journal file through a temporary file (a crash never leaves half a file).</summary>
     public static void Write(string path,IReadOnlyList<GilEntry> entries)
     {
-        AtomicFile.Write(path,JsonSerializer.SerializeToUtf8Bytes(new FileDto(1,entries.ToArray()),Json));
+        AtomicFile.Write(path,JsonSerializer.SerializeToUtf8Bytes(new FileDto(1,entries.ToArray()),Json),keep:true);
     }
 }

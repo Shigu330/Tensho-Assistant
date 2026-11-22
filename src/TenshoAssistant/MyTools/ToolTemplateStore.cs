@@ -55,10 +55,9 @@ public sealed class ToolTemplateStore:IDisposable
         this.path=path;this.warn=warn;ReadOnly=readOnly;
         try
         {
-            if(!File.Exists(path))return;
-            if(new FileInfo(path).Length>8*1024*1024)throw new InvalidDataException("My tools file too large.");
-            var dto=JsonSerializer.Deserialize<FileDto>(File.ReadAllBytes(path),Options) ?? throw new InvalidDataException("Empty my tools file.");
-            if(dto.Schema!=1 || dto.Tools is null)throw new InvalidDataException("Unknown my tools schema.");
+            // X-833: the file, or its previous version (« .bak ») when it is missing or does not read.
+            if(!File.Exists(path) && !File.Exists(AtomicFile.BackupOf(path)))return;
+            var dto=AtomicFile.ReadKept(path,ReadFile,(aside,error)=>warn(error,$"My tools did not read; their previous version (.bak) was read, the damaged file kept as {Path.GetFileName(aside)}."));
             foreach(var saved in dto.Tools.Take(MaxTools))
             {
                 if(saved?.Json is not null && ToolTemplateFormat.Parse(saved.Json).Template is { } template && tools.All(tool=>tool.Template.Id!=template.Id))
@@ -68,6 +67,13 @@ public sealed class ToolTemplateStore:IDisposable
         }
         catch(Exception error) when(error is IOException or UnauthorizedAccessException or JsonException or InvalidDataException or NotSupportedException)
         {Unavailable=true;tools=[];warn(error,"My tools could not be read; the file is left as it is.");}
+    }
+    private static FileDto ReadFile(string file)
+    {
+        if(new FileInfo(file).Length>8*1024*1024)throw new InvalidDataException("My tools file too large.");
+        var dto=JsonSerializer.Deserialize<FileDto>(File.ReadAllBytes(file),Options) ?? throw new InvalidDataException("Empty my tools file.");
+        if(dto.Schema!=1 || dto.Tools is null)throw new InvalidDataException("Unknown my tools schema.");
+        return dto;
     }
     /// <summary>Adds a tool, or replaces the one with its id. Its progress stays only if the file is the same. False when the store is unavailable, read-only or full.</summary>
     public bool Install(ToolTemplate template,string json)
@@ -123,7 +129,7 @@ public sealed class ToolTemplateStore:IDisposable
     {
         try
         {
-            AtomicFile.Write(path,JsonSerializer.SerializeToUtf8Bytes(snapshot,Options));
+            AtomicFile.Write(path,JsonSerializer.SerializeToUtf8Bytes(snapshot,Options),keep:true);
         }
         catch(Exception error) when(error is IOException or UnauthorizedAccessException){warn(error,"My tools could not be saved.");}
     }

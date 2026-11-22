@@ -40,7 +40,9 @@ public sealed unsafe class DutyProgressReader : IDisposable
         this.framework=framework;this.client=client;this.unlocks=unlocks;this.data=data;this.log=log;this.catalog=catalog;this.player=player;this.file=file;
         writer=new((error,what)=>log.Warning(error,"{0}",what));
         // 0.997 (review): a file that does not read (another shape, damaged) is kept as is: nothing is written over it.
-        try{if(file is not null && File.Exists(file)){if(DutyProgress.Read(File.ReadAllText(file)) is { } read){saved=read.All;lastCharacter=read.Last;}else{log.Warning("Saved duty progress unreadable: kept as is, not written over.");this.file=null;}}}
+        // X-833: the file, or its previous version (« .bak ») when it is missing or does not read; the damaged file kept aside.
+        try{if(file is not null && (File.Exists(file) || File.Exists(AtomicFile.BackupOf(file)))){var read=AtomicFile.ReadKept(file,path=>DutyProgress.Read(File.ReadAllText(path)) ?? throw new InvalidDataException("Saved duty progress unreadable."),
+            (aside,error)=>log.Warning(error,"Saved duty progress did not read; its previous version (.bak) was read, the damaged file kept as {0}.",Path.GetFileName(aside)));saved=read.All;lastCharacter=read.Last;}}
         catch(Exception error){log.Warning(error,"Saved duty progress unreadable: kept as is, not written over.");this.file=null;}
         if(saved.TryGetValue(lastCharacter,out var last))state=new(last.ByInstance,last.ReadAt,true);
         TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
@@ -85,7 +87,7 @@ public sealed unsafe class DutyProgressReader : IDisposable
                 var changed=!saved.TryGetValue(who.ContentId,out var before) || before.ByInstance.Count!=building.Count || building.Any(pair=>before.ByInstance.GetValueOrDefault(pair.Key)!=pair.Value);
                 lastCharacter=who.ContentId;
                 saved[who.ContentId]=new(new(building),now);
-                if(changed){var text=DutyProgress.Write(saved,lastCharacter);var path=file;writer.Enqueue("Duty progress could not be saved.",()=>AtomicFile.Write(path,text));}
+                if(changed){var text=DutyProgress.Write(saved,lastCharacter);var path=file;writer.Enqueue("Duty progress could not be saved.",()=>AtomicFile.Write(path,text,keep:true));}
             }
             building=[];pending=null;nextRead=now.AddSeconds(5);Unavailable=false;warned=false;
         }

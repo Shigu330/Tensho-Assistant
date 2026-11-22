@@ -71,7 +71,10 @@ public static class CraftLists
         return needs;
     }
 
-    public static IReadOnlyList<CraftList> Read(string path)
+    /// <summary>X-833: the file, or its previous version (« .bak ») when it is missing or does not read (AtomicFile.ReadKept).</summary>
+    public static IReadOnlyList<CraftList> Read(string path,Action<string,Exception>? recovered=null)=>AtomicFile.ReadKept(path,ReadFile,recovered);
+
+    private static IReadOnlyList<CraftList> ReadFile(string path)
     {
         if(!File.Exists(path))return [];
         if(new FileInfo(path).Length>2*1024*1024)throw new InvalidDataException("Crafting lists file too large.");
@@ -83,7 +86,7 @@ public static class CraftLists
 
     public static void Write(string path,IReadOnlyList<CraftList> lists)
     {
-        AtomicFile.Write(path,JsonSerializer.SerializeToUtf8Bytes(new FileDto(1,lists.Take(MaxLists).ToArray()),Json));
+        AtomicFile.Write(path,JsonSerializer.SerializeToUtf8Bytes(new FileDto(1,lists.Take(MaxLists).ToArray()),Json),keep:true);
     }
 }
 
@@ -113,7 +116,7 @@ public sealed class CraftListStore(string path,Action<Exception,string> warn,boo
     private void Load()
     {
         if(lists is not null)return;
-        try{lists=CraftLists.Read(path).ToList();}
+        try{lists=CraftLists.Read(path,(aside,error)=>warn(error,$"Crafting lists did not read; their previous version (.bak) was read, the damaged file kept as {Path.GetFileName(aside)}.")).ToList();}
         catch(Exception error){lists=[];failed=true;warn(error,"Crafting lists could not be read; the file is not written over.");}
     }
 }

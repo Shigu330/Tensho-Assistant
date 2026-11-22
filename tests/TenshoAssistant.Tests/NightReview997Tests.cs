@@ -16,7 +16,10 @@ internal static class NightReview997Tests
             var duties=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Duties.cs"));
             Check(duties.Contains("if (progress is null) ImGui.TextDisabled(localization.Get(DutyProgressUnavailable"),"duty line");
             Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Collections/AchievementProgressWatcher.Dalamud.cs")).Contains("else{saveBlocked=true;log.Warning(read.Exception?.GetBaseException(),\"Saved achievement progress unreadable: kept as is, not written over.\");}"),"achievements kept (0.1140: read off the frame)");
-            Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Duties/DutyProgressReader.Dalamud.cs")).Contains("else{log.Warning(\"Saved duty progress unreadable: kept as is, not written over.\");this.file=null;}"),"duties kept");
+            // X-833: the duty progress read through AtomicFile.ReadKept (its .bak when the file does not read); neither readable: kept, not written over.
+            var dutyReader=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Duties/DutyProgressReader.Dalamud.cs"));
+            Check(dutyReader.Contains("var read=AtomicFile.ReadKept(file,path=>DutyProgress.Read(File.ReadAllText(path)) ?? throw new InvalidDataException(\"Saved duty progress unreadable.\")")
+                && dutyReader.Contains("catch(Exception error){log.Warning(error,\"Saved duty progress unreadable: kept as is, not written over.\");this.file=null;}"),"duties kept");
             Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Reminders/GardenChatWatcher.Dalamud.cs")).Contains("if(GardenHarvests.IsNew(at,lastHarvest,slot,lastHarvestSlot))") && File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Reminders/GardenChat.cs")).Contains("SameHarvest=TimeSpan.FromSeconds(5)"),"one harvest");
             Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Garden.cs")).Contains("if(ripe.Length==0){ChatNotice?.Invoke(localization.Get(\"Garden.HarvestNoneRipe\"));return;}"),"ripe only");
         }),

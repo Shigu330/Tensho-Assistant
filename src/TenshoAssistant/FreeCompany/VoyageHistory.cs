@@ -71,8 +71,10 @@ public static class VoyageHistory
     private static readonly JsonSerializerOptions Json=TenshoJson.Own(new(){MaxDepth=8});
     private sealed record FileDto(int Schema,VoyageRecord[] Records);
 
-    /// <summary>Reads the history file (missing = empty; a bad one throws, so it is never overwritten by mistake).</summary>
-    public static List<VoyageRecord> Read(string path)
+    /// <summary>Reads the history file (missing = empty; a bad one throws, so it is never overwritten by mistake). X-833: or its previous version (« .bak ») when it is missing or does not read (AtomicFile.ReadKept).</summary>
+    public static List<VoyageRecord> Read(string path)=>AtomicFile.ReadKept(path,ReadFile);
+
+    private static List<VoyageRecord> ReadFile(string path)
     {
         if(!File.Exists(path))return [];
         if(new FileInfo(path).Length>16*1024*1024)throw new InvalidDataException("Voyage history too large.");
@@ -84,7 +86,7 @@ public static class VoyageHistory
     /// <summary>Writes the history through a temporary file.</summary>
     public static void Write(string path,IReadOnlyList<VoyageRecord> records)
     {
-        AtomicFile.Write(path,JsonSerializer.SerializeToUtf8Bytes(new FileDto(1,records.ToArray()),Json));
+        AtomicFile.Write(path,JsonSerializer.SerializeToUtf8Bytes(new FileDto(1,records.ToArray()),Json),keep:true);
     }
 }
 

@@ -129,6 +129,17 @@ internal static class MyToolsTests
                 third.Install(template,json);third.FlushAsync().Wait();
                 Check(File.ReadAllText(path).Contains("bad"),"and kept in the file");
             }
+            // X-833: a damaged file with its previous version (.bak) beside it: that version is read, the damaged file kept aside; without one,
+            // as before: unavailable, never written over.
+            var bytes=File.ReadAllBytes(path+".bak");
+            File.WriteAllText(path,"not json");
+            using(var recovered=new ToolTemplateStore(path,(_,_)=>{}))
+            {
+                var aside=Directory.GetFiles(Path.GetDirectoryName(path)!,Path.GetFileName(path)+".broken-*");
+                Check(!recovered.Unavailable && recovered.Tools.Count+recovered.RefusedCount>0 && aside.Length==1 && File.ReadAllText(aside[0])=="not json","X-833: the previous version read, the damaged file kept aside");
+                Check(File.ReadAllBytes(path+".bak").SequenceEqual(bytes),"X-833: the .bak read as it is");
+            }
+            File.Delete(path+".bak");
             File.WriteAllText(path,"not json");
             using(var broken=new ToolTemplateStore(path,(_,_)=>{}))
             {

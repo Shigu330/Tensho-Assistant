@@ -33,7 +33,17 @@ internal static class CraftLists433Tests
                 Check(store.Lists.Count==0 && store.Set(0,new("Gear",[new(10,5)])) && store.Set(1,new("Food",[])),"created");
                 var again=new CraftListStore(path,(_,_)=>{});
                 Check(again.Lists.Select(list=>list.Name).SequenceEqual(["Gear","Food"]) && again.Lists[0].Entries.Single()==new CraftListEntry(10,5),"round trip");
+                // X-833: a file damaged (a power cut after a save) with its previous version (.bak) beside it: that version is read, the
+                // damaged file moved aside, its text kept; without a .bak, as before: unavailable, never written over.
                 File.WriteAllText(path,"{ not json");
+                var said=new List<string>();
+                var recovered=new CraftListStore(path,(_,message)=>said.Add(message));
+                _=recovered.Lists;   // read on first use
+                var aside=Directory.GetFiles(folder,"CraftLists.json.broken-*");
+                Check(!recovered.Unavailable && recovered.Lists.Select(list=>list.Name).SequenceEqual(["Gear"]) && aside.Length==1 && File.ReadAllText(aside[0])=="{ not json"
+                    && said.Single().Contains("previous version (.bak) was read",StringComparison.Ordinal),"X-833: the previous version read, the damaged file kept aside");
+                Check(recovered.Set(1,new("Food",[])) && new CraftListStore(path,(_,_)=>{}).Lists.Count==2,"X-833: written again once recovered");
+                File.Delete(path+".bak");File.WriteAllText(path,"{ not json");
                 var broken=new CraftListStore(path,(_,_)=>{});
                 Check(broken.Unavailable && !broken.Set(0,new("X",[])) && File.ReadAllText(path)=="{ not json","not written over");
             }
