@@ -399,6 +399,8 @@ internal sealed partial class MainWindow
                 ? localization.Format("HoverUi.NpcSaleStack",sold.SellPrice.ToString("N0",Numbers),count,(sold.SellPrice*(long)count).ToString("N0",Numbers))
                 :localization.Format("HoverUi.NpcSale",sold.SellPrice.ToString("N0",Numbers)));
         }
+        // X-797 (0.1810): what an NPC sells it for (the lowest gil shop, normal quality); nothing when no NPC sells it.
+        if(npcVendors?.State.Catalog?.GilPrice(id) is { } npcBuy)ImGui.TextDisabled(localization.Format("HoverUi.NpcBuy",npcBuy.ToString("N0",Numbers)));
         if(!hoverPanel || configuration.HoverShowUsages)MeasureMap("hover usages",()=>DrawHoveredUsages(id));
         // X-197 (0.1761): the item's desynthesis against your level; what a coffer holds that a collection tracks.
         if(!hoverPanel || configuration.HoverShowDesynth)DrawItemDesynth(id);
@@ -499,6 +501,9 @@ internal sealed partial class MainWindow
             // X-207 (0.1782): the NPC's price against the market's, advice only (the item's quality; nothing when either is unknown).
             if(itemCatalog.State.Catalog?.Find(hovered.ItemId) is { SellPrice:>0 } npcSold && Inventory.StockValue.MarketOverNpc(npcSold.SellPrice,Inventory.StockValue.FromQuote(prices,hovered.Hq)?.Unit) is { } ratio)
                 ImGui.TextColored(ratio>=1 ? Success:Warning,ratio>=1 ? localization.Format("HoverUi.MarketOverNpc",ratio.ToString(ratio>=10 ? "N0":"0.#",Numbers)):localization.Get("HoverUi.NpcOverMarket"));
+            // X-797 (0.1810): the market against buying from an NPC (normal quality, as the NPC sells it): the difference a piece.
+            if(Inventory.StockValue.MarketOverNpcBuy(npcVendors?.State.Catalog?.GilPrice(hovered.ItemId),Inventory.StockValue.FromQuote(prices,false)?.Unit) is { } gap and not 0)
+                ImGui.TextColored(gap>0 ? Success:Muted,localization.Format(gap>0 ? "HoverUi.NpcBuyCheaper":"HoverUi.MarketBelowNpcBuy",Math.Abs(gap).ToString("N0",Numbers)));
             // X-292 (0.1291): the world's lines say where they come from: Universalis' upload, or the look at the game's board when newer.
             ImGui.TextDisabled(prices.UploadedAt is { } date ? localization.Format(prices.SeenAtBoard ? "HoverUi.SeenAtBoard":"HoverUi.Uploaded",date.ToLocalTime().ToString("g")):localization.Get("HoverUi.UnknownDate"));
             if(!prices.HasRecentUpload(now))StateLine(UI.UiState.Stale,localization.Get("HoverUi.Old"));

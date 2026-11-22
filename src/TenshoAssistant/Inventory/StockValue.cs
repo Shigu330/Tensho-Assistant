@@ -20,7 +20,8 @@ public sealed record StockValueLine(string Place,long Value,int Priced,int Unpri
 /// of the last and the average sale), <paramref name="PerDay"/> the units sold a day, <paramref name="PerDayGil"/> sold price × sales a
 /// day (what the market moves of it each day), <paramref name="NpcPrice"/> what an NPC pays for one (0: none known).
 /// </summary>
-public sealed record StockSleeper(uint ItemId,bool Hq,long Quantity,IReadOnlyList<string> Places,long Sold,decimal PerDay,long PerDayGil,uint NpcPrice);
+/// <param name="NpcBuy">X-797 (0.1810): the lowest price an NPC sells one piece for, in gil (normal quality); null when no NPC sells it.</param>
+public sealed record StockSleeper(uint ItemId,bool Hq,long Quantity,IReadOnlyList<string> Places,long Sold,decimal PerDay,long PerDayGil,uint NpcPrice,uint? NpcBuy=null);
 
 /// <summary>
 /// X-207 (the user's request of 12/11, the comparison with other plugins K-14): the estimated value of the stocks, per storage and per
@@ -85,7 +86,7 @@ public static class StockValue
     /// sold price or speed is not known is counted apart (<c>Unknown</c>), never taken as 0 (R06). Advice only.
     /// </summary>
     public static (IReadOnlyList<StockSleeper> Lines,int Unknown) Sleepers(IEnumerable<(string Place,InventoryStack Stack)> stacks,Func<uint,bool> marketable,
-        Func<uint,bool,(decimal Price,decimal? PerDay)?> sold,Func<uint,uint> npcPrice,int most)
+        Func<uint,bool,(decimal Price,decimal? PerDay)?> sold,Func<uint,uint> npcPrice,int most,Func<uint,uint?>? npcBuy=null)
     {
         var held=new Dictionary<(uint Id,bool Hq),(long Quantity,List<string> Places)>();
         foreach(var (place,stack) in stacks)
@@ -101,7 +102,7 @@ public static class StockValue
         {
             if(sold(id,hq) is not { Price:>0 } price || price.PerDay is not { } perDay){unknown++;continue;}
             if(perDay<=0)continue;
-            lines.Add(new(id,hq,quantity,places,(long)Math.Round(price.Price),perDay,(long)Math.Round(price.Price*perDay),npcPrice(id)));
+            lines.Add(new(id,hq,quantity,places,(long)Math.Round(price.Price),perDay,(long)Math.Round(price.Price*perDay),npcPrice(id),npcBuy?.Invoke(id)));
         }
         return ([..lines.OrderByDescending(line=>line.PerDayGil).ThenByDescending(line=>line.Sold).ThenBy(line=>line.ItemId).ThenBy(line=>line.Hq).Take(Math.Max(0,most))],unknown);
     }
@@ -111,4 +112,11 @@ public static class StockValue
     /// pays more (&lt; 1.0); null when either price is unknown or 0.
     /// </summary>
     public static double? MarketOverNpc(uint npcPrice,long? marketUnit)=>npcPrice>0 && marketUnit is > 0 and var unit ? (double)unit/npcPrice:null;
+
+    /// <summary>
+    /// X-797 (0.1810, the user's test of 22/11: dark matter at 400 gil on the market, 120 gil at an NPC): the market's price of one piece less
+    /// the NPC's selling price (buying from an NPC): above 0, the NPC is that much cheaper; below 0, the market is; null when either is unknown
+    /// or 0. The NPC sells normal quality: compared with the market's normal quality.
+    /// </summary>
+    public static long? MarketOverNpcBuy(uint? npcBuy,long? marketUnit)=>npcBuy is > 0 and var buy && marketUnit is > 0 and var unit ? unit-buy:null;
 }

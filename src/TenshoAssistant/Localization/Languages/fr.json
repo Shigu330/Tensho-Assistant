@@ -3900,8 +3900,11 @@
     "ExpansionBoth": "Extension (d'après ses lieux de récolte et les quêtes qui le donnent) : {0}",
     "NpcSale": "Vente au PNJ (NQ) : {0} gils l'unité",
     "NpcSaleStack": "Vente au PNJ (NQ) : {0} gils l'unité, pile de {1} : {2} gils",
-    "MarketOverNpc": "Le marché paie {0} fois le prix du PNJ.",
-    "NpcOverMarket": "Le PNJ paie plus que le marché.",
+    "MarketOverNpc": "Le marché paie {0} fois le prix de vente au PNJ.",
+    "NpcOverMarket": "La vente au PNJ rapporte plus que le marché.",
+    "NpcBuy": "Vendu par les PNJ : {0} gils.",
+    "NpcBuyCheaper": "Moins cher chez un PNJ que sur le marché : {0} gils de moins l'unité.",
+    "MarketBelowNpcBuy": "Moins cher sur le marché que chez un PNJ : {0} gils de moins l'unité.",
     "SameLookHeld": "Même apparence déjà détenue : {0}",
     "SameLookMore": "et {0} de plus",
     "SameLookNone": "Aucune pièce de même apparence dans vos rangements lus.",
@@ -8449,7 +8452,8 @@
     "ColumnSold": "Vendu (gils)",
     "ColumnPerDay": "Ventes par jour",
     "ColumnPerDayGil": "Gils par jour",
-    "ColumnNpc": "PNJ (gils)"
+    "ColumnNpc": "Vente au PNJ (gils)",
+    "ColumnNpcBuy": "Achat au PNJ (gils)"
   },
   "Island": {
     "TabWorkshop": "Atelier",

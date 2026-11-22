@@ -3900,8 +3900,11 @@
     "ExpansionBoth": "Expansion (from where it is gathered and the quests giving it): {0}",
     "NpcSale": "NPC sale (NQ): {0} gil each",
     "NpcSaleStack": "NPC sale (NQ): {0} gil each, stack of {1}: {2} gil",
-    "MarketOverNpc": "The market pays {0}× the NPC's price.",
-    "NpcOverMarket": "The NPC pays more than the market.",
+    "MarketOverNpc": "The market pays {0}× what an NPC gives you for it.",
+    "NpcOverMarket": "Selling it to an NPC pays more than the market.",
+    "NpcBuy": "Sold by NPCs: {0} gil.",
+    "NpcBuyCheaper": "Cheaper from an NPC than on the market: {0} gil less a piece.",
+    "MarketBelowNpcBuy": "Cheaper on the market than from an NPC: {0} gil less a piece.",
     "SameLookHeld": "Same look held: {0}",
     "SameLookMore": "and {0} more",
     "SameLookNone": "No piece of the same look in your storages read.",
@@ -8449,7 +8452,8 @@
     "ColumnSold": "Sold (gil)",
     "ColumnPerDay": "Sales a day",
     "ColumnPerDayGil": "Gil a day",
-    "ColumnNpc": "NPC (gil)"
+    "ColumnNpc": "Sell to NPC (gil)",
+    "ColumnNpcBuy": "Buy from NPC (gil)"
   },
   "Island": {
     "TabWorkshop": "Workshop",
