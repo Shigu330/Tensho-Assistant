@@ -788,6 +788,7 @@ internal sealed partial class MainWindow
                         : string.Join(localization.Get("BeastUi.SpaceOr"), space.Options.Select(option => Placed(option.Kind, option.Places))))
                     : Placed(space.Kind, space.Places);
                 ImGui.TextColored(space.Kind == BeastSpaces.Campsite ? Accent : Text, $"{Step(space.Step)} · {text}");
+                if (space.Kind is BeastSpaces.Shop or BeastSpaces.Treasure) { DrawBeastSpaceAdvice(space.Kind, catalog); continue; }
                 if (BeastSpaces.CampsitePlaces(space) is not (var places and > 0)) continue;
                 ImGui.Indent();
                 try
@@ -812,12 +813,31 @@ internal sealed partial class MainWindow
             foreach (var id in BeastTeams.BookOrder(beasts))
             {
                 if (Of(id) is not { } beast) continue;
-                var feeds = catalog.Items.Count(item => BeastItems.UsableBy(item, beast.FamilyId));
-                ImGui.TextUnformatted(beast.Satiety > 0 ? localization.Format("BeastUi.FeedLine", beast.Name, beast.Family, satiety, beast.Satiety, feeds)
-                    : localization.Format("BeastUi.FeedLineUnread", beast.Name, beast.Family, satiety, feeds));
+                // X-771 (0.1773): M2 the bestiary's satiety when its page was read, else the column « to confirm »; M3 the feeds by name.
+                var feeds = BeastSpaces.Feeds(catalog.Items, beast.FamilyId) is { Count: > 0 } names ? string.Join(", ", names) : localization.Get("BeastUi.FeedNone");
+                var (value, fromBook) = BeastSpaces.SatietyOf(beast, beastPlans?.Book);
+                ImGui.TextWrapped(value <= 0 ? localization.Format("BeastUi.FeedLineUnread", beast.Name, beast.Family, satiety, feeds)
+                    : localization.Format(fromBook ? "BeastUi.FeedLine" : "BeastUi.FeedLineToConfirm", beast.Name, beast.Family, satiety, value, feeds));
             }
         }
         finally { ImGui.TreePop(); }
+    }
+
+    /// <summary>
+    /// X-771 M3 (0.1773): under a shop or a treasure space, what the game's guide says of it (DescriptionString 1736 and 1737, its text on
+    /// hover): a shop's wares are not in any game file (none of the XBM sheets lists them), so the panel points to the team's feeds below; a
+    /// treasure coffer gives one ephemeral item to choose, two with the thief's knife (XBMItem 57). Display only (R03.3).
+    /// </summary>
+    private void DrawBeastSpaceAdvice(int kind, BeastCatalog catalog)
+    {
+        ImGui.Indent();
+        try
+        {
+            var knife = catalog.Items.FirstOrDefault(item => item.Row == BeastSpaces.ThiefKnife)?.Name is { Length: > 0 } name ? name : localization.Get("BeastUi.ThiefKnife");
+            ImGui.TextDisabled(kind == BeastSpaces.Shop ? localization.Get("BeastUi.ShopAdvice") : localization.Format("BeastUi.TreasureAdvice", knife));
+            if (catalog.Rules.FirstOrDefault(rule => rule.Key == (kind == BeastSpaces.Shop ? "Shop" : "Treasure")) is { } rule) TipText(() => rule.Text);
+        }
+        finally { ImGui.Unindent(); }
     }
 
     /// <summary>

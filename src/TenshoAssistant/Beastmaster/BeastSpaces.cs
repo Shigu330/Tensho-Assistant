@@ -31,6 +31,8 @@ public static class BeastSpaces
 
     /// <summary>The Crucible item that revives an incapacitated familiar (XBMItem 96: « Ranime une bête hors de combat. »).</summary>
     public const uint ReviveItem = 96;
+    /// <summary>X-771 M3 (0.1773): XBMItem 57 « Dague de voleur » / « Thief's Knife »: two items from a treasure coffer instead of one (the game's guide, DescriptionString 1737; Addon 17623).</summary>
+    public const uint ThiefKnife = 57;
 
     /// <summary>The column count of each sheet read; another count means the game changed it: no space is read then (R08).</summary>
     public static readonly IReadOnlyDictionary<string, int> Columns = new Dictionary<string, int>
@@ -105,6 +107,20 @@ public static class BeastSpaces
             && int.TryParse(text[1..^1], System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out var rank) && rank > 0).ToArray();
         return own is [var at] && at >= 16 ? SatietyShown(texts[at - 16]) : 0;
     }
+
+    /// <summary>
+    /// X-771 M2 (0.1773): the satiety the panel shows: the one the bestiary's page showed in game when it was read (the game's own number,
+    /// kept with the page), else XBMPet column 3, taken as satiety on one reading only and shown « to confirm » (R06); 0 when neither.
+    /// </summary>
+    public static (int Value, bool FromBook) SatietyOf(Beast beast, IReadOnlyDictionary<uint, BeastTeams.BookRead>? book)
+        => book is not null && book.TryGetValue(beast.Id, out var page) && page.Satiety > 0 ? (page.Satiety, true) : (beast.Satiety, false);
+
+    /// <summary>
+    /// X-771 M3 (0.1773): the names of the feeds a familiar's family can eat (those whose description in the game names the family), in the
+    /// catalog's order, so the panel says which ones to look for at a shop rather than only how many there are.
+    /// </summary>
+    public static IReadOnlyList<string> Feeds(IEnumerable<BeastItem> items, int family)
+        => family > 0 ? items.Where(item => BeastItems.UsableBy(item, family)).Select(item => item.Name).Where(name => name.Length > 0).Distinct().ToArray() : [];
 
     /// <summary>The satiety the bestiary's page shows, « 0/3 » → 3 (its second number); 0 when not of that shape.</summary>
     public static int SatietyShown(string text) => text.Split('/') is [var now, var most]

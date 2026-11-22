@@ -45,7 +45,8 @@ internal static class BeastResultRewards1771Tests
             Check(BeastResults.Rewards(Values(Board1112, (58, 1)), Icon) is null, "the row always 0 not 0");
             Check(BeastResults.Rewards(Values(Board1112, (63, 0)), Icon) is null && BeastResults.Rewards(Values(Board1112, (63, 1000)), Icon) is null, "a count of 0 or over 999");
             Check(BeastResults.Rewards(Values(Board1112, (47, 2)), Icon) is null, "a second reward announced but empty");
-            Check(BeastResults.Rewards(Values(Board1112, (47, 2), (49, 9), (54, 60009), (64, 3)), Icon) is [{ Item: 51734 }, { Item: 9, Count: 3 }], "two rewards, each checked");
+            // X-771 M1 (0.1773): two rewards, a layout never seen, are refused whole even when each slot would fit.
+            Check(BeastResults.Rewards(Values(Board1112, (47, 2), (49, 9), (54, 60009), (64, 3)), Icon) is null, "two rewards: a layout never seen, not read");
             var refused = BeastResults.Parse(Values(Board1112, (53, 1)), Beasts(), DateTimeOffset.UnixEpoch, Icon);
             Check(refused is { Score: 7550 } && refused.Rewards is null, "the rewards refused, the score and the beasts kept");
         }),

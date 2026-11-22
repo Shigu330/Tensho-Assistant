@@ -42,7 +42,9 @@ public static class BeastResults
     private const int BonusSum = 13, BonusCount = 14, BonusList = 31, BonusSlots = 16, Total = 68;
     // X-135 (0.1771, docs/evidence/0.1771-beast-result-rewards.md): the rewards: their number at 47, then four rows of five slots before the
     // total (68): 48 the Item row, 53 its icon, 58 always 0 on the two boards recorded, 63 the count (4 and 5 on the two boards).
-    private const int RewardCount = 47, RewardItems = 48, RewardIcons = 53, RewardZero = 58, RewardCounts = 63, RewardSlots = 5, MaxRewardCount = 999;
+    // X-771 M1 (0.1773): only one reward was ever seen; two to five would put each one's numbers one slot further in each row, a layout never
+    // recorded: refused whole until a reading shows it (the log keeps the numbers 47 to 67 of every result to learn it).
+    private const int RewardCount = 47, RewardItems = 48, RewardIcons = 53, RewardZero = 58, RewardCounts = 63, RewardsSeen = 1, MaxRewardCount = 999;
 
     public static BoardResult? Parse(IReadOnlyDictionary<int, long> values, IReadOnlyList<Beast> beasts, DateTimeOffset at) => Parse(values, beasts, at, out _);
 
@@ -54,16 +56,16 @@ public static class BeastResults
     }
 
     /// <summary>
-    /// X-135 (0.1771): the window's rewards: 1 to 5 of them (1 on the two boards recorded), each an Item row whose icon in the Item sheet is the
-    /// icon the window gives it (« noyau d'essence bestiale de basse qualité », Item 51734, icon 20217, on both), the slot at 58 onwards 0, a
-    /// count from 1 to 999. Anything else (a number never seen, an icon that is not the item's): null, the rewards « not read » (R08), the rest
-    /// of the result kept.
+    /// X-135 (0.1771): the window's rewards: one of them, as on the two boards recorded (X-771 M1, 0.1773: two to five, never seen, are
+    /// refused whole), an Item row whose icon in the Item sheet is the icon the window gives it (« noyau d'essence bestiale de basse qualité »,
+    /// Item 51734, icon 20217, on both), the slot at 58 onwards 0, a count from 1 to 999. Anything else (a number never seen, an icon that is
+    /// not the item's): null, the rewards « not read » (R08), the rest of the result kept.
     /// </summary>
     public static IReadOnlyList<BoardReward>? Rewards(IReadOnlyDictionary<int, long> values, Func<uint, uint> itemIcon)
     {
         long Value(int index) => values.TryGetValue(index, out var value) ? value : -1;
         var count = Value(RewardCount);
-        if (count < 1 || count > RewardSlots) return null;
+        if (count != RewardsSeen) return null;
         var rewards = new List<BoardReward>();
         for (var slot = 0; slot < count; slot++)
         {
