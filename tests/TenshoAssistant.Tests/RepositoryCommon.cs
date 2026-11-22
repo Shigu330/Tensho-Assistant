@@ -41,10 +41,11 @@ internal static class RepositoryCommon
     /// <summary>X-772 (0.1801, D-217): the player files of community-discoveries/players, as the merge tool reads them: <c>&lt;issue&gt;.jsonl.gz</c>
     /// (gzip of a header line, then one fact per line, without place nor day), or an <c>&lt;issue&gt;.json</c> of before (v2 JSON, its facts with
     /// place and days): (file, header or null for a file of before, the facts as JSON).</summary>
-    public static List<(string File,JsonElement? Header,List<JsonElement> Facts)> Players()
+    /// X-826 (0.1827): folder: another players/ folder (files the merge tool has just written), the repository's by default.
+    public static List<(string File,JsonElement? Header,List<JsonElement> Facts)> Players(string? folder=null)
     {
         var players=new List<(string,JsonElement?,List<JsonElement>)>();
-        foreach(var path in Directory.GetFiles(Path.GetFullPath("community-discoveries/players")).Order(StringComparer.Ordinal))
+        foreach(var path in Directory.GetFiles(folder ?? Path.GetFullPath("community-discoveries/players")).Order(StringComparer.Ordinal))
         {
             var name=Path.GetFileName(path);
             if(name.EndsWith(".jsonl.gz",StringComparison.Ordinal))

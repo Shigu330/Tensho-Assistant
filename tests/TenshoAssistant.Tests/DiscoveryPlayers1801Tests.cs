@@ -19,13 +19,13 @@ internal static class DiscoveryPlayers1801Tests
         {
             var players = RepositoryCommon.Players();
             Check(players.Count > 0,"player files read");
+            // X-826 (0.1827): the header's fields are those the merge tool writes (PLAYER_HEADER: Gist and Revision of X-804, Counted of X-808 too),
+            // each of its own shape, and nothing else (DiscoveryHeader1827Tests.Header); an anonymous withdrawn file (X-803) passes the same rule.
+            var allowed = DiscoveryHeader1827Tests.ToolHeader();
             foreach (var (file,header,facts) in players)
             {
                 Check(file.EndsWith(".jsonl.gz",StringComparison.Ordinal) && header is not null,"converted by the merge tool (no <issue>.json left): " + file);
-                var h = header!.Value;
-                Check(h.GetProperty("Format").GetString() == "tensho-discoveries-player" && h.GetProperty("Version").GetInt32() == 1
-                    && h.GetProperty("Issue").GetInt32().ToString() + ".jsonl.gz" == file && h.GetProperty("Count").GetInt32() == facts.Count,"its header: " + h);
-                Check(h.EnumerateObject().All(member => member.Name is "Format" or "Version" or "Issue" or "Login" or "Count"),"nothing else in the header: " + h);
+                DiscoveryHeader1827Tests.Header(file,header!.Value,facts.Count,allowed);
                 var extra = facts.SelectMany(fact => fact.EnumerateObject().Select(member => member.Name)).Where(name => !Kept.Contains(name)).Distinct().ToList();
                 Check(extra.Count == 0,file + ": fields a player file no longer keeps (X, Z, First, Last…): " + string.Join(", ",extra));
             }

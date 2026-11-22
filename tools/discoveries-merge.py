@@ -97,6 +97,9 @@ OLD_PLUGIN_FACTS=200_000
 ORDER=["Kind","Subject","Detail","Territory","Map","CellX","CellZ","X","Z","LevelMin","LevelMax","Seen","Imported","First","Last","Hq","Values"]
 # X-772 (0.1801, D-217): a player file keeps only what the merge needs, compressed like the common files: no exact place nor day.
 PLAYER_FORMAT="tensho-discoveries-player";PLAYER_VERSION=1;PLAYER_SUFFIX=".jsonl.gz"
+# X-826: the only fields of a player file's header, in the order player_bytes writes them; read_player refuses any other, and
+# DiscoveryPlayers1801Tests checks the repository's player files against this list (never a character name, world, place nor day).
+PLAYER_HEADER=("Format","Version","Issue","Login","Gist","Revision","Counted","Count")
 PLAYER_ORDER=["Kind","Subject","Detail","Territory","Map","CellX","CellZ","LevelMin","LevelMax","Hq","Values"]
 PLACE=("X","Z","First","Last")
 
@@ -154,6 +157,21 @@ def valid(f):
 def sighted(f):
     """X-183 (N5): a fact of a player's share is a sighting of theirs: Seen a whole count from 1 to MAX_SEEN, at least the values counted in it."""
     return whole(f.get("Seen")) and 1<=f["Seen"]<=MAX_SEEN and sum((f.get("Values") or {}).values())<=f["Seen"]
+
+# X-829 (security review X-810, I1): VistaSeen, FishCondition and FishTransition count the Eorzea minute of the sighting (levels and values); a share
+# keeps its Eorzea hour only (the plugin sends no more since 0.1831; an older plugin's gist is brought to the hour here, before anything is kept).
+EORZEA_TIME_KINDS={18,11,21}
+def eorzea_hour(f):
+    """X-829: a fact of EORZEA_TIME_KINDS with its levels and values brought to the Eorzea hour (minute // 60 * 60); any other fact unchanged."""
+    if f.get("Kind") not in EORZEA_TIME_KINDS:return f
+    for n in ("LevelMin","LevelMax"):
+        if whole(f.get(n)):f[n]=f[n]//60*60
+    if isinstance(f.get("Values"),dict):
+        hours={}
+        for k,c in sorted(f["Values"].items(),key=lambda kv:int(kv[0])):
+            h=str(int(k)//60*60);hours[h]=min(hours.get(h,0)+c,MAX_COUNT)
+        f["Values"]=hours
+    return f
 
 def capped(f):
     """X-183 (N5): one player's histogram of a fact brought to at most PLAYER_SIGHTINGS sightings, its shape kept (each value kept at 1 at least) and
@@ -363,7 +381,9 @@ def clean(data,player=False):
     for f in data.get("Facts",[])[:MAX_FACTS*len(KINDS) if data.get("Version")==3 else MAX_FACTS]:
         # 0.1012: checked on the time as sent, then kept to the day (an older gist with times is accepted and brought to the day, not refused).
         if not isinstance(f,dict) or not valid(f) or not valid(daily(dict(f))) or player and not sighted(f):refused+=1;continue
-        g=capped(daily(dict(f)));g["Seen"]=0;g["Imported"]=1;facts[key(g)]=g
+        g=capped(daily(dict(f)));g["Seen"]=0;g["Imported"]=1
+        if player:g=eorzea_hour(g)   # X-829: a share keeps the Eorzea hour, never the minute
+        facts[key(g)]=g
     kinds=collections.Counter(f["Kind"] for f in facts.values())
     return list(facts.values()),{"facts":len(facts),"refused":refused,"kinds":dict(sorted(kinds.items()))}
 
@@ -396,6 +416,7 @@ def player_bytes(issue,author,facts,noted=None,counted=None):
     facts=sorted((without_place(f) for f in facts),key=sort_key)
     header={"Format":PLAYER_FORMAT,"Version":PLAYER_VERSION,"Issue":issue,**({"Login":author} if author else {}),**merged_note(noted),
             **({"Counted":counted} if counted is not None else {}),"Count":len(facts)}
+    if list(header)!=[k for k in PLAYER_HEADER if k in header]:raise ValueError(f"a player file's header outside PLAYER_HEADER: {list(header)}")
     return gzip.compress("".join(v3_line(o)+"\n" for o in [header]+facts).encode("utf-8"),compresslevel=9,mtime=0)
 
 def read_player(path):
@@ -409,6 +430,7 @@ def read_player(path):
     header=json.loads(lines[0]) if lines else None
     if not isinstance(header,dict) or header.get("Format")!=PLAYER_FORMAT or header.get("Version")!=PLAYER_VERSION:
         raise ValueError(f"{os.path.basename(path)}: not a player file of version {PLAYER_VERSION}")
+    if set(header)-set(PLAYER_HEADER):raise ValueError(f"{os.path.basename(path)}: its header holds a field it never keeps: {sorted(set(header)-set(PLAYER_HEADER))}")
     facts=[json.loads(line) for line in lines[1:] if line]
     if header.get("Count")!=len(facts) or not all(isinstance(f,dict) and not set(f)-set(PLAYER_ORDER) for f in facts):
         raise ValueError(f"{os.path.basename(path)}: its facts differ from its header or hold a field it never keeps")
@@ -902,6 +924,14 @@ def selftest():
     gid="0123456789abcdef0123";other="fedcba9876543210fedc"
     body=(f"Shared from Tensho Assistant 0.1146.0 (World › Discoveries › automatic exchange).\n\nGist: https://gist.github.com/{gid}\n\n"
           "- [x] I share these discoveries under CC0-1.0 (public domain, https://creativecommons.org/publicdomain/zero/1.0/).\n\nThe gist is updated at each exchange; this issue stays the same.")
+    # X-829: a share's Eorzea minutes (vista, fish weather, weather before) kept to the hour; another kind's values untouched.
+    minute={"Kind":11,"Subject":5,"Detail":2,"Territory":0,"Map":0,"CellX":0,"CellZ":0,"X":0,"Z":0,"LevelMin":1023,"LevelMax":1079,"Seen":3,"Imported":0,
+            "First":"2026-11-20T00:00:00+00:00","Last":"2026-11-21T00:00:00+00:00","Values":{"1023":1,"1050":1,"1079":1}}
+    other={**minute,"Kind":5,"Values":{"1023":1,"1050":1,"1079":1}}
+    got={f["Kind"]:f for f in clean({"Version":2,"Facts":[minute,other]},player=True)[0]}
+    check(got[11]["LevelMin"]==1020 and got[11]["LevelMax"]==1020 and got[11]["Values"]=={"1020":3} and got[5]["Values"]=={"1023":1,"1050":1,"1079":1}
+          and clean({"Version":2,"Facts":[minute]})[0][0]["Values"]=={"1023":1,"1050":1,"1079":1},
+          f"X-829: a share keeps the Eorzea hour only ({got[11]}), another kind and the common set as they are")
     share=lambda **k:{"number":7,"title":"Discoveries: Ann","body":body,"author":{"login":"Ann"},"labels":[],**k}
     check(is_share(share()) and is_share(share(labels=[{"name":"discoveries"}])),"a share without its label is found by its title")
     check(is_share(share(title="my discoveries")),"by its content when the title was changed")
@@ -1180,6 +1210,38 @@ def selftest():
         said.clear();rebuild(say)
         check(read_player(os.path.join(PLAYERS,"7.jsonl.gz"))["Noted"]=={"Gist":"g7","Revision":"r7"},f"X-804: a file written again (a fact refused) keeps its note ({said})")
         os.remove(os.path.join(PLAYERS,"7.jsonl.gz"))
+        # X-826: the header holds PLAYER_HEADER only: what player_bytes writes (note and « Counted » too), and a header with anything else refused.
+        written=gzip.decompress(player_bytes(43,"Ann",[dict(spots[0])],{"Gist":"g2","Revision":"r2"},True)).decode("utf-8").split("\n")[0]
+        check(list(json.loads(written))==list(PLAYER_HEADER),f"X-826: a player file's header: exactly PLAYER_HEADER, in its order ({written})")
+        for field,value in (("World","Alpha"),("Name","Ann Doe"),("X",10.0),("First","2026-11-01T00:00:00+00:00")):
+            write_atomic(os.path.join(PLAYERS,"8.jsonl.gz"),gzip.compress("".join(v3_line(o)+"\n" for o in [{"Format":PLAYER_FORMAT,"Version":PLAYER_VERSION,"Issue":8,field:value,"Count":1},without_place(spots[2])]).encode("utf-8"),mtime=0))
+            try:read_player(os.path.join(PLAYERS,"8.jsonl.gz"));kept_bad=True
+            except ValueError:kept_bad=False
+            check(not kept_bad,f"X-826: a header holding {field}: refused")
+        os.remove(os.path.join(PLAYERS,"8.jsonl.gz"))
+        # X-825: sync on a share merged before X-804 (its player file without a note) whose gist brings nothing new: the player file's note
+        # alone written (what a « note only » pull request carries: the same fact lines, the common set the same bytes), so the plugin deletes that gist.
+        for folder in (PLAYERS,V3_DIR):
+            for n in os.listdir(folder):os.remove(os.path.join(folder,n))
+        put(43,[dict(s) for s in spots],"Ann");rebuild(say)
+        before=snapshot();gid="0123456789abcdef0123";revision="ab"*20;mine=(PLAYERS,"43.jsonl.gz")
+        shared={"number":43,"title":"Discoveries: Ann","author":{"login":"Ann"},"labels":[],
+                "body":f"Shared from Tensho Assistant 0.1826.0\n\nGist: https://gist.github.com/{gid}\n\n- [x] I share these discoveries under CC0-1.0 (public domain).\n"}
+        class Listed:stdout=json.dumps([shared])
+        real=(subprocess.run,gist_listing,from_gist_files);names=globals();out=io.StringIO()
+        try:
+            subprocess.run=lambda *a,**k:Listed()
+            names["gist_listing"]=lambda gist:("Ann",{},revision)
+            names["from_gist_files"]=lambda files,fetch:{"Version":2,"Facts":[{**s,"Seen":3,"Imported":0} for s in spots]}
+            stdout=sys.stdout;sys.stdout=out
+            try:sync(False)
+            finally:sys.stdout=stdout
+        finally:subprocess.run,names["gist_listing"],names["from_gist_files"]=real
+        after=snapshot();lines=lambda data:gzip.decompress(data).decode("utf-8").split("\n")
+        check(set(after)==set(before) and {k for k in after if after[k]!=before[k]}=={mine} and lines(after[mine])[1:]==lines(before[mine])[1:]
+              and "Gist" not in json.loads(lines(before[mine])[0]) and read_player(os.path.join(PLAYERS,"43.jsonl.gz"))["Noted"]=={"Gist":gid,"Revision":revision}
+              and "noted in its player file" in out.getvalue(),
+              f"X-825: sync, a share merged before X-804 with nothing new: its player file's note alone written ({out.getvalue()[-240:]})")
     PLAYERS,V3_DIR=saved
     # X-146: a gist file read within its bound and its time, a slow trickle stopped.
     class Answer:

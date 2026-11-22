@@ -9,7 +9,7 @@ Usage:
   python -I -X utf8 tools/discoveries-trust.py merge <pull request> [--list PATH] [--dry-run]
       Exit 0: merged (--dry-run: would be); 1: not a trusted account's share, or no list: nothing done; 2: usage, or a list that does not
       read; 3: a doubt: not merged, the pull request commented once with the reason (« TELL THE MAINTAINER » printed); 4: its CI still
-      runs: nothing done, run again later.
+      runs, or GitHub has not computed yet whether it merges: nothing done, run again later.
   python -I -X utf8 tools/discoveries-trust.py --selftest
       The decision on made-up pull requests, tickets and shares (no network).
 
@@ -31,6 +31,10 @@ Checks, all needed for a merge:
   - the player file of the pull request: that issue and that login, the gist and revision just read noted as merged, a fact file the merge
     tool reads (fields of a player file only: nothing of the player), every fact of the gist and of the file on Devloppement kept, no fact
     from anywhere else, and something new;
+  - X-825: a « note only » pull request (a player file merged before X-804, whose gist brings nothing new: sync notes the gist and
+    revision merged, so the plugin deletes that gist): its player file is the only file changed, its fact lines are byte for byte those of
+    Devloppement's file (of the current format), and its header differs only by Gist, Revision and Counted. Anything more (a fact changed, a
+    common file, another header field): a doubt, for the maintainer's word. Its ticket is not commented « merged » (nothing new was merged);
   - X-823: the content, by value: a sync of this share alone is replayed offline on Devloppement's community-discoveries (the commit read
     then), with the gist just read (discoveries-merge.py: union, rebuild); every file of the pull request's players/ and v3/ must hold what
     that replay writes (gzip files compared once unpacked, index.json without its byte counts and hashes, which must name the pull
@@ -56,7 +60,7 @@ REASONS={
     "pr-origin":("the pull request does not come from a branch of this repository opened by the worker's account (a fork, or another author)",
                  "la demande de fusion ne vient pas d'une branche de ce dépôt ouverte par le compte du travailleur (un fork, ou un autre auteur)"),
     "pr-base":("the pull request is not based on Devloppement","la demande de fusion n'est pas basée sur Devloppement"),
-    "pr-conflict":("GitHub sees a conflict, or has not computed it yet","GitHub voit un conflit, ou ne l'a pas encore calculé"),
+    "pr-conflict":("GitHub sees a conflict","GitHub voit un conflit"),
     "pr-files":("files other than the ticket's player file and the common set, or a list of files not read whole","des fichiers autres que le fichier du joueur et l'ensemble commun, ou une liste de fichiers pas lue en entier"),
     "ticket":("the ticket is closed, not a share, or not readable as one (gist link, CC0-1.0, title)","le ticket est fermé, n'est pas un partage, ou ne se lit pas comme tel (lien du gist, CC0-1.0, titre)"),
     "owner":("the gist is not owned by the ticket's author","le gist n'appartient pas à l'auteur du ticket"),
@@ -126,6 +130,8 @@ def decide(trusted,pr,ticket,share):
         or (pr.get("author") or "").lower()!=WORKER.lower():return "doubt","pr-origin"
     if pr.get("state")!="OPEN" or pr.get("draft"):return "doubt","pr-state"
     if pr.get("base")!=BASE:return "doubt","pr-base"
+    # X-824 M2 (review of 0.1823): « UNKNOWN » is GitHub not having computed it yet (just after a push): wait, never a public doubt
+    if pr.get("mergeable")=="UNKNOWN":return "wait","GitHub has not computed whether it merges yet"
     if pr.get("mergeable")!="MERGEABLE":return "doubt","pr-conflict"
     files=pr.get("files") or []
     paths=[p for row in files for p in row if p]
@@ -145,7 +151,9 @@ def decide(trusted,pr,ticket,share):
     if not held or held.get("Issue")!=number or (held.get("Login") or "").lower()!=author.lower() \
         or held.get("Noted")!={"Gist":gist,"Revision":share.get("revision")} or not share.get("revision"):return "doubt","player-file"
     keys,given,before=held.get("keys") or set(),share.get("gist_keys") or set(),share.get("base_keys") or set()
-    if not given<=keys or not before<=keys or not keys<=given|before or held.get("same"):return "doubt","facts"
+    if not given<=keys or not before<=keys or not keys<=given|before:return "doubt","facts"
+    # X-825: nothing new: safe only as a « note only » pull request (the player file alone, its header's note alone changed)
+    if held.get("same") and not (share.get("note_only") is True and paths==[f"community-discoveries/players/{number}.jsonl.gz"]):return "doubt","facts"
     if share.get("content")!="same":return "doubt","content"   # X-823: by value, replayed (never read: a doubt)
     checks=pr.get("checks") or []
     failed=[c for c in checks if c[1]=="COMPLETED" and c[2] not in ("SUCCESS","SKIPPED","NEUTRAL") and c[0]]
@@ -183,6 +191,22 @@ def replay(base,number,author,gist_facts,noted):
             m.rebuild(say=lambda *_:None,fresh=[(name,f) for f in gist_facts],pending={name:(number,author,facts,m.merged_note(noted))},history=lambda:past)
         finally:m.PLAYERS,m.V3_DIR=saved
         return {f"{sub}/{name}":open(os.path.join(root,name),"rb").read() for sub,root in roots.items() for name in sorted(os.listdir(root))}
+
+NOTE_FIELDS=("Gist","Revision","Counted")   # X-825: what a « note only » pull request may change in a player file's header
+
+def note_only(before,after):
+    """X-825, pure. Whether the player file after (the pull request's bytes) differs from before (Devloppement's) by its header's note only:
+    both of the current format and read whole, every fact line byte for byte the same, the header's other fields the same, its fields those of
+    the merge tool (PLAYER_HEADER), and the note (Gist, Revision, Counted) changed. Anything that does not read: False (never a merge)."""
+    m=tool()
+    try:
+        old=m.gunzip_bounded(before,m.MAX_DECOMPRESSED).decode("utf-8").split("\n")
+        new=m.gunzip_bounded(after,m.MAX_DECOMPRESSED).decode("utf-8").split("\n")
+        was,now=json.loads(old[0]),json.loads(new[0])
+    except Exception:return False   # zlib.error is no OSError: any failure is no « note only »
+    if not isinstance(was,dict) or not isinstance(now,dict) or old[1:]!=new[1:]:return False
+    rest=lambda header:{k:v for k,v in header.items() if k not in NOTE_FIELDS}
+    return was!=now and rest(was)==rest(now) and was.get("Format")==m.PLAYER_FORMAT and not set(now)-set(m.PLAYER_HEADER)
 
 def index_entries(data):
     """An index.json's text without what depends on the compressor (each entry's Bytes and Sha256), and its entries."""
@@ -227,26 +251,50 @@ def pull_request(n):
                        "isCrossRepository,headRepository,headRepositoryOwner,author"))
     rows=gh("api","--paginate",f"repos/{REPOSITORY}/pulls/{n}/files?per_page=100","--jq",'.[] | [.filename, (.previous_filename // "")] | @tsv')
     files=[tuple(line.split("\t")) for line in rows.splitlines() if line.strip()]
-    checks=[((c.get("workflowName") or c.get("name") or c.get("context") or ""),(c.get("status") or "COMPLETED"),(c.get("conclusion") or c.get("state") or ""))
-            for c in info.get("statusCheckRollup") or []]
+    checks=[check_row(c) for c in info.get("statusCheckRollup") or []]
     owner=((info.get("headRepositoryOwner") or {}).get("login") or "");name=((info.get("headRepository") or {}).get("name") or "")
     return {"head":info["headRefName"],"base":info["baseRefName"],"state":info["state"],"draft":info["isDraft"],"mergeable":info["mergeable"],
             "sha":info["headRefOid"],"changed":info["changedFiles"],"files":files,"checks":checks,
             "cross":info.get("isCrossRepository"),"head_repo":f"{owner}/{name}" if owner and name else "","author":((info.get("author") or {}).get("login") or "")}
 
+def check_row(c):
+    """X-824 M2 (review of 0.1823): one entry of statusCheckRollup as (name, status, conclusion). A check run says its status (COMPLETED once
+    done) and conclusion; a commit status (StatusContext: no status, a state) is done only at SUCCESS, FAILURE or ERROR, its PENDING or
+    EXPECTED being still to come. Before, a missing status read as COMPLETED, so a pending status was taken for a failure (« ci »), and the
+    pull request was told in public that a check had failed while it ran."""
+    name=c.get("workflowName") or c.get("name") or c.get("context") or ""
+    if "status" not in c and "state" in c or c.get("__typename")=="StatusContext":
+        state=(c.get("state") or "").upper()
+        return (name,"COMPLETED" if state in ("SUCCESS","FAILURE","ERROR") else "PENDING",state)
+    return (name,(c.get("status") or "PENDING").upper(),(c.get("conclusion") or "").upper())
+
 def folder_blobs(ref):
-    """X-823: {repository path: git blob id} of the files of FOLDERS at a commit (a folder that does not exist: none)."""
+    """X-823: {repository path: git blob id} of the files of FOLDERS at a commit (a folder that does not exist: none).
+    X-827 (review of 0.1826, M3): read through the git trees API, walked folder by folder from the commit's tree. The contents API lists at
+    most 1 000 entries of a folder: past 1 000 player files, the base replayed and the pull request's head were read cut short, and every
+    trusted merge became a public doubt. A tree GitHub says is truncated is refused (never a merge on a partial list)."""
+    trees={}
+    def entries(sha):
+        if sha not in trees:
+            data=json.loads(gh("api",f"repos/{REPOSITORY}/git/trees/{sha}"))
+            if not isinstance(data,dict) or data.get("truncated") or not isinstance(data.get("tree"),list):raise RuntimeError(f"tree {str(sha)[:60]}: truncated or not a tree")
+            trees[sha]={e.get("path"):e for e in data["tree"] if isinstance(e,dict)}
+        return trees[sha]
     found={}
     for folder in FOLDERS:
-        try:rows=gh("api",f"repos/{REPOSITORY}/contents/{folder}?ref={ref}","--jq",'.[] | [.type, .path, .sha] | @tsv')
-        except RuntimeError as error:
-            if "404" in str(error) or "Not Found" in str(error):continue
-            raise
-        for line in rows.splitlines():
-            if not line.strip():continue
-            kind,path,sha=line.split("\t")
-            if kind!="file" or not re.fullmatch(r"[0-9a-f]{40}",sha):raise RuntimeError(f"{path}: not a plain file")   # a folder or a link where a sync writes files
-            found[path]=sha
+        sha=ref
+        for part in folder.split("/"):
+            entry=entries(sha).get(part)
+            if entry is None:sha=None;break
+            if entry.get("type")!="tree":raise RuntimeError(f"{folder}: not a folder")
+            sha=entry.get("sha")
+        if sha is None:continue
+        for name,entry in sorted(entries(sha).items()):
+            path=f"{folder}/{name}"
+            # a folder, a link or a submodule where a sync writes plain files: refused
+            if entry.get("type")!="blob" or entry.get("mode") not in ("100644","100755") or not re.fullmatch(r"[0-9a-f]{40}",str(entry.get("sha"))):
+                raise RuntimeError(f"{path}: not a plain file")
+            found[path]=entry["sha"]
     return found
 
 def blob(sha):
@@ -324,6 +372,8 @@ def gather(n):
             data=expected.get(path)
             head[path]=data if data is not None and blob_sha(data)==sha else blob(sha)
         found=content_doubt(expected,head)
+        mine=f"{FOLDERS[0]}/{number}{m.PLAYER_SUFFIX}"
+        share["note_only"]=mine in base and mine in head and note_only(base[mine],head[mine])   # X-825
     except Exception as error:   # a replay that stops (Lossy, a file that does not read) is a doubt, never a merge
         found=f"not replayed ({type(error).__name__}: {str(error)[:120]})"
     if found:print(f"content: {found}")
@@ -362,12 +412,16 @@ def merge(n,path,dry):
         print(f"TELL THE MAINTAINER: pull request #{n} (ticket #{ticket.get('number')}) not merged automatically: {REASONS[reason][0]}")
         return 3
     number,author=ticket["number"],tool().login(ticket["issue"])
-    subject=f"Discoveries of #{number} {AUTOMATIC} (trusted account {author})"
-    body=compose(f"Every check of tools/discoveries-trust.py passed: {share['facts']} facts from gist revision {share['revision'][:12]}.",
-                 f"Toutes les vérifications de tools/discoveries-trust.py sont passées : {share['facts']} faits de la révision {share['revision'][:12]} du gist.")
+    noted=(share.get("file") or {}).get("same") is True   # X-825: a « note only » pull request (decide let it through only as such)
+    subject=f"Discoveries of #{number} {AUTOMATIC} (trusted account {author}{', gist noted only' if noted else ''})"
+    if noted:body=compose(f"Every check of tools/discoveries-trust.py passed: the player file notes gist revision {share['revision'][:12]} as merged (nothing new), so the plugin deletes that gist.",
+                          f"Toutes les vérifications de tools/discoveries-trust.py sont passées : le fichier du joueur note la révision {share['revision'][:12]} du gist comme fusionnée (rien de neuf), le plugin supprime donc ce gist.")
+    else:body=compose(f"Every check of tools/discoveries-trust.py passed: {share['facts']} facts from gist revision {share['revision'][:12]}.",
+                      f"Toutes les vérifications de tools/discoveries-trust.py sont passées : {share['facts']} faits de la révision {share['revision'][:12]} du gist.")
     if dry:print(f"#{n} would be merged (squash, head {pr['sha'][:7]}): {subject}");return 0
     gh("pr","merge",str(n),"--repo",REPOSITORY,"--squash","--match-head-commit",pr["sha"],"--subject",subject,"--body",body)
     print(f"#{n} merged (head {pr['sha'][:7]}): {subject}")
+    if noted:print(f"#{number}: nothing new merged: no « Merged » comment on the ticket (as sync does)");return 0
     out=subprocess.run([sys.executable,"-I","-X","utf8",os.path.join(ROOT,"tools","discoveries-merge.py"),"notice",str(number),"merged",version_on_base(),str(share["facts"])],
                        capture_output=True,text=True,timeout=TIMEOUT)
     print((out.stdout+out.stderr).strip() or f"#{number}: notice gave nothing")
@@ -409,6 +463,16 @@ def selftest():
     check(decide(trusted,pr(head="travailleur/discoveries-43-v3"),ticket(),share())[0]=="merge" and decide(trusted,pr(head="travailleur/discoveries-430"),ticket(),share())[0]=="skip","a suffix after the ticket accepted, another ticket not")
     check(decide(trusted,pr(checks=[("Build and test","IN_PROGRESS","")]),ticket(),share())[0]=="wait","its CI still runs: wait")
     check(decide(trusted,pr(checks=[]),ticket(),share())[0]=="wait","no CI yet: wait")
+    # X-824 M2: passing states wait, never a public doubt
+    check(decide(trusted,pr(mergeable="UNKNOWN"),ticket(),share())[0]=="wait","X-824 M2: mergeable not computed yet: wait")
+    rows=[check_row(c) for c in ({"__typename":"CheckRun","workflowName":"Build and test","status":"COMPLETED","conclusion":"SUCCESS"},
+                                 {"__typename":"StatusContext","context":"ci/other","state":"PENDING"},{"context":"ci/expected","state":"EXPECTED"})]
+    check(rows[1][1]=="PENDING" and rows[2][1]=="PENDING" and decide(trusted,pr(checks=rows),ticket(),share())[0]=="merge",
+          f"X-824 M2: a commit status still pending is no failure: {rows}")
+    check(check_row({"workflowName":"Build and test"})[1]=="PENDING" and decide(trusted,pr(checks=[check_row({"workflowName":"Build and test"})]),ticket(),share())[0]=="wait",
+          "X-824 M2: a check run without its status is not finished: wait")
+    failed=[check_row(c) for c in ({"workflowName":"Build and test","status":"COMPLETED","conclusion":"SUCCESS"},{"context":"ci/other","state":"ERROR"})]
+    check(decide(trusted,pr(checks=failed),ticket(),share())==("doubt","ci"),"X-824 M2: a commit status in error is still a failure")
     reds={
         "pr-origin (a fork)":(pr(cross=True,head_repo="Mallory/Tensho-Assistant"),ticket(),share()),
         "pr-origin (a fork that names the repository)":(pr(cross=True),ticket(),share()),
@@ -440,6 +504,13 @@ def selftest():
     reds["facts (lost)"]=(pr(),ticket(),share(file=held(keys={"a","c"})))
     reds["facts (from elsewhere)"]=(pr(),ticket(),share(file=held(keys={"a","b","c","z"})))
     reds["facts (nothing new)"]=(pr(),ticket(),share(file=held(same=True)))
+    # X-825: a « note only » pull request: the player file alone, nothing new, its header's note alone changed
+    alone=[("community-discoveries/players/43.jsonl.gz","")]
+    check(decide(trusted,pr(files=alone,changed=1),ticket(),share(file=held(same=True),note_only=True))==("merge","every check passed"),
+          "X-825: a note only (the player file alone, its note alone changed): merged")
+    reds["facts (a note with a common file)"]=(pr(),ticket(),share(file=held(same=True),note_only=True))
+    reds["facts (nothing new, more than the note)"]=(pr(files=alone,changed=1),ticket(),share(file=held(same=True),note_only=False))
+    reds["facts (nothing new, note not said)"]=(pr(files=alone,changed=1),ticket(),share(file=held(same=True)))
     reds["content"]=(pr(),ticket(),share(content="community-discoveries/v3/kind-01.jsonl.gz: differs"))
     reds["content (never replayed)"]=(pr(),ticket(),{k:v for k,v in share().items() if k!="content"})
     reds["ci"]=(pr(checks=[("Build and test","COMPLETED","FAILURE")]),ticket(),share())
@@ -465,8 +536,30 @@ def selftest():
         with contextlib.redirect_stdout(io.StringIO()):init(path)
         check(read_list(path)=={"friend"},"init leaves a list as the maintainer wrote it")
     check(allowed("community-discoveries/v3/kind-07.jsonl.gz",43) and not allowed("community-discoveries/v3/../x",43) and not allowed("community-discoveries/players/430.jsonl.gz",43),"allowed paths")
+    import gzip
+    def packed(header,*lines):return gzip.compress(("".join(json.dumps(o,separators=(",",":"))+"\n" for o in [header])+"".join(l+"\n" for l in lines)).encode("utf-8"),mtime=0)
+    plain={"Format":m.PLAYER_FORMAT,"Version":1,"Issue":43,"Login":"Shigu330","Count":1};fact='{"Kind":1,"Subject":2}'
+    noted={"Format":m.PLAYER_FORMAT,"Version":1,"Issue":43,"Login":"Shigu330","Gist":gist,"Revision":"r2","Counted":True,"Count":1}
+    check(note_only(packed(plain,fact),packed(noted,fact)),"X-825: the header's note alone: a note only")
+    for what,after in (("a fact changed",packed(noted,'{"Kind":1,"Subject":3}')),("a fact more",packed({**noted,"Count":2},fact,fact)),
+                       ("the login changed",packed({**noted,"Login":"Bob"},fact)),("nothing changed",packed(plain,fact)),
+                       ("a field the tool never writes",packed({**noted,"World":"Alpha"},fact)),("bytes that do not read",b"not gzip")):
+        check(not note_only(packed(plain,fact),after),f"X-825: {what}: no note only")
     end_to_end(check)
     print(f"discoveries-trust selftest: {ok}/{total} ok");return 0 if ok==total else 1
+
+def fake_tree(trees,tid,limit=None):
+    """end_to_end, X-827: what GitHub's git trees API answers for a made-up tree id « commit|folder » (a commit: its root tree), from
+    {commit: {path: bytes}}; limit: past that many entries, « truncated » as GitHub says it."""
+    ref,_,prefix=tid.partition("|");found={}
+    for path,data in trees[ref].items():
+        if prefix and not path.startswith(prefix+"/"):continue
+        rest=path[len(prefix)+1:] if prefix else path
+        name,_,deeper=rest.partition("/")
+        found[name]={"path":name,"mode":"040000","type":"tree","sha":f"{ref}|{prefix+'/' if prefix else ''}{name}"} if deeper else \
+                    {"path":name,"mode":"100644","type":"blob","sha":blob_sha(data)}
+    listed=list(found.values())
+    return json.dumps({"sha":tid,"tree":listed[:limit] if limit else listed,"truncated":bool(limit and len(listed)>limit)})
 
 class Merged(Exception):
     """end_to_end: the made-up GitHub was asked to merge."""
@@ -502,10 +595,11 @@ def end_to_end(check):
     def pr_info(**k):return {"headRefName":"travailleur/discoveries-43","baseRefName":BASE,"isDraft":False,"mergeable":"MERGEABLE","headRefOid":head_sha,
                              "state":"OPEN","isCrossRepository":False,"headRepository":{"name":"Tensho-Assistant"},"headRepositoryOwner":{"login":"Shigu330"},
                              "author":{"login":WORKER},"statusCheckRollup":[{"workflowName":REQUIRED,"status":"COMPLETED","conclusion":"SUCCESS"}],**k}
-    def run(head,info=None,extra=(),dry=True):
-        """merge() on this head ({path: bytes}); → (exit code, printed text, the gh calls made)."""
-        trees={base_sha:base,head_sha:head};store={blob_sha(d):d for t in trees.values() for d in t.values()}
-        changed=sorted(p for p in set(base)|set(head) if base.get(p)!=head.get(p))+list(extra)
+    def run(head,info=None,extra=(),dry=True,start=None):
+        """merge() on this head ({path: bytes}), Devloppement holding start (base by default); → (exit code, printed text, the gh calls made)."""
+        base_=start or base
+        trees={base_sha:base_,head_sha:head};store={blob_sha(d):d for t in trees.values() for d in t.values()}
+        changed=sorted(p for p in set(base_)|set(head) if base_.get(p)!=head.get(p))+list(extra)
         calls=[]
         def fake(*args,raw=False):
             calls.append(args);a=list(args)
@@ -519,9 +613,9 @@ def end_to_end(check):
             if url.endswith(f"/branches/{BASE}"):return base_sha+"\n"
             if "/comments?" in url:return ""
             if "/git/blobs/" in url:return base64.b64encode(store[url.rsplit("/",1)[1]]).decode("ascii")
+            if "/git/trees/" in url:return fake_tree(trees,url.rsplit("/git/trees/",1)[1])
             if "/contents/" in url:
                 path,ref=url.split("/contents/",1)[1].split("?ref=");tree=trees[ref]
-                if path in FOLDERS:return "".join(f"file\t{p}\t{blob_sha(d)}\n" for p,d in tree.items() if p.rsplit("/",1)[0]==path)
                 if path in tree:return blob_sha(tree[path])+"\n"
                 raise RuntimeError("gh api: HTTP 404: Not Found")
             raise RuntimeError(f"unexpected gh call: {a[:3]}")
@@ -556,6 +650,43 @@ def end_to_end(check):
         code,said,calls=run(head,info,extra,dry=False)
         check(code==3 and REASONS[reason][0] in said and not merged_call(calls) and any(c[:2]==("pr","comment") for c in calls),
               f"X-823: {name}: a doubt, never merged ({code}: {said[-240:]})")
+    # X-825: a share merged before X-804 (its player file without a note) whose gist brings nothing new: sync's « note only » pull request
+    # (replayed by the merge tool) merged; a fact changed or a common file changed beside the note: a doubt.
+    merged=replay(base,43,login,cleaned(raw(2)),{"Gist":gist,"Revision":"r2"})
+    lines=gzip.decompress(merged[mine]).decode("utf-8").split("\n");header=json.loads(lines[0])
+    old={**merged,mine:gzip.compress(("\n".join([json.dumps({k:v for k,v in header.items() if k not in NOTE_FIELDS},separators=(",",":"))]+lines[1:])).encode("utf-8"),compresslevel=9,mtime=0)}
+    note=replay(old,43,login,cleaned(raw(2)),{"Gist":gist,"Revision":"r2"})
+    check(note_only(old[mine],note[mine]) and {p for p in note if note[p]!=old.get(p)}=={mine},
+          f"X-825: the replay of a share with nothing new changes the player file's note only ({sorted(p for p in note if note[p]!=old.get(p))})")
+    code,said,calls=run(note,dry=False,start=old)
+    check(code=="merged" and not any(c[:2]==("pr","comment") for c in calls),f"X-825: a note only, the player file alone: merged, nothing commented ({code}: {said[-240:]})")
+    code,said,calls=run(note,start=old)
+    check(code==0 and "gist noted only" in said,f"X-825: said as a note only ({code}: {said[-200:]})")
+    for name,head,reason in (("a note and a fact changed",{**note,mine:repacked(note[mine],level99)},"content"),
+                             ("a note and the common set changed",reindexed({**note,kind:repacked(note[kind],level99)}),"facts")):
+        code,said,calls=run(head,dry=False,start=old)
+        check(code==3 and REASONS[reason][0] in said and not merged_call(calls),f"X-825: {name}: a doubt, never merged ({code}: {said[-240:]})")
+    # X-827: past 1 000 player files (the contents API's bound) every file listed; a tree GitHub cuts short, a link or a folder: refused.
+    many={**good,**{f"{FOLDERS[0]}/{n}{m.PLAYER_SUFFIX}":str(n).encode() for n in range(1000,2200)},"docs/x.md":b"x"}
+    global gh
+    saved=gh
+    def listing(tree,limit=None,mode=None):
+        global gh
+        def fake(*args,raw=False):
+            tid=args[1].rsplit("/git/trees/",1)[1];answer=json.loads(fake_tree({"c":tree},tid,limit))
+            if mode:answer["tree"]=[{**e,"mode":mode} if e["type"]=="blob" else e for e in answer["tree"]]
+            return json.dumps(answer)
+        gh=fake
+        try:return folder_blobs("c")
+        except RuntimeError as error:return str(error)
+        finally:gh=saved
+    listed=listing(many)
+    check(isinstance(listed,dict) and len([p for p in listed if p.startswith(FOLDERS[0]+"/")])==1201 and kind in listed and "docs/x.md" not in listed
+          and all(listed[p]==blob_sha(d) for p,d in many.items() if p in listed),f"X-827: past 1 000 player files, every one listed with its blob ({len(listed)})")
+    check(listing(many,limit=1000)=="tree c|community-discoveries/players: truncated or not a tree",f"X-827: a tree GitHub says is truncated: refused, never a partial list ({listing(many,limit=1000)})")
+    check(str(listing(good,mode="120000")).endswith("not a plain file") and str(listing({**good,f"{FOLDERS[0]}/deeper/x":b"x"})).endswith("not a plain file"),
+          "X-827: a link or a folder where a sync writes plain files: refused")
+    check(listing({"docs/x.md":b"x"})=={},"X-827: no community-discoveries folder: nothing listed")
 
 if __name__=="__main__":
     for stream in (sys.stdout,sys.stderr):

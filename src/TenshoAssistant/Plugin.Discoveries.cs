@@ -77,7 +77,7 @@ public sealed partial class Plugin
             Discoveries.DiscoveryDatabase? database=null;
             try
             {
-                database=new Discoveries.DiscoveryDatabase(databasePath);
+                database=new Discoveries.DiscoveryDatabase(databasePath){Log=message=>log.Warning(message)};
                 var (mine,sharedCount)=database.Count();
                 log.Information("Discoveries: SQLite {0} database, {1} facts of yours, {2} shared.",database.LibraryVersion(),mine,sharedCount);
                 if(Discoveries.DiscoveryFiles.OldFiles(saved) is { Length:>0 } old)
