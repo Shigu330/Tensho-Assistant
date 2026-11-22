@@ -394,7 +394,7 @@ public sealed class GitHubExchange : IDisposable
         try{taken=await TakeCommonV3(store).ConfigureAwait(false) ?? ("CommonUnreadable",0,0);}
         catch(Exception error) when(CommonUnreadable(error)){taken=(CommonUnreachable(error) ? "CommonUnreachable":"CommonUnreadable",0,0);}
         var (common,added,joined)=taken;
-        var sent="";(bool Go,string Said) aside=(true,"");
+        var sent="";(bool Go,string Said) aside=(true,"");var replaced=false;
         // X-587 (external audit A16 of 18/11): your own base not read whole at start (DiscoveryStore.MineIncomplete): the gist would be
         // replaced by this session's facts only, and its kinds missing here removed; nothing is sent, the common data above are still taken.
         if(upload && Connected && store.MineIncomplete)sent="ShareBlocked";
@@ -409,13 +409,15 @@ public sealed class GitHubExchange : IDisposable
             // X-822: after a write of github.json that failed, written again first, or nothing made (a send whose gist and issue cannot be
             // noted would make new ones at each exchange). Not written when the last write held: another client of this profile may have
             // renewed the sign-in since, and this client's older copy would hide it (GitHubToken1171Tests, N2).
-            else{if(MetaUnsaved)KeepMeta();sent=await Rotate(mine).ConfigureAwait(false);}
+            else{if(MetaUnsaved)KeepMeta();(sent,replaced)=await Rotate(mine).ConfigureAwait(false);}
         }
         // X-656 M2 (review of 0.1598): an exchange « blocked » or « not reached » breaks the row of refusals (« 3 exchanges in a row »).
         if(sent is "ShareBlocked" or "ShareAsideWaiting")ClearRefused();
         // X-656 M1 (review of 0.1598): the give-up is said by the send that replaces the gist without those copies, whenever it comes (an
-        // upload that failed, « SentSame » or « ShareEmpty » leave them on the gist: still to say).
-        if(sent=="Sent")lock(gate)if(meta.AsideGivenUp){meta.AsideGivenUp=false;sent="ShareAsideGivenUp";}
+        // upload that failed, « SentSame » or « ShareEmpty » leave them on the gist: still to say). X-824 M1 (review of 0.1823): told by the
+        // upload itself (replaced), not by the word « Sent », which « ShareOldGistKept » takes the place of: the give-up was then never said
+        // while another account's gist waited. Said first: « ShareOldGistKept » is said again at every exchange until that gist goes.
+        if(replaced)lock(gate)if(meta.AsideGivenUp){meta.AsideGivenUp=false;sent="ShareAsideGivenUp";}
         lock(gate)meta.Exchanged=DateTimeOffset.UtcNow;
         SaveMeta();
         return new("ExchangeDone",added.ToString("N0",TenshoAssistant.Localization.TenshoCulture.Current),joined.ToString("N0",TenshoAssistant.Localization.TenshoCulture.Current),common,sent);
@@ -556,7 +558,7 @@ public sealed class GitHubExchange : IDisposable
     /// which keeps the issue (edited to link it); the merged gist is deleted once no issue links it any more. A fact not merged yet is never
     /// left out: it is sent again until a merge notes it. Nothing new: « ShareMerged », the gist deleted, the issue kept for the next one.
     /// </summary>
-    private async Task<string> Rotate(DiscoveryFile mine)
+    private async Task<(string Said,bool Replaced)> Rotate(DiscoveryFile mine)
     {
         using var held=await HoldRotation().ConfigureAwait(false);
         AdoptGist();
@@ -570,7 +572,7 @@ public sealed class GitHubExchange : IDisposable
             Save(state);KeepMeta();
         }
         var news=GistRotation.News(mine.Facts,state.Merged);
-        var sent="ShareMerged";
+        var sent="ShareMerged";var replaced=false;
         if(news.Count>0)
         {
             // X-174 (0.1137, DEC-052): sent as a v3 set: index.json and one kind-NN.jsonl.gz.b64 per kind (base64: a gist holds text). The index holds each
@@ -600,7 +602,7 @@ public sealed class GitHubExchange : IDisposable
                 if(state.Issue!=issue)state.Merged=[];
                 state.Issue=issue;state.SentGist=gist;state.SentRevision=revision ?? "";state.Sent=GistRotation.Hashes(news);state.Rotated=false;
                 Save(state);KeepMeta();
-                sent="Sent";
+                sent="Sent";replaced=true;
             }
         }
         string current,account;lock(gate){current=meta.GistId;account=meta.Login;}
@@ -620,7 +622,7 @@ public sealed class GitHubExchange : IDisposable
                 if(await DeleteGist(state.OldGist).ConfigureAwait(false)){state.OldGist="";state.OldLogin="";Save(state);}
             }
         }
-        return sent;
+        return (sent,replaced);
     }
 
     /// <summary>X-804: the gist and revision the merge tool notes in this issue's player file on main (no account), or null (none, not reached).</summary>

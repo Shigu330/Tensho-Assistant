@@ -152,7 +152,7 @@ internal static class MetaUnsaved1825Tests
         ("Meta unsaved 1825: wired (the plugin gives the database its log; every gist or issue step keeps github.json first)",() =>
         {
             var code=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Discoveries/GitHubExchange.cs")).ReplaceLineEndings("\n");
-            Check(code.Contains("else{if(MetaUnsaved)KeepMeta();sent=await Rotate(mine).ConfigureAwait(false);}",StringComparison.Ordinal)
+            Check(code.Contains("else{if(MetaUnsaved)KeepMeta();(sent,replaced)=await Rotate(mine).ConfigureAwait(false);}",StringComparison.Ordinal)
                 && code.Contains("if(!SaveMeta())throw new ExchangeRefused(\"ExchangeMetaUnsaved\",false);",StringComparison.Ordinal)
                 && !code.Contains("catch(Exception){}\n    }\n\n    /// <summary>X-181 (0.1171, night review N8)",StringComparison.Ordinal),"the exchange stops on a failed write");
             Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Discoveries.cs")).Contains("new Discoveries.DiscoveryDatabase(databasePath){Log=message=>log.Warning(message)};",StringComparison.Ordinal),

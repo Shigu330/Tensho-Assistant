@@ -9,7 +9,7 @@ Usage:
   python -I -X utf8 tools/discoveries-trust.py merge <pull request> [--list PATH] [--dry-run]
       Exit 0: merged (--dry-run: would be); 1: not a trusted account's share, or no list: nothing done; 2: usage, or a list that does not
       read; 3: a doubt: not merged, the pull request commented once with the reason (« TELL THE MAINTAINER » printed); 4: its CI still
-      runs: nothing done, run again later.
+      runs, or GitHub has not computed yet whether it merges: nothing done, run again later.
   python -I -X utf8 tools/discoveries-trust.py --selftest
       The decision on made-up pull requests, tickets and shares (no network).
 
@@ -56,7 +56,7 @@ REASONS={
     "pr-origin":("the pull request does not come from a branch of this repository opened by the worker's account (a fork, or another author)",
                  "la demande de fusion ne vient pas d'une branche de ce dépôt ouverte par le compte du travailleur (un fork, ou un autre auteur)"),
     "pr-base":("the pull request is not based on Devloppement","la demande de fusion n'est pas basée sur Devloppement"),
-    "pr-conflict":("GitHub sees a conflict, or has not computed it yet","GitHub voit un conflit, ou ne l'a pas encore calculé"),
+    "pr-conflict":("GitHub sees a conflict","GitHub voit un conflit"),
     "pr-files":("files other than the ticket's player file and the common set, or a list of files not read whole","des fichiers autres que le fichier du joueur et l'ensemble commun, ou une liste de fichiers pas lue en entier"),
     "ticket":("the ticket is closed, not a share, or not readable as one (gist link, CC0-1.0, title)","le ticket est fermé, n'est pas un partage, ou ne se lit pas comme tel (lien du gist, CC0-1.0, titre)"),
     "owner":("the gist is not owned by the ticket's author","le gist n'appartient pas à l'auteur du ticket"),
@@ -126,6 +126,8 @@ def decide(trusted,pr,ticket,share):
         or (pr.get("author") or "").lower()!=WORKER.lower():return "doubt","pr-origin"
     if pr.get("state")!="OPEN" or pr.get("draft"):return "doubt","pr-state"
     if pr.get("base")!=BASE:return "doubt","pr-base"
+    # X-824 M2 (review of 0.1823): « UNKNOWN » is GitHub not having computed it yet (just after a push): wait, never a public doubt
+    if pr.get("mergeable")=="UNKNOWN":return "wait","GitHub has not computed whether it merges yet"
     if pr.get("mergeable")!="MERGEABLE":return "doubt","pr-conflict"
     files=pr.get("files") or []
     paths=[p for row in files for p in row if p]
@@ -227,12 +229,22 @@ def pull_request(n):
                        "isCrossRepository,headRepository,headRepositoryOwner,author"))
     rows=gh("api","--paginate",f"repos/{REPOSITORY}/pulls/{n}/files?per_page=100","--jq",'.[] | [.filename, (.previous_filename // "")] | @tsv')
     files=[tuple(line.split("\t")) for line in rows.splitlines() if line.strip()]
-    checks=[((c.get("workflowName") or c.get("name") or c.get("context") or ""),(c.get("status") or "COMPLETED"),(c.get("conclusion") or c.get("state") or ""))
-            for c in info.get("statusCheckRollup") or []]
+    checks=[check_row(c) for c in info.get("statusCheckRollup") or []]
     owner=((info.get("headRepositoryOwner") or {}).get("login") or "");name=((info.get("headRepository") or {}).get("name") or "")
     return {"head":info["headRefName"],"base":info["baseRefName"],"state":info["state"],"draft":info["isDraft"],"mergeable":info["mergeable"],
             "sha":info["headRefOid"],"changed":info["changedFiles"],"files":files,"checks":checks,
             "cross":info.get("isCrossRepository"),"head_repo":f"{owner}/{name}" if owner and name else "","author":((info.get("author") or {}).get("login") or "")}
+
+def check_row(c):
+    """X-824 M2 (review of 0.1823): one entry of statusCheckRollup as (name, status, conclusion). A check run says its status (COMPLETED once
+    done) and conclusion; a commit status (StatusContext: no status, a state) is done only at SUCCESS, FAILURE or ERROR, its PENDING or
+    EXPECTED being still to come. Before, a missing status read as COMPLETED, so a pending status was taken for a failure (« ci »), and the
+    pull request was told in public that a check had failed while it ran."""
+    name=c.get("workflowName") or c.get("name") or c.get("context") or ""
+    if "status" not in c and "state" in c or c.get("__typename")=="StatusContext":
+        state=(c.get("state") or "").upper()
+        return (name,"COMPLETED" if state in ("SUCCESS","FAILURE","ERROR") else "PENDING",state)
+    return (name,(c.get("status") or "PENDING").upper(),(c.get("conclusion") or "").upper())
 
 def folder_blobs(ref):
     """X-823: {repository path: git blob id} of the files of FOLDERS at a commit (a folder that does not exist: none)."""
@@ -409,6 +421,16 @@ def selftest():
     check(decide(trusted,pr(head="travailleur/discoveries-43-v3"),ticket(),share())[0]=="merge" and decide(trusted,pr(head="travailleur/discoveries-430"),ticket(),share())[0]=="skip","a suffix after the ticket accepted, another ticket not")
     check(decide(trusted,pr(checks=[("Build and test","IN_PROGRESS","")]),ticket(),share())[0]=="wait","its CI still runs: wait")
     check(decide(trusted,pr(checks=[]),ticket(),share())[0]=="wait","no CI yet: wait")
+    # X-824 M2: passing states wait, never a public doubt
+    check(decide(trusted,pr(mergeable="UNKNOWN"),ticket(),share())[0]=="wait","X-824 M2: mergeable not computed yet: wait")
+    rows=[check_row(c) for c in ({"__typename":"CheckRun","workflowName":"Build and test","status":"COMPLETED","conclusion":"SUCCESS"},
+                                 {"__typename":"StatusContext","context":"ci/other","state":"PENDING"},{"context":"ci/expected","state":"EXPECTED"})]
+    check(rows[1][1]=="PENDING" and rows[2][1]=="PENDING" and decide(trusted,pr(checks=rows),ticket(),share())[0]=="merge",
+          f"X-824 M2: a commit status still pending is no failure: {rows}")
+    check(check_row({"workflowName":"Build and test"})[1]=="PENDING" and decide(trusted,pr(checks=[check_row({"workflowName":"Build and test"})]),ticket(),share())[0]=="wait",
+          "X-824 M2: a check run without its status is not finished: wait")
+    failed=[check_row(c) for c in ({"workflowName":"Build and test","status":"COMPLETED","conclusion":"SUCCESS"},{"context":"ci/other","state":"ERROR"})]
+    check(decide(trusted,pr(checks=failed),ticket(),share())==("doubt","ci"),"X-824 M2: a commit status in error is still a failure")
     reds={
         "pr-origin (a fork)":(pr(cross=True,head_repo="Mallory/Tensho-Assistant"),ticket(),share()),
         "pr-origin (a fork that names the repository)":(pr(cross=True),ticket(),share()),
