@@ -6,6 +6,7 @@ namespace TenshoAssistant;
 
 // X-229 (0.1784, the user's request of 12/11, K-31, R04 agreement given): the meal of the gear planner, chosen per job among the meals of the
 // sheets (Well Fed with an ItemFood row), NQ or HQ; the stats with it in a fifth column. At a synced level: unknown (formula not proved, R06).
+// X-778 (0.1787, the review of 0.1784, I2): the meal eaten taken out of the values read before the meal chosen is added.
 internal sealed partial class MainWindow
 {
     private void DrawGearMealPicker(uint job)
@@ -40,22 +41,53 @@ internal sealed partial class MainWindow
         Tip("Gear.MealHqTip");
     }
 
-    private ((GearModel Model,uint Meal,bool Hq,int Language) Key,GearModel Result)? gearMealCache;
+    private ((GearModel Model,uint Meal,bool Hq,int Language,int Eaten) Key,GearModel Result)? gearMealCache;
+    private DateTimeOffset gearMealEatenAt;
+    private int gearMealEaten;
+
+    /// <summary>X-778: the Well Fed of the player now, read at most once a second (the crafting simulator's reader, CraftDetectedNow): its
+    /// Param (the ItemFood row, plus 10000 for HQ); 0: none; -1: not read.</summary>
+    private int GearMealEaten()
+    {
+        var now=DateTimeOffset.UtcNow;
+        if(now-gearMealEatenAt>=TimeSpan.FromSeconds(1))
+        {
+            gearMealEatenAt=now;
+            gearMealEaten=CraftDetectedNow?.Invoke(characterStats.State.JobId) is { } detected ? detected.Food ?? 0:-1;
+        }
+        return gearMealEaten;
+    }
 
     /// <summary>X-229: the model with the meal chosen for the job: the planned values with it and the derived values from them; built once per
-    /// change of the model or of the meal.</summary>
+    /// change of the model or of the meal. X-778: for the job worn (its values read from the game hold the meal eaten), the meal eaten is taken
+    /// out first (in the game a new meal replaces it); when it cannot be, the column is unknown.</summary>
     private GearModel GearMealModel(GearModel model,CharacterStatsState state)
     {
         var choice=configuration.GearMeals?.GetValueOrDefault(state.JobId);
-        var key=(model,choice?.ItemId ?? 0,choice?.Hq==true,localization.Revision);
-        if(gearMealCache is { } cached && ReferenceEquals(cached.Key.Model,model) && cached.Key.Meal==key.Item2 && cached.Key.Hq==key.Item3 && cached.Key.Language==key.Item4)return cached.Result;
+        var fromGame=state.JobId==characterStats.State.JobId;
+        var key=(model,choice?.ItemId ?? 0,choice?.Hq==true,localization.Revision,choice is { ItemId:not 0 } && fromGame ? GearMealEaten():0);
+        if(gearMealCache is { } cached && ReferenceEquals(cached.Key.Model,model) && cached.Key.Meal==key.Item2 && cached.Key.Hq==key.Item3 && cached.Key.Language==key.Item4
+           && cached.Key.Eaten==key.Item5)return cached.Result;
         var result=model;
-        if(GearMeals.Chosen(GearMealList?.Invoke(),choice) is { } meal)
+        var meals=GearMealList?.Invoke();
+        if(GearMeals.Chosen(meals,choice) is { } meal)
         {
-            var (withMeal,bonuses)=GearMeals.Apply(model.PlannedValues,meal.Meal,meal.Hq);
-            var derived=CombatCategory(state.Category) && state.Modifiers.Div>0;
-            result=model with {MealValues=withMeal,MealBonuses=bonuses,
-                CombatMeal=derived ? StatFormulas.Combat(withMeal,state.Category,state.Role,state.Modifiers).ToDictionary(row=>row.Key,row=>row.Value):new Dictionary<string,string>()};
+            IReadOnlyDictionary<string,int> values=model.PlannedValues;string? eatenName=null;var unknown=false;
+            if(key.Item5!=0)
+            {
+                if(key.Item5>0 && Craft.CraftConsumables.FromStatus(meals,(ushort)key.Item5,false) is { } eaten
+                   && GearMeals.WithoutActive(state.Values,model.PlannedValues,eaten.Item,eaten.Hq) is { } without)
+                {values=without.Values;eatenName=eaten.Item.Name+(eaten.Hq ? " HQ":"");}
+                else unknown=true;
+            }
+            if(unknown)result=model with {MealValues=new Dictionary<string,int>(),MealBonuses=new Dictionary<string,int>(),CombatMeal=new Dictionary<string,string>(),MealUnknown=true};
+            else
+            {
+                var (withMeal,bonuses)=GearMeals.Apply(values,meal.Meal,meal.Hq);
+                var derived=CombatCategory(state.Category) && state.Modifiers.Div>0;
+                result=model with {MealValues=withMeal,MealBonuses=bonuses,MealEaten=eatenName,
+                    CombatMeal=derived ? StatFormulas.Combat(withMeal,state.Category,state.Role,state.Modifiers).ToDictionary(row=>row.Key,row=>row.Value):new Dictionary<string,string>()};
+            }
         }
         gearMealCache=(key,result);
         return result;

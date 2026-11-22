@@ -116,7 +116,7 @@ internal sealed partial class MainWindow
         Dictionary<GearSlot,IReadOnlyList<MeldedMateria>> Melds,double WornLevel,double PlannedLevel,Dictionary<int,int> WornTotals,
         Dictionary<int,int> PlannedTotals,Dictionary<string,int> PlannedValues,IReadOnlyList<(string Key,string Value)> CombatNow,
         IReadOnlyDictionary<string,string> CombatLater,IReadOnlyDictionary<string,int>? MealValues=null,IReadOnlyDictionary<string,int>? MealBonuses=null,
-        IReadOnlyDictionary<string,string>? CombatMeal=null);
+        IReadOnlyDictionary<string,string>? CombatMeal=null,string? MealEaten=null,bool MealUnknown=false);
     // X-229 (0.1784): every meal from the sheets (set by Plugin.cs), and the one chosen for a job.
     internal Func<IReadOnlyList<Craft.CraftConsumable>>? GearMealList { get; set; }
     private string gearMealQuery="";
@@ -427,7 +427,10 @@ internal sealed partial class MainWindow
         {
             foreach(var key in meal is null ? new[]{"Stat","Worn","Planned","Delta"}:["Stat","Worn","Planned","Delta","Meal"])ImGui.TableSetupColumn(localization.Get("Gear.Column"+key));
             ImGui.TableHeadersRow();
-            if(meal is not null && ImGui.TableGetColumnFlags(4).HasFlag(ImGuiTableColumnFlags.IsHovered))WrappedTooltip(localization.Get("Gear.MealColumnTip"));
+            // X-778: the meal eaten taken out first is said; or the column unknown when it cannot be.
+            if(meal is not null && ImGui.TableGetColumnFlags(4).HasFlag(ImGuiTableColumnFlags.IsHovered))
+                WrappedTooltip(localization.Get("Gear.MealColumnTip")+(model.MealUnknown ? "\n"+localization.Get("Gear.MealEatenUnknown")
+                    :model.MealEaten is { } eaten ? "\n"+localization.Format("Gear.MealEatenOut",eaten):""));
             // 0.311: only the stats of the job's kind (no GP / CP on a combat job, no critical hit on a gatherer).
             var combat=CombatCategory(state.Category);
             foreach(var param in GearStatOrder)
@@ -452,10 +455,17 @@ internal sealed partial class MainWindow
                 if(later!=now)ImGui.TextColored(later>now ? Success:Error,$"{(later>now ? "+":"")}{(later-now).ToString("N0",Numbers)}");
                 if(meal is null)continue;
                 ImGui.TableNextColumn();
-                if(GearRules.AttributeOf(param) is { } mealKey && model.MealBonuses?.GetValueOrDefault(mealKey) is > 0 and var bonus)
+                if(model.MealUnknown){ImGui.TextDisabled("—");continue;}
+                // X-778: the value with the meal chosen, the meal eaten taken out (shown even where the meal chosen gives nothing).
+                if(GearRules.AttributeOf(param) is { } mealKey && meal.TryGetValue(mealKey,out var withMeal))
                 {
-                    ImGui.TextColored(UI.FfxivTheme.Gold,meal.GetValueOrDefault(mealKey).ToString("N0",Numbers));
-                    TipText(localization.Format("Gear.MealBonus",bonus.ToString("N0",Numbers)));
+                    var bonus=model.MealBonuses?.GetValueOrDefault(mealKey) ?? 0;var eatenOut=later-(withMeal-bonus);
+                    if(withMeal==later && bonus==0){ImGui.TextUnformatted(later.ToString("N0",Numbers));continue;}
+                    ImGui.TextColored(withMeal!=later ? UI.FfxivTheme.Gold:Text,withMeal.ToString("N0",Numbers));
+                    var lines=new List<string>();
+                    if(bonus>0)lines.Add(localization.Format("Gear.MealBonus",bonus.ToString("N0",Numbers)));
+                    if(eatenOut>0)lines.Add(localization.Format("Gear.MealEatenStat",eatenOut.ToString("N0",Numbers)));
+                    TipText(string.Join("\n",lines));
                 }
                 else ImGui.TextUnformatted(later.ToString("N0",Numbers));
             }
@@ -471,7 +481,7 @@ internal sealed partial class MainWindow
                 ImGui.TextColored(later is not null && later!=rowValue ? UI.FfxivTheme.Gold:Text,later ?? "—");
                 if(meal is null)continue;
                 ImGui.TableNextColumn();ImGui.TableNextColumn();
-                var withMeal=model.CombatMeal?.GetValueOrDefault(rowKey);
+                var withMeal=model.MealUnknown ? null:model.CombatMeal?.GetValueOrDefault(rowKey);
                 ImGui.TextColored(withMeal is not null && withMeal!=later ? UI.FfxivTheme.Gold:Text,withMeal ?? "—");
             }
         }

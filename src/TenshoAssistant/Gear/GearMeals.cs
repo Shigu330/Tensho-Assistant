@@ -36,6 +36,32 @@ public static class GearMeals
         return (result,bonuses);
     }
 
+    /// <summary>
+    /// X-778 (the review of 0.1784, I2): the planned values without the meal the player has eaten. The values read from the game (the
+    /// Character window's) already hold its bonus, and in the game a new meal replaces the one eaten: the bonus is taken out before the meal
+    /// chosen is added. Its bonus was computed from the real value without it (worn gear), so that value is found back exactly: the one
+    /// value whose value plus its bonus is the value read (value plus bonus only grows). Null when one of its stats has no such value (the
+    /// stats read not yet up to date, or another bonus in them): then the meal column is unknown, never two meals added up (R06). A stat not
+    /// read is left out.
+    /// </summary>
+    public static (Dictionary<string,int> Values,Dictionary<string,int> Removed)? WithoutActive(IReadOnlyDictionary<string,int> real,
+        IReadOnlyDictionary<string,int> planned,CraftConsumable eaten,bool hq)
+    {
+        var values=new Dictionary<string,int>(planned);var removed=new Dictionary<string,int>();
+        foreach(var param in eaten.Bonuses.Select(bonus=>bonus.BaseParam).Distinct())
+        {
+            if(GearRules.AttributeOf((int)param) is not { } key || !real.TryGetValue(key,out var read) || !values.TryGetValue(key,out var value))continue;
+            var most=eaten.Bonuses.Where(bonus=>bonus.BaseParam==param).Sum(bonus=>(long)Math.Max(0,bonus.Relative ? (hq ? bonus.MaxHq:bonus.Max):(hq ? bonus.ValueHq:bonus.Value)));
+            int? without=null;
+            for(var candidate=read;candidate>=0 && read-candidate<=most;candidate--)
+                if(candidate+CraftConsumables.Bonus(eaten,hq,param,candidate)==read){without=candidate;break;}
+            if(without is not { } found)return null;
+            if(read-found>0)removed[key]=read-found;
+            values[key]=value-(read-found);
+        }
+        return (values,removed);
+    }
+
     /// <summary>The meal chosen for a job in the list read from the sheets; null when none is chosen or the item is no longer a meal.</summary>
     public static (CraftConsumable Meal,bool Hq)? Chosen(IReadOnlyList<CraftConsumable>? meals,GearMealChoice? choice)=>
         choice is { ItemId:not 0 } && meals?.FirstOrDefault(meal=>meal.ItemId==choice.ItemId) is { } found ? (found,choice.Hq):null;

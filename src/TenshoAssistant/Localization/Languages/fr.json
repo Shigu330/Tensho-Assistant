@@ -8789,7 +8789,10 @@
     "MealSearch": "Chercher un repas",
     "MealSearchTip": "Deux lettres au moins : filtre les repas par nom (200 affichés au plus).",
     "MealHq": "HQ",
-    "MealHqTip": "Le repas de haute qualité : ses propres pourcentages et plafonds.\nPar défaut : activé"
+    "MealHqTip": "Le repas de haute qualité : ses propres pourcentages et plafonds.\nPar défaut : activé",
+    "MealEatenOut": "Le repas que vous avez mangé ({0}) est retiré d'abord : dans le jeu, un nouveau repas le remplace.",
+    "MealEatenStat": "Votre repas mangé retiré : -{0}",
+    "MealEatenUnknown": "Inconnu pour l'instant : le repas que vous avez mangé n'a pas pu être retiré des stats lues (peut-être pas encore à jour) ; deux repas ne sont jamais additionnés."
   },
   "VesselBuilds": {
     "Searching": "Recherche des montages…",

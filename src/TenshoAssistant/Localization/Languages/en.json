@@ -8789,7 +8789,10 @@
     "MealSearch": "Search a meal",
     "MealSearchTip": "Two letters at least: filters the meals by name (200 shown at most).",
     "MealHq": "HQ",
-    "MealHqTip": "The high-quality meal: its own percents and caps.\nDefault: on"
+    "MealHqTip": "The high-quality meal: its own percents and caps.\nDefault: on",
+    "MealEatenOut": "The meal you have eaten ({0}) is taken out first: in the game a new meal replaces it.",
+    "MealEatenStat": "Your meal eaten taken out: -{0}",
+    "MealEatenUnknown": "Unknown for now: the meal you have eaten could not be taken out of the stats read (they may not be up to date yet); two meals are never added up."
   },
   "VesselBuilds": {
     "Searching": "Searching builds…",
