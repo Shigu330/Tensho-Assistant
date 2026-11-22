@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (782 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (784 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -394,6 +394,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-223 | User request of 2026-11-12 (plugin comparison, K-39, accepted on 11/12): next… | Done in 0.1233 |
 | X-224 | User request of 2026-11-12 (plugin comparison, K-40, accepted on 11/12)… | Done in 0.1227 |
 | X-225 | User request of 2026-11-12 (plugin comparison, K-46, accepted on 11/12)… | Done in 0.1719.0 |
+| X-226 | User request of 2026-11-12 (plugin comparison, K-15, accepted on 11/12; user's… | Done in 0.1778.0 |
 | X-250 | First-player review of 11/12 (the agent's notes), before the public… | Done in 0.1180 |
 | X-251 | First-player review of 11/12 (the agent's notes), before the public… | Done in 0.1181 |
 | X-252 | First-player review of 11/12 (the agent's notes), before the public… | Done in 0.1182 |
@@ -850,12 +851,13 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-769 | Review of block 0.1759 to 0.1764 (review 0.1764, 22/11), minor M1, M2, M3: M1… | Done in 0.1765.0 |
 | X-770 | Review of block 0.1765 to 0.1768 (review 0.1768, 22/11), minor M1, M2: M1 in… | Done in 0.1769.0 |
 | X-771 | Review of block 0.1769 to 0.1772 (review 0.1772, 22/11), minor M1, M2, M3, M4… | Done in 0.1773.0 |
+| X-773 | Review of block 0.1773 to 0.1775 (review 0.1775, 22/11), minor M1, M2, M3: M1… | Done in 0.1776.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (782 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (784 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1247,6 +1249,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-223 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-39, accepté… | Fait en 0.1233 |
 | X-224 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-40, accepté… | Fait en 0.1227 |
 | X-225 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-46, accepté… | Fait en 0.1719.0 |
+| X-226 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-15, accepté… | Fait en 0.1778.0 |
 | X-250 | Revue « premier joueur » du 12/11 (notes de l'agent), avant l'annonce publique… | Fait en 0.1180 |
 | X-251 | Revue « premier joueur » du 12/11 (notes de l'agent), avant l'annonce publique… | Fait en 0.1181 |
 | X-252 | Revue « premier joueur » du 12/11 (notes de l'agent), avant l'annonce publique… | Fait en 0.1182 |
@@ -1703,3 +1706,4 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-769 | Relecture du bloc 0.1759 à 0.1764 (relecture 0.1764, 22/11), mineurs M1, M2, M3… | Fait en 0.1765.0 |
 | X-770 | Relecture du bloc 0.1765 à 0.1768 (relecture 0.1768, 22/11), mineurs M1, M2… | Fait en 0.1769.0 |
 | X-771 | Relecture du bloc 0.1769 à 0.1772 (relecture 0.1772, 22/11), mineurs M1, M2… | Fait en 0.1773.0 |
+| X-773 | Relecture du bloc 0.1773 à 0.1775 (relecture 0.1775, 22/11), mineurs M1, M2, M3… | Fait en 0.1776.0 |

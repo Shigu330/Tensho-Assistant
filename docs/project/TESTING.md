@@ -2690,6 +2690,16 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1775) Pendant que vous jouez, fenêtre de chat Tensho ouverte avec un long historique, rechargez Tensho : le chat montre ses lignes en moins de 3 s ; une minute après, dalamud.log a la ligne « Chat window in the first minute after the load (X-558): … » (combien d'images de 16 ms ou plus) et « Chat window: lines first drawn … ms after the load » (à rapporter si plus de 3000 ms ou des images de 16 ms ou plus).
 
+- [ ] (0.1776) Chat Tensho, historique gardé : rechargez Tensho avec un autre onglet affiché, et faites-vous envoyer un message (ou dites un mot d'alerte) dans les secondes qui suivent : l'onglet qui le montre garde son non-lu et son « ! ».
+
+- [ ] (0.1777) Réglages d'un onglet du chat Tensho qui montre les actions des autres joueurs : cochez « Cacher les téléportations des autres » ; dans une cité animée, les lignes « … prépare Téléportation » et « … utilise Téléportation » des autres joueurs ne s'affichent plus dans cet onglet ; les vôtres restent, et un onglet sans la case les montre encore.
+
+- [ ] (0.1778) Hors combat, mangez un plat : quand il reste 5 minutes à l'effet Repas, une ligne [Tensho] « Repas : l'effet finit dans 5 min » et le son des alarmes, une seule fois ; rien de plus à la fin de l'effet.
+
+- [ ] (0.1778) Appelez votre compagnon chocobo (légume de Gysahl) et laissez son temps descendre sous 5 minutes hors combat : « Votre compagnon chocobo part dans 5 min », une fois ; renvoyez-le avant : aucun rappel.
+
+- [ ] (0.1778) En combat ou dans une mission, laissez le repas passer sous 5 minutes : rien pendant le combat ou la mission ; le rappel vient une fois sorti, si l'effet tient encore.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.

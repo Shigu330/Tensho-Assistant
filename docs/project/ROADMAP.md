@@ -80,7 +80,9 @@ in-game readings through GitHub, on the player's click or the opt-in daily excha
 <!-- gen:decisions:en -->
 Open points, produced by script from the agent's source of decisions. Choices already taken: [DECISIONS](DECISIONS.md); the former tables: [archive](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/archive/DECISIONS-EN-ATTENTE-2026-11-09.md).
 
-Nothing open.
+| No. | Point | Choice applied, or record awaited | Where |
+|---|---|---|---|
+| D-216 | X-468 (shared discoveries beyond 200,000 facts of a kind, study of 11/22): how to keep every fact, with a weight per fact (number of players who saw it) | A now: one file per kind, cap raised (high bound near 2 million), beyond it the plugin and the tool keep the facts seen by the most players then the newest, pages prefer a confirmed fact and show « seen by N players » or « seen once »; no format change; 2 versions. Slicing (B) prepared, done only if a kind nears a few hundred thousand facts |  |
 <!-- /gen:decisions:en -->
 
 ## In-game tests
@@ -177,7 +179,9 @@ donnée prise sur des sites web).
 <!-- gen:decisions:fr -->
 Points ouverts, produits par script depuis la source des décisions de l'agent. Choix déjà faits : [DECISIONS](DECISIONS.md) ; anciens tableaux : [archive](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/archive/DECISIONS-EN-ATTENTE-2026-11-09.md).
 
-Aucune en attente.
+| N° | Point | Choix appliqué, ou relevé attendu | Où |
+|---|---|---|---|
+| D-216 | X-468 (découvertes partagées au-delà de 200 000 faits d'un genre, étude du 22/11) : comment garder tous les faits, avec un poids par fait (nombre de joueurs qui l'ont vu) | A maintenant : un fichier par genre, plafond relevé (borne haute vers 2 millions), au-delà le plugin et l'outil gardent les faits vus par le plus de joueurs puis les plus récents, pages qui préfèrent un fait confirmé et montrent « vu par N joueurs » ou « vu une fois » ; aucun changement de format ; 2 versions. Découpage en tranches (B) préparé, fait seulement si un genre approche quelques centaines de milliers de faits |  |
 <!-- /gen:decisions:fr -->
 
 ## Tests en jeu
