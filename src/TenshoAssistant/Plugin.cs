@@ -104,7 +104,7 @@ public sealed partial class Plugin : IDalamudPlugin
 
     public Plugin(IDalamudPluginInterface pluginInterface, ICommandManager commands, IPluginLog log,
         IGameInventory inventory, IPlayerState player, IClientState client, IFramework framework, IDataManager data, IGameGui gameGui,
-        ITextureProvider textures, IUnlockState unlocks, IGameInteropProvider interop,IObjectTable objects,IContextMenu contextMenus,IGameConfig gameConfig,ICondition condition,IFateTable fateTable,ITargetManager targets,IPartyList partyList,IChatGui chat,IDtrBar dtrBar,IKeyState keyState,IMarketBoard marketBoardEvents,IAddonLifecycle addonLifecycle)
+        ITextureProvider textures, IUnlockState unlocks, IGameInteropProvider interop,IObjectTable objects,IContextMenu contextMenus,IGameConfig gameConfig,ICondition condition,IFateTable fateTable,ITargetManager targets,IPartyList partyList,IChatGui chat,IDtrBar dtrBar,IKeyState keyState,IMarketBoard marketBoardEvents,ISeStringEvaluator seStrings,IAddonLifecycle addonLifecycle)
     {
         // 0.525 (user report: lag when the plugin loads): what the load costs, said in the log, to tell the plugin's own work from the runtime's pauses.
         var loadStarted=System.Diagnostics.Stopwatch.GetTimestamp();var pausesBefore=GC.GetTotalPauseDuration();var gen2Before=GC.CollectionCount(2);
@@ -145,9 +145,14 @@ public sealed partial class Plugin : IDalamudPlugin
             registrations.Register(() => { }, dutyLoot.Dispose);
             registrations.Register(() => { }, monsterLoot.Dispose);
             registrations.Register(() => { }, fashionData.Dispose);
-            var saved = pluginInterface.GetPluginConfig() as Configuration;
-            var newInstall = saved is null;
-            var configuration = saved ?? new Configuration();
+            // X-685 part 2 (0.1745, D-206 a): Tensho's own settings file (pluginConfigs\TenshoAssistant\Settings.json, System.Text.Json), no
+            // longer Dalamud's (Newtonsoft kept every unloaded copy of Tensho in the game process); Dalamud's file read once, then left as it was.
+            var settingsFile=new SettingsFile<Configuration>(SettingsFile<Configuration>.In(pluginInterface.GetPluginConfigDirectory()),pluginInterface.ConfigFile.FullName,
+                (error,message)=>{if(error is null)log.Warning(message);else log.Warning(error,message);});
+            var configuration=settingsFile.Load(out var settingsOrigin);
+            var newInstall=settingsOrigin==SettingsOrigin.New;
+            var keptAside=settingsFile.KeptAside;
+            if(settingsOrigin is SettingsOrigin.Legacy)log.Information("Settings moved from Dalamud's settings file to Tensho's own (Settings.json), once; Dalamud's file is left as it was.");
             TenshoAssistant.Competitive.CompetitiveGate.Developer=()=>configuration.DeveloperMode;
             // X-177 C4.2 (0.1200): one thread compiles at a time, in the order of the need: the readers' classes wait until the window
             // exists and its warm-up has compiled the interface's code (bounded by ReaderCompiler.MaxHold; dropped at unload).
@@ -175,19 +180,28 @@ public sealed partial class Plugin : IDalamudPlugin
             var saveNotes=new Diagnostics.SlowNotes(TimeSpan.FromMinutes(5));
             // X-177 step 2 (0.1164): Dalamud's save is the cost (64 to 71 ms each time, 371 to 648 ms the first time after a load; the text
             // itself about 2 ms once warm): only the text is made here, a checked copy is written off the game's thread (SettingsSaver).
-            var saveText=new Newtonsoft.Json.JsonSerializerSettings{TypeNameAssemblyFormatHandling=Newtonsoft.Json.TypeNameAssemblyFormatHandling.Simple,TypeNameHandling=Newtonsoft.Json.TypeNameHandling.Objects};
+            // X-685 part 2 (0.1745): the text is System.Text.Json's (SettingsJson), the copy written to Tensho's own file, merged with it.
             var saver=new SettingsSaver<Configuration>(configuration,
-                live=>Newtonsoft.Json.JsonConvert.SerializeObject(live,saveText),
-                text=>Newtonsoft.Json.JsonConvert.DeserializeObject<Configuration>(text),
-                copy=>pluginInterface.SavePluginConfig(copy),
+                live=>SettingsJson.Write(live),
+                text=>SettingsJson.Read<Configuration>(text),
+                copy=>settingsFile.Save(copy,framework.IsInFrameworkUpdateThread),
                 action=>_=framework.RunOnFrameworkThread(action),
                 (error,message)=>{if(error is null)log.Warning(message);else log.Warning(error,message);});
-            registrations.Register(()=>_=saver.Warm(()=>pluginInterface.ConfigFile is { Exists: true } file ? File.ReadAllText(file.FullName) : null),
+            registrations.Register(()=>_=saver.Warm(()=>File.Exists(settingsFile.FilePath) ? File.ReadAllText(settingsFile.FilePath) : null),
                 ()=>
                 {
-                    if(saver.Flush(TimeSpan.FromSeconds(5)))return;
+                    // X-764 M1 (review of 0.1751): from here every save is the last one: the full wait for another client's lock on any
+                    // thread (the game's tenth of a second refused it before, and no save followed), its failure said as a loss.
+                    settingsFile.Close();
+                    if(saver.Flush(TimeSpan.FromSeconds(5)))
+                    {
+                        // A write of the worker that failed just before (said « written at the next save »): the next save is this one (the saver,
+                        // closed by Flush, saves the live settings at once).
+                        if(settingsFile.Failing && settingsFile.ClosingSave is null)saver.Save();
+                        return;
+                    }
                     // X-184 N22 (0.1207): the live settings were handed to the writer: waited for, and said as it is.
-                    if(saver.Settle(TimeSpan.FromSeconds(15)))log.Warning("The last settings save took more than 5 s at unload; the settings were written once it ended.");
+                    if(saver.Settle(TimeSpan.FromSeconds(15)))log.Warning(settingsFile.ClosingSave==false ? "The last settings save took more than 5 s at unload and failed (said above)." : "The last settings save took more than 5 s at unload; the settings were written once it ended.");
                     else log.Warning("The settings were still being written 20 s after the unload began; the last ones may not be on disk.");
                 });
             void SaveTimed(string what)
@@ -276,6 +290,9 @@ public sealed partial class Plugin : IDalamudPlugin
             // X-484 (0.1482): the game's log filters, in the client's language (docs/evidence/0.1482-chat-log-filters.md).
             mainWindow.ChatFilterSource=()=>data.GetExcelSheet<Lumina.Excel.Sheets.LogFilter>()
                 .Select(row=>new Chat.ChatFilterRow(row.RowId,row.LogKind,row.Caster,row.Target,row.Category,row.DisplayOrder,row.Preset,row.Name.ExtractText(),row.Example.ExtractText())).ToList();
+            // X-484 (0.1777): the names of Teleport and Return in the client's language (Action rows 5 and 6), for the tabs that hide others' teleports.
+            try{Chat.ChatTravel.Names=Chat.ChatTravel.From(Chat.ChatTravel.Actions.Select(id=>data.GetExcelSheet<Lumina.Excel.Sheets.Action>().GetRowOrDefault(id)?.Name.ExtractText()));}
+            catch(Exception error){log.Warning(error,"Chat window: the names of Teleport and Return could not be read (maybe after a game update): others' teleports are not hidden.");}
             mainWindow.OpenDalamudLink=(plugin,command,data,text)=>
             {
                 if(!chatGui.RegisteredLinkHandlers.TryGetValue((plugin,command),out var handler))return false;
@@ -422,11 +439,7 @@ public sealed partial class Plugin : IDalamudPlugin
             var discord=new Alarms.DiscordNotifier();
             registrations.Register(()=>{},discord.Dispose);
             mainWindow.ConfigureDiscord(discord);
-            // Reminders and vessel returns made before 0.319 have no source: recognized once by their group, for the Discord categories.
-            var migrated=false;
-            foreach(var alarm in configuration.Alarms ?? [])
-                migrated|=Alarms.DiscordWebhook.AssignLegacySource(alarm,localization.Get("Reminders.Title"),localization.Get("FreeCompany.Title"));
-            if(migrated)try{saver.Save();}catch(Exception error){log.Warning(error,"Alarm sources could not be saved.");}
+            // X-574 (0.1793, the user's choice of 17/11): the alarms made before 0.319 (no stored source) are no longer given one by their group.
             Alarms.AlarmService? alarms=null;
             registrations.Register(()=>{},()=>{chat.RemoveChatLinkHandler();alarmLinks.Clear();});
             registrations.Register(()=>alarms=new Alarms.AlarmService(framework,condition,log,configuration,()=>SaveTimed("alarms"),
@@ -521,6 +534,24 @@ public sealed partial class Plugin : IDalamudPlugin
             mainWindow.BeastName=id=>beasts.State.Catalog?.Beasts.FirstOrDefault(beast=>beast.Id==id)?.Name ?? "";
             mainWindow.SpellName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.AozAction>().GetRowOrDefault(id) is { } spell ? data.GetExcelSheet<Lumina.Excel.Sheets.Action>().GetRowOrDefault(spell.Action.RowId)?.Name.ExtractText() ?? "":"";
             mainWindow.GuideNewInstall=newInstall;
+            // X-761 (review of 0.1746, I1): the settings file held by another program at load: said in the chat (now, or at the next login),
+            // and once more when it can be read again; this session writes nothing to it (SettingsFile.Unseen).
+            var settingsNotices=new List<string>();
+            void SettingsNotice(string key,params object[] values)=>_=framework.RunOnFrameworkThread(()=>
+            {
+                var text=values.Length==0 ? localization.Get(key):localization.Format(key,values);
+                if(client.IsLoggedIn)chat.Print("[Tensho] "+text);else settingsNotices.Add(text);
+            });
+            Action settingsNoticeOnLogin=()=>{foreach(var text in settingsNotices)chat.Print("[Tensho] "+text);settingsNotices.Clear();};
+            registrations.Register(()=>client.Login+=settingsNoticeOnLogin,()=>client.Login-=settingsNoticeOnLogin);
+            if(settingsOrigin is SettingsOrigin.Held or SettingsOrigin.HeldBackup)SettingsNotice(settingsOrigin==SettingsOrigin.HeldBackup ? "Plugin.SettingsHeldBackup" : "Plugin.SettingsHeld");
+            settingsFile.FreeAgain=()=>SettingsNotice("Plugin.SettingsFreeAgain");
+            // X-763 M1 (review of 0.1746): a settings file that could not be read at load, kept aside: said in the chat, with what was read
+            // instead (the previous copy, Dalamud's older file, or new settings).
+            var unreadableKey=settingsOrigin switch{SettingsOrigin.Backup when keptAside is not null=>"Plugin.SettingsUnreadableBackup",SettingsOrigin.LegacyAfterUnreadable=>"Plugin.SettingsUnreadableLegacy",SettingsOrigin.NewAfterUnreadable=>"Plugin.SettingsUnreadableNew",_=>null};
+            if(unreadableKey is not null)SettingsNotice(unreadableKey,keptAside ?? "?");
+            // X-765 M4 (review of 0.1751): its previous copy unreadable too, kept aside under its own name (no longer written over).
+            if(settingsFile.BackupKeptAside is { } backupAside)SettingsNotice("Plugin.SettingsBackupKeptAside",backupAside);
             // 0.508 (I-05): the retainer sale list. Read only while it is open; Universalis on the panel's button only.
             Market.RetainerSalesReader? retainerSales=null;
             registrations.Register(()=>retainerSales=new Market.RetainerSalesReader(framework,gameGui,client,player,log,()=>configuration.RetainerSalesPanel,()=>configuration.DeveloperMode),()=>retainerSales?.Dispose());
@@ -535,7 +566,11 @@ public sealed partial class Plugin : IDalamudPlugin
             mainWindow.MarketTaxRatesSource=()=>marketTaxes?.Rates;
             Help.CommunityHelpIndex? communityHelp=null;
             registrations.Register(()=>mainWindow.CommunityHelp=communityHelp=new Help.CommunityHelpIndex(),()=>communityHelp?.Dispose());
-            registrations.Register(()=>boardReader=new Beastmaster.BeastBoardReader(framework,gameGui,log,()=>mainWindow.Beasts?.State.Catalog?.Beasts,mainWindow.BeastRanksRead,mainWindow.BeastResultRead,mainWindow.BeastBookRead),()=>boardReader?.Dispose());
+            // X-747 (0.1772): the furniture placed in a house and its event objects, in the log (developer mode only), before any code.
+            Maps.HousingFurnitureProbe? housingProbe=null;
+            registrations.Register(()=>housingProbe=new Maps.HousingFurnitureProbe(framework,client,objects,log,()=>configuration.DeveloperMode),()=>housingProbe?.Dispose());
+            registrations.Register(()=>boardReader=new Beastmaster.BeastBoardReader(framework,gameGui,log,()=>mainWindow.Beasts?.State.Catalog?.Beasts,mainWindow.BeastRanksRead,mainWindow.BeastResultRead,mainWindow.BeastBookRead)
+                {ItemIcon=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Item>().GetRowOrDefault(id)?.Icon ?? 0u},()=>boardReader?.Dispose());
             registrations.Register(()=>{boardWindow=new BeastBoardWindow(mainWindow){Windows=()=>boardReader?.State ?? default};boardWindows.AddWindow(boardWindow);},()=>{if(boardWindow is not null)boardWindows.RemoveWindow(boardWindow);});
             showBoardPanel=()=>configuration.ShowBeastBoardPanel;
             // X-549 (0.1522): the board the game's board or team window is about, for the panel and the page.
@@ -642,6 +677,21 @@ public sealed partial class Plugin : IDalamudPlugin
             Gear.GameGearsetReader? gameGearsets=null;
             registrations.Register(()=>gameGearsets=new Gear.GameGearsetReader(framework,client,log,expIndex,jobOrder,expToNext),()=>gameGearsets?.Dispose());
             mainWindow.GearsetSource=gameGearsets;
+            // X-221 (0.1760, the user's request of 12/11, K-37): the bonus points left of a manual's Grace, counted from your experience lines.
+            Gear.GraceWatcher? graceWatcher=null;
+            registrations.Register(()=>graceWatcher=new Gear.GraceWatcher(framework,client,player,objects,chat,log,expIndex,()=>configuration.GraceCounts??=[],()=>SaveTimed("grace"),
+                status=>data.GetExcelSheet<Lumina.Excel.Sheets.Status>().GetRowOrDefault(status)?.Name.ExtractText() ?? status.ToString(System.Globalization.CultureInfo.InvariantCulture)),()=>graceWatcher?.Dispose());
+            // X-213 (0.1781, the user's request of 12/11, K-23): the shared FATE ranks, read when the player opens the game's Shared FATE window, per character.
+            Fields.SharedFateReader? sharedFates=null;
+            registrations.Register(()=>sharedFates=new Fields.SharedFateReader(framework,client,player,gameGui,log,()=>configuration.SharedFates??=[],()=>SaveTimed("shared FATEs")),()=>sharedFates?.Dispose());
+            mainWindow.SharedFatesNow=()=>sharedFates?.Shown;
+            mainWindow.GraceSource=()=>graceWatcher?.Shown;
+            // X-197 (0.1761): an item's desynthesis (Item sheet) and your desynthesis levels (PlayerState, read on the framework thread).
+            mainWindow.ItemDesynthOf=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Item>().GetRowOrDefault(id) is { } desynthItem
+                ? Items.ItemDesynth.Of(desynthItem.Desynth,desynthItem.ClassJobRepair.RowId,desynthItem.LevelItem.RowId):null;
+            Items.DesynthesisLevels? desynthLevels=null;
+            registrations.Register(()=>desynthLevels=new Items.DesynthesisLevels(framework,client,log),()=>desynthLevels?.Dispose());
+            mainWindow.DesynthLevelOf=job=>desynthLevels?.Of(job);
             // X-223 (0.1233): the region of the home world's data centre (WorldRegionGroup row), for the Jumbo Cactpot's draw time.
             mainWindow.HomeRegion=()=>player.HomeWorld.ValueNullable?.DataCenter.ValueNullable?.Region.RowId ?? 0;
             // X-222 (0.1232): the player's own kills for the S ranks counted by kills, from the game's « You defeat » message.
@@ -715,6 +765,25 @@ public sealed partial class Plugin : IDalamudPlugin
                     if(extractText is not null)linkNotices.Add(extractText);
                 }
             }},()=>gearWear?.Dispose());
+            // X-226 (0.1778): the preparation reminder (a meal's Well Fed status or the chocobo companion about to end, or ended by itself),
+            // outside fights and duties only, once per end: chat and sound with the alarm options, as the wear alert.
+            string WellFedName()=>data.GetExcelSheet<Lumina.Excel.Sheets.Status>().GetRowOrDefault(Reminders.PrepReminderWatcher.WellFed)?.Name.ExtractText() is { Length:>0 } fed ? fed:localization.Get("PrepReminders.WellFed");
+            Reminders.PrepReminderWatcher? prepReminders=null;
+            registrations.Register(()=>prepReminders=new Reminders.PrepReminderWatcher(framework,client,objects,condition,()=>configuration.PrepReminders ?? new(),log){Due=notice=>
+            {
+                var options=configuration.AlarmOptions ?? new();
+                // The minutes left in the common format (X-312).
+                var left=UI.TimeLeft.Write(TimeSpan.FromMinutes(notice.Minutes),(key,first,second)=>localization.Format(key,first,second));
+                var text=notice.Kind==Reminders.PrepKind.Meal
+                    ? localization.Format(notice.Ended ? "PrepReminders.MealEnded":"PrepReminders.MealEnding",WellFedName(),left)
+                    : notice.Ended ? localization.Get("PrepReminders.ChocoboEnded"):localization.Format("PrepReminders.ChocoboEnding",left);
+                // Never said in a duty (the watcher holds it back there): the alarm options as outside one.
+                if(options.ChatAllowed(false))chat.Print("[Tensho] "+text);
+                if(options.SoundAllowed(false))Alarms.AlarmService.PlaySound(options.Sound,log);
+                if(options.ChatAllowed(false) || options.SoundAllowed(false))linkNotices.Add(text);
+            },
+            // X-774 (0.1780): the companion can only be out where mounts are allowed (HowToPage row 361; TerritoryType.Mount, probed).
+            MountAllowed=territory=>territory==0 ? null:data.GetExcelSheet<Lumina.Excel.Sheets.TerritoryType>().GetRowOrDefault(territory)?.Mount},()=>prepReminders?.Dispose());
             mainWindow.GearCatalog=()=>gear?.Catalog;
             mainWindow.GearCatalogFailed=()=>gear?.CatalogFailed==true;
             mainWindow.EquippedGear=()=>gear?.Equipped ?? [];
@@ -743,13 +812,19 @@ public sealed partial class Plugin : IDalamudPlugin
             // 0.911 (X-76): a key item's name (EventItem row), for the hand-ins seen in game.
             mainWindow.KeyItemNameOf=id=>data.GetExcelSheet<Lumina.Excel.Sheets.EventItem>().GetRowOrDefault(id)?.Name.ExtractText();
             mainWindow.AchievementNameOf=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Achievement>().GetRowOrDefault(id)?.Name.ExtractText();
-            // 0.351 (g, I-04): gil journal per character, kept 90 days; since 0.1139 (X-173) in TenshoData.db, the files of before (GilJournal/<id>.json)
-            // converted when their character is first loaded and kept aside.
+            // 0.351 (g, I-04): gil journal per character, kept 90 days; since 0.1139 (X-173) in TenshoData.db; the files of before (GilJournal/<id>.json)
+            // left aside, never read (X-574, 0.1793).
             Inventory.GilWatcher? gilWatcher=null;
             var gilStore=new Inventory.GilJournalStore(Path.Combine(pluginInterface.GetPluginConfigDirectory(),"GilJournal"),tenshoData);
             registrations.Register(()=>gilWatcher=new Inventory.GilWatcher(framework,player,gameGui,gilStore,log,
                 ()=>mainWindow.GameWindowSource?.Invoke().Select(window=>window.Name).ToArray() ?? [],()=>mainWindow.DeveloperMode,chatGui),()=>gilWatcher?.Dispose());
             mainWindow.GilJournalState=()=>gilWatcher?.State;
+            // X-557 (0.1774): a gain in a duty that nothing else explains is the duty's; the character's own names kept out of the « Other » context (R25).
+            if(gilWatcher is not null)
+            {
+                gilWatcher.InDuty=()=>condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty];
+                gilWatcher.OwnNames=()=>[player.CharacterName,player.HomeWorld.ValueNullable?.Name.ExtractText(),player.CurrentWorld.ValueNullable?.Name.ExtractText(),objects.LocalPlayer?.CompanyTag.TextValue];
+            }
             // The server bar's entries (alarms, reminders, currencies, gil, X-217's optional entries), once the services they show exist:
             // the server bar family (X-153, 0.1240: Plugin.ServerBar.cs), in the order they were created before.
             RegisterServerBar(dtrBar,framework,gameGui,player,client,inventory,configuration,localization,()=>currencies?.State,()=>gilWatcher?.State?.Entries,()=>gear?.Equipped ?? []);
@@ -809,11 +884,13 @@ public sealed partial class Plugin : IDalamudPlugin
             mainWindow.ChallengeRows=()=>challengeRows;
             // g, M-04 (0.374): one status file per character (Characters/<local character id>.json): ventures, counters, « done » boxes.
             Character.CharacterStatusWatcher? characterStatus=null;
-            registrations.Register(()=>characterStatus=new Character.CharacterStatusWatcher(framework,player,log,configuration,()=>SaveTimed("character status"),
+            registrations.Register(()=>characterStatus=new Character.CharacterStatusWatcher(framework,player,log,
                 ()=>dailyRoulettes,Path.Combine(pluginInterface.GetPluginConfigDirectory(),"Characters"),
                 // X-196 (0.1409): the retainers' job and market town, named from the sheets (ClassJob abbreviation; Town, whose rows are RetainerTown's values).
                 job=>data.GetExcelSheet<Lumina.Excel.Sheets.ClassJob>().GetRowOrDefault(job)?.Abbreviation.ExtractText() ?? "",
-                town=>data.GetExcelSheet<Lumina.Excel.Sheets.Town>().GetRowOrDefault(town)?.Name.ExtractText() ?? ""),()=>characterStatus?.Dispose());
+                town=>data.GetExcelSheet<Lumina.Excel.Sheets.Town>().GetRowOrDefault(town)?.Name.ExtractText() ?? "",
+                // X-469 (0.1762, D-174): the open retainer's items on sale, as the sale list reader copies them.
+                sales:()=>retainerSales?.State),()=>characterStatus?.Dispose());
             mainWindow.CharacterStatusSource=characterStatus;
             // g, C-03 (0.357): items the armoire takes, for the storage report.
             IReadOnlySet<uint>? cabinetItems=null;
@@ -851,7 +928,7 @@ public sealed partial class Plugin : IDalamudPlugin
             registrations.Register(()=>mainWindow.ChatMessages.Renumbered+=chatSenders.Renumber,()=>mainWindow.ChatMessages.Renumbered-=chatSenders.Renumber);
             RegisterChat(configuration,client,addonLifecycle,framework,player,pluginInterface.GetPluginConfigDirectory(),chatSenders);
             Chat.ChatPlayerActions? chatPlayers=null;
-            registrations.Register(()=>mainWindow.ChatPlayers=chatPlayers=new Chat.ChatPlayerActions(interop,framework,client,objects,targets,partyList,data,log,chatSenders,gameConfig),
+            registrations.Register(()=>mainWindow.ChatPlayers=chatPlayers=new Chat.ChatPlayerActions(interop,framework,client,objects,targets,partyList,data,log,chatSenders,gameConfig,seStrings),
                 ()=>{mainWindow.ChatPlayers=null;chatPlayers?.Dispose();chatSenders.Clear();});
             // X-715 (0.1718, D-202 b): developer mode, what the game's chat sends on a click on a player's name, read only.
             Chat.ChatLinkWatch? chatLinkWatch=null;
@@ -1121,6 +1198,25 @@ public sealed partial class Plugin : IDalamudPlugin
                 catch(Exception error){log.Warning(error,"Crafting food and medicine unavailable.");return [];}
             });
             mainWindow.CraftConsumableList=()=>craftConsumables.Value;
+            // X-229 (0.1784): every meal (Well Fed, Status 48, with an ItemFood row) and all its bonuses, for the gear planner, built on first use.
+            var gearMeals=new Lazy<IReadOnlyList<Craft.CraftConsumable>>(()=>
+            {
+                try
+                {
+                    var foods=data.GetExcelSheet<Lumina.Excel.Sheets.ItemFood>();var list=new List<Craft.CraftConsumable>();
+                    foreach(var item in data.GetExcelSheet<Lumina.Excel.Sheets.Item>().Where(row=>row.ItemAction.RowId!=0 && !row.Name.IsEmpty))
+                    {
+                        if(item.ItemAction.ValueNullable is not { } action || action.Data.Count<2 || (uint)action.Data[0]!=Craft.CraftConsumables.WellFed
+                           || foods.GetRowOrDefault(action.Data[1]) is not { } food)continue;
+                        var bonuses=food.Params.Where(param=>param.BaseParam.RowId!=0)
+                            .Select(param=>new Craft.CraftBonus(param.BaseParam.RowId,param.IsRelative,param.Value,param.Max,param.ValueHQ,param.MaxHQ)).ToArray();
+                        if(bonuses.Length>0)list.Add(new(item.RowId,item.Name.ExtractText(),false,bonuses,action.Data[1]));
+                    }
+                    return list.OrderBy(item=>item.Name,StringComparer.CurrentCultureIgnoreCase).ToArray();
+                }
+                catch(Exception error){log.Warning(error,"Meals for the gear planner unavailable.");return [];}
+            });
+            mainWindow.GearMealList=()=>gearMeals.Value;
             // 0.464: food, medicine and specialist read from the game for the simulator; a failure leaves them unknown.
             var craftDetectionWarned=false;
             mainWindow.CraftDetectedNow=job=>
@@ -1711,5 +1807,16 @@ public sealed partial class Plugin : IDalamudPlugin
         gameDataCancel.Cancel();
         try { registrations.Dispose(); }
         catch (AggregateException error) { log.Error(error, "Failed to release some Tensho registrations."); }
+        // X-685 (0.1752): once the data files are closed, this copy's own Microsoft.Data.Sqlite factory is released: its prune timer and
+        // its two handlers of the process events held this whole load context after the unload, for good (Diagnostics.UnloadRelease).
+        log.Information("Unload: {0}.",Diagnostics.UnloadRelease.Sqlite().Text);
+        // Developer mode: what still holds this copy among the process's events (none expected; « unknown » on a runtime that keeps them elsewhere).
+        if(developerAtUnload())
+        {
+            var held=Diagnostics.UnloadRelease.ProcessEventsFrom(System.Runtime.Loader.AssemblyLoadContext.GetLoadContext(typeof(Plugin).Assembly));
+            log.Information("Unload: process event handlers still from this copy: {0}.",held is null ? "unknown":held.Count==0 ? "none":string.Join(", ",held));
+        }
+        // X-685 (0.1755): the count of full collections at the end of the unload, for the next loads' line (« after N full collection(s) »).
+        if(unloadParts is { } unloaded)Diagnostics.UnloadWatch.Unloaded(unloaded,GC.CollectionCount(2));
     }
 }

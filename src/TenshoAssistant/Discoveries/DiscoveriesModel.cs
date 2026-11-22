@@ -953,7 +953,7 @@ public static class SeenPlaces
 /// <summary>X-43 (0.807): the files: the base, the exports (a dated copy) and the imports (every .json of the import folder, read once, then renamed).</summary>
 public static class DiscoveryFiles
 {
-    private static readonly JsonSerializerOptions Options=new(){WriteIndented=false};
+    private static readonly JsonSerializerOptions Options=TenshoJson.Own(new(){WriteIndented=false});
     public const long MaxBytes=64L*1024*1024;
 
     public static DiscoveryFile? Read(string path)
@@ -1044,6 +1044,19 @@ public static class DiscoveryFiles
         if(Directory.Exists(folder))
             foreach(var path in Directory.GetFiles(folder,"kind-*.json.gz"))
                 if(KindOf(path) is { } kind && !byKind.ContainsKey(kind) && (held is null || held.Contains(kind))){File.Delete(path);written.Remove(kind);}
+    }
+
+    /// <summary>
+    /// X-574 (0.1793): the files of before still there beside the database (Discoveries.json, and Shared/ when it holds a kind's file), by name:
+    /// left aside, never read while the database is in use. Looked at only, never opened.
+    /// </summary>
+    public static string[] OldFiles(string mainPath)
+    {
+        var found=new List<string>();
+        if(File.Exists(mainPath))found.Add(Path.GetFileName(mainPath));
+        try{if(SharedKindsOnDisk(mainPath).Count>0)found.Add(Path.GetFileName(SharedFolder(mainPath))+"/");}
+        catch(Exception error) when(error is IOException or UnauthorizedAccessException){}
+        return [.. found];
     }
 
     /// <summary>X-93 (0.941): the shared kinds that have a file next to the main file.</summary>

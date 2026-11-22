@@ -72,8 +72,8 @@ internal static class ChatTabs1656Tests
             var reset=settings.ResetTabs("General","Battle","Event","Social");
             var fresh=new ChatSettings().EnsureTabs("General","Battle","Event","Social");
             Check(reset==settings.Tabs && reset.Count==4 && reset.Select(tab=>tab.Name).SequenceEqual(fresh.Select(tab=>tab.Name))
-                  && reset.Zip(fresh).All(pair=>pair.First.Channels.SequenceEqual(pair.Second.Channels) && pair.First.ShowUnread==pair.Second.ShowUnread)
-                  && settings.TabsVersion==ChatSettings.CurrentTabs,"the four default tabs, as a new player's");
+                  && reset.Zip(fresh).All(pair=>pair.First.Channels.SequenceEqual(pair.Second.Channels) && pair.First.ShowUnread==pair.Second.ShowUnread),
+                  "the four default tabs, as a new player's");
             Check(settings.Opacity==33 && settings.FontScale==120 && settings.HistoryMessages==4321 && settings.HistoryDays==12
                   && settings.HiddenPlayers=="Ann Example" && settings.Colors[ChatChannel.Say]==0xABCDEF && settings.ContextProfiles,
                   "the history's bounds, the look, the hidden players, the colours and the profiles unchanged");

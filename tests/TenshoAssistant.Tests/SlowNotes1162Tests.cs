@@ -35,7 +35,9 @@ internal static class SlowNotes1162Tests
             var plugin=Read("src/TenshoAssistant/Plugin.cs");
             Check(plugin.Contains("Slow reader: {0} took {1:0} ms in one frame (worst {2:0} ms; named at most every 5 minutes).")
                 && plugin.Contains("Slow settings save: {0} took {1:0} ms (worst {2:0} ms; named at most every 5 minutes)."),"the log lines");
-            foreach(var what in new[]{"window","alarms","voyages","character status","automatic alarms"})
+            // X-574 (0.1793): the character status watcher no longer saves the settings (the shared « done » boxes of before 0.374 no longer
+            // move); the grace counts' save, made on the framework thread too, stands in its place.
+            foreach(var what in new[]{"window","alarms","voyages","grace","automatic alarms"})
                 Check(plugin.Contains($"SaveTimed(\"{what}\")"),"timed: "+what);
             Check(!plugin.Contains("()=>pluginInterface.SavePluginConfig(configuration),") && !plugin.Contains("() => pluginInterface.SavePluginConfig(configuration),"),"no untimed save handed to a reader");
         }),

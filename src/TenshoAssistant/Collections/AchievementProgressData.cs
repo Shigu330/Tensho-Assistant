@@ -5,17 +5,15 @@ namespace TenshoAssistant.Collections;
 /// <summary>
 /// X-173 (0.1140, user's choice of 12/11): where the achievement progress seen is kept. Since this version, in the player's data file
 /// (<see cref="TenshoDataFile"/>, TenshoData.db): one row per character and achievement, a character's rows replaced whole in one transaction at
-/// each change (a failed save heals at the next one, as the whole file did before). The file of before (AchievementProgress.json) is converted
-/// the first time it is loaded (its rows and a « converted » mark written together), then moved, never removed, into before-sqlite-&lt;date&gt;/
-/// beside it. A file of before that cannot be read stays in place and nothing is written (as before); a data file that is there but unusable is
-/// never replaced (nothing written this session); when the data file cannot be created, the JSON file stays in use as before.
+/// each change (a failed save heals at the next one, as the whole file did before). X-574 (0.1793, the user's choice of 17/11): the file of
+/// before (AchievementProgress.json) is no longer converted: still there while the data file is in use, it is left aside, never read, moved nor
+/// removed (said once, <see cref="TenshoDataFile.LeftAside"/>). A data file that is there but unusable is never replaced (nothing written this
+/// session); when the data file cannot be created, the JSON file stays in use as before.
 /// </summary>
 public sealed class AchievementProgressData
 {
-    public const string Family="achievements";
     private readonly string file;
     private readonly TenshoDataFile data;
-    private readonly object gate=new();
 
     /// <summary>Test hook: run inside a save's transaction, after its rows and before the commit (a stop or an error there).</summary>
     internal Action? DuringSave { get; set; }
@@ -29,70 +27,20 @@ public sealed class AchievementProgressData
     public Dictionary<ulong,Dictionary<uint,AchievementProgress>> Load(DateTimeOffset now)
     {
         if(data.Database() is not { } opened)return ReadFile();
-        Convert(opened,now);
+        // X-574 (0.1793): a file of before still there is left aside, never read (the progress is the data file's).
+        if(File.Exists(file))data.LeftAside("Achievement progress",Path.GetFileName(file));
         return ReadRows(opened);
     }
 
     /// <summary>
-    /// The file of before converted (at a load, and at a save when it was held at the load); true when nothing is left to convert. Relay 37
-    /// (0.1205): a file held by another program at the load (read nothing, nothing marked) left the session without any save of this family;
-    /// the next save converts it now that it may be free. A file of before that cannot be read (damaged) is set aside whole, never written
-    /// over nor removed, and the family goes on (the progress is seen again in game): it used to block every save for good (D-145).
-    /// </summary>
-    private bool Convert(TenshoDataDatabase opened,DateTimeOffset now)
-    {
-        if(!File.Exists(file))return true;
-        lock(gate)
-        {
-            if(!File.Exists(file))return true;
-                {
-                    // X-182 (0.1169, night review N3): read in an immediate transaction; a file written again after the conversion (an older
-                    // version still running) is merged the same way as a save: the newest reading of each achievement wins.
-                    var marked=false;
-                    using(var open=opened.Open())
-                    using(var transaction=open.BeginTransaction(deferred:false))
-                    {
-                        var converted=TenshoDataDatabase.ConvertedAt(open,Family,transaction);
-                        marked=converted is not null;
-                        if(File.Exists(file) && (converted is null || TenshoDataFile.WrittenAgain(file,converted.Value)))
-                        {
-                            // X-336 M4 (0.1380): written again but held by another client: not merged, so not set aside either.
-                            if(TenshoDataFile.StillThere(ReadOrSetAside) is { } found)
-                            {
-                                Upsert(open,transaction,found.Select(pair=>(pair.Key,(IReadOnlyDictionary<uint,AchievementProgress>)pair.Value)).ToList());
-                                if(converted is null)TenshoDataDatabase.MarkConverted(open,transaction,Family,now);
-                                marked=true;
-                            }
-                            else marked=false;
-                        }
-                        DuringSave?.Invoke();
-                        transaction.Commit();
-                    }
-                    if(marked)data.SetAside(file,now,"achievement progress");
-                    return marked;
-                }
-        }
-    }
-
-    // D-145 (0.1205): a damaged file of before counts as nothing to add; Convert then marks the family and sets the file aside whole.
-    private Dictionary<ulong,Dictionary<uint,AchievementProgress>> ReadOrSetAside()
-    {
-        try{return ReadFile();}
-        catch(InvalidDataException){return [];}
-    }
-
-    /// <summary>
-    /// A character's progress saved (<paramref name="all"/> is what the JSON file holds when it is still in use); refused while the file of before
-    /// is not converted. X-182 (0.1169, night review N9): each achievement written only when newer than the one saved (seen later), never the
-    /// character's rows deleted: a client left open with an older reading never takes back what another client saw since.
+    /// A character's progress saved (<paramref name="all"/> is what the JSON file holds when it is still in use). X-574 (0.1793): with the data file,
+    /// a file of before is neither read nor written. X-182 (0.1169, night review N9): each achievement written only when newer than the one saved
+    /// (seen later), never the character's rows deleted: a client left open with an older reading never takes back what another client saw since.
     /// </summary>
     public void Save(ulong character,IReadOnlyDictionary<uint,AchievementProgress> progress,Dictionary<ulong,Dictionary<uint,AchievementProgress>> all)
     {
         if(data.Database() is not { } opened){AtomicFile.Write(file,AchievementProgressStore.Write(all));return;}
         using var open=opened.Open();
-        // Relay 37 (0.1205): held at the load, converted at the first save that finds it free; still held: refused as before.
-        if(File.Exists(file) && !TenshoDataDatabase.Converted(open,Family) && !TenshoDataFile.ConvertBeforeSave(()=>Convert(opened,DateTimeOffset.UtcNow),"achievement progress"))
-            throw new InvalidOperationException("The achievement progress file of before is not converted yet; nothing written over it.");
         using var transaction=open.BeginTransaction(deferred:false);
         Upsert(open,transaction,[(character,progress)]);
         DuringSave?.Invoke();
@@ -118,8 +66,7 @@ public sealed class AchievementProgressData
 
     private static long Id(ulong character)=>unchecked((long)character);
 
-    // Rows written in the caller's transaction, each only when newer than the one saved (X-182); at a conversion the « converted » mark is in the
-    // same transaction: either the whole file is in the database, or none of it.
+    // Rows written in the caller's transaction, each only when newer than the one saved (X-182).
     private static void Upsert(SqliteConnection open,SqliteTransaction transaction,IReadOnlyList<(ulong Character,IReadOnlyDictionary<uint,AchievementProgress> Progress)> characters)
     {
         using(var insert=open.CreateCommand())

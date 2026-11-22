@@ -24,25 +24,28 @@ internal static class Characters345Tests
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
-        ("Characters: one file per character, the former shared file split once and kept, an erased character's files deleted",() =>
+        // X-574 (0.1793, the user's choice of 17/11): the former shared file is no longer split: left as it is, never read.
+        ("Characters: one file per character, the former shared file left as it is (X-574), an erased character's files deleted",() =>
         {
             var root = Folder();
             try
             {
                 var legacy = Path.Combine(root,"InventoryBank.json");
                 new FileInventoryBankStore(legacy).Save([Entry(11,BankStorageKind.Saddlebag),Entry(22,BankStorageKind.Retainer,99),Entry(22,BankStorageKind.Bags)]);
+                var bytes = File.ReadAllBytes(legacy);
                 var folder = Path.Combine(root,"InventoryBank");
                 var store = new PerCharacterBankStore(folder,legacy);
+                Check(store.Load().Length == 0 && !Directory.Exists(folder),"the former file is not read nor split");
+                Check(File.ReadAllBytes(legacy).SequenceEqual(bytes) && !File.Exists(legacy + ".migrated") && !Directory.Exists(folder + ".migrating"),"former file left as it is, not renamed");
+                store.Save([Entry(11,BankStorageKind.Saddlebag),Entry(22,BankStorageKind.Retainer,99),Entry(22,BankStorageKind.Bags)]);
                 var loaded = store.Load();
-                Check(loaded.Length == 3 && File.Exists(Path.Combine(folder,"11.json")) && File.Exists(Path.Combine(folder,"22.json")),"split into one file per character");
-                Check(!File.Exists(legacy) && File.Exists(legacy + ".migrated"),"former file kept beside, not deleted");
-                Check(!Directory.Exists(folder + ".migrating"),"temporary folder moved into place");
+                Check(loaded.Length == 3 && File.Exists(Path.Combine(folder,"11.json")) && File.Exists(Path.Combine(folder,"22.json")),"one file per character");
                 store.Save(loaded.Where(entry => entry.Key.CharacterId != 11).ToArray());
                 Check(File.Exists(Path.Combine(folder,"11.json")),"X-141: a whole list without a character never deletes it");
                 store.Apply(new BankChange(Erase: 11),loaded);
                 Check(!File.Exists(Path.Combine(folder,"11.json")) && File.Exists(Path.Combine(folder,"22.json")),"erased character (explicit command): its file deleted, the other kept");
                 var again = new PerCharacterBankStore(folder,legacy).Load();
-                Check(again.Length == 2 && again.All(entry => entry.Key.CharacterId == 22),"reloaded from the remaining file; no second migration");
+                Check(again.Length == 2 && again.All(entry => entry.Key.CharacterId == 22) && File.ReadAllBytes(legacy).SequenceEqual(bytes),"reloaded from the remaining file; the former file never read");
             }
             finally { Directory.Delete(root,true); }
         }),

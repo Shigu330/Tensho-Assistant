@@ -8,8 +8,12 @@ public sealed record BeastGain(uint Beast, int RankBefore, int ExpBefore, int Ra
 /// <param name="Total">X-481: the window's « Total »: the score and the bonus; null when not read.</param>
 /// <param name="Parts">X-481 (0.1525): the score's lines as the window shows them; null in a result kept before 0.1525.</param>
 /// <param name="BonusPoints">X-481 (0.1525): each bonus's points, in the window's order; null when the bonus is not read.</param>
+/// <param name="Rewards">X-135 (0.1771): the window's « Récompenses » (items and counts); null when not read (« not read », never none).</param>
 public sealed record BoardResult(DateTimeOffset At, int Score, IReadOnlyList<BeastGain> Beasts, int? Bonus = null, int? Bonuses = null, int? Total = null,
-    BoardParts? Parts = null, IReadOnlyList<int>? BonusPoints = null);
+    BoardParts? Parts = null, IReadOnlyList<int>? BonusPoints = null, IReadOnlyList<BoardReward>? Rewards = null);
+/// <summary>X-135 (0.1771): one reward of the board's result window: the Item row, its icon (the Item sheet's, checked) and the count the window
+/// gives it (index 63 onwards: to confirm against the game's window, docs/evidence/0.1771-beast-result-rewards.md).</summary>
+public sealed record BoardReward(uint Item, uint Icon, int Count);
 /// <summary>X-481 (0.1525, the user's reading R-X-481 of 17/11: the game's window beside the developer line of the same board): the score's lines,
 /// index 4 « Chemin parcouru » (moves made), 6 the enemies (« affrontement »), 8 the elite enemies (« cible d'élite »), 10 the boss (« gardien du
 /// plateau »), 12 « PV restants » (remaining HP) with its value at 11. docs/evidence/0.1470-beast-result-window.md.</summary>
@@ -36,8 +40,41 @@ public static class BeastResults
     private static readonly int[] ScoreParts = [4, 6, 8, 10, 12];
     // X-481 (0.1470): the bonuses' sum, their number, the first one's points (one slot each, at most 16 before index 47), the total.
     private const int BonusSum = 13, BonusCount = 14, BonusList = 31, BonusSlots = 16, Total = 68;
+    // X-135 (0.1771, docs/evidence/0.1771-beast-result-rewards.md): the rewards: their number at 47, then four rows of five slots before the
+    // total (68): 48 the Item row, 53 its icon, 58 always 0 on the two boards recorded, 63 the count (4 and 5 on the two boards).
+    // X-771 M1 (0.1773): only one reward was ever seen; two to five would put each one's numbers one slot further in each row, a layout never
+    // recorded: refused whole until a reading shows it (the log keeps the numbers 47 to 67 of every result to learn it).
+    private const int RewardCount = 47, RewardItems = 48, RewardIcons = 53, RewardZero = 58, RewardCounts = 63, RewardsSeen = 1, MaxRewardCount = 999;
 
     public static BoardResult? Parse(IReadOnlyDictionary<int, long> values, IReadOnlyList<Beast> beasts, DateTimeOffset at) => Parse(values, beasts, at, out _);
+
+    /// <summary>X-135 (0.1771): as above, with the rewards read when <paramref name="itemIcon"/> (an Item row's icon in the Item sheet) is given.</summary>
+    public static BoardResult? Parse(IReadOnlyDictionary<int, long> values, IReadOnlyList<Beast> beasts, DateTimeOffset at, Func<uint, uint>? itemIcon)
+    {
+        var result = Parse(values, beasts, at, out _);
+        return result is not null && itemIcon is not null ? result with { Rewards = Rewards(values, itemIcon) } : result;
+    }
+
+    /// <summary>
+    /// X-135 (0.1771): the window's rewards: one of them, as on the two boards recorded (X-771 M1, 0.1773: two to five, never seen, are
+    /// refused whole), an Item row whose icon in the Item sheet is the icon the window gives it (« noyau d'essence bestiale de basse qualité »,
+    /// Item 51734, icon 20217, on both), the slot at 58 onwards 0, a count from 1 to 999. Anything else (a number never seen, an icon that is
+    /// not the item's): null, the rewards « not read » (R08), the rest of the result kept.
+    /// </summary>
+    public static IReadOnlyList<BoardReward>? Rewards(IReadOnlyDictionary<int, long> values, Func<uint, uint> itemIcon)
+    {
+        long Value(int index) => values.TryGetValue(index, out var value) ? value : -1;
+        var count = Value(RewardCount);
+        if (count != RewardsSeen) return null;
+        var rewards = new List<BoardReward>();
+        for (var slot = 0; slot < count; slot++)
+        {
+            var (item, icon, zero, number) = (Value(RewardItems + slot), Value(RewardIcons + slot), Value(RewardZero + slot), Value(RewardCounts + slot));
+            if (item is <= 0 or > uint.MaxValue || icon <= 0 || itemIcon((uint)item) != icon || zero > 0 || number < 1 || number > MaxRewardCount) return null;
+            rewards.Add(new BoardReward((uint)item, (uint)icon, (int)number));
+        }
+        return rewards.AsReadOnly();
+    }
 
     /// <summary>X-465 (0.1465): why the window is refused, for the log (numbers only); empty when it is read.</summary>
     public static string Why(IReadOnlyDictionary<int, long> values, IReadOnlyList<Beast> beasts)
@@ -114,6 +151,8 @@ public static class BeastResults
         var merged = kept with
         {
             Bonus = bonus.Bonus, Bonuses = bonus.Bonuses, Total = bonus.Total, BonusPoints = bonus.BonusPoints, Parts = parts,
+            // X-135 (0.1771): the rewards of the new reading when it read them, else those of the first.
+            Rewards = read.Rewards ?? kept.Rewards,
         };
         return Shown(kept, merged) ? null : merged;
     }
@@ -125,7 +164,8 @@ public static class BeastResults
     /// <summary>X-590 A06: the numbers the page shows beside the score and the beasts are the same.</summary>
     private static bool Shown(BoardResult left, BoardResult right)
         => left.Bonus == right.Bonus && left.Bonuses == right.Bonuses && left.Total == right.Total && left.Parts == right.Parts
-           && (left.BonusPoints ?? []).SequenceEqual(right.BonusPoints ?? []) && left.BonusPoints is null == right.BonusPoints is null;
+           && (left.BonusPoints ?? []).SequenceEqual(right.BonusPoints ?? []) && left.BonusPoints is null == right.BonusPoints is null
+           && (left.Rewards ?? []).SequenceEqual(right.Rewards ?? []) && left.Rewards is null == right.Rewards is null;
 
     /// <summary>The known ranks with the result's « after » ranks over them.</summary>
     public static Dictionary<uint, int> Merge(IReadOnlyDictionary<uint, int>? known, BoardResult result)

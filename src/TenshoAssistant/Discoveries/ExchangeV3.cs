@@ -73,8 +73,8 @@ public static class ExchangeV3
         if(info.Type!=typeof(DiscoveryFact))return;
         foreach(var property in info.Properties.Where(property=>NotShared.Contains(property.Name)).ToList())info.Properties.Remove(property);
     }}};
-    private static readonly JsonSerializerOptions LineOptions=new(){UnmappedMemberHandling=JsonUnmappedMemberHandling.Disallow,TypeInfoResolver=SharedFields};
-    private static readonly JsonSerializerOptions ReadOptions=new(){UnmappedMemberHandling=JsonUnmappedMemberHandling.Skip,TypeInfoResolver=SharedFields};
+    private static readonly JsonSerializerOptions LineOptions=TenshoJson.Own(new(){UnmappedMemberHandling=JsonUnmappedMemberHandling.Disallow,TypeInfoResolver=SharedFields});
+    private static readonly JsonSerializerOptions ReadOptions=TenshoJson.Own(new(){UnmappedMemberHandling=JsonUnmappedMemberHandling.Skip,TypeInfoResolver=SharedFields});
 
     /// <summary>X-186 (0.1170): whether a fact line names Own or Key at its top level (any case): such a line is refused, never read in part.</summary>
     public static bool NamesPrivate(ReadOnlySpan<byte> line)
@@ -101,7 +101,7 @@ public static class ExchangeV3
             var name=FileName(group.Key);files[name]=bytes;
             index.Files.Add(new(){Name=name,Kind=group.Key,Count=facts.Count,Bytes=bytes.Length,Sha256=Sha256(bytes)});
         }
-        return new(JsonSerializer.Serialize(index),files);
+        return new(JsonSerializer.Serialize(index,TenshoJson.Plain),files);
     }
 
     /// <summary>The files of a set as a gist holds them (text only): index.json, and each kind file in base64 under its name and <see cref="GistSuffix"/>.</summary>
@@ -121,7 +121,7 @@ public static class ExchangeV3
         using var memory=new MemoryStream();
         using(var gzip=new GZipStream(memory,CompressionLevel.Optimal,true))
         {
-            WriteLine(gzip,JsonSerializer.SerializeToUtf8Bytes(header));
+            WriteLine(gzip,JsonSerializer.SerializeToUtf8Bytes(header,TenshoJson.Plain));
             foreach(var fact in ordered)
             {
                 var copy=fact.Copy();
@@ -142,7 +142,7 @@ public static class ExchangeV3
         try
         {
             if(Encoding.UTF8.GetByteCount(json)>MaxIndexBytes)return null;
-            var index=JsonSerializer.Deserialize<ExchangeV3Index>(json);
+            var index=JsonSerializer.Deserialize<ExchangeV3Index>(json,TenshoJson.Plain);
             if(index is not { Format:FormatName, Version:Version, Files:not null })return null;
             var kinds=new HashSet<int>();var known=new List<ExchangeV3Entry>();
             foreach(var entry in index.Files)
@@ -185,7 +185,7 @@ public static class ExchangeV3
         {
             if(header is null)
             {
-                try{header=line is null ? null:JsonSerializer.Deserialize<ExchangeV3Header>(line);}catch(JsonException){header=null;}
+                try{header=line is null ? null:JsonSerializer.Deserialize<ExchangeV3Header>(line,TenshoJson.Plain);}catch(JsonException){header=null;}
                 if(header is null || header.Format!=FormatName)throw new InvalidDataException("Shared discoveries file without its header.");
                 if(header.Version!=Version)throw new InvalidDataException("Shared discoveries file of an unknown version.");
                 if(header.Kind!=entry.Kind || header.Count!=entry.Count)throw new InvalidDataException("Shared discoveries file of another kind or count than its index says.");

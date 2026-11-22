@@ -2,7 +2,8 @@ using TenshoAssistant.FreeCompany;
 
 namespace TenshoAssistant.Reminders;
 
-public enum FinishedKind { Ventures, Voyages, SquadronMission, SquadronTraining, Garden }
+/// <summary>X-729 (0.1727): Garden = beds the game said ripe; GardenExpected = beds ripe by the calculation only, to confirm in game.</summary>
+public enum FinishedKind { Ventures, Voyages, SquadronMission, SquadronTraining, Garden, GardenExpected }
 
 /// <summary>
 /// 0.455 (user request, in-game campaign): what waits for the player, for the Reminders icon of the server bar: retainer ventures and vessels back,
@@ -50,8 +51,10 @@ public static class ReminderCounts
         Add(FinishedKind.Voyages,vessels?.Count(vessel=>Voyages.StateOf(vessel,now)==VoyageState.Returned) ?? 0);
         Add(FinishedKind.SquadronMission,Over(mission,now) ? 1:0);
         Add(FinishedKind.SquadronTraining,Over(training,now) ? 1:0);
-        // X-720 (0.1723): a bed ripe by the calculation (to confirm in game) is one to look at too.
-        Add(FinishedKind.Garden,beds?.Count(bed=>GardenJournal.State(bed,now) is GardenState.Ripe or GardenState.Expected) ?? 0);
+        // X-720 (0.1723): a bed ripe by the calculation (to confirm in game) is one to look at too; X-729 (0.1727): counted apart, with its
+        // own words, never said « ripe » before the game says so.
+        Add(FinishedKind.Garden,beds?.Count(bed=>GardenJournal.State(bed,now)==GardenState.Ripe) ?? 0);
+        Add(FinishedKind.GardenExpected,beds?.Count(bed=>GardenJournal.State(bed,now)==GardenState.Expected) ?? 0);
         return list;
     }
 }

@@ -47,7 +47,8 @@ internal static class ChatStatus1715Tests
                 && reader.Contains("private readonly ChatPieceLog combatSaid=new(1,30);", StringComparison.Ordinal), "the combat lines described, one per kind, thirty at most");
             var window = Read("MainWindow.ChatWindow.cs");
             Check(window.Contains("ChatSegmentKind.StatusLink=>false,", StringComparison.Ordinal), "drawn as text, nothing to click");
-            Check(window.Contains("run.Link is { Kind:ChatSegmentKind.StatusLink } statusLink && ImGui.IsItemHovered())DrawChatStatusTip(statusLink.StatusId);", StringComparison.Ordinal), "its tooltip on hover");
+            // X-733 (0.1734): with the meal's Param (its bonuses).
+            Check(window.Contains("run.Link is { Kind:ChatSegmentKind.StatusLink } statusLink && ImGui.IsItemHovered())DrawChatStatusTip(statusLink.StatusId,statusLink.Param);", StringComparison.Ordinal), "its tooltip on hover");
             Check(window.Contains("if(ChatPlayers?.Status(id) is not { } status)return;", StringComparison.Ordinal), "none for an unknown status");
             var data = Read("Chat/ChatPlayerActions.Dalamud.cs");
             Check(data.Contains("status.Name.ExtractText().Trim() is { Length:>0 } name", StringComparison.Ordinal) && data.Contains("if(id==0)return null;", StringComparison.Ordinal), "a row without a name: no tooltip");

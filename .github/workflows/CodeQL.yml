@@ -58,3 +58,46 @@ jobs:
         uses: github/codeql-action/analyze@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
         with:
           category: "/language:${{ matrix.language }}"
+
+  analyze-desktop:
+    # X-148 (0.1791): the desktop application (src/TenshoAssistant.Desktop, net10.0-windows) and the pinned copy of PluginUiTest.Host it
+    # builds, which the Linux job above cannot build: a Windows job. Dalamud's reference assemblies where these projects look for them
+    # (DALAMUD_HOME), checked as in build.yml (scripts/Get-Dalamud.ps1); nothing from them is run. Its own category, beside the plugin's.
+    name: Analyze C# (desktop application)
+    runs-on: windows-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          global-json-file: global.json
+
+      - name: Download Dalamud
+        shell: pwsh
+        run: |
+          $hooks = Join-Path $env:APPDATA 'XIVLauncher\addon\Hooks\dev'
+          ./scripts/Get-Dalamud.ps1 -Destination $hooks
+          "DALAMUD_HOME=$hooks" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Restore
+        run: dotnet restore src/TenshoAssistant.Desktop/TenshoAssistant.Desktop.csproj
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+        with:
+          languages: csharp
+          build-mode: manual
+
+      - name: Build
+        run: dotnet build src/TenshoAssistant.Desktop/TenshoAssistant.Desktop.csproj -c Release --no-restore
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+        with:
+          category: "/language:csharp/desktop"

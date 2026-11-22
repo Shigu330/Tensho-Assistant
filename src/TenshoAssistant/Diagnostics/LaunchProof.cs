@@ -22,7 +22,7 @@ public sealed record LaunchProof(int Format, string Version, string Dll, DateTim
             Count(SelfCheckStatus.Suspect), Count(SelfCheckStatus.Failed));
     }
 
-    public string Serialize() => JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true });
+    public string Serialize() => JsonSerializer.Serialize(this, TenshoJson.Own(new JsonSerializerOptions { WriteIndented = true }));
 
     /// <summary>The SHA-256 of a file in lower-case hexadecimal, or "" when it cannot be read (then no proof can match).</summary>
     public static string Hash(string? path)

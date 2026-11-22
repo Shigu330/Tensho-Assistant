@@ -13,15 +13,17 @@ public sealed partial class Plugin
 {
     /// <summary>
     /// The persistence family: the player's data file (TenshoData.db, X-173: every family moved into it, opened on first use), the bank
-    /// (0.345, I-03: one entry per character; X-173, 0.1149: kept in TenshoData.db, the files of before converted at the first load and kept
-    /// aside) and its bridge to the game's inventory. Made before the main window, which shows them.
+    /// (0.345, I-03: one entry per character; X-173, 0.1149: kept in TenshoData.db; X-574, 0.1793: the files of before left aside, never
+    /// read) and its bridge to the game's inventory. Made before the main window, which shows them.
     /// </summary>
     private (TenshoDataFile Data,InventoryBankService Bank,BankInventoryBridge Bridge) RegisterPersistence(IDalamudPluginInterface pluginInterface,
         Configuration configuration,IDataManager data,IGameInventory inventory,IGameGui gameGui,IPlayerState player,IClientState client,IFramework framework)
     {
         var folder=pluginInterface.GetPluginConfigDirectory();
-        // TenshoDataFile holds no open handle (each use opens and closes the database): nothing to release.
         var tenshoData=new TenshoDataFile(Path.Combine(folder,TenshoDataDatabase.FileName),(error,message)=>log.Warning(error,message),message=>log.Information(message));
+        // X-750 (0.1794): kept open from the start, off the frame (a save's close no longer folds the journal in); closed last at unload, after
+        // every family registered after it has saved (the registrations are released in reverse order).
+        registrations.Register(()=>_=Task.Run(tenshoData.KeepOpen),tenshoData.Close);
         InventoryBankService? bank=null;
         registrations.Register(()=>bank=new InventoryBankService(new PerCharacterBankStore(Path.Combine(folder,"InventoryBank"),Path.Combine(folder,"InventoryBank.json"),data:tenshoData)),
             ()=>{bank?.Dispose();bank=null;});

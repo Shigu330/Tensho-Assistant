@@ -7,7 +7,8 @@ using TenshoAssistant.Inventory;
 // file for the families of X-173, D-141). Behaviour tests (R28): real files in a temporary folder; the file of before converted whole in one
 // transaction or not at all; a stop inside a save and inside the conversion; a stop between the conversion and the move of the old file; an
 // unreadable old file; one damaged data file blocking every family; a data file that cannot be created (JSON as before); a data file of 0.1139
-// opened by this version, its gil rows kept.
+// opened by this version, its gil rows kept. X-574 (0.1793, the user's choice of 17/11): the file of before is no longer converted: left aside,
+// never read, moved nor removed (the cases about the conversion now say that).
 internal static class AchievementSqlite1140Tests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
@@ -21,7 +22,7 @@ internal static class AchievementSqlite1140Tests
         try{run(root,Path.Combine(root,"AchievementProgress.json"),Path.Combine(root,TenshoDataDatabase.FileName));}
         finally{SqliteConnection.ClearAllPools();try{Directory.Delete(root,true);}catch(IOException){}catch(UnauthorizedAccessException){}}
     }
-    private static TenshoDataFile Data(string database,List<string>? warnings=null)=>new(database,(error,message)=>warnings?.Add(message+" "+error.Message));
+    private static TenshoDataFile Data(string database,List<string>? warnings=null,List<string>? said=null)=>new(database,(error,message)=>warnings?.Add(message+" "+error.Message),said is null ? null:line=>{if(line.EndsWith("(X-574).",StringComparison.Ordinal))said.Add(line);});
     private static Dictionary<ulong,Dictionary<uint,AchievementProgress>> Sample()=>new()
     {
         [First]=new(){[3811]=new(0,1,At.AddDays(-3)),[1357]=new(200,200,At.AddDays(-2))},
@@ -38,56 +39,53 @@ internal static class AchievementSqlite1140Tests
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
-        ("Achievements SQLite 1140: the file of before converted whole (ids above long.MaxValue), kept aside byte for byte, the same after a restart",() => InTemp((root,file,database) =>
+        ("Achievements SQLite 1140: a file of before is left aside, never read nor moved (X-574); ids above long.MaxValue saved, the same after a restart",() => InTemp((root,file,database) =>
         {
             File.WriteAllText(file,AchievementProgressStore.Write(Sample()));var bytes=File.ReadAllBytes(file);
-            var store=new AchievementProgressData(file,Data(database));
+            var said=new List<string>();
+            var store=new AchievementProgressData(file,Data(database,said:said));
             Check(store.Mode=="sqlite","SQLite in use: "+store.Mode);
-            Check(Same(store.Load(At),Sample()),"same progress after the conversion");
-            Check(!File.Exists(file) && Aside(root) is [var kept] && File.ReadAllBytes(kept).SequenceEqual(bytes),"the file of before kept aside, unchanged");
-            Check(Same(new AchievementProgressData(file,Data(database)).Load(At),Sample()),"after a restart");
+            Check(store.Load(At).Count==0,"nothing read from the file of before");
+            Check(File.ReadAllBytes(file).SequenceEqual(bytes) && Aside(root).Length==0,"the file of before in place, unchanged, nothing set aside");
+            Check(said.Count(line=>line=="Achievement progress: a file of an old format (AchievementProgress.json) was left aside, not read (X-574).")==1,"said once: "+string.Join(" | ",said));
+            store.Load(At);
+            Check(said.Count==1,"once per data file");
+            store.Save(First,Sample()[First],Sample());store.Save(Second,Sample()[Second],Sample());
+            Check(Same(new AchievementProgressData(file,Data(database)).Load(At),Sample()),"saved in the data file, the same after a restart");
             var all=Sample();all[First][3811]=new(1,1,At.AddMinutes(5));
             store.Save(First,all[First],all);
             Check(Same(new AchievementProgressData(file,Data(database)).Load(At),all),"a save replaces that character's rows; the other character untouched");
+            Check(File.ReadAllBytes(file).SequenceEqual(bytes),"the file of before never written");
         })),
-        ("Achievements SQLite 1140: a stop between the conversion and the move never brings the old progress back over newer",() => InTemp((root,file,database) =>
+        ("Achievements SQLite 1140: an old file found again never brings the old progress back over newer",() => InTemp((root,file,database) =>
         {
-            File.WriteAllText(file,AchievementProgressStore.Write(Sample()));
-            var store=new AchievementProgressData(file,Data(database));store.Load(At);
-            var all=Sample();all[Second][42]=new(10,10,At.AddHours(1));store.Save(Second,all[Second],all);
-            File.Copy(Aside(root)[0],file);
+            var store=new AchievementProgressData(file,Data(database));
+            var all=Sample();all[Second][42]=new(10,10,At.AddHours(1));store.Save(First,all[First],all);store.Save(Second,all[Second],all);
+            File.WriteAllText(file,AchievementProgressStore.Write(Sample()));var bytes=File.ReadAllBytes(file);
             Check(Same(new AchievementProgressData(file,Data(database)).Load(At),all),"newer progress kept");
-            Check(!File.Exists(file) && Aside(root).Length==2,"the old file set aside again, both copies kept");
+            Check(File.ReadAllBytes(file).SequenceEqual(bytes) && Aside(root).Length==0,"the old file left where it is, unchanged");
         })),
-        ("Achievements SQLite 1140: a stop inside the conversion leaves the old file and nothing half written; inside a save, the last save whole",() => InTemp((root,file,database) =>
+        ("Achievements SQLite 1140: a stop inside a save leaves the last save whole; the file of before stays as it is",() => InTemp((root,file,database) =>
         {
             File.WriteAllText(file,AchievementProgressStore.Write(Sample()));var bytes=File.ReadAllBytes(file);
             var data=Data(database);
-            var store=new AchievementProgressData(file,data){DuringSave=()=>throw new IOException("simulated stop")};
-            Check(Throws<IOException>(()=>store.Load(At)),"the conversion fails");
-            Check(File.ReadAllBytes(file).SequenceEqual(bytes) && Aside(root).Length==0,"the old file in place, unchanged");
-            using(var open=data.Database()!.Open())
-            {
-                Check(Convert.ToInt64(TenshoDataDatabase.Scalar(open,"SELECT COUNT(*) FROM achievement_progress;"))==0,"no row of a half conversion");
-                Check(!TenshoDataDatabase.Converted(open,AchievementProgressData.Family),"no « converted » mark");
-            }
-            var restarted=new AchievementProgressData(file,Data(database));
-            Check(Same(restarted.Load(At),Sample()),"converted at the next start");
-            restarted.DuringSave=()=>throw new IOException("simulated stop");
-            var changed=Sample();changed[First].Clear();
-            Check(Throws<IOException>(()=>restarted.Save(First,changed[First],changed)),"the save fails");
+            var store=new AchievementProgressData(file,data);
+            store.Save(First,Sample()[First],Sample());store.Save(Second,Sample()[Second],Sample());
+            store.DuringSave=()=>throw new IOException("simulated stop");
+            var changed=Sample();changed[First][3811]=new(1,1,At.AddDays(1));
+            Check(Throws<IOException>(()=>store.Save(First,changed[First],changed)),"the save fails");
             Check(Same(new AchievementProgressData(file,Data(database)).Load(At),Sample()),"the save of before whole");
+            Check(File.ReadAllBytes(file).SequenceEqual(bytes) && Aside(root).Length==0,"the old file in place, unchanged");
         })),
-        // D-145 (0.1205, relay 37): it used to block every save of the family for good; it is now set aside whole (never written over nor
-        // removed) and the family goes on: the progress is seen again in game.
-        ("Achievements SQLite 1140: an unreadable file of before is set aside whole, never written over; the progress is saved again",() => InTemp((root,file,database) =>
+        // D-145 (0.1205, relay 37): an unreadable file of before used to block every save of the family. X-574 (0.1793): it is not read at all.
+        ("Achievements SQLite 1140: an unreadable file of before is left where it is, never read nor written over; the progress is saved",() => InTemp((root,file,database) =>
         {
             File.WriteAllText(file,"{bad");
             var store=new AchievementProgressData(file,Data(database));
             Check(store.Load(At).Count==0,"nothing read from it, no error");
-            Check(!File.Exists(file) && Aside(root) is [var kept] && File.ReadAllText(kept)=="{bad","set aside byte for byte, never removed");
             store.Save(First,Sample()[First],Sample());
-            Check(Same(new AchievementProgressData(file,Data(database)).Load(At),new(){[First]=Sample()[First]}),"saved again");
+            Check(Same(new AchievementProgressData(file,Data(database)).Load(At),new(){[First]=Sample()[First]}),"saved");
+            Check(File.ReadAllText(file)=="{bad" && Aside(root).Length==0,"left byte for byte, never moved nor removed");
         })),
         ("Achievements SQLite 1140: one damaged data file blocks every family and is never written over; a file that cannot be created keeps JSON",() => InTemp((root,file,database) =>
         {

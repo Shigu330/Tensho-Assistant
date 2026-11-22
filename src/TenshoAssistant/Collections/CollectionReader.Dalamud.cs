@@ -31,6 +31,8 @@ internal sealed partial class CollectionReader : IDisposable
     private ExcelSheet<OrchestrionCategory>? orchestrionCategories;
     private bool orchestrionUnavailable,orchestrionUnlockUnavailable;
     private string? orchestrionIssue,blueIssue,triadIssue;
+    // X-742 (0.1795): every territory's place name and map, read once per pass when a spell's place is a place name.
+    private (uint PlaceName,uint Map)[]? bluePlaceMaps;
     private readonly List<CollectionEntry> entries = [];
     private readonly RegistrationScope registrations = new();
     private int position;
@@ -283,6 +285,7 @@ internal sealed partial class CollectionReader : IDisposable
                             var description = "";
                             var location = "";
                             var dutyLevel = 0;
+                            uint placeMap = 0, placeDuty = 0;
                             if (blueDetails.TryGetRow(row.RowId, out var details))
                             {
                                 number = details.Number;
@@ -292,20 +295,29 @@ internal sealed partial class CollectionReader : IDisposable
                                 if (source.RowId != 0)
                                     try
                                 {
+                                    // X-742 (0.1795): the place linked only when the sheets name one map (a territory's, or the one map of a place
+                                    // name) or a duty; never guessed (Monsters.BlueSpellPlan.MapOfPlace).
                                     if (source.RowType == typeof(PlaceName))
+                                    {
                                         location = data.GetExcelSheet<PlaceName>().TryGetRow(source.RowId, out var place) ? place.Name.ExtractText() : "";
+                                        bluePlaceMaps ??= [.. data.GetExcelSheet<TerritoryType>().Select(zone => (zone.PlaceName.RowId, zone.Map.RowId))];
+                                        placeMap = Monsters.BlueSpellPlan.MapOfPlace(bluePlaceMaps, source.RowId);
+                                    }
                                     else if (source.RowType == typeof(TerritoryType))
+                                    {
                                         location = data.GetExcelSheet<TerritoryType>().TryGetRow(source.RowId, out var territory) ? territory.PlaceName.ValueNullable?.Name.ExtractText() ?? "" : "";
+                                        if (location.Length > 0) placeMap = territory.Map.RowId;
+                                    }
                                     else if (source.RowType == typeof(ContentFinderCondition))
                                     {
                                         // X-76 P5 (0.930): the duty's required level, from the same row (ContentFinderCondition.ClassJobLevelRequired).
-                                        if (data.GetExcelSheet<ContentFinderCondition>().TryGetRow(source.RowId, out var content)) { location = content.Name.ExtractText(); dutyLevel = content.ClassJobLevelRequired; }
+                                        if (data.GetExcelSheet<ContentFinderCondition>().TryGetRow(source.RowId, out var content)) { location = content.Name.ExtractText(); dutyLevel = content.ClassJobLevelRequired; placeDuty = source.RowId; }
                                     }
                                 }
                                     catch (Exception) { location = ""; blueIssue = "Blue magic spell catalogue partly read; the other collections can still be browsed."; }
                             }
                             entries.Add(new(CollectionKind.BlueMagic, row.RowId, name, action.Icon,
-                                character != 0 && unlocks.IsAozActionUnlocked(row), number, row.Rank, description, location, DutyLevel: dutyLevel));
+                                character != 0 && unlocks.IsAozActionUnlocked(row), number, row.Rank, description, location, DutyLevel: dutyLevel, PlaceMap: placeMap, PlaceDuty: placeDuty));
                         }
                     }
                 }
@@ -325,6 +337,7 @@ internal sealed partial class CollectionReader : IDisposable
             var issues=new List<CollectionCategoryIssue>();
             if(orchestrionIssue is not null)issues.Add(new(CollectionKind.Orchestrion,orchestrionIssue));
             if(blueIssue is not null)issues.Add(new(CollectionKind.BlueMagic,blueIssue));
+            bluePlaceMaps=null;
             if(triadIssue is not null)issues.Add(new(CollectionKind.TripleTriad,triadIssue));
             issues.AddRange(CompletionIssues());
             if(character!=0)ApplyCompletionMemory(character,entries,completionLifetime());

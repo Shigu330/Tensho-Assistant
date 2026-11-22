@@ -25,7 +25,7 @@ public sealed unsafe class AchievementProgressWatcher : IDisposable
 
     // X-102 (0.987, user choice DEC-045, from C-15): what was seen is kept on disk per character, and a tracked achievement seen reaching its
     // maximum is said once (completed). X-173 (0.1140): kept in TenshoData.db through AchievementProgressData (AchievementProgress.json
-    // converted once), read off the frame at start; nothing is read nor written before it is there.
+    // left aside since X-574, 0.1793), read off the frame at start; nothing is read nor written before it is there.
     private readonly AchievementProgressData? data;
     private Task<Dictionary<ulong,Dictionary<uint,AchievementProgress>>>? loading;
     private bool saveBlocked;

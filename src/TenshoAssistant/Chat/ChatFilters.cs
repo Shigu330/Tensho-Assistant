@@ -309,9 +309,13 @@ public sealed class ChatTabFilter
     // X-717 M1 (review of 0.1716): the players hidden, a set (a lookup per message).
     private readonly ChatPlayerSet hidden;
 
-    public ChatTabFilter(ChatTabSettings tab,ChatFilterTable? table,ChatSettings? settings)
+    // X-484 (0.1777): the names of Teleport and Return, for a tab that hides others' teleports.
+    private readonly IReadOnlySet<string> travel;
+
+    /// <param name="travel">X-484 (0.1777): the names of the actions « Hide others' teleports » hides (<see cref="ChatTravel.Names"/> when null).</param>
+    public ChatTabFilter(ChatTabSettings tab,ChatFilterTable? table,ChatSettings? settings,IReadOnlySet<string>? travel=null)
     {
-        this.tab=tab;
+        this.tab=tab;this.travel=travel ?? ChatTravel.Names;
         if(tab.Filters is { } filters && table is { Rows.Count:>0 }){this.table=table;chosen=filters.ToHashSet();}
         keep=ChatTextFilter.Words(tab.KeepWords);hide=ChatTextFilter.Words(tab.HideWords);hidden=new(settings?.HiddenPlayers);
     }
@@ -322,6 +326,7 @@ public sealed class ChatTabFilter
         // X-447 B10 (0.1654): a conversation's tab shows only the tells with its player, both ways.
         if(tab.Conversation is { } partner && !ChatConversations.With(record,partner))return false;
         if(!ByKind(record))return false;
+        if(tab.HideOthersTravel && ChatTravel.ByOthers(record,travel))return false;
         if(ChatTextFilter.IsPlayer(record.Sender,hidden))return false;
         return keep.Count==0 && hide.Count==0 || ChatTextFilter.Passes(ChatTextFilter.Text(record),keep,hide,tab.WordsMatchCase);
     }
@@ -337,5 +342,39 @@ public sealed class ChatTabFilter
             matched=true;
         }
         return !matched && tab.Unlisted;
+    }
+}
+
+/// <summary>
+/// X-484 (0.1777, beyond the game; the user's request of 15/11 « hide the others' mounts and teleports »). Reading R-X-484 of 20/11 (a capture of
+/// the game's log in a busy city): when another player teleports, the game writes two combat lines, « … readies Teleport. » and « … uses
+/// Teleport. »; nothing was written for the player's mount. A combat line names its action as plain text, which the reader marks as an action's
+/// name (ChatSegmentKind.ActionName, ChatActionLines, 0.1734); Teleport and Return are the Action sheet's rows 5 and 6
+/// (docs/evidence/0.1734-chat-action-lines.md). A line is another player's teleport when it is a combat line whose subject is a player other
+/// than you (party, alliance or other: Dalamud's XivChatRelationKind 2 to 4) and which names one of these actions. Shown or not only: nothing
+/// is counted nor kept (DEC-053). docs/evidence/0.1777-chat-others-teleport.md. Pure (tests); the names are set once by the plugin.
+/// </summary>
+public static class ChatTravel
+{
+    /// <summary>The Action sheet's rows of Teleport (5) and Return (6).</summary>
+    public static readonly IReadOnlyList<uint> Actions=[5,6];
+    /// <summary>XivChatRelationKind: a party member, an alliance member, another player.</summary>
+    public const byte PartyMember=2,OtherPlayer=4;
+    private static IReadOnlySet<string> names=new HashSet<string>();
+
+    /// <summary>The names of Teleport and Return in the client's language (empty until the plugin read them: nothing is hidden then).</summary>
+    public static IReadOnlySet<string> Names{get=>Volatile.Read(ref names);set=>Volatile.Write(ref names,value);}
+
+    /// <summary>The names kept from the sheet's (empty or missing ones left out).</summary>
+    public static IReadOnlySet<string> From(IEnumerable<string?> sheet)
+        =>sheet.Where(name=>!string.IsNullOrWhiteSpace(name)).Select(name=>name!.Trim()).ToHashSet(StringComparer.Ordinal);
+
+    /// <summary>A combat line in which a player other than you readies or uses one of <paramref name="actions"/>.</summary>
+    public static bool ByOthers(ChatRecord record,IReadOnlySet<string> actions)
+    {
+        if(actions.Count==0 || record.Channel!=ChatChannel.Combat || record.Source is <PartyMember or >OtherPlayer)return false;
+        foreach(var segment in record.Body)
+            if(segment.Kind==ChatSegmentKind.ActionName && actions.Contains(segment.Text.Trim()))return true;
+        return false;
     }
 }

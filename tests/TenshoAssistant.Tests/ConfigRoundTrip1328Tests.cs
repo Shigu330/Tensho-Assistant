@@ -1,41 +1,43 @@
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using TenshoAssistant;
 using TenshoAssistant.Alarms;
 
 // 0.1328 (X-334, review of 0.1318 I6, R28.14): the « save then read back » of X-277 (GearExactOutsideCaps renamed GearExactAtCaps) and X-280
 // (an alarm moved in place) went through reflection or System.Text.Json, while the plugin saves its settings with Newtonsoft and
 // TypeNameHandling.Objects (Plugin.cs, saveText; Dalamud reads them the same way). Here the same serializer and settings, on a file written
-// before the rename.
+// before the rename. X-685 part 2 (0.1745): the plugin's serializer is now SettingsJson (System.Text.Json, Tensho's own file); a file
+// written by Dalamud before (Newtonsoft, type names) is read once by SettingsJson.ReadLegacy: both are read here. X-574 (0.1793, the user's
+// choice of 17/11): the name of before 0.1290 is no longer read; a file that still holds it loads all the same (the name ignored).
 internal static class ConfigRoundTrip1328Tests
 {
     private static void Check(bool value, string message) { if (!value) throw new Exception(message); }
 
-    // The plugin's settings (Plugin.cs: saveText).
-    private static readonly JsonSerializerSettings Settings = new() { TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple, TypeNameHandling = TypeNameHandling.Objects };
-    private static string Save(Configuration configuration) => JsonConvert.SerializeObject(configuration, Settings);
-    private static Configuration Load(string text) => JsonConvert.DeserializeObject<Configuration>(text, Settings) ?? throw new Exception("not read back");
+    // The plugin's serializer (Plugin.cs: SettingsJson since 0.1745), and Dalamud's (Newtonsoft, type names) for a file written before.
+    private static readonly JsonSerializerSettings Dalamud = new() { TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple, TypeNameHandling = TypeNameHandling.Objects };
+    private static string Save(Configuration configuration) => SettingsJson.Write(configuration);
+    private static Configuration Load(string text) => SettingsJson.Read<Configuration>(text) ?? throw new Exception("not read back");
 
-    // A settings file as written before 0.1290: the old name, no new one.
-    private static string BeforeRename(bool? exactOutsideCaps)
+    // A settings file as written before 0.1290: the old name, no new one (Tensho's own text, or Dalamud's).
+    private static string BeforeRename(bool? exactOutsideCaps, bool dalamud = false)
     {
-        var file = JObject.Parse(Save(new Configuration()));
+        var file = SettingsJson.Node(dalamud ? JsonConvert.SerializeObject(new Configuration(), Dalamud) : Save(new Configuration()));
         Check(file.Remove("GearExactAtCaps"), "the new name was saved");
         if (exactOutsideCaps is { } value) file["GearExactOutsideCaps"] = value;
-        return file.ToString(Formatting.None);
+        return SettingsJson.Text(file);
     }
 
     public static IEnumerable<(string Name, Action Run)> Cases =>
     [
-        ("Config round trip 1328: the plugin's serializer reads the old name, writes the new one only, and keeps the choice across two saves", () =>
+        ("Config round trip 1328: the plugin's serializer keeps GearExactAtCaps across two saves; a file with the old name still loads (X-574: that name ignored)", () =>
         {
-            Check(Plugin().Contains("TypeNameAssemblyFormatHandling=Newtonsoft.Json.TypeNameAssemblyFormatHandling.Simple,TypeNameHandling=Newtonsoft.Json.TypeNameHandling.Objects", StringComparison.Ordinal), "the same settings as the plugin");
-            var off = Load(BeforeRename(false));
-            Check(!off.GearExactAtCaps, "turned off before the rename: off");
+            Check(Plugin().Contains("live=>SettingsJson.Write(live),", StringComparison.Ordinal) && Plugin().Contains("text=>SettingsJson.Read<Configuration>(text),", StringComparison.Ordinal), "the same serializer as the plugin");
+            var off = Load(Save(new Configuration { GearExactAtCaps = false, GearLevelsBelow = 7 }));
+            Check(!off.GearExactAtCaps && off.GearLevelsBelow == 7, "turned off: off");
             var saved = Save(off);
-            Check(saved.Contains("\"GearExactAtCaps\":false", StringComparison.Ordinal) && !saved.Contains("GearExactOutsideCaps", StringComparison.Ordinal), "the new name saved, never the old one");
+            Check(SettingsJson.Node(saved)["GearExactAtCaps"]?.GetValue<bool>() == false && !saved.Contains("GearExactOutsideCaps", StringComparison.Ordinal), "the name saved, never the old one");
             Check(!Load(saved).GearExactAtCaps && !Load(Save(Load(saved))).GearExactAtCaps, "still off after two saves");
-            Check(Load(BeforeRename(true)).GearExactAtCaps, "on before the rename: on");
+            var before = BeforeRename(false);
+            Check(Load(before) is { GearExactAtCaps: true } && SettingsJson.ReadLegacy<Configuration>(BeforeRename(false, dalamud: true)) is { GearExactAtCaps: true }, "the old name ignored: the default, on (no error)");
             Check(Load(BeforeRename(null)).GearExactAtCaps, "never set: the default, on");
         }),
         ("Config round trip 1328: an alarm moved in place is read back by the plugin's serializer: same alarm, new time, nothing lost", () =>

@@ -448,8 +448,9 @@ public static class BeastTeams
     /// <summary>
     /// X-578 (0.1548): a beast's page of the game's bestiary (XBMMonsterBookDetail): its rank (« Rang 5 (8) »: 8 the beast's own rank, 5 the
     /// rank it is synchronised at on the board), the attributes and HP the page shows (those of the synchronised rank) and its experience.
+    /// X-771 M2 (0.1773): Satiety = the page's « Satiété 0/3 » (its second number, 3); 0 when not read (a page kept before 0.1773).
     /// </summary>
-    public sealed record BookRead(uint Beast, int Rank, int Synced, BeastStats Stats, int Hp, int Exp);
+    public sealed record BookRead(uint Beast, int Rank, int Synced, BeastStats Stats, int Hp, int Exp, int Satiety = 0);
 
     /// <summary>
     /// X-578 (0.1548, docs/evidence/0.1548-beast-book.md): the texts of the bestiary's beast page, in the order of the window's nodes: each
@@ -472,7 +473,7 @@ public static class BeastTeams
         int[] stats = [Whole(texts[own - 6]), Whole(texts[own - 12]), Whole(texts[own - 8]), Whole(texts[own - 14]), Whole(texts[own - 10])];
         var (exp, hp, satiety) = (Part(texts[own - 2]), Part(texts[own - 4]), Part(texts[own - 16]));
         if (rank > Math.Max(1, beast.Ranks.Count) || synced < 1 || synced > rank || stats.Any(value => value < 0) || exp < 0 || hp < 0 || satiety < 0) return null;
-        return new BookRead(beast.Id, rank, synced, new BeastStats(stats[0], stats[1], stats[2], stats[3], stats[4]), hp, exp);
+        return new BookRead(beast.Id, rank, synced, new BeastStats(stats[0], stats[1], stats[2], stats[3], stats[4]), hp, exp, BeastSpaces.SatietyShown(texts[own - 16]));
     }
 
     /// <summary>
@@ -508,7 +509,7 @@ public static class BeastTeams
     public static string Key(IReadOnlySet<uint>? held, IReadOnlyDictionary<uint, int>? ranks, IReadOnlySet<uint>? floors = null, string mark = "")
         => (mark.Length > 0 ? mark + "|" : "") + (held is null ? "?" : string.Join(",", held.Order())) + "|" + string.Join(",", (ranks ?? new Dictionary<uint, int>()).OrderBy(pair => pair.Key)
             .Select(pair => $"{pair.Key}:{pair.Value}{(floors?.Contains(pair.Key) == true ? "+" : "")}"));
-    public static string Write(SavedPlans plans) => JsonSerializer.Serialize(plans);
+    public static string Write(SavedPlans plans) => JsonSerializer.Serialize(plans,TenshoJson.Plain);
     /// <summary>
     /// X-617 (review of block 0.1551 to 0.1554, I1): the plans read from the file joined with those kept in memory while the file could not be
     /// read (held by another program, BeastPlansFile.Blocked). Before, the file replaced the memory and all read meanwhile was lost without a
@@ -552,7 +553,7 @@ public static class BeastTeams
     }
     public static SavedPlans? Read(string text)
     {
-        try { return JsonSerializer.Deserialize<SavedPlans>(text) is { Plans: not null, Keys: not null } plans ? plans : null; }
+        try { return JsonSerializer.Deserialize<SavedPlans>(text,TenshoJson.Plain) is { Plans: not null, Keys: not null } plans ? plans : null; }
         catch (JsonException) { return null; }
     }
 }

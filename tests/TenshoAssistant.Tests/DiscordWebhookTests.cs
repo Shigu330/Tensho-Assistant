@@ -205,17 +205,14 @@ internal static class DiscordWebhookTests
             while (survivor.State.Sent < 1) { if (DateTime.UtcNow > until) throw new Exception("worker died: " + survivor.State); Thread.Sleep(10); }
             Check(survivor.State.Failed == 1 && survivor.State.Status == DiscordStatus.Sent,"the error is recorded and the next post still leaves");
         }),
-        ("Discord role ids: ASCII digits only, a pasted mention is accepted; legacy alarms get their source and job",()=>
+        ("Discord role ids: ASCII digits only, a pasted mention is accepted; legacy alarms get their job",()=>
         {
             Check(!DiscordWebhook.IsValidRoleId("１１２２３３４４５５６６７７８８９９") && DiscordWebhook.RoleIdFrom("１１２２３３４４５５６６７７８８９９") is null,"full-width digits refused");
             Check(!DiscordWebhook.IsValidUrl("https://discord.com/api/webhooks/１２３４５６７８９０１２３４５６７８/" + Token),"full-width digits refused in the address");
             Check(DiscordWebhook.RoleIdFrom(" <@&112233445566778899> ") == "112233445566778899" && DiscordWebhook.RoleIdFrom("112233445566778899") == "112233445566778899","mention or bare id");
             Check(DiscordWebhook.RoleIdFrom("  ") == "" && DiscordWebhook.RoleIdFrom("Modérateurs") is null,"empty removes, a name is refused");
-            var reminder = new TenshoAlarm { Group = "Rappels" }; var voyage = new TenshoAlarm { Group = "Compagnie libre" }; var weather = new TenshoAlarm { Group = "Pluie · Limsa" };
-            Check(DiscordWebhook.AssignLegacySource(reminder,"Rappels","Compagnie libre") && reminder.Source == AlarmSource.Reminder,"reminder by its group");
-            Check(DiscordWebhook.AssignLegacySource(voyage,"Rappels","Compagnie libre") && voyage.Source == AlarmSource.Voyage,"voyage by its group");
-            Check(!DiscordWebhook.AssignLegacySource(weather,"Rappels","Compagnie libre") && weather.Source == AlarmSource.Other,"other groups untouched");
-            Check(!DiscordWebhook.AssignLegacySource(reminder,"Rappels","Compagnie libre"),"done once");
+            // X-574 (0.1793): the alarms of before 0.319 are no longer given a source by their group (AssignLegacySource is gone).
+            Check(typeof(DiscordWebhook).GetMethod("AssignLegacySource") is null && DiscordWebhook.SourceOf(new TenshoAlarm { Group = "Rappels" }) == AlarmSource.Other,"no source guessed from a group");
             Check(AlarmSchedule.JobOfAlarm(new TenshoAlarm { ItemId = 5, JobId = 17 },_ => null) == 17,"stored job kept");
             Check(AlarmSchedule.JobOfAlarm(new TenshoAlarm { ItemId = 5 },_ => null) == 0 && AlarmSchedule.JobOfAlarm(new TenshoAlarm(),_ => throw new Exception("not asked")) == 0,"no sources, no item");
         }),

@@ -96,7 +96,7 @@ internal static class SettingsRead1120Tests
             var host=Read("src/TenshoAssistant.Desktop/Host.cs");
             Check(host.Contains("Newtonsoft.Json.JsonConvert.DeserializeObject(SettingsGuard.Project(SettingsGuard.ReadBounded(path)),configurationType,settings);") && !host.Contains("PopulateObject") && !host.Contains("File.ReadAllText("),"one bounded, projected reading");
             Check(host.Contains("return SettingsGuard.AllowedType(type,plugin) ? type : throw new Newtonsoft.Json.JsonSerializationException("),"the binder enforces the closed list");
-            Check(host.Contains("var value=Parse(path);"),"the start reads through it too");
+            Check(host.Contains("var value=Parse(path,out var from);"),"the start reads through it too");
             var status=Read("src/TenshoAssistant.Desktop/StatusBar.cs");
             Check(status.Contains("(reload??=new(host.ReadSettingsAgain)).Request();") && status.Contains(": result.Value is { } fresh ? host.ApplySettings(fresh)"),"read off the frame, applied at once when valid");
             Check(!host.Contains("File.Write") && !status.Contains("File.Write"),"the app never writes the plugin's settings");

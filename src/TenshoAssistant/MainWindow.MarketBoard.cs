@@ -51,6 +51,8 @@ internal sealed partial class MainWindow
     private (int Column,bool Descending) marketOfferSort=(0,false),marketSaleSort=(0,true);
     private (MarketBoard? Board,MarketFilter Filter,(int,bool) Sort) marketSalesKey;
     private MarketSale[] marketSalesShown=[];
+    // X-767 M2 (review of 0.1756): the « N sale(s) copied » note, shown only while the item, filters and order copied are shown.
+    private readonly TenshoAssistant.Market.CopiedNote<(MarketBoard? Board,MarketFilter Filter,(int,bool) Sort)> marketSalesCopied=new();
     // I22 (0.669): the filtered sales and their statistics, once per change, not at each frame.
     private MarketSale[] marketSalesFiltered=[];
     private TenshoAssistant.Market.MarketSaleStats? marketSalesStats;
@@ -276,6 +278,15 @@ internal sealed partial class MainWindow
             ImGui.TextColored(Accent,localization.Format("MarketBoard.Stats",stats.Minimum.ToString("N0",Numbers),stats.Average.ToString("N0",Numbers),stats.Maximum.ToString("N0",Numbers),stats.Sales,stats.Units.ToString("N0",Numbers)));
         else{ImGui.TextDisabled(localization.Get("MarketBoard.NoSales"));return;}
         ImGui.TextDisabled(localization.Get("MarketBoard.SortHelp"));
+        // X-212 part 2 (0.1756, the user's request of 12/11): the sales shown (filters and sort of the table) copied as CSV; the lines counted.
+        if(ImGui.SmallButton(localization.Get("MarketBoard.CopyCsv")))
+        {
+            var text=MarketBoardMath.SalesCsv(board.ItemId,itemCatalog.State.Catalog?.Find(board.ItemId)?.Name ?? $"#{board.ItemId}",marketSalesShown);
+            ImGui.SetClipboardText(text);
+            marketSalesCopied.Copied(marketSalesKey,localization.Format("MarketBoard.CsvCopied",marketSalesShown.Length));
+        }
+        Tip("MarketBoard.CopyCsvTip");
+        if(marketSalesCopied.For(marketSalesKey) is { } copied){ImGui.SameLine();ImGui.TextDisabled(copied);}
         if(!UI.UiComponents.BeginDataTable("MarketSales",5,sortable:true,scrollHeight:Math.Max(160,ImGui.GetContentRegionAvail().Y)))return;
         try
         {

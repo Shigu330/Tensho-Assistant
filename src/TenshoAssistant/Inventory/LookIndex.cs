@@ -1,0 +1,57 @@
+namespace TenshoAssistant.Inventory;
+
+/// <summary>X-216: a piece held with a given look: the item and the place it is in.</summary>
+public readonly record struct LookHeld(uint Item,string Place);
+
+/// <summary>X-216 (part 2): one piece of the glamour collection: the item, the places it is in (in the order of the places read), and the
+/// other items held with the same look.</summary>
+public sealed record LookPiece(uint Item,IReadOnlyList<string> Places,IReadOnlyList<uint> SameLook);
+
+/// <summary>
+/// X-216 (the user's request of 12/11, the comparison with other plugins K-26), first part: the pieces a character holds, by look (the same
+/// models, Item.ModelMain and ModelSub, and the same equipment slot, EquipSlotCategory: what StorageReport.SameLook groups in the glamour
+/// dresser), for « same look » on any item sheet. Built once per change of the storages read; items without a model or a slot are left out;
+/// dyes aside (not part of the look). Pure (tests).
+/// </summary>
+public sealed class LookIndex
+{
+    private readonly Dictionary<(ulong Main,ulong Sub,uint Slot),List<LookHeld>> byLook=[];
+
+    public int Pieces{get;private set;}
+
+    public static LookIndex Build(IEnumerable<(string Place,IEnumerable<uint> Items)> places,Func<uint,ItemLook?> look)
+    {
+        var index=new LookIndex();
+        foreach(var (place,items) in places)
+            foreach(var item in items.Distinct())
+            {
+                if(item==0 || look(item) is not { Main:not 0,Slot:not 0 } seen)continue;
+                var key=(seen.Main,seen.Sub,seen.Slot);
+                if(!index.byLook.TryGetValue(key,out var list))index.byLook[key]=list=[];
+                list.Add(new(item,place));
+                index.Pieces++;
+            }
+        return index;
+    }
+
+    /// <summary>
+    /// X-216 (part 2): the glamour collection piece by piece: every item held with a look, once, with all the places it is in and the other
+    /// items of the same look (a piece kept twice, or two pieces that look the same). In the order of the looks met, then of the items.
+    /// </summary>
+    public IReadOnlyList<LookPiece> Collection()
+    {
+        var pieces=new List<LookPiece>();
+        foreach(var held in byLook.Values)
+        {
+            var items=held.Select(piece=>piece.Item).Distinct().ToArray();
+            foreach(var item in items)
+                pieces.Add(new(item,[..held.Where(piece=>piece.Item==item).Select(piece=>piece.Place).Distinct()],[..items.Where(other=>other!=item)]));
+        }
+        return pieces;
+    }
+
+    /// <summary>The pieces held with this look (the item itself included when held), in the order of the places; empty when none; a look
+    /// without a model or a slot finds nothing.</summary>
+    public IReadOnlyList<LookHeld> Find(ItemLook look)=>
+        look is { Main:not 0,Slot:not 0 } && byLook.TryGetValue((look.Main,look.Sub,look.Slot),out var held) ? held:[];
+}

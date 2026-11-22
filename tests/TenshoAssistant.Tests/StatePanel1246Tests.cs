@@ -78,7 +78,7 @@ internal static class StatePanel1246Tests
             Check(dashboard.Contains("()=>configuration.StatePanel && !inDesktopApp,StatePanelVisible,DrawStatePanelContents,Alpha:0.7f);"),"its setting");
             Check(dashboard.Contains("return StateBar.Shown(DashboardState?.Overall,configuration.StateServerBarOnlyProblems);"),"the same rule as the bar entry");
             Check(dashboard.Contains("private bool DashboardWanted=>configuration.StateServerBar || configuration.StatePanel || configuration.DesktopLink;"),"read only while one of its readers is on");
-            Check(dashboard.Contains("if(ImGui.SmallButton(localization.Get(\"Dashboard.Details\")+\"##TenshoStateDetails\"))OpenSettings();\n        Tip(\"Dashboard.DetailsTip\");"),"Details opens the settings");
+            Check(dashboard.Contains("if(ImGui.SmallButton(localization.Get(\"Dashboard.Details\")+\"##TenshoStateDetails\"))OpenStateSettings();\n        Tip(\"Dashboard.DetailsTip\");"),"Details opens the settings (X-724: its category)");
             Check(Read("src/TenshoAssistant/Link/LocalLinkFeed.Dalamud.cs").Contains("loggedIn ? ReadHeld():null,ReadState()));"),"the link sends it");
             Check(Read("src/TenshoAssistant/Plugin.Desktop.cs").Contains("{Held=mainWindow.AlarmHeldItems,State=mainWindow.DashboardLinkState};"),"from the window's snapshot");
             var advanced=Read("src/TenshoAssistant/MainWindow.Advanced.cs");

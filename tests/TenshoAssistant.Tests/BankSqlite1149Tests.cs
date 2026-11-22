@@ -6,7 +6,9 @@ using TenshoAssistant.Inventory;
 // and one character at a time. Behaviour tests (R28): real files in a temporary folder; the folder of before converted whole in one transaction or
 // not at all (a stop inside, an unreadable character file); the former shared file split then converted; a data file that blocks (newer layout)
 // or cannot be created (files as before); two clients at once on one data file; the lock held by the other client; SQLite kept busy by another
-// writer (tried again, never a blocked bank); a tampered row fails closed; the desktop application's copy reads it, never converting.
+// writer (tried again, never a blocked bank); a tampered row fails closed; the desktop application's copy reads it, never converting. X-574
+// (0.1793, the user's choice of 17/11): the files of before (the folder, the former shared file) are no longer converted: left aside, never read,
+// moved nor removed (the cases about the conversion say that now).
 internal static class BankSqlite1149Tests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
@@ -40,8 +42,13 @@ internal static class BankSqlite1149Tests
         try { run(root,Path.Combine(root,"InventoryBank"),Path.Combine(root,"InventoryBank.json"),Path.Combine(root,TenshoDataDatabase.FileName)); }
         finally { SqliteConnection.ClearAllPools(); try { Directory.Delete(root,true); } catch (IOException) { } catch (UnauthorizedAccessException) { } }
     }
-    private static TenshoDataFile Data(string database,List<string>? warnings = null) => new(database,(error,message) => warnings?.Add(message + " " + error.Message));
-    private static PerCharacterBankStore Store(string folder,string legacy,string database,int lockWaitMs = 10_000) => new(folder,legacy,lockWaitMs,Data(database));
+    private static TenshoDataFile Data(string database,List<string>? warnings = null,List<string>? said = null) => new(database,(error,message) => warnings?.Add(message + " " + error.Message),said is null ? null : line => { if (line.EndsWith("(X-574).",StringComparison.Ordinal)) said.Add(line); });
+    private static PerCharacterBankStore Store(string folder,string legacy,string database,int lockWaitMs = 10_000,List<string>? said = null) => new(folder,legacy,lockWaitMs,Data(database,said: said));
+    // Every file under a folder, by relative path, with its bytes (the files of before, compared byte for byte).
+    private static (string Name,byte[] Bytes)[] Files(string folder) => Directory.GetFiles(folder,"*",SearchOption.AllDirectories).Order(StringComparer.Ordinal)
+        .Select(path => (Path.GetRelativePath(folder,path),File.ReadAllBytes(path))).ToArray();
+    private static bool Same((string Name,byte[] Bytes)[] left,(string Name,byte[] Bytes)[] right)
+        => left.Length == right.Length && left.Zip(right).All(pair => pair.First.Name == pair.Second.Name && pair.First.Bytes.SequenceEqual(pair.Second.Bytes));
     // Entries compared by what is saved (the file's JSON of each entry), in order.
     private static string Text(IEnumerable<BankEntry> entries) => string.Join("\n",FileInventoryBankStore.EntryRows(entries.ToArray()));
     private static string[] Aside(string root) => Directory.GetDirectories(root,"before-sqlite-*").SelectMany(directory => Directory.GetFiles(directory,"*",SearchOption.AllDirectories)).ToArray();
@@ -50,10 +57,11 @@ internal static class BankSqlite1149Tests
         using var open = new TenshoDataDatabase(database).Open();
         return Convert.ToInt64(TenshoDataDatabase.Scalar(open,"SELECT COUNT(*) FROM bank_entries;"));
     }
+    // X-574 (0.1793): no « converted » mark is written any more.
     private static bool Marked(string database)
     {
         using var open = new TenshoDataDatabase(database).Open();
-        return TenshoDataDatabase.Converted(open,PerCharacterBankStore.Family);
+        return Convert.ToInt64(TenshoDataDatabase.Scalar(open,"SELECT COUNT(*) FROM converted;")) > 0;
     }
     private static bool Throws<T>(Action run) where T : Exception
     {
@@ -62,7 +70,7 @@ internal static class BankSqlite1149Tests
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
-        ("Bank SQLite 1149: the folder of before converted whole (a character kept only in its .bak too), kept aside byte for byte, the same after a restart",() => InTemp((root,folder,legacy,database) =>
+        ("Bank SQLite 1149: the folder of before is left aside, never read nor moved, byte for byte (X-574); the bank saved, the same after a restart",() => InTemp((root,folder,legacy,database) =>
         {
             var one = new[] { Entry(1,BankStorageKind.Saddlebag),Entry(1,BankStorageKind.Retainer,99,item: 2),Entry(1,BankStorageKind.Bags) };
             var two = new[] { Entry(0x8000_0000_0000_0002UL,BankStorageKind.Retainer,0x8000_0000_0000_0007UL),Entry(0x8000_0000_0000_0002UL,BankStorageKind.Currency) };
@@ -72,25 +80,30 @@ internal static class BankSqlite1149Tests
             files.Save([.. three.Select(entry => entry with { Name = "Saved twice" })]);
             File.Delete(Path.Combine(folder,"3.json"));
             Check(File.Exists(Path.Combine(folder,"3.json.bak")),"character 3 kept only in its .bak");
-            var expected = new PerCharacterBankStore(folder,legacy).Load();
-            var bytes = Directory.GetFiles(folder).OrderBy(path => Path.GetFileName(path)).Select(path => (Path.GetFileName(path),File.ReadAllBytes(path))).ToArray();
-            var store = Store(folder,legacy,database);
+            var bytes = Files(folder);
+            var said = new List<string>();
+            var store = Store(folder,legacy,database,said: said);
             Check(store.Mode == "sqlite","SQLite in use: " + store.Mode);
-            Check(Text(store.Load()) == Text(expected),"the same entries, in the same order, after the conversion");
-            Check(!Directory.Exists(folder) && Marked(database) && Rows(database) == 6,"folder moved, marked converted, six rows");
-            var kept = Directory.GetDirectories(root,"before-sqlite-*").Single();
-            Check(Directory.GetFiles(Path.Combine(kept,"InventoryBank")).OrderBy(path => Path.GetFileName(path)).Select(path => (Path.GetFileName(path),File.ReadAllBytes(path)))
-                .Zip(bytes).All(pair => pair.First.Item1 == pair.Second.Item1 && pair.First.Item2.SequenceEqual(pair.Second.Item2)) && Aside(root).Length == bytes.Length,"every file of before kept aside, unchanged");
-            Check(Text(Store(folder,legacy,database).Load()) == Text(expected),"after a restart");
-            Check(!Directory.Exists(folder),"no folder made again");
+            Check(store.Load().Length == 0 && Rows(database) == 0,"nothing read from the folder of before");
+            Check(Same(Files(folder),bytes) && Aside(root).Length == 0 && !Marked(database),"the folder in place, every file unchanged, nothing set aside nor marked");
+            Check(said.SequenceEqual(["Bank: a file of an old format (InventoryBank/) was left aside, not read (X-574)."]),"said once: " + string.Join(" | ",said));
+            store.Save([.. one,.. two]);
+            Check(Text(Store(folder,legacy,database).Load()) == Text([.. one,.. two]) && Rows(database) == 5,"the bank saved in the data file, the same after a restart");
+            store.Load();
+            Check(said.Count == 1 && Same(Files(folder),bytes),"said once per data file; the folder never written");
         })),
-        ("Bank SQLite 1149: the former shared file split then converted; changes are per character, erase on command only, a whole-list save deletes nothing",() => InTemp((root,folder,legacy,database) =>
+        ("Bank SQLite 1149: the former shared file is left aside, never split nor read (X-574); changes are per character, erase on command only, a whole-list save deletes nothing",() => InTemp((root,folder,legacy,database) =>
         {
             new FileInventoryBankStore(legacy).Save([Entry(5,BankStorageKind.Saddlebag),Entry(6,BankStorageKind.Retainer,9),Entry(6,BankStorageKind.Bags)]);
-            var store = Store(folder,legacy,database);
-            Check(store.Load().Length == 3 && Rows(database) == 3,"three storages converted from the former file");
-            Check(!File.Exists(legacy) && File.Exists(legacy + ".migrated") && !Directory.Exists(folder) && Aside(root).Any(path => path.EndsWith("6.json",StringComparison.Ordinal)),
-                "the former file kept as .migrated, the split folder set aside");
+            File.Copy(legacy,legacy + ".bak");
+            var legacyBytes = File.ReadAllBytes(legacy);
+            var said = new List<string>();
+            var store = Store(folder,legacy,database,said: said);
+            Check(store.Load().Length == 0 && Rows(database) == 0,"nothing read from the former file");
+            Check(File.ReadAllBytes(legacy).SequenceEqual(legacyBytes) && !File.Exists(legacy + ".migrated") && !Directory.Exists(folder) && Aside(root).Length == 0,
+                "the former file in place, unchanged, never split");
+            Check(said.SequenceEqual(["Bank: files of an old format (InventoryBank.json, InventoryBank.json.bak) were left aside, not read (X-574)."]),"said once, with its copy: " + string.Join(" | ",said));
+            store.Save([Entry(5,BankStorageKind.Saddlebag),Entry(6,BankStorageKind.Retainer,9),Entry(6,BankStorageKind.Bags)]);
             using var bank = Ready(store);
             Import(bank,Entry(5,BankStorageKind.Retainer,1));
             Check(Await(bank.ForgetAsync(new BankKey(6,BankStorageKind.Retainer,9))).Success,"forget one storage");
@@ -100,25 +113,19 @@ internal static class BankSqlite1149Tests
             var whole = Store(folder,legacy,database);
             whole.Save(whole.Load().Where(entry => false).ToArray());
             Check(Rows(database) == 1,"a whole-list save never deletes a character");
-            Check(!Directory.Exists(folder),"nothing written to the files of before");
+            Check(!Directory.Exists(folder) && File.ReadAllBytes(legacy).SequenceEqual(legacyBytes) && File.ReadAllBytes(legacy + ".bak").SequenceEqual(legacyBytes),"nothing written to the files of before");
         })),
-        ("Bank SQLite 1149: a stop inside the conversion and an unreadable character file leave the files in place, nothing in the data file, every write refused",() => InTemp((root,folder,legacy,database) =>
+        ("Bank SQLite 1149: files of before (one unreadable) are never read, moved nor written; the bank works from the data file",() => InTemp((root,folder,legacy,database) =>
         {
             new PerCharacterBankStore(folder,legacy).Save([Entry(1,BankStorageKind.Saddlebag),Entry(2,BankStorageKind.Bags)]);
-            var stopped = Store(folder,legacy,database);
-            stopped.DuringConversion = () => throw new IOException("stop inside the transaction");
-            Check(Throws<IOException>(() => stopped.Load()),"the stop is seen");
-            Check(File.Exists(Path.Combine(folder,"1.json")) && File.Exists(Path.Combine(folder,"2.json")) && Aside(root).Length == 0,"the files stay");
-            Check(Rows(database) == 0 && !Marked(database),"no row, no mark");
-            Check(Throws<InvalidOperationException>(() => stopped.Apply(new BankChange(Put: Entry(1,BankStorageKind.Bags)),[])),"a failed load refuses every write");
-            var good = File.ReadAllBytes(Path.Combine(folder,"2.json"));
             File.WriteAllText(Path.Combine(folder,"2.json"),"{ broken");
-            var broken = Store(folder,legacy,database);
-            Check(Throws<InvalidDataException>(() => broken.Load()),"an unreadable character file fails the whole conversion");
-            Check(Rows(database) == 0 && !Marked(database) && File.ReadAllText(Path.Combine(folder,"2.json")) == "{ broken" && File.Exists(Path.Combine(folder,"1.json")),"nothing converted, nothing moved");
-            Check(Throws<InvalidOperationException>(() => broken.Save([Entry(1,BankStorageKind.Bags)])),"and nothing written");
-            File.WriteAllBytes(Path.Combine(folder,"2.json"),good);
-            Check(Store(folder,legacy,database).Load().Length == 2 && Marked(database),"converted at the next start once readable");
+            var bytes = Files(folder);
+            var store = Store(folder,legacy,database);
+            Check(store.Load().Length == 0,"the load works: nothing read from the files");
+            var bags = Entry(1,BankStorageKind.Bags);
+            Check(store.Apply(new BankChange(Put: bags),[]).Length == 1 && Rows(database) == 1,"a change is saved in the data file");
+            Check(Text(Store(folder,legacy,database).Load()) == Text([bags]),"read back from the data file only");
+            Check(Same(Files(folder),bytes) && Aside(root).Length == 0 && !Marked(database),"the files stay as they were, the unreadable one too");
         })),
         ("Bank SQLite 1149: a data file of a newer layout blocks the bank and is never written; no data file possible: the files as before",() => InTemp((root,folder,legacy,database) =>
         {
@@ -138,7 +145,7 @@ internal static class BankSqlite1149Tests
         })),
         ("Bank SQLite 1149: two clients on one data file at the same time lose nothing; the lock held by the other: refused, nothing written",() => InTemp((root,folder,legacy,database) =>
         {
-            new PerCharacterBankStore(folder,legacy).Save([Entry(4,BankStorageKind.Saddlebag)]);
+            Store(folder,legacy,database).Save([Entry(4,BankStorageKind.Saddlebag)]);
             using var first = Ready(Store(folder,legacy,database));
             using var second = Ready(Store(folder,legacy,database));
             var runs = new[] { (Bank: first,Base: 1000UL),(Bank: second,Base: 2000UL) }.Select(side => Task.Run(() =>
@@ -188,24 +195,25 @@ internal static class BankSqlite1149Tests
             Check(Throws<InvalidDataException>(() => Store(folder,legacy,database).Load()),"a damaged entry: refused");
             Check(Rows(database) == 1,"nothing written over it");
         })),
-        ("Bank SQLite 1149: the desktop application's copy shows the same bank, from the files before the conversion, never converting its copy",() => InTemp((root,folder,legacy,database) =>
+        ("Bank SQLite 1149: the desktop application's copy shows the same bank, from its copy of the data file even beside files of before, never converting",() => InTemp((root,folder,legacy,database) =>
         {
             var entries = new[] { Entry(1,BankStorageKind.Saddlebag),Entry(1,BankStorageKind.Retainer,8) };
-            new PerCharacterBankStore(folder,legacy).Save(entries);
-            Store(folder,legacy,database).Load();
+            Store(folder,legacy,database).Save(entries);
             var mirror = Path.Combine(root,"mirror");
             var copy = TenshoDataDatabase.CopyForDesktop(database,Path.Combine(mirror,TenshoDataDatabase.FileName));
             Check(copy.Copied == 1,"copied: " + string.Join("; ",copy.Problems));
-            Directory.CreateDirectory(Path.Combine(mirror,"InventoryBank"));
+            // X-574 (0.1793): a copy of a file of before beside it (the plugin no longer moves them): never read in place of the data file.
+            new PerCharacterBankStore(Path.Combine(mirror,"InventoryBank"),Path.Combine(mirror,"InventoryBank.json")).Save([Entry(1,BankStorageKind.Bags)]);
+            var old = Files(Path.Combine(mirror,"InventoryBank"));
             var app = new PerCharacterBankStore(Path.Combine(mirror,"InventoryBank"),Path.Combine(mirror,"InventoryBank.json"),data: Data(Path.Combine(mirror,TenshoDataDatabase.FileName)));
-            Check(Text(app.Load()) == Text(new PerCharacterBankStore(folder,legacy,data: Data(database)).Load()),"the application shows the same storages");
-            Check(Directory.Exists(Path.Combine(mirror,"InventoryBank")) && !Directory.GetDirectories(mirror,"before-sqlite-*").Any(),"an emptied copy of the folder: nothing to convert, nothing moved");
+            Check(Text(app.Load()) == Text(new PerCharacterBankStore(folder,legacy,data: Data(database)).Load()) && Text(app.Load()) == Text(entries),"the application shows the same storages");
+            Check(Same(Files(Path.Combine(mirror,"InventoryBank")),old) && !Directory.GetDirectories(mirror,"before-sqlite-*").Any(),"the copy of the files of before: nothing converted, nothing moved");
             var window = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.DesktopData.cs")).Replace("\r\n","\n");
-            Check(window.Contains("var json=File.Exists(legacy) || Directory.Exists(files) && Directory.EnumerateFiles(files,\"*.json*\").Any();")
-                && window.Contains("new PerCharacterBankStore(files,legacy,data:!json && File.Exists(file) ? new TenshoDataFile(file,warn):null)")
+            Check(window.Contains("new PerCharacterBankStore(files,legacy,data:File.Exists(file) ? new TenshoDataFile(file,warn):null)")
+                && !window.Contains("var json=File.Exists(legacy)")
                 && window.Contains("case \"bank\":\n                UseDesktopBank(folder,warn);")
                 && window.Contains("UseDesktopVoyages(folder,warn);\n                UseDesktopBank(folder,warn);"),
-                "the app reads its copy of the data file once no bank file is left, the copy of the files before, never converting");
+                "the app reads its copy of the data file when there is one, the copy of the files otherwise (the plugin's JSON mode), never converting");
             // X-153 (0.1239): made in the persistence family (Plugin.Persistence.cs).
             var plugin = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Persistence.cs"));
             Check(plugin.IndexOf("var tenshoData=new TenshoDataFile(",StringComparison.Ordinal) is var made and > 0

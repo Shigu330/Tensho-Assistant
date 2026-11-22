@@ -244,6 +244,9 @@ internal sealed partial class MainWindow : Window, IDisposable
     public override void PostDraw(){bodyFontScope?.Dispose();bodyFontScope=null;FfxivTheme.Pop();}
 
     internal void OpenSettings(){page=Page.Settings;IsOpen=true;}
+    /// <summary>X-724 (0.1730): Tensho's state and its dashboard live in Settings › Tracking › Server bar: the dashboard's « Details » and
+    /// the state entry's click open that category.</summary>
+    internal void OpenStateSettings(){page=Page.Settings;OpenSettingsCategory("Tracking","ServerBar");IsOpen=true;}
     internal void OpenAlarms(){page=Page.Alarms;IsOpen=true;}
     internal void OpenReminders(){page=Page.Reminders;IsOpen=true;}
     // 0.344 (g, I-02): from the currency entry of the server bar.

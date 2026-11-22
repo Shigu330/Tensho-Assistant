@@ -5,6 +5,49 @@ using Lumina.Excel.Sheets;
 // Read-only evidence for NPC-VENDORS-014: how scrip exchanges encode currencies and how NPCs reach their shops.
 if(args.Length is <1 or >2)throw new ArgumentException("Supply installed sqpack directory and optionally an item name.");
 using var data=new GameData(args[0],new LuminaOptions{DefaultExcelLanguage=Language.French,CacheFileResources=false});
+// PROBE_CHATACTIONS (X-734, 0.1734): the plugin's own rules (Chat/ChatActionLines.cs, Chat/ChatActionTips.cs) on the client's sheets in the
+// language given (PROBE_CHATACTIONS=French, English, German or Japanese): each combat kind's ends after an action's name (LogMessage), then
+// the sample lines of PROBE_CHATLINES (« kind#text|kind#text »): the action found, its tooltip in a player's line and in another's, its rows.
+if(Environment.GetEnvironmentVariable("PROBE_CHATACTIONS") is { Length:>0 } chatLanguage)
+{
+    var language=Enum.Parse<Language>(chatLanguage);
+    var transient=data.Excel.GetSheet<ActionTransient>(language);
+    // As the plugin (Chat/ChatPlayerActions.Dalamud.cs): the general actions are the player's, with their sheet's description when
+    // ActionTransient has none; each row's class category.
+    var generalRows=data.Excel.GetSheet<GeneralAction>(language).Where(row=>row.Action.RowId!=0).GroupBy(row=>row.Action.RowId)
+        .ToDictionary(group=>group.Key,group=>group.First().Description.ExtractText().Trim());
+    var actionRows=data.Excel.GetSheet<Lumina.Excel.Sheets.Action>(language).Where(row=>!row.Name.IsEmpty)
+        .Select(row=>new TenshoAssistant.Chat.ChatActionRow(row.RowId,row.Name.ExtractText(),row.Icon,row.IsPlayerAction,row.IsPvP,
+            transient.GetRowOrDefault(row.RowId)?.Description.ExtractText().Trim() is { Length:>0 } described ? described:generalRows.GetValueOrDefault(row.RowId,""),
+            row.ClassJobCategory.RowId,generalRows.ContainsKey(row.RowId))).ToList();
+    var tips=TenshoAssistant.Chat.ChatActionTips.Build(actionRows);
+    var templates=data.Excel.GetSheet<LogMessage>(language).Where(row=>row.LogKind.RowId is (>=41 and <=49) or 58).Select(row=>((int)row.LogKind.RowId,row.Text.ToMacroString())).ToList();
+    var lines=new TenshoAssistant.Chat.ChatActionLines(templates,actionRows.Select(row=>row.Name),language!=Language.Japanese);
+    Console.WriteLine($"ACTIONS rows {actionRows.Count} names {lines.Names} player names {tips.Players.Count} all {tips.All.Count}; combat kinds with an end {lines.Kinds}");
+    foreach(var group in templates.Where(template=>TenshoAssistant.Chat.ChatActionLines.End(template.Item2) is not null).GroupBy(template=>template.Item1))
+        Console.WriteLine($"KIND {group.Key}: {group.Count()} templates, ends "+string.Join(" | ",group.Select(template=>"«"+TenshoAssistant.Chat.ChatActionLines.End(template.Item2)+"»").Distinct()));
+    if(Environment.GetEnvironmentVariable("PROBE_CHATAMBIGUOUS") is { Length:>0 })
+    {
+        var actionSheet=data.Excel.GetSheet<Lumina.Excel.Sheets.Action>(language);
+        var ambiguous=actionRows.Where(row=>row.Player && !row.PvP).GroupBy(row=>row.Name.Trim()).Where(group=>group.Select(row=>(row.Icon,row.Description)).Distinct().Count()>1).ToList();
+        Console.WriteLine($"PLAYER names {actionRows.Where(row=>row.Player && !row.PvP).Select(row=>row.Name.Trim()).Distinct().Count()}, ambiguous {ambiguous.Count}, "
+            +$"still without a tooltip in a player's line {ambiguous.Count(group=>!tips.Players.ContainsKey(group.Key))}: "+string.Join(", ",ambiguous.Where(group=>!tips.Players.ContainsKey(group.Key)).Take(20).Select(group=>"«"+group.Key+"»")));
+        foreach(var group in ambiguous.Take(25))
+            Console.WriteLine($"AMBIGUOUS «{group.Key}»: "+string.Join(", ",group.Select(row=>actionSheet.GetRow(row.Id) is var full ? $"{row.Id} icon {row.Icon} job {full.ClassJob.RowId} cat {full.ClassJobCategory.RowId} lvl {full.ClassJobLevel} desc {row.Description.Length}":"")));
+        var general=data.Excel.GetSheet<GeneralAction>(language).Where(row=>row.Action.RowId!=0).ToList();
+        Console.WriteLine($"GENERAL actions with an action: {general.Count}: "+string.Join(", ",general.Take(30).Select(row=>$"{row.RowId}→{row.Action.RowId} «{row.Name.ExtractText()}» icon {row.Icon} desc {row.Description.ExtractText().Length}")));
+    }
+    foreach(var sample in (Environment.GetEnvironmentVariable("PROBE_CHATLINES") ?? "").Split('|',StringSplitOptions.RemoveEmptyEntries))
+    {
+        var parts=sample.Split('#',2);var kind=int.Parse(parts[0]);var text=parts[1];
+        var found=lines.Find(kind,text);
+        var name=found is { } at ? text.Substring(at.Start,at.Length):"";
+        string Tip(bool byPlayer)=>TenshoAssistant.Chat.ChatActionTips.Find(tips,name,byPlayer) is { } tip ? $"icon {tip.Icon} «{tip.Description[..Math.Min(70,tip.Description.Length)]}»":"none";
+        Console.WriteLine(found is null ? $"LINE kind {kind} «{text}»: no action"
+            :$"LINE kind {kind} «{text}»: «{name}»; a player's line: {Tip(true)}; another's: {Tip(false)}; rows "+string.Join(", ",actionRows.Where(row=>row.Name.Trim()==name).Take(8).Select(row=>$"{row.Id} icon {row.Icon} player {row.Player} pvp {row.PvP}")));
+    }
+    return;
+}
 // PROBE_SRANK (X-76 P5, 0.931): the notorious monsters of every territory (TerritoryType.NotoriousMonsterTerritory -> NotoriousMonster: BNpcName,
 // Rank), to check Tensho's S rank table (Hunting/SRankConditions.cs) against the game; read-only.
 // X-462 (0.1464): territories drawn on several maps of the same frame (same territory, scale and offset) but with their own marker range: the
@@ -817,6 +860,53 @@ if(Environment.GetEnvironmentVariable("PROBE_GRACE") is { Length:>0 })
             Console.WriteLine($"FOOD {row} exp {food.EXPBonusPercent}% params {string.Join(" | ",food.Params.Where(entry=>entry.BaseParam.RowId!=0).Select(entry=>$"{entry.BaseParam.RowId} '{paramsEn.GetRowOrDefault(entry.BaseParam.RowId)?.Name.ExtractText()}' value {entry.Value} max {entry.Max} relative {entry.IsRelative} hq {entry.ValueHQ}/{entry.MaxHQ}"))}");
     foreach(var id in new uint[]{4632,4633,4634,4635,12667,12668,26553,26554})
         Console.WriteLine($"DESC {id} {itemsEn.GetRowOrDefault(id)?.Description.ExtractText().Replace((char)10,' ')}");
+    return;
+}
+// PROBE_SHAREDFATE (X-213, 0.1781): the shared FATE ranks (FateProgressUI: the zone, the FATEs needed for ranks 2 to 4, the order) and the
+// gemstone traders (FateShop, keyed like the NPC: its special shops, their names and items). Read-only.
+if(Environment.GetEnvironmentVariable("PROBE_SHAREDFATE") is { Length:>0 })
+{
+    foreach(var row in data.Excel.GetSheet<FateProgressUI>())
+        Console.WriteLine($"PROGRESS {row.RowId} territory {row.Location.RowId} '{row.Location.ValueNullable?.PlaceName.ValueNullable?.Name.ExtractText()}' rank2 {row.ReqFatesToRank2} rank3 {row.ReqFatesToRank3} rank4 {row.ReqFatesToRank4} order {row.DisplayOrder} u0 {row.Unknown0}");
+    // Shops whose entries need a shared FATE rank achievement (« Free Market Friend »), and the achievements' data.
+    var achievements=data.Excel.GetSheet<Achievement>();
+    foreach(var shop in data.Excel.GetSheet<SpecialShop>())
+    {
+        var gated=shop.Item.Where(entry=>entry.AchievementUnlock.RowId is >= 2343 and <= 2348 or >= 3022 and <= 3027 or >= 3559 and <= 3564).ToArray();
+        if(gated.Length>0)Console.WriteLine($"GATED shop {shop.RowId} entries {shop.Item.Count(entry=>entry.ReceiveItems.Any(receive=>receive.Item.RowId!=0))}, gated {gated.Length} by [{string.Join(",",gated.Select(entry=>entry.AchievementUnlock.RowId).Distinct())}]");
+    }
+    foreach(var id in new uint[]{2343,2344,2348,3022,3027,3559,3564})
+        if(achievements.TryGetRow(id,out var achievement))
+            Console.WriteLine($"ACHIEVEMENT {id} '{achievement.Name.ExtractText()}' type {achievement.Type} key {achievement.Key.RowId} data [{string.Join(",",achievement.Data.Select(value=>value.RowId))}] category {achievement.AchievementCategory.RowId}");
+    var fateResidents=data.Excel.GetSheet<ENpcResident>();
+    var specials=data.Excel.GetSheet<SpecialShop>();
+    var fateItems=data.Excel.GetSheet<Item>();
+    var levels=data.Excel.GetSheet<Level>().Where(level=>level.Type==8).GroupBy(level=>level.Object.RowId).ToDictionary(group=>group.Key,group=>group.Select(level=>level.Territory.RowId).Distinct().ToArray());
+    foreach(var fate in data.Excel.GetSheet<FateShop>())
+    {
+        var ids=fate.SpecialShop.Select(shop=>shop.RowId).ToArray();
+        if(Environment.GetEnvironmentVariable("PROBE_SHAREDFATE")=="talk" && fate.RowId is 1037484 or 1048628)
+            foreach(var (talk,index) in fate.DefaultTalk.Select((talk,index)=>(talk,index)).Where(pair=>pair.talk.RowId!=0))
+                Console.WriteLine($"  TALK {index} {talk.RowId}: "+string.Join(" / ",talk.Value.Text.Select(text=>text.ExtractText()).Where(text=>text.Length>0)));
+        Console.WriteLine($"FATESHOP {fate.RowId} '{(fateResidents.TryGetRow(fate.RowId,out var who) ? who.Singular.ExtractText():"")}' levels [{string.Join(",",levels.GetValueOrDefault(fate.RowId) ?? [])}] shops [{string.Join(",",ids)}] talks [{string.Join(",",fate.DefaultTalk.Select(talk=>talk.RowId))}]");
+        foreach(var id in ids.Where(id=>id!=0))
+            if(specials.TryGetRow(id,out var shop))
+            {
+                var entries=shop.Item.Where(entry=>entry.ReceiveItems.Any(receive=>receive.Item.RowId!=0)).ToArray();
+                Console.WriteLine($"  SHOP {id} '{shop.Name.ExtractText()}' entries {entries.Length} currency type {shop.UseCurrencyType}: "+string.Join(" | ",entries.Take(40).Select(entry=>string.Join("+",entry.ReceiveItems.Where(receive=>receive.Item.RowId!=0).Select(receive=>$"{receive.Item.RowId} '{(fateItems.TryGetRow(receive.Item.RowId,out var item) ? item.Name.ExtractText():"")}'"))+$" for {string.Join("+",entry.ItemCosts.Where(cost=>cost.CurrencyCost>0).Select(cost=>$"{cost.CurrencyCost}x{cost.ItemCost.RowId}"))} q{entry.Quest.RowId} ach{entry.AchievementUnlock.RowId} u0[{string.Join(",",entry.Unknown0)}] u1[{string.Join(",",entry.Unknown1)}] u2 {entry.Unknown2} patch {entry.PatchNumber} order {entry.Order}")));
+            }
+    }
+    return;
+}
+// PROBE_TERRMOUNT (X-774, 0.1780): the TerritoryType sheet's Mount column (mounts allowed), by intended use, with named examples; the
+// chocobo companion can only be out where it can be ridden (HowToPage row 361). Read-only.
+if(Environment.GetEnvironmentVariable("PROBE_TERRMOUNT") is { Length:>0 })
+{
+    var places=data.Excel.GetSheet<TerritoryType>(Language.English).Where(row=>row.PlaceName.RowId!=0).ToArray();
+    foreach(var group in places.GroupBy(row=>row.TerritoryIntendedUse.RowId).OrderBy(group=>group.Key))
+        Console.WriteLine($"USE {group.Key}: mount {group.Count(row=>row.Mount)} of {group.Count()} e.g. "+string.Join(", ",group.Take(5).Select(row=>$"{row.RowId} '{row.PlaceName.ValueNullable?.Name.ExtractText()}' {(row.Mount ? "mount":"no mount")}")));
+    foreach(var id in new uint[]{128,129,130,131,132,133,134,135,137,138,139,140,141,144,148,177,178,179,339,340,341,418,419,478,628,635,819,820,962,963,1185,1186})
+        if(places.FirstOrDefault(row=>row.RowId==id) is { } row)Console.WriteLine($"TERRITORY {id} '{row.PlaceName.ValueNullable?.Name.ExtractText()}' use {row.TerritoryIntendedUse.RowId} mount {row.Mount}");
     return;
 }
 // PROBE_MOUNT (X-219, 0.1229): the Mount sheet's seats (ExtraSeats), riding music (RideBGM -> BGM.File, matched to OrchestrionPath.File for the

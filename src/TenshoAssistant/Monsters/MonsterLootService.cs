@@ -7,7 +7,6 @@ public sealed record MonsterLootState(uint ItemId, MonsterItemDocument? Item, ul
 
 public sealed class MonsterLootService : IDisposable
 {
-    public static readonly TimeSpan FreshFor = TimeSpan.FromMinutes(30);
     public const int ItemCacheCapacity = 16;
     public const int MonsterCacheCapacity = 32;
     private readonly object gate = new();

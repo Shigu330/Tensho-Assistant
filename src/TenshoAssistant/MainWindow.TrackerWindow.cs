@@ -30,29 +30,76 @@ internal sealed partial class MainWindow
     private void DrawTrackerContents()
     {
         var now=DateTimeOffset.UtcNow;
-        if(now>=trackerRefresh){trackerRows=TrackedAlarms.Rows(configuration.Alarms,now);trackerRefresh=now.AddSeconds(1);}
+        // X-727 (0.1733): an alarm made without an icon shows its item's (Item sheet).
+        if(now>=trackerRefresh){trackerRows=TrackedAlarms.Rows(configuration.Alarms,now,itemIcon:id=>itemCatalog.State.Catalog?.Find(id)?.IconId ?? 0);trackerRefresh=now.AddSeconds(1);}
         if(trackerRows.Count==0){ImGui.TextDisabled(localization.Get("Tracker.Empty"));return;}
         foreach(var row in trackerRows)
         {
             ImGui.PushID(row.Id.ToString());
             try
             {
-                DrawGameIcon(row.IconId,new Vector2(20));ImGui.SameLine();
+                // X-727 (0.1733): the icon and the name answer as every item of Tensho (R10): the common tooltip, with the alarm's place and
+                // next time under its header; the common menu, with the alarm's gestures first.
+                var alarm=configuration.Alarms?.FirstOrDefault(entry=>entry.Id==row.Id);
+                var place=alarm is null ? null:AlarmPlace(alarm);
+                var map=place is { } point ? maps.State.Catalog?.Find(point.MapId):null;
+                var item=itemCatalog.State.Catalog?.Find(row.ItemId);
+                DrawGameIcon(row.IconId,new Vector2(20));
+                TrackerRowHelp("TrackerIcon",row,item,alarm,map,place,now);
+                ImGui.SameLine();
                 if(ImGui.Selectable(row.Label,false,ImGuiSelectableFlags.None,new Vector2(220,0))){OpenAlarmItem(row.ItemId);IsOpen=true;}
+                TrackerRowHelp("TrackerName",row,item,alarm,map,place,now);
                 ImGui.SameLine();
                 var left=row.At-now;
                 ImGui.TextColored(left<=TimeSpan.FromMinutes(5) ? Accent:Muted,AlarmDtrEntry.Remaining(left,localization.Get)+(row.Weather ? " *":""));
                 if(row.Weather)Tip("Alarms.WeatherCondition");
-                if(configuration.Alarms?.FirstOrDefault(alarm=>alarm.Id==row.Id) is { } alarm && AlarmPlace(alarm) is { } place
-                   && maps.State.Catalog?.Find(place.MapId) is { } map)
+                if(map is not null && place is { } shown)
                 {
+                    var (_,_,x,y)=shown;
                     ImGui.SameLine();
-                    if(ImGui.SmallButton(localization.Get("Tracker.Map")))OpenMapPointFromPage(map,place.X,place.Y);
-                    PlaceMenu("TrackerPlace",map,new(place.X,place.Y),map.Zone);
+                    if(ImGui.SmallButton(localization.Get("Tracker.Map")))OpenMapPointFromPage(map,x,y);
+                    PlaceMenu("TrackerPlace",map,new(x,y),map.Zone);
                 }
             }
             finally{ImGui.PopID();}
         }
+    }
+
+    /// <summary>X-727 (0.1733): hover and right click of a tracker row's icon or name: the common item tooltip with the alarm's place and next
+    /// time; the common item menu with the alarm's gestures first (the Alarm module, turn it off, the map on its point).</summary>
+    private void TrackerRowHelp(string id,TrackedAlarm row,Items.ItemDefinition? item,TenshoAlarm? alarm,Maps.MapDefinition? map,(uint TerritoryId,uint MapId,float X,float Y)? place,DateTimeOffset now)
+    {
+        if(ImGui.IsItemHovered())
+        {
+            var lines=new List<string>{row.Label};
+            if(map is not null && place is { } at)lines.Add(localization.Format("Tracker.Place",map.Zone,Maps.MapProjection.CoordinateText(new(at.X,at.Y))));
+            lines.Add(localization.Format("Tracker.Next",row.At.ToLocalTime().ToString("t"),AlarmDtrEntry.Remaining(row.At-now,localization.Get))
+                +(row.Weather ? " · "+localization.Get("Alarms.WeatherCondition"):""));
+            DrawItemInfoTooltip(row.ItemId,lines:lines);
+        }
+        // X-735 M1 (review of 0.1733): an item the item list does not know (or not loaded yet) keeps the alarm's gestures, which do not depend
+        // on the item: a menu of its own, under the alarm's name.
+        if(item is null)
+        {
+            if(alarm is not null && ImGui.BeginPopupContextItem(UniqueMenuId($"{id}{row.Id}")))
+            {
+                try{ImGui.TextColored(Accent,row.Label);ImGui.Separator();TrackerAlarmMenu(alarm,map,place);}
+                finally{ImGui.EndPopup();}
+            }
+            return;
+        }
+        ItemLinksMenu(UniqueMenuId($"{id}{row.Id}"),item,first:alarm is null ? null:()=>TrackerAlarmMenu(alarm,map,place));
+    }
+
+    private void TrackerAlarmMenu(TenshoAlarm alarm,Maps.MapDefinition? map,(uint TerritoryId,uint MapId,float X,float Y)? place)
+    {
+        if(ImGui.Selectable(localization.Get("Alarms.Open")+"##TrackerOpenAlarm")){page=Page.Alarms;IsOpen=true;}
+        if(ImGui.Selectable(localization.Get("Tracker.TurnOff")+"##TrackerTurnOff"))
+        {
+            alarm.Enabled=false;NoteGameCopy([alarm]);trackerRefresh=default;
+            TrySave("Alarm turned off from the tracker",()=>alarm.Enabled=true);
+        }
+        if(map is not null && place is { } at && ImGui.Selectable(localization.Get("Tracker.Map")+"##TrackerMapMenu"))OpenMapPointFromPage(map,at.X,at.Y);
     }
 
     /// <summary>0.514: the free-standing panels, as Dalamud windows; Plugin adds them to its window system.</summary>

@@ -45,7 +45,7 @@ public sealed class RaphaelSequenceCache(Func<RecipeDefinition,CraftStats,int,Cr
     private static string Key(RecipeDefinition recipe,CraftStats stats,int startingQuality,CraftSolveOptions options)=>Convert.ToHexString(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(new
     {
         recipe.RecipeId,recipe.CraftTypeId,recipe.Level,recipe.Simulation,stats,startingQuality,options.TargetQuality,options.Forbidden
-    })));
+    },TenshoJson.Plain)));
     private static CraftSolveResult? Replay(RecipeDefinition recipe,CraftStats stats,int startingQuality,CraftSolveOptions options,IReadOnlyList<CraftActionKind> actions,CancellationToken token)
     {
         if(actions.Count==0 || CraftActionRules.UsesForbidden(actions,options.Forbidden))return null;

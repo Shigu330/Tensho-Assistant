@@ -356,7 +356,7 @@ public sealed class SeenPriceStore
         return null;
     }
 
-    public static List<SeenMarketEntry>? Read(string path,long max=MaxFileBytes)=>File.Exists(path) && new FileInfo(path).Length<=max ? JsonSerializer.Deserialize<List<SeenMarketEntry>>(File.ReadAllText(path)):null;
+    public static List<SeenMarketEntry>? Read(string path,long max=MaxFileBytes)=>File.Exists(path) && new FileInfo(path).Length<=max ? JsonSerializer.Deserialize<List<SeenMarketEntry>>(File.ReadAllText(path),TenshoJson.Plain):null;
     /// <summary>
     /// X-171 (0.1216, audit of 12/11, R02): two game clients on one profile each held the file's entries of the start and wrote back their whole
     /// copy: the second write erased what the first client had seen since. The write now holds the profile's lock file (« .lock » beside it) and
@@ -384,7 +384,7 @@ public sealed class SeenPriceStore
         var count=joined.Count;
         while(true)
         {
-            var text=JsonSerializer.Serialize(count==joined.Count ? joined:joined.Take(count).ToList());
+            var text=JsonSerializer.Serialize(count==joined.Count ? joined:joined.Take(count).ToList(),TenshoJson.Plain);
             var bytes=System.Text.Encoding.UTF8.GetByteCount(text);
             if(bytes<=max || count==0)return text;
             count=(int)Math.Max(0,Math.Min(count-1L,(long)(count*(double)max/bytes*0.95)));

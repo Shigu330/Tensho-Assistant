@@ -26,12 +26,15 @@ internal sealed class BeastBoardReader : IDisposable
     private readonly Action<Dictionary<uint, int>> ranksRead;
     private readonly Action<BoardResult>? resultRead;
     private readonly Action<BeastTeams.BookRead>? bookRead;
+    /// <summary>X-135 (0.1771): an Item row's icon in the Item sheet, to check the result window's rewards (null: the rewards not read).</summary>
+    public Func<uint, uint>? ItemIcon { get; init; }
     private string? bookSeen;
     private volatile uint activeBeast;
     private string? activeSaid;
     /// <summary>X-136 (0.1550): the beast the game's « Cornes d'appel » window details (its XBMPet row; 0: closed or not read).</summary>
     public uint ActiveBeast => activeBeast;
     private bool bookWarned;
+    private readonly HashSet<uint> satietySaid = [];
     private DateTimeOffset next;
     private bool warned;
     private bool resultWarned;
@@ -172,12 +175,15 @@ internal sealed class BeastBoardReader : IDisposable
         var seen = string.Join(";", values.Select(pair => $"{pair.Key}:{pair.Value}"));
         if (seen == resultSeen) return;
         resultSeen = seen;
-        if (BeastResults.Parse(values, known, now) is { } result)
+        if (BeastResults.Parse(values, known, now, ItemIcon) is { } result)
         {
             log.Information("Beastmaster board result read: score {0}, {1} beasts, {2} ranks gained.", result.Score, result.Beasts.Count, result.Beasts.Sum(gain => gain.RankAfter - gain.RankBefore));
             // X-562 M4 (review of 0.1526): the window names its bonuses, Tensho numbers them; its numbers from 47 on are not studied: said
             // here (numbers only) to see in game whether they are the bonuses' XBMScoreBonus rows.
             log.Information("Beastmaster board result, numbers 47 to 62: {0}.", string.Join(",", Enumerable.Range(47, 16).Select(index => values.TryGetValue(index, out var number) ? number.ToString(System.Globalization.CultureInfo.InvariantCulture) : "-")));
+            // X-135 (0.1771): the rewards (numbers only: item rows, icons, counts), or why not, to compare with the game's window.
+            log.Information("Beastmaster board result, rewards: {0}; numbers 47 to 67: {1}.", result.Rewards is { } rewards ? string.Join(", ", rewards.Select(reward => $"item {reward.Item} x{reward.Count}")) : "not read",
+                string.Join(",", Enumerable.Range(47, 21).Select(index => values.TryGetValue(index, out var number) ? number.ToString(System.Globalization.CultureInfo.InvariantCulture) : "-")));
             resultRead(result);
         }
         else if (!resultWarned)
@@ -209,6 +215,12 @@ internal sealed class BeastBoardReader : IDisposable
         {
             log.Information("Beastmaster bestiary read: beast {0}, rank {1} (synchronised {2}).", read.Beast, read.Rank, read.Synced);
             bookRead(read);
+            // X-744 (0.1770): the satiety the page shows against XBMPet column 3, said once per beast (R06: each page read checks the column).
+            if (BeastSpaces.SatietyOfBook(texts) is var shown and > 0 && known.FirstOrDefault(beast => beast.Id == read.Beast) is { } beast && satietySaid.Add(read.Beast))
+            {
+                if (shown == beast.Satiety) log.Information("Beastmaster satiety checked: beast {0}, the bestiary shows {1}, as XBMPet column 3.", read.Beast, shown);
+                else log.Warning("Beastmaster satiety differs: beast {0}, the bestiary shows {1}, XBMPet column 3 holds {2} (the panel's satiety is not the game's).", read.Beast, shown, beast.Satiety);
+            }
         }
         else if (!bookWarned && texts.Any(text => text.Length > 2 && text[0] == '(' && text[^1] == ')'))
         {

@@ -17,7 +17,7 @@ public static class ChatTheme
     public const string Prefix="TENSHO-CHATLOOK1:";
     /// <summary>The longest code read (a whole look is about 3 000 characters).</summary>
     public const int MaxCode=8000;
-    private static readonly JsonSerializerOptions Options=new(){DefaultIgnoreCondition=JsonIgnoreCondition.WhenWritingNull};
+    private static readonly JsonSerializerOptions Options=TenshoJson.Own(new(){DefaultIgnoreCondition=JsonIgnoreCondition.WhenWritingNull});
 
     private sealed class Look
     {
@@ -145,7 +145,7 @@ public static class ChatTheme
     {
         var text=(code ?? "").Trim();
         if(!text.StartsWith(Prefix,StringComparison.Ordinal) || text.Length>MaxCode)return null;
-        try{return JsonSerializer.Deserialize<Look>(Encoding.UTF8.GetString(Convert.FromBase64String(text[Prefix.Length..])));}
+        try{return JsonSerializer.Deserialize<Look>(Encoding.UTF8.GetString(Convert.FromBase64String(text[Prefix.Length..])),TenshoJson.Plain);}
         catch(Exception error) when (error is FormatException or JsonException or ArgumentException or DecoderFallbackException or NotSupportedException){return null;}
     }
 

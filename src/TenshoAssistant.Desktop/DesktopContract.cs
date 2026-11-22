@@ -26,6 +26,7 @@ internal static class DesktopContract
     [
         new("TenshoAssistant.Configuration",Kind.Type,"",false,null,"the saved settings"),
         new("TenshoAssistant.Configuration",Kind.Property,"LanguageCode",false,null,"the plugin's language"),
+        new("TenshoAssistant.SettingsJson",Kind.Method,"Read",true,["System.String","System.Type"],"Tensho's own settings file read by the plugin's reader (X-685, 0.1745)"),
         new(Main,Kind.Type,"",false,null,"the plugin's window"),
         new(Main,Kind.Method,"DesktopSurfaceMap",false,[],"the typed contract (DesktopSurface): pages, data, alarms, notices"),
         new(Main,Kind.Property,"PageEntries",false,null,"the navigation"),

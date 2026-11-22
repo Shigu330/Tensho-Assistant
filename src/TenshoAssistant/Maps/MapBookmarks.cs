@@ -30,7 +30,7 @@ public static class MapBookmarks
     }
 
     private sealed record ShareEntry(string N, uint M, uint T, float X, float Y, string? O, string? G);
-    private static readonly JsonSerializerOptions ShareJson = new() { MaxDepth = 4 };
+    private static readonly JsonSerializerOptions ShareJson = TenshoJson.Own(new() { MaxDepth = 4 });
 
     /// <summary>
     /// 0.378 (g, M-08): bookmarks as a text code to share (like TENSHO-GEAR1, no third-party site): prefix then base64url of a JSON

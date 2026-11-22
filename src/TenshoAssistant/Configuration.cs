@@ -12,9 +12,15 @@ public static class ConfigurationReset
         "Version", "Alarms", "ReminderDone", "TreasureMapAt", "MacroChainPlan", "MapBookmarks", "PlaceDirectory", "CraftPresets", "CraftLogTargets", "GcSupplySeen", "GpRegenBase", "CollectableScrutinyGain", "CollectableIntuitionGain", "TripleTriadDeck",
         "TripleTriadDecks", "FollowedQuests", "Observations", "InventorySortProfiles", "InventorySortTemplates", "LanguageCode",
         // 0.315: saved data added since 0.258 (vessels, gear and materia plans).
-        "Voyages", "OceanSightings", "WeatherStoryZones", "GearPlans", "SRankKills", "DutyNotes", "GearPlanSets", "CollectionMemories", "LastCraftStats", "FashionOutfit", "WeatherFavorites", "GearMateria", "SubmarineUnlocked", "VesselPlans",
+        "Voyages", "OceanSightings", "WeatherStoryZones", "GearPlans", "SRankKills", "BlueSpellsWanted", "DutyNotes", "GearPlanSets", "CollectionMemories", "LastCraftStats", "FashionOutfit", "WeatherFavorites", "GearMateria", "SubmarineUnlocked", "VesselPlans",
         // X-225 (0.1719): the aetherial wheels on the company's stand, as last read.
         "AetherialWheels",
+        // X-221 (0.1760): the bonus points of a manual counted per character (the player's data).
+        "GraceCounts",
+        // X-213 (0.1781): the shared FATE ranks read from the game's window, per character (the player's data).
+        "SharedFates",
+        // X-229 (0.1784): the meal chosen in the gear planner, per job (the player's data).
+        "GearMeals",
         // 0.321: interface state, not a setting (which navigation groups are folded).
         "NavigationCollapsed",
         // X-521 M2 (D-180): interface state, not a setting (the category chosen in each tab of the Settings page).
@@ -55,6 +61,8 @@ public static class ConfigurationReset
         "HoverShowCollection", "HoverShowStock", "HoverShowUsages", "HoverShowSources",
         // 0.377 (g, M-07): comparison with the worn piece under the item tooltip.
         "HoverShowCompare",
+        // X-197 (0.1761): the desynthesis and coffer lines under the item tooltip.
+        "HoverShowDesynth", "HoverShowCoffer",
         // X-684 (0.1696): the parts of Tensho's own tooltips turned off.
         "TooltipPartsHidden",
         // X-605 (0.1697): the order of the families' tabs, dragged with the mouse.
@@ -81,6 +89,8 @@ public static class ConfigurationReset
         "WorkshopPanel", "WorkshopPanelProject", "WorkshopFollowed", "WorkshopDelivered", "PreparationPanel", "PreparationPanelItem", "PreparationPanelRecipe", "PreparationPanelTarget", "CraftListPanel", "CraftListPanelName", "ListPanelsHideInCombat", "ListPanelsHideBehindGame", "CurrencyValueMarket", "ListPanelsBase", "ListPanelsGathering", "ListPanelsVendor", "ListPanelsMonster", "ListPanelsOther", "ListPanelsCrystal", "ListPanelsCurrenciesOn", "ListPanelsMetOnly", "HoverVendors", "HoverVendorsMetOnly", "HoverVendorsByCurrency", "HoverVendorCurrenciesOn",
         // 0.376 (g, M-06): wear alert, bar and thresholds.
         "GearWear",
+        // X-226 (0.1778): the preparation reminder (meal, chocobo companion) and its thresholds.
+        "PrepReminders",
         // 0.386 (g, X-10): clocks of other time zones.
         "WorldClocks",
         // 0.388 (user request): sort button on the game's inventory window.
@@ -517,9 +527,7 @@ public sealed partial class Configuration
     // X-277 (0.1290): only the gear of the exact level at the expansion caps, the « Levels below » window at every other level (the rule of
     // 0.430, « exact level outside caps », was the wrong way round).
     public bool GearExactAtCaps { get; set; } = true;
-    // X-277 (0.1290): the setting's name before 0.1290; a file saved before is read with it (the player's choice kept: on stays on, off
-    // stays off, the window everywhere), and it is never written again (a property without getter is not saved).
-    public bool GearExactOutsideCaps { set=>GearExactAtCaps=value; }
+    // X-574 (0.1793, the user's choice of 17/11): the setting's name before 0.1290 (GearExactOutsideCaps) is no longer read.
     public int GearMinItemLevel { get; set; }
     public bool GearAssumeHq { get; set; } = true;
     // 0.311: other jobs' armor and accessories in the lists (glamour since patch 7.4; weapons stay job-locked).
@@ -528,6 +536,8 @@ public sealed partial class Configuration
     public bool GearOwnedOnly { get; set; }
     // 0.312: planned materia per job and slot (MeldedMateria codes); a slot listed here overrides the worn piece's materia.
     public Dictionary<uint,Dictionary<TenshoAssistant.Gear.GearSlot,List<uint>>>? GearMateria { get; set; }
+    // X-229 (0.1784): per job, the meal chosen in the gear planner (its stats shown with it).
+    public Dictionary<uint,TenshoAssistant.Gear.GearMealChoice>? GearMeals { get; set; }
     // Header and advanced settings (0.206).
     public bool ShowHeaderClock { get; set; } = true;
     /// <summary>0.728: a frame on the hotbar slot of the next action of a node's plan.</summary>
@@ -653,6 +663,10 @@ public sealed partial class Configuration
     public bool ShowEnglishItemName { get; set; }
     // 0.554 (C3): per character and job, the attributes last read; the player's data, kept by « reset all ».
     public Dictionary<ulong,Dictionary<uint,TenshoAssistant.Craft.CraftJobStats>>? LastCraftStats { get; set; }
+    // X-221 (0.1760): per character, what Tensho counted of each manual's Grace (statuses 45 and 46): the player's data, kept by « reset all ».
+    public Dictionary<ulong,List<TenshoAssistant.Gear.GraceCount>>? GraceCounts { get; set; }
+    // X-213 (0.1781): per character, what the game's Shared FATE window showed of each zone (rank, progress), when it was last opened: the player's data, kept by « reset all ».
+    public Dictionary<ulong,Dictionary<uint,TenshoAssistant.Fields.SharedFateRead>>? SharedFates { get; set; }
     // 0.552 (C2): the crafting log panel also tries the sequences saved for other recipes.
     public bool CraftLogTryAllPresets { get; set; } = true;
     public int SortPreviewField { get; set; }
@@ -692,6 +706,8 @@ public sealed partial class Configuration
     // 0.360 (g, C-09): wishlist item ids, in the order they were added (replaced whole on every change).
     private List<uint>? wishlist;
     public List<uint>? Wishlist { get=>Volatile.Read(ref wishlist); set=>Volatile.Write(ref wishlist,value); }
+    /// <summary>X-742 (0.1795): the blue magic spells the player wants (AozAction rows), checked on the Blue magic page.</summary>
+    public List<uint>? BlueSpellsWanted { get; set; }
     // X-101 (0.1000, DEC-048): the player's price for each wish, and the sale alert (off by default).
     public Dictionary<uint,long>? WishlistPrices { get; set; }
     public bool WishlistSaleAlert { get; set; }
@@ -791,6 +807,9 @@ public sealed partial class Configuration
     public List<string>? WorldClocks { get; set; }
     // 0.377 (g, M-07): under the game's item tooltip, the hovered gear against the worn piece of its slot (on by default).
     public bool HoverShowCompare { get; set; } = true;
+    // X-197 (0.1761): under the game's item tooltip, the item's desynthesis against your level, and what a coffer holds that a collection tracks (on by default).
+    public bool HoverShowDesynth { get; set; } = true;
+    public bool HoverShowCoffer { get; set; } = true;
     // X-684 (0.1696, M3 of X-700): the parts of Tensho's own tooltips turned off (« Kind.Part », UI/TooltipParts.All); none by default.
     // Replaced whole at each change (MainWindow.SetTipPart).
     public List<string> TooltipPartsHidden { get; set; } = [];
@@ -799,6 +818,8 @@ public sealed partial class Configuration
     public Dictionary<string,List<string>> TabOrders { get; set; } = new();
     // 0.376 (g, M-06): wear and spiritbond alert (on), on-screen bar (off) and thresholds; null = defaults.
     public Gear.GearWearSettings? GearWear { get; set; }
+    /// <summary>X-226 (0.1778): the preparation reminder outside fights and duties (meal, chocobo companion); null: the defaults.</summary>
+    public Reminders.PrepReminderSettings? PrepReminders { get; set; }
     // 0.370 (g, X-02): favourite orchestrion rolls (Orchestrion rows), 300 at most.
     private List<uint>? orchestrionFavorites;
     public List<uint>? OrchestrionFavorites { get=>Volatile.Read(ref orchestrionFavorites); set=>Volatile.Write(ref orchestrionFavorites,value); }

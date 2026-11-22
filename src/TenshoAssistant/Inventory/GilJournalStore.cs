@@ -6,17 +6,16 @@ namespace TenshoAssistant.Inventory;
 /// <summary>
 /// X-173 (0.1139, user's choice of 12/11): where the gil journal is kept. Since this version, in the player's data file
 /// (<see cref="TenshoDataDatabase"/>, <c>TenshoData.db</c>): one row per entry, a character's journal replaced whole in one transaction at each
-/// save (at most once a minute), so a stop in the middle leaves the last save whole. The file of before (GilJournal/&lt;id&gt;.json) is converted
-/// the first time its character is loaded: its rows and a « converted » mark written in one transaction, then the file moved, never removed, into
-/// GilJournal/before-sqlite-yyyyMMdd-HHmmss/. A file that cannot be read is left where it is and the journal is not written (as before). A data
-/// file that exists but cannot be opened (SQLite not loaded, damaged, newer layout) is never replaced: the journal is unavailable and nothing is
-/// written this session; when the data file cannot be created at all, the JSON files stay in use as before.
+/// save (at most once a minute), so a stop in the middle leaves the last save whole. X-574 (0.1793, the user's choice of 17/11): the file of
+/// before (GilJournal/&lt;id&gt;.json) is no longer converted: still there while the data file is in use, it is left aside, never read, moved nor
+/// removed (said once, <see cref="TenshoDataFile.LeftAside"/>). A data file that exists but cannot be opened (SQLite not loaded, damaged, newer
+/// layout) is never replaced: the journal is unavailable and nothing is written this session; when the data file cannot be created at all, the
+/// JSON files stay in use as before.
 /// </summary>
 public sealed class GilJournalStore
 {
     private readonly string folder;
     private readonly TenshoDataFile data;
-    private readonly object gate=new();
 
     /// <summary>Test hook: run inside a save's transaction, after its rows and before the commit (a stop or an error there).</summary>
     internal Action? DuringSave { get; set; }
@@ -36,59 +35,18 @@ public sealed class GilJournalStore
     {
         var json=Path.Combine(folder,FileName(character));
         if(data.Database() is not { } opened)return GilJournal.Read(json);
-        Convert(opened,character,json,now);
+        // X-574 (0.1793): a file of before still there is left aside, never read (the journal is the data file's).
+        if(File.Exists(json))data.LeftAside("Gil journal",Path.Combine(Path.GetFileName(folder),"*.json"));
         return ReadRows(opened,character);
     }
 
-    /// <summary>
-    /// A character's file of before converted (at a load, and at a save when it was held at the load); true when nothing is left to convert.
-    /// Relay 37 (0.1205): a file held by another program at the load (read nothing, nothing marked) left the session without any save of that
-    /// journal; the next save converts it now that it may be free. One that cannot be read still throws: the journal is never written over it.
-    /// </summary>
-    private bool Convert(TenshoDataDatabase opened,ulong character,string json,DateTimeOffset now)
-    {
-        if(!File.Exists(json))return true;
-        lock(gate)
-        {
-            if(!File.Exists(json))return true;
-                {
-                    var marked=true;
-                    using(var open=opened.Open())
-                    {
-                        if(ConvertedAt(open,character) is not { } converted)
-                        {
-                            if(TenshoDataFile.StillThere(()=>GilJournal.Read(json)) is { } found)WriteRows(open,character,found,now);
-                            else marked=false;
-                        }
-                        // X-182 (0.1169, night review N3): written again after the conversion (an older version still running): merged.
-                        else if(TenshoDataFile.WrittenAgain(json,converted))
-                        {
-                            // X-336 M4 (0.1380): written again but held by another client: not merged, so not set aside either.
-                            if(TenshoDataFile.StillThere(()=>GilJournal.Read(json)) is { } again)WriteRows(open,character,Merge(ReadRows(opened,character),again),null);
-                            else marked=false;
-                        }
-                    }
-                    if(marked)data.SetAside(json,now,"gil journal");
-                    return marked;
-                }
-        }
-    }
-
-    /// <summary>A character's journal saved whole (replaces what was there); refused while its file of before is not converted.</summary>
+    /// <summary>A character's journal saved whole (replaces what was there). X-574 (0.1793): a file of before is neither read nor written.</summary>
     public void Save(ulong character,IReadOnlyList<GilEntry> entries)
     {
         var json=Path.Combine(folder,FileName(character));
         if(data.Database() is not { } opened){GilJournal.Write(json,entries);return;}
         using var open=opened.Open();
-        if(File.Exists(json) && !Converted(open,character))
-        {
-            // Relay 37 (0.1205): held at the load, converted at the first save that finds it free; this save replaces the character's rows,
-            // so what the file held (never loaded this session) is merged in, never dropped. Still held: refused as before.
-            if(!TenshoDataFile.ConvertBeforeSave(()=>Convert(opened,character,json,DateTimeOffset.UtcNow),"gil journal"))
-                throw new InvalidOperationException("The gil journal file of before is not converted yet; nothing written over it.");
-            entries=Merge(ReadRows(opened,character),entries);
-        }
-        WriteRows(open,character,entries,null);
+        WriteRows(open,character,entries);
     }
 
     /// <summary>
@@ -108,20 +66,7 @@ public sealed class GilJournalStore
 
     private static long Id(ulong character)=>unchecked((long)character);
 
-    private static bool Converted(SqliteConnection open,ulong character)=>ConvertedAt(open,character) is not null;
-    private static DateTimeOffset? ConvertedAt(SqliteConnection open,ulong character)
-    {
-        using var command=open.CreateCommand();
-        command.CommandText="SELECT at FROM gil_converted WHERE character=$character;";
-        command.Parameters.AddWithValue("$character",Id(character));
-        return command.ExecuteScalar() is long at ? new DateTimeOffset(at,TimeSpan.Zero):null;
-    }
-
-    /// <summary>X-182 (0.1169): two journals of a character as one: every entry once (same time, change, balance, source and kind), in time order.</summary>
-    public static List<GilEntry> Merge(IReadOnlyList<GilEntry> saved,IReadOnlyList<GilEntry> found)
-        =>saved.Concat(found).Distinct().OrderBy(entry=>entry.At).ToList();
-
-    private void WriteRows(SqliteConnection open,ulong character,IReadOnlyList<GilEntry> entries,DateTimeOffset? converted)
+    private void WriteRows(SqliteConnection open,ulong character,IReadOnlyList<GilEntry> entries)
     {
         using var transaction=open.BeginTransaction();
         using(var delete=open.CreateCommand())
@@ -145,13 +90,6 @@ public sealed class GilJournalStore
                 source.Value=(int)entry.Source;category.Value=(int)entry.Category;
                 insert.ExecuteNonQuery();
             }
-        }
-        if(converted is { } when)
-        {
-            using var mark=open.CreateCommand();
-            mark.Transaction=transaction;mark.CommandText="INSERT OR REPLACE INTO gil_converted(character,at) VALUES($character,$at);";
-            mark.Parameters.AddWithValue("$character",Id(character));mark.Parameters.AddWithValue("$at",when.UtcTicks);
-            mark.ExecuteNonQuery();
         }
         DuringSave?.Invoke();
         transaction.Commit();

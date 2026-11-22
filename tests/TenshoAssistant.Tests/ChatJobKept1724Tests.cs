@@ -58,8 +58,8 @@ internal static class ChatJobKept1724Tests
             Check(ChatFormat.Plain(record, noBrackets, _ => "") == "[1] [SAG] Ann Doe: hello", "the name's brackets follow the setting; the number and the job keep theirs");
             var capture = new ChatSettings { ShowTimestamps = false, ShowChannel = false, CaptureNames = true };
             var shown = ChatFormat.Plain(record, capture, _ => "");
-            Check(shown.StartsWith("[1] [SAG] #", StringComparison.Ordinal) && !shown.Contains("Ann", StringComparison.Ordinal) && ChatFormat.ShownSender(record, true) == "1SAG " + ChatFormat.StandIn("Ann Doe"), "capture mode: the number and the job stay, the name replaced: " + shown);
-            Check(ChatFormat.ShownSender(record, false) == "1SAG Ann Doe", "the search: as before");
+            Check(shown.StartsWith("[1] [SAG] #", StringComparison.Ordinal) && !shown.Contains("Ann", StringComparison.Ordinal) && ChatFormat.ShownSender(record, true) == "[1] [SAG] " + ChatFormat.StandIn("Ann Doe"), "capture mode: the number and the job stay, the name replaced: " + shown);
+            Check(ChatFormat.ShownSender(record, false) == "[1] [SAG] Ann Doe", "the search: as shown (X-730 M2)");
             var unknown = ChatFormat.WithJobIcon(ChatFormat.Runs(record with { Job = 0 }, settings, _ => ""), 0);
             Check(!unknown.Any(run => run.Role == ChatRole.JobIcon) && string.Concat(unknown.Select(run => run.Text)) == "[1] [SAG] [Ann Doe]: hello", "job not known: no icon, no empty brackets");
             var plain = new ChatRecord(2, Now, 10, ChatChannel.Say, "Ann Doe", [new ChatSegment("hi")], Job: Sage);

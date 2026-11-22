@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (742 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (800 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -340,6 +340,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-144 | Audit A13 (GPT audit of 11/11, checked in the code by the master, order… | Done in 0.1126 |
 | X-146 | Audit A10 (GPT audit of 11/11, checked in the code by the master, order… | Done in 0.1214 |
 | X-147 | Audit A14 (GPT audit of 11/11, checked in the code by the master, order… | Done in 0.1217 |
+| X-148 | Partly | Done in 0.1791.0 |
 | X-149 | GPT review of 11/11, checked in the code by the master, accepted by the user… | Done in 0.1119 |
 | X-150 | GPT review of 11/11, checked in the code by the master, accepted by the user… | Done in 0.1120 |
 | X-151 | GPT review of 11/11, checked in the code by the master, accepted by the user… | Done in 0.1238 |
@@ -385,6 +386,10 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-201 | User request of 2026-11-12 (« add an automatic route calculator for airships… | Done in 0.1248 |
 | X-204 | User request of 2026-11-12 (plugin comparison, the agent's notes; content… | Done in 0.1235 |
 | X-205 | User request of 2026-11-12 (plugin comparison, the agent's notes; content… | Done in 0.1241 |
+| X-207 | User request of 2026-11-12 (plugin comparison, K-14, accepted on 11/12)… | Done in 0.1788.0 |
+| X-212 | User request of 2026-11-12 (plugin comparison, K-21, accepted on 11/12): CSV… | Done in 0.1756.0 |
+| X-213 | User request of 2026-11-12 (plugin comparison, K-23, accepted on 11/12): shared… | Done in 0.1781.0 |
+| X-216 | User request of 2026-11-12 (plugin comparison, K-26, accepted on 11/12)… | Done in 0.1789.0 |
 | X-217 | User request of 2026-11-12 (plugin comparison, K-30, accepted on 11/12)… | Done in 0.1226 |
 | X-218 | User request of 2026-11-12 (plugin comparison, K-32, accepted on 11/12): job… | Done in 0.1228 |
 | X-219 | User request of 2026-11-12 (plugin comparison, K-34, accepted on 11/12): richer… | Done in 0.1229 |
@@ -393,6 +398,8 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-223 | User request of 2026-11-12 (plugin comparison, K-39, accepted on 11/12): next… | Done in 0.1233 |
 | X-224 | User request of 2026-11-12 (plugin comparison, K-40, accepted on 11/12)… | Done in 0.1227 |
 | X-225 | User request of 2026-11-12 (plugin comparison, K-46, accepted on 11/12)… | Done in 0.1719.0 |
+| X-226 | User request of 2026-11-12 (plugin comparison, K-15, accepted on 11/12; user's… | Done in 0.1778.0 |
+| X-229 | User request of 2026-11-12 (plugin comparison, K-31, accepted on 11/12; user's… | Done in 0.1784.0 |
 | X-250 | First-player review of 11/12 (the agent's notes), before the public… | Done in 0.1180 |
 | X-251 | First-player review of 11/12 (the agent's notes), before the public… | Done in 0.1181 |
 | X-252 | First-player review of 11/12 (the agent's notes), before the public… | Done in 0.1182 |
@@ -560,6 +567,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-444 | Review of block 0.1436 to 0.1445 (review 0.1445, 15/11), minor M1, M2, M3, M4… | Done in 0.1446.0 |
 | X-445 | User request of 11/15 around 8:10 pm, made precise around 8:25 pm (Tensho chat… | Done in 0.1458 |
 | X-446 | Tool: state.py child set ID "text" without the field (etat, version or… | Done in 0.1455.0 |
+| X-448 | User request of 11/15 around 8:20 pm (Tensho chat window): also plan a… | Done in 0.1454.0 |
 | X-449 | User request of 11/15 around 8:20 pm: redo the settings to make them easier… | Done in 0.1496 |
 | X-450 | User request of 11/15 around 8:30 pm: a private page of the in-game tests (only… | Done in 0.1455.0 |
 | X-451 | Review of block 0.1446 to 0.1454 (review 0.1454, 15/11), I1: finding in… | Done in 0.1456 |
@@ -576,6 +584,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-464 | Review of block 0.1455 to 0.1461 (review 0.1461, 15/11), minor M1, M2, M3, M4… | Done in 0.1466 |
 | X-465 | Bug seen in the Beastmaster labyrinth by the user on 11/15 around 9:56 pm… | Done in 0.1465 |
 | X-466 | User request of 11/15 around 10:15 pm (Tensho chat window): the chat should… | Done in 0.1476 |
+| X-469 | User decision of 11/15 around 10:30 pm (D-174, retainer table X-196): « items… | Done in 0.1762.0 |
 | X-470 | Tool, idea I-015 put on the plan by the user on 11/15 around 10:35 pm… | Done in 0.1467.0 |
 | X-471 | Tool, idea I-014 put on the plan by the user on 11/15 around 10:35 pm: the same… | Done in 0.1467.0 |
 | X-472 | Bug seen by the user on 11/15 around 10:40 pm (screenshot, game chat and Tensho… | Done in 0.1471.0 |
@@ -652,6 +661,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-554 | Review of block 0.1516 to 0.1520 (review 0.1520, 17/11), I1: finding in… | Done in 0.1521 |
 | X-555 | Review of block 0.1516 to 0.1520 (review 0.1520, 17/11), I2: finding in… | Done in 0.1521 |
 | X-556 | Review of block 0.1516 to 0.1520 (review 0.1520, 17/11), minor M1, M2, M3, M4… | Done in 0.1585 |
+| X-557 | User request of 17/11 around 11:20 (sold a few things; check the parsers to see… | Done in 0.1774.0 |
 | X-559 | Gap to DEC-053 found by relay 104 (17/11 around 12:10): combat lines still… | Done in 0.1528 |
 | X-560 | Bug seen by the user on 17/11 around 12:20 (capture of the chat settings… | Done in 0.1565 |
 | X-561 | Review of block 0.1521 to 0.1526 (review 0.1526, 17/11), I1: finding in… | Done in 0.1527 |
@@ -664,6 +674,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-571 | Flaky test « Fair lock 1309 » (two bank stores on one file, 2 s lock wait)… | Done in 0.1541 |
 | X-572 | Review of block 0.1535 to 0.1539 (review 0.1539, 17/11), I1: finding in… | Done in 0.1540 |
 | X-573 | Review of block 0.1535 to 0.1539 (review 0.1539, 17/11), minor M1, M2, M3, M4… | Done in 0.1542 |
+| X-574 | User decision of 17/11 around 15:40 (« yes remove it, I am the only one using… | Done in 0.1793.0 |
 | X-575 | Bug seen by the user in the Beastmaster labyrinth on 17/11 around 23:00 (two… | Done in 0.1545 |
 | X-576 | User reading of 18/11 around 00:05 (capture of the window before entering the… | Done in 0.1546 |
 | X-577 | Tool: a decision added through the master's queue (decisions.py add, replayed… | Done in 0.1551 |
@@ -673,6 +684,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-581 | Bug seen by the user on 18/11 around 00:35 (capture of the Garden page, house… | Done in 0.1572 |
 | X-582 | Tool (defect seen on 18/11 around 00:30, relay 110): q.py plafond, hence… | Done in 0.1548 |
 | X-583 | Tool: on 18/11 around 01:00, relay 110 asked the master a question then waited… | Done in 0.1551 |
+| X-584 | Defect seen by the user on 18/11 around 00:25 (test T-0.1508-1, test page, two… | Done in 0.1657.0 |
 | X-585 | Review of block 0.1540 to 0.1550 (review 0.1550, 18/11), minor M1, M2, M3, M4… | Done in 0.1558 |
 | X-586 | External audit of 18/11 (GPT-6.2 Astra, commit c6389abe, 27 new findings, 6… | Done in 0.1550 |
 | X-587 | External audit of 18/11, family « player data after an error »: A16 (critical… | Done in 0.1551 |
@@ -809,13 +821,59 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-721 | User request of 21/11 around 13:15 (screenshot of the server bar, kept out of… | Done in 0.1725.0 |
 | X-722 | User request of 21/11 around 13:35 (screenshot of Tensho's chat, start of the… | Done in 0.1724.0 |
 | X-723 | Bug reported by the user on 21/11 around 13:40: in Tensho's chat, the players'… | Done in 0.1724.0 |
+| X-724 | User request of 21/11 around 13:50 (two screenshots of the Settings, kept out… | Done in 0.1730.0 |
+| X-725 | User request of 21/11 around 13:55 (« check the rest too », after the server… | Done in 0.1731.0 |
 | X-726 | Review of block 0.1717 to 0.1720 (review 0.1720, 21/11), minor M1: M1 in… | Done in 0.1721.0 |
+| X-727 | User request of 21/11 around 14:00 (screenshot of the « Tensho tracker »… | Done in 0.1733.0 |
+| X-728 | Bug reported by the user on 21/11 around 14:42: no Tensho menu on a right click… | Done in 0.1732.0 |
+| X-729 | Review of block 0.1721 to 0.1726 (review 0.1726, 21/11), I1: finding in… | Done in 0.1727.0 |
+| X-730 | Review of block 0.1721 to 0.1726 (review 0.1726, 21/11), minor M1, M2: M1 in… | Done in 0.1729.0 |
+| X-731 | Review of block 0.1721 to 0.1726 (review 0.1726, 21/11), pre-existing before… | Done in 0.1727.0 |
+| X-732 | Bug reported by the user on 21/11 around 15:20 (screenshot of the « Fade out… | Done in 0.1736.0 |
+| X-733 | In-game test T-0.1715-1 (test page, 21/11 around 15:51): problem reported by… | Done in 0.1734.0 |
+| X-734 | In-game test T-0.1720-1 (test page, 21/11 around 15:49): problem reported by… | Done in 0.1734.0 |
+| X-735 | Review of block 0.1727 to 0.1733 (review 0.1733, 21/11), minor M1: M1 in… | Done in 0.1735.0 |
+| X-744 | Idea I-026 chosen by the user on 21/11 around 16:00 (idea box): Labyrinth… | Done in 0.1770.0 |
+| X-745 | Idea I-027 chosen by the user on 21/11 around 16:00 (idea box): Beastmaster… | Done in 0.1767.0 |
+| X-746 | Idea I-029 chosen by the user on 21/11 around 16:00 (idea box): Beastmaster… | Done in 0.1766.0 |
+| X-748 | Idea I-022 chosen by the user on 21/11 around 16:00 (idea box): Vendors: hide… | Done in 0.1738.0 |
+| X-750 | Idea I-024 chosen by the user on 21/11 around 16:00 (idea box): SQLite: saves… | Done in 0.1794.0 |
+| X-751 | Idea I-049 chosen by the user on 21/11 around 16:00 (idea box): Tool: mutation… | Done in 0.1742.0 |
+| X-752 | Idea I-043 chosen by the user on 21/11 around 16:00 (idea box): Sources… | Done in 0.1763.0 |
+| X-753 | Idea I-044 chosen by the user on 21/11 around 16:00 (idea box): Sources… | Done in 0.1764.0 |
+| X-754 | Idea I-050 chosen by the user on 21/11 around 16:00 (idea box): Capture mode… | Done in 0.1737.0 |
+| X-755 | Idea I-051 chosen by the user on 21/11 around 16:00 (idea box): Labyrinth… | Done in 0.1750.0 |
+| X-756 | Review of block 0.1734 to 0.1738 (review 0.1738, 21/11), I1: finding in… | Done in 0.1739.0 |
+| X-757 | Review of block 0.1734 to 0.1738 (review 0.1738, 21/11), minor M1, M2, M3, M4… | Done in 0.1740.0 |
+| X-758 | Follow-up of D-202 b and X-715: probe reading received on 21/11 around 18:45… | Done in 0.1746.0 |
+| X-759 | Review of block 0.1739 to 0.1742 (review 0.1742, 21/11), I1: finding in… | Done in 0.1743.0 |
+| X-760 | Review of block 0.1739 to 0.1742 (review 0.1742, 21/11), minor M1, M2: M1 in… | Done in 0.1744.0 |
+| X-761 | Review of block 0.1743 to 0.1746 (review 0.1746, 21/11), I1: finding in… | Done in 0.1747.0 |
+| X-762 | Review of block 0.1743 to 0.1746 (review 0.1746, 21/11), I2: finding in… | Done in 0.1748.0 |
+| X-763 | Review of block 0.1743 to 0.1746 (review 0.1746, 21/11), minor M1, M2, M3: M1… | Done in 0.1749.0 |
+| X-764 | Review of block 0.1747 to 0.1751 (review 0.1751, 21/11), minor M1, M2, M3: M1… | Done in 0.1753.0 |
+| X-765 | Review of block 0.1747 to 0.1751 (review 0.1751, 21/11), pre-existing before… | Done in 0.1754.0 |
+| X-766 | Another player's meal, a first meal put on before its line (review of 0.1751… | Done in 0.1757.0 |
+| X-767 | Review of block 0.1752 to 0.1756 (review 0.1756, 21/11), minor M1, M2: M1 in… | Done in 0.1758.0 |
+| X-768 | Review of block 0.1757 to 0.1758 (review 0.1758, 21/11), minor M1, M2: M1 in… | Done in 0.1759.0 |
+| X-769 | Review of block 0.1759 to 0.1764 (review 0.1764, 22/11), minor M1, M2, M3: M1… | Done in 0.1765.0 |
+| X-770 | Review of block 0.1765 to 0.1768 (review 0.1768, 22/11), minor M1, M2: M1 in… | Done in 0.1769.0 |
+| X-771 | Review of block 0.1769 to 0.1772 (review 0.1772, 22/11), minor M1, M2, M3, M4… | Done in 0.1773.0 |
+| X-773 | Review of block 0.1773 to 0.1775 (review 0.1775, 22/11), minor M1, M2, M3: M1… | Done in 0.1776.0 |
+| X-774 | Review of block 0.1776 to 0.1779 (review 0.1779, 22/11), I1: finding in… | Done in 0.1780.0 |
+| X-775 | Flaky CI test: SettingsFile1745Tests (two clients saving at once); its reader… | Done in 0.1785.0 |
+| X-776 | Intermittent check of the tool that verifies without reloading the game: twice… | Done in 0.1785.0 |
+| X-777 | Review of block 0.1780 to 0.1784 (review 0.1784, 22/11), I1: finding in… | Done in 0.1786.0 |
+| X-778 | Review of block 0.1780 to 0.1784 (review 0.1784, 22/11), I2: finding in… | Done in 0.1787.0 |
+| X-779 | Review of block 0.1780 to 0.1784 (review 0.1784, 22/11), minor M1: M1 in… | Done in 0.1788.0 |
+| X-780 | Review of block 0.1785 to 0.1789 (review 0.1789, 22/11), minor M2: M2 in… | Done in 0.1790.0 |
+| X-781 | Review of block 0.1785 to 0.1789 (review 0.1789, 22/11), pre-existing before… | Done in 0.1790.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (742 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (800 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1153,6 +1211,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-144 | Audit A13 (audit GPT du 11/11… | Fait en 0.1126 |
 | X-146 | Audit A10 (audit GPT du 11/11… | Fait en 0.1214 |
 | X-147 | Audit A14 (audit GPT du 11/11… | Fait en 0.1217 |
+| X-148 | Fait en partie en 0.1215 : actions des workflows épinglées par empreinte (A16)… | Fait en 0.1791.0 |
 | X-149 | revue GPT du 11/11 (C:\Plugins-ff14-plan-2026-11-11-2dddccb), vérifiée dans le… | Fait en 0.1119 |
 | X-150 | revue GPT du 11/11 (C:\Plugins-ff14-plan-2026-11-11-2dddccb), vérifiée dans le… | Fait en 0.1120 |
 | X-151 | revue GPT du 11/11 (C:\Plugins-ff14-plan-2026-11-11-2dddccb), vérifiée dans le… | Fait en 0.1238 |
@@ -1198,6 +1257,10 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-201 | Demande de l'utilisateur du 2026-11-12 (« ajoute un calculateur de trajet auto… | Fait en 0.1248 |
 | X-204 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, notes de… | Fait en 0.1235 |
 | X-205 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, notes de… | Fait en 0.1241 |
+| X-207 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-14, accepté… | Fait en 0.1788.0 |
+| X-212 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-21, accepté… | Fait en 0.1756.0 |
+| X-213 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-23, accepté… | Fait en 0.1781.0 |
+| X-216 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-26, accepté… | Fait en 0.1789.0 |
 | X-217 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-30, accepté… | Fait en 0.1226 |
 | X-218 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-32, accepté… | Fait en 0.1228 |
 | X-219 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-34, accepté… | Fait en 0.1229 |
@@ -1206,6 +1269,8 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-223 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-39, accepté… | Fait en 0.1233 |
 | X-224 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-40, accepté… | Fait en 0.1227 |
 | X-225 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-46, accepté… | Fait en 0.1719.0 |
+| X-226 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-15, accepté… | Fait en 0.1778.0 |
+| X-229 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-31, accepté… | Fait en 0.1784.0 |
 | X-250 | Revue « premier joueur » du 12/11 (notes de l'agent), avant l'annonce publique… | Fait en 0.1180 |
 | X-251 | Revue « premier joueur » du 12/11 (notes de l'agent), avant l'annonce publique… | Fait en 0.1181 |
 | X-252 | Revue « premier joueur » du 12/11 (notes de l'agent), avant l'annonce publique… | Fait en 0.1182 |
@@ -1373,6 +1438,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-444 | Relecture du bloc 0.1436 à 0.1445 (relecture 0.1445, 15/11), mineurs M1, M2… | Fait en 0.1446.0 |
 | X-445 | Demande de l'utilisateur du 15/11 vers 20 h 10, précisée vers 20 h 25 (essai de… | Fait en 0.1458 |
 | X-446 | Outil : state.py child set ID "texte" sans le champ (etat, version ou… | Fait en 0.1455.0 |
+| X-448 | Demande de l'utilisateur du 15/11 vers 20 h 20 (fenêtre de chat Tensho) : «… | Fait en 0.1454.0 |
 | X-449 | Demande de l'utilisateur du 15/11 vers 20 h 20 : « il faut aussi refaire les… | Fait en 0.1496 |
 | X-450 | Demande de l'utilisateur du 15/11 vers 20 h 30 : une page privée des essais en… | Fait en 0.1455.0 |
 | X-451 | Relecture du bloc 0.1446 à 0.1454 (relecture 0.1454, 15/11), I1 : X-403… | Fait en 0.1456 |
@@ -1389,6 +1455,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-464 | Relecture du bloc 0.1455 à 0.1461 (relecture 0.1461, 15/11), mineurs M1, M2… | Fait en 0.1466 |
 | X-465 | Bug vu au Dédale bestial par l'utilisateur le 15/11 vers 21 h 56 (mode… | Fait en 0.1465 |
 | X-466 | Demande de l'utilisateur du 15/11 vers 22 h 15 (fenêtre de chat Tensho) : « il… | Fait en 0.1476 |
+| X-469 | Décision de l'utilisateur du 15/11 vers 22 h 30 (D-174, tableau des servants… | Fait en 0.1762.0 |
 | X-470 | Outil, idée I-015 mise au plan par l'utilisateur le 15/11 vers 22 h 35… | Fait en 0.1467.0 |
 | X-471 | Outil, idée I-014 mise au plan par l'utilisateur le 15/11 vers 22 h 35 : la… | Fait en 0.1467.0 |
 | X-472 | Bug vu par l'utilisateur le 15/11 vers 22 h 40 (capture, chat du jeu et fenêtre… | Fait en 0.1471.0 |
@@ -1465,6 +1532,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-554 | Relecture du bloc 0.1516 à 0.1520 (relecture 0.1520, 17/11), I1 : X-484… | Fait en 0.1521 |
 | X-555 | Relecture du bloc 0.1516 à 0.1520 (relecture 0.1520, 17/11), I2 : X-484… | Fait en 0.1521 |
 | X-556 | Relecture du bloc 0.1516 à 0.1520 (relecture 0.1520, 17/11), mineurs M1, M2… | Fait en 0.1585 |
+| X-557 | Demande de l'utilisateur du 17/11 vers 11 h 20 (« j'ai vendu quelques trucs… | Fait en 0.1774.0 |
 | X-559 | Écart à DEC-053 relevé par le relais 104 (passage-104, 17/11 vers 12 h 10)… | Fait en 0.1528 |
 | X-560 | Bug vu par l'utilisateur le 17/11 vers 12 h 20 (capture des « Réglages du chat… | Fait en 0.1565 |
 | X-561 | Relecture du bloc 0.1521 à 0.1526 (relecture 0.1526, 17/11), I1 : X-549… | Fait en 0.1527 |
@@ -1477,6 +1545,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-571 | Test fragile « Fair lock 1309 » (deux magasins de banque sur un fichier… | Fait en 0.1541 |
 | X-572 | Relecture du bloc 0.1535 à 0.1539 (relecture 0.1539, 17/11), I1 : Le rejeu peut… | Fait en 0.1540 |
 | X-573 | Relecture du bloc 0.1535 à 0.1539 (relecture 0.1539, 17/11), mineurs M1, M2… | Fait en 0.1542 |
+| X-574 | Décision de l'utilisateur du 17/11 vers 15 h 40 (« oui retire, je suis seul à… | Fait en 0.1793.0 |
 | X-575 | Bug vu par l'utilisateur au Dédale bestial le 17/11 vers 23 h (deux captures du… | Fait en 0.1545 |
 | X-576 | Relevé de l'utilisateur du 18/11 vers 0 h 05 (capture de la fenêtre d'avant… | Fait en 0.1546 |
 | X-577 | Outil : une décision ajoutée par la file de la maître (decisions.py add… | Fait en 0.1551 |
@@ -1486,6 +1555,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-581 | Bug vu par l'utilisateur le 18/11 vers 0 h 35 (capture de la page Jardin… | Fait en 0.1572 |
 | X-582 | Outil (défaut constaté le 18/11 vers 0 h 30, relais 110) : q.py plafond, et… | Fait en 0.1548 |
 | X-583 | Outil : le 18/11 vers 1 h, le relais 110 a posé une question à la maître puis… | Fait en 0.1551 |
+| X-584 | Défaut vu par l'utilisateur le 18/11 vers 0 h 25 (essai T-0.1508-1, page des… | Fait en 0.1657.0 |
 | X-585 | Relecture du bloc 0.1540 à 0.1550 (relecture 0.1550, 18/11), mineurs M1, M2… | Fait en 0.1558 |
 | X-586 | Audit externe du 18/11 (GPT-6.2 Astra, commit c6389abe, 27 constats nouveaux… | Fait en 0.1550 |
 | X-587 | Audit externe du 18/11, famille « données du joueur après une erreur » : A16… | Fait en 0.1551 |
@@ -1622,4 +1692,50 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-721 | Demande de l'utilisateur du 21/11 vers 13 h 15 (capture de la barre du serveur… | Fait en 0.1725.0 |
 | X-722 | Demande de l'utilisateur du 21/11 vers 13 h 35 (capture du chat de Tensho… | Fait en 0.1724.0 |
 | X-723 | Bug signalé par l'utilisateur le 21/11 vers 13 h 40 : dans le chat de Tensho… | Fait en 0.1724.0 |
+| X-724 | Demande de l'utilisateur du 21/11 vers 13 h 50 (deux captures des Paramètres… | Fait en 0.1730.0 |
+| X-725 | Demande de l'utilisateur du 21/11 vers 13 h 55 (« vérifier aussi le reste »… | Fait en 0.1731.0 |
 | X-726 | Relecture du bloc 0.1717 à 0.1720 (relecture 0.1720, 21/11), mineurs M1 : M1… | Fait en 0.1721.0 |
+| X-727 | Demande de l'utilisateur du 21/11 vers 14 h (capture de la fenêtre « Suivi… | Fait en 0.1733.0 |
+| X-728 | Bug signalé par l'utilisateur le 21/11 vers 14 h 42 : pas de menu Tensho au… | Fait en 0.1732.0 |
+| X-729 | Relecture du bloc 0.1721 à 0.1726 (relecture 0.1726, 21/11), I1 : X-720 : un… | Fait en 0.1727.0 |
+| X-730 | Relecture du bloc 0.1721 à 0.1726 (relecture 0.1726, 21/11), mineurs M1, M2… | Fait en 0.1729.0 |
+| X-731 | Relecture du bloc 0.1721 à 0.1726 (relecture 0.1726, 21/11), déjà là avant le… | Fait en 0.1727.0 |
+| X-732 | Bug signalé par l'utilisateur le 21/11 vers 15 h 20 (capture du réglage «… | Fait en 0.1736.0 |
+| X-733 | Essai T-0.1715-1 en jeu (page des essais, 21/11 vers 15 h 51) : problème… | Fait en 0.1734.0 |
+| X-734 | Essai T-0.1720-1 en jeu (page des essais, 21/11 vers 15 h 49) : problème… | Fait en 0.1734.0 |
+| X-735 | Relecture du bloc 0.1727 à 0.1733 (relecture 0.1733, 21/11), mineurs M1 : M1… | Fait en 0.1735.0 |
+| X-744 | Idée I-026 choisie par l'utilisateur le 21/11 vers 16 h (boîte à idées)… | Fait en 0.1770.0 |
+| X-745 | Idée I-027 choisie par l'utilisateur le 21/11 vers 16 h (boîte à idées)… | Fait en 0.1767.0 |
+| X-746 | Idée I-029 choisie par l'utilisateur le 21/11 vers 16 h (boîte à idées)… | Fait en 0.1766.0 |
+| X-748 | Idée I-022 choisie par l'utilisateur le 21/11 vers 16 h (boîte à idées) : Essai… | Fait en 0.1738.0 |
+| X-750 | Idée I-024 choisie par l'utilisateur le 21/11 vers 16 h (boîte à idées) : Base… | Fait en 0.1794.0 |
+| X-751 | Idée I-049 choisie par l'utilisateur le 21/11 vers 16 h (boîte à idées) : Outil… | Fait en 0.1742.0 |
+| X-752 | Idée I-043 choisie par l'utilisateur le 21/11 vers 16 h (boîte à idées)… | Fait en 0.1763.0 |
+| X-753 | Idée I-044 choisie par l'utilisateur le 21/11 vers 16 h (boîte à idées)… | Fait en 0.1764.0 |
+| X-754 | Idée I-050 choisie par l'utilisateur le 21/11 vers 16 h (boîte à idées) : Mode… | Fait en 0.1737.0 |
+| X-755 | Idée I-051 choisie par l'utilisateur le 21/11 vers 16 h (boîte à idées) : Essai… | Fait en 0.1750.0 |
+| X-756 | Relecture du bloc 0.1734 à 0.1738 (relecture 0.1738, 21/11), I1 : X-733 : le… | Fait en 0.1739.0 |
+| X-757 | Relecture du bloc 0.1734 à 0.1738 (relecture 0.1738, 21/11), mineurs M1, M2… | Fait en 0.1740.0 |
+| X-758 | Suite de D-202 b et X-715 : relevé de la sonde reçu le 21/11 vers 18 h 45… | Fait en 0.1746.0 |
+| X-759 | Relecture du bloc 0.1739 à 0.1742 (relecture 0.1742, 21/11), I1 : R04 (données… | Fait en 0.1743.0 |
+| X-760 | Relecture du bloc 0.1739 à 0.1742 (relecture 0.1742, 21/11), mineurs M1, M2… | Fait en 0.1744.0 |
+| X-761 | Relecture du bloc 0.1743 à 0.1746 (relecture 0.1746, 21/11), I1 : Settings.json… | Fait en 0.1747.0 |
+| X-762 | Relecture du bloc 0.1743 à 0.1746 (relecture 0.1746, 21/11), I2 : R04, données… | Fait en 0.1748.0 |
+| X-763 | Relecture du bloc 0.1743 à 0.1746 (relecture 0.1746, 21/11), mineurs M1, M2, M3… | Fait en 0.1749.0 |
+| X-764 | Relecture du bloc 0.1747 à 0.1751 (relecture 0.1751, 21/11), mineurs M1, M2, M3… | Fait en 0.1753.0 |
+| X-765 | Relecture du bloc 0.1747 à 0.1751 (relecture 0.1751, 21/11), déjà là avant le… | Fait en 0.1754.0 |
+| X-766 | Repas d'un autre joueur, premier repas posé avant sa ligne (relecture 0.1751… | Fait en 0.1757.0 |
+| X-767 | Relecture du bloc 0.1752 à 0.1756 (relecture 0.1756, 21/11), mineurs M1, M2… | Fait en 0.1758.0 |
+| X-768 | Relecture du bloc 0.1757 à 0.1758 (relecture 0.1758, 21/11), mineurs M1, M2… | Fait en 0.1759.0 |
+| X-769 | Relecture du bloc 0.1759 à 0.1764 (relecture 0.1764, 22/11), mineurs M1, M2, M3… | Fait en 0.1765.0 |
+| X-770 | Relecture du bloc 0.1765 à 0.1768 (relecture 0.1768, 22/11), mineurs M1, M2… | Fait en 0.1769.0 |
+| X-771 | Relecture du bloc 0.1769 à 0.1772 (relecture 0.1772, 22/11), mineurs M1, M2… | Fait en 0.1773.0 |
+| X-773 | Relecture du bloc 0.1773 à 0.1775 (relecture 0.1775, 22/11), mineurs M1, M2, M3… | Fait en 0.1776.0 |
+| X-774 | Relecture du bloc 0.1776 à 0.1779 (relecture 0.1779, 22/11), I1 : Le compagnon… | Fait en 0.1780.0 |
+| X-775 | Test fragile en CI : SettingsFile1745Tests (« deux clients qui enregistrent… à… | Fait en 0.1785.0 |
+| X-776 | Contrôle intermittent de l'outil de vérification sans recharger le jeu : à deux… | Fait en 0.1785.0 |
+| X-777 | Relecture du bloc 0.1780 à 0.1784 (relecture 0.1784, 22/11), I1 : Un compagnon… | Fait en 0.1786.0 |
+| X-778 | Relecture du bloc 0.1780 à 0.1784 (relecture 0.1784, 22/11), I2 : La colonne «… | Fait en 0.1787.0 |
+| X-779 | Relecture du bloc 0.1780 à 0.1784 (relecture 0.1784, 22/11), mineurs M1 : M1… | Fait en 0.1788.0 |
+| X-780 | Relecture du bloc 0.1785 à 0.1789 (relecture 0.1789, 22/11), mineurs M2 : M2… | Fait en 0.1790.0 |
+| X-781 | Relecture du bloc 0.1785 à 0.1789 (relecture 0.1789, 22/11), déjà là avant le… | Fait en 0.1790.0 |

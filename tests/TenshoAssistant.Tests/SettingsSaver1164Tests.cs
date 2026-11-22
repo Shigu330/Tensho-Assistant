@@ -153,7 +153,8 @@ internal static class SettingsSaver1164Tests
         ("Settings saver 1164: wiring: every settings save of the plugin goes through it; the copy is checked; unload flushes", () =>
         {
             var plugin = Read("src/TenshoAssistant/Plugin.cs");
-            Check(plugin.Split("SavePluginConfig(").Length == 2 && plugin.Contains("copy=>pluginInterface.SavePluginConfig(copy),"), "one SavePluginConfig left: the saver's");
+            // X-685 part 2 (0.1745): the saver writes Tensho's own settings file (SettingsFile), no longer Dalamud's (SavePluginConfig).
+            Check(plugin.Split("settingsFile.Save(").Length == 2 && plugin.Contains("copy=>settingsFile.Save(copy,framework.IsInFrameworkUpdateThread),") && !plugin.Contains("SavePluginConfig("), "one settings save left: the saver's");
             Check(plugin.Contains("saver.Flush(TimeSpan.FromSeconds(5))") && plugin.Contains("saver.Warm("), "flushed at unload, warmed at load");
             Check(plugin.Contains("if(saver.Settle(TimeSpan.FromSeconds(15)))log.Warning(") && !plugin.Contains("the settings were saved again"), "0.1207: settled at unload, the log says what happened");
             Check(plugin.Contains("action=>_=framework.RunOnFrameworkThread(action)"), "the fallback runs on the game's thread");

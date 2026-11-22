@@ -34,6 +34,8 @@ internal sealed partial class MainWindow
         GilCategory.Quest=>Dalamud.Interface.FontAwesomeIcon.Scroll,
         GilCategory.CustomDeliveries=>Dalamud.Interface.FontAwesomeIcon.Truck,
         GilCategory.Beastmaster=>Dalamud.Interface.FontAwesomeIcon.Paw,
+        // X-557 (0.1774).
+        GilCategory.Duty=>Dalamud.Interface.FontAwesomeIcon.Dungeon,
         _=>Dalamud.Interface.FontAwesomeIcon.QuestionCircle,
     };
     private void DrawGilJournal()

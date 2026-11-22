@@ -60,7 +60,6 @@ internal sealed partial class MainWindow
     private ChatSettings ChatOptions=>configuration.Chat;
     // Saved once no control is active any more (tab names, channels, colours: several edits per frame while typing or picking).
     private bool chatSettingsPending;
-    private const int ChatLayoutsPerFrame=100;
 
     // X-485 (0.1479): never brought to the front (NoBringToFrontOnFocus) and put at the back when it appears: Tensho's other windows stay in
     // front of it. Its own setting decides what a game window over it does (StepsAside false: not the panels' setting).
@@ -72,20 +71,62 @@ internal sealed partial class MainWindow
         Padding:new Vector2(ChatLook.Padding.X,ChatLook.Padding.Y),Place:ChatPlace,Frame:ChatFrame,Once:ChatPlaceOnce,Early:()=>WarmupChatDone);
 
     /// <summary>X-447 D6 (0.1618): faded under a game window, else the opacity chosen while the mouse is not on the window (ChatLook.Alpha).
-    /// X-447 B1 (0.1622): then faded out after the delay without a new message in the tab shown (ChatLook.Idle); faded out, the clicks go through.</summary>
+    /// X-447 B1 (0.1622): then faded out after the delay without a new message in the tab shown (ChatLook.Idle); faded out, the clicks go through.
+    /// X-732 (0.1736): faded out, the content is not drawn (ImGui skips a window whose alpha is 0 at its Begin) and its lines are no longer
+    /// refreshed there: the tab shown's newest message is then taken here, from the chat's data (ChatFadeClock); with the setting on, a tell
+    /// received or an alert in any tab counts too.</summary>
     private float? ChatFade()
     {
         var hovered=chatAt is { } at && ChatLook.Under((ImGui.GetMousePos().X,ImGui.GetMousePos().Y),(at.X,at.Y),(chatSize.X,chatSize.Y));
-        if(chatShownNewest!=chatSeenNewest){chatSeenNewest=chatShownNewest;chatLastMessageAt=Environment.TickCount64;}
-        var alpha=ChatLook.Idle(ChatBaseFade(hovered),ChatOptions.BoundedFadeAfter,(Environment.TickCount64-chatLastMessageAt)/1000d,hovered || chatMenuOpen);
+        var now=Environment.TickCount64;
+        var wake=false;
+        // X-757 M3 (0.1740, review of 0.1738): the chat put back on its history (every line numbered again): the tab's newest and the last
+        // message looked at taken again from the data, none of them new (as ChatConversations); before the content draws, which takes the
+        // newest again the same way.
+        if(chatFadeClock.Restored(ChatMessages.Restores))
+        {
+            if(chatShownTab is { } restoredTab)chatShownNewest=ChatFadeClock.Newest(ChatMessages,restoredTab,ChatOptions,ChatFilterTableNow());
+            chatWakeChecked=ChatMessages.LastId;
+            chatFadeClock.Renumbered(chatShownNewest);
+        }
+        if(chatIdleOut && chatShownTab is { } shownTab)
+        {
+            var options=ChatOptions;
+            chatShownNewest=ChatFadeClock.Newest(ChatMessages,shownTab,options,ChatFilterTableNow());
+            var last=ChatMessages.LastId;
+            wake=options.FadeBackOnTell && last>chatWakeChecked
+                && ChatFadeClock.Wakes(ChatMessages.After(chatWakeChecked),ChatTextFilter.Words(options.AlertWords),options.AlertOwnName ? ChatMessages.OwnName:null);
+            chatWakeChecked=last;
+        }
+        else chatWakeChecked=ChatMessages.LastId;
+        var newest=chatShownNewest;
+        var before=chatFadeClock.LastAt;
+        chatFadeClock.Note(newest,wake,now);
+        var alpha=chatFadeClock.Alpha(ChatBaseFade(hovered),ChatOptions.BoundedFadeAfter,now,hovered || chatMenuOpen);
+        // X-732 (0.1736): developer mode, how a faded-out window came back (ten times at most per session; never a message's words). X-757 M4
+        // (0.1740): with the tab shown, the newest message's number and the alpha before and after (the probe X-732's definition asked for).
+        if(chatIdleOut && alpha is not <= 0f && developerMode && chatFadeSaid<10)
+        {
+            chatFadeSaid++;
+            log.Information("Chat window, faded out, back: {0}; tab « {1} », its newest message {2}; alpha {3} then {4}.",
+                chatFadeClock.LastAt!=before ? (wake ? "a tell or an alert (the setting on)":"a new message of the tab shown"):"the mouse or a menu of the chat",
+                chatShownTab?.Name ?? "",newest,ChatFadeText(chatFadeAlpha),ChatFadeText(alpha));
+        }
         chatIdleOut=alpha is <= 0f;
+        chatFadeAlpha=alpha;
         return alpha;
     }
     private float? ChatBaseFade(bool hovered)
         =>ChatLook.Alpha(ChatCover.Faded(ChatOptions.WhenCovered,chatCovered) ? ChatCover.FadedAlpha:null,ChatOptions.BoundedTextOpacity,hovered);
-    // X-447 B1 (0.1622): the newest message of the tab shown (its id; -1: none), the one seen last, when it came, and the window faded out.
-    private long chatShownNewest=-1,chatSeenNewest=-1,chatLastMessageAt=Environment.TickCount64;
+    // X-447 B1 (0.1622): the newest message of the tab shown (its id; -1: none) and the window faded out. X-732 (0.1736): when the last message
+    // that keeps it up came (ChatFadeClock), the last message looked at for a tell or an alert, the developer's lines said.
+    private long chatShownNewest=-1,chatWakeChecked;
+    private readonly ChatFadeClock chatFadeClock=new(Environment.TickCount64);
     private bool chatIdleOut;
+    private int chatFadeSaid;
+    // X-757 M4 (0.1740): the alpha given at the last frame (null: the window's own), for the developer's line.
+    private float? chatFadeAlpha;
+    private static string ChatFadeText(float? alpha)=>alpha is { } value ? value.ToString("0.00",System.Globalization.CultureInfo.InvariantCulture):"its own";
 
     /// <summary>X-447 D5 (0.1618): the window's margins, corners and frame thickness from its settings.</summary>
     private PanelFrame ChatFrame()=>new(new Vector2(ChatOptions.BoundedMarginX,ChatOptions.BoundedMarginY),ChatOptions.BoundedRounding,ChatOptions.BoundedBorder);
@@ -224,7 +265,7 @@ internal sealed partial class MainWindow
         if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ChatWindow.SectionTabs")+"###ChatTabsSection"))DrawChatTabSettings(options);
         if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ChatWindow.SectionContexts")+"###ChatContextsSection"))DrawChatContextProfiles(options);
         if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ChatWindow.SectionColors")+"###ChatColorsSection"))DrawChatColorSettings(options);
-        if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ChatWindow.SectionPlayers")+"###ChatPlayersSection"))DrawChatPlayers(options);
+        if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ChatWindow.SectionPlayers")+"###ChatPlayersSection")){DrawChatPlayers(options);DrawChatServerBarSetting();}
         if(developerMode)DrawChatKinds();
         SaveChatSettingsWhenReleased();
     }
@@ -345,6 +386,8 @@ internal sealed partial class MainWindow
         // X-447 B2 (0.1622): spacing between the lines; B1: the window fades out after a delay without message.
         SliderSetting("ChatWindow.LineSpacing","ChatWindow.LineSpacingTip",()=>configuration.Chat.BoundedLineSpacing,value=>configuration.Chat.LineSpacing=value,0,12,defaults.LineSpacing,"%d px");
         SliderSetting("ChatWindow.FadeAfter","ChatWindow.FadeAfterTip",()=>configuration.Chat.BoundedFadeAfter,value=>configuration.Chat.FadeAfter=value,0,600,defaults.FadeAfter,"%d s");
+        // X-732 (0.1736): a tell or an alert in any tab brings the faded window back too (off by default).
+        BoolSetting("ChatWindow.FadeBackOnTell","ChatWindow.FadeBackOnTellTip",()=>configuration.Chat.FadeBackOnTell,value=>configuration.Chat.FadeBackOnTell=value,c=>c.Chat.FadeBackOnTell);
         IntSetting("ChatWindow.MaxLines","ChatWindow.MaxLinesTip",()=>configuration.Chat.BoundedMaxLines,value=>configuration.Chat.MaxLines=value,ChatStore.MinimumLines,ChatStore.MaximumLines,defaults.MaxLines);
         DrawChatLookCode();
     }
@@ -911,6 +954,8 @@ internal sealed partial class MainWindow
         ListSetting("ChatWindow.HideWords","ChatWindow.HideWordsTip",()=>tab.HideWords,value=>{tab.HideWords=value;ChatTabChanged(tab);},300,()=>tab.WordsMatchCase);
         CheckSetting("ChatWindow.WordsMatchCase","ChatWindow.WordsMatchCaseTip",()=>tab.WordsMatchCase,value=>{tab.WordsMatchCase=value;ChatTabChanged(tab);});
         CheckSetting("ChatWindow.FoldRepeats","ChatWindow.FoldRepeatsTip",()=>tab.FoldRepeats,value=>{tab.FoldRepeats=value;ChatTabChanged(tab);});
+        // X-484 (0.1777, beyond the game): others' Teleport and Return left out of this tab (ChatTravel).
+        CheckSetting("ChatWindow.HideOthersTravel","ChatWindow.HideOthersTravelTip",()=>tab.HideOthersTravel,value=>{tab.HideOthersTravel=value;ChatTabChanged(tab);});
     }
 
     /// <summary>X-484 (0.1482, beyond the game): players hidden from every tab, players whose name stands out.</summary>
@@ -931,10 +976,15 @@ internal sealed partial class MainWindow
         try{if(ImGui.SmallButton(localization.Get("Alarms.Try")+"##ChatAlertSoundTry"))alarmService?.PreviewChatSound(configuration.Chat.AlertSound);}
         finally{ImGui.EndDisabled();}
         Tip("Advanced.TryTip");
-        // X-447 B7 (0.1647, after WIM): the alerts not seen counted in the game's server bar.
-        BoolSetting("ChatWindow.ServerBarAlerts","ChatWindow.ServerBarAlertsTip",()=>configuration.Chat.ServerBarAlerts,value=>configuration.Chat.ServerBarAlerts=value,c=>c.Chat.ServerBarAlerts);
         // X-447 B10 (0.1654, after WIM): each player's tells in a tab of their own (memory only).
         BoolSetting("ChatWindow.Conversations","ChatWindow.ConversationsTip",()=>configuration.Chat.Conversations,value=>configuration.Chat.Conversations=value,c=>c.Chat.Conversations);
+    }
+
+    /// <summary>X-447 B7 (0.1647, after WIM): the alerts not seen counted in the game's server bar. X-724 (0.1730): in the Settings page's
+    /// « Server bar » category with the other entries, and in the chat window's own settings under its players.</summary>
+    private void DrawChatServerBarSetting()
+    {
+        BoolSetting("ChatWindow.ServerBarAlerts","ChatWindow.ServerBarAlertsTip",()=>configuration.Chat.ServerBarAlerts,value=>configuration.Chat.ServerBarAlerts=value,c=>c.Chat.ServerBarAlerts);
     }
 
     private void SetHiddenPlayers(ChatSettings options,string value)
@@ -1247,8 +1297,31 @@ internal sealed partial class MainWindow
         },TaskScheduler.Default);
     }
 
-    /// <summary>X-564 (0.1632): the chat window's tabs and lines, once its code is compiled (the first time timed for the log).</summary>
+    // X-558 (0.1775): the next tab not shown to take its messages (ChatLoading.RefreshOrder), the frames of the first minute after the load,
+    // and this frame's refresh time for them.
+    private int chatRefreshNext;
+    private readonly ChatLoadFrames chatLoadFrames=new();
+    private double chatRefreshMs;
+
+    /// <summary>X-564 (0.1632): the chat window's tabs and lines, once its code is compiled (the first time timed for the log). X-558 (0.1775):
+    /// each frame of the first minute after the load timed (ChatLoadFrames: the frames of 16 ms or more said in the log, then the minute's line).</summary>
     private void DrawChatWindowLines()
+    {
+        if(chatLoadFrames.Done){DrawChatWindowTabsAndLines();return;}
+        var started=System.Diagnostics.Stopwatch.GetTimestamp();
+        // X-558 (0.1779): the runtime's pauses and this thread's compilations during the frame, apart from the chat's own time.
+        var paused=GC.GetTotalPauseDuration();
+        var compiled=System.Runtime.JitInfo.GetCompilationTime(true);
+        chatRefreshMs=0;
+        try{DrawChatWindowTabsAndLines();}
+        finally
+        {
+            foreach(var line in chatLoadFrames.Add(WarmupSinceMade,System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds,chatRefreshMs,
+                (GC.GetTotalPauseDuration()-paused).TotalMilliseconds,(System.Runtime.JitInfo.GetCompilationTime(true)-compiled).TotalMilliseconds))log.Information("{0}",line);
+        }
+    }
+
+    private void DrawChatWindowTabsAndLines()
     {
         var options=ChatOptions;
         FollowChatContext(options);
@@ -1257,7 +1330,17 @@ internal sealed partial class MainWindow
         var table=ChatFilterTableNow();
         // X-558 (0.1532): the tabs' new lines, measured apart in developer mode (the « Slow frame » line).
         var refreshStarted=System.Diagnostics.Stopwatch.GetTimestamp();
-        foreach(var tab in tabs)ChatMessages.ViewOf(tab).Refresh(ChatMessages,tab,options.BoundedMaxLines,table,options);
+        // X-558 (0.1775): the shown tab first, the others while the frame's refresh stays under 3 ms (after the history is read back, every
+        // tab takes all the messages again: one frame for all of them was one long frame); a tab left takes its messages at the next frame.
+        var shown=chatTabShown>=0 && chatTabShown<chatMainTabs.Count ? tabs.IndexOf(chatMainTabs[chatTabShown]):-1;
+        foreach(var index in ChatLoading.RefreshOrder(tabs.Count,shown,chatRefreshNext))
+        {
+            var tab=tabs[index];
+            ChatMessages.ViewOf(tab).Refresh(ChatMessages,tab,options.BoundedMaxLines,table,options);
+            if(index!=shown)chatRefreshNext=index+1;
+            if(!ChatLoading.RefreshMore(System.Diagnostics.Stopwatch.GetElapsedTime(refreshStarted).TotalMilliseconds))break;
+        }
+        chatRefreshMs=System.Diagnostics.Stopwatch.GetElapsedTime(refreshStarted).TotalMilliseconds;
         // X-447 B7 (0.1647): the alerts not seen, for the server bar.
         Volatile.Write(ref chatAlertsUnseen,ChatAlert.Unseen(tabs.Select(ChatMessages.ViewOf),chatUnseen));
         // X-447 B11 (0.1714): the tabs drawn in a window of their own leave this window's bar (their lines were refreshed above, their alerts counted).
@@ -1926,7 +2009,8 @@ internal sealed partial class MainWindow
                     if(!chatLinesBlocked && run.Role==ChatRole.Sender && !options.CaptureNames && ChatChannels.Spoken(record.Channel))TipText(()=>ChatSenderTip(record));
                     if(!chatLinesBlocked && run.Link is { Kind:ChatSegmentKind.DalamudLink })TipText(localization.Get("ChatWindow.DalamudLinkGameTip"));
                     // X-473 (0.1715): a status the game linked: its icon, name and description, as the game's tooltip.
-                    if(!chatLinesBlocked && run.Link is { Kind:ChatSegmentKind.StatusLink } statusLink && ImGui.IsItemHovered())DrawChatStatusTip(statusLink.StatusId);
+                    // X-733 (0.1734): a meal's or a medicine's: the bonuses of what was eaten or drunk, as the game's status tooltip.
+                    if(!chatLinesBlocked && run.Link is { Kind:ChatSegmentKind.StatusLink } statusLink && ImGui.IsItemHovered())DrawChatStatusTip(statusLink.StatusId,statusLink.Param);
                     // X-473 (0.1720): an action a combat line names: its icon, name and description, as the game's tooltip; none when the name is
                     // not one action for sure (the line's subject: a player's action or any).
                     if(!chatLinesBlocked && run.Link is { Kind:ChatSegmentKind.ActionName } actionName && ImGui.IsItemHovered())DrawChatActionTip(actionName.Action,ChatActionTips.ByPlayer(record.Source));
@@ -2034,11 +2118,12 @@ internal sealed partial class MainWindow
     };
 
     /// <summary>X-473 (0.1715): a status's tooltip, as the game's: its icon, its name, its description (Status sheet); none for a status the
-    /// sheet does not name (never a false one). Display only: nothing counted nor kept (R03.1).</summary>
-    private void DrawChatStatusTip(uint id)
+    /// sheet does not name (never a false one). Display only: nothing counted nor kept (R03.1). X-733 (0.1734): a meal's or a medicine's,
+    /// once its Param was read on the one who gained it: the bonuses instead of the description, as the game's status tooltip.</summary>
+    private void DrawChatStatusTip(uint id,Chat.ChatStatusParam? param)
     {
         if(ChatPlayers?.Status(id) is not { } status)return;
-        DrawChatGameTip(status,new Vector2(24,32));
+        DrawChatGameTip(status,new Vector2(24,32),param is { Value:>0 } read ? ChatPlayers.FoodLines(id,read.Value):null);
     }
 
     /// <summary>X-473 (0.1720): an action's tooltip, as the game's: its icon, its name, its description (Action and ActionTransient sheets);
@@ -2049,14 +2134,21 @@ internal sealed partial class MainWindow
         DrawChatGameTip(action,new Vector2(32,32));
     }
 
-    /// <summary>X-473 (0.1715, 0.1720): a tooltip of the game's data: its icon (<paramref name="icon"/> at the interface's scale), name and description.</summary>
-    private void DrawChatGameTip(ChatStatusTip tip,Vector2 icon)
+    /// <summary>X-473 (0.1715, 0.1720): a tooltip of the game's data: its icon (<paramref name="icon"/> at the interface's scale), name and description.
+    /// X-733 (0.1734): <paramref name="lines"/>, when given, in place of the description (a meal's bonuses).</summary>
+    private void DrawChatGameTip(ChatStatusTip tip,Vector2 icon,IReadOnlyList<string>? lines=null)
     {
         using(TooltipScope.Begin())
         {
             DrawGameIcon(tip.Icon,icon*Dalamud.Interface.Utility.ImGuiHelpers.GlobalScale);
             ImGui.SameLine();
             ImGui.TextColored(Accent,tip.Name);
+            if(lines is { Count:>0 })
+            {
+                ImGui.Separator();
+                foreach(var line in lines)ImGui.TextColored(Text,line);
+                return;
+            }
             if(tip.Description.Length==0)return;
             ImGui.PushTextWrapPos(ImGui.GetFontSize()*28);
             try{ImGui.Separator();ImGui.TextColored(Muted,tip.Description);}

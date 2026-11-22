@@ -36,7 +36,10 @@ internal sealed partial class MainWindow
         ImGui.TextDisabled(localization.Format("NpcUi.Count",offers.Count,offers.Select(offer=>offer.Vendor.NpcId).Distinct().Count()));
         ImGui.TextDisabled(localization.Get("NpcUi.FlagHelp"));
         if(mapOpenError is { } flagError)ImGui.TextColored(Accent,flagError);
-        if(!ImGui.BeginTable("NpcOffers",4,ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchProp | ImGuiTableFlags.ScrollY,new Vector2(0,Math.Clamp(offers.Count*26+30,90,420))))return;
+        // X-748 (0.1738): the vendors on no map folded into one row (shown on a click), after those that stand on a map.
+        var (placed,unplaced)=NpcVendorRows.Split(offers,offer=>VendorLocations(offer.Vendor).Count>0);
+        var rows=NpcVendorRows.Rows(placed.Count,unplaced.Count,npcVendorsUnplacedOpen);
+        if(!ImGui.BeginTable("NpcOffers",4,ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchProp | ImGuiTableFlags.ScrollY,new Vector2(0,Math.Clamp(rows*26+30,90,420))))return;
         try
         {
             ImGui.TableSetupScrollFreeze(0,1);
@@ -45,9 +48,27 @@ internal sealed partial class MainWindow
             ImGui.TableSetupColumn(localization.Get("NpcUi.Cost"),ImGuiTableColumnFlags.WidthStretch,2);
             ImGui.TableSetupColumn(localization.Get("NpcUi.Shop"),ImGuiTableColumnFlags.WidthStretch,2);
             ImGui.TableHeadersRow();
-            for(var index=0;index<offers.Count;index++)
+            for(var index=0;index<placed.Count;index++)DrawNpcOfferRow(placed[index],index);
+            if(unplaced.Count>0)
             {
-                var offer=offers[index];
+                ImGui.TableNextRow();ImGui.TableNextColumn();
+                // X-757 M2 (0.1740): the vendors counted, not their offers.
+                if(ImGui.Selectable(localization.Format(npcVendorsUnplacedOpen ? "NpcUi.UnplacedOpen":"NpcUi.UnplacedClosed",NpcVendorRows.Vendors(unplaced,offer=>offer.Vendor.NpcId))+"##Unplaced",false,ImGuiSelectableFlags.SpanAllColumns))
+                    npcVendorsUnplacedOpen=!npcVendorsUnplacedOpen;
+                Tip("NpcUi.UnplacedTip");
+                if(npcVendorsUnplacedOpen)for(var index=0;index<unplaced.Count;index++)DrawNpcOfferRow(unplaced[index],placed.Count+index);
+            }
+        }
+        finally{ImGui.EndTable();}
+        ImGui.TextDisabled(localization.Get("NpcUi.Source"));
+    }
+
+    // X-748 (0.1738): the vendors on no map shown (per session; folded at first).
+    private bool npcVendorsUnplacedOpen;
+
+    /// <summary>One vendor's row of an item's table: name (its menu and tooltip), places, cost, shop.</summary>
+    private void DrawNpcOfferRow(NpcVendorOffer offer,int index)
+    {
                 ImGui.PushID(index);
                 try
                 {
@@ -63,10 +84,6 @@ internal sealed partial class MainWindow
                     ImGui.TableNextColumn();ImGui.TextUnformatted(offer.Sale.ShopName.Length>0 ? offer.Sale.ShopName:localization.Get("NpcUi.Kind"+offer.Sale.Kind));
                 }
                 finally{ImGui.PopID();}
-            }
-        }
-        finally{ImGui.EndTable();}
-        ImGui.TextDisabled(localization.Get("NpcUi.Source"));
     }
 
     // Vendor sheet (0.140, opened from the map's right-click « Vendors » tab): positions with a Tensho map link, then each shop's

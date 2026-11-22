@@ -18,8 +18,16 @@ internal sealed partial class MainWindow
     /// <summary>From elsewhere: this FATE's lines, wherever they are.</summary>
     private void OpenFate(string name){fateQuery=name;page=Page.Fates;}
 
+    // X-213 (0.1781): the shared FATE ranks (the zones from the sheets; the character's ranks as the game's window showed them).
+    internal Func<IReadOnlyList<SharedFateZone>?>? SharedFatesLoad { get; set; }
+    internal Func<IReadOnlyDictionary<uint,SharedFateRead>?>? SharedFatesNow { get; set; }
+    private Task<IReadOnlyList<SharedFateZone>?>? sharedFatesTask;
+    private IReadOnlyList<SharedFateZone>? sharedFateZones;
+    private bool sharedFatesFailed;
+
     private void DrawFates()
     {
+        DrawSharedFates();
         if(fateZones is null && !fatesFailed && fatesTask is null && FatesLoad is { } load)fatesTask=Task.Run(load);
         if(fatesTask is { IsCompleted:true } done)
         {
@@ -54,6 +62,74 @@ internal sealed partial class MainWindow
             foreach(var (zone,row) in rows)DrawFateRow(zone,row);
         }
         finally{ImGui.EndTable();}
+    }
+
+    /// <summary>
+    /// X-213 (the user's request of 12/11, K-23): each shared FATE zone, the character's rank, the FATEs toward the next one and the
+    /// gemstone trader's items still to come, as the game's Shared FATE window showed them when last opened; « unknown » until then (R06).
+    /// </summary>
+    private void DrawSharedFates()
+    {
+        if(sharedFateZones is null && !sharedFatesFailed && sharedFatesTask is null && SharedFatesLoad is { } load)sharedFatesTask=Task.Run(load);
+        if(sharedFatesTask is { IsCompleted:true } done)
+        {
+            sharedFatesTask=null;
+            sharedFateZones=done.IsCompletedSuccessfully ? done.Result:null;
+            sharedFatesFailed=sharedFateZones is not { Count:>0 };
+        }
+        var kept=SharedFatesNow?.Invoke();
+        var zones=sharedFateZones;
+        var header=zones is null ? localization.Get("Fates.SharedTitle"):localization.Format("Fates.SharedHeader",zones.Count(zone=>kept?.ContainsKey(zone.Territory)==true),zones.Count);
+        if(!ImGui.CollapsingHeader(header+"###SharedFates"))return;
+        Tip("Fates.SharedHelp");
+        if(sharedFatesFailed){ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("Fates.SharedUnavailable"));return;}
+        if(zones is null){StateLine(UI.UiState.Waiting,localization.Get("Fates.SharedLoading"));return;}
+        ImGui.TextDisabled(SharedFates.LastRead(kept) is { } at ? localization.Format("Fates.SharedReadAt",at.ToLocalTime().ToString("g")):localization.Get("Fates.SharedNeverRead"));
+        if(!UI.UiComponents.BeginDataTable("###SharedFateRows",4,scrollHeight:Math.Min(260,ImGui.GetTextLineHeightWithSpacing()*(zones.Count+1)+8)))return;
+        try
+        {
+            ImGui.TableSetupScrollFreeze(0,1);
+            UI.UiComponents.HeadersRow([..new[]{"SharedColumnZone","SharedColumnRank","SharedColumnNext","SharedColumnRewards"}.Select(column=>localization.Get("Fates."+column))],_=>false);
+            foreach(var zone in zones)DrawSharedFateRow(zone,kept?.GetValueOrDefault(zone.Territory));
+        }
+        finally{ImGui.EndTable();}
+    }
+
+    private void DrawSharedFateRow(SharedFateZone zone,SharedFateRead? read)
+    {
+        ImGui.TableNextRow();
+        ImGui.TableNextColumn();ImGui.TextUnformatted(zone.Name);
+        ImGui.TableNextColumn();
+        if(read is null){ImGui.TextDisabled(localization.Get("Fates.SharedUnknown"));Tip("Fates.SharedUnknownTip");}
+        else ImGui.TextUnformatted(localization.Format("Fates.SharedRank",read.Rank,read.MaxRank));
+        ImGui.TableNextColumn();
+        if(read is null){ImGui.TextDisabled(localization.Get("Fates.SharedUnknown"));Tip("Fates.SharedUnknownTip");}
+        else if(read.Rank>=read.MaxRank)ImGui.TextColored(Success,localization.Get("Fates.SharedMaxRank"));
+        else
+        {
+            ImGui.TextUnformatted(localization.Format("Fates.SharedNext",read.Progress,read.Needed));
+            TipText(localization.Format("Fates.SharedNextTip",read.Rank+1));
+        }
+        ImGui.TableNextColumn();
+        if(!zone.TraderKnown){ImGui.TextDisabled(localization.Get("Fates.SharedRewardsNoTrader"));Tip("Fates.SharedRewardsNoTraderTip");return;}
+        if(SharedFates.Remaining(zone,read) is not { } left){ImGui.TextDisabled(localization.Get("Fates.SharedUnknown"));Tip("Fates.SharedUnknownTip");return;}
+        var achievement=read is not null && read.Rank<zone.MaxRank ? zone.Achievement:null;
+        if(left.Count==0 && achievement is null){ImGui.TextColored(Success,localization.Get("Fates.SharedRewardsNone"));return;}
+        ImGui.TextUnformatted(left.Count==1 ? localization.Get("Fates.SharedRewardsOne"):localization.Format("Fates.SharedRewards",left.Count));
+        if(!ImGui.IsItemHovered())return;
+        using(TooltipScope.Begin())
+        {
+            TooltipTitle(zone.Name);
+            foreach(var reward in left)
+            {
+                DrawGameIcon(reward.Icon,new Vector2(ImGui.GetTextLineHeight()));
+                ImGui.SameLine();
+                ImGui.TextUnformatted(reward.Name);
+                ImGui.SameLine();
+                ImGui.TextDisabled(localization.Format("Fates.SharedRewardLine",reward.Rank,reward.Cost,reward.CostName));
+            }
+            if(achievement is not null)ImGui.TextUnformatted(localization.Format("Fates.SharedAchievement",zone.MaxRank,achievement));
+        }
     }
 
     private void DrawFateRow(FieldZone zone,FieldEvent row)

@@ -4,38 +4,49 @@ using TenshoAssistant.Discoveries;
 
 // 0.916 (X-76 E1, DEC-042, docs/evidence/0.916-discoveries-format.md): the discoveries file is version 2 before 1.0.0: optional Hq and Values (yours,
 // shared) and ImportedHq and ImportedValues (imported, never shared), left out when empty; version 1 files still read; the fact's Key unchanged.
+// X-574 (0.1793, the user's choice of 17/11): the reader of version 1 and 2 gists (CommunityDiscoveries.Parse, Encode, Decode) is gone; the gist
+// is a v3 set since 0.1137 (ExchangeV3), read back here the same way.
 internal static class DiscoveriesFormat916Tests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
     private static readonly DateTimeOffset At=new(2026,11,8,12,0,0,TimeSpan.Zero);
     private static string Source(string file)=>File.ReadAllText(Path.GetFullPath(file));
     private static string Histogram(Dictionary<int,int>? values)=>values is null ? "null":string.Join(",",values.OrderBy(pair=>pair.Key).Select(pair=>$"{pair.Key}:{pair.Value}"));
+    // X-574 (0.1793): the gist as the exchange writes it (a v3 set, ExchangeV3) and read back the same way; the v1/v2 Encode and Decode are gone.
+    private static List<DiscoveryFact> ThroughGist(DiscoveryFile mine)
+    {
+        var files=ExchangeV3.GistFiles(ExchangeV3.Build(mine));
+        var index=ExchangeV3.ParseIndex(files[ExchangeV3.IndexName])!;
+        return [.. index.Files.SelectMany(entry=>ExchangeV3.ReadKind(new MemoryStream(Convert.FromBase64String(files[entry.Name+ExchangeV3.GistSuffix])),entry).Facts)];
+    }
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
-        ("Discoveries format: a version 1 file still reads (base, shared file, gist); version 2 is written; an unknown version is refused",() =>
+        ("Discoveries format: a version 1 file still reads (the base file of the JSON mode); version 2 is written; an unknown version is refused",() =>
         {
             const string one="{\"Version\":1,\"Producer\":\"Tensho Assistant\",\"Written\":\"2026-11-08T12:00:00+00:00\",\"Facts\":[{\"Kind\":4,\"Subject\":5,\"Detail\":6,"
                 +"\"Territory\":0,\"Map\":0,\"CellX\":0,\"CellZ\":0,\"X\":0,\"Z\":0,\"LevelMin\":2,\"LevelMax\":3,\"Seen\":4,\"Imported\":0,"
                 +"\"First\":\"2026-11-08T12:00:00+00:00\",\"Last\":\"2026-11-08T12:00:00+00:00\",\"Key\":\"4:5:6:0:0:0:0\"}]}";
             Check(DiscoveryFile.CurrentVersion==2 && DiscoveryFile.OldestVersion==1,"versions");
-            var parsed=CommunityDiscoveries.Parse(one);
-            Check(parsed is { Version:1, Facts.Count:1 } && parsed.Facts[0] is { Hq:0, Values:null, ImportedHq:0, ImportedValues:null } && DiscoveryStore.Valid(parsed.Facts[0]),"parsed");
-            var store=new DiscoveryStore();store.Load(parsed!);
-            Check(store.Find(DiscoveryKind.Desynthesis,_=>true,4) is [{ Seen:4, LevelMin:2, LevelMax:3, Values:null }],"loaded as it was");
             var folder=Path.Combine(Path.GetTempPath(),"tensho-916-"+Guid.NewGuid().ToString("N"));
+            var store=new DiscoveryStore();
             try
             {
                 var path=Path.Combine(folder,"Discoveries.json");
                 Directory.CreateDirectory(folder);File.WriteAllText(path,one);
-                Check(DiscoveryFiles.Read(path) is { Version:1, Facts.Count:1 },"the base file reads");
+                var parsed=DiscoveryFiles.Read(path);
+                Check(parsed is { Version:1, Facts.Count:1 } && parsed.Facts[0] is { Hq:0, Values:null, ImportedHq:0, ImportedValues:null } && DiscoveryStore.Valid(parsed.Facts[0]),"the base file reads");
+                store.Load(parsed!);
+                Check(store.Find(DiscoveryKind.Desynthesis,_=>true,4) is [{ Seen:4, LevelMin:2, LevelMax:3, Values:null }],"loaded as it was");
                 DiscoveryFiles.Write(path,store.Snapshot(At));
                 Check(DiscoveryFiles.Read(path) is { Version:2, Facts.Count:1 } && File.ReadAllText(path).StartsWith("{\"Version\":2,",StringComparison.Ordinal),"written as version 2");
                 File.WriteAllText(path,one.Replace("\"Version\":1","\"Version\":3"));
-                Check(DiscoveryFiles.Read(path) is null && CommunityDiscoveries.Parse(one.Replace("\"Version\":1","\"Version\":0")) is null,"unknown versions refused");
+                Check(DiscoveryFiles.Read(path) is null,"a newer version refused");
+                File.WriteAllText(path,one.Replace("\"Version\":1","\"Version\":0"));
+                Check(DiscoveryFiles.Read(path) is null,"an older one refused");
             }
             finally{try{Directory.Delete(folder,true);}catch(Exception){}}
-            Check(CommunityDiscoveries.Decode(CommunityDiscoveries.Encode(CommunityDiscoveries.Parse(one)!)) is { Facts.Count:1 },"a gist of version 1 reads");
+            Check(typeof(CommunityDiscoveries).GetMethod("Decode") is null && ThroughGist(CommunityDiscoveries.Mine(store.Snapshot(At,false))) is [{ Seen:4 }],"shared as a v3 set (no v1/v2 gist reader left)");
             Check(CommunityDiscoveries.Mine(store.Snapshot(At,false)).Version==2,"shared as version 2");
         }),
         ("Discoveries format: every sighting counts its value (5, 5, 7 gives 5:2 7:1) and its HQ; the Key is the same seven parts",() =>
@@ -100,8 +111,8 @@ internal static class DiscoveriesFormat916Tests
             Check(fresh.Find(DiscoveryKind.MonsterDrop,_=>true,4) is [{ Seen:0, Imported:1, Hq:0, Values:null, ImportedHq:1 } added] && Histogram(added.ImportedValues)=="2:4","a new import is imported only");
             var mine=CommunityDiscoveries.Mine(store.Snapshot(At,false));
             Check(mine.Facts is [{ Hq:1, ImportedHq:0, ImportedValues:null, Imported:0 } sent] && Histogram(sent.Values)=="1:1","only yours shared");
-            var back=CommunityDiscoveries.Decode(CommunityDiscoveries.Encode(mine))!;
-            Check(back.Version==2 && back.Facts[0].Hq==1 && Histogram(back.Facts[0].Values)=="1:1","the gist keeps them");
+            var back=ThroughGist(mine);
+            Check(back.Count==1 && back[0].Hq==1 && Histogram(back[0].Values)=="1:1","the gist keeps them");
         }),
         ("Discoveries format: the written file leaves out empty HQ and values, and writes them as a JSON object when there are some",() =>
         {

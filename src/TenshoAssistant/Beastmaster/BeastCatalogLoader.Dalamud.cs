@@ -15,6 +15,8 @@ internal sealed class BeastCatalogLoader : IDisposable
 {
     // Addon rows of the eight families: 17741 « Thériens » for family 1 (the game's sheet of Cu sith).
     private const uint FamilyAddonBase = 17740;
+    // X-746 (0.1766): Addon 17749 « Assimilation (Nv 22) » / « Borrow (Lv. 22) », right after the eight families.
+    private const uint BorrowLabelAddon = 17749;
     private readonly BeastService service;
     private readonly IFramework framework;
     private readonly IClientState client;
@@ -69,7 +71,13 @@ internal sealed class BeastCatalogLoader : IDisposable
         var elementMacros = new Dictionary<uint, string>();
         foreach (var row in data.Excel.GetSheet<RawRow>(null, "XBMElement"))
             if (row.ReadColumn(0) is ReadOnlySeString name) elementMacros[row.RowId] = name.ToMacroString();
-        return BeastCatalog.Build(sheets,
+        // X-746 (0.1766): the actions Borrow gives, one per family: their condition is the familiar's Kinship (Action.PrimaryCostType 125,
+        // PrimaryCostValue the family); their effect from ActionTransient (docs/evidence/0.1766-beast-borrow.md).
+        var transient = data.GetExcelSheet<ActionTransient>();
+        var borrowActions = actions.Where(action => action.PrimaryCostType == BeastCatalog.KinshipCost)
+            .Select(action => (action.RowId, (int)action.PrimaryCostType, (int)action.PrimaryCostValue, action.Name.ExtractText(), (uint)action.Icon,
+                transient.TryGetRow(action.RowId, out var text) ? text.Description.ExtractText() : "")).ToArray();
+        var catalog = BeastCatalog.Build(sheets,
             id => pets.TryGetRow(id, out var pet) ? pet.Name.ExtractText() : "",
             family => addon.TryGetRow(FamilyAddonBase + (uint)Math.Max(family, 0), out var text) ? text.Text.ExtractText() : "",
             id => actions.TryGetRow(id, out var action) ? (int)action.AttackType.RowId : 0,
@@ -89,7 +97,56 @@ internal sealed class BeastCatalogLoader : IDisposable
             statusName: id => data.GetExcelSheet<Lumina.Excel.Sheets.Status>().GetRowOrDefault(id)?.Name.ExtractText() ?? "",
             // X-622 M1 (review of 0.1560): 1 helpful, 2 harmful (docs/evidence/0.1562-beast-effect-category.md).
             statusCategory: id => data.GetExcelSheet<Lumina.Excel.Sheets.Status>().GetRowOrDefault(id)?.StatusCategory ?? 0,
+            // X-755 (0.1750): the names of the effects a beast inflicts, the game's own (Addon 12472 to 12481 and 17755).
+            effectName: row => addon.TryGetRow(row, out var text) ? text.Text.ExtractText() : "",
+            // X-746 (0.1766): « Assimilation (Nv 22) », the game's label beside the families' names (Addon 17741 to 17748).
+            borrowActions: borrowActions,
+            borrowLabel: addon.TryGetRow(BorrowLabelAddon, out var borrow) ? borrow.Text.ExtractText() : "",
             elementMacro: row => elementMacros.GetValueOrDefault(row, ""));
+        // X-744 (0.1770): each board's spaces that are not fights (XBMContentStageEvent), the campsites' places (XBMContentCamp), the random
+        // spaces' options (XBMContentRandomStageEvent, XBMRandomStageEvent) and the game's words (Addon 17551 to 17557, 17771, 17728):
+        // docs/evidence/0.1770-crucible-spaces.md. Read apart: a sheet with another column count, or a failure, leaves the spaces out.
+        try
+        {
+            var rows = new Dictionary<string, List<XbmRow>>();
+            foreach (var (name, columns) in BeastSpaces.Columns)
+            {
+                token.ThrowIfCancellationRequested();
+                if (data.Excel.GetRawSheet(name) is not RawSubrowExcelSheet || data.Excel.GetRawSheet(name).Columns.Count != columns) { rows.Clear(); break; }
+                var read = new List<XbmRow>();
+                foreach (var group in data.Excel.GetSubrowSheet<RawSubrow>(null, name))
+                    foreach (var row in group) read.Add(new(row.RowId, row.SubrowId, Enumerable.Range(0, columns).Select(index => Cell(row.ReadColumn(index))).ToArray()));
+                rows[name] = read;
+            }
+            if (rows.Count == BeastSpaces.Columns.Count)
+            {
+                var spaces = BeastSpaces.Read(rows["XBMContentStageEvent"], rows["XBMContentCamp"], rows["XBMContentRandomStageEvent"], rows["XBMRandomStageEvent"]);
+                string Word(uint row) => addon.TryGetRow(row, out var text) ? text.Text.ExtractText().Trim() : "";
+                var names = Enumerable.Range(BeastSpaces.Enemy, BeastSpaces.Random - BeastSpaces.Enemy + 1).ToDictionary(kind => kind, kind => Word(BeastSpaces.NameAddonBase + (uint)kind));
+                catalog = catalog with { Spaces = spaces, SpaceNames = names, StepLabel = Word(BeastSpaces.StepAddon), SatietyLabel = Word(BeastSpaces.SatietyAddon) };
+            }
+        }
+        catch (Exception error) when (error is not OperationCanceledException and not OutOfMemoryException) { }
+        // X-744 (0.1768): the Crucible's ephemeral items (XBMItem, read raw: 14 columns, else none, R08), their kinds' names (XBMItemType)
+        // and the game's guide rules of the board's spaces and items (DescriptionString): docs/evidence/0.1768-crucible-items.md.
+        // A failure here leaves the items and rules out (said on the page), never the rest of the Beastmaster's data.
+        try
+        {
+            var familyNames = Enumerable.Range(1, 8).ToDictionary(family => family, family => addon.TryGetRow(FamilyAddonBase + (uint)family, out var text) ? text.Text.ExtractText() : "");
+            var items = new List<BeastItem>();
+            var itemSheet = data.Excel.GetRawSheet("XBMItem");
+            if (itemSheet.Columns.Count == BeastItems.Columns)
+                foreach (var row in data.Excel.GetSheet<RawRow>(null, "XBMItem"))
+                    if (BeastItems.Read(new XbmRow(row.RowId, 0, Enumerable.Range(0, BeastItems.Columns).Select(index => Cell(row.ReadColumn(index))).ToArray()), familyNames) is { } item) items.Add(item);
+            var kinds = new Dictionary<int, string>();
+            foreach (var row in data.Excel.GetSheet<RawRow>(null, "XBMItemType"))
+                if (row.RowId is >= 1 and <= 3 && Cell(row.ReadColumn(0)) is string kind && kind.Length > 0) kinds[(int)row.RowId] = kind;
+            var guide = data.Excel.GetSheet<RawRow>(null, "DescriptionString");
+            string GuideText(uint id) => guide.TryGetRow(id, out var row) && Cell(row.ReadColumn(0)) is string text ? text.Trim() : "";
+            var rules = BeastItems.Guide.Select(rule => new BeastGuideRule(rule.Key, GuideText(rule.Title), GuideText(rule.Text))).Where(rule => rule.Title.Length > 0 && rule.Text.Length > 0).ToArray();
+            return catalog with { Items = items, ItemKinds = kinds, Rules = rules };
+        }
+        catch (Exception error) when (error is not OperationCanceledException and not OutOfMemoryException) { return catalog; }
     }
 
     private unsafe void OnUpdate(IFramework _)

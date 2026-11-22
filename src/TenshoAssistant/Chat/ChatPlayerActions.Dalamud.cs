@@ -22,17 +22,20 @@ namespace TenshoAssistant.Chat;
 /// menu of a character in range (AgentHUD.OpenContextMenuFromTarget: friend request, blacklist… as the game offers them). A failure turns the
 /// entries off until the plugin reloads, said once.
 /// </summary>
-internal sealed unsafe class ChatPlayerActions : IDisposable
+internal sealed unsafe class ChatPlayerActions : IDisposable,IChatLineData
 {
     private readonly IFramework framework;private readonly IClientState client;private readonly IObjectTable objects;private readonly ITargetManager targets;
     private readonly IPartyList party;private readonly IDataManager data;private readonly IPluginLog log;private readonly ChatSources sources;
     private readonly IGameConfig? config;
+    // X-733 (0.1734): the game's words of a meal's bonuses (Addon 1016 and 1017), evaluated as the game does (null: none, as outside the game).
+    private readonly ISeStringEvaluator? strings;
+    private bool disposed;
     private Hook<RaptureLogModule.Delegates.AddMsgSourceEntry>? hook;
     private bool failed;
 
-    public ChatPlayerActions(IGameInteropProvider interop,IFramework framework,IClientState client,IObjectTable objects,ITargetManager targets,IPartyList party,IDataManager data,IPluginLog log,ChatSources sources,IGameConfig? config=null)
+    public ChatPlayerActions(IGameInteropProvider interop,IFramework framework,IClientState client,IObjectTable objects,ITargetManager targets,IPartyList party,IDataManager data,IPluginLog log,ChatSources sources,IGameConfig? config=null,ISeStringEvaluator? strings=null)
     {
-        this.framework=framework;this.client=client;this.objects=objects;this.targets=targets;this.party=party;this.data=data;this.log=log;this.sources=sources;this.config=config;
+        this.framework=framework;this.client=client;this.objects=objects;this.targets=targets;this.party=party;this.data=data;this.log=log;this.sources=sources;this.config=config;this.strings=strings;
         client.Logout+=OnLogout;
         // X-690 (0.1666): each job's role, read once from the ClassJob sheet; the jobs the game shows, once a second.
         try{sources.Jobs.SetRoles(data.GetExcelSheet<Lumina.Excel.Sheets.ClassJob>().Select(row=>(row.RowId,row.Role)));}
@@ -151,33 +154,185 @@ internal sealed unsafe class ChatPlayerActions : IDisposable
         return tip;
     }
 
-    // X-473 (0.1720): the actions by name (Action and ActionTransient sheets, the client's language), made once on a thread of their own at the
-    // first hover: no tooltip until they are ready, none at all if they could not be read.
-    private Task<(Dictionary<string,ChatStatusTip> Players,Dictionary<string,ChatStatusTip> All)>? actionTips;
+    // X-473 (0.1720): the actions by name (Action and ActionTransient sheets, the client's language), made once on a thread of their own: no
+    // tooltip until they are ready, none at all if they could not be read. X-734 (0.1734): with the combat lines' templates (LogMessage) that
+    // say where a line names one (ChatActionLines), made at the first message the chat window copies (Prepare), before any combat line.
+    private Task<ChatActionData>? actionTips;
+    private sealed record ChatActionData((Dictionary<string,ChatStatusTip> Players,Dictionary<string,ChatStatusTip> All) Tips,ChatActionLines? Lines);
     /// <summary>X-473 (0.1720): an action a combat line names, as the game's tooltip shows it; null when the name is not one action for sure
     /// (ChatActionTips) or the actions are not read yet.</summary>
     public ChatStatusTip? Action(string name,bool byPlayer)
     {
         actionTips??=Task.Run(ActionTips);
-        return actionTips.IsCompletedSuccessfully ? ChatActionTips.Find(actionTips.Result,name,byPlayer):null;
+        return actionTips.IsCompletedSuccessfully ? ChatActionTips.Find(actionTips.Result.Tips,name,byPlayer):null;
     }
 
-    private (Dictionary<string,ChatStatusTip>,Dictionary<string,ChatStatusTip>) ActionTips()
+    /// <summary>X-734 (0.1734): starts reading the actions' names and the lines' templates, once.</summary>
+    public void Prepare()=>actionTips??=Task.Run(ActionTips);
+
+    /// <summary>X-734 (0.1734): where the last text of a combat line of <paramref name="kind"/> names an action; null when none, or not read yet.</summary>
+    public (int Start,int Length)? ActionIn(int kind,string text)
+        =>actionTips is { IsCompletedSuccessfully:true } ready && ready.Result.Lines is { } lines ? lines.Find(kind,text):null;
+
+    private ChatActionData ActionTips()
     {
         try
         {
             var transient=data.GetExcelSheet<Lumina.Excel.Sheets.ActionTransient>();
+            // X-734 (0.1734): the general actions (Sprint, Teleport, Return…) are the player's, with the GeneralAction sheet's description
+            // when ActionTransient has none (Teleport: none there, 98 characters here, read on 21/11).
+            var general=data.GetExcelSheet<Lumina.Excel.Sheets.GeneralAction>().Where(row=>row.Action.RowId!=0).GroupBy(row=>row.Action.RowId)
+                .ToDictionary(group=>group.Key,group=>group.First().Description.ExtractText().Trim());
             var rows=data.GetExcelSheet<Lumina.Excel.Sheets.Action>().Where(row=>!row.Name.IsEmpty)
-                .Select(row=>new ChatActionRow(row.RowId,row.Name.ExtractText(),row.Icon,row.IsPlayerAction,row.IsPvP,transient.GetRowOrDefault(row.RowId)?.Description.ExtractText().Trim() ?? "")).ToList();
+                .Select(row=>new ChatActionRow(row.RowId,row.Name.ExtractText(),row.Icon,row.IsPlayerAction,row.IsPvP,
+                    transient.GetRowOrDefault(row.RowId)?.Description.ExtractText().Trim() is { Length:>0 } described ? described:general.GetValueOrDefault(row.RowId,""),
+                    row.ClassJobCategory.RowId,general.ContainsKey(row.RowId))).ToList();
             var tips=ChatActionTips.Build(rows);
-            log.Information("Chat window, the actions' names read for their tooltips: {0} rows, {1} names of the player's actions, {2} names in all.",rows.Count,tips.Players.Count,tips.All.Count);
-            return tips;
+            var lines=Lines(rows);
+            log.Information("Chat window, the actions' names read for their tooltips: {0} rows, {1} names of the player's actions, {2} names in all; {3} combat kinds whose lines can end with an action's name.",
+                rows.Count,tips.Players.Count,tips.All.Count,lines?.Kinds ?? 0);
+            return new(tips,lines);
         }
         catch(Exception error)
         {
             log.Warning(error,"Chat window, the actions could not be read (maybe after a game update): no action tooltip.");
-            return (new Dictionary<string,ChatStatusTip>(),new Dictionary<string,ChatStatusTip>());
+            return new((new Dictionary<string,ChatStatusTip>(),new Dictionary<string,ChatStatusTip>()),null);
         }
+    }
+
+    /// <summary>X-734 (0.1734): the combat lines' templates (LogMessage, the client's language) and the actions' names; null when unreadable
+    /// (no action is then found in a line).</summary>
+    private ChatActionLines? Lines(IEnumerable<ChatActionRow> rows)
+    {
+        try
+        {
+            var templates=data.GetExcelSheet<Lumina.Excel.Sheets.LogMessage>().Where(row=>ChatChannels.From((int)row.LogKind.RowId)==ChatChannel.Combat)
+                .Select(row=>((int)row.LogKind.RowId,row.Text.ToMacroString())).ToList();
+            return new ChatActionLines(templates,rows.Select(row=>row.Name),data.Language!=Dalamud.Game.ClientLanguage.Japanese);
+        }
+        catch(Exception error)
+        {
+            log.Warning(error,"Chat window, the combat lines' templates could not be read (maybe after a game update): no action named in a line.");
+            return null;
+        }
+    }
+
+    // X-733 (0.1734): a meal's or a medicine's status looked for on the one who gained it, at its line and in the frames after (the game may
+    // print the line first); each outcome said once in the log. A failure turns it off until the plugin reloads. X-756 (0.1739): compared
+    // with the Param held at the line (ChatStatusWatch): a meal eaten over another one still held is never taken for the older one.
+    private readonly HashSet<string> statusSaid=[];
+    private bool statusFailed;
+    /// <summary>X-733 (0.1734): reads into <paramref name="param"/> the Param of <paramref name="status"/> on the player named (name and home
+    /// world), or on you (<paramref name="name"/> null): now, or in the next frames (on the game's thread); another player's half a second at
+    /// most after the line (X-762, D-208).</summary>
+    public void StatusParam(ChatStatusParam param,uint status,string? name,ushort world)=>ReadStatus(param,status,name,world,0,0,Environment.TickCount64,false);
+
+    private void ReadStatus(ChatStatusParam param,uint status,string? name,ushort world,int frame,ushort atLine,long lineAt,bool fresh)
+    {
+        if(disposed || statusFailed || TenshoAssistant.Competitive.CompetitiveGate.Cut || !client.IsLoggedIn)return;
+        try
+        {
+            var elapsed=Environment.TickCount64-lineAt;
+            // X-762 (review of 0.1746, I2; D-208, the owner's choice of 21/11 at about 8:15 pm): another player's status is read half a second
+            // at most after its line (what D-207 was asked on); past it, never read again: no bonus rather than an older meal.
+            if(name is not null && !ChatStatusWatch.OtherMayRead(elapsed)){var end=ChatStatusWatch.OtherEnd(atLine,fresh);if(end.Value!=0)param.Value=end.Value;StatusSaid(end.How);return;}
+            var character=name is null ? objects.LocalPlayer:objects.OfType<IPlayerCharacter>().FirstOrDefault(found=>found.Name.TextValue==name && found.HomeWorld.RowId==world);
+            if(character is null){StatusSaid("the one who gained it is not in range");return;}
+            ushort seen=0;float remaining=0;var extended=false;
+            foreach(var held in character.StatusList)
+            {
+                if(seen==0 && held.StatusId==status && held.Param!=0){seen=held.Param;remaining=held.RemainingTime;}
+                if(ChatStatusWatch.ExtendsMeals(held.StatusId))extended=true;
+            }
+            if(frame==0)atLine=seen;
+            // X-766 (review of 0.1751, X-764 M2; D-211, the owner's choice of 21/11 at about 10:30 pm, R04): another player's Well Fed status
+            // held at its line is the line's when its remaining time is the meal's full duration (put on just before the line).
+            // X-768 (review of 0.1758, M2): never the meal shown for that player's line of the 4 s before (D-208).
+            if(frame==0 && name is not null && status==Craft.CraftConsumables.WellFed && seen!=0)fresh=MealPutOnAtLine(seen,remaining,extended,name,world,lineAt);
+            if(frame==0 && name is not null && status==Craft.CraftConsumables.WellFed)MealLine(param,name,world,lineAt);
+            var read=name is null ? ChatStatusWatch.Next(atLine,seen,frame,elapsed):ChatStatusWatch.Other(atLine,seen,elapsed,fresh);
+            if(read.Over){if(read.Value!=0)param.Value=read.Value;StatusSaid(read.How);if(read.Value!=0 && read.Value!=atLine)StatusLate(frame,elapsed);return;}
+            framework.RunOnTick(()=>ReadStatus(param,status,name,world,frame+1,atLine,lineAt,fresh),delayTicks:1);
+        }
+        catch(Exception error)
+        {
+            statusFailed=true;
+            log.Warning(error,"Chat window, a meal's status could not be read (maybe after a game update): its tooltip shows the status's description only, until the plugin reloads.");
+        }
+    }
+
+    // X-766 (D-211): each meal's full duration by its Param (ItemAction, read once); null when unreadable (then no meal is taken as put on
+    // at its line: as before). X-768 (review of 0.1758, M1): the gap between the full duration and the remaining time at the line is said in
+    // the log (MealGapLog: the largest taken, and each near one not taken): what ChatStatusWatch.FreshSeconds must cover, measured in game.
+    private IReadOnlyDictionary<ushort,int>? mealDurations;
+    private bool mealDurationsRead;
+    private readonly MealGapLog mealGaps=new();
+    private bool MealPutOnAtLine(ushort param,float remaining,bool extended,string name,ushort world,long lineAt)
+    {
+        if(!mealDurationsRead)
+        {
+            mealDurationsRead=true;
+            try
+            {
+                mealDurations=ChatStatusWatch.MealDurations(data.GetExcelSheet<Lumina.Excel.Sheets.ItemAction>().Where(row=>row.Data.Count>=3 && row.DataHQ.Count>=3)
+                    .SelectMany(row=>new[]{((uint)row.Data[0],(uint)row.Data[1],(uint)row.Data[2],false),((uint)row.DataHQ[0],(uint)row.DataHQ[1],(uint)row.DataHQ[2],true)}));
+                log.Information("Chat window, the meals' full durations read for another player's meal: {0} Params, {1}.",mealDurations.Count,
+                    string.Join(", ",mealDurations.Values.GroupBy(seconds=>seconds).OrderBy(group=>group.Key).Select(group=>$"{group.Count()} of {group.Key} s")));
+            }
+            catch(Exception error){log.Warning(error,"Chat window, the meals' durations could not be read (maybe after a game update): another player's meal put on before its line shows no bonus.");}
+        }
+        var full=mealDurations?.GetValueOrDefault(param) ?? 0;
+        var earlier=ChatStatusWatch.ShownJustBefore(param,mealLines.Where(line=>line.Name==name && line.World==world).Select(line=>(line.Param.Value,line.LineAt)),lineAt);
+        if(mealGaps.Say(remaining,full,extended,earlier) is { } said)log.Information("Chat window, another player's meal held at its line {0}.",said);
+        if(earlier)return false;
+        return ChatStatusWatch.PutOnAtLine(remaining,full,extended);
+    }
+
+    // X-768 (review of 0.1758, M2): the boxes of another player's meal lines of the last seconds (the meal shown with each line, 0 while it is
+    // read), in memory only, dropped past ChatStatusWatch.EarlierMealMs: what a later line of the same player compares with (D-208).
+    private readonly List<(string Name,ushort World,ChatStatusParam Param,long LineAt)> mealLines=[];
+    private void MealLine(ChatStatusParam param,string name,ushort world,long lineAt)
+    {
+        mealLines.RemoveAll(line=>lineAt-line.LineAt>ChatStatusWatch.EarlierMealMs);
+        mealLines.Add((name,world,param,lineAt));
+    }
+
+    private void StatusSaid(string how)
+    {
+        if(statusSaid.Add(how))log.Information("Chat window, a meal's or a medicine's status read for its line's tooltip: {0}.",how);
+    }
+
+    // X-760 (0.1744, review of 0.1742, M2): the longest delay seen between a line and its status put on, said in the log each time it grows:
+    // what the watch must cover (ChatStatusWatch.WatchMs), measured in game.
+    private long statusLateMs=-1;
+    private void StatusLate(int frame,long elapsed)
+    {
+        if(elapsed<=statusLateMs)return;
+        statusLateMs=elapsed;
+        log.Information("Chat window, a meal's or a medicine's status put on {0} frame(s) ({1} ms) after its line: the longest seen since the plugin loaded (the watch lasts {2} ms at least for your own status, {3} ms at most for another player's).",frame,elapsed,ChatStatusWatch.WatchMs,ChatStatusWatch.OtherMs);
+    }
+
+    // X-733 (0.1734): the lines of a meal's or a medicine's tooltip, made once per status and Param (ItemFood and BaseParam sheets, Addon 1016
+    // and 1017, the client's language, evaluated by Dalamud as the game does); null when they cannot be made (the description then).
+    private readonly Dictionary<(uint,ushort),IReadOnlyList<string>?> foods=[];
+    /// <summary>X-733 (0.1734): what the game's tooltip of a meal's or a medicine's status shows for this Param; null when not known.</summary>
+    public IReadOnlyList<string>? FoodLines(uint status,ushort param)
+    {
+        if(param==0 || strings is null || !ChatFoodTip.Holds(status))return null;
+        if(foods.TryGetValue((status,param),out var known))return known;
+        IReadOnlyList<string>? lines=null;
+        try
+        {
+            var (row,hq)=ChatFoodTip.Row(param);
+            if(data.GetExcelSheet<Lumina.Excel.Sheets.ItemFood>().GetRowOrDefault(row) is { } food)
+                lines=ChatFoodTip.Lines(status,hq,food.EXPBonusPercent,
+                    food.Params.Where(bonus=>bonus.BaseParam.RowId!=0).Select(bonus=>new ChatFoodBonus(bonus.BaseParam.ValueNullable?.Name.ExtractText() ?? "",bonus.IsRelative,bonus.Value,bonus.Max,bonus.ValueHQ,bonus.MaxHQ)).ToList(),
+                    exp=>strings.EvaluateFromAddon(1017,[new((uint)exp)]).ExtractText(),
+                    (relative,value,max)=>strings.EvaluateFromAddon(1016,[new(relative ? 1u:0u),new((uint)value),new((uint)max)]).ExtractText()) is { Count:>0 } made ? made:null;
+        }
+        catch(Exception error){log.Warning(error,"Chat window, a meal's bonuses could not be read (maybe after a game update): its tooltip shows the status's description.");}
+        if(foods.Count<200)foods[(status,param)]=lines;
+        return lines;
     }
 
     /// <summary>The character of that player in range (name and home world), or null.</summary>
@@ -309,5 +464,5 @@ internal sealed unsafe class ChatPlayerActions : IDisposable
         return found;
     }
 
-    public void Dispose(){TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnJobsTick);client.Logout-=OnLogout;hook?.Dispose();hook=null;sources.Clear();}
+    public void Dispose(){disposed=true;TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnJobsTick);client.Logout-=OnLogout;hook?.Dispose();hook=null;sources.Clear();}
 }

@@ -124,28 +124,52 @@ internal static class FairLock1309Tests
             Check(busy.Load().Length == 0 && waiting.Load().Length == 0,"both loaded, empty");
             using var stop = new CancellationTokenSource();
             var held = new StrongBox<int>();
+            // X-760 (0.1744, review of 0.1742, M1): the busy store's saves begun while the waiting store was in line (its live mark; between two
+            // saves the busy store has no mark of its own) and ended while that mark was still live: a fair lock queues such a save behind the
+            // waiting store, whose mark goes as it gets the lock, so none, whatever the threads' timing; an unfair lock lets it save ahead.
+            var inLine = new StrongBox<int>();
+            var ahead = new StrongBox<int>();
+            // 0.1794: the busy store's exception kept for the test (on a raw thread it would end the whole test process).
+            Exception? greedyError = null;
             var greedy = new Thread(() =>
             {
-                var until = Environment.TickCount64 + 120_000;   // past the waiting store's five waits of 10 s: stopped by the test
-                while (Environment.TickCount64 < until && !stop.IsCancellationRequested)
+                try
                 {
-                    busy.Apply(new BankChange(Put: Entry(7,BankStorageKind.Retainer,1000 + (ulong)held.Value)),[]);
-                    Interlocked.Increment(ref held.Value);
+                    var until = Environment.TickCount64 + 120_000;   // past the waiting store's waits of 10 s: stopped by the test
+                    while (Environment.TickCount64 < until && !stop.IsCancellationRequested)
+                    {
+                        var waitingMarks = Marks(root).Where(Live).ToArray();
+                        busy.Apply(new BankChange(Put: Entry(7,BankStorageKind.Retainer,1000 + (ulong)held.Value)),[]);
+                        Interlocked.Increment(ref held.Value);
+                        if (waitingMarks.Length == 0) continue;
+                        Interlocked.Increment(ref inLine.Value);
+                        if (waitingMarks.Any(Live)) Interlocked.Increment(ref ahead.Value);
+                    }
                 }
+                catch (Exception error) { greedyError = error; }
             }) { IsBackground = true };
             greedy.Start();
             Started(held);
-            for (var i = 0UL; i < 5; i++)
+            // X-751 (0.1742, idea I-049): fair at the stores' level too. The waiting store's change got through even with a lock made unfair on
+            // purpose (the busy store leaves gaps between its saves, and the waiting store waits 10 s). X-760 (0.1744): the busy store's saves
+            // ahead of the waiting store already in line are counted (above), no longer its saves from before the waiting store's mark to after
+            // its lock (a thread set aside under load let a fair lock pass more than the 3 allowed).
+            // 0.1794 (X-574 made the saves faster): changes until at least one wait was measured, 5 at least, 40 at most.
+            var changes = 0UL;
+            for (; changes < 40 && (changes < 5 || Volatile.Read(ref inLine.Value) == 0); changes++)
             {
                 var watch = System.Diagnostics.Stopwatch.StartNew();
-                var saved = waiting.Apply(new BankChange(Put: Entry(8,BankStorageKind.Retainer,2000 + i)),[]);
-                Check(saved.Count(entry => entry.Key.CharacterId == 8) == (int)i + 1,"the waiting store's change " + i + " saved (" + watch.ElapsedMilliseconds + " ms)");
+                var saved = waiting.Apply(new BankChange(Put: Entry(8,BankStorageKind.Retainer,2000 + changes)),[]);
+                Check(saved.Count(entry => entry.Key.CharacterId == 8) == (int)changes + 1,"the waiting store's change " + changes + " saved (" + watch.ElapsedMilliseconds + " ms)");
             }
-            Check(greedy.IsAlive,"the busy store was still saving after the waiting store's changes");
+            Check(greedy.IsAlive,"the busy store was still saving after the waiting store's changes" + (greedyError is null ? "" : ": " + greedyError));
             stop.Cancel();
             Check(greedy.Join(TimeSpan.FromSeconds(30)),"the greedy store stopped");
+            Check(greedyError is null,"the busy store's saves: " + greedyError);
+            Check(inLine.Value >= 1,"the busy store found the waiting store in line at least once (else nothing was measured)");
+            Check(ahead.Value == 0,"fair: the busy store saved ahead of the waiting store already in line " + ahead.Value + " time(s) of " + inLine.Value);
             var all = new PerCharacterBankStore(folder,legacy,10_000,Data()).Load();
-            Check(all.Count(entry => entry.Key.CharacterId == 8) == 5 && all.Count(entry => entry.Key.CharacterId == 7) == held.Value,
+            Check(all.Count(entry => entry.Key.CharacterId == 8) == (int)changes && all.Count(entry => entry.Key.CharacterId == 7) == held.Value,
                 "nothing lost on either side: " + all.Count(entry => entry.Key.CharacterId == 7) + " of " + held.Value);
             Check(Marks(root).Length == 0,"no waiting mark left");
         })),

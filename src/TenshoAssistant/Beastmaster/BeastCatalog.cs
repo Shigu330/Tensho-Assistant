@@ -18,6 +18,18 @@ public sealed record BeastStats(int Strength, int Intelligence, int PhysicalResi
 /// unaspected one (« Neutre » in the game's beast book). AutoAttack is that row's name, empty for an unaspected one.</summary>
 public sealed record Beast(uint Id, string Name, uint Icon, string Family, string AutoAttack, string Assault, string Volley, IReadOnlyList<BeastStats> Ranks, string CatchPlace = "", uint AutoRow = 0)
 {
+    /// <summary>X-755 (0.1750): the effects it inflicts, as places in <see cref="BeastEffects.Order"/> (the game's order); empty for none.</summary>
+    public IReadOnlyList<int> Effects { get; init; } = [];
+
+    /// <summary>X-746 (0.1766): its family's number (XBMPet column 1, 1 to 8; its name is Addon 17740 + it); 0 not known.</summary>
+    public int FamilyId { get; init; }
+
+    /// <summary>X-745 (0.1767): where it is caught, XBMPet column 6: 1 a zone, 2 a duty (<see cref="CatchPlace"/> names it), 0 the beast the job starts with.</summary>
+    public int CatchKind { get; init; }
+
+    /// <summary>X-744 (0.1770): its satiety, XBMPet column 3 (<see cref="BeastSpaces.Satiety"/>: the bestiary's « Satiété 0/3 » for Cu sith); 0 not read.</summary>
+    public int Satiety { get; init; }
+
     /// <summary>Attributes at this rank; a rank outside the table is the nearest known one. Null when the table is empty.</summary>
     public BeastStats? At(int rank) => Ranks.Count == 0 ? null : Ranks[Math.Clamp(rank - 1, 0, Ranks.Count - 1)];
 }
@@ -40,6 +52,13 @@ public sealed record BoardEnemy(string Name, uint Icon, string Weakness, IReadOn
 /// (AgentXBMStageDetailList, StageDetailEntry.BattleDetailId); 0 not known.</summary>
 public sealed record BoardBattle(bool Guardian, IReadOnlyList<BoardEnemy> Enemies, uint Detail = 0);
 public sealed record BoardBonus(string Name, string Condition, int Points);
+/// <summary>
+/// X-746 (0.1766, the user's idea I-029 of 18/11): the action Borrow (« Assimilation ») gives with a familiar of this family: the action
+/// whose condition is the familiar's Kinship of that family (Action.PrimaryCostType 125, PrimaryCostValue the family, XBMPet column 1;
+/// docs/evidence/0.1766-beast-borrow.md), its name and icon from the Action sheet, Effect the first part of its description
+/// (ActionTransient: effect, duration, condition), in the client's language.
+/// </summary>
+public sealed record BeastBorrow(int Family, uint Action, string Name, uint Icon, string Effect);
 /// <summary>X-109 (0.981): Content = its ContentFinderCondition row (XBMContent column 0), which gives the labyrinth's territory.
 /// X-576 (0.1546): RankRecommended = the first number of the board window's « Rang de bête recommandé : X à Y » (Addon 17912, two numbers
 /// given by the game's code; Y is RankLimit, XBMContent column 3): the previous board's RankLimit plus one (<see cref="BeastCatalog.RankFloor"/>;
@@ -66,6 +85,71 @@ public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Boa
     /// </summary>
     public IReadOnlyDictionary<string, uint> ElementIcons { get; init; } = new Dictionary<string, uint>();
 
+    /// <summary>X-755 (0.1750): the names of <see cref="BeastEffects.Order"/> in the client's language (Addon); empty when not given (tests).</summary>
+    public IReadOnlyList<string> EffectNames { get; init; } = [];
+
+    /// <summary>X-746 (0.1766): the action Borrow gives, by family number; empty when not read (tests, a game update that moved it).</summary>
+    public IReadOnlyDictionary<int, BeastBorrow> Borrows { get; init; } = new Dictionary<int, BeastBorrow>();
+
+    /// <summary>X-746 (0.1766): the game's own label of Borrow in the Beastmaster's windows (Addon 17749, « Assimilation (Nv 22) »); empty when not given.</summary>
+    public string BorrowLabel { get; init; } = "";
+
+    /// <summary>X-744 (0.1768): the Crucible's ephemeral items (XBMItem), in the sheet's order; empty when not read (tests, a game update).</summary>
+    public IReadOnlyList<BeastItem> Items { get; init; } = [];
+
+    /// <summary>X-744 (0.1768): the names of the item kinds (XBMItemType rows 1 to 3: beast gear, Crucible items, feed), by kind.</summary>
+    public IReadOnlyDictionary<int, string> ItemKinds { get; init; } = new Dictionary<int, string>();
+
+    /// <summary>X-744 (0.1768): the game's guide rules of the board's spaces and of the item kinds (<see cref="BeastItems.Guide"/>), read ones only.</summary>
+    public IReadOnlyList<BeastGuideRule> Rules { get; init; } = [];
+
+    /// <summary>X-744 (0.1770): each board's spaces that are not fights (<see cref="BeastSpaces.Read"/>), by XBMContent row; empty when not read.</summary>
+    public IReadOnlyDictionary<uint, IReadOnlyList<BoardSpace>> Spaces { get; init; } = new Dictionary<uint, IReadOnlyList<BoardSpace>>();
+
+    /// <summary>X-744 (0.1770): the game's names of the spaces' kinds (Addon 17551 to 17557), by kind (2 to 8).</summary>
+    public IReadOnlyDictionary<int, string> SpaceNames { get; init; } = new Dictionary<int, string>();
+
+    /// <summary>X-744 (0.1770): the game's « Étape » of the board's layout (Addon 17771, without its number) and « Satiété » (Addon 17728).</summary>
+    public string StepLabel { get; init; } = "";
+    public string SatietyLabel { get; init; } = "";
+
+    /// <summary>X-746 (0.1766): the action Borrow gives with this beast; null when not known.</summary>
+    public BeastBorrow? BorrowOf(Beast beast) => Borrows.GetValueOrDefault(beast.FamilyId);
+
+    /// <summary>X-746 (0.1766): Action.PrimaryCostType of the eight actions Borrow gives: « the familiar's Kinship », its value the family.</summary>
+    public const int KinshipCost = 125;
+
+    /// <summary>
+    /// X-746 (0.1766): one action per family of the beasts, among the Action rows whose condition is a Kinship (<see cref="KinshipCost"/>):
+    /// the first row of each family (the game also has three copies of Cloud Skim further on, with another icon, for its directions).
+    /// A family with no such row has none (its beasts show nothing).
+    /// </summary>
+    public static IReadOnlyDictionary<int, BeastBorrow> BorrowsOf(IEnumerable<(uint Row, int CostType, int CostValue, string Name, uint Icon, string Description)> actions, IEnumerable<int> families)
+    {
+        var wanted = families.Where(family => family > 0).ToHashSet();
+        return actions.Where(action => action.CostType == KinshipCost && wanted.Contains(action.CostValue) && action.Name.Length > 0)
+            .GroupBy(action => action.CostValue)
+            .Select(group => group.OrderBy(action => action.Row).First())
+            .ToDictionary(action => action.CostValue, action => new BeastBorrow(action.CostValue, action.Row, action.Name, action.Icon, EffectOf(action.Description)));
+    }
+
+    /// <summary>X-746 (0.1766): the first part of an action's description, up to its first empty line (effect, duration, condition; the
+    /// game's notes about hotbars and replacements after it); the whole text when it has no empty line.</summary>
+    public static string EffectOf(string description)
+    {
+        var lines = description.Trim().Replace("\r\n", "\n").Split('\n');
+        var end = Array.FindIndex(lines, line => line.Trim().Length == 0);
+        var kept = end > 0 ? lines[..end] : lines;
+        return string.Join("\n", kept.Select(line => line.Trim()).Where(line => line.Length > 0));
+    }
+
+    /// <summary>
+    /// X-764 M3 (review of 0.1751): true when a beast's XBMPet columns 11 to 21 are not all flags (a game update changed their type, or
+    /// moved them at the same column count): no beast shows an effect then, and the bestiary says the effects are unavailable, instead of
+    /// « none » for every beast.
+    /// </summary>
+    public bool EffectsUnavailable { get; init; }
+
     /// <summary>X-551 (0.1574): the number of the font icon a sheet's text starts with (« &lt;icon(56)&gt;Feu » → 56); 0 when it starts with none.</summary>
     public static uint IconOfMacro(string? macro)
     {
@@ -84,7 +168,8 @@ public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Boa
 
     public static BeastCatalog Build(IReadOnlyDictionary<string, IReadOnlyList<XbmRow>> sheets, Func<uint, string> petName, Func<int, string> familyName,
         Func<uint, int> attackType, Func<uint, string> enemyName, Func<uint, string> actionName, Func<uint, (string Name, int Level, int ItemLevel)> content, Func<int, uint, string>? catchPlace = null,
-        Func<uint, int>? aspect = null, Func<uint, string>? statusName = null, Func<uint, int>? statusCategory = null, Func<uint, string>? elementMacro = null)
+        Func<uint, int>? aspect = null, Func<uint, string>? statusName = null, Func<uint, int>? statusCategory = null, Func<uint, string>? elementMacro = null,
+        Func<uint, string>? effectName = null, IEnumerable<(uint Row, int CostType, int CostValue, string Name, uint Icon, string Description)>? borrowActions = null, string borrowLabel = "")
     {
         foreach (var (sheet, columns) in Columns)
         {
@@ -100,10 +185,14 @@ public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Boa
         string Auto(uint action) => AutoRow(action) is var element and not 0 ? Element(element) : "";
         var grow = sheets["XBMPetParamGrow"].GroupBy(row => row.Row).ToDictionary(group => group.Key, group => group.OrderBy(row => row.Sub)
             .Select(row => new BeastStats(row.Int(0), row.Int(1), row.Int(2), row.Int(3), row.Int(4))).ToArray());
+        // X-764 M3 (review of 0.1751): the eleven flags read only when every beast's columns 11 to 21 hold flags (R08; empty, as XbmRow reads it: none).
+        var effectsRead = sheets["XBMPet"].Where(row => row.Row != 0 && row.UInt(4) != 0).All(row => BeastEffects.Order.All(effect => effect.Column < row.Cells.Length && row.Cells[effect.Column] is null or bool));
         var beasts = sheets["XBMPet"].Where(row => row.Row != 0 && row.UInt(4) != 0).Select(row => new Beast(row.Row, Capitalize(petName(row.UInt(0))), row.UInt(4),
             familyName(row.Int(1)), Auto(row.UInt(5)), row.Text(9), row.Text(10), Array.AsReadOnly(grow.GetValueOrDefault(row.UInt(2)) ?? []),
             // 0.688 (user report): columns 6 and 7, where the beast is caught: docs/evidence/0.688-beast-places.md.
-            catchPlace?.Invoke(row.Int(6), row.UInt(7)) ?? "", AutoRow(row.UInt(5)))).ToArray();
+            catchPlace?.Invoke(row.Int(6), row.UInt(7)) ?? "", AutoRow(row.UInt(5)))
+            // X-755 (0.1750): columns 11 to 21, the effects it inflicts, put in the game's order (BeastEffects).
+            { Effects = effectsRead ? BeastEffects.Of(column => row.Cells[column] is true) : [], FamilyId = row.Int(1), CatchKind = row.Int(6), Satiety = BeastSpaces.Satiety(row) }).ToArray();
 
         var shapes = sheets["XBMActionEffectType"].ToDictionary(row => row.Row, row => row.Text(0));
         var targets = sheets["XBMActionTarget"].ToDictionary(row => row.Row, row => row.Text(0));
@@ -137,7 +226,15 @@ public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Boa
         if (elementMacro is not null)
             foreach (var (row, name) in elements)
                 if (name.Length > 0 && IconOfMacro(elementMacro(row)) is var icon and not 0) icons[name] = icon;
-        return new(Array.AsReadOnly(beasts), Array.AsReadOnly(boards)) { ElementIcons = icons };
+        return new(Array.AsReadOnly(beasts), Array.AsReadOnly(boards))
+        {
+            ElementIcons = icons,
+            EffectNames = effectName is null ? [] : BeastEffects.Order.Select(effect => effectName(effect.Name)).ToArray(),
+            EffectsUnavailable = !effectsRead,
+            // X-746 (0.1766): the action Borrow gives, per family of the beasts read.
+            Borrows = borrowActions is null ? new Dictionary<int, BeastBorrow>() : BorrowsOf(borrowActions, beasts.Select(beast => beast.FamilyId)),
+            BorrowLabel = borrowLabel,
+        };
     }
 
     /// <summary>

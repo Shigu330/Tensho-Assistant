@@ -7,5 +7,8 @@
     <Compile Include="../../src/TenshoAssistant/FreeCompany/SubmarineUnlocks.cs" Link="SubmarineUnlocks.cs" />
     <!-- X-480 (0.1469): PROBE_FLOORS=check evaluates the plugin's own floors rule on every territory. -->
     <Compile Include="../../src/TenshoAssistant/Maps/MapFloors.cs" Link="MapFloors.cs" />
+    <!-- X-734 (0.1734): PROBE_CHATACTIONS runs the chat window's own rules for an action named in a combat line. -->
+    <Compile Include="../../src/TenshoAssistant/Chat/ChatActionLines.cs" Link="ChatActionLines.cs" />
+    <Compile Include="../../src/TenshoAssistant/Chat/ChatActionTips.cs" Link="ChatActionTips.cs" />
   </ItemGroup>
 </Project>

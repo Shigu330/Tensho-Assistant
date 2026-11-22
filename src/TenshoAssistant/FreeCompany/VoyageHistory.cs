@@ -74,7 +74,7 @@ public static class VoyageHistory
         return "\""+safe.Replace("\"","\"\"")+"\"";
     }
 
-    private static readonly JsonSerializerOptions Json=new(){MaxDepth=8};
+    private static readonly JsonSerializerOptions Json=TenshoJson.Own(new(){MaxDepth=8});
     private sealed record FileDto(int Schema,VoyageRecord[] Records);
 
     /// <summary>Reads the history file (missing = empty; a bad one throws, so it is never overwritten by mistake).</summary>
@@ -97,16 +97,14 @@ public static class VoyageHistory
 /// <summary>
 /// X-173 (0.1148, user's choice of 12/11): where the voyage history is kept. Since this version, in the player's data file (<see cref="TenshoDataFile"/>,
 /// TenshoData.db): one row per voyage, the history replaced whole in one transaction at each save (a stop in the middle leaves the last save
-/// whole). The file of before (VoyageHistory.json) is converted the first time it is loaded (its rows and a « converted » mark written together),
-/// then moved, never removed, into before-sqlite-&lt;date&gt;/ beside it. A file of before that cannot be read stays in place and nothing is written
-/// (as before); a data file that is there but unusable is never replaced (nothing written this session); when the data file cannot be created, or
-/// none is given, the JSON file stays in use as before.
+/// whole). X-574 (0.1793, the user's choice of 17/11): the file of before (VoyageHistory.json) is no longer converted: still there while the data
+/// file is in use, it is left aside, never read, moved nor removed (said once, <see cref="TenshoDataFile.LeftAside"/>). A data file that is there
+/// but unusable is never replaced (nothing written this session); when the data file cannot be created, or none is given, the JSON file stays in
+/// use as before.
 /// </summary>
 public sealed class VoyageHistoryData(string file,TenshoDataFile? data)
 {
-    public const string Family="voyages";
-    private readonly object gate=new();
-    private static readonly JsonSerializerOptions Json=new(){MaxDepth=8};
+    private static readonly JsonSerializerOptions Json=TenshoJson.Own(new(){MaxDepth=8});
 
     /// <summary>Test hook: run inside a save's transaction, after its rows and before the commit (a stop or an error there).</summary>
     internal Action? DuringSave { get; set; }
@@ -114,71 +112,27 @@ public sealed class VoyageHistoryData(string file,TenshoDataFile? data)
     /// <summary>« sqlite », « json » or « blocked » (see <see cref="TenshoDataFile.Mode"/>); « json » without a data file.</summary>
     public string Mode=>data?.Mode ?? "json";
 
-    /// <summary>
-    /// The history, as saved (throws when it cannot be read: the caller then never writes over it). X-182 (0.1169, night review N3, N28): the
-    /// file of before is read inside an immediate transaction (a second client waits, then finds it converted); found again after the conversion
-    /// and written since (an older version still running), its voyages not in the database are added, never dropped.
-    /// </summary>
+    /// <summary>The history, as saved (throws when it cannot be read: the caller then never writes over it).</summary>
     public List<VoyageRecord> Load(DateTimeOffset now)
     {
         if(data?.Database() is not { } opened)return VoyageHistory.Read(file);
-        Convert(opened,data,now);
+        // X-574 (0.1793): a file of before still there is left aside, never read (the history is the data file's).
+        if(File.Exists(file))data.LeftAside("Voyage history",Path.GetFileName(file));
         return ReadRows(opened);
-    }
-
-    /// <summary>
-    /// The file of before converted (at a load, and at a save when it was held at the load); true when nothing is left to convert. Relay 37
-    /// (0.1205): a file held by another program at the load (read nothing, nothing marked) left the session without any save of the history;
-    /// the next save converts it now that it may be free. One that cannot be read still throws: the history is never written over it.
-    /// </summary>
-    private bool Convert(TenshoDataDatabase opened,TenshoDataFile data,DateTimeOffset now)
-    {
-        if(!File.Exists(file))return true;
-        lock(gate)
-        {
-            if(!File.Exists(file))return true;
-                {
-                    var marked=false;
-                    using(var open=opened.Open())
-                    using(var transaction=open.BeginTransaction(deferred:false))
-                    {
-                        var converted=TenshoDataDatabase.ConvertedAt(open,Family,transaction);
-                        marked=converted is not null;
-                        if(File.Exists(file) && (converted is null || TenshoDataFile.WrittenAgain(file,converted.Value)))
-                        {
-                            // X-336 M4 (0.1380): written again but held by another client: not merged, so not set aside either.
-                            if(TenshoDataFile.StillThere(()=>VoyageHistory.Read(file)) is { } found)
-                            {
-                                Write(open,transaction,found,keep:true);
-                                if(converted is null)TenshoDataDatabase.MarkConverted(open,transaction,Family,now);
-                                marked=true;
-                            }
-                            else marked=false;
-                        }
-                        DuringSave?.Invoke();
-                        transaction.Commit();
-                    }
-                    if(marked)data.SetAside(file,now,"voyage history");
-                    return marked;
-                }
-        }
     }
 
     /// <summary>
     /// X-182 (0.1169, night review N4): the voyages that changed written by their key (house, kind, slot, registration), the others left as they
     /// are (another client's company is never erased); then what is older than the history keeps (180 days, the newest 5 000) is removed. The
-    /// JSON file, when it is still in use, is written whole from <paramref name="all"/>. Refused while the file of before is not converted.
+    /// JSON file, when it is still in use, is written whole from <paramref name="all"/>. X-574 (0.1793): with the data file, a file of before is
+    /// neither read nor written.
     /// </summary>
     public void Save(IReadOnlyList<VoyageRecord> all,IReadOnlyList<VoyageRecord>? changed=null,DateTimeOffset? now=null)
     {
         if(data?.Database() is not { } opened){VoyageHistory.Write(file,all);return;}
         using var open=opened.Open();
-        // Relay 37 (0.1205): held at the load, converted at the first save that finds it free (its voyages kept, then this save's written
-        // by their key over them); still held: refused as before.
-        if(File.Exists(file) && !TenshoDataDatabase.Converted(open,Family) && !TenshoDataFile.ConvertBeforeSave(()=>Convert(opened,data,now ?? DateTimeOffset.UtcNow),"voyage history"))
-            throw new InvalidOperationException("The voyage history file of before is not converted yet; nothing written over it.");
         using var transaction=open.BeginTransaction(deferred:false);
-        Write(open,transaction,changed ?? all,keep:false);
+        Write(open,transaction,changed ?? all);
         var at=now ?? DateTimeOffset.UtcNow;
         using(var purge=open.CreateCommand())
         {
@@ -194,13 +148,13 @@ public sealed class VoyageHistoryData(string file,TenshoDataFile? data)
         transaction.Commit();
     }
 
-    // Rows written by key in the caller's transaction: replaced (a save: the voyage read again), or kept when already there (keep: a file of before).
-    private static void Write(SqliteConnection open,SqliteTransaction transaction,IReadOnlyList<VoyageRecord> records,bool keep)
+    // Rows written by key in the caller's transaction: replaced (a save: the voyage read again).
+    private static void Write(SqliteConnection open,SqliteTransaction transaction,IReadOnlyList<VoyageRecord> records)
     {
         using(var insert=open.CreateCommand())
         {
             insert.Transaction=transaction;
-            insert.CommandText=(keep ? "INSERT OR IGNORE":"INSERT OR REPLACE")+" INTO voyage_records(house,kind,slot,registered,vessel,rank,return_at,points,route,loot) "
+            insert.CommandText="INSERT OR REPLACE INTO voyage_records(house,kind,slot,registered,vessel,rank,return_at,points,route,loot) "
                 +"VALUES($house,$kind,$slot,$registered,$vessel,$rank,$return,$points,$route,$loot);";
             var house=insert.Parameters.Add("$house",SqliteType.Integer);var kind=insert.Parameters.Add("$kind",SqliteType.Integer);
             var slot=insert.Parameters.Add("$slot",SqliteType.Integer);var registered=insert.Parameters.Add("$registered",SqliteType.Integer);

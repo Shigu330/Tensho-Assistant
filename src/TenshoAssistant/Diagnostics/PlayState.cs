@@ -22,5 +22,5 @@ public static class PlayState
         =>!written || reason!=writtenReason || (reason is not null && now-writtenAt>=Heartbeat);
 
     public static string ToJson(string? reason,DateTimeOffset now)
-        =>JsonSerializer.Serialize(new Dictionary<string,object>{["format"]=1,["busy"]=reason is not null,["reason"]=reason ?? "",["updated"]=now.ToUniversalTime().ToString("o")});
+        =>JsonSerializer.Serialize(new Dictionary<string,object>{["format"]=1,["busy"]=reason is not null,["reason"]=reason ?? "",["updated"]=now.ToUniversalTime().ToString("o")},TenshoJson.Plain);
 }

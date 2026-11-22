@@ -4,7 +4,8 @@ using TenshoAssistant.Discoveries;
 
 // 0.1136 (X-172, user's choice of 12/11, trial docs/evidence/x172-sqlite-trial.md): the discoveries in Discoveries.db (SQLite), written row by row;
 // the files of before converted once, kept aside. Behaviour tests (R28): real databases in a temporary folder, a write that fails on a read-only
-// file, a save left uncommitted, a reader on another connection while the game writes, the layout of a newer version refused.
+// file, a save left uncommitted, a reader on another connection while the game writes, the layout of a newer version refused. X-574 (0.1793,
+// the user's choice of 17/11): the files of before are no longer converted: left aside, never read, moved nor removed.
 internal static class DiscoveriesSqlite1136Tests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
@@ -39,7 +40,7 @@ internal static class DiscoveriesSqlite1136Tests
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
-        ("Discoveries 1136: the files of before are converted once into Discoveries.db and kept aside; the same facts read back",() => InTemp(root =>
+        ("Discoveries 1136: the files of before are never read nor moved by Discoveries.db (X-574); the facts saved read back with their provenance",() => InTemp(root =>
         {
             var main=Path.Combine(root,"Discoveries.json");
             var store=new DiscoveryStore();
@@ -47,15 +48,18 @@ internal static class DiscoveriesSqlite1136Tests
             store.SeeSource(DiscoveryKind.FishCatch,4869,1,3,At,135,16,Place);
             store.SeeMonster(10,20,135,16,new Vector3(5,0,5),12,At);
             DiscoveryFiles.WriteSplit(main,store.Snapshot(At),[]);
-            var aside=DiscoveryDatabase.ConvertFiles(root,At,(_,error)=>throw error);
-            Check(aside is not null && File.Exists(Path.Combine(aside,"Discoveries.json")) && File.Exists(DiscoveryFiles.SharedPath(Path.Combine(aside,"Shared"),DiscoveryKind.FishCatch)),"the old files kept aside, whole");
-            Check(!File.Exists(main) && !Directory.Exists(DiscoveryFiles.SharedFolder(main)),"nothing left in their place");
+            var kind=DiscoveryFiles.SharedPath(DiscoveryFiles.SharedFolder(main),DiscoveryKind.FishCatch);
+            var bytes=(File.ReadAllBytes(main),File.ReadAllBytes(kind));
             var database=new DiscoveryDatabase(Path.Combine(root,DiscoveryDatabase.FileName));
+            Check(database.Count()==(0,0),"nothing read from the files of before");
+            Check(File.ReadAllBytes(main).SequenceEqual(bytes.Item1) && File.ReadAllBytes(kind).SequenceEqual(bytes.Item2) && Directory.GetDirectories(root,"before-sqlite-*").Length==0,"the old files in place, whole");
+            Check(DiscoveryFiles.OldFiles(main).SequenceEqual(["Discoveries.json","Shared/"]),"named as left aside");
+            Save(store,database);
             Check(database.Count()==(2,1),"two of yours (the fish became yours), one shared");
             var back=Restart(database);
             Check(back.Find(DiscoveryKind.FishCatch,4869u,5).Single() is { Seen:1, Imported:1, Own:{ LevelMin:3 } } && back.Find(DiscoveryKind.FishCatch,4870u,5).Single().Seen==0,"read back with its provenance");
             Check(!back.Dirty,"nothing to save after reading");
-            Check(DiscoveryDatabase.ConvertFiles(root,At.AddMinutes(1),(_,error)=>throw error) is null && database.Count()==(2,1),"never converted twice");
+            Check(new DiscoveryDatabase(Path.Combine(root,DiscoveryDatabase.FileName)).Count()==(2,1) && File.ReadAllBytes(main).SequenceEqual(bytes.Item1),"opened again: the same rows, the old file still untouched");
         })),
         ("Discoveries 1136: a save writes the changed rows only, in one transaction; a write that fails is taken again; the base cleared on purpose empties it",() => InTemp(root =>
         {

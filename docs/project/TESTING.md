@@ -537,7 +537,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.545) Carte : la molette zoome aussi sur la colonne d'outils et le curseur ; le pas et l'inversion fonctionnent.
 
-- [ ] (0.546) Carte, réglage activé : un clic gauche sur un endroit vide pose le drapeau ; un glisser ne le pose pas ; un clic sur une icône garde son effet.
+- [x] (0.546) Carte, réglage activé : un clic gauche sur un endroit vide pose le drapeau ; un glisser ne le pose pas ; un clic sur une icône garde son effet.
 
 - [x] (0.547) Carte, bouton « Couches » : chaque case change la carte, comme dans les réglages ; « Tout masquer » puis « Tout afficher » ; la colonne tient dans une petite fenêtre.
 
@@ -2447,9 +2447,9 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1677) Barre de côté : « Personnage » remplace Collections, Équipement, Chocobo, Bestiaire, La Grande Mascarade, Armes antiques et Dresseur ; ses huit onglets s'ouvrent ; quitter la page puis recliquer « Personnage » : l'onglet quitté revient
 
-- [ ] (0.1677) Recherche rapide : taper « bestiaire » puis « équipement » : le résultat « … · Personnage » ouvre le bon onglet ; depuis l'accueil, la tuile Équipement ouvre l'onglet Équipement
+- [x] (0.1677) Recherche rapide : taper « bestiaire » puis « équipement » : le résultat « … · Personnage » ouvre le bon onglet ; depuis l'accueil, la tuile Équipement ouvre l'onglet Équipement
 
-- [ ] (0.1678) Barre de côté : « Objets » ouvre quatre onglets (Recherche d'objets, Rangements, Trier, Marchés) ; « Souhaits » reste une entrée à part ; clic droit sur un objet du jeu › prix : l'onglet Marchés s'ouvre ; « Voir les quantités » de l'objet en contexte ouvre l'onglet Recherche d'objets
+- [x] (0.1678) Barre de côté : « Objets » ouvre quatre onglets (Recherche d'objets, Rangements, Trier, Marchés) ; « Souhaits » reste une entrée à part ; clic droit sur un objet du jeu › prix : l'onglet Marchés s'ouvre ; « Voir les quantités » de l'objet en contexte ouvre l'onglet Recherche d'objets
 
 - [ ] (0.1679) Barre de côté : « Monde » ouvre sept onglets (Carte, Météo, ALÉA, Échoppes, Butin des missions, Butin des monstres, Découvertes) ; « Artisanat » a l'onglet Macros et « Récolte » l'onglet Pêche en mer ; un lien de carte du chat ou « Voir sur la carte » ouvre l'onglet Carte ; la météo ouverte depuis une zone montre le nom de la zone sous le titre
 
@@ -2463,9 +2463,9 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1681) Aide › « Lancer le guide » : le guide montre les mêmes étapes qu'avant, sans page ni réglage nouveau ; seule la place des pages dans la barre de côté a changé.
 
-- [ ] (0.1683) Barre de côté : l'entrée « Alerte (n) » et la catégorie « CALENDRIER » remplacent « Alarmes » et « SUIVI » ; si la catégorie était repliée avant la mise à jour, elle l'est encore ; la page s'ouvre sur le titre « Alerte »
+- [x] (0.1683) Barre de côté : l'entrée « Alerte (n) » et la catégorie « CALENDRIER » remplacent « Alarmes » et « SUIVI » ; si la catégorie était repliée avant la mise à jour, elle l'est encore ; la page s'ouvre sur le titre « Alerte »
 
-- [ ] (0.1683) Recherche rapide : taper « alerte » propose la page Alerte et l'ouvre ; en anglais, « alarm » fait de même
+- [x] (0.1683) Recherche rapide : taper « alerte » propose la page Alerte et l'ouvre ; en anglais, « alarm » fait de même
 
 - [ ] (0.1685) Pêche normale : lancer, attendre la touche : le chrono s'arrête à la touche (« Touche à N s » avec « ! », « !! » ou « !!! ») et reste figé pendant le ferrage, que le poisson soit pris ou non ; au lancer suivant il repart de zéro ; le poisson pris a sa case « Temps de touche » marquée « » »
 
@@ -2495,14 +2495,14 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1694) Aide à la pêche au harpon : survoler le nom d'un poisson : info-bulle complète de l'objet, puis l'ombre et « vu » s'il l'a été
 
-- [ ] (0.1695) Jardin : survoler une plantation puis une graine des croisements : lignes du jardin, puis collection, stock, usages et comment obtenir la graine
+- [x] (0.1695) Jardin : survoler une plantation puis une graine des croisements : lignes du jardin, puis collection, stock, usages et comment obtenir la graine
 
 - [ ] (0.1695) Eurêka et Bozja, onglet des actions : survoler une action : icône, nom, catégorie et maximum, description du jeu
 
 - [ ] (0.1696) Paramètres › Général › Autres infobulles : couper « Météo actuelle » (Lieux) puis survoler un lien de carte du chat ou un favori de la carte : la météo n'y est plus ; la remettre : elle revient. Même chose avec « Boutiques » (PNJ) sur la page Marchands
 
 
-- [ ] (0.1698) Alarmes (ou Rappels, Jardin) : tirer un onglet à une autre place, quitter la page puis revenir, puis recharger le plugin : l'ordre reste ; un lien qui ouvre un onglet précis (par exemple une alarme depuis la barre du serveur) ouvre toujours le bon ; Paramètres › Apparence › « Remettre les onglets des pages dans l'ordre » : l'ordre d'origine revient
+- [x] (0.1698) Alarmes (ou Rappels, Jardin) : tirer un onglet à une autre place, quitter la page puis revenir, puis recharger le plugin : l'ordre reste ; un lien qui ouvre un onglet précis (par exemple une alarme depuis la barre du serveur) ouvre toujours le bon ; Paramètres › Apparence › « Remettre les onglets des pages dans l'ordre » : l'ordre d'origine revient
 
 - [ ] (0.1700) Objets : ouvrir plusieurs objets de suite dans la fiche (un avec recette, un récoltable, un sans marché) : les onglets suivent sans clignoter ni montrer un corps vide, dans l'ordre rangé ; faire défiler l'aperçu d'un objet puis changer d'onglet et revenir : le défilement reste
 
@@ -2538,17 +2538,17 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1713) Carte de Tensho › réglages des zones colorées : décocher « Zones de récolte » : la case « Zones de récolte à horaire » se grise et aucune zone de récolte n'est dessinée, ni verte ni rose ; recocher : les deux reviennent
 
-- [ ] (0.1714) Fenêtre de chat Tensho : clic droit sur un onglet › « Détacher dans sa propre fenêtre » : l'onglet quitte la barre et s'ouvre dans sa propre fenêtre, avec son nom et ses messages ; les messages nouveaux y arrivent, les liens, le clic droit sur un message (copier, épingler, choisir du texte) et la molette y marchent ; la déplacer et la redimensionner, puis /xlplugins › recharger Tensho : elle revient à la même place
+- [x] (0.1714) Fenêtre de chat Tensho : clic droit sur un onglet › « Détacher dans sa propre fenêtre » : l'onglet quitte la barre et s'ouvre dans sa propre fenêtre, avec son nom et ses messages ; les messages nouveaux y arrivent, les liens, le clic droit sur un message (copier, épingler, choisir du texte) et la molette y marchent ; la déplacer et la redimensionner, puis /xlplugins › recharger Tensho : elle revient à la même place
 
-- [ ] (0.1714) Fenêtre de chat Tensho : avec un onglet détaché, le bouton en haut de sa fenêtre (flèche vers une boîte), puis sa croix une autre fois : l'onglet revient dans la barre de la fenêtre de chat, affiché ; avec un seul onglet restant dans la fenêtre de chat, « Détacher » est grisé et son info-bulle dit pourquoi
+- [x] (0.1714) Fenêtre de chat Tensho : avec un onglet détaché, le bouton en haut de sa fenêtre (flèche vers une boîte), puis sa croix une autre fois : l'onglet revient dans la barre de la fenêtre de chat, affiché ; avec un seul onglet restant dans la fenêtre de chat, « Détacher » est grisé et son info-bulle dit pourquoi
 
 - [ ] (0.1714) Fenêtre de chat Tensho : avec un onglet détaché, taper « /tensho chat hide » : toutes les fenêtres de chat Tensho disparaissent ; recevoir un message, puis taper « /tensho chat » : elles reviennent, le message est là ; clic droit sur un onglet › « Masquer toutes les fenêtres de chat un moment » fait de même
 
-- [ ] (0.1715) Fenêtre de chat Tensho, onglet du combat : prendre un effet (manger un plat, une potion, ou un effet en combat), puis survoler le nom de l'effet dans la ligne « … bénéficie de l'effet … » : l'info-bulle montre son icône, son nom et sa description comme celle du jeu ; si rien ne s'affiche, le dire (le jeu ne lie peut-être pas ce statut)
+- [ ] (0.1715) Fenêtre de chat Tensho, onglet du combat : manger un plat (ou boire une potion), puis survoler « Repu » (ou l'effet de la potion) dans la ligne « Vous bénéficiez de l'effet … » : l'info-bulle montre l'icône et le nom, puis les bonus comme l'info-bulle du statut dans le jeu (« Effets du repas (exp +n%) », puis « Collecte +n% (max m) »…, valeurs HQ pour un plat HQ) ; un autre effet montre sa description ; si un repas ne montre que « Sous l'effet d'un repas. », le dire
 
 - [x] (0.1715) Mode développeur, après quelques lignes de combat (actions, dégâts, effets) dans le chat du jeu : dalamud.log a des lignes « Chat window, pieces of a combat line (kind …) » et « pieces of a message with a link » avec « Status … » (rien d'autre à faire : l'agent les lit)
 
-- [ ] (0.1716) Fenêtre de chat Tensho › roue dentée › Joueurs : ajouter plus de 8 noms à « Joueurs cachés » : la liste reste haute de 8 lignes avec sa barre de défilement, et la croix d'une ligne la retire toujours
+- [x] (0.1716) Fenêtre de chat Tensho › roue dentée › Joueurs : ajouter plus de 8 noms à « Joueurs cachés » : la liste reste haute de 8 lignes avec sa barre de défilement, et la croix d'une ligne la retire toujours
 
 - [ ] (0.1717) Fenêtre de chat Tensho, profils de contexte : dans un contexte dont le profil ne montre que des onglets détachés, la fenêtre de chat garde le premier de ces onglets (sa fenêtre détachée se cache) ; hors de ce contexte, il retourne dans sa fenêtre
 
@@ -2556,7 +2556,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1717) Réglages du chat › Joueurs mis en avant : après l'avis « liste pleine », retirer un joueur par le menu d'un message (« Ne plus mettre en avant ») ou changer le texte tapé : l'avis disparaît
 
-- [ ] (0.1718) Mode développeur : dans le chat du jeu, cliquer sur le nom d'un joueur, du bouton gauche puis du droit : un joueur près de vous, un joueur loin sur votre monde, un joueur d'un autre monde ; le journal (dalamud.log) doit montrer une ligne « Chat link probe, click N » par clic et, quand le menu du jeu s'ouvre, une ligne « menu after click N » (ou « without a link click »), sans nom de joueur
+- [x] (0.1718) Mode développeur : dans le chat du jeu, cliquer sur le nom d'un joueur, du bouton gauche puis du droit : un joueur près de vous, un joueur loin sur votre monde, un joueur d'un autre monde ; le journal (dalamud.log) doit montrer une ligne « Chat link probe, click N » par clic et, quand le menu du jeu s'ouvre, une ligne « menu after click N » (ou « without a link click »), sans nom de joueur
 
 - [ ] (0.1719) Maison de la compagnie, base de tour éthéréen : installer un tour (fenêtre ouverte) : Tensho › Rappels, ligne « Tours éthéréens » : « 1 en charge », et « Tour par tour » donne le tour, son emplacement, sa charge et « chargé à » l'heure d'installation plus 20, 45 ou 70 heures selon le grade ; une alarme automatique « … chargé » est créée à cette heure (page Alertes)
 
@@ -2564,23 +2564,179 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1719) Quand un tour est chargé : la ligne dit « chargé » (ou « chargé depuis … au plus tard »), l'alarme a sonné ; retirer un tour de la base (fenêtre ouverte) : il quitte la ligne et son alarme à venir disparaît
 
-- [ ] (0.1720) Fenêtre de chat Tensho, onglet de combat : utiliser une compétence (et laisser un allié en utiliser une) : son nom dans la ligne « … utilise … » montre au survol l'info-bulle du jeu (icône, nom, description) ; le nom d'une action d'ennemi qui porte le nom d'une action de joueur n'a pas d'info-bulle
+- [ ] (0.1720) Fenêtre de chat Tensho, onglet de combat : se téléporter, utiliser une compétence de votre job (et laisser un allié en utiliser une), puis survoler le nom de l'action dans la ligne « Vous utilisez … » ou « … utilise … » : l'info-bulle montre son icône, son nom et sa description ; survoler aussi le nom d'un effet (« Vous bénéficiez de l'effet … ») : son info-bulle ; le nom d'une action d'ennemi qui porte le nom d'une action de joueur n'a pas d'info-bulle
 
-- [ ] (0.1722) Mode développeur, atelier de la compagnie, panneau de contrôle aérien : liste des aéronefs, puis le détail de l'aéronef (ses pièces) : le journal a des lignes « Workshop vessel read: Airship 1: rank …, speed …, range … » ; dire si vitesse, distance et pièces sont à 0 avant le détail et lues après
+- [x] (0.1722) Mode développeur, atelier de la compagnie, panneau de contrôle aérien : liste des aéronefs, puis le détail de l'aéronef (ses pièces) : le journal a des lignes « Workshop vessel read: Airship 1: rank …, speed …, range … » ; dire si vitesse, distance et pièces sont à 0 avant le détail et lues après
 
-- [ ] (0.1722) Compagnie libre › Trajets › Aéronefs : choisir l'aéronef : si ses valeurs n'ont pas été lues, une ligne dit « Vitesse et distance de ce vaisseau non lues… » et aucun trajet n'est cherché ; sinon vitesse et distance sont celles du jeu (ou « d'après ses pièces lues à l'atelier ») et des trajets sont proposés ; saisir une vitesse et une distance retire la ligne
+- [x] (0.1722) Compagnie libre › Trajets › Aéronefs : choisir l'aéronef : si ses valeurs n'ont pas été lues, une ligne dit « Vitesse et distance de ce vaisseau non lues… » et aucun trajet n'est cherché ; sinon vitesse et distance sont celles du jeu (ou « d'après ses pièces lues à l'atelier ») et des trajets sont proposés ; saisir une vitesse et une distance retire la ligne
 
-- [ ] (0.1723) Jardin, un emplacement dont l'heure calculée est passée sans avoir ouvert son menu en jeu : la grille dit « Mûr ? » (marque en sablier), l'info-bulle « Mûr selon le calcul, à confirmer en jeu » avec l'explication ; le message du chat dit « devrait être mûr selon le calcul » ; ouvrir le menu de l'emplacement en jeu quand il est mûr : « Mûr » (marque verte)
+- [x] (0.1723) Jardin, un emplacement dont l'heure calculée est passée sans avoir ouvert son menu en jeu : la grille dit « Mûr ? » (marque en sablier), l'info-bulle « Mûr selon le calcul, à confirmer en jeu » avec l'explication ; le message du chat dit « devrait être mûr selon le calcul » ; ouvrir le menu de l'emplacement en jeu quand il est mûr : « Mûr » (marque verte)
 
 - [ ] (0.1723) Mode développeur : planter une graine puis ouvrir le menu d'un emplacement : le journal a « Garden planting noted: patch …, bed …, seed item …, planted …, growing … h (…) » et « Garden bed state kept: … (… min now) … »
 
-- [ ] (0.1724) En équipe, quelques messages dans le chat d'équipe : la fenêtre de chat de Tensho écrit « [1] [icône SAG] [Nom] » (chiffre, puis icône et abréviation du job, puis le nom) dans la couleur du rôle ; quitter l'équipe : ces lignes gardent couleur et icône ; un message du même joueur après (s'il n'est plus proche) n'a pas de couleur
+- [x] (0.1724) En équipe, quelques messages dans le chat d'équipe : la fenêtre de chat de Tensho écrit « [1] [icône SAG] [Nom] » (chiffre, puis icône et abréviation du job, puis le nom) dans la couleur du rôle ; quitter l'équipe : ces lignes gardent couleur et icône ; un message du même joueur après (s'il n'est plus proche) n'a pas de couleur
 
 - [ ] (0.1724) Mode développeur, en équipe : le journal a « Chat window, pieces of a sender's name (kind 14): … » ; dire d'où viennent le chiffre et l'abréviation (glyphe U+…, mot en capitales, icône)
 
-- [ ] (0.1725) Barre du serveur, entrée « Reste à faire » activée : tout cocher dans Rappels (ou rien à faire) : l'entrée disparaît de la barre du serveur ; un rappel qui revient (remise à zéro) ou une tâche affichée : elle revient seule en quelques secondes
+- [x] (0.1725) Barre du serveur, entrée « Reste à faire » activée : tout cocher dans Rappels (ou rien à faire) : l'entrée disparaît de la barre du serveur ; un rappel qui revient (remise à zéro) ou une tâche affichée : elle revient seule en quelques secondes
 
 - [ ] (0.1726) Vos ventes, liste à vendre d'un servant avec des prix vus : le bouton « Copier » montre et copie le prix le plus bas vu moins 1 (coller dans le jeu) ; la colonne « Prix vu » dit « tableau, 13:45 » (l'heure entière au survol) ; à la largeur par défaut de la fenêtre, les colonnes « Prix vu » et « Copier » se voient en entier
+
+- [ ] (0.1727) Jardin, un emplacement dont l'heure calculée est passée sans que le jeu l'ait dit mûr : survoler l'icône des rappels terminés de la barre du serveur : la ligne dit « Emplacements mûrs selon le calcul, à confirmer en jeu : 1 », pas « Emplacements mûrs » ; ouvrir le menu de l'emplacement en jeu (mûr) : la ligne devient « Emplacements mûrs : 1 » ; l'accueil, ligne « Terminé », dit la même chose
+
+- [ ] (0.1727) si une récolte est à venir et les rappels du jardin activés : l'accueil, « Prochaine échéance », dit « <graine> : mûr (calcul) », comme l'onglet Alarmes du jardin
+
+- [ ] (0.1728) Planificateur de trajets, aéronef dont vitesse et distance sont inconnues (ligne « non lues ») : saisir la vitesse seule : la ligne reste et rien n'est cherché ; saisir aussi la distance : la ligne disparaît et la recherche donne des trajets
+
+- [ ] (0.1729) Fenêtre de discussion Tensho, en équipe, une ligne d'un membre (« [1] [SAG] Nom ») : chercher « [1] », puis « 1 SAG » : la ligne est trouvée les deux fois
+
+- [ ] (0.1730) Paramètres › Suivi et notifications › Barre du serveur : on y trouve toutes les cases de la barre du serveur (alarme, rappels, rappels terminés, devises, gils du jour, sacs, équipement, zone, alertes du chat, état de Tensho et son panneau), puis l'infobulle ; Général › En-tête et accueil n'en a plus ; Panneaux › Joueurs du chat n'a plus les alertes dans la barre
+
+- [ ] (0.1730) N'afficher que les sacs dans la barre du serveur : la case « Infobulle Tensho sur ses entrées » n'est pas grisée ; tout couper : elle l'est
+
+- [ ] (0.1730) Tableau de bord (état de Tensho), bouton « Détails », et clic sur l'entrée de l'état dans la barre du serveur : la page s'ouvre sur Suivi et notifications › Barre du serveur
+
+- [ ] (0.1731) Paramètres, Général : « Ouverture et fermeture de la fenêtre » a « Fermer Tensho quand il ouvre une fenêtre du jeu » ; « En-tête et accueil » n'a plus que les deux heures et l'annuaire ; « Survol et clic droit des objets » a « Afficher les prix au survol des objets en jeu » (grisé si Universalis est coupé) ; « Objets et marché » a « Tableau des ventes : copier l'offre la plus basse moins 1 »
+
+- [ ] (0.1731) Paramètres, Suivi et notifications › Alerte : « Fenêtre de suivi épinglée » y est ; Panneaux › À côté des fenêtres du jeu : « Panneau à côté de la liste de ventes des servants » ; Données › Sources communautaires : sous Universalis, la ligne dit où sont les prix au survol ; chercher « prix au survol » dans la recherche des réglages mène au bon endroit
+
+- [ ] (0.1732) Carnet de récolte du jeu, clic droit sur un objet (un objet de collection aussi) : le menu du jeu a l'entrée « Tensho » et ses outils portent sur cet objet
+
+- [ ] (0.1732) Carnet de pêche du jeu, clic droit sur un poisson : l'entrée « Tensho » apparaît ; sinon, en mode développeur, lire la ligne « Context menu opened » du journal (nom de la fenêtre, objet survolé)
+
+- [ ] (0.1733) Fenêtre « Suivi Tensho » avec une alarme d'objet créée sans icône (terreau, minerai) : la ligne montre l'icône de l'objet ; survoler l'icône ou le nom : l'info-bulle de l'objet, avec sous son nom le lieu et la prochaine alarme
+
+- [ ] (0.1733) Clic droit sur une ligne du suivi : « Ouvrir le module Alerte », « Couper cette alarme » (la ligne disparaît, l'alarme est coupée dans Alerte), « Carte », puis le menu habituel de l'objet
+
+- [ ] (0.1736) Fenêtre de chat Tensho, « S'effacer après » à 10 s (réglages de la fenêtre de chat) : attendre qu'elle s'efface, puis qu'un message arrive dans l'onglet affiché (un /dire d'un joueur proche, ou /echo dans un onglet qui le montre) : la fenêtre revient ; un message d'un autre onglet ne la fait pas revenir
+
+- [ ] (0.1736) Même réglage, avec « Revenir aussi pour un message privé ou une alerte » coché : effacée, un message privé reçu (ou un message avec votre prénom) dans un autre onglet la fait revenir ; décoché, non
+
+- [ ] (0.1737) Mode capture de la fenêtre de chat coché, page Cartes, liens de carte du chat : survoler un lien envoyé par un joueur : l'info-bulle montre « #XXXXX », le même code que la fenêtre de chat pour ce joueur, jamais son nom ; décoché : son nom avec son monde (Nom@Monde)
+
+- [ ] (0.1738) Page Marchands, un objet vendu par beaucoup de PNJ dont certains à placer chez soi (un meuble ou une teinture courante) : les marchands sur une carte d'abord, puis une seule ligne « Marchands sans position : N (cliquez pour les afficher) » ; un clic les montre, un autre les cache
+
+- [ ] (0.1739) Fenêtre de chat de Tensho, déjà Repu d'un repas : manger un autre repas ; survoler la nouvelle ligne « Vous bénéficiez de l'effet Repu » : les bonus du nouveau repas (pas de l'ancien) ; à la fin de l'effet, la ligne « Vous perdez l'effet Repu » montre seulement la description
+
+- [ ] (0.1740) Fenêtre de chat, « S'effacer après » à 10 s et historique gardé : recharger Tensho, attendre que la fenêtre s'efface sans écrire : elle ne revient pas quand les anciens messages sont remis (dans les premières secondes) ; un nouveau message de l'onglet la fait revenir
+
+- [ ] (0.1744) Chat de Tensho : manger un repas alors qu'on est déjà Repu d'un autre repas : l'info-bulle de la nouvelle ligne « Repu » montre les bonus du nouveau repas ; puis lire le journal : la ligne « status put on N frame(s) (M ms) after its line » donne le délai du jeu, s'il y en a un
+
+- [ ] (0.1745) Premier chargement de cette version : les réglages sont les mêmes qu'avant (thème, alarmes, chat, carte, tailles d'icônes) ; le journal dit une fois « Settings moved from Dalamud's settings file to Tensho's own (Settings.json) » ; le fichier pluginConfigs\TenshoAssistant\Settings.json existe
+
+- [ ] (0.1745) Changer un réglage, recharger Tensho : le réglage est gardé
+
+- [ ] (0.1745) Après quelques rechargements (mode développeur) : les lignes « context alive » ne nomment aucune copie chargée depuis cette version, et la mémoire gérée ne monte plus d'une copie à chaque rechargement
+
+- [ ] (0.1748) Chat de Tensho, un autre joueur à portée mange un repas (ligne « … bénéficie de l'effet Repu ») : l'info-bulle de « Repu » montre les bonus de ce repas, ou seulement la description du statut ; jamais les bonus d'un repas plus ancien ; le journal dit l'issue (« another player's, … »).
+
+- [ ] (0.1750) Tensho, page Dresseur (bestiaire) et panneau du Dédale bestial (équipe, bêtes appelées pour un combat) : après le texte de chaque bête, les icônes des effets qu'elle inflige, dans l'ordre de la fenêtre « Formation de l'équipe » du jeu, chacune nommée au survol (Mouton : Sommeil ; Mandragore : Pesanteur puis Poison ; Cu sith : aucune).
+
+- [ ] (0.1751) Tensho, page Banque, un onglet avec des objets (filtres au choix) : « Copier en CSV », puis collez dans un tableur : une ligne par rangement, objet et qualité, avec la quantité ; le message dit le nombre de lignes copiées.
+
+- [ ] (0.1752) Barre du serveur, entrée « Tensho » : après une séance avec plusieurs mises à jour de Tensho, la mémoire affichée ne grimpe plus d'environ 100 Mo à chaque mise à jour ; dites le nombre affiché après le démarrage du jeu et après cinq mises à jour.
+
+- [ ] (0.1756) Tensho, page Marché, un objet, onglet Historique (filtres au choix) : « Copier en CSV », puis collez dans un tableur : une ligne par vente affichée, dans l'ordre du tableau, avec la date, le monde, le prix unitaire, la quantité et la qualité ; le message dit le nombre de ventes copiées.
+
+- [ ] (0.1757) Près d'un autre joueur qui n'est pas Repu, quand il prend un repas : survolez l'effet « Repu » de sa ligne dans la fenêtre de chat de Tensho : l'info-bulle montre les bonus de ce repas ; si elle n'en montre aucun, la ligne du journal « … s from its full duration » dit l'écart vu (à rapporter).
+
+- [ ] (0.1758) Tensho, page Marché, un objet, onglet Historique : « Copier en CSV », la note « N vente(s) copiée(s) » s'affiche ; changez de filtre ou d'objet : la note disparaît. De même à la Banque après un changement d'onglet ou de filtre.
+
+- [ ] (0.1759) Près d'un autre joueur qui prend deux repas différents à moins de 3 s d'écart : survolez l'effet « Repu » de la deuxième ligne dans la fenêtre de chat de Tensho : l'info-bulle montre les bonus du deuxième repas, ou aucun, jamais ceux du premier ; le journal dit « the meal shown for that player's line of the 4 s before » quand c'est ce cas.
+
+- [ ] (0.1760) Utilisez un manuel d'artisan (ou de récolteur) pendant que Tensho tourne, puis fabriquez (ou récoltez) : page Équipement, sous le dernier artisan (ou récolteur), « Grâce de l'artisan — environ N points de bonus restants » ; N baisse à chaque ligne d'expérience de la part du manuel (sans autre bonus : 60 % des points gagnés) ; le journal dit « Grace: an experience line read ».
+
+- [ ] (0.1760) Avec un manuel compté : rechargez Tensho (/xlplugins) : la ligne garde son nombre. Un manuel déjà actif quand Tensho se charge sans compte gardé (ou après de l'expérience gagnée sans Tensho) : « Points restants inconnus ».
+
+- [ ] (0.1760) Quand le jeu retire la Grâce (plafond atteint), la ligne disparaît ; le dernier nombre vu était proche de 0 (à rapporter s'il en était loin).
+
+- [ ] (0.1761) Survolez dans le jeu un objet recyclable (une pièce d'équipement fabriquée) : sous l'infobulle, « Recyclage : <artisan>, niveau de l'objet N, votre niveau M : au-dessus / en dessous de votre niveau » ; M est celui de la fenêtre de recyclage du jeu pour cet artisan.
+
+- [ ] (0.1761) Survolez un coffret ou un paquet de cartes : « Collections : les N obtenus » quand vous avez tout, sinon « n sur N pas encore obtenus » ; coupez chaque ligne dans Paramètres › infobulles : elle disparaît.
+
+- [ ] (0.1762) À une sonnette, ouvrez la liste des servants puis la liste de vente d'un servant qui vend quelque chose : page Personnages, tableau des servants, sous ce servant, « Objets en vente (relevés le …) » et chaque objet avec sa quantité et son prix (HQ dit) ; un servant jamais ouvert qui vend dit « pas encore relevés ».
+
+- [ ] (0.1762) Rechargez Tensho : la liste du servant reste, avec sa date ; vendez ou retirez un objet puis rouvrez la liste de vente : la liste et sa date changent.
+
+- [ ] (0.1765) Avec un manuel compté (page Équipement, « environ N points de bonus restants ») : téléportez-vous ou changez de zone, puis fabriquez (ou récoltez) : la ligne garde son nombre et continue de baisser, elle ne revient jamais au plafond entier.
+
+- [ ] (0.1765) Si vous utilisez un manuel de compagnie (I ou II) ou un manuel révisé : le journal dit « Grace: 45 (Param N, … » (46 pour un manuel de récolte) ; N doit être 40, 50 ou 80 selon le manuel (à rapporter sinon), et la page Équipement part du plafond de ce manuel (250 000, 500 000 ou 2 000 000).
+
+- [ ] (0.1766) Page Dresseur, bestiaire : après la famille de chaque bête, une petite icône ; au survol « Assimilation (Nv 22) : Cuir de thérien » (ou l'action de sa famille) et son effet. Ouvrez le filtre des familles : chaque famille avec son action ; choisissez-en une : la ligne sous le filtre montre l'icône, le nom et l'effet. Comparez avec l'action que le jeu donne quand vous utilisez Assimilation avec une bête de cette famille.
+
+- [ ] (0.1767) Page Dresseur, onglet « À capturer » : les bêtes pas encore capturées, d'abord « Dans la nature » puis « En mission » ; pour chacune le lieu de capture du jeu, le premier lieu vu (zone et coordonnées) et ses deux techniques. Cliquez un lieu vu : la carte de Tensho s'ouvre sur ce lieu ; clic droit : drapeau et éthérite la plus proche. Décochez la case : les bêtes déjà capturées reviennent, marquées.
+
+- [ ] (0.1768) Page Dresseur, onglet « Objets temporaires » : le guide du jeu sur les cases du plateau, puis l'équipement de dressage, les objets du Dédale et les aliments, chacun avec son icône, son nom et son effet ; chaque aliment dit les familles qui peuvent le manger. Choisissez une famille : seuls ses aliments restent. Au Dédale bestial, comparez avec un marchand ou un coffre au trésor.
+
+- [ ] (0.1769) Avec un manuel compté (page Équipement, « environ N points de bonus restants »), si le jeu retire l'effet (plafond atteint) ou si vous le retirez : une demi-minute après, la ligne n'est plus montrée et le journal dit « Grace: 45 not held at 30 readings in a row … its count is dropped » (46 pour un manuel de récolte) ; un manuel utilisé ensuite repart de son plafond entier s'il est utilisé pendant que Tensho tourne.
+
+- [ ] (0.1770) Au Dédale bestial, panneau à côté du plateau, « Plateau entier » puis « Campements, marchands et coffres du plateau » : les cases et leurs étapes (« Étape N ») doivent correspondre à la fenêtre « Disposition du plateau » du jeu, les campements avec le même nombre de bêtes.
+
+- [ ] (0.1770) Sur une case de campement, après un combat (fenêtre de l'équipe ouverte une fois) : le panneau dit « À reposer : … » ; comparez avec « Vous et N de vos bêtes » du jeu et les PV de la fenêtre de l'équipe (les plus blessées d'abord, pas plus que N).
+
+- [ ] (0.1770) Ouvrez dans le bestiaire du jeu la page de trois bêtes de familles différentes : le journal dit « Beastmaster satiety checked » pour chacune (à rapporter s'il dit « differs ») ; la satiété du panneau (« Aliments de l'équipe ») est celle du bestiaire (« Satiété 0/N »).
+
+- [ ] (0.1771) Finissez un plateau du Dédale bestial : page Dresseur, onglet de l'équipe, « Dernier plateau » : la ligne « Récompenses » (objet, icône, ×N) doit être celle de la fenêtre de résultat du jeu ; le journal dit « Beastmaster board result, rewards: item … xN » (à rapporter si la quantité diffère de la fenêtre).
+
+- [ ] (0.1772) Mode développeur actif, entrez dans votre maison (où sont vos sonnettes) et attendez 10 s : le journal (dalamud.log) a une ligne « Housing furniture probe (X-747, developer mode): … » ; notez où sont les sonnettes dans la pièce. Rien ne change encore sur la carte.
+
+- [ ] (0.1773) Dédale bestial, panneau à côté du plateau, section « Campements, marchands et coffres du plateau » : sous chaque marchand, la ligne « Ses offres ne sont pas lues… » ; sous chaque coffre, « Un objet temporaire au choix ; deux avec « Dague de voleur » » ; au survol, le texte du guide du jeu.
+
+- [ ] (0.1773) Ouvrez la page d'une bête de l'équipe dans le bestiaire du jeu, puis le panneau : sa ligne d'« Aliments de l'équipe » donne la satiété de la page (« (bestiaire) »), les autres bêtes « (à confirmer…) », et chaque ligne nomme les aliments de sa famille.
+
+- [ ] (0.1774) Faites une mission (donjon) jusqu'au bout : page Journal des gils, les gains de la fin et des coffres sont dans « Missions (récompenses) », plus dans « Autre ».
+
+- [ ] (0.1774) Mode développeur actif, faites un gain ou une dépense que Tensho classe « Autre » : 3 s après, dalamud.log a une ligne « Gil other context: … » avec les messages et fenêtres autour, sans aucun nom de personnage, de servant, de monde ni de compagnie.
+
+- [ ] (0.1775) Pendant que vous jouez, fenêtre de chat Tensho ouverte avec un long historique, rechargez Tensho : le chat montre ses lignes en moins de 3 s ; une minute après, dalamud.log a la ligne « Chat window in the first minute after the load (X-558): … » (combien d'images de 16 ms ou plus) et « Chat window: lines first drawn … ms after the load » (à rapporter si plus de 3000 ms ou des images de 16 ms ou plus).
+
+- [ ] (0.1776) Chat Tensho, historique gardé : rechargez Tensho avec un autre onglet affiché, et faites-vous envoyer un message (ou dites un mot d'alerte) dans les secondes qui suivent : l'onglet qui le montre garde son non-lu et son « ! ».
+
+- [ ] (0.1777) Réglages d'un onglet du chat Tensho qui montre les actions des autres joueurs : cochez « Cacher les téléportations des autres » ; dans une cité animée, les lignes « … prépare Téléportation » et « … utilise Téléportation » des autres joueurs ne s'affichent plus dans cet onglet ; les vôtres restent, et un onglet sans la case les montre encore.
+
+- [ ] (0.1778) Hors combat, mangez un plat : quand il reste 5 minutes à l'effet Repas, une ligne [Tensho] « Repas : l'effet finit dans 5 min » et le son des alarmes, une seule fois ; rien de plus à la fin de l'effet.
+
+- [ ] (0.1778) Appelez votre compagnon chocobo (légume de Gysahl) et laissez son temps descendre sous 5 minutes hors combat : « Votre compagnon chocobo part dans 5 min », une fois ; renvoyez-le avant : aucun rappel.
+
+- [ ] (0.1778) En combat ou dans une mission, laissez le repas passer sous 5 minutes : rien pendant le combat ou la mission ; le rappel vient une fois sorti, si l'effet tient encore.
+
+- [ ] (0.1780) Compagnon chocobo sorti, rappel à 5 min : quand « Votre compagnon chocobo part dans 5 min » a été dit, montez puis descendez deux fois (le compagnon revient) : l'avis n'est pas redit.
+
+- [ ] (0.1780) Réglez le rappel du compagnon à 0 min, appelez-le et montez sur une monture quand il lui reste 1 ou 2 minutes ; restez monté plus longtemps, puis descendez : « Votre compagnon chocobo est parti » une fois, une vingtaine de secondes après la descente.
+
+- [ ] (0.1781) Ouvrez la fenêtre ALÉA du jeu (menu principal › Déplacements › ALÉA) puis la page ALÉA de Tensho, section « Rangs de réussite des ALÉA » : chaque zone vue dans la fenêtre du jeu a le même rang et le même compte « x/y ALÉA » que la fenêtre ; les zones jamais montrées disent « inconnu ». Dans dalamud.log, la ligne « Shared FATE window read (X-213) » (à rapporter si les comptes diffèrent).
+
+- [ ] (0.1781) Survolez « n objets » d'une zone d'Endwalker ou de Dawntrail dont vous n'avez pas le rang maximal : les articles du comptoir de la zone que vous ne pouvez pas encore acheter, avec leur rang et leur prix, et le haut fait « Héros de grand chemin » ; comparez avec ce que le comptoir de la zone vous propose.
+
+- [ ] (0.1782) Rangements › Rapport, section « Valeur estimée des stocks », Universalis activé : cliquez « Estimer avec les prix du marché » : l'avancement « Prix demandés : n objets sur m » monte, puis un tableau par rangement de ce personnage et un par personnage ; les objets sans prix sont comptés à part, jamais dans la valeur ; Arrêter coupe les demandes.
+
+- [ ] (0.1782) Survolez dans un sac un objet vendable au PNJ et sur le marché, après que son prix a été lu : sous les prix du marché, « Le marché paie n fois le prix du PNJ » ou « Le PNJ paie plus que le marché ».
+
+- [ ] (0.1783) Survolez une pièce d'équipement dont vous avez la même apparence dans la coiffeuse mirage ou le bahut personnel (après les avoir ouverts une fois) : sous la partie collection, une coche « Même apparence déjà détenue : Coiffeuse mirage (nom de la pièce) » ; une pièce dont vous n'avez aucune apparence : une croix « Aucune pièce de même apparence dans vos rangements lus ».
+
+- [ ] (0.1784) Planificateur d'équipement d'un job de combat : choisissez un repas que vous connaissez (bouton HQ ou NQ comme le vôtre) : une colonne « Avec repas » apparaît ; mangez ce repas en jeu et comparez la colonne aux stats de la fenêtre Personnage du jeu avec le même équipement (à rapporter si une stat diffère).
+
+- [ ] (0.1786) Avec votre compagnon chocobo sorti (plus de 5 min restantes) : renvoyez-le, puis téléportez-vous vers une autre zone et restez-y plus longtemps que le temps qu'il lui restait : aucun « est parti » ne doit être dit.
+
+- [ ] (0.1786) Compagnon sorti : montez sur une monture, chevauchez un moment puis descendez : il revient ; dans dalamud.log, les lignes « Chocobo companion out of sight (X-777) » puis « Chocobo companion back (X-777) » disent le minuteur du jeu au départ et au retour (à rapporter : le minuteur a-t-il continué pendant la monture ?).
+
+- [ ] (0.1787) Mangez un repas de combat, puis ouvrez le planificateur d'équipement du job porté et choisissez un autre repas : l'info-bulle de l'en-tête « Avec repas » nomme le repas mangé retiré, et la colonne montre vos stats avec le seul repas choisi (sans repas choisi différent, choisissez le même repas : la colonne doit égaler la colonne Prévu sans changement d'équipement).
+
+- [ ] (0.1788) Rangements › Rapport › Valeur estimée des stocks : cliquez « Estimer » ; sous les tableaux, « Dort et se vend » liste vos objets qui se vendent, avec prix vendu, ventes par jour, gils par jour et prix du PNJ ; comparez deux lignes au tableau du marché du jeu (ou à la fenêtre des prix de Tensho).
+
+- [ ] (0.1789) Collections › Mirage : vos pièces de la coiffeuse mirage, du bahut personnel, des sacs et des servants sont listées une fois chacune, avec où elles sont ; une pièce que vous avez en double, ou deux pièces de même apparence, montre « n autre(s) » dans « Même apparence » ; essayez la recherche et le filtre d'emplacement.
+
+- [ ] (0.1790) Planificateur d'équipement, un repas choisi : mangez un repas (ou laissez-le finir) : la colonne « Avec le repas » montre « — » une à deux secondes, puis la bonne valeur, jamais une valeur trop basse ou deux repas additionnés.
+
+- [ ] (0.1790) Compagnon chocobo dehors : téléportez-vous, attendez qu'il revienne, renvoyez-le, puis montez plus longtemps que le temps qu'il lui restait : aucun « est parti » à la descente.
+
+- [ ] (0.1793) Rechargement du plugin : vos données sont toutes là (banque et inventaires, journal des gils, avancement des hauts faits, historique des voyages, découvertes, onglets et apparence de la fenêtre de discussion, alarmes et leur envoi Discord) ; aucune ligne « left aside » attendue dans le journal pour vos fichiers.
+
+- [ ] (0.1794) Après un rechargement : dans dalamud.log, la ligne « Tensho data: a save took … ms with the journal folded in at its close (each save before X-750), … ms with the file kept open (X-750). » ; vos données toutes là après un second rechargement (banque, gils, découvertes).
+
+- [ ] (0.1795) Magie bleue : cochez quelques sorts pas encore appris ; « n sort(s) voulu(s), m pas encore appris » s'affiche ; « Copier les sorts voulus, par lieu » colle une ligne par lieu ; la case « Par lieu » trie la liste par lieu (le lieu après chaque sort).
+
+- [ ] (0.1795) Magie bleue : ouvrez la fiche d'un sort appris dans une zone (ex. une zone de La Noscea) : le bouton « Carte » ouvre la bonne carte de Tensho ; un sort appris dans une mission : le bouton « Mission » ouvre sa page ; un lieu partagé par plusieurs cartes : aucun bouton.
 
 **0.535 : interfaces** — à voir en jouant
 

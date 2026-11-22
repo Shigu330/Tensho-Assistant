@@ -76,6 +76,8 @@ internal sealed partial class MainWindow
         var plans=configuration.GearPlans??=[];
         var plan=plans.GetValueOrDefault(state.JobId) ?? [];
         var model=GearModelFor(catalog,state,worn,plan,otherJob);
+        // X-229 (0.1784): with the meal chosen for this job (its own cache, on top of the model's).
+        model=GearMealModel(model,state);
         var (plannedPieces,wornPieces)=(model.Planned,model.Worn);
         gearLooks=model.Looks;gearMelds=model.Melds;
 
@@ -113,7 +115,11 @@ internal sealed partial class MainWindow
         Dictionary<GearSlot,(GearItem Item,bool Hq,IReadOnlyList<(int,int)> Materia)> Worn,Dictionary<GearSlot,GearItem> Looks,
         Dictionary<GearSlot,IReadOnlyList<MeldedMateria>> Melds,double WornLevel,double PlannedLevel,Dictionary<int,int> WornTotals,
         Dictionary<int,int> PlannedTotals,Dictionary<string,int> PlannedValues,IReadOnlyList<(string Key,string Value)> CombatNow,
-        IReadOnlyDictionary<string,string> CombatLater);
+        IReadOnlyDictionary<string,string> CombatLater,IReadOnlyDictionary<string,int>? MealValues=null,IReadOnlyDictionary<string,int>? MealBonuses=null,
+        IReadOnlyDictionary<string,string>? CombatMeal=null,string? MealEaten=null,bool MealUnknown=false);
+    // X-229 (0.1784): every meal from the sheets (set by Plugin.cs), and the one chosen for a job.
+    internal Func<IReadOnlyList<Craft.CraftConsumable>>? GearMealList { get; set; }
+    private string gearMealQuery="";
     private GearModelKey? gearModelKey;
     private GearModel? gearModel;
 
@@ -179,6 +185,8 @@ internal sealed partial class MainWindow
         }
         finally{ImGui.EndDisabled();}
         Tip("Gear.TryPlanTip");
+        ImGui.SameLine();
+        DrawGearMealPicker(state.JobId);
         ImGui.SameLine();
         // 0.331: the planned materia are part of the plan (they also apply to worn pieces): cleared too, the button active while either is set.
         ImGui.BeginDisabled(plan.Count==0 && configuration.GearMateria?.GetValueOrDefault(state.JobId) is not { Count:>0 });
@@ -390,13 +398,6 @@ internal sealed partial class MainWindow
         return gearPickRows;
     }
 
-    /// <summary>X-290 (0.1294): the next text on the same line when it fits in what is left of it, else on the next line: never cut at the edge.</summary>
-    private static void SameLineOrNext(string text)
-    {
-        ImGui.SameLine();
-        if(ImGui.GetContentRegionAvail().X<ImGui.CalcTextSize(text).X)ImGui.NewLine();
-    }
-
     // Same worn pieces (slot, item, HQ): the loader publishes a new list every second, usually with the same content.
     private static bool SameWorn(IReadOnlyList<EquippedPiece>? before,IReadOnlyList<EquippedPiece> now)
     {
@@ -412,11 +413,17 @@ internal sealed partial class MainWindow
     private void DrawGearStats(CharacterStatsState state,GearModel model)
     {
         var (wornTotals,plannedTotals,plannedValues)=(model.WornTotals,model.PlannedTotals,model.PlannedValues);
-        if(!ImGui.BeginTable("GearStats",4,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp))return;
+        // X-229 (0.1784): a fifth column with the meal chosen.
+        var meal=model.MealValues;
+        if(!ImGui.BeginTable("GearStats",meal is null ? 4:5,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp))return;
         try
         {
-            foreach(var key in new[]{"Stat","Worn","Planned","Delta"})ImGui.TableSetupColumn(localization.Get("Gear.Column"+key));
+            foreach(var key in meal is null ? new[]{"Stat","Worn","Planned","Delta"}:["Stat","Worn","Planned","Delta","Meal"])ImGui.TableSetupColumn(localization.Get("Gear.Column"+key));
             ImGui.TableHeadersRow();
+            // X-778: the meal eaten taken out first is said; or the column unknown when it cannot be.
+            if(meal is not null && ImGui.TableGetColumnFlags(4).HasFlag(ImGuiTableColumnFlags.IsHovered))
+                WrappedTooltip(localization.Get("Gear.MealColumnTip")+(model.MealUnknown ? "\n"+localization.Get("Gear.MealEatenUnknown")
+                    :model.MealEaten is { } eaten ? "\n"+localization.Format("Gear.MealEatenOut",eaten):""));
             // 0.311: only the stats of the job's kind (no GP / CP on a combat job, no critical hit on a gatherer).
             var combat=CombatCategory(state.Category);
             foreach(var param in GearStatOrder)
@@ -439,6 +446,21 @@ internal sealed partial class MainWindow
                 ImGui.TableNextColumn();ImGui.TextColored(later!=now ? UI.FfxivTheme.Gold:Text,later.ToString("N0",Numbers));
                 ImGui.TableNextColumn();
                 if(later!=now)ImGui.TextColored(later>now ? Success:Error,$"{(later>now ? "+":"")}{(later-now).ToString("N0",Numbers)}");
+                if(meal is null)continue;
+                ImGui.TableNextColumn();
+                if(model.MealUnknown){ImGui.TextDisabled("—");continue;}
+                // X-778: the value with the meal chosen, the meal eaten taken out (shown even where the meal chosen gives nothing).
+                if(GearRules.AttributeOf(param) is { } mealKey && meal.TryGetValue(mealKey,out var withMeal))
+                {
+                    var bonus=model.MealBonuses?.GetValueOrDefault(mealKey) ?? 0;var eatenOut=later-(withMeal-bonus);
+                    if(withMeal==later && bonus==0){ImGui.TextUnformatted(later.ToString("N0",Numbers));continue;}
+                    ImGui.TextColored(withMeal!=later ? UI.FfxivTheme.Gold:Text,withMeal.ToString("N0",Numbers));
+                    var lines=new List<string>();
+                    if(bonus>0)lines.Add(localization.Format("Gear.MealBonus",bonus.ToString("N0",Numbers)));
+                    if(eatenOut>0)lines.Add(localization.Format("Gear.MealEatenStat",eatenOut.ToString("N0",Numbers)));
+                    TipText(string.Join("\n",lines));
+                }
+                else ImGui.TextUnformatted(later.ToString("N0",Numbers));
             }
             // Combat jobs: the derived values (critical rate, damage bonus…) in the same columns, same formulas as the Character page.
             if(!combat || state.Modifiers.Div<=0)return;
@@ -450,6 +472,10 @@ internal sealed partial class MainWindow
                 ImGui.TableNextColumn();
                 var later=model.CombatLater.GetValueOrDefault(rowKey);
                 ImGui.TextColored(later is not null && later!=rowValue ? UI.FfxivTheme.Gold:Text,later ?? "—");
+                if(meal is null)continue;
+                ImGui.TableNextColumn();ImGui.TableNextColumn();
+                var withMeal=model.MealUnknown ? null:model.CombatMeal?.GetValueOrDefault(rowKey);
+                ImGui.TextColored(withMeal is not null && withMeal!=later ? UI.FfxivTheme.Gold:Text,withMeal ?? "—");
             }
         }
         finally{ImGui.EndTable();}

@@ -127,7 +127,8 @@ internal sealed partial class MainWindow
                         // X-684 (0.1672): the one place tooltip, the channel and who sent it under it.
                         if(ImGui.IsItemHovered())
                         {
-                            var line=localization.Format("ChatLinks.Line",ChannelName(link.Channel),link.Sender.Length>0 ? link.Sender:localization.Get("ChatLinks.NoSender"));
+                            // X-754 (0.1737, R25): in the chat window's capture mode, the sender's stand-in (the chat window's code), never the name.
+                            var line=localization.Format("ChatLinks.Line",ChannelName(link.Channel),link.Sender.Length>0 ? Chat.ChatFormat.LinkSender(link.Sender,ChatOptions.CaptureNames):localization.Get("ChatLinks.NoSender"));
                             if(map is not null && MapCatalog.CoordinatesValid(link.X,link.Y))DrawPlaceTooltip(map,new Vector2(link.X,link.Y),link.Place.Length>0 ? link.Place:null,line);
                             else WrappedTooltip(line);
                         }

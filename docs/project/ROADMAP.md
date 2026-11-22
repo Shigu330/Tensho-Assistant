@@ -82,8 +82,7 @@ Open points, produced by script from the agent's source of decisions. Choices al
 
 | No. | Point | Choice applied, or record awaited | Where |
 |---|---|---|---|
-| D-200 | Chat tab order: one order for the window and the context profiles, or one order per profile? | One order (applied): a profile shows its tabs in the settings' order; dragging them in a profile changes their order for all |  |
-| D-203 | Tensho chat window: the game's menu of a player far away. Whether to imitate the event the game's chat sends on a click on a player, to settle after the developer-mode probe's measure (evidence 0.1718; in-game test: a player near you, a player far away, a player of another world). | Keep it so: near you, the game's menu of that character; far away, the line in the game's own chat. Pros: nothing fragile, never another player's menu. Cons: far away, the game's chat is still needed. |  |
+| D-216 | X-468 (shared discoveries beyond 200,000 facts of a kind, study of 11/22): how to keep every fact, with a weight per fact (number of players who saw it) | A now: one file per kind, cap raised (high bound near 2 million), beyond it the plugin and the tool keep the facts seen by the most players then the newest, pages prefer a confirmed fact and show « seen by N players » or « seen once »; no format change; 2 versions. Slicing (B) prepared, done only if a kind nears a few hundred thousand facts |  |
 <!-- /gen:decisions:en -->
 
 ## In-game tests
@@ -182,8 +181,7 @@ Points ouverts, produits par script depuis la source des décisions de l'agent. 
 
 | N° | Point | Choix appliqué, ou relevé attendu | Où |
 |---|---|---|---|
-| D-200 | Ordre des onglets du chat (X-687) : un seul ordre pour la fenêtre et les profils par contexte, ou un ordre par profil ? | Un seul ordre (appliqué) : un profil montre ses onglets dans l'ordre des réglages ; les faire glisser dans un profil change leur ordre pour tous |  |
-| D-203 | Fenêtre de chat de Tensho : menu du jeu d'un joueur loin. Imiter ou non l'événement que le chat du jeu envoie au clic sur un joueur, à trancher après la mesure de la sonde en mode développeur (preuve 0.1718 ; essai en jeu : un joueur près, un joueur loin, un joueur d'un autre monde). | Garder ainsi : près de vous, le menu du jeu de ce personnage ; loin, la ligne du chat du jeu. Pour : rien de fragile, jamais le menu d'un autre joueur. Contre : loin, il faut encore passer par le chat du jeu. |  |
+| D-216 | X-468 (découvertes partagées au-delà de 200 000 faits d'un genre, étude du 22/11) : comment garder tous les faits, avec un poids par fait (nombre de joueurs qui l'ont vu) | A maintenant : un fichier par genre, plafond relevé (borne haute vers 2 millions), au-delà le plugin et l'outil gardent les faits vus par le plus de joueurs puis les plus récents, pages qui préfèrent un fait confirmé et montrent « vu par N joueurs » ou « vu une fois » ; aucun changement de format ; 2 versions. Découpage en tranches (B) préparé, fait seulement si un genre approche quelques centaines de milliers de faits |  |
 <!-- /gen:decisions:fr -->
 
 ## Tests en jeu

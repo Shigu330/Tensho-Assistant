@@ -51,6 +51,10 @@ internal sealed partial class MainWindow
             Page("FATEs",()=>Task.FromResult(FatesLoad?.Invoke() is { Count:>0 } zones
                 ? Diagnostics.SelfCheck.Ok("FATEs",$"{zones.Count} zones, {zones.Sum(zone=>zone.Events.Count)} FATEs")
                 :Diagnostics.SelfCheck.Failed("FATEs","nothing read"))),
+            // X-213 (0.1781): the shared FATE zones and their gemstone traders' items by rank, from the sheets.
+            Page("shared FATEs",()=>Task.FromResult(SharedFatesLoad?.Invoke() is { Count:>0 } sharedZones
+                ? Diagnostics.SelfCheck.Ok("shared FATEs",$"{sharedZones.Count} zones, {sharedZones.Count(zone=>zone.TraderKnown)} with a trader, {sharedZones.Sum(zone=>zone.Rewards.Count)} items, highest ranks {string.Join("/",sharedZones.Select(zone=>zone.MaxRank).Distinct())}")
+                :Diagnostics.SelfCheck.Failed("shared FATEs","nothing read"))),
             Page("deep dungeons",()=>Task.FromResult(DeepDungeonLoad?.Invoke() is { Count:>0 } dungeons
                 ? (dungeons.SelectMany(dungeon=>dungeon.Pomanders.Concat(dungeon.Others)).Any(thing=>thing.Tooltip.Contains('<'))
                     ? Diagnostics.SelfCheck.Suspect("deep dungeons","a text kept a macro")
@@ -68,6 +72,28 @@ internal sealed partial class MainWindow
                 :read.Count(entry=>entry.IssuerName.Length>0) is var named && named*2<read.Count
                     ? Diagnostics.SelfCheck.Suspect("quest givers",$"{named} givers named of {read.Count} quests")
                     :Diagnostics.SelfCheck.Ok("quest givers",$"{read.Count} quests: {named} givers named, {read.Count(TenshoAssistant.Quests.QuestPlaces.HasGiverPlace)} placed, {read.Count(entry=>entry.EndName.Length>0)} end NPCs, {read.Count(entry=>entry.Jobs.Length>0)} with jobs, {read.Count(entry=>entry.Society.Length>0)} allied society"))),
+            // X-746 (0.1766) and X-745 (0.1767): the Beastmaster's data as read in the game (worked out off the frame at load: waited for, ten
+            // seconds at most): one action Borrow gives per family of the beasts, the beasts caught in a zone or a duty.
+            Page("beastmaster borrow and items",async ()=>
+            {
+                for(var wait=0;wait<100 && Beasts?.State is { Catalog:null,Error:null };wait++)await Task.Delay(100);
+                if(Beasts?.State is not { Catalog:{ } beasts })return Diagnostics.SelfCheck.NotRead("beastmaster borrow and items",Beasts?.State.Error ?? "Beastmaster data not read yet");
+                var families=beasts.Beasts.Select(beast=>beast.FamilyId).Where(family=>family>0).Distinct().Count();
+                var text=$"{beasts.Beasts.Count} beasts, {beasts.Boards.Count} boards, {beasts.Borrows.Count} Borrow actions for {families} families, "
+                    +$"{beasts.Beasts.Count(beast=>beast.CatchKind==TenshoAssistant.Beastmaster.BeastCapture.InZone)} caught in a zone, {beasts.Beasts.Count(beast=>beast.CatchKind==TenshoAssistant.Beastmaster.BeastCapture.InDuty)} in a duty";
+                // X-744 (0.1768): the ephemeral items, the feeds whose families were read, the guide's rules.
+                var feeds=beasts.Items.Where(item=>item.Kind==TenshoAssistant.Beastmaster.BeastItems.Feed).ToArray();
+                var unread=feeds.Count(feed=>feed.Families.Count==0);
+                text+=$"; {beasts.Items.Count} ephemeral items ({string.Join("+",beasts.ItemKinds.OrderBy(kind=>kind.Key).Select(kind=>beasts.Items.Count(item=>item.Kind==kind.Key)))}), {feeds.Length-unread} of {feeds.Length} feeds with their families, {beasts.Rules.Count} guide rules";
+                // X-744 (0.1770): the boards' spaces that are not fights, the campsites' places, the random spaces' options, the satiety.
+                var spaces=beasts.Spaces.Values.SelectMany(list=>list).ToArray();
+                int Count(int kind)=>spaces.Count(space=>space.Kind==kind);
+                var camps=spaces.Where(space=>space.Kind==TenshoAssistant.Beastmaster.BeastSpaces.Campsite).ToArray();
+                text+=$"; {beasts.Spaces.Count} boards with {spaces.Length} spaces ({Count(TenshoAssistant.Beastmaster.BeastSpaces.Shop)} shops, {camps.Length} campsites with {camps.Count(camp=>camp.Places>0)} places read, "
+                    +$"{Count(TenshoAssistant.Beastmaster.BeastSpaces.Treasure)} treasures, {Count(TenshoAssistant.Beastmaster.BeastSpaces.Random)} random with {spaces.Count(space=>space.Options.Count>0)} read), {beasts.Beasts.Count(beast=>beast.Satiety>0)} beasts with a satiety";
+                var spacesBad=beasts.Spaces.Count==0 || camps.Any(camp=>camp.Places==0) || spaces.Any(space=>space.Kind==TenshoAssistant.Beastmaster.BeastSpaces.Random && space.Options.Count==0) || beasts.Beasts.Any(beast=>beast.Satiety==0);
+                return beasts.Borrows.Count!=families || unread>0 || beasts.Items.Count==0 || spacesBad ? Diagnostics.SelfCheck.Suspect("beastmaster borrow and items",text):Diagnostics.SelfCheck.Ok("beastmaster borrow and items",text);
+            }),
             Page("lexicon",()=>Task.FromResult(LexiconLoad?.Invoke() is { Count:>0 } words
                 ? Diagnostics.SelfCheck.Ok("lexicon",$"{words.Count} words, {words.Select(word=>word.Kind).Distinct().Count()} kinds")
                 :Diagnostics.SelfCheck.Failed("lexicon","nothing read"))),

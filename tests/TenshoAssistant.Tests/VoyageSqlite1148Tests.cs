@@ -5,7 +5,8 @@ using TenshoAssistant.FreeCompany;
 // 0.1148 (X-173, user's choice of 12/11): the voyage history in the player's data file, TenshoData.db, beside the gil journal and the achievement
 // progress (D-141). Behaviour tests (R28): real files in a temporary folder; the file of before converted whole in one transaction or not at all; a
 // stop inside the conversion; a stop between the conversion and the move of the old file; an unreadable old file; a data file that blocks (newer
-// layout); a data file that cannot be created (JSON as before); two writers at once; the desktop application's copy reading it.
+// layout); a data file that cannot be created (JSON as before); two writers at once; the desktop application's copy reading it. X-574 (0.1793,
+// the user's choice of 17/11): the file of before is no longer converted: left aside, never read, moved nor removed (the cases say that now).
 internal static class VoyageSqlite1148Tests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
@@ -18,7 +19,7 @@ internal static class VoyageSqlite1148Tests
         try{run(root,Path.Combine(root,"VoyageHistory.json"),Path.Combine(root,TenshoDataDatabase.FileName));}
         finally{SqliteConnection.ClearAllPools();try{Directory.Delete(root,true);}catch(IOException){}catch(UnauthorizedAccessException){}}
     }
-    private static TenshoDataFile Data(string database,List<string>? warnings=null)=>new(database,(error,message)=>warnings?.Add(message+" "+error.Message));
+    private static TenshoDataFile Data(string database,List<string>? warnings=null,List<string>? said=null)=>new(database,(error,message)=>warnings?.Add(message+" "+error.Message),said is null ? null:line=>{if(line.EndsWith("(X-574).",StringComparison.Ordinal))said.Add(line);});
     private static VoyageRecord Voyage(ulong house,int slot,DateTimeOffset registered,DateTimeOffset? back,params (uint Item,int Count)[] loot)
         =>new(house,slot%2==0 ? VesselKind.Submarine:VesselKind.Airship,slot,"Vessel \""+slot+"\" ×",50+slot,registered,back,[1u,5u,9u],["Deep-sea Site 1","The Ivory Shoals"],
             loot.Select(entry=>new VoyageLoot(entry.Item,entry.Count)).ToArray());
@@ -40,50 +41,49 @@ internal static class VoyageSqlite1148Tests
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
-        ("Voyages SQLite 1148: the file of before converted whole, kept aside byte for byte, the same after a restart; a save replaces the history",() => InTemp((root,file,database) =>
+        ("Voyages SQLite 1148: a file of before is left aside, never read nor moved (X-574); the history saved, the same after a restart; a save writes by key",() => InTemp((root,file,database) =>
         {
             VoyageHistory.Write(file,Sample());var bytes=File.ReadAllBytes(file);
-            var data=new VoyageHistoryData(file,Data(database));
+            var said=new List<string>();
+            var data=new VoyageHistoryData(file,Data(database,said:said));
             Check(data.Mode=="sqlite","SQLite in use: "+data.Mode);
-            Check(Same(data.Load(At),Sample()),"same voyages after the conversion (ids above long.MaxValue, no return time, quotes in names)");
-            Check(!File.Exists(file) && Aside(root) is [var kept] && File.ReadAllBytes(kept).SequenceEqual(bytes),"the file of before kept aside, unchanged");
-            Check(Same(new VoyageHistoryData(file,Data(database)).Load(At),Sample()),"after a restart");
+            Check(data.Load(At).Count==0,"nothing read from the file of before");
+            Check(File.ReadAllBytes(file).SequenceEqual(bytes) && Aside(root).Length==0,"the file of before in place, unchanged, nothing set aside");
+            Check(said.SequenceEqual(["Voyage history: a file of an old format (VoyageHistory.json) was left aside, not read (X-574)."]),"said once: "+string.Join(" | ",said));
+            data.Save(Sample());
+            Check(Same(new VoyageHistoryData(file,Data(database)).Load(At),Sample()),"saved (ids above long.MaxValue, no return time, quotes in names), the same after a restart");
             var added=Voyage(17,3,At.AddHours(3),At.AddHours(30),(5,5));
             data.Save(Sample().Skip(1).Append(added).ToList());
             Check(Same(new VoyageHistoryData(file,Data(database)).Load(At),Sample().Append(added).ToList()),"a save writes its voyages by key, the others kept (X-182)");
+            Check(said.Count==1 && File.ReadAllBytes(file).SequenceEqual(bytes),"said once; the file of before never written");
             using var open=new TenshoDataDatabase(database).Open();
-            Check(TenshoDataDatabase.Converted(open,VoyageHistoryData.Family),"marked converted");
+            Check(Convert.ToInt64(TenshoDataDatabase.Scalar(open,"SELECT COUNT(*) FROM converted;"))==0,"no « converted » mark written");
         })),
-        ("Voyages SQLite 1148: a stop inside the conversion leaves the file of before in place and nothing marked; the next start converts it",() => InTemp((root,file,database) =>
+        ("Voyages SQLite 1148: a stop inside a save leaves the last save whole; the file of before stays as it is",() => InTemp((root,file,database) =>
         {
-            VoyageHistory.Write(file,Sample());
+            VoyageHistory.Write(file,Sample().Take(1).ToList());var bytes=File.ReadAllBytes(file);
+            new VoyageHistoryData(file,Data(database)).Save(Sample());
             var data=new VoyageHistoryData(file,Data(database)){DuringSave=()=>throw new IOException("stop inside the transaction")};
-            Check(Throws<IOException>(()=>data.Load(At)),"the stop is seen");
-            Check(File.Exists(file) && Aside(root).Length==0,"the file of before stays");
-            using(var open=new TenshoDataDatabase(database).Open())
-            {
-                Check(!TenshoDataDatabase.Converted(open,VoyageHistoryData.Family) && Convert.ToInt64(TenshoDataDatabase.Scalar(open,"SELECT COUNT(*) FROM voyage_records;"))==0,"no row, no mark");
-            }
-            // Relay 37 (0.1205): a save that finds it not converted converts it first: its voyages kept, never written over.
-            new VoyageHistoryData(file,Data(database)).Save(Sample().Take(1).ToList());
-            Check(!File.Exists(file) && Aside(root).Length==1,"converted by the save, then set aside");
-            Check(Same(new VoyageHistoryData(file,Data(database)).Load(At),Sample()),"every voyage of the file kept");
+            var changed=Sample();changed[1]=changed[1] with {Loot=[new VoyageLoot(8,8)]};
+            Check(Throws<IOException>(()=>data.Save(changed)),"the stop is seen");
+            Check(Same(new VoyageHistoryData(file,Data(database)).Load(At),Sample()),"the save of before whole");
+            Check(File.ReadAllBytes(file).SequenceEqual(bytes) && Aside(root).Length==0,"the file of before stays, unchanged");
         })),
-        ("Voyages SQLite 1148: a stop between the conversion and the move never brings the old history back over newer",() => InTemp((root,file,database) =>
+        ("Voyages SQLite 1148: an old file found again never brings the old history back over newer",() => InTemp((root,file,database) =>
         {
-            VoyageHistory.Write(file,Sample());
-            var data=new VoyageHistoryData(file,Data(database));data.Load(At);
+            var data=new VoyageHistoryData(file,Data(database));
             var newer=Sample();newer[0]=newer[0] with {Loot=[new VoyageLoot(7,7)]};data.Save(newer);
-            File.Copy(Aside(root)[0],file);
+            VoyageHistory.Write(file,Sample());var bytes=File.ReadAllBytes(file);
             Check(Same(new VoyageHistoryData(file,Data(database)).Load(At),newer),"newer history kept");
-            Check(!File.Exists(file) && Aside(root).Length==2,"the old file set aside again, both copies kept");
+            Check(File.ReadAllBytes(file).SequenceEqual(bytes) && Aside(root).Length==0,"the old file left where it is, unchanged");
         })),
         ("Voyages SQLite 1148: an unreadable file of before, a blocked data file, no data file: never written over",() => InTemp((root,file,database) =>
         {
             File.WriteAllText(file,"{ not json");
             var warnings=new List<string>();
             var store=new VoyageHistoryStore(file,(_,message)=>warnings.Add(message),Data(database));
-            Check(store.Unavailable && store.Records.Count==0 && warnings.Count==1,"unreadable: unavailable, said once");
+            // X-574 (0.1793): the file of before is not read: the history (the data file's) stays usable.
+            Check(!store.Unavailable && store.Records.Count==0 && warnings.Count==0,"unreadable file of before: not read, the history usable");
             Check(File.ReadAllText(file)=="{ not json" && Aside(root).Length==0,"left where it is");
             File.Delete(file);
             using(var open=new TenshoDataDatabase(database).Open())TenshoDataDatabase.Run(open,"PRAGMA user_version=9;");
@@ -114,9 +114,11 @@ internal static class VoyageSqlite1148Tests
             Check(!app.Unavailable && Same(app.Records,VoyageHistory.Prune(saved,DateTimeOffset.UtcNow)),"the application shows the same voyages");
             // X-413 (0.1385): line ends normalised first; « A && CRLF || LF » never checked A on an LF tree.
             var window=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.DesktopData.cs")).Replace("\r\n","\n");
-            Check(window.Contains("new FreeCompany.VoyageHistoryStore(json,warn,!File.Exists(json) && File.Exists(file) ? new TenshoDataFile(file,warn):null)")
+            // X-574 (0.1793): the copy of the data file whenever there is one (a VoyageHistory.json of before left in the plugin's folder is no
+            // longer moved: it must never win); the JSON copy only without it (the plugin's JSON mode).
+            Check(window.Contains("new FreeCompany.VoyageHistoryStore(json,warn,File.Exists(file) ? new TenshoDataFile(file,warn):null)")
                 && window.Contains("UseDesktopPlayerData(folder,warn);\n                UseDesktopVoyages(folder,warn);"),
-                "the app reads its copy of the data file once converted, the JSON copy before, never converting it itself");
+                "the app reads its copy of the data file when there is one, the JSON copy otherwise, never converting it");
             // X-153 (0.1403): the store is created in the voyages family (Plugin.Voyages.cs), called after the persistence family.
             var plugin=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"));
             var voyages=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Voyages.cs"));

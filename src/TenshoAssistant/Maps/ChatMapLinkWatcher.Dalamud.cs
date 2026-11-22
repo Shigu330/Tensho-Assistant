@@ -41,7 +41,9 @@ public sealed class ChatMapLinkWatcher : IDisposable
             foreach(var payload in message.Message.Payloads)
             {
                 if(payload is not MapLinkPayload link)continue;
-                History.Add(new(DateTimeOffset.UtcNow,Group(message.LogKind),message.Sender.TextValue.Trim(),link.TerritoryType.RowId,link.Map.RowId,
+                // X-754 (0.1737): the sender written as the chat window reads it (its world « @World », the game's number and job glyphs), so
+                // that capture mode gives the same stand-in as the chat window (ChatFormat.LinkSender).
+                History.Add(new(DateTimeOffset.UtcNow,Group(message.LogKind),Chat.ChatPayloads.Text(message.Sender.Payloads.Select(Chat.ChatReader.Payload)).Trim(),link.TerritoryType.RowId,link.Map.RowId,
                     link.XCoord,link.YCoord,link.PlaceName));
             }
             warned=false;

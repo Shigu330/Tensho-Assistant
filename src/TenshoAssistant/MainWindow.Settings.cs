@@ -67,6 +67,7 @@ internal sealed partial class MainWindow
         BoolSetting("Settings.HelpBanners","SettingTips.HelpBanners",()=>configuration.HelpBanners,value=>configuration.HelpBanners=value,c=>c.HelpBanners);
         // 0.327 (queue step e): opening page, shared row (tooltip and « ↺ »); turning it on remembers the current page at once.
         BoolSetting("Settings.OpenOnLastPage","SettingTips.OpenOnLastPage",()=>configuration.OpenOnLastPage,value=>{configuration.OpenOnLastPage=value;rememberedPage=null;RememberPage();},c=>c.OpenOnLastPage);
+        DrawCloseOnGameWindowSetting();
     }
     private void DrawLanguageSetting()
     {
@@ -125,11 +126,16 @@ internal sealed partial class MainWindow
             BoolSetting("Settings.HoverCollection","Settings.HoverCollectionTip",()=>configuration.HoverShowCollection,value=>configuration.HoverShowCollection=value,c=>c.HoverShowCollection);
             BoolSetting("Settings.HoverStock","Settings.HoverStockTip",()=>configuration.HoverShowStock,value=>configuration.HoverShowStock=value,c=>c.HoverShowStock);
             BoolSetting("Settings.HoverUsages","Settings.HoverUsagesTip",()=>configuration.HoverShowUsages,value=>configuration.HoverShowUsages=value,c=>c.HoverShowUsages);
+            // X-197 (0.1761): the item's desynthesis against your level; what a coffer holds that a collection tracks.
+            BoolSetting("Settings.HoverDesynth","Settings.HoverDesynthTip",()=>configuration.HoverShowDesynth,value=>configuration.HoverShowDesynth=value,c=>c.HoverShowDesynth);
+            BoolSetting("Settings.HoverCoffer","Settings.HoverCofferTip",()=>configuration.HoverShowCoffer,value=>configuration.HoverShowCoffer=value,c=>c.HoverShowCoffer);
             BoolSetting("Settings.HoverSources","Settings.HoverSourcesTip",()=>configuration.HoverShowSources,value=>configuration.HoverShowSources=value,c=>c.HoverShowSources);
             // 0.377 (g, M-07): comparison with the worn piece.
             BoolSetting("Settings.HoverCompare","Settings.HoverCompareTip",()=>configuration.HoverShowCompare,value=>configuration.HoverShowCompare=value,c=>c.HoverShowCompare);
         }
         finally{ImGui.EndDisabled();ImGui.Unindent();}
+        // X-725 (0.1731): the market prices on hover (Universalis), beside the item uses on hover.
+        DrawMarketHoverSettings();
         // 0.705 (user request): NPC vendors in item tooltips, set as the list panels are. X-76 step 3 (0.952): out of the « item uses » block,
         // Tensho's own item tooltips (How to get, collection) use it whether that panel is on or not.
         BoolSetting("Settings.HoverVendors","Settings.HoverVendorsTip",()=>configuration.HoverVendors,value=>configuration.HoverVendors=value,c=>c.HoverVendors);
@@ -158,6 +164,7 @@ internal sealed partial class MainWindow
         // X-76 H5 (0.915): shared combo row; an unknown saved value is shown as the data centre (MarketScopeShown).
         ComboSetting("Settings.MarketScope","Settings.MarketScopeTip",()=>MarketScopeShown,value=>configuration.MarketBoardScope=value,
             Enum.GetValues<TenshoAssistant.Market.MarketScope>().Select(scope=>(scope,localization.Get("Settings.MarketScope"+scope))).ToArray(),DefaultConfiguration.MarketBoardScope,200);
+        DrawUndercutSetting();
     }
 
     // X-100 (0.999, DEC-048): the panels beside the game's windows (X-449: then each tool's aids, in their own categories).
@@ -165,15 +172,9 @@ internal sealed partial class MainWindow
     {
         BoolSetting("DutyFinder.Setting","Advanced.DutyFinderTip",()=>configuration.ShowDutyFinderLoot,value=>configuration.ShowDutyFinderLoot=value,c=>c.ShowDutyFinderLoot);
         BoolSetting("CharacterStats.Setting","Advanced.CharacterPanelTip",()=>configuration.ShowCharacterPanel,value=>configuration.ShowCharacterPanel=value,c=>c.ShowCharacterPanel);
+        DrawRetainerSalesSetting();
         BoolSetting("Advanced.HidePanelsBehindGame","Advanced.HidePanelsBehindGameTip",()=>configuration.HidePanelsBehindGame,value=>configuration.HidePanelsBehindGame=value,c=>c.HidePanelsBehindGame);
         BoolSetting("Advanced.HideBarsBehindGame","Advanced.HideBarsBehindGameTip",()=>configuration.HideBarsBehindGame,value=>configuration.HideBarsBehindGame=value,c=>c.HideBarsBehindGame);
-    }
-
-    // X-100 (0.999, DEC-048): alarms, their game commands, and the server bar entries (also on their own pages).
-    private void DrawTrackingServerBarSettings()
-    {
-        BoolSetting("Currencies.ServerBar","Currencies.ServerBarTip",()=>configuration.CurrencyServerBar,value=>configuration.CurrencyServerBar=value,c=>c.CurrencyServerBar);
-        BoolSetting("GilJournal.ServerBar","GilJournal.ServerBarTip",()=>configuration.GilServerBar,value=>configuration.GilServerBar=value,c=>c.GilServerBar);
     }
 
     // X-100 (0.999, DEC-048): a search among every setting of this page (SettingsIndex, kept in step with the code by a test); a click opens its tab.

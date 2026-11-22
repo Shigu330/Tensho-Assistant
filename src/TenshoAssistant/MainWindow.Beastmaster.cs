@@ -19,6 +19,16 @@ internal sealed partial class MainWindow
     private (BeastSort Sort, bool Descending) beastSort = (BeastSort.Name, false);
     private (object? Catalog, object? Obtained, string Query, string? Family, bool Only, int Rank, BeastSort Sort, bool Descending) beastViewKey;
     private IReadOnlyList<Beast> beastView = [];
+    // X-745 (0.1767): the « To capture » tab: only the beasts not captured yet (on by default), its rows worked out when something changes.
+    private bool beastCaptureMissing = true;
+    private (object? Catalog, object? Obtained, bool Missing) beastCaptureKey;
+    private IReadOnlyList<Beast> beastCaptureRows = [];
+    // X-744 (0.1768): the « Ephemeral items » tab: a search, one family's feeds (0: every family), the lists worked out when something changes.
+    private string beastItemQuery = string.Empty;
+    private int beastItemFamily;
+    private (object? Catalog, int Family, string Query) beastItemKey;
+    private IReadOnlyDictionary<int, IReadOnlyList<BeastItem>> beastItemLists = new Dictionary<int, IReadOnlyList<BeastItem>>();
+    private (int Id, string Name)[] beastItemFamilies = [];
 
     private void DrawBeastmaster()
     {
@@ -28,7 +38,9 @@ internal sealed partial class MainWindow
         DetailTabs("BeastTabs",
         [
             ("Beasts", localization.Get("BeastUi.Beasts"), () => DrawBeastList(state, catalog)),
+            ("Capture", localization.Get("BeastUi.Capture"), () => DrawBeastCapture(state, catalog)),
             ("Boards", localization.Get("BeastUi.Boards"), () => DrawBeastBoards(catalog)),
+            ("Items", localization.Get("BeastUi.Items"), () => DrawBeastItems(catalog)),
             ("Team", localization.Get("BeastUi.Team"), () => DrawBeastTeam(state, catalog)),
         ], ref beastTabFocus);
     }
@@ -68,6 +80,8 @@ internal sealed partial class MainWindow
         var obtained = state.Obtained;
         if (obtained is null) ImGui.TextDisabled(localization.Get(state.ObtainedUnavailable ? "BeastUi.ObtainedFailed" : "BeastUi.ObtainedUnknown"));
         else ImGui.TextDisabled(localization.Format("BeastUi.ObtainedCount", obtained.Count, catalog.Beasts.Count));
+        // X-764 M3 (review of 0.1751): the effects' columns no longer hold flags (a game update): said once here, no beast shows « none ».
+        if (catalog.EffectsUnavailable) ImGui.TextDisabled(localization.Get("BeastUi.EffectsUnavailable"));
         ImGui.SetNextItemWidth(200); ImGui.InputTextWithHint("##BeastQuery", localization.Get("BeastUi.Search"), ref beastQuery, 64); Tip("BeastUi.SearchTip");
         ImGui.SameLine();
         ImGui.SetNextItemWidth(150);
@@ -77,7 +91,11 @@ internal sealed partial class MainWindow
             {
                 if (ImGui.Selectable(localization.Get("BeastUi.AllFamilies"), beastFamily is null)) beastFamily = null;
                 foreach (var family in catalog.Beasts.Select(beast => beast.Family).Where(name => name.Length > 0).Distinct().Order())
-                    if (ImGui.Selectable(family, beastFamily == family)) beastFamily = family;
+                {
+                    // X-746 (0.1766): each family with the action Borrow gives with it (the game's name).
+                    var borrowed = catalog.Beasts.FirstOrDefault(beast => beast.Family == family) is { } member ? catalog.BorrowOf(member) : null;
+                    if (ImGui.Selectable(borrowed is null ? family : $"{family} · {borrowed.Name}##{family}", beastFamily == family)) beastFamily = family;
+                }
             }
             finally { ImGui.EndCombo(); }
         }
@@ -86,6 +104,9 @@ internal sealed partial class MainWindow
         ImGui.SetNextItemWidth(90); if (ImGui.InputInt(localization.Get("BeastUi.Rank") + "##BeastRank", ref beastRank)) beastRank = Math.Clamp(beastRank, 1, Math.Max(1, catalog.Beasts.Max(beast => beast.Ranks.Count))); Tip("BeastUi.RankTip");
         ImGui.SameLine();
         ImGui.Checkbox(localization.Get("BeastUi.OnlyObtained"), ref beastOnlyObtained); Tip("BeastUi.OnlyObtainedTip");
+        // X-746 (0.1766): the family chosen: the action Borrow gives with its beasts, its icon, name and effect (the game's texts).
+        if (beastFamily is not null && catalog.Beasts.FirstOrDefault(beast => beast.Family == beastFamily) is { } chosen && catalog.BorrowOf(chosen) is { } borrow)
+            DrawBeastBorrowLine(catalog, borrow);
         var key = ((object?)catalog, (object?)obtained, beastQuery, beastFamily, beastOnlyObtained, beastRank, beastSort.Sort, beastSort.Descending);
         if (key != beastViewKey) { beastViewKey = key; beastView = catalog.View(beastQuery, beastFamily, beastOnlyObtained, obtained, beastRank, beastSort.Sort, beastSort.Descending); }
         var flags = ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Sortable | ImGuiTableFlags.SizingStretchProp;
@@ -114,7 +135,9 @@ internal sealed partial class MainWindow
                 // X-135 (0.1163): the beast's rank when read (team window or board result).
                 if (BeastRanks?.TryGetValue(beast.Id, out var rankKnown) == true) { ImGui.SameLine(); ImGui.TextDisabled(localization.Format("BeastUi.KnownRank", rankKnown)); }
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(beast.Family);
+                DrawBeastBorrowIcon(catalog, beast);
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(beast.AutoAttack.Length > 0 ? beast.AutoAttack : localization.Get("BeastUi.Magical"));
+                DrawBeastEffects(catalog, beast);
                 var stats = beast.At(beastRank);
                 foreach (var value in new[] { stats?.Strength, stats?.Intelligence, stats?.PhysicalResistance, stats?.MagicalResistance, stats?.Vitality })
                 { ImGui.TableNextColumn(); ImGui.TextUnformatted(value?.ToString() ?? "?"); }
@@ -290,6 +313,19 @@ internal sealed partial class MainWindow
         var totals = result.Total is { } total ? " · " + localization.Format("BeastUi.ResultTotal", result.Bonus ?? 0, result.Bonuses ?? 0, total) : "";
         if (!TenshoAssistant.UI.UiComponents.Header(localization.Format("BeastUi.ResultTitle", result.At.ToLocalTime().ToString("g"), result.Score) + totals + "###BeastResult", ImGuiTreeNodeFlags.None)) return;
         DrawBeastResultLines(result);
+        // X-135 (0.1771): the window's rewards (« Récompenses »): each item, its icon and its count (to confirm against the game's window);
+        // « not read » for a result kept before, or numbers never seen (R08), never « none ».
+        if (result.Rewards is { } rewards)
+        {
+            TenshoAssistant.UI.UiComponents.SubTitle(localization.Get("BeastUi.ResultRewards"));
+            foreach (var reward in rewards)
+            {
+                DrawSmallGameIcon(reward.Icon); ImGui.SameLine();
+                ImGui.TextUnformatted(localization.Format("BeastUi.ResultReward", itemCatalog.State.Catalog?.Find(reward.Item)?.Name ?? $"#{reward.Item}", reward.Count));
+                TipText(() => localization.Get("BeastUi.ResultRewardTip"));
+            }
+        }
+        else ImGui.TextDisabled(localization.Get("BeastUi.ResultRewardsUnread"));
         foreach (var gain in result.Beasts)
         {
             var beast = catalog.Beasts.FirstOrDefault(row => row.Id == gain.Beast);
@@ -498,6 +534,183 @@ internal sealed partial class MainWindow
     /// drawn when the element has no icon, in the desktop application (no game font) or once the renderer failed (said once in the log):
     /// the word alone stays.
     /// </summary>
+    // X-755 (0.1750, the user's reading R-X-553): the effects a beast inflicts, after the text on its line: the game's icons in the game's order
+    // (BeastEffects, as the game's « Formation de l'équipe »), each named on hover in the client's words; nothing for a beast that inflicts none.
+    private void DrawBeastEffects(BeastCatalog catalog, Beast beast)
+    {
+        if (beast.Effects.Count == 0) return;
+        var side = new Vector2(ImGui.GetTextLineHeight());
+        foreach (var at in beast.Effects)
+        {
+            ImGui.SameLine();
+            DrawGameIcon(BeastEffects.Order[at].Icon, side);
+            if (at < catalog.EffectNames.Count && catalog.EffectNames[at].Length > 0) TipText(catalog.EffectNames[at]);
+        }
+    }
+
+    // X-745 (0.1767, the user's idea I-027): the beasts to capture, those of the open world first, then those of duties: where the game says
+    // they are caught, the places seen in game (a click shows the first on Tensho's map, a right click gives every place's flag, aetheryte
+    // and map), their two techniques. A list only, nothing in combat.
+    private void DrawBeastCapture(BeastState state, BeastCatalog catalog)
+    {
+        var obtained = state.Obtained;
+        if (BeastCapture.Missing(catalog.Beasts, obtained) is { } missing) ImGui.TextDisabled(localization.Format("BeastUi.CaptureCount", missing));
+        else ImGui.TextDisabled(localization.Get(state.ObtainedUnavailable ? "BeastUi.ObtainedFailed" : "BeastUi.ObtainedUnknown"));
+        ImGui.Checkbox(localization.Get("BeastUi.CaptureMissing"), ref beastCaptureMissing); Tip("BeastUi.CaptureMissingTip");
+        var key = ((object?)catalog, (object?)obtained, beastCaptureMissing);
+        if (key != beastCaptureKey) { beastCaptureKey = key; beastCaptureRows = BeastCapture.Rows(catalog.Beasts, obtained, beastCaptureMissing); }
+        if (beastCaptureRows.Count == 0) { EmptyState("BeastUi.CaptureNone"); return; }
+        if (!TenshoAssistant.UI.UiComponents.BeginDataTable("BeastCaptureTable", 4, scrollHeight: Math.Max(200, ImGui.GetContentRegionAvail().Y))) return;
+        try
+        {
+            ImGui.TableSetupColumn(localization.Get("BeastUi.Name"), ImGuiTableColumnFlags.WidthStretch);
+            ImGui.TableSetupColumn(localization.Get("BeastUi.CatchPlace"));
+            ImGui.TableSetupColumn(localization.Get("BeastUi.CaptureWhere"));
+            ImGui.TableSetupColumn(localization.Get("BeastUi.CaptureTechniques"));
+            ImGui.TableSetupScrollFreeze(0, 1);
+            TenshoAssistant.UI.UiComponents.HeadersRow([localization.Get("BeastUi.Name"), localization.Get("BeastUi.CatchPlace"), localization.Get("BeastUi.CaptureWhere"), localization.Get("BeastUi.CaptureTechniques")], _ => false);
+            var kind = -1;
+            foreach (var beast in beastCaptureRows)
+            {
+                if (beast.CatchKind != kind)
+                {
+                    kind = beast.CatchKind;
+                    ImGui.TableNextRow(); ImGui.TableNextColumn();
+                    TenshoAssistant.UI.UiComponents.SubTitle(localization.Get(kind == BeastCapture.InZone ? "BeastUi.CaptureInZone" : "BeastUi.CaptureInDuty"));
+                }
+                ImGui.TableNextRow(); ImGui.TableNextColumn();
+                ImGui.PushID((int)beast.Id);
+                try
+                {
+                    DrawSmallGameIcon(beast.Icon);
+                    var known = obtained?.Contains(beast.Id);
+                    DrawStateMark(known); ImGui.SameLine();
+                    ImGui.TextColored(known == true ? Success : known == false ? Muted : Accent, beast.Name);
+                    ImGui.SameLine(); ImGui.TextDisabled(beast.Family);
+                    DrawBeastBorrowIcon(catalog, beast);
+                    ImGui.TableNextColumn(); ImGui.TextUnformatted(beast.CatchPlace);
+                    ImGui.TableNextColumn(); DrawBeastCapturePlaces(beast);
+                    ImGui.TableNextColumn(); ImGui.TextUnformatted(localization.Format("BeastUi.CaptureTechniquesLine", beast.Assault, beast.Volley));
+                }
+                finally { ImGui.PopID(); }
+            }
+        }
+        finally { ImGui.EndTable(); }
+    }
+
+    // X-745 (0.1767): the first place seen (its zone and coordinates) as a link to Tensho's map, the others in the right-click menu.
+    private void DrawBeastCapturePlaces(Beast beast)
+    {
+        if (beast.CatchKind != BeastCapture.InZone) { ImGui.TextDisabled(localization.Get("BeastUi.CaptureInDutyPlace")); return; }
+        var places = BeastPlacesOf(beast.Id);
+        if (places.Count == 0) { ImGui.TextDisabled(localization.Get("BeastUi.CaptureNotSeen")); Tip("BeastUi.CaptureNotSeenTip"); return; }
+        var first = places[0];
+        var text = NpcPlace(first) + (places.Count > 1 ? localization.Format("BeastUi.CaptureMore", places.Count - 1) : "");
+        if (ImGui.Selectable(text) && maps.State.Catalog?.Find(first.MapId) is { } map)
+        { ShowMapOnTenshoMap(map.MapId); mapCenterRequest = Maps.MapProjection.PixelFromCoordinate(new Vector2(first.X, first.Y), map); mapViewFollow = false; }
+        Tip("BeastUi.CapturePlaceTip");
+        NpcMenu($"BeastCapture{beast.Id}", beast.Name, 0, places);
+    }
+
+    // X-744 (0.1768, the user's idea I-026, first part): the Crucible's ephemeral items as the game describes them, by kind; the feeds one
+    // family can eat (the families named in each feed's description); the game's own rules of the board's spaces (campsite, shop, treasure,
+    // random) and of each kind of item. Display only, nothing sent to the game (R03.3).
+    private void DrawBeastItems(BeastCatalog catalog)
+    {
+        if (catalog.Items.Count == 0) { EmptyState("BeastUi.ItemsNone"); return; }
+        var key = ((object?)catalog, beastItemFamily, beastItemQuery);
+        if (key != beastItemKey)
+        {
+            beastItemKey = key;
+            beastItemFamilies = catalog.Beasts.Where(beast => beast.FamilyId > 0 && beast.Family.Length > 0).GroupBy(beast => beast.FamilyId).OrderBy(group => group.Key).Select(group => (group.Key, group.First().Family)).ToArray();
+            beastItemLists = new[] { BeastItems.Gear, BeastItems.CrucibleItem, BeastItems.Feed }.ToDictionary(kind => kind, kind => BeastItems.Of(catalog.Items, kind, beastItemFamily, beastItemQuery));
+        }
+        ImGui.SetNextItemWidth(200); ImGui.InputTextWithHint("##BeastItemQuery", localization.Get("BeastUi.Search"), ref beastItemQuery, 64); Tip("BeastUi.ItemSearchTip");
+        ImGui.SameLine(); ImGui.SetNextItemWidth(220);
+        var chosen = beastItemFamilies.FirstOrDefault(family => family.Id == beastItemFamily).Name;
+        if (ImGui.BeginCombo("##BeastItemFamily", chosen ?? localization.Get("BeastUi.ItemAllFamilies")))
+        {
+            try
+            {
+                if (ImGui.Selectable(localization.Get("BeastUi.ItemAllFamilies"), beastItemFamily == 0)) beastItemFamily = 0;
+                foreach (var (id, name) in beastItemFamilies) if (ImGui.Selectable(name, beastItemFamily == id)) beastItemFamily = id;
+            }
+            finally { ImGui.EndCombo(); }
+        }
+        Tip("BeastUi.ItemFamilyTip");
+        if (TenshoAssistant.UI.UiComponents.Header(localization.Get("BeastUi.ItemSpaces"), ImGuiTreeNodeFlags.None))
+            foreach (var rule in catalog.Rules.Where(rule => rule.Key is "Campsite" or "Shop" or "Treasure" or "Random")) DrawBeastRule(rule);
+        foreach (var kind in new[] { BeastItems.Gear, BeastItems.CrucibleItem, BeastItems.Feed })
+        {
+            var shown = beastItemLists.GetValueOrDefault(kind) ?? [];
+            var title = catalog.ItemKinds.TryGetValue(kind, out var name) ? name : localization.Get("BeastUi.ItemKind" + kind);
+            if (!TenshoAssistant.UI.UiComponents.Header($"{title} ({shown.Count})##BeastItemKind{kind}", kind == BeastItems.Feed ? ImGuiTreeNodeFlags.DefaultOpen : ImGuiTreeNodeFlags.None)) continue;
+            var guideKey = kind == BeastItems.Gear ? "Gear" : kind == BeastItems.CrucibleItem ? "CrucibleItem" : "Feed";
+            if (catalog.Rules.FirstOrDefault(rule => rule.Key == guideKey) is { } guide) DrawBeastRule(guide);
+            // X-770 (0.1769): with a family chosen, the feeds whose families were not read are kept, and the page says how many.
+            if (kind == BeastItems.Feed && beastItemFamily > 0 && shown.Count(BeastItems.FamiliesUnread) is var unread and > 0)
+                ImGui.TextColored(Warning, localization.Format("BeastUi.ItemFamiliesUnreadKept", unread));
+            foreach (var item in shown) DrawBeastItem(item);
+        }
+    }
+
+    // X-744 (0.1768): one item: the game's icon and name, its effect, and for a feed the families that can eat it.
+    private void DrawBeastItem(BeastItem item)
+    {
+        ImGui.PushID((int)item.Row);
+        try
+        {
+            ImGui.Spacing();
+            if (item.Icon != 0) { DrawGameIcon(item.Icon, new Vector2(ImGui.GetTextLineHeight() * 1.5f)); ImGui.SameLine(); }
+            ImGui.BeginGroup();
+            try
+            {
+                ImGui.TextUnformatted(item.Name);
+                if (item.Kind == BeastItems.Feed)
+                    ImGui.TextWrapped(item.Families.Count == 0 ? localization.Get("BeastUi.ItemFamiliesUnknown")
+                        : beastItemFamilies.Length > 0 && beastItemFamilies.All(family => item.Families.Contains(family.Id)) ? localization.Get("BeastUi.ItemEveryFamily")
+                        : localization.Format("BeastUi.ItemFamilies", string.Join(", ", item.Families.Select(family => beastItemFamilies.FirstOrDefault(known => known.Id == family).Name ?? family.ToString(Numbers)))));
+                if (item.Effect.Length > 0) { ImGui.PushStyleColor(ImGuiCol.Text, Muted); try { ImGui.TextWrapped(item.Effect); } finally { ImGui.PopStyleColor(); } }
+            }
+            finally { ImGui.EndGroup(); }
+        }
+        finally { ImGui.PopID(); }
+    }
+
+    // X-744 (0.1768): one rule of the game's guide of the Crucible, its title and text as the client gives them.
+    private void DrawBeastRule(BeastGuideRule rule)
+    {
+        TenshoAssistant.UI.UiComponents.SubTitle(rule.Title);
+        ImGui.PushStyleColor(ImGuiCol.Text, Muted);
+        try { ImGui.TextWrapped(rule.Text); }
+        finally { ImGui.PopStyleColor(); }
+    }
+
+    // X-746 (0.1766): after a beast's family, the icon of the action Borrow gives with it, its name and effect on hover.
+    private void DrawBeastBorrowIcon(BeastCatalog catalog, Beast beast)
+    {
+        if (catalog.BorrowOf(beast) is not { } borrow) return;
+        ImGui.SameLine();
+        DrawGameIcon(borrow.Icon, new Vector2(ImGui.GetTextLineHeight()));
+        TipText(() => localization.Format("BeastUi.BorrowTip", BorrowLabel(catalog), borrow.Name, borrow.Effect));
+    }
+
+    // X-746 (0.1766): under the filter, the action Borrow gives with the family chosen.
+    private void DrawBeastBorrowLine(BeastCatalog catalog, BeastBorrow borrow)
+    {
+        DrawGameIcon(borrow.Icon, new Vector2(ImGui.GetTextLineHeight() * 1.5f));
+        ImGui.SameLine();
+        ImGui.BeginGroup();
+        try
+        {
+            ImGui.TextUnformatted(localization.Format("BeastUi.BorrowLine", BorrowLabel(catalog), borrow.Name));
+            if (borrow.Effect.Length > 0) { ImGui.PushStyleColor(ImGuiCol.Text, Muted); try { ImGui.TextWrapped(borrow.Effect); } finally { ImGui.PopStyleColor(); } }
+        }
+        finally { ImGui.EndGroup(); }
+    }
+
+    private string BorrowLabel(BeastCatalog catalog) => catalog.BorrowLabel.Length > 0 ? catalog.BorrowLabel : localization.Get("BeastUi.Borrow");
+
     private void DrawBeastElementIcon(BeastCatalog catalog, string element)
     {
         if (inDesktopApp || beastFontIconFailed || element.Length == 0 || !catalog.ElementIcons.TryGetValue(element, out var icon)) return;
@@ -542,8 +755,89 @@ internal sealed partial class MainWindow
         }
         DrawBeastPlan(plan, board, catalog, state.Obtained is null, wrapAt);
         ImGui.PushTextWrapPos(wrapAt);
-        try { ImGui.TextDisabled(localization.Get("BeastUi.TeamPanelNote")); }
+        try
+        {
+            DrawBeastSpaces(board, plan, team, catalog);
+            ImGui.TextDisabled(localization.Get("BeastUi.TeamPanelNote"));
+        }
         finally { ImGui.PopTextWrapPos(); }
+    }
+
+    /// <summary>
+    /// X-744 (0.1770, the user's idea I-026, second part): the board's spaces that are not fights, in its order (the game's « Étape N »): shops,
+    /// campsites with their places, treasure coffers, random spaces with what they may hold (XBMContentStageEvent and its sheets); under each
+    /// campsite, the familiars to rest from the HP the game's team window shows (BeastSpaces.Rest, the game's guide); then each familiar's
+    /// satiety and the feeds its family can eat. Folded; display only, nothing chosen nor sent to the game (R03.3).
+    /// </summary>
+    private void DrawBeastSpaces(Board board, BoardPlan plan, IReadOnlyList<BeastTeams.TeamMember>? team, BeastCatalog catalog)
+    {
+        if (!catalog.Spaces.TryGetValue(board.Id, out var spaces) || spaces.Count == 0) return;
+        if (!TenshoAssistant.UI.UiComponents.TreeNode(localization.Format("BeastUi.Spaces", spaces.Count) + "###BeastSpaces")) return;
+        try
+        {
+            Beast? Of(uint id) => catalog.Beasts.FirstOrDefault(beast => beast.Id == id);
+            string Names(IEnumerable<uint> ids) => string.Join(", ", ids.Select(id => Of(id)?.Name ?? $"#{id}"));
+            string Kind(int kind) => catalog.SpaceNames.TryGetValue(kind, out var name) && name.Length > 0 ? name : localization.Get("BeastUi.SpaceKind" + kind);
+            string Step(int step) => catalog.StepLabel.Length > 0 ? $"{catalog.StepLabel} {step.ToString(Numbers)}" : localization.Format("BeastUi.SpaceStep", step);
+            string Placed(int kind, int places) => kind != BeastSpaces.Campsite ? Kind(kind) : places > 0 ? localization.Format("BeastUi.SpacePlaces", Kind(kind), places) : localization.Format("BeastUi.SpacePlacesUnread", Kind(kind));
+            ImGui.TextDisabled(localization.Get("BeastUi.SpacesNote"));
+            foreach (var space in spaces)
+            {
+                var text = space.Kind == BeastSpaces.Random
+                    ? localization.Format("BeastUi.SpaceRandom", Kind(space.Kind), space.Options.Count == 0 ? localization.Get("BeastUi.SpaceRandomUnread")
+                        : string.Join(localization.Get("BeastUi.SpaceOr"), space.Options.Select(option => Placed(option.Kind, option.Places))))
+                    : Placed(space.Kind, space.Places);
+                ImGui.TextColored(space.Kind == BeastSpaces.Campsite ? Accent : Text, $"{Step(space.Step)} · {text}");
+                if (space.Kind is BeastSpaces.Shop or BeastSpaces.Treasure) { DrawBeastSpaceAdvice(space.Kind, catalog); continue; }
+                if (BeastSpaces.CampsitePlaces(space) is not (var places and > 0)) continue;
+                ImGui.Indent();
+                try
+                {
+                    if (team is not { Count: > 0 }) { ImGui.TextDisabled(localization.Get("BeastUi.RestNoTeam")); continue; }
+                    var advice = BeastSpaces.Rest(team, places);
+                    if (advice.Rest.Count > 0) ImGui.TextColored(Success, localization.Format("BeastUi.RestAdvice", Names(advice.Rest)));
+                    else ImGui.TextDisabled(localization.Get("BeastUi.RestNone"));
+                    if (advice.Full.Count > 0) ImGui.TextDisabled(localization.Format("BeastUi.RestFull", Names(advice.Full)));
+                    if (advice.Down.Count > 0)
+                        ImGui.TextColored(Warning, localization.Format("BeastUi.RestDown", Names(advice.Down), catalog.Items.FirstOrDefault(item => item.Row == BeastSpaces.ReviveItem)?.Name ?? localization.Get("BeastUi.ReviveItem")));
+                    if (advice.Unread.Count > 0) ImGui.TextDisabled(localization.Format("BeastUi.RestUnread", Names(advice.Unread)));
+                }
+                finally { ImGui.Unindent(); }
+            }
+            // The team taken (the game's team window), else the advised team: each one's satiety and the feeds its family can eat.
+            var beasts = team is { Count: > 0 } ? team.Select(member => member.Beast).ToArray() : plan.Team.Select(pick => pick.Beast).ToArray();
+            if (beasts.Length == 0) return;
+            TenshoAssistant.UI.UiComponents.SubTitle(localization.Get("BeastUi.FeedTeam"));
+            TipText(() => localization.Get("BeastUi.FeedTeamTip"));
+            var satiety = catalog.SatietyLabel.Length > 0 ? catalog.SatietyLabel : localization.Get("BeastUi.Satiety");
+            foreach (var id in BeastTeams.BookOrder(beasts))
+            {
+                if (Of(id) is not { } beast) continue;
+                // X-771 (0.1773): M2 the bestiary's satiety when its page was read, else the column « to confirm »; M3 the feeds by name.
+                var feeds = BeastSpaces.Feeds(catalog.Items, beast.FamilyId) is { Count: > 0 } names ? string.Join(", ", names) : localization.Get("BeastUi.FeedNone");
+                var (value, fromBook) = BeastSpaces.SatietyOf(beast, beastPlans?.Book);
+                ImGui.TextWrapped(value <= 0 ? localization.Format("BeastUi.FeedLineUnread", beast.Name, beast.Family, satiety, feeds)
+                    : localization.Format(fromBook ? "BeastUi.FeedLine" : "BeastUi.FeedLineToConfirm", beast.Name, beast.Family, satiety, value, feeds));
+            }
+        }
+        finally { ImGui.TreePop(); }
+    }
+
+    /// <summary>
+    /// X-771 M3 (0.1773): under a shop or a treasure space, what the game's guide says of it (DescriptionString 1736 and 1737, its text on
+    /// hover): a shop's wares are not in any game file (none of the XBM sheets lists them), so the panel points to the team's feeds below; a
+    /// treasure coffer gives one ephemeral item to choose, two with the thief's knife (XBMItem 57). Display only (R03.3).
+    /// </summary>
+    private void DrawBeastSpaceAdvice(int kind, BeastCatalog catalog)
+    {
+        ImGui.Indent();
+        try
+        {
+            var knife = catalog.Items.FirstOrDefault(item => item.Row == BeastSpaces.ThiefKnife)?.Name is { Length: > 0 } name ? name : localization.Get("BeastUi.ThiefKnife");
+            ImGui.TextDisabled(kind == BeastSpaces.Shop ? localization.Get("BeastUi.ShopAdvice") : localization.Format("BeastUi.TreasureAdvice", knife));
+            if (catalog.Rules.FirstOrDefault(rule => rule.Key == (kind == BeastSpaces.Shop ? "Shop" : "Treasure")) is { } rule) TipText(() => rule.Text);
+        }
+        finally { ImGui.Unindent(); }
     }
 
     /// <summary>
@@ -602,6 +896,7 @@ internal sealed partial class MainWindow
                 var beast = catalog.Beasts.FirstOrDefault(row => row.Id == id);
                 if (beast is not null) { DrawSmallGameIcon(beast.Icon); ImGui.SameLine(); DrawBeastElementIcon(catalog, beast.AutoAttack); }
                 ImGui.TextUnformatted(BeastCallText(fight, place, id, catalog));
+                if (beast is not null) DrawBeastEffects(catalog, beast);
                 DrawBeastCombo(id);
             }
             if (fromTeam is { Lost.Count: > 0 } lost)
@@ -684,6 +979,7 @@ internal sealed partial class MainWindow
                     if (BeastTeams.RankLow(board, pick.Rank, pick.RankKnown)) { ImGui.SameLine(); ImGui.TextColored(Warning, localization.Format(BeastTeams.RankLowKey(board, false), board.RankRecommended, board.RankLimit)); }
                     // X-551 (0.1574): the type of damage after the game's own icon of it (none for an unaspected magical attack).
                     ImGui.TableNextColumn(); DrawBeastElementIcon(catalog, beast.AutoAttack); ImGui.TextDisabled(beast.AutoAttack.Length > 0 ? beast.AutoAttack : localization.Get("BeastUi.Magical"));
+                    DrawBeastEffects(catalog, beast);
                 }
             }
             finally { ImGui.EndTable(); }

@@ -9,6 +9,16 @@ public static class DesktopPaths
 {
     public static string PluginConfig(string appData)=>Path.Combine(PluginUiTest.Host.DalamudPaths.XivLauncher(appData),"pluginConfigs","TenshoAssistant.json");
 
+    /// <summary>X-685 part 2 (0.1745): Tensho's own settings file beside Dalamud's (pluginConfigs\TenshoAssistant\Settings.json), read first.</summary>
+    public static string OwnSettings(string dalamudFile)=>Path.Combine(Path.ChangeExtension(dalamudFile,null),"Settings.json");
+
+    /// <summary>
+    /// X-763 M3 (review of 0.1746): the note of the settings read names the file actually read; Dalamud's older file read while Tensho's own
+    /// is there (a copy of the plugin that cannot read it) is said as older, never as Tensho's own.
+    /// </summary>
+    public static string ReadNote(string from,string own,bool ownThere)=>"read from "+from+" (read-only, without the Discord addresses)"
+        +(ownThere && !string.Equals(from,own,StringComparison.OrdinalIgnoreCase) ? "; older than "+own+", which this copy of the plugin cannot read" : "");
+
     public static string Own(string localAppData)=>DesktopInstall.OwnFolder(localAppData);
 
     /// <summary>The plugin's text language: the saved one (Configuration.LanguageCode), else Windows' display language.</summary>

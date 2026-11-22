@@ -35,6 +35,22 @@ internal static unsafe class RetainerReader
         return [.. found];
     }
 
+    /// <summary>X-469 (0.1762): the name of the retainer with this id (the one whose sale list is open), as the table keeps it; null when the
+    /// game's list is not ready or holds no such retainer. Framework thread only.</summary>
+    public static string? NameOf(ulong retainerId)
+    {
+        var manager=RetainerManager.Instance();
+        if(retainerId==0 || manager==null || !manager->IsReady)return null;
+        var count=(int)manager->GetRetainerCount();
+        if(count<0 || count>CharacterStatuses.MaximumVentures)return null;
+        for(var index=0;index<count;index++)
+        {
+            var retainer=manager->GetRetainerBySortedIndex((uint)index);
+            if(retainer!=null && retainer->RetainerId==retainerId)return RetainerStates.Text(retainer->NameString);
+        }
+        return null;
+    }
+
     private static string Name(Func<byte,string>? name,byte id)
     {
         if(name is null || id==0)return "";

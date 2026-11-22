@@ -326,7 +326,8 @@ internal sealed partial class MainWindow
     /// </summary>
     /// <param name="glamourOnly">X-290: a piece of the gear plan kept for its look only: its mark instead of the stats.</param>
     /// <param name="hq">X-294: the HQ state when the caller knows it (a worn or planned piece); else « assume HQ » of the Gear page.</param>
-    private void DrawItemInfoTooltip(uint id,bool glamourOnly=false,bool? hq=null)
+    /// <param name="lines">X-727 (0.1733): the caller's own lines (the tracker's place and next time), drawn under the item's header; data only, no hook.</param>
+    private void DrawItemInfoTooltip(uint id,bool glamourOnly=false,bool? hq=null,IReadOnlyList<string>? lines=null)
     {
         if(ItemTooltipAlreadyDrawn(id))return;
         var item=itemCatalog.State.Catalog?.Find(id);
@@ -343,6 +344,12 @@ internal sealed partial class MainWindow
             // X-363 (0.1350): asked of Garland once the mouse rested on this item (patchDwell), read from what is known before.
             if(ItemPatchText(id,ask:patchDwell.Settled(id,Environment.TickCount64)) is { } patchText)ImGui.TextDisabled(patchText);
             if(ShowIds)ImGui.TextDisabled($"ID {id}");
+            if(lines is { Count:>0 })
+            {
+                ImGui.Separator();
+                foreach(var line in lines)ImGui.TextUnformatted(line);
+                ImGui.Separator();
+            }
             DrawItemGearStats(id,glamourOnly,hq);
             DrawItemInfoBody(item,id);
         }
@@ -380,6 +387,8 @@ internal sealed partial class MainWindow
         DrawItemExpansion(id);
         // X-95 (0.951): the parts of the item panel timed in developer mode (the panel reached 173 ms in the slow frame log).
         if(!hoverPanel || configuration.HoverShowCollection)MeasureMap("hover collection",()=>DrawItemCollection(item));
+        // X-216 (0.1783): a piece of the same look already held, and where (with the collection part).
+        if(!hoverPanel || configuration.HoverShowCollection)MeasureMap("hover same look",()=>DrawItemSameLook(id));
         if(!hoverPanel || configuration.HoverShowStock)MeasureMap("hover stock",()=>DrawHoveredStock(id));
         // 0.346 (g, I-06): NPC sale price (Item.PriceLow, game data), and the hovered stack's when the game tooltip is for one of the
         // player's slots; for NQ (the HQ price is not in the sheet); nothing when the item does not sell to NPCs (price 0).
@@ -391,6 +400,9 @@ internal sealed partial class MainWindow
                 :localization.Format("HoverUi.NpcSale",sold.SellPrice.ToString("N0",Numbers)));
         }
         if(!hoverPanel || configuration.HoverShowUsages)MeasureMap("hover usages",()=>DrawHoveredUsages(id));
+        // X-197 (0.1761): the item's desynthesis against your level; what a coffer holds that a collection tracks.
+        if(!hoverPanel || configuration.HoverShowDesynth)DrawItemDesynth(id);
+        if(!hoverPanel || configuration.HoverShowCoffer)MeasureMap("hover coffer",()=>DrawItemCoffer(id));
         // « How to get it » is the last part: hidden, its Garland / wiki fallback is not asked from the hover either.
         if(hoverPanel && !configuration.HoverShowSources)return;
         // How to obtain the item itself (0.144: the sources follow the unlocking item, not only the collection page).
@@ -446,7 +458,8 @@ internal sealed partial class MainWindow
     // Cheap lookups, cut short with the default settings (stock on).
     private bool HoverInfoShown(Items.ItemDefinition? item,uint id)=>configuration.HoverShowStock || configuration.HoverShowSources
         || configuration.HoverShowCollection && (item is { MountId:not 0 } or { CompanionId:not 0 } or { TripleTriadCardId:not 0 } or { OrchestrionId:not 0 } || item is not null && GameItemUnlocked(item.Id) is not null)
-        || configuration.HoverShowUsages && HoveredUsageLines(id).Count>0;
+        || configuration.HoverShowUsages && HoveredUsageLines(id).Count>0
+        || configuration.HoverShowDesynth && DesynthOf(id) is not null || configuration.HoverShowCoffer && CofferOf(id) is not null;
 
     private void DrawHoveredUsages(uint id)
     {
@@ -483,6 +496,9 @@ internal sealed partial class MainWindow
                 ImGui.TextUnformatted(localization.Format("HoverUi.Stack",count,(unit*count).ToString("N0",Numbers)));
                 DrawGilIcon();
             }
+            // X-207 (0.1782): the NPC's price against the market's, advice only (the item's quality; nothing when either is unknown).
+            if(itemCatalog.State.Catalog?.Find(hovered.ItemId) is { SellPrice:>0 } npcSold && Inventory.StockValue.MarketOverNpc(npcSold.SellPrice,Inventory.StockValue.FromQuote(prices,hovered.Hq)?.Unit) is { } ratio)
+                ImGui.TextColored(ratio>=1 ? Success:Warning,ratio>=1 ? localization.Format("HoverUi.MarketOverNpc",ratio.ToString(ratio>=10 ? "N0":"0.#",Numbers)):localization.Get("HoverUi.NpcOverMarket"));
             // X-292 (0.1291): the world's lines say where they come from: Universalis' upload, or the look at the game's board when newer.
             ImGui.TextDisabled(prices.UploadedAt is { } date ? localization.Format(prices.SeenAtBoard ? "HoverUi.SeenAtBoard":"HoverUi.Uploaded",date.ToLocalTime().ToString("g")):localization.Get("HoverUi.UnknownDate"));
             if(!prices.HasRecentUpload(now))StateLine(UI.UiState.Stale,localization.Get("HoverUi.Old"));

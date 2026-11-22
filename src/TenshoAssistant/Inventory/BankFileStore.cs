@@ -17,12 +17,12 @@ public sealed class FileInventoryBankStore : IInventoryBankStore
     private readonly string path;
     private readonly object gate = new();
     private bool loadFailed;
-    private static readonly JsonSerializerOptions JsonOptions = new()
+    private static readonly JsonSerializerOptions JsonOptions = TenshoJson.Own(new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
         MaxDepth = 16,
-    };
+    });
 
     public FileInventoryBankStore(string path)
     {

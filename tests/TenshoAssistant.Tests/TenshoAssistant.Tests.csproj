@@ -7,6 +7,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="../../src/TenshoAssistant/TenshoJson.cs" Link="TenshoJson.cs" />
     <Compile Include="../../src/TenshoAssistant/MyTools/*.cs" Exclude="../../src/TenshoAssistant/MyTools/*.Dalamud.cs" Link="MyTools/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Discoveries/*.cs" Exclude="../../src/TenshoAssistant/Discoveries/*.Dalamud.cs" Link="Discoveries/%(Filename)%(Extension)" />
     <!-- X-403 (0.1434): the Tensho chat window's pure parts (channels, store, tab views, format, settings). -->
@@ -51,6 +52,7 @@
     <Compile Include="../../src/TenshoAssistant/Alarms/WorldClocks.cs" Link="Alarms/WorldClocks.cs" />
     <Compile Include="../../src/TenshoAssistant/Alarms/TrackedAlarms.cs" Link="Alarms/TrackedAlarms.cs" />
     <Compile Include="../../src/TenshoAssistant/Alarms/InfoBarRules.cs" Link="Alarms/InfoBarRules.cs" />
+    <Compile Include="../../src/TenshoAssistant/Alarms/ServerBarEntries.cs" Link="Alarms/ServerBarEntries.cs" />
     <Compile Include="../../src/TenshoAssistant/Credits/CreditCatalog.cs" Link="Credits/CreditCatalog.cs" />
     <Compile Include="../../src/TenshoAssistant/Alarms/DiscordNotifier.cs" Link="Alarms/DiscordNotifier.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/MapCatalog.cs" Link="Maps/MapCatalog.cs" />
@@ -72,6 +74,7 @@
     <Compile Include="../../src/TenshoAssistant/Maps/MapResume.cs" Link="Maps/MapResume.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/IslandResources.cs" Link="Maps/IslandResources.cs" />
     <Compile Include="../../src/TenshoAssistant/Gear/JobProgress.cs" Link="Gear/JobProgress.cs" />
+    <Compile Include="../../src/TenshoAssistant/Gear/ManualGrace.cs" Link="Gear/ManualGrace.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/MapSearch.cs" Link="Maps/MapSearch.cs" />
     <Compile Include="../../src/TenshoAssistant/Competitive/CompetitiveZones.cs" Link="Competitive/CompetitiveZones.cs" />
     <Compile Include="../../src/TenshoAssistant/Competitive/CompetitiveGateHooks.cs" Link="Competitive/CompetitiveGateHooks.cs" />
@@ -108,6 +111,7 @@
     <Compile Include="../../src/TenshoAssistant/Reminders/ReminderCounts.cs" Link="Reminders/ReminderCounts.cs" />
     <Compile Include="../../src/TenshoAssistant/Reminders/GardenChat.cs" Link="Reminders/GardenChat.cs" />
     <Compile Include="../../src/TenshoAssistant/Reminders/GardenCrosses.cs" Link="Reminders/GardenCrosses.cs" />
+    <Compile Include="../../src/TenshoAssistant/Reminders/PrepReminders.cs" Link="Reminders/PrepReminders.cs" />
     <Compile Include="../../src/TenshoAssistant/Reminders/GardenForecasts.cs" Link="Reminders/GardenForecasts.cs" />
     <Compile Include="../../src/TenshoAssistant/Reminders/SquadronPlanner.cs" Link="Reminders/SquadronPlanner.cs" />
     <Compile Include="../../src/TenshoAssistant/Reminders/WondrousTailsOdds.cs" Link="Reminders/WondrousTailsOdds.cs" />
@@ -127,6 +131,7 @@
     <Compile Include="../../src/TenshoAssistant/Gear/GearCatalog.cs" Link="Gear/GearCatalog.cs" />
     <Compile Include="../../src/TenshoAssistant/Gear/GearPlanSets.cs" Link="Gear/GearPlanSets.cs" />
     <Compile Include="../../src/TenshoAssistant/Gear/GearPlanKey.cs" Link="Gear/GearPlanKey.cs" />
+    <Compile Include="../../src/TenshoAssistant/Gear/GearMeals.cs" Link="Gear/GearMeals.cs" />
     <Compile Include="../../src/TenshoAssistant/Gear/GearWear.cs" Link="Gear/GearWear.cs" />
     <Compile Include="../../src/TenshoAssistant/Gear/GearCompare.cs" Link="Gear/GearCompare.cs" />
     <Compile Include="../../src/TenshoAssistant/Gear/Gearsets.cs" Link="Gear/Gearsets.cs" />
@@ -201,6 +206,7 @@
     <Compile Include="../../src/TenshoAssistant/AtomicFile.cs" Link="AtomicFile.cs" />
     <Compile Include="../../src/TenshoAssistant/BackgroundWriter.cs" Link="BackgroundWriter.cs" />
     <Compile Include="../../src/TenshoAssistant/SettingsSaver.cs" Link="SettingsSaver.cs" />
+    <Compile Include="../../src/TenshoAssistant/SettingsFile.cs" Link="SettingsFile.cs" />
     <Compile Include="../../src/TenshoAssistant/TenshoDataDatabase.cs" Link="TenshoDataDatabase.cs" />
     <Compile Include="../../src/TenshoAssistant/OnceSet.cs" Link="OnceSet.cs" />
     <Compile Include="../../src/TenshoAssistant/FairFileLock.cs" Link="FairFileLock.cs" />

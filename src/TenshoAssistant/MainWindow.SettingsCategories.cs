@@ -41,7 +41,7 @@ internal sealed partial class MainWindow
         new("Map","MapWindow",DrawMapWindowSettings),
         new("Tracking","Alarms",DrawAlarmSettings),
         new("Tracking","AlarmCommands",DrawAlarmCommandSettings),
-        new("Tracking","ServerBar",DrawTrackingServerBarSettings),
+        new("Tracking","ServerBar",DrawServerBarSettings),
         new("Data","Storage",DrawStorageSettings),
         new("Data","Cache",DrawCacheSettings),
         new("Data","Sources",DrawSourceSettings),

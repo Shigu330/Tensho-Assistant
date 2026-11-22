@@ -45,6 +45,8 @@ internal sealed class ChatReader : IDisposable
     // messages: window off, logout (ChatPlayerActions), unload.
     internal ChatSources? Sources{get;set;}
     private ChatSources? sources=>Sources;
+    /// <summary>X-733, X-734 (0.1734): the game's data a line needs at its arrival (set by the plugin; null: none, as outside the game).</summary>
+    internal Func<IChatLineData?>? LineData{get;set;}
 
     public ChatReader(IChatGui chat,IClientState client,IPluginLog log,Func<ChatSettings> settings,ChatStore store,Func<bool>? developer=null,ChatHistoryKeeper? history=null,Func<string?>? ownName=null)
     {
@@ -89,8 +91,14 @@ internal sealed class ChatReader : IDisposable
                     var last=ChatPayloads.LinkLast(payloads,index);
                     payloads[index]=payloads[index] with{Link=link with{Data=new SeString(message.Message.Payloads.Skip(index).Take(last-index+1).ToList()).Encode()}};
                 }
-            // X-473 (0.1720): in a combat line, an action's coloured name is kept as such (its tooltip on hover).
-            var body=ChatPayloads.Segments(payloads,ChatChannels.From((int)message.LogKind)==ChatChannel.Combat);
+            // X-473 (0.1720), X-734 (0.1734): in a combat line, an action named in its last text (where the game's template puts it) is kept
+            // as such (its tooltip on hover).
+            var logKind=(int)message.LogKind;
+            var lineData=LineData?.Invoke();
+            lineData?.Prepare();
+            var body=ChatPayloads.Segments(payloads,lineData is { } named && ChatChannels.From(logKind)==ChatChannel.Combat ? text=>named.ActionIn(logKind,text):null);
+            // X-733 (0.1734): a meal's or a medicine's status keeps the Param of the one who gained it (its bonuses on hover).
+            if(lineData is not null)body=WithStatusParams(body,message,lineData);
             if(developer?.Invoke()==true && ChatPayloads.HasLink(payloads))
             {
                 var kind=(int)message.LogKind;
@@ -144,6 +152,27 @@ internal sealed class ChatReader : IDisposable
         }
     }
 
+    /// <summary>X-733 (0.1734): a meal's or a medicine's status link (ChatFoodTip.Holds) gets a box for its Param, read on the one who gained it:
+    /// the player the line links, else you when the line is yours (Dalamud's XivChatRelationKind 1, as source or target); any other line, or
+    /// any other status: the body as it is. The pieces of one link keep one link. X-756 (0.1739): only a line of a buff gained (kind 46): a
+    /// status lost (kind 48) has no Param left to read.</summary>
+    private static IReadOnlyList<ChatSegment> WithStatusParams(IReadOnlyList<ChatSegment> body,IChatMessage message,IChatLineData data)
+    {
+        if(!ChatStatusWatch.Reads((int)message.LogKind))return body;
+        if(!body.Any(segment=>segment.Link is { Kind:ChatSegmentKind.StatusLink } link && ChatFoodTip.Holds(link.StatusId)))return body;
+        var player=message.Message.Payloads.OfType<PlayerPayload>().FirstOrDefault();
+        if(player is null && (byte)message.SourceKind!=1 && (byte)message.TargetKind!=1)return body;
+        var made=new Dictionary<ChatLink,ChatLink>(ReferenceEqualityComparer.Instance);
+        return body.Select(segment=>segment.Link is { Kind:ChatSegmentKind.StatusLink } link && ChatFoodTip.Holds(link.StatusId) ? segment with{Link=Made(link)}:segment).ToList();
+        ChatLink Made(ChatLink link)
+        {
+            if(made.TryGetValue(link,out var known))return known;
+            var param=new ChatStatusParam();
+            data.StatusParam(param,link.StatusId,player?.PlayerName,(ushort)(player?.World.RowId ?? 0));
+            return made[link]=link with{Param=param};
+        }
+    }
+
     /// <summary>X-479 (0.1468): one of the game's payloads as the reader tells it apart (ChatPayload: pure, replayed by the tests on recorded messages).</summary>
     internal static ChatPayload Payload(Payload payload)=>payload switch
     {
@@ -181,4 +210,16 @@ internal sealed class ChatReader : IDisposable
         // X-475: the history's queue (lines already made) written when it is on, then released.
         history?.Dispose();
     }
+}
+
+/// <summary>X-733, X-734 (0.1734): what the reader asks of the game's data when a line arrives (ChatPlayerActions; null outside the game).</summary>
+internal interface IChatLineData
+{
+    /// <summary>Starts reading the actions' names and the combat lines' templates, once (on a thread of its own).</summary>
+    void Prepare();
+    /// <summary>Where the last text of a combat line of this kind names an action (ChatActionLines); null when none or not read yet.</summary>
+    (int Start,int Length)? ActionIn(int kind,string text);
+    /// <summary>Reads into the box the Param of a meal's or a medicine's status on the one who gained it: the player named (name and home
+    /// world), or you (name null); now, or in the frames after.</summary>
+    void StatusParam(ChatStatusParam param,uint status,string? name,ushort world);
 }

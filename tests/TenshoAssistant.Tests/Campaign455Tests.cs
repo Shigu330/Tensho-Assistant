@@ -14,6 +14,7 @@ internal static class Campaign455Tests
             var now=new DateTimeOffset(2026,11,4,12,0,0,TimeSpan.Zero);
             Check(ReminderCounts.Finished(null,null,null,null,null,now).Count==0,"nothing known");
             var ripe=GardenJournal.Plant("Pot","Seed",1,0,now.AddHours(-2));
+            ripe.GameState=GardenGameState.Ripe; // X-729 (0.1727): « ripe » once the game said so (else counted apart, GardenExpected)
             var growing=GardenJournal.Plant("Pot","Seed",5,0,now.AddHours(-2));
             var list=ReminderCounts.Finished([now.AddHours(-1),now.AddHours(1),null],[new VoyageVessel{ReturnAt=now.AddMinutes(-1)},new VoyageVessel{ReturnAt=now.AddMinutes(1)},new VoyageVessel()],
                 (7,now.AddSeconds(-1)),(0,now.AddSeconds(-1)),[ripe,growing],now);

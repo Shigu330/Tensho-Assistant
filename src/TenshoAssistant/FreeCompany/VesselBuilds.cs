@@ -100,6 +100,12 @@ public static class VesselBuilds
         return (0,0,VesselStatsSource.Unknown);
     }
 
+    /// <summary>X-730 M1 (0.1728, review of 0.1721 to 0.1726): where the planner's speed and range come from once the player typed one: unknown
+    /// stays unknown until both are typed (the other one is still an old value, 1 or another vessel's: never searched with); read or from the
+    /// parts: typed, so known.</summary>
+    public static VesselStatsSource AfterTyping(VesselStatsSource from,bool speedTyped,bool rangeTyped)
+        =>from==VesselStatsSource.Unknown && !(speedTyped && rangeTyped) ? VesselStatsSource.Unknown:VesselStatsSource.Read;
+
     public static BuildSummary Summarize(VesselPartCatalog catalog,VesselBuild build)
     {
         var parts=Enumerable.Range(0,4).Select(slot=>catalog.Find(build.Kind,build[slot])).ToArray();
