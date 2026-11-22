@@ -35,15 +35,18 @@ with their day and place, as the player shared them, until they are merged: sinc
 and its revision merged last (`"Gist"`, `"Revision"`); the merge tool never reads that revision again, and the plugin, reading the note from `main`,
 deletes that gist whole (GitHub keeps no old revision of a deleted gist, but a copy or fork someone made of it before survives) and makes a new one
 with only what is new, the issue edited to link it (its history keeps the old link, now dead). The tool keeps a player's facts by key, so a fact
-missing from a newer gist is never taken out.
+missing from a newer gist is never taken out (a gist holds news only). A fact found wrong later (a plugin bug, a rule tightened) is taken out
+of every player file by a rule of the tool: `rebuild` applies the current rules to each file and writes it again without the facts they refuse;
+`withdraw` takes out a whole player.
 The files reach players with the next release (they are read from `main`).
 Since Tensho 0.1210: one issue per GitHub account counts (the newest; an older one by the same author is left out); each field must have the
 plugin's type; a player counts for at most 1,000 sightings of a fact in the common histograms (the shape of theirs kept); the exact place kept is the one
 of the earliest day; a player alone far outside the other players' levels on over 5 % of the facts they share is left out and checked by hand.
-**Withdrawing.** What you share stays in the common base, without your name, even if you stop sharing. Close your « Discoveries » issue (or
+**Withdrawing.** What you share stays in the common base even if you stop sharing. Close your « Discoveries » issue (or
 ask in it): the maintainer removes `players/<issue>.jsonl.gz`, the link with your GitHub account, with `python tools/discoveries-merge.py withdraw <issue>`;
 since Tensho 0.1816 your facts stay in `v3/`, held by an anonymous file `players/withdrawn-<random>.jsonl.gz` (no issue, no login) that counts like a
-player file (before, the facts no other player had left the common files). The git history keeps the files as they were; if you share again later,
+player file (before, the facts no other player had left the common files). Until then, and after: the closed issue keeps its public title
+« Discoveries: <login> », and the git history keeps the files as they were, the login in them; if you share again later,
 your facts kept this way count once more.
 
 **File format (version 2, since Tensho 0.916).** `{"Version":2,"Producer":…,"Written":…,"Facts":[…]}`. A fact is identified by `Kind`, `Subject`, `Detail`,
@@ -105,16 +108,19 @@ partagées, jusqu'à leur fusion : depuis Tensho 0.1817, l'en-tête de `players/
 (`"Gist"`, `"Revision"`) ; l'outil de fusion ne relit jamais cette révision, et le plugin, qui lit cette note sur `main`, supprime ce gist en entier
 (GitHub ne garde aucune ancienne révision d'un gist supprimé, mais une copie ou un fork qu'une personne en aurait fait avant reste) et en crée un
 nouveau avec seulement les nouveautés, le ticket modifié pour y renvoyer (son historique garde l'ancien lien, devenu mort). L'outil garde les faits
-d'un joueur par clé : un fait absent d'un gist plus récent n'est jamais retiré.
+d'un joueur par clé : un fait absent d'un gist plus récent n'est jamais retiré (un gist ne garde que les nouveautés). Un fait reconnu faux plus
+tard (bogue du plugin, règle resserrée) sort de chaque fichier de joueur par une règle de l'outil : `rebuild` applique les règles du moment à chaque
+fichier et le réécrit sans les faits qu'elles refusent ; `withdraw` retire un joueur entier.
 Depuis Tensho 0.1210 : un seul ticket par compte GitHub compte (le plus récent ; un plus ancien du même auteur est laissé de côté) ; chaque champ
 doit avoir le type du plugin ; un joueur compte pour 1 000 observations d'un fait au plus dans les histogrammes communs (la forme des siens gardée) ; le
 lieu exact gardé est celui du jour le plus ancien ; un joueur seul très loin des niveaux des autres joueurs sur plus de 5 % des faits qu'il partage avec
 eux est laissé de côté et regardé à la main.
-**Se retirer.** Ce que vous partagez reste dans la base commune, sans votre nom, même si vous arrêtez de partager. Fermez votre ticket
+**Se retirer.** Ce que vous partagez reste dans la base commune même si vous arrêtez de partager. Fermez votre ticket
 « Discoveries » (ou demandez-le dedans) : le mainteneur retire `players/<ticket>.jsonl.gz`, le lien avec votre compte GitHub, avec
 `python tools/discoveries-merge.py withdraw <ticket>` ; depuis Tensho 0.1816, vos faits restent dans `v3/`, portés par un fichier anonyme
 `players/withdrawn-<aléatoire>.jsonl.gz` (sans ticket ni identifiant) qui compte comme un fichier de joueur (avant, les faits qu'aucun autre joueur
-n'avait quittaient les fichiers communs). L'historique git garde les fichiers tels qu'ils étaient ; si vous partagez de nouveau plus tard, vos faits
+n'avait quittaient les fichiers communs). Jusque-là, et après : le ticket fermé garde son titre public « Discoveries: <identifiant> », et
+l'historique git garde les fichiers tels qu'ils étaient, avec l'identifiant ; si vous partagez de nouveau plus tard, vos faits
 gardés ainsi comptent une fois de plus.
 
 **Format du fichier (version 2, depuis Tensho 0.916).** `{"Version":2,"Producer":…,"Written":…,"Facts":[…]}`. Un fait est identifié par `Kind`, `Subject`,

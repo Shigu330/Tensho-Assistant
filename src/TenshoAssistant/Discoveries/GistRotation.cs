@@ -19,6 +19,8 @@ public sealed class GistRotationState
     public Dictionary<string,string> Sent { get; set; }=[];
     public Dictionary<string,string> Merged { get; set; }=[];
     public string OldGist { get; set; }="";
+    /// <summary>X-820 M1 (review of 0.1819): the GitHub account whose gist OldGist is: only that account can delete it (another one is answered 404).</summary>
+    public string OldLogin { get; set; }="";
     public bool Rotated { get; set; }
     /// <summary>The account, gist, its files and last upload's hash when this state was written (Known): the clients of the profile take them
     /// from here, never from an older github.json another client wrote outside the rotation lock.</summary>
@@ -85,13 +87,16 @@ public static class GistRotation
     public static bool Confirmed((string Gist,string Revision)? note,GistRotationState state,string gist)
         =>note is { } merged && gist.Length>0 && state.SentGist==gist && state.SentRevision.Length>0 && merged.Gist==gist && merged.Revision==state.SentRevision;
 
-    /// <summary>After a confirmed merge: what was sent is known merged; that gist is to delete; the next gist keeps the issue.</summary>
-    public static GistRotationState AfterMerge(GistRotationState state)
+    /// <summary>After a confirmed merge: what was sent is known merged; that gist is to delete (by <paramref name="login"/>, its account); the next gist keeps the issue.</summary>
+    public static GistRotationState AfterMerge(GistRotationState state,string login="")
     {
         var merged=new Dictionary<string,string>(state.Merged,StringComparer.Ordinal);
         foreach(var (key,hash) in state.Sent)merged[key]=hash;
-        return new(){Issue=state.Issue,Merged=merged,OldGist=state.SentGist,Rotated=true};
+        return new(){Issue=state.Issue,Merged=merged,OldGist=state.SentGist,OldLogin=login,Rotated=true};
     }
+
+    /// <summary>X-820 M1: whether the account connected now may delete the merged gist still to delete (its own; an older state that does not name the account: tried).</summary>
+    public static bool Deletes(GistRotationState state,string login)=>state.OldLogin.Length==0 || string.Equals(state.OldLogin,login,StringComparison.OrdinalIgnoreCase);
 
     /// <summary>The facts to send: those the common base does not hold as they are (new, or changed since they were merged).</summary>
     public static List<DiscoveryFact> News(IEnumerable<DiscoveryFact> mine,IReadOnlyDictionary<string,string> merged)
@@ -104,14 +109,14 @@ public static class GistRotation
         try{state=File.Exists(path) ? JsonSerializer.Deserialize<GistRotationState>(File.ReadAllText(path),TenshoJson.Plain):null;}
         catch(Exception error) when(error is IOException or UnauthorizedAccessException or JsonException){return null;}
         if(state is null)return null;
-        state.Sent??=[];state.Merged??=[];state.SentGist??="";state.SentRevision??="";state.OldGist??="";state.Login??="";state.Gist??="";state.GistFiles??=[];state.UploadHash??="";
+        state.Sent??=[];state.Merged??=[];state.SentGist??="";state.SentRevision??="";state.OldGist??="";state.OldLogin??="";state.Login??="";state.Gist??="";state.GistFiles??=[];state.UploadHash??="";
         return state;
     }
     /// <summary>The state of this issue: another issue (a new one, another account) starts with nothing known merged, a gist still to delete kept.</summary>
     public static GistRotationState Read(string path,int issue)
     {
         var state=Load(path) ?? new(){Issue=issue};
-        return state.Issue==issue ? state:new(){Issue=issue,OldGist=state.OldGist};
+        return state.Issue==issue ? state:new(){Issue=issue,OldGist=state.OldGist,OldLogin=state.OldLogin};
     }
     public static void Write(string path,GistRotationState state)=>AtomicFile.Write(path,JsonSerializer.Serialize(state,TenshoJson.Plain));
 }

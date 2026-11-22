@@ -39,18 +39,21 @@ internal static class DiscoveryWithdraw1816Tests
         }),
         ("Discovery withdraw 1816: said before the first share, in the help, in each issue and the README, in English and French",() =>
         {
-            const string en="What you share stays in the common base, without your name, even if you stop sharing.";
-            const string fr="Ce que vous partagez reste dans la base commune, sans votre nom, même si vous arrêtez de partager.";
+            // X-820 M2 (review of 0.1819): « without your name » went further than what happens (the maintainer's withdraw, the issue's title, git history).
+            const string en="What you share stays in the common base even if you stop sharing. On request (or once your issue is closed), the maintainer removes the link between your GitHub name and your discoveries; your issue's title and the repository's history still show that name.";
+            const string fr="Ce que vous partagez reste dans la base commune même si vous arrêtez de partager. Sur demande (ou une fois votre ticket fermé), le mainteneur retire le lien entre votre nom GitHub et vos découvertes ; le titre de votre ticket et l'historique du dépôt montrent encore ce nom.";
             foreach(var key in new[]{"PublicWarning","ConnectTip","DisconnectTip","ExchangeHelp","DiscoveriesExchange"})
             {
                 Check(Key("en","",key).EndsWith(en,StringComparison.Ordinal),"en "+key);
                 Check(Key("fr","",key).EndsWith(fr,StringComparison.Ordinal),"fr "+key);
             }
             var exchange=Read("src/TenshoAssistant/Discoveries/GitHubExchange.cs");
-            Check(exchange.Contains("What you share stays in the common base, without your name, even if you stop sharing",StringComparison.Ordinal)
-                && exchange.Contains("Français : ce que vous partagez reste dans la base commune, sans votre nom",StringComparison.Ordinal),"the issue, both languages");
+            Check(exchange.Contains("What you share stays in the common base even if you stop sharing. Close this issue (or ask in it) and the maintainer removes your player file",StringComparison.Ordinal)
+                && exchange.Contains("Français : ce que vous partagez reste dans la base commune même si vous arrêtez de partager. Fermez ce ticket",StringComparison.Ordinal),"the issue, both languages");
             var readme=Read("community-discoveries/README.md");
-            Check(readme.Contains("**Withdrawing.** "+en,StringComparison.Ordinal) && readme.Contains("**Se retirer.** "+fr,StringComparison.Ordinal),"the README, both halves");
+            Check(readme.Contains("**Withdrawing.** What you share stays in the common base even if you stop sharing.",StringComparison.Ordinal)
+                && readme.Contains("**Se retirer.** Ce que vous partagez reste dans la base commune même si vous arrêtez de partager.",StringComparison.Ordinal)
+                && readme.Contains("« Discoveries: <login> »",StringComparison.Ordinal),"the README, both halves, the issue's title said");
             var decisions=Read("docs/project/DECISIONS.md");
             Check(decisions.Contains("Completed in 0.1816 (X-803",StringComparison.Ordinal) && decisions.Contains("Complétée en 0.1816 (X-803",StringComparison.Ordinal),"DEC-052 completed in both halves");
         }),

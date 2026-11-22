@@ -70,8 +70,8 @@ public sealed class GitHubExchange : IDisposable
     public const string Repository="Shigu330/Tensho-Assistant",GistFile="tensho-discoveries.b64";
     /// <summary>X-803 (user decision of 22/11): said in each player's issue, in English then French (GitHub in two languages, R20.1): what is shared
     /// stays in the common base without the player's name, even after they stop sharing. The French half is listed in Languages406Tests.AllowedLiterals.</summary>
-    internal const string IssueStays="What you share stays in the common base, without your name, even if you stop sharing (closing this issue removes your name, not your discoveries).";
-    internal const string IssueStaysFrench="Français : ce que vous partagez reste dans la base commune, sans votre nom, même si vous arrêtez de partager (fermer ce ticket retire votre nom, pas vos découvertes).";
+    internal const string IssueStays="What you share stays in the common base even if you stop sharing. Close this issue (or ask in it) and the maintainer removes your player file, which links your GitHub name to your discoveries; this issue's title and the repository's history still show that name.";
+    internal const string IssueStaysFrench="Français : ce que vous partagez reste dans la base commune même si vous arrêtez de partager. Fermez ce ticket (ou demandez-le dedans) et le mainteneur retire votre fichier de joueur, qui relie votre nom GitHub à vos découvertes ; le titre de ce ticket et l'historique du dépôt montrent encore ce nom.";
     /// <summary>X-175: the files that hold a secret, never put in a backup copy.</summary>
     public static readonly IReadOnlySet<string> SecretFiles=new HashSet<string>(StringComparer.OrdinalIgnoreCase){"github.token","github.refresh"};
     public static readonly TimeSpan Every=TimeSpan.FromHours(20),Retry=TimeSpan.FromMinutes(15);
@@ -559,7 +559,8 @@ public sealed class GitHubExchange : IDisposable
         var state=GistRotation.Read(RotationPath,issue);
         if(GistRotation.Asks(state,gist,issue) && GistRotation.Confirmed(await MergedNote(issue).ConfigureAwait(false),state,gist))
         {
-            state=GistRotation.AfterMerge(state);
+            string login;lock(gate)login=meta.Login;
+            state=GistRotation.AfterMerge(state,login);
             lock(gate){meta.GistId="";meta.GistFiles=[];meta.UploadHash="";}
             Save(state);SaveMeta();
         }
@@ -597,12 +598,22 @@ public sealed class GitHubExchange : IDisposable
                 sent="Sent";
             }
         }
-        string current;lock(gate)current=meta.GistId;
+        string current,account;lock(gate){current=meta.GistId;account=meta.Login;}
         if(state.OldGist.Length>0 && state.OldGist!=current)
         {
-            WriteSecrets();
-            await Fresh().ConfigureAwait(false);
-            if(await DeleteGist(state.OldGist).ConfigureAwait(false)){state.OldGist="";Save(state);}
+            // X-820 M1 (review of 0.1819): another account's gist is answered 404 (« already gone ») though it stays: kept noted, said, deleted
+            // once that account is connected again.
+            if(!GistRotation.Deletes(state,account))
+            {
+                Log?.Invoke("Discoveries: the merged gist of the GitHub account used before on this PC is kept: only that account can delete it.");
+                sent="ShareOldGistKept";
+            }
+            else
+            {
+                WriteSecrets();
+                await Fresh().ConfigureAwait(false);
+                if(await DeleteGist(state.OldGist).ConfigureAwait(false)){state.OldGist="";state.OldLogin="";Save(state);}
+            }
         }
         return sent;
     }
