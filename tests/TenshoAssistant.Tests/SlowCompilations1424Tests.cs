@@ -10,7 +10,6 @@ internal static class SlowCompilations1424Tests
     private static readonly DateTimeOffset At = new(2026, 11, 15, 15, 12, 10, TimeSpan.FromHours(1));
 
     private static void Sample() { }
-    private static void Other() { }
 
     public static IEnumerable<(string Name, Action Run)> Cases =>
     [
