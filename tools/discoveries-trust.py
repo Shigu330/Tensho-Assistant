@@ -269,18 +269,32 @@ def check_row(c):
     return (name,(c.get("status") or "PENDING").upper(),(c.get("conclusion") or "").upper())
 
 def folder_blobs(ref):
-    """X-823: {repository path: git blob id} of the files of FOLDERS at a commit (a folder that does not exist: none)."""
+    """X-823: {repository path: git blob id} of the files of FOLDERS at a commit (a folder that does not exist: none).
+    X-827 (review of 0.1826, M3): read through the git trees API, walked folder by folder from the commit's tree. The contents API lists at
+    most 1 000 entries of a folder: past 1 000 player files, the base replayed and the pull request's head were read cut short, and every
+    trusted merge became a public doubt. A tree GitHub says is truncated is refused (never a merge on a partial list)."""
+    trees={}
+    def entries(sha):
+        if sha not in trees:
+            data=json.loads(gh("api",f"repos/{REPOSITORY}/git/trees/{sha}"))
+            if not isinstance(data,dict) or data.get("truncated") or not isinstance(data.get("tree"),list):raise RuntimeError(f"tree {str(sha)[:60]}: truncated or not a tree")
+            trees[sha]={e.get("path"):e for e in data["tree"] if isinstance(e,dict)}
+        return trees[sha]
     found={}
     for folder in FOLDERS:
-        try:rows=gh("api",f"repos/{REPOSITORY}/contents/{folder}?ref={ref}","--jq",'.[] | [.type, .path, .sha] | @tsv')
-        except RuntimeError as error:
-            if "404" in str(error) or "Not Found" in str(error):continue
-            raise
-        for line in rows.splitlines():
-            if not line.strip():continue
-            kind,path,sha=line.split("\t")
-            if kind!="file" or not re.fullmatch(r"[0-9a-f]{40}",sha):raise RuntimeError(f"{path}: not a plain file")   # a folder or a link where a sync writes files
-            found[path]=sha
+        sha=ref
+        for part in folder.split("/"):
+            entry=entries(sha).get(part)
+            if entry is None:sha=None;break
+            if entry.get("type")!="tree":raise RuntimeError(f"{folder}: not a folder")
+            sha=entry.get("sha")
+        if sha is None:continue
+        for name,entry in sorted(entries(sha).items()):
+            path=f"{folder}/{name}"
+            # a folder, a link or a submodule where a sync writes plain files: refused
+            if entry.get("type")!="blob" or entry.get("mode") not in ("100644","100755") or not re.fullmatch(r"[0-9a-f]{40}",str(entry.get("sha"))):
+                raise RuntimeError(f"{path}: not a plain file")
+            found[path]=entry["sha"]
     return found
 
 def blob(sha):
@@ -534,6 +548,19 @@ def selftest():
     end_to_end(check)
     print(f"discoveries-trust selftest: {ok}/{total} ok");return 0 if ok==total else 1
 
+def fake_tree(trees,tid,limit=None):
+    """end_to_end, X-827: what GitHub's git trees API answers for a made-up tree id « commit|folder » (a commit: its root tree), from
+    {commit: {path: bytes}}; limit: past that many entries, « truncated » as GitHub says it."""
+    ref,_,prefix=tid.partition("|");found={}
+    for path,data in trees[ref].items():
+        if prefix and not path.startswith(prefix+"/"):continue
+        rest=path[len(prefix)+1:] if prefix else path
+        name,_,deeper=rest.partition("/")
+        found[name]={"path":name,"mode":"040000","type":"tree","sha":f"{ref}|{prefix+'/' if prefix else ''}{name}"} if deeper else \
+                    {"path":name,"mode":"100644","type":"blob","sha":blob_sha(data)}
+    listed=list(found.values())
+    return json.dumps({"sha":tid,"tree":listed[:limit] if limit else listed,"truncated":bool(limit and len(listed)>limit)})
+
 class Merged(Exception):
     """end_to_end: the made-up GitHub was asked to merge."""
 
@@ -586,9 +613,9 @@ def end_to_end(check):
             if url.endswith(f"/branches/{BASE}"):return base_sha+"\n"
             if "/comments?" in url:return ""
             if "/git/blobs/" in url:return base64.b64encode(store[url.rsplit("/",1)[1]]).decode("ascii")
+            if "/git/trees/" in url:return fake_tree(trees,url.rsplit("/git/trees/",1)[1])
             if "/contents/" in url:
                 path,ref=url.split("/contents/",1)[1].split("?ref=");tree=trees[ref]
-                if path in FOLDERS:return "".join(f"file\t{p}\t{blob_sha(d)}\n" for p,d in tree.items() if p.rsplit("/",1)[0]==path)
                 if path in tree:return blob_sha(tree[path])+"\n"
                 raise RuntimeError("gh api: HTTP 404: Not Found")
             raise RuntimeError(f"unexpected gh call: {a[:3]}")
@@ -639,6 +666,27 @@ def end_to_end(check):
                              ("a note and the common set changed",reindexed({**note,kind:repacked(note[kind],level99)}),"facts")):
         code,said,calls=run(head,dry=False,start=old)
         check(code==3 and REASONS[reason][0] in said and not merged_call(calls),f"X-825: {name}: a doubt, never merged ({code}: {said[-240:]})")
+    # X-827: past 1 000 player files (the contents API's bound) every file listed; a tree GitHub cuts short, a link or a folder: refused.
+    many={**good,**{f"{FOLDERS[0]}/{n}{m.PLAYER_SUFFIX}":str(n).encode() for n in range(1000,2200)},"docs/x.md":b"x"}
+    global gh
+    saved=gh
+    def listing(tree,limit=None,mode=None):
+        global gh
+        def fake(*args,raw=False):
+            tid=args[1].rsplit("/git/trees/",1)[1];answer=json.loads(fake_tree({"c":tree},tid,limit))
+            if mode:answer["tree"]=[{**e,"mode":mode} if e["type"]=="blob" else e for e in answer["tree"]]
+            return json.dumps(answer)
+        gh=fake
+        try:return folder_blobs("c")
+        except RuntimeError as error:return str(error)
+        finally:gh=saved
+    listed=listing(many)
+    check(isinstance(listed,dict) and len([p for p in listed if p.startswith(FOLDERS[0]+"/")])==1201 and kind in listed and "docs/x.md" not in listed
+          and all(listed[p]==blob_sha(d) for p,d in many.items() if p in listed),f"X-827: past 1 000 player files, every one listed with its blob ({len(listed)})")
+    check(listing(many,limit=1000)=="tree c|community-discoveries/players: truncated or not a tree",f"X-827: a tree GitHub says is truncated: refused, never a partial list ({listing(many,limit=1000)})")
+    check(str(listing(good,mode="120000")).endswith("not a plain file") and str(listing({**good,f"{FOLDERS[0]}/deeper/x":b"x"})).endswith("not a plain file"),
+          "X-827: a link or a folder where a sync writes plain files: refused")
+    check(listing({"docs/x.md":b"x"})=={},"X-827: no community-discoveries folder: nothing listed")
 
 if __name__=="__main__":
     for stream in (sys.stdout,sys.stderr):
