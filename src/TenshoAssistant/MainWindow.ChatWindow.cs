@@ -60,7 +60,6 @@ internal sealed partial class MainWindow
     private ChatSettings ChatOptions=>configuration.Chat;
     // Saved once no control is active any more (tab names, channels, colours: several edits per frame while typing or picking).
     private bool chatSettingsPending;
-    private const int ChatLayoutsPerFrame=100;
 
     // X-485 (0.1479): never brought to the front (NoBringToFrontOnFocus) and put at the back when it appears: Tensho's other windows stay in
     // front of it. Its own setting decides what a game window over it does (StepsAside false: not the panels' setting).

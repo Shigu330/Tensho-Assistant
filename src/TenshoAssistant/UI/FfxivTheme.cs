@@ -25,7 +25,6 @@ internal static class FfxivTheme
     public static Vector4 TextMuted=>current.TextMuted;
     public static Vector4 Success=>current.Success;
     public static Vector4 Selected=>current.Selected;
-    public static Vector4 Hovered=>current.Hovered;
     public static Vector4 Warning=>current.Warning;
     public static Vector4 Error=>current.Error;
 

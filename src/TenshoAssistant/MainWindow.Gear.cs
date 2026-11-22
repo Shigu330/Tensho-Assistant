@@ -398,13 +398,6 @@ internal sealed partial class MainWindow
         return gearPickRows;
     }
 
-    /// <summary>X-290 (0.1294): the next text on the same line when it fits in what is left of it, else on the next line: never cut at the edge.</summary>
-    private static void SameLineOrNext(string text)
-    {
-        ImGui.SameLine();
-        if(ImGui.GetContentRegionAvail().X<ImGui.CalcTextSize(text).X)ImGui.NewLine();
-    }
-
     // Same worn pieces (slot, item, HQ): the loader publishes a new list every second, usually with the same content.
     private static bool SameWorn(IReadOnlyList<EquippedPiece>? before,IReadOnlyList<EquippedPiece> now)
     {
