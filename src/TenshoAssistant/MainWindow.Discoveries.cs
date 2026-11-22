@@ -154,11 +154,13 @@ internal sealed partial class MainWindow
     {
         if(item==0 || DiscoveryStore is not { } store || !DiscoveriesLoaded)return [];
         if(discoveredSources.Item==item && discoveredSources.Revision==store.Revision)return discoveredSources.Lines;
-        var lines=ItemSourceKinds.Where(kind=>kind is not (DiscoveryKind.FishCondition or DiscoveryKind.FestivalSeen or DiscoveryKind.VistaSeen or DiscoveryKind.VoyageUnlock
+        var found=ItemSourceKinds.Where(kind=>kind is not (DiscoveryKind.FishCondition or DiscoveryKind.FestivalSeen or DiscoveryKind.VistaSeen or DiscoveryKind.VoyageUnlock
                 or DiscoveryKind.BlueSpellLearned or DiscoveryKind.BeastTamed or DiscoveryKind.FashionEvaluation or DiscoveryKind.NpcPlace or DiscoveryKind.BlueSpellCaster
                 or DiscoveryKind.FishLure or DiscoveryKind.FishTransition or DiscoveryKind.FishBite or DiscoveryKind.QuestItemAsked or DiscoveryKind.SpearShadow))
-            .SelectMany(kind=>store.Find(kind,subject=>subject==item,4)).OrderByDescending(DiscoveryFact.TimesOf).Take(4)
-            .Select(fact=>$"{DiscoveryFactName(fact)} ({DiscoveryFactLevel(fact)}, ×{DiscoveryFact.TimesOf(fact)})").ToArray();
+            .SelectMany(kind=>store.Find(kind,subject=>subject==item,4));
+        // X-468 (0.1806, D-216 a): the most confirmed first, each line saying how many players saw it.
+        var lines=DiscoveryFact.MostConfirmed(found).Take(4)
+            .Select(fact=>$"{DiscoveryFactName(fact)} ({DiscoveryFactLevel(fact)}, ×{DiscoveryFact.TimesOf(fact)}, {DiscoveryPlayers(fact)})").ToArray();
         discoveredSources=(item,store.Revision,lines);
         return lines;
     }
@@ -555,11 +557,14 @@ internal sealed partial class MainWindow
                 }
                 ImGui.TableNextColumn();ImGui.TextUnformatted(DiscoveryFactLevel(fact));
                 ImGui.TableNextColumn();ImGui.TextUnformatted(fact.Seen.ToString("N0",Numbers));
-                ImGui.TableNextColumn();ImGui.TextUnformatted(fact.Imported.ToString("N0",Numbers));
+                ImGui.TableNextColumn();ImGui.TextUnformatted(DiscoveryPlayers(fact));
             }
         }
         finally{ImGui.EndTable();}
     }
+    /// <summary>X-468 (0.1806, D-216 a): « seen by N players » (the common count, DiscoveryFact.WitnessesOf) or « seen by one player only ».</summary>
+    private string DiscoveryPlayers(DiscoveryFact fact)=>DiscoveryFact.WitnessesOf(fact) is var players and >1
+        ? localization.Format("DiscoveriesUi.SeenByPlayers",players.ToString("N0",Numbers)):localization.Get("DiscoveriesUi.SeenByOne");
 
     // Developer mode: a line in the log for each new fact, where the files are, and emptying the base (asked twice).
     private void DrawDiscoveryDebug(string folder)
