@@ -18,7 +18,10 @@ GitHub in the plugin (the warning says so) and the issue of each player states i
 
 The maintainer merges the gists with `python tools/discoveries-merge.py sync` (GitHub CLI needed; `--dry-run` reports only): each player's valid facts kept
 in `players/<issue>.jsonl.gz`, facts that do not hold refused, a player whose refusals pass 5 % flagged and left out, then the `v3/` set rebuilt from the
-player files with `rebuild` (each player counts as one import of a fact); then the result is committed.
+player files with `rebuild` (each player counts as one import of a fact); then the result is committed. Since Tensho 0.1803, `rebuild` (and `sync`,
+`withdraw`) stops before writing anything when `v3/` is missing or cut short (no `index.json`, an index listing fewer files than the folder holds,
+a file that does not read whole, or a fact a player holds that the committed `v3/` has but the one read now lacks): the places and days live there
+only, so `v3/` is restored from git first. The places and days a player left out brings (flagged, or an older issue of the same account) never count.
 **Player files (since Tensho 0.1801).** A file of `players/` keeps no exact place (`X`, `Z`) nor day (`First`, `Last`): beside the issue, they told
 where that GitHub account was on that day. It keeps what the merge needs (the fact's identity, its levels, its HQ sightings and values), compressed:
 `<issue>.jsonl.gz`, gzip of UTF-8 lines, a header `{"Format":"tensho-discoveries-player","Version":1,"Issue":n,"Login":…,"Count":n}` then one fact
@@ -72,7 +75,11 @@ GitHub dans le plugin (l'avertissement le dit) et le ticket de chaque joueur l'i
 Le mainteneur fusionne les gists avec `python tools/discoveries-merge.py sync` (GitHub CLI nécessaire ; `--dry-run` fait seulement le rapport) : les faits
 valides de chaque joueur gardés dans `players/<ticket>.jsonl.gz`, les faits invalides refusés, un joueur dont les refus dépassent 5 % signalé et laissé de côté,
 puis l'ensemble `v3/` reconstruit à partir des fichiers des joueurs avec `rebuild` (chaque joueur compte comme un import d'un fait) ;
-puis le résultat est enregistré dans le dépôt. Les fichiers arrivent chez les joueurs avec la release suivante (lus sur `main`).
+puis le résultat est enregistré dans le dépôt. Depuis Tensho 0.1803, `rebuild` (et `sync`, `withdraw`) s'arrête avant de rien écrire quand `v3/`
+manque ou est tronqué (pas d'`index.json`, un index qui liste moins de fichiers que le dossier n'en a, un fichier qui ne se lit pas en entier, ou un
+fait qu'un joueur a, présent dans le `v3/` enregistré mais absent de celui lu) : les lieux et les jours ne sont que là, donc `v3/` se remet d'abord
+depuis git. Les lieux et les jours qu'apporte un joueur laissé de côté (signalé, ou un ticket plus ancien du même compte) ne comptent jamais.
+Les fichiers arrivent chez les joueurs avec la release suivante (lus sur `main`).
 **Fichiers de joueur (depuis Tensho 0.1801).** Un fichier de `players/` ne garde aucun lieu exact (`X`, `Z`) ni aucun jour (`First`, `Last`) : à côté
 du ticket, ils disaient où était ce compte GitHub ce jour-là. Il garde ce que la fusion demande (l'identité du fait, ses niveaux, ses observations HQ
 et ses valeurs), compressé : `<ticket>.jsonl.gz`, gzip de lignes UTF-8, un en-tête

@@ -12,7 +12,10 @@ Usage:
       X-183 (0.1210): one issue per GitHub account: the newest one is read, an older one of the same author is reported and not read; a player
       file notes its author (« Login »); a player file whose issue is no longer an open share is reported with the withdraw command.
   python tools/discoveries-merge.py rebuild
-      Rebuilds the v3 set community-discoveries/v3/ from community-discoveries/players/*.json.
+      Rebuilds the common set community-discoveries/v3/ from the player files (community-discoveries/players/) and the common set as it is:
+      since X-772 the places and days of the facts are in v3/ only (and in the gists sync reads). X-795: v3/index.json missing (while player
+      files of the new format exist), an index listing fewer kind files than the folder holds, a set that does not read whole, or a fact a
+      counted player holds that is in the common set of git HEAD but has no place now: STOP (exit 2), nothing written; restore v3/ from git first.
   python tools/discoveries-merge.py withdraw <issue> [--dry-run]
       X-183: removes players/<issue>.jsonl.gz, or the <issue>.json of before (a player who closed their issue or asked to be taken out), then
       rebuilds.
@@ -402,20 +405,61 @@ def outliers(held):
             if f["LevelMax"]>0 and far([g["LevelMax"] for g in others],f["LevelMax"],False) or f["LevelMin"]>0 and low and far(low,f["LevelMin"],True):alone[name]+=1
     return {name:(alone[name],shared[name]) for name in shared}
 
-def rebuild(say=print,fresh=()):
+class Lossy(ValueError):
+    """X-795: a rebuild that would lose places or days (the common set it reads is missing or incomplete): stopped before anything is written."""
+
+def v3_guard(folder=None):
+    """X-795 (review of 0.1802, I1): since X-772 the place and days of a fact live in the common set only (v3/), beside the gists read by sync and
+    the player files of before. A rebuild that reads no v3/index.json, or an index listing fewer files than the folder holds, would write a common
+    set without those places and remove the kind files: refused here, before anything is written. → the v3 set as read (None without an index,
+    when no player file of the new format exists: a first build, from the player files of before)."""
+    folder=folder or V3_DIR
+    index=os.path.join(folder,V3_INDEX)
+    renewed=[n for n in player_names() if n.endswith(PLAYER_SUFFIX)]
+    if not os.path.isfile(index):
+        if renewed:raise Lossy(f"{os.path.relpath(index,ROOT)} is missing while {len(renewed)} player file(s) of the new format exist "
+                               f"({', '.join(renewed[:3])}): their facts' places and days are only in the common set; restore community-discoveries/v3 "
+                               "from git history first")
+        return None
+    try:entries=v3_index(open(index,"rb").read(MAX_INDEX+1).decode("utf-8"))
+    except (OSError,ValueError,UnicodeDecodeError) as error:raise Lossy(f"{os.path.relpath(index,ROOT)} unreadable ({error}): restore community-discoveries/v3 from git history first")
+    listed={e["Name"] for e in entries}
+    unlisted=sorted(n for n in os.listdir(folder) if re.fullmatch(r"kind-\d+\.jsonl\.gz(\.b64)?",n) and n.split(".b64")[0] not in listed)
+    if unlisted:raise Lossy(f"the index lists {len(listed)} kind file(s) and the folder holds {', '.join(unlisted[:5])} besides: an index cut short; "
+                            "restore community-discoveries/v3 from git history first")
+    try:return from_v3_dir(folder)
+    except (OSError,ValueError) as error:raise Lossy(f"the common set does not read whole ({type(error).__name__}: {error}): restore community-discoveries/v3 from git history first")
+
+GIT_TIMEOUT=60   # a local git call (the remote calls' deadline is REMOTE_TIMEOUT)
+def git_bytes(rel):
+    """A file of git HEAD (bytes), or None (no git, no such file)."""
+    try:out=subprocess.run(["git","-C",ROOT,"show",f"HEAD:{rel}"],capture_output=True,timeout=GIT_TIMEOUT)
+    except (OSError,subprocess.SubprocessError):return None
+    return out.stdout if out.returncode==0 else None
+
+def head_v3_keys():
+    """X-795: the keys of the common set of git HEAD (the set last committed), or None when it cannot be read (another folder than the
+    repository's, no git, no set committed yet)."""
+    if os.path.normcase(os.path.abspath(V3_DIR))!=os.path.normcase(os.path.join(ROOT,"community-discoveries","v3")):return None
+    rel="community-discoveries/v3/"
+    index=git_bytes(rel+V3_INDEX)
+    if index is None:return None
+    try:
+        got=v3_read(lambda:index.decode("utf-8"),lambda e:git_bytes(rel+e["Name"]) or b"")
+        return {key(f) for f in got["Facts"] if isinstance(f,dict) and all(n in f for n in ("Kind","Subject","Detail","Territory","Map","CellX","CellZ"))}
+    except (ValueError,UnicodeDecodeError):return None
+
+def rebuild(say=print,fresh=(),skip=(),history=None):
     # X-772 (0.1801, D-217): the place (X, Z) and days (First, Last) of a fact are no longer in the player files: per fact, the earliest day's
     # exact place and the latest day seen, from the common set as it is (v3/), from the player files of before (each written again here without
     # them) and from the gists just read (fresh, sync); on the same first day, the first met keeps its place.
-    places={}
-    def place(f):
-        known=places.get(key(f))
-        if known is None:places[key(f)]={n:f[n] for n in PLACE};return
-        if when(f["First"])<when(known["First"]):known["First"]=f["First"];known["X"]=f["X"];known["Z"]=f["Z"]
-        if when(f["Last"])>when(known["Last"]):known["Last"]=f["Last"]
-    if os.path.isfile(os.path.join(V3_DIR,V3_INDEX)):
-        for f in clean(from_v3_dir(V3_DIR))[0]:place(f)
-    names=player_names();renewed={stem(n) for n in names if n.endswith(PLAYER_SUFFIX)}
-    files=[]
+    # X-795: the common set read whole first (v3_guard), and nothing written when a fact a counted player holds is in the common set of git HEAD
+    # but has no place now (Lossy). X-796 M1: the places and days of a player left out (FLAG, or an older issue of the same account) never count.
+    # fresh: facts, or (player file name, fact) pairs (sync); skip: player file names read as if removed (withdraw removes them after the write).
+    current=v3_guard()
+    sources=[(None,f) for f in clean(current)[0]] if current is not None else []
+    names=[n for n in player_names() if n not in set(skip)];renewed={stem(n) for n in names if n.endswith(PLAYER_SUFFIX)}
+    files=[];later=[]   # later: the player files' writes, done once the common set is written (a stop before it leaves every file as it was)
     for name in names:
         path=os.path.join(PLAYERS,name);player=read_player(path);issue=stem(name)
         if player["Old"]:
@@ -423,45 +467,72 @@ def rebuild(say=print,fresh=()):
             # common set, then the file written again without them (or, beside its new file after a conversion cut short, removed).
             kept=[f for f in player["Facts"] if valid(dict(f))]
             kept=[daily(f) for f in kept]
-            for f in kept:place(f)
-            if issue in renewed:os.remove(path);say(f"{name}: removed (its {issue}{PLAYER_SUFFIX} is there: a conversion cut short)");continue
+            sources+=[(issue+PLAYER_SUFFIX,f) for f in kept]
+            if issue in renewed:
+                later.append(lambda path=path,name=name,issue=issue:(os.remove(path),say(f"{name}: removed (its {issue}{PLAYER_SUFFIX} is there: a conversion cut short)")))
+                continue
             if len(kept)<len(player["Facts"]):say(f"{name}: {len(player['Facts'])-len(kept)} facts refused by the current rules")
-            write_player(issue,player.get("Login"),kept)
-            say(f"{name}: written again as {issue}{PLAYER_SUFFIX}, without exact places nor days (X-772)")
+            later.append(lambda issue=issue,player=player,kept=kept,name=name:(write_player(issue,player.get("Login"),kept),
+                         say(f"{name}: written again as {issue}{PLAYER_SUFFIX}, without exact places nor days (X-772)")))
         files.append((issue+PLAYER_SUFFIX,issue,(player.get("Login") or "").lower(),player.get("Login"),
                       [without_place(f) for f in kept] if player["Old"] else player["Facts"]))
-    for f in fresh:place(f)
+    sources+=[pair if isinstance(pair,tuple) else (None,pair) for pair in fresh]
+    def places_of(excluded):
+        places={}
+        for owner,f in sources:
+            if owner in excluded:continue
+            known=places.get(key(f))
+            if known is None:places[key(f)]={n:f[n] for n in PLACE};continue
+            if when(f["First"])<when(known["First"]):known["First"]=f["First"];known["X"]=f["X"];known["Z"]=f["Z"]
+            if when(f["Last"])>when(known["Last"]):known["Last"]=f["Last"]
+        return places
     # Each player's facts with their fact's place and days; refused by the current rules: the file written again without them; with no
     # place known anywhere: kept in the file, left out of the common set until a share brings it.
-    placed=[]
-    for name,issue,author,shown,facts in files:
-        kept=[];held=[];waiting=0
-        for f in facts:
-            try:spot=places.get(key(f))
-            except (KeyError,TypeError):continue
-            if spot is None:waiting+=1;held.append(f);continue
-            full={**f,**spot,"Seen":0,"Imported":1}
-            if valid(dict(full)):kept.append(capped(full));held.append(f)
-        if len(held)<len(facts):say(f"{name}: {len(facts)-len(held)} facts refused by the current rules");write_player(issue,shown,held)
-        if waiting:say(f"{name}: {waiting} facts whose place is in no common file nor gist read now: kept in the player file, left out of the common set")
-        placed.append((name,author,kept))
+    def placed_with(places):
+        placed=[]
+        for name,issue,author,shown,facts in files:
+            kept=[];held=[];waiting=set()
+            for f in facts:
+                try:spot=places.get(key(f))
+                except (KeyError,TypeError):continue
+                if spot is None:waiting.add(key(f));held.append(f);continue
+                full={**f,**spot,"Seen":0,"Imported":1}
+                if valid(dict(full)):kept.append(capped(full));held.append(f)
+            placed.append((name,issue,author,shown,facts,kept,held,waiting))
+        return placed
+    placed=placed_with(places_of(set()))
     # X-183 (N13): one file per GitHub account: the newest issue of a login counts, an older one is reported and left out (a file without its login,
     # written before 0.1210, counts as it is until sync notes it).
-    newest={login:name for name,login,_ in placed if login}
-    counted=[]
-    for name,login,kept in placed:
-        if login and newest[login]!=name:say(f"{name}: same author as {newest[login]} (a newer issue): not counted");continue
-        counted.append((name,kept))
+    newest={p[2]:p[0] for p in placed if p[2]}
+    counted=[p[0] for p in placed if not (p[2] and newest[p[2]]!=p[0])]
     # X-183 (N5): a player alone far outside the others' levels on over 5 % of the facts they share is left out, never allowed to widen everyone's facts.
     held=collections.defaultdict(list)
-    for name,kept in counted:
-        for f in kept:held[key(f)].append((name,f))
+    for p in placed:
+        if p[0] in counted:
+            for f in p[5]:held[key(f)].append((p[0],f))
     left=set()
     for name,(alone,shared) in sorted(outliers(held).items()):
-        if alone>=FAR_FACTS and alone*20>shared:left.add(name);say(f"{name}: FLAG: alone far outside the other players' levels on {alone} of the {shared} facts it shares: not counted, check it by hand")
+        if alone>=FAR_FACTS and alone*20>shared:left.add(name)
+    # X-796 M1: the places and days a left-out player brought (a file of before, a gist read now) are taken again without them.
+    excluded=left|{p[0] for p in placed if p[0] not in counted}
+    if any(owner in excluded for owner,_ in sources):placed=placed_with(places_of(excluded))
+    for name,issue,login,shown,facts,kept,kept_held,waiting in placed:
+        if len(kept_held)<len(facts):
+            say(f"{name}: {len(facts)-len(kept_held)} facts refused by the current rules")
+            later.append(lambda issue=issue,shown=shown,kept_held=kept_held:write_player(issue,shown,kept_held))
+        if waiting:say(f"{name}: {len(waiting)} facts whose place is in no common file nor gist read now: kept in the player file, left out of the common set")
+        if login and newest[login]!=name:say(f"{name}: same author as {newest[login]} (a newer issue): not counted")
+    for name,(alone,shared) in sorted(outliers(held).items()):
+        if name in left:say(f"{name}: FLAG: alone far outside the other players' levels on {alone} of the {shared} facts it shares: not counted, check it by hand")
+    # X-795: a fact a counted player holds, in the common set of git HEAD, with no place now: the common set read was incomplete; nothing written.
+    past=head_v3_keys() if history is None else history()
+    if past:
+        lost=sorted({k for p in placed if p[0] in counted and p[0] not in left for k in p[7] if k in past})
+        if lost:raise Lossy(f"{len(lost)} fact(s) held by players and in the common set of git HEAD have no place in the common set read now "
+                            f"(first: {lost[0]}): it is incomplete; restore community-discoveries/v3 from git history first")
     merged={}
-    for name,kept in counted:
-        if name in left:continue
+    for name,issue,author,shown,facts,kept,kept_held,waiting in placed:
+        if name not in counted or name in left:continue
         for f in kept:
             known=merged.get(key(f))
             if known is None:merged[key(f)]=dict(f);continue
@@ -477,7 +548,9 @@ def rebuild(say=print,fresh=()):
     players=len(counted)-len(left)
     # X-174, X-357 (0.1349): the v3 set only, compared byte for byte (X-113: the same facts are not written again, a date alone changes nothing).
     say(f"common: {len(common['Facts'])} facts from {players} players")
-    return write_v3(bounded(common["Facts"],say=say),V3_DIR,say)
+    changed=write_v3(bounded(common["Facts"],say=say),V3_DIR,say)
+    for write in later:write()
+    return changed
 
 def write_v3(facts,folder,say=print):
     """X-174: the v3 set of these facts in folder: a file written only when its bytes change, a kind file no longer in the set removed. True if changed."""
@@ -542,6 +615,11 @@ def sync(dry):
     issues=json.loads(subprocess.run(["gh","issue","list","-R","Shigu330/Tensho-Assistant","--state","open","--limit",str(ISSUE_LIMIT),
         "--json","number,title,body,author,labels"],capture_output=True,text=True,check=True,timeout=REMOTE_TIMEOUT).stdout)
     os.makedirs(PLAYERS,exist_ok=True)
+    # X-795: the common set read whole before any player file is written (a stop here leaves everything as it was).
+    try:v3_guard()
+    except Lossy as error:
+        if not dry:raise
+        print(f"STOP at the write: {error}")
     taken={};shares=set();fresh=[]
     # X-183 (N13): the newest issue of an account first; an older one of the same account (a gist made again, a second issue) is not read.
     for issue in sorted(issues,key=lambda i:-i["number"]):
@@ -566,7 +644,7 @@ def sync(dry):
         what=" nothing new (same facts as its player file): no write, no « Merged » comment" if (added,gone)==(0,0) else f" {added} new or changed, {gone} gone"
         print(f"#{issue['number']} {issue['title']} (author {short(login(issue))}): {report['facts']} facts, {report['refused']} refused, kinds {report['kinds']};{what}{flag}")
         if dry or flag:continue
-        fresh.extend(facts)   # X-772: their places and days go to the common set (rebuild), never to the player file
+        fresh.extend((f"{issue['number']}{PLAYER_SUFFIX}",f) for f in facts)   # X-772: their places and days go to the common set (rebuild), never to the player file; X-796 M1: with their player
         if (added,gone)==(0,0):
             # X-183 (N13): a file written before 0.1210 gets its author noted (the facts unchanged), so rebuild counts one file per account.
             try:held=player_of(issue["number"])
@@ -592,8 +670,10 @@ def withdraw(issue,dry):
     if not present:print(f"players/{issue}: no such player file");return 2
     shown=", ".join("players/"+os.path.basename(path) for path in present)
     if dry:print(f"{shown} would be removed, then the common files rebuilt");return 0
+    # X-795: rebuilt without them first; the files removed once the common set is written (a stop leaves them, and the set, as they were)
+    rebuild(skip=[os.path.basename(path) for path in present])
     for path in present:os.remove(path)
-    print(f"{shown} removed");rebuild();return 0
+    print(f"{shown} removed");return 0
 
 # ---------- X-116: facts to recheck after a game patch ----------
 CELL_KINDS=PLACED  # every fact with a place: a changed layout cell can change what was seen there
@@ -854,6 +934,53 @@ def selftest():
         with contextlib.redirect_stdout(io.StringIO()):gone=withdraw("100",False)   # its lines are the tool's report, not the selftest's
         check(gone==0 and sorted(os.listdir(PLAYERS))==["43.jsonl.gz"] and {g["Subject"] for g in common()}=={1,2,3},
               "X-772: withdrawn: the file removed, the facts no other player has gone")
+        # X-795 (review of 0.1802, I1): a rebuild that reads the common set missing or cut short stops before writing anything (behaviour).
+        for folder in (PLAYERS,V3_DIR):
+            for n in os.listdir(folder):os.remove(os.path.join(folder,n))
+        put(43,[dict(s) for s in spots],"Ann");put(44,[dict(s) for s in spots[:2]],"Cy");rebuild(say)
+        def snapshot():return {(d,n):open(os.path.join(d,n),"rb").read() for d in (PLAYERS,V3_DIR) for n in sorted(os.listdir(d))}
+        def stops(run):
+            try:run();return False
+            except Lossy:return True
+        whole_set=snapshot();keys={key(g) for g in common()}
+        index_text=open(os.path.join(V3_DIR,V3_INDEX),encoding="utf-8").read()
+        os.remove(os.path.join(V3_DIR,V3_INDEX))
+        check(stops(lambda:rebuild(say)) and snapshot()=={k:v for k,v in whole_set.items() if k[1]!=V3_INDEX},
+              "X-795: v3/index.json missing: rebuild stops, no kind file removed, no player file written")
+        check(stops(lambda:withdraw("44",False)) and os.path.isfile(os.path.join(PLAYERS,"44.jsonl.gz")),"X-795: withdraw stops too, the player file kept")
+        write_atomic(os.path.join(V3_DIR,V3_INDEX),index_text);check(snapshot()==whole_set,"X-795: restored, the same set")
+        entry=json.loads(index_text);entry["Files"]=[];write_atomic(os.path.join(V3_DIR,V3_INDEX),json.dumps(entry))
+        check(stops(lambda:rebuild(say)) and open(os.path.join(V3_DIR,v3_name(1)),"rb").read()==whole_set[(V3_DIR,v3_name(1))],
+              "X-795: an index listing fewer kind files than the folder holds: rebuild stops, the kind file kept")
+        os.remove(os.path.join(V3_DIR,v3_name(1)))
+        check(stops(lambda:rebuild(say,history=lambda:keys)) and not os.path.exists(os.path.join(V3_DIR,v3_name(1)))
+              and snapshot()=={(d,n):v for (d,n),v in whole_set.items() if d==PLAYERS} | {(V3_DIR,V3_INDEX):json.dumps(entry).encode("utf-8")},
+              "X-795: an index cut short with its file gone: the facts of git HEAD without a place stop the rebuild, nothing written")
+        write_atomic(os.path.join(V3_DIR,V3_INDEX),index_text)
+        check(stops(lambda:rebuild(say)),"X-795: a kind file listed in the index but missing: rebuild stops")
+        write_atomic(os.path.join(V3_DIR,v3_name(1)),whole_set[(V3_DIR,v3_name(1))])
+        said.clear();check(not rebuild(say,history=lambda:keys) and snapshot()==whole_set,f"X-795: the set whole again: rebuilt, nothing changed ({said})")
+        write_player(45,"Di",[without_place(f(1,9,128,10.0,10.0,"2026-11-03T00:00:00+00:00"))])
+        said.clear();rebuild(say,history=lambda:keys)
+        check("45.jsonl.gz: 1 facts whose place is in no common file nor gist read now: kept in the player file, left out of the common set" in said,
+              f"X-795: a fact never in the common set still waits, without a stop ({said})")
+        os.remove(os.path.join(PLAYERS,"45.jsonl.gz"))
+        # X-796 M1: a player left out (FLAG) brings no place nor day, even through a gist read now (sync) or a file of before.
+        for folder in (PLAYERS,V3_DIR):
+            for n in os.listdir(folder):os.remove(os.path.join(folder,n))
+        put(43,[dict(g) for g in first],"Ann");rebuild(say)
+        write_player(100,"Bob",[{**without_place(g),"LevelMax":100000} for g in first])
+        early=[{**g,"X":70.0,"Z":130.0,"First":"2026-11-01T00:00:00+00:00","Last":"2026-11-20T00:00:00+00:00"} for g in first]
+        said.clear();rebuild(say,fresh=[("100.jsonl.gz",g) for g in early])
+        got={(g["X"],g["First"][:10],g["Last"][:10]) for g in common()}
+        check(got=={(60.0,"2026-11-03","2026-11-03")} and any(l.startswith("100.jsonl.gz: FLAG") for l in said),
+              f"X-796 M1: the gist of a player left out gives neither place nor day ({got}, {said})")
+        os.remove(os.path.join(PLAYERS,"100.jsonl.gz"));put(100,[{**g,"LevelMax":100000} for g in early],"Bob")
+        said.clear();rebuild(say);got={(g["X"],g["First"][:10],g["Last"][:10]) for g in common()}
+        check(got=={(60.0,"2026-11-03","2026-11-03")} and sorted(os.listdir(PLAYERS))==["100.jsonl.gz","43.jsonl.gz"],
+              f"X-796 M1: nor their file of before (converted all the same) ({got}, {said})")
+        rebuild(say,fresh=early);got={(g["X"],g["First"][:10]) for g in common()}
+        check(got=={(70.0,"2026-11-01")},f"X-796 M1: a place from a counted source still takes the earliest day ({got})")
     PLAYERS,V3_DIR=saved
     # X-146: a gist file read within its bound and its time, a slow trickle stopped.
     class Answer:
@@ -942,12 +1069,15 @@ if __name__=="__main__":
     utf8_output(sys.stdout);utf8_output(sys.stderr)
     if len(sys.argv)<2:print(__doc__);sys.exit(2)
     command=sys.argv[1]
-    if command=="sync":sync("--dry-run" in sys.argv)
-    elif command=="rebuild":rebuild()
-    elif command=="check" and len(sys.argv)==3:print(clean(read(sys.argv[2]))[1])
+    try:
+        if command=="sync":sync("--dry-run" in sys.argv);sys.exit(0)
+        if command=="rebuild":rebuild();sys.exit(0)
+        if command=="withdraw" and len([a for a in sys.argv[2:] if a!="--dry-run"])==1:
+            sys.exit(withdraw([a for a in sys.argv[2:] if a!="--dry-run"][0],"--dry-run" in sys.argv))
+    except Lossy as error:   # X-795
+        print(f"STOP: {error}; nothing written");sys.exit(2)
+    if command=="check" and len(sys.argv)==3:print(clean(read(sys.argv[2]))[1])
     elif command=="notice":sys.exit(notice(sys.argv[2:]))
-    elif command=="withdraw" and len([a for a in sys.argv[2:] if a!="--dry-run"])==1:
-        sys.exit(withdraw([a for a in sys.argv[2:] if a!="--dry-run"][0],"--dry-run" in sys.argv))
     elif command=="recheck":
         argv=sys.argv[2:];changes=argv[argv.index("--changes")+1] if "--changes" in argv else None
         print(recheck_report(changes,"--local" in argv,int(argv[argv.index("--limit")+1]) if "--limit" in argv else 40))

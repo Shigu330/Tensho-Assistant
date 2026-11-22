@@ -21,7 +21,7 @@ internal static class DiscoveryBound1383Tests
         ("Discovery bound 1383: rebuild writes the bounded set, v3_build refuses a kind over the bound, the selftest holds the cases", () =>
         {
             var tool = Read("tools/discoveries-merge.py");
-            Check(tool.Contains("return write_v3(bounded(common[\"Facts\"],say=say),V3_DIR,say)"), "rebuild writes bounded(...)");
+            Check(tool.Contains("changed=write_v3(bounded(common[\"Facts\"],say=say),V3_DIR,say)"), "rebuild writes bounded(...)");   // 0.1803 (X-795): the player files written after it
             Check(tool.Contains("if over:raise ValueError(f\"kinds over the bound of {MAX_FACTS} facts"), "v3_build refuses a kind over the bound");
             Check(tool.Contains("key=lambda f:(-f[\"Imported\"],-when(f[\"Last\"]).timestamp(),sort_key(f))"), "the most seen, then the most recent");
             foreach (var name in new[] { "X-406: bounded keeps", "X-406: the bounded set's index reads whole", "X-406: a kind over the bound: v3_build refuses to write" })
