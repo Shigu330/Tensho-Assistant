@@ -97,6 +97,9 @@ OLD_PLUGIN_FACTS=200_000
 ORDER=["Kind","Subject","Detail","Territory","Map","CellX","CellZ","X","Z","LevelMin","LevelMax","Seen","Imported","First","Last","Hq","Values"]
 # X-772 (0.1801, D-217): a player file keeps only what the merge needs, compressed like the common files: no exact place nor day.
 PLAYER_FORMAT="tensho-discoveries-player";PLAYER_VERSION=1;PLAYER_SUFFIX=".jsonl.gz"
+# X-826: the only fields of a player file's header, in the order player_bytes writes them; read_player refuses any other, and
+# DiscoveryPlayers1801Tests checks the repository's player files against this list (never a character name, world, place nor day).
+PLAYER_HEADER=("Format","Version","Issue","Login","Gist","Revision","Counted","Count")
 PLAYER_ORDER=["Kind","Subject","Detail","Territory","Map","CellX","CellZ","LevelMin","LevelMax","Hq","Values"]
 PLACE=("X","Z","First","Last")
 
@@ -396,6 +399,7 @@ def player_bytes(issue,author,facts,noted=None,counted=None):
     facts=sorted((without_place(f) for f in facts),key=sort_key)
     header={"Format":PLAYER_FORMAT,"Version":PLAYER_VERSION,"Issue":issue,**({"Login":author} if author else {}),**merged_note(noted),
             **({"Counted":counted} if counted is not None else {}),"Count":len(facts)}
+    if list(header)!=[k for k in PLAYER_HEADER if k in header]:raise ValueError(f"a player file's header outside PLAYER_HEADER: {list(header)}")
     return gzip.compress("".join(v3_line(o)+"\n" for o in [header]+facts).encode("utf-8"),compresslevel=9,mtime=0)
 
 def read_player(path):
@@ -409,6 +413,7 @@ def read_player(path):
     header=json.loads(lines[0]) if lines else None
     if not isinstance(header,dict) or header.get("Format")!=PLAYER_FORMAT or header.get("Version")!=PLAYER_VERSION:
         raise ValueError(f"{os.path.basename(path)}: not a player file of version {PLAYER_VERSION}")
+    if set(header)-set(PLAYER_HEADER):raise ValueError(f"{os.path.basename(path)}: its header holds a field it never keeps: {sorted(set(header)-set(PLAYER_HEADER))}")
     facts=[json.loads(line) for line in lines[1:] if line]
     if header.get("Count")!=len(facts) or not all(isinstance(f,dict) and not set(f)-set(PLAYER_ORDER) for f in facts):
         raise ValueError(f"{os.path.basename(path)}: its facts differ from its header or hold a field it never keeps")
@@ -1180,6 +1185,15 @@ def selftest():
         said.clear();rebuild(say)
         check(read_player(os.path.join(PLAYERS,"7.jsonl.gz"))["Noted"]=={"Gist":"g7","Revision":"r7"},f"X-804: a file written again (a fact refused) keeps its note ({said})")
         os.remove(os.path.join(PLAYERS,"7.jsonl.gz"))
+        # X-826: the header holds PLAYER_HEADER only: what player_bytes writes (note and « Counted » too), and a header with anything else refused.
+        written=gzip.decompress(player_bytes(43,"Ann",[dict(spots[0])],{"Gist":"g2","Revision":"r2"},True)).decode("utf-8").split("\n")[0]
+        check(list(json.loads(written))==list(PLAYER_HEADER),f"X-826: a player file's header: exactly PLAYER_HEADER, in its order ({written})")
+        for field,value in (("World","Alpha"),("Name","Ann Doe"),("X",10.0),("First","2026-11-01T00:00:00+00:00")):
+            write_atomic(os.path.join(PLAYERS,"8.jsonl.gz"),gzip.compress("".join(v3_line(o)+"\n" for o in [{"Format":PLAYER_FORMAT,"Version":PLAYER_VERSION,"Issue":8,field:value,"Count":1},without_place(spots[2])]).encode("utf-8"),mtime=0))
+            try:read_player(os.path.join(PLAYERS,"8.jsonl.gz"));kept_bad=True
+            except ValueError:kept_bad=False
+            check(not kept_bad,f"X-826: a header holding {field}: refused")
+        os.remove(os.path.join(PLAYERS,"8.jsonl.gz"))
     PLAYERS,V3_DIR=saved
     # X-146: a gist file read within its bound and its time, a slow trickle stopped.
     class Answer:
