@@ -271,14 +271,17 @@ internal static class SettingsFile1745Tests
             // At once: each client saves its own counter 25 times while a reader keeps reading the file.
             var path = oneFile.FilePath;
             var broken = 0;
+            string? unexpected = null;   // X-775: an exception of a thread is kept and checked, never left to take the test process down
             using var stop = new CancellationTokenSource();
-            var reader = new Thread(() => { while (!stop.IsCancellationRequested) { try { SettingsJson.Node(System.IO.File.ReadAllText(path)); } catch (System.Text.Json.JsonException) { Interlocked.Increment(ref broken); } catch (IOException) { } } }) { IsBackground = true };
+            // X-775: File.ReadAllText throws UnauthorizedAccessException on Windows while the file is being replaced (as SettingsFile.cs expects).
+            var reader = new Thread(() => { try { while (!stop.IsCancellationRequested) { try { SettingsJson.Node(System.IO.File.ReadAllText(path)); } catch (System.Text.Json.JsonException) { Interlocked.Increment(ref broken); } catch (Exception error) when (error is IOException or UnauthorizedAccessException) { } } } catch (Exception error) { Interlocked.CompareExchange(ref unexpected, "reader: " + error, null); } }) { IsBackground = true };
             reader.Start();
-            var a = new Thread(() => { for (var i = 1; i <= 25; i++) { one.MapView.IconScale = 1f + i; oneFile.Save(one); } });
-            var b = new Thread(() => { for (var i = 1; i <= 25; i++) { two.MapView.MapIconPriorities[5] = new() { [9] = i }; twoFile.Save(two); } });
+            var a = new Thread(() => { try { for (var i = 1; i <= 25; i++) { one.MapView.IconScale = 1f + i; oneFile.Save(one); } } catch (Exception error) { Interlocked.CompareExchange(ref unexpected, "first client: " + error, null); } });
+            var b = new Thread(() => { try { for (var i = 1; i <= 25; i++) { two.MapView.MapIconPriorities[5] = new() { [9] = i }; twoFile.Save(two); } } catch (Exception error) { Interlocked.CompareExchange(ref unexpected, "second client: " + error, null); } });
             a.Start(); b.Start();
             Check(a.Join(TimeSpan.FromSeconds(60)) && b.Join(TimeSpan.FromSeconds(60)), "both ended");
             stop.Cancel(); reader.Join();
+            Check(unexpected is null, "no exception left in a thread: " + unexpected);
             var last = Settings(root).Load(out _);
             Check(last.MapView.IconScale == 26f && last.MapView.MapIconPriorities.GetValueOrDefault(5u)?.GetValueOrDefault(9u) == 25, $"each one's last value: {last.MapView.IconScale}, {last.MapView.MapIconPriorities.GetValueOrDefault(5u)?.GetValueOrDefault(9u)}");
             Check(last.DeveloperMode == one.DeveloperMode && last.HidePanelsBehindGame == two.HidePanelsBehindGame, "the earlier changes still there");
