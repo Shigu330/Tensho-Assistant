@@ -86,6 +86,11 @@ MAX_SEEN=100_000;PLAYER_SIGHTINGS=1_000;FAR_FACTS=3
 # X-174: the v3 format and its bounds (ExchangeV3 in the plugin).
 V3_FORMAT="tensho-discoveries";V3_VERSION=3;V3_INDEX="index.json";GIST_V2="tensho-discoveries.b64";GIST_SUFFIX=".b64"
 MAX_COMPRESSED=32*1024*1024;MAX_DECOMPRESSED=256*1024*1024;MAX_LINE=64*1024;MAX_INDEX=1024*1024
+# X-807 M2 (review of 0.1806): the producer written in every kind file of the common set, also the one fit_bytes measures with (a shorter one
+# measured a file that the write then made larger than the bound).
+PRODUCER="Tensho Assistant community"
+# X-807 M3: the plugins up to 0.1804 refuse the whole index once one entry counts more facts than this (their MaxFacts); said when reached.
+OLD_PLUGIN_FACTS=200_000
 ORDER=["Kind","Subject","Detail","Territory","Map","CellX","CellZ","X","Z","LevelMin","LevelMax","Seen","Imported","First","Last","Hq","Values"]
 # X-772 (0.1801, D-217): a player file keeps only what the merge needs, compressed like the common files: no exact place nor day.
 PLAYER_FORMAT="tensho-discoveries-player";PLAYER_VERSION=1;PLAYER_SUFFIX=".jsonl.gz"
@@ -189,6 +194,9 @@ def bounded(facts,limit=None,say=print,max_compressed=None,max_decompressed=None
             mine=sorted(mine,key=lambda f:(-f["Imported"],-when(f["Last"]).timestamp(),sort_key(f)))[:limit];cut=True
             say(f"kind {kind}: {len(by[kind])} facts over the bound of {limit}: {len(by[kind])-limit} left out (the least seen, then the oldest)")
         mine=fit_bytes(kind,mine,max_compressed,max_decompressed,say)
+        if len(mine)>OLD_PLUGIN_FACTS:
+            say(f"WARN kind {kind}: {len(mine)} facts, over {OLD_PLUGIN_FACTS}: Tensho 0.1804 and older refuse the whole common set (every kind), "
+                "not only this one (X-807 M3)")
         cut=cut or len(mine)<len(by[kind])
         kept.extend(mine)
     return sorted(kept,key=sort_key) if cut else facts
@@ -204,15 +212,16 @@ def fit_bytes(kind,facts,max_compressed,max_decompressed,say=print):
         if total+sizes[n]>max_decompressed:break
         total+=sizes[n];count+=1
     keep=[facts[n] for n in ordered[:count]]
-    while keep and len(v3_kind_bytes(kind,keep,"t"))>max_compressed:
-        keep=keep[:max(0,min(len(keep)-1,int(len(keep)*max_compressed/len(v3_kind_bytes(kind,keep,"t"))*0.98)))]
+    while keep and len(v3_kind_bytes(kind,keep,PRODUCER))>max_compressed:
+        keep=keep[:max(0,min(len(keep)-1,int(len(keep)*max_compressed/len(v3_kind_bytes(kind,keep,PRODUCER))*0.98)))]
     if len(keep)<len(facts):
         say(f"kind {kind}: {len(facts)} facts over the format's byte bounds: {len(facts)-len(keep)} left out (the least seen, then the oldest)")
         return keep
     return facts
 
 def v3_build(facts,producer):
-    """(index.json text, {name: gzip bytes}) of a v3 set. X-406: a kind over MAX_FACTS is refused (its index entry would refuse the whole set)."""
+    """(index.json text, {name: gzip bytes}) of a v3 set. X-406: a kind over MAX_FACTS is refused (its index entry would refuse the whole set).
+    X-807 M2: so is a kind file over MAX_COMPRESSED (v3_index and the plugin's ParseIndex refuse the whole index for one such entry)."""
     by=collections.defaultdict(list)
     for f in facts:by[f["Kind"]].append(f)
     over={k:len(v) for k,v in by.items() if len(v)>MAX_FACTS}
@@ -220,6 +229,7 @@ def v3_build(facts,producer):
     files={};entries=[]
     for kind in sorted(by):
         data=v3_kind_bytes(kind,by[kind],producer);files[v3_name(kind)]=data
+        if len(data)>MAX_COMPRESSED:raise ValueError(f"kind {kind}: {len(data)} compressed bytes, over the bound of {MAX_COMPRESSED} (bounded() first)")
         entries.append({"Name":v3_name(kind),"Kind":kind,"Count":len(by[kind]),"Bytes":len(data),"Sha256":hashlib.sha256(data).hexdigest().upper()})
     index={"Format":V3_FORMAT,"Version":V3_VERSION,"Written":newest(facts),"Files":entries}
     return json.dumps(index,ensure_ascii=False,indent=1)+"\n",files
@@ -410,10 +420,12 @@ def player_of(issue):
         if os.path.isfile(path):return read_player(path)
     return None
 
+def name_order(n):return (0,int(stem(n)),n) if stem(n).isdigit() else (1,0,n)
+
 def player_names():
     """The player files, in issue order (X-183: « 43 » before « 100 »); X-772: <issue>.jsonl.gz, and the <issue>.json of before."""
     names=[n for n in os.listdir(PLAYERS) if (n.endswith(".json") or n.endswith(PLAYER_SUFFIX)) and not n.startswith(".")] if os.path.isdir(PLAYERS) else []
-    return sorted(names,key=lambda n:(0,int(stem(n)),n) if stem(n).isdigit() else (1,0,n))
+    return sorted(names,key=name_order)
 
 def far(values,mine,lowest):
     """X-183 (N5): one player's level far outside what all the others saw: more than twice their widest plus 10."""
@@ -476,19 +488,29 @@ def head_v3_keys():
         return {key(f) for f in got["Facts"] if isinstance(f,dict) and all(n in f for n in ("Kind","Subject","Detail","Territory","Map","CellX","CellZ"))}
     except (ValueError,UnicodeDecodeError):return None
 
-def rebuild(say=print,fresh=(),skip=(),history=None):
+def rebuild(say=print,fresh=(),skip=(),history=None,pending=None):
     # X-772 (0.1801, D-217): the place (X, Z) and days (First, Last) of a fact are no longer in the player files: per fact, the earliest day's
     # exact place and the latest day seen, from the common set as it is (v3/), from the player files of before (each written again here without
     # them) and from the gists just read (fresh, sync); on the same first day, the first met keeps its place.
     # X-795: the common set read whole first (v3_guard), and nothing written when a fact a counted player holds is in the common set of git HEAD
     # but has no place now (Lossy). X-796 M1: the places and days of a player left out (FLAG, or an older issue of the same account) never count.
     # fresh: facts, or (player file name, fact) pairs (sync); skip: player file names read as if removed (withdraw removes them after the write).
+    # X-807 M1 (review of 0.1806): pending: {player file name: (issue, login, facts)}, the player files sync has read from the gists: taken here
+    # instead of the disk, and written in `later` like every other player file, once the common set is written. Before, sync wrote them before
+    # rebuild, whose stop then left them rewritten beside a common set that was not.
+    pending=dict(pending or {})
     current=v3_guard()
     sources=[(None,f) for f in clean(current)[0]] if current is not None else []
-    names=[n for n in player_names() if n not in set(skip)];renewed={stem(n) for n in names if n.endswith(PLAYER_SUFFIX)}
+    names=[n for n in player_names() if n not in set(skip)]
+    names=sorted(names+[n for n in pending if n not in names],key=name_order);renewed={stem(n) for n in names if n.endswith(PLAYER_SUFFIX)}
     files=[];later=[]   # later: the player files' writes, done once the common set is written (a stop before it leaves every file as it was)
     for name in names:
-        path=os.path.join(PLAYERS,name);player=read_player(path);issue=stem(name)
+        path=os.path.join(PLAYERS,name);issue=stem(name)
+        if name in pending:
+            _,author,given=pending[name]
+            player={"Issue":issue,"Login":author,"Facts":[without_place(f) for f in given],"Old":False}
+            later.append(lambda issue=issue,author=author,given=given:write_player(issue,author,given))
+        else:player=read_player(path)
         if player["Old"]:
             # 0.1005, 0.1012: a file of before follows the current rules and keeps the day only; X-772: its places and days kept for the
             # common set, then the file written again without them (or, beside its new file after a conversion cut short, removed).
@@ -496,7 +518,7 @@ def rebuild(say=print,fresh=(),skip=(),history=None):
             kept=[daily(f) for f in kept]
             sources+=[(issue+PLAYER_SUFFIX,f) for f in kept]
             if issue in renewed:
-                later.append(lambda path=path,name=name,issue=issue:(os.remove(path),say(f"{name}: removed (its {issue}{PLAYER_SUFFIX} is there: a conversion cut short)")))
+                later.append(lambda path=path,name=name,issue=issue:(os.path.exists(path) and os.remove(path),say(f"{name}: removed (its {issue}{PLAYER_SUFFIX} is there: a conversion cut short)")))
                 continue
             if len(kept)<len(player["Facts"]):say(f"{name}: {len(player['Facts'])-len(kept)} facts refused by the current rules")
             later.append(lambda issue=issue,player=player,kept=kept,name=name:(write_player(issue,player.get("Login"),kept),
@@ -570,7 +592,7 @@ def rebuild(say=print,fresh=(),skip=(),history=None):
             # 0.916: HQ sightings and values added over the players (each player's file counts once).
             if "Values" in f:known["Values"]=histogram_sum(known.get("Values"),f["Values"])
             if f.get("Hq",0)>0:known["Hq"]=min(known.get("Hq",0)+f["Hq"],sum(known["Values"].values()))
-    common={"Version":VERSION,"Producer":"Tensho Assistant community","Written":datetime.now(timezone.utc).isoformat(),
+    common={"Version":VERSION,"Producer":PRODUCER,"Written":datetime.now(timezone.utc).isoformat(),
             "Facts":sorted(merged.values(),key=sort_key)}
     players=len(counted)-len(left)
     # X-174, X-357 (0.1349): the v3 set only, compared byte for byte (X-113: the same facts are not written again, a date alone changes nothing).
@@ -581,7 +603,7 @@ def rebuild(say=print,fresh=(),skip=(),history=None):
 
 def write_v3(facts,folder,say=print):
     """X-174: the v3 set of these facts in folder: a file written only when its bytes change, a kind file no longer in the set removed. True if changed."""
-    index,files=v3_build(facts,"Tensho Assistant community");files={**files,V3_INDEX:index.encode("utf-8")}
+    index,files=v3_build(facts,PRODUCER);files={**files,V3_INDEX:index.encode("utf-8")}
     os.makedirs(folder,exist_ok=True);changed=0
     for name,data in files.items():
         path=os.path.join(folder,name)
@@ -642,6 +664,8 @@ def sync(dry):
     issues=json.loads(subprocess.run(["gh","issue","list","-R","Shigu330/Tensho-Assistant","--state","open","--limit",str(ISSUE_LIMIT),
         "--json","number,title,body,author,labels"],capture_output=True,text=True,check=True,timeout=REMOTE_TIMEOUT).stdout)
     os.makedirs(PLAYERS,exist_ok=True)
+    # X-807 M1: the player files to write (issue file name: (issue, login, facts)), given to rebuild, which writes them after the common set.
+    pending={}
     # X-795: the common set read whole before any player file is written (a stop here leaves everything as it was).
     try:v3_guard()
     except Lossy as error:
@@ -676,16 +700,16 @@ def sync(dry):
             # X-183 (N13): a file written before 0.1210 gets its author noted (the facts unchanged), so rebuild counts one file per account.
             try:held=player_of(issue["number"])
             except (OSError,ValueError):continue
-            if held is not None and held.get("Login")!=login(issue):write_player(issue["number"],login(issue),facts);print(f"#{issue['number']}: author noted in its player file")
+            if held is not None and held.get("Login")!=login(issue):pending[f"{issue['number']}{PLAYER_SUFFIX}"]=(issue["number"],login(issue),facts);print(f"#{issue['number']}: author noted in its player file")
             continue
-        write_player(issue["number"],login(issue),facts)
+        pending[f"{issue['number']}{PLAYER_SUFFIX}"]=(issue["number"],login(issue),facts)
     # X-183 (N13): a player file whose issue is no longer an open share (closed by the player, or deleted) still counts until it is withdrawn.
     if len(issues)<ISSUE_LIMIT:
         for name in player_names():
             if stem(name).isdigit() and int(stem(name)) not in shares:
                 print(f"players/{name}: issue #{stem(name)} is no longer an open share (closed or deleted): its facts still count; "
                       f"python -I -X utf8 tools/discoveries-merge.py withdraw {stem(name)} removes them")
-    if not dry:rebuild(fresh=fresh)
+    if not dry:rebuild(fresh=fresh,pending=pending)
     else:
         print();print(recheck_report())
 
@@ -766,6 +790,7 @@ def recheck_report(changes_path=None,local=False,limit=40):
 
 def selftest():
     """recheck and news on made-up data (no network, no game)."""
+    global MAX_COMPRESSED,OLD_PLUGIN_FACTS   # X-807: lowered for a case, then given back
     ok=total=0
     def check(cond,what):
         nonlocal ok,total;total+=1;ok+=bool(cond)
@@ -1008,6 +1033,25 @@ def selftest():
               f"X-796 M1: nor their file of before (converted all the same) ({got}, {said})")
         rebuild(say,fresh=early);got={(g["X"],g["First"][:10]) for g in common()}
         check(got=={(70.0,"2026-11-01")},f"X-796 M1: a place from a counted source still takes the earliest day ({got})")
+        # X-807 M1 (review of 0.1806): the player files sync read are written by rebuild after the common set; a stop leaves them as they were.
+        for folder in (PLAYERS,V3_DIR):
+            for n in os.listdir(folder):os.remove(os.path.join(folder,n))
+        solo={**spots[0],"Subject":8}   # held by Ann alone: no gist brings its place
+        put(43,[*[dict(s) for s in spots],dict(solo)],"Ann");put(44,[dict(s) for s in spots[:2]],"Cy");rebuild(say)
+        whole_set=snapshot();keys={key(g) for g in common()}
+        index_text=open(os.path.join(V3_DIR,V3_INDEX),encoding="utf-8").read()
+        cut=json.loads(index_text);cut["Files"]=[];write_atomic(os.path.join(V3_DIR,V3_INDEX),json.dumps(cut));os.remove(os.path.join(V3_DIR,v3_name(1)))
+        newer=[*[dict(s) for s in spots],{**spots[0],"Subject":7}]
+        pending={"44.jsonl.gz":(44,"Cy",newer),"45.jsonl.gz":(45,"Di",[dict(spots[2])])}
+        gists=[(n,g) for n,(_,_,given) in pending.items() for g in given]
+        before=snapshot()
+        check(stops(lambda:rebuild(say,fresh=gists,history=lambda:keys,pending=pending)) and snapshot()==before,
+              "X-807 M1: a stop in the rebuild of sync leaves every player file as it was (none rewritten, none created)")
+        write_atomic(os.path.join(V3_DIR,V3_INDEX),index_text);write_atomic(os.path.join(V3_DIR,v3_name(1)),whole_set[(V3_DIR,v3_name(1))])
+        said.clear();rebuild(say,fresh=gists,history=lambda:keys,pending=pending)
+        check(read_player(os.path.join(PLAYERS,"44.jsonl.gz"))["Facts"]==sorted([without_place(g) for g in newer],key=sort_key)
+              and read_player(os.path.join(PLAYERS,"45.jsonl.gz"))["Login"]=="Di" and 7 in {g["Subject"] for g in common()},
+              f"X-807 M1: the set whole: the player files of sync written after it, their facts in the common set ({said})")
     PLAYERS,V3_DIR=saved
     # X-146: a gist file read within its bound and its time, a slow trickle stopped.
     class Answer:
@@ -1048,11 +1092,21 @@ def selftest():
         said=[];kept=bounded(wide,say=said.append,max_decompressed=1024+100*line)
         heavy=sorted(wide,key=lambda x:(-x["Imported"],-when(x["Last"]).timestamp(),sort_key(x)))
         check(90<=len(kept)<=100 and {key(x) for x in kept}=={key(x) for x in heavy[:len(kept)]} and {key(x) for x in wide if x["Imported"]>=2}<={key(x) for x in kept}
-              and len(gzip.decompress(v3_kind_bytes(1,kept,"t")))<=1024+100*line and said and "over the format's byte bounds" in said[0],
+              and len(gzip.decompress(v3_kind_bytes(1,kept,PRODUCER)))<=1024+100*line and said and "over the format's byte bounds" in said[0],
               f"X-468: over the decompressed bound, the most seen then the most recent kept ({len(kept)}, {said})")
         squeezed=bounded(wide,say=said.append,max_compressed=1200)
-        check(0<len(squeezed)<len(wide) and len(v3_kind_bytes(1,squeezed,"t"))<=1200 and {key(x) for x in squeezed}=={key(x) for x in heavy[:len(squeezed)]},
-              f"X-468: over the compressed bound, the file written fits it ({len(squeezed)}, {len(v3_kind_bytes(1,squeezed,'t'))} bytes)")
+        check(0<len(squeezed)<len(wide) and len(v3_kind_bytes(1,squeezed,PRODUCER))<=1200 and {key(x) for x in squeezed}=={key(x) for x in heavy[:len(squeezed)]},
+              f"X-468: over the compressed bound, the file written fits it ({len(squeezed)}, {len(v3_kind_bytes(1,squeezed,PRODUCER))} bytes)")
+        # X-807 M2: measured with the producer the write uses: the file as write_v3 writes it fits; v3_build refuses a kind file over the bound.
+        compressed,old=MAX_COMPRESSED,OLD_PLUGIN_FACTS
+        try:
+            MAX_COMPRESSED=1200
+            check(len(v3_build(squeezed,PRODUCER)[1][v3_name(1)])<=1200,"X-807 M2: the file bounded() keeps is the size v3_build writes, within the bound")
+            check(refused(lambda:v3_build(wide,PRODUCER)),"X-807 M2: v3_build refuses a kind file over the compressed bound (its entry would refuse the index)")
+            OLD_PLUGIN_FACTS=3;said.clear();bounded(wide[:5],say=said.append)
+            check(any(s.startswith("WARN kind 1: 5 facts, over 3: Tensho 0.1804 and older refuse the whole common set") for s in said),
+                  f"X-807 M3: a kind past the bound of the plugins up to 0.1804 is said ({said})")
+        finally:MAX_COMPRESSED,OLD_PLUGIN_FACTS=compressed,old
         said.clear();check(bounded(wide,say=said.append) is wide and not said,"X-468: within every bound: the same list, nothing said")
     finally:MAX_FACTS=bound
     plugin=open(os.path.join(ROOT,"src","TenshoAssistant","Discoveries","DiscoveriesModel.cs"),encoding="utf-8").read()

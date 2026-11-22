@@ -49,7 +49,8 @@ the sums over the players. Version 1 files (without them) are still read.
 (optional ones left out when empty, nothing else). Since Tensho 0.1170 the plugin ignores a name it does not know when it reads `v3/` (a field
 added later needs no version 4), but refuses a line that holds `Own` or `Key` (a player's own part); the merge tool stays strict on the players' gists
 (any other name refuses the line). Readers check the size and the SHA-256 against the index before use and read the lines as a stream
-within bounds (32 MB compressed, 256 MB decompressed, 64 KB per line, 200,000 facts per kind); a bad line is refused and counted, a file whose refusals
+within bounds (32 MB compressed, 256 MB decompressed, 64 KB per line, 2,000,000 facts per kind since Tensho 0.1805; Tensho 0.1804 and older read at
+most 200,000 facts per kind and refuse the whole set, every kind, once one kind counts more: the merge tool warns when a kind passes it); a bad line is refused and counted, a file whose refusals
 pass 5 % is refused. A player's gist holds the same set, `index.json` and each kind file in base64 (`kind-NN.jsonl.gz.b64`). The tool writes the same
 facts as the same bytes. Since Tensho 0.1349 the common facts are in `v3/` only: the version 2 common file `discoveries.json` is no longer written
 nor read (the plugin takes nothing without `v3/`); the merge tool still reads a player's older gist holding the single `tensho-discoveries.b64`.
@@ -108,7 +109,9 @@ avec la valeur gardée la plus proche). Dans `v3/`, ce sont les sommes sur les j
 ci-dessus (les facultatifs omis quand ils sont vides, rien d'autre). Depuis Tensho 0.1170, le plugin ignore un nom qu'il ne connaît pas quand il
 lit `v3/` (un champ ajouté plus tard ne demande pas de version 4), mais refuse une ligne qui contient `Own` ou `Key` (la part propre d'un joueur) ;
 l'outil de fusion reste strict sur les gists des joueurs (tout autre nom fait refuser la ligne). Les lecteurs vérifient la taille et le SHA-256 contre l'index avant tout usage et
-lisent les lignes en flux, dans des bornes (32 Mo compressés, 256 Mo décompressés, 64 Ko par ligne, 200 000 faits par genre) ; une ligne fausse est
+lisent les lignes en flux, dans des bornes (32 Mo compressés, 256 Mo décompressés, 64 Ko par ligne, 2 000 000 de faits par genre depuis Tensho 0.1805 ;
+Tensho 0.1804 et avant lisent au plus 200 000 faits par genre et refusent tout l'ensemble, tous les genres, dès qu'un genre en compte plus : l'outil de
+fusion prévient quand un genre dépasse ce nombre) ; une ligne fausse est
 refusée et comptée, un fichier dont les refus dépassent 5 % est refusé. Le gist d'un joueur contient le même ensemble, `index.json` et chaque fichier de
 genre en base64 (`kind-NN.jsonl.gz.b64`). L'outil écrit les mêmes faits avec les mêmes octets. Depuis Tensho 0.1349, les faits communs sont dans `v3/`
 seulement : le fichier commun de version 2 `discoveries.json` n'est plus écrit ni lu (sans `v3/`, le plugin ne prend rien) ; l'outil de fusion lit encore

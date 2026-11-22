@@ -399,6 +399,15 @@ internal static class Headless
         return true;
     }
 
+    /// <summary>X-807 M4: the trial base of the « Discoveries-trial » picture on (true) or taken back (false). False when the method cannot be reached.</summary>
+    public static bool DiscoveriesTrial(Host host,bool on)
+    {
+        var method=host.Window.GetType().GetMethod("DesktopDiscoveriesTrial",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic);
+        if(method is null)return false;
+        method.Invoke(host.Window,[on]);
+        return true;
+    }
+
     /// <summary>X-606 (0.1710): the trial quests of the « Quests-details » picture on (true) or taken back (false). False when the method cannot be reached.</summary>
     public static bool QuestTrial(Host host,bool on)
     {

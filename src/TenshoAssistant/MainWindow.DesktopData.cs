@@ -59,6 +59,32 @@ internal sealed partial class MainWindow
         else if(!on && sortTrial is not null){developerMode=sortTrialDeveloper;sortTrial=null;}
         sortingViewResult=null;sortingViewError=null;sortingViewSnapshot=null;
     }
+    // X-807 M4 (review of 0.1806, R37): the « Discoveries-trial » picture: a trial base (Discoveries/DiscoveryTrial) shown with a search that
+    // finds its monsters, writing blocked; what was shown before (the copy's base, or none) given back after the picture. Never in the game.
+    private (Discoveries.DiscoveryStore? Store,string? Folder,bool Loaded,string? Problem,bool Blocked,string Search)? desktopDiscoveriesBefore;
+    private void DesktopDiscoveriesTrial(bool on)
+    {
+        if(!inDesktopApp)return;
+        if(!on)
+        {
+            if(desktopDiscoveriesBefore is not { } before)return;
+            DiscoveriesLoaded=false;
+            DiscoveryStore=before.Store;DiscoveryFolder=before.Folder;DesktopDiscoveriesProblem=before.Problem;DiscoveriesWriteBlocked=before.Blocked;discoverySearch=before.Search;
+            DiscoveriesLoaded=before.Loaded;desktopDiscoveriesBefore=null;
+            return;
+        }
+        desktopDiscoveriesBefore??=(DiscoveryStore,DiscoveryFolder,DiscoveriesLoaded,DesktopDiscoveriesProblem,DiscoveriesWriteBlocked,discoverySearch);
+        // The monsters: the first named ones whose name holds the two first letters of the first named one (one search finds them all).
+        var named=Enumerable.Range(1,3000).Select(id=>(Id:(uint)id,Name:DiscoveryMonsterName((uint)id))).ToArray();
+        var first=named.First();var wanted=first.Name[..Math.Min(2,first.Name.Length)];
+        var monsters=named.Where(row=>SearchText.Contains(row.Name,wanted,StringComparison.CurrentCultureIgnoreCase)).Take(Discoveries.DiscoveryTrial.Counts.Length).Select(row=>row.Id).ToArray();
+        var map=maps.State.Catalog is { } catalog && catalog.MapOf(148) is > 0 and var central ? central:4u;
+        var store=new Discoveries.DiscoveryStore();
+        store.Load(Discoveries.DiscoveryTrial.File(monsters,148,map));
+        DiscoveriesWriteBlocked=true;DiscoveriesLoaded=false;
+        DiscoveryStore=store;DiscoveryFolder=Path.Combine(Path.GetTempPath(),"tensho-discoveries-trial");DesktopDiscoveriesProblem=null;discoverySearch=wanted;
+        DiscoveriesLoaded=true;
+    }
     // X-606 (0.1710, R37): the « Quests-details » picture: the trial quests (Quests/QuestTrial) published to the quest list, the first one's
     // details open; taken back after the picture (the list emptied, nothing chosen). Never in the game.
     private void DesktopQuestTrial(bool on)

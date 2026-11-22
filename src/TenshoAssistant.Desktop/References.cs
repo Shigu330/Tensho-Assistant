@@ -71,6 +71,7 @@ internal static class References
                 if(shot.Setup=="sort-trial")host.Surface.SortTrial(true);
                 if(shot.Setup=="fc-routes" && !Headless.FreeCompanyTab(host,1))Console.WriteLine($"  {shot.Id}: the Best routes tab could not be asked");
                 if(shot.Setup=="quest-trial" && !Headless.QuestTrial(host,true))Console.WriteLine($"  {shot.Id}: the trial quests could not be given");
+                if(shot.Setup=="discoveries-trial" && !Headless.DiscoveriesTrial(host,true))Console.WriteLine($"  {shot.Id}: the trial discoveries could not be given");
                 // X-520 (0.1536): a tab and a category of the Settings page (the Debug tab in developer mode).
                 if(ReferencePlan.SettingsSetup(shot.Setup) is { } settings)host.Surface.OpenSettings(settings.Tab,settings.Category,settings.Developer);
                 thrown+=Take(host,status,window,shot,folder,compare,rows);
@@ -81,6 +82,7 @@ internal static class References
                 if(shot.Setup=="error")host.SheetsFail(false);
                 if(shot.Setup=="sort-trial")host.Surface.SortTrial(false);
                 if(shot.Setup=="quest-trial")Headless.QuestTrial(host,false);
+                if(shot.Setup=="discoveries-trial")Headless.DiscoveriesTrial(host,false);
                 if(ReferencePlan.SettingsSetup(shot.Setup) is not null)host.Surface.OpenSettings("General","",false);
                 if(trial is not null){Headless.RetainerTrialEnd(host);try{Directory.Delete(trial,true);}catch(IOException){}catch(UnauthorizedAccessException){}}
                 if(shot.Setup=="dashboard"){status.Link=link;host.GameMeasures(null,Environment.TickCount64);host.GameState(null);}
