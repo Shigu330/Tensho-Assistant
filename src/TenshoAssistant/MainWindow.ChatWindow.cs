@@ -1296,8 +1296,26 @@ internal sealed partial class MainWindow
         },TaskScheduler.Default);
     }
 
-    /// <summary>X-564 (0.1632): the chat window's tabs and lines, once its code is compiled (the first time timed for the log).</summary>
+    // X-558 (0.1775): the next tab not shown to take its messages (ChatLoading.RefreshOrder), the frames of the first minute after the load,
+    // and this frame's refresh time for them.
+    private int chatRefreshNext;
+    private readonly ChatLoadFrames chatLoadFrames=new();
+    private double chatRefreshMs;
+
+    /// <summary>X-564 (0.1632): the chat window's tabs and lines, once its code is compiled (the first time timed for the log). X-558 (0.1775):
+    /// each frame of the first minute after the load timed (ChatLoadFrames: the frames of 16 ms or more said in the log, then the minute's line).</summary>
     private void DrawChatWindowLines()
+    {
+        var started=System.Diagnostics.Stopwatch.GetTimestamp();
+        chatRefreshMs=0;
+        try{DrawChatWindowTabsAndLines();}
+        finally
+        {
+            foreach(var line in chatLoadFrames.Add(WarmupSinceMade,System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds,chatRefreshMs))log.Information("{0}",line);
+        }
+    }
+
+    private void DrawChatWindowTabsAndLines()
     {
         var options=ChatOptions;
         FollowChatContext(options);
@@ -1306,7 +1324,17 @@ internal sealed partial class MainWindow
         var table=ChatFilterTableNow();
         // X-558 (0.1532): the tabs' new lines, measured apart in developer mode (the « Slow frame » line).
         var refreshStarted=System.Diagnostics.Stopwatch.GetTimestamp();
-        foreach(var tab in tabs)ChatMessages.ViewOf(tab).Refresh(ChatMessages,tab,options.BoundedMaxLines,table,options);
+        // X-558 (0.1775): the shown tab first, the others while the frame's refresh stays under 3 ms (after the history is read back, every
+        // tab takes all the messages again: one frame for all of them was one long frame); a tab left takes its messages at the next frame.
+        var shown=chatTabShown>=0 && chatTabShown<chatMainTabs.Count ? tabs.IndexOf(chatMainTabs[chatTabShown]):-1;
+        foreach(var index in ChatLoading.RefreshOrder(tabs.Count,shown,chatRefreshNext))
+        {
+            var tab=tabs[index];
+            ChatMessages.ViewOf(tab).Refresh(ChatMessages,tab,options.BoundedMaxLines,table,options);
+            if(index!=shown)chatRefreshNext=index+1;
+            if(!ChatLoading.RefreshMore(System.Diagnostics.Stopwatch.GetElapsedTime(refreshStarted).TotalMilliseconds))break;
+        }
+        chatRefreshMs=System.Diagnostics.Stopwatch.GetElapsedTime(refreshStarted).TotalMilliseconds;
         // X-447 B7 (0.1647): the alerts not seen, for the server bar.
         Volatile.Write(ref chatAlertsUnseen,ChatAlert.Unseen(tabs.Select(ChatMessages.ViewOf),chatUnseen));
         // X-447 B11 (0.1714): the tabs drawn in a window of their own leave this window's bar (their lines were refreshed above, their alerts counted).
