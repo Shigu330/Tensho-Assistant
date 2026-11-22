@@ -627,6 +627,7 @@
     "FormSecurity": "Un problème de sécurité ?",
     "FormSecurityTip": "Ouvre la page de signalement privé. Ne mettez jamais un problème de sécurité dans un ticket public.",
     "BannerTitle": "Première visite",
+    "DataFallback": "Le fichier de données de Tensho ({0}) n'a pas pu être créé : cette session écrit dans les anciens fichiers. Ce qui s'écrit maintenant (journal des gils, voyages, hauts faits, relevé de banque) ne sera pas repris dans le fichier de données quand il pourra être créé.",
     "BannerSeen": "Compris",
     "BannerSeenTip": "Masque ceci pour de bon sur cette page. L'aide reste accessible par le « ? ».",
     "BannerMore": "En savoir plus",

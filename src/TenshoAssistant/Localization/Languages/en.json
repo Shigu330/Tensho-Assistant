@@ -627,6 +627,7 @@
     "FormSecurity": "A security problem?",
     "FormSecurityTip": "Opens the private report page. Never put a security problem in a public issue.",
     "BannerTitle": "First visit",
+    "DataFallback": "Your Tensho data file ({0}) could not be created: this session writes to the older files instead. What is written now (gil journal, voyages, achievements, bank record) will not be taken into the data file once it can be created.",
     "BannerSeen": "Got it",
     "BannerSeenTip": "Hides this for good on this page. The help stays under the « ? ».",
     "BannerMore": "Tell me more",

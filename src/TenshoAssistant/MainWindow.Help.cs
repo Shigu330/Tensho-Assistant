@@ -43,6 +43,18 @@ internal sealed partial class MainWindow
     // 0.503 (lot 2, G8): the first time a page is opened, two lines on it; it does not come back. Setting in General.
     private bool HelpBannerShows(Page shown) => configuration.HelpBanners && shown != Page.Help && configuration.HelpSeen?.Contains(shown.ToString()) != true;
 
+    // X-789 (0.1802, idea I-058): the player's data file (TenshoData.db) could not be created: said on every page while it lasts, with what it
+    // means (what this session writes is not taken into the data file once it can be created). Read without opening the file.
+    internal TenshoDataFile? TenshoData { get; set; }
+    private void DrawDataFallbackBanner()
+    {
+        if (TenshoData?.JsonFallback != true) return;
+        ImGui.PushStyleColor(ImGuiCol.Text, Warning);
+        try { ImGui.TextWrapped(localization.Format("Help.DataFallback", TenshoDataDatabase.FileName)); }
+        finally { ImGui.PopStyleColor(); }
+        ImGui.Separator();
+    }
+
     private void DrawHelpBanner()
     {
         if (!HelpBannerShows(page)) return;

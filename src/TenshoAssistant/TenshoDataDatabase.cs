@@ -326,6 +326,11 @@ public sealed class TenshoDataFile
         }
     }
 
+    /// <summary>X-789 (0.1802, idea I-058): the data file could not be created and the JSON files of before are written instead (« json »
+    /// mode), known once a family opened it; never opens the file (read in Draw by the main window's banner). What is written meanwhile is
+    /// not taken into the data file once it can be created (X-574: the files of before are no longer converted).</summary>
+    public bool JsonFallback{get{lock(gate)return tried && database is null && blocked is null;}}
+
     /// <summary>« sqlite », « json » (file could not be created) or « blocked » (file there but unusable); opens it on first use.</summary>
     public string Mode
     {
