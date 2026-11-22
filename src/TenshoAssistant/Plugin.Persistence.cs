@@ -13,8 +13,8 @@ public sealed partial class Plugin
 {
     /// <summary>
     /// The persistence family: the player's data file (TenshoData.db, X-173: every family moved into it, opened on first use), the bank
-    /// (0.345, I-03: one entry per character; X-173, 0.1149: kept in TenshoData.db, the files of before converted at the first load and kept
-    /// aside) and its bridge to the game's inventory. Made before the main window, which shows them.
+    /// (0.345, I-03: one entry per character; X-173, 0.1149: kept in TenshoData.db; X-574, 0.1793: the files of before left aside, never
+    /// read) and its bridge to the game's inventory. Made before the main window, which shows them.
     /// </summary>
     private (TenshoDataFile Data,InventoryBankService Bank,BankInventoryBridge Bridge) RegisterPersistence(IDalamudPluginInterface pluginInterface,
         Configuration configuration,IDataManager data,IGameInventory inventory,IGameGui gameGui,IPlayerState player,IClientState client,IFramework framework)

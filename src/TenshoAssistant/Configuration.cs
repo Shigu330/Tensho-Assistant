@@ -527,9 +527,7 @@ public sealed partial class Configuration
     // X-277 (0.1290): only the gear of the exact level at the expansion caps, the « Levels below » window at every other level (the rule of
     // 0.430, « exact level outside caps », was the wrong way round).
     public bool GearExactAtCaps { get; set; } = true;
-    // X-277 (0.1290): the setting's name before 0.1290; a file saved before is read with it (the player's choice kept: on stays on, off
-    // stays off, the window everywhere), and it is never written again (a property without getter is not saved).
-    public bool GearExactOutsideCaps { set=>GearExactAtCaps=value; }
+    // X-574 (0.1793, the user's choice of 17/11): the setting's name before 0.1290 (GearExactOutsideCaps) is no longer read.
     public int GearMinItemLevel { get; set; }
     public bool GearAssumeHq { get; set; } = true;
     // 0.311: other jobs' armor and accessories in the lists (glamour since patch 7.4; weapons stay job-locked).

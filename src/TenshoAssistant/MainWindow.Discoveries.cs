@@ -11,7 +11,7 @@ internal sealed partial class MainWindow
 {
     internal DiscoveryStore? DiscoveryStore { get; set; }
     internal string? DiscoveryFolder { get; set; }
-    /// <summary>X-172 (0.1136): the SQLite database of the discoveries, once opened (null: the JSON files of before, when it could not be made).</summary>
+    /// <summary>X-172 (0.1136): the SQLite database of the discoveries, once opened (null: the JSON files, when it could not be made).</summary>
     internal DiscoveryDatabase? DiscoveryDatabase { get; set; }
     /// <summary>X-77.1 (0.883): the exchange with the repository through GitHub (connection by code, opt-in automatic exchange).</summary>
     internal GitHubExchange? DiscoveryExchange { get; set; }

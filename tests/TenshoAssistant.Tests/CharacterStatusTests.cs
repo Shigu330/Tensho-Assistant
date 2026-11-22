@@ -49,7 +49,8 @@ internal static class CharacterStatusTests
             finally{if(Directory.Exists(folder))Directory.Delete(folder,true);}
             var watcher = Read("Character/CharacterStatusWatcher.Dalamud.cs");
             Check(watcher.Contains("if(id==0 || id==current)return false;",StringComparison.Ordinal),"the logged-in character is never erased");
-            Check(watcher.Contains("if(migrated){if(WriteLocked(id)){configuration.ReminderDone=null;saveConfiguration();}}",StringComparison.Ordinal),"shared boxes moved once, only after the file is written");
+            // X-574 (0.1793): the shared boxes of before 0.374 no longer move to the first character seen; the watcher never touches the settings.
+            Check(!watcher.Contains("ReminderDone",StringComparison.Ordinal) && !watcher.Contains("saveConfiguration",StringComparison.Ordinal),"shared boxes left as they are, the settings never written by the watcher");
             Check(Read("MainWindow.Reminders.cs").Contains("var done=ResetSchedule.DoneSince(ReminderDoneAt(key),reset);",StringComparison.Ordinal),"done boxes per character");
         }),
         // From CharacterTimers936Tests: X-76 P9 (0.936): leves, deliveries, allied quests and squadron kept per character; merged like the rest; daily and weekly counts only since their reset.

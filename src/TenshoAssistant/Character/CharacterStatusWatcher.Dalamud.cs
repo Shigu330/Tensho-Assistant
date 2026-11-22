@@ -7,15 +7,13 @@ namespace TenshoAssistant.Character;
 /// g, M-04 (0.374): every 30 seconds on the framework thread while a character is logged in, copies what the Reminders page reads
 /// (GameTimers: ventures once the retainer list was opened, next treasure map, Wondrous Tails, hunt bills, daily roulettes) into that
 /// character's status and writes its file when something changed (or every 10 minutes). The other characters' files are read once at
-/// start. The Reminders page's « done » boxes are kept per character here; the former shared boxes go to the first character seen.
+/// start. The Reminders page's « done » boxes are kept per character here (X-574, 0.1793: the shared boxes of before 0.374 no longer move).
 /// </summary>
 public sealed class CharacterStatusWatcher : IDisposable
 {
     private readonly IFramework framework;
     private readonly IPlayerState player;
     private readonly IPluginLog log;
-    private readonly Configuration configuration;
-    private readonly Action saveConfiguration;
     private readonly Func<IReadOnlyList<RouletteRow>?> roulettes;
     // X-196 (0.1409): the job's abbreviation and the market town's name, in the client's language (null in the tests: texts left empty).
     private readonly Func<byte,string>? jobName,townName;
@@ -33,12 +31,12 @@ public sealed class CharacterStatusWatcher : IDisposable
     private DateTimeOffset nextListing;
     private bool listingWarned;
 
-    public CharacterStatusWatcher(IFramework framework,IPlayerState player,IPluginLog log,Configuration configuration,Action saveConfiguration,
+    public CharacterStatusWatcher(IFramework framework,IPlayerState player,IPluginLog log,
         Func<IReadOnlyList<RouletteRow>?> roulettes,string folder,Func<byte,string>? jobName=null,Func<byte,string>? townName=null,
         Func<TenshoAssistant.Market.RetainerSalesState?>? sales=null)
     {
         this.sales=sales;
-        this.framework=framework;this.player=player;this.log=log;this.configuration=configuration;this.saveConfiguration=saveConfiguration;
+        this.framework=framework;this.player=player;this.log=log;
         this.roulettes=roulettes;this.folder=folder;this.jobName=jobName;this.townName=townName;
         foreach(var status in CharacterStatuses.ReadAll(folder,(path,error)=>
                 {
@@ -124,15 +122,13 @@ public sealed class CharacterStatusWatcher : IDisposable
             {
                 statuses.TryGetValue(id,out var old);
                 var merged=CharacterStatuses.Merge(old,fresh);
-                // The former shared « done » boxes (before 0.374) go to the first character seen, once.
-                var migrated=false;
-                if(merged.Done is null && configuration.ReminderDone is { Count:>0 } shared){merged=merged with{Done=new(shared)};migrated=true;}
+                // X-574 (0.1793, the user's choice of 17/11): the shared « done » boxes of before 0.374 no longer go to the first character seen;
+                // the shared ones stay those shown while no character is logged in.
                 var changed=CharacterStatuses.Changed(old,merged);
                 statuses[id]=merged;
                 if(changed || now>=nextSave)
                 {
-                    if(migrated){if(WriteLocked(id)){configuration.ReminderDone=null;saveConfiguration();}}
-                    else QueueWrite(id);
+                    QueueWrite(id);
                     nextSave=now.AddMinutes(10);
                 }
             }

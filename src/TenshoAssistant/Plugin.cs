@@ -439,11 +439,7 @@ public sealed partial class Plugin : IDalamudPlugin
             var discord=new Alarms.DiscordNotifier();
             registrations.Register(()=>{},discord.Dispose);
             mainWindow.ConfigureDiscord(discord);
-            // Reminders and vessel returns made before 0.319 have no source: recognized once by their group, for the Discord categories.
-            var migrated=false;
-            foreach(var alarm in configuration.Alarms ?? [])
-                migrated|=Alarms.DiscordWebhook.AssignLegacySource(alarm,localization.Get("Reminders.Title"),localization.Get("FreeCompany.Title"));
-            if(migrated)try{saver.Save();}catch(Exception error){log.Warning(error,"Alarm sources could not be saved.");}
+            // X-574 (0.1793, the user's choice of 17/11): the alarms made before 0.319 (no stored source) are no longer given one by their group.
             Alarms.AlarmService? alarms=null;
             registrations.Register(()=>{},()=>{chat.RemoveChatLinkHandler();alarmLinks.Clear();});
             registrations.Register(()=>alarms=new Alarms.AlarmService(framework,condition,log,configuration,()=>SaveTimed("alarms"),
@@ -816,8 +812,8 @@ public sealed partial class Plugin : IDalamudPlugin
             // 0.911 (X-76): a key item's name (EventItem row), for the hand-ins seen in game.
             mainWindow.KeyItemNameOf=id=>data.GetExcelSheet<Lumina.Excel.Sheets.EventItem>().GetRowOrDefault(id)?.Name.ExtractText();
             mainWindow.AchievementNameOf=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Achievement>().GetRowOrDefault(id)?.Name.ExtractText();
-            // 0.351 (g, I-04): gil journal per character, kept 90 days; since 0.1139 (X-173) in TenshoData.db, the files of before (GilJournal/<id>.json)
-            // converted when their character is first loaded and kept aside.
+            // 0.351 (g, I-04): gil journal per character, kept 90 days; since 0.1139 (X-173) in TenshoData.db; the files of before (GilJournal/<id>.json)
+            // left aside, never read (X-574, 0.1793).
             Inventory.GilWatcher? gilWatcher=null;
             var gilStore=new Inventory.GilJournalStore(Path.Combine(pluginInterface.GetPluginConfigDirectory(),"GilJournal"),tenshoData);
             registrations.Register(()=>gilWatcher=new Inventory.GilWatcher(framework,player,gameGui,gilStore,log,
@@ -888,7 +884,7 @@ public sealed partial class Plugin : IDalamudPlugin
             mainWindow.ChallengeRows=()=>challengeRows;
             // g, M-04 (0.374): one status file per character (Characters/<local character id>.json): ventures, counters, « done » boxes.
             Character.CharacterStatusWatcher? characterStatus=null;
-            registrations.Register(()=>characterStatus=new Character.CharacterStatusWatcher(framework,player,log,configuration,()=>SaveTimed("character status"),
+            registrations.Register(()=>characterStatus=new Character.CharacterStatusWatcher(framework,player,log,
                 ()=>dailyRoulettes,Path.Combine(pluginInterface.GetPluginConfigDirectory(),"Characters"),
                 // X-196 (0.1409): the retainers' job and market town, named from the sheets (ClassJob abbreviation; Town, whose rows are RetainerTown's values).
                 job=>data.GetExcelSheet<Lumina.Excel.Sheets.ClassJob>().GetRowOrDefault(job)?.Abbreviation.ExtractText() ?? "",

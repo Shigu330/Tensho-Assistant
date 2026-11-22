@@ -4,6 +4,8 @@ using TenshoAssistant.Chat;
 // 0.1466 (X-464): the minor findings of the review of 0.1455 to 0.1461. M1: a background build still running after Stop's wait is said
 // (Stop false, logged), not claimed stopped. M2: the Battle and Event tabs count no unread line (new or saved in 0.1458). M3: the General tab
 // saved before 0.1458 leaves the NPC dialogue to Event. M4: the combat lines have their own limit: they no longer push the spoken lines out.
+// X-574 (0.1793, the user's choice of 17/11): the one-time corrections of tabs saved before 0.1466 (M2 on saved tabs, M3) are gone: tabs saved
+// stay as they are.
 internal static class ChatReview1466Tests
 {
     private static void Check(bool value, string message) { if (!value) throw new Exception(message); }
@@ -17,36 +19,34 @@ internal static class ChatReview1466Tests
             var tabs = Tabs(new ChatSettings());
             Check(tabs[0].ShowUnread && !tabs[1].ShowUnread && !tabs[2].ShowUnread && tabs[3].ShowUnread, string.Join(",", tabs.Select(tab => tab.ShowUnread)));
         }),
-        ("Chat review 1466 M2, M3: tabs saved in 0.1458 are corrected once; a tab of the player's own is left as it is", () =>
+        ("Chat review 1466 M2, M3: tabs saved are kept as they are, the player's own tab and unread counts included (X-574: no correction)", () =>
         {
             var oldGeneral = ChatChannels.All.Where(channel => channel != ChatChannel.Combat).ToList();
             var mine = new List<ChatChannel> { ChatChannel.Say, ChatChannel.Npc };
             var settings = new ChatSettings
             {
-                TabsVersion = 1,
                 Tabs = [new() { Name = "General", Channels = [.. oldGeneral] }, new() { Name = "Battle", Channels = [ChatChannel.Combat] },
                         new() { Name = "Event", Channels = [ChatChannel.Npc] }, new() { Name = "Mine", Channels = [.. mine] }],
             };
             var tabs = Tabs(settings);
-            Check(!tabs[1].ShowUnread && !tabs[2].ShowUnread && tabs[0].ShowUnread && tabs[3].ShowUnread, "unread off in Battle and Event only");
-            Check(!tabs[0].Shows(ChatChannel.Npc) && tabs[0].Channels.Count == oldGeneral.Count - 1, "the old General leaves the NPC dialogue to Event");
+            Check(ReferenceEquals(tabs, settings.Tabs) && tabs.Count == 4 && tabs.All(tab => tab.ShowUnread), "the saved tabs, unread counts as saved");
+            Check(tabs[0].Shows(ChatChannel.Npc) && tabs[0].Channels.Count == oldGeneral.Count, "the saved General as it was");
             Check(tabs[3].Channels.SequenceEqual(mine), "the player's own tab unchanged");
-            Check(settings.TabsVersion == ChatSettings.CurrentTabs && ChatSettings.CurrentTabs == 2, "done once");
-            tabs[0].Channels.Add(ChatChannel.Npc); tabs[1].ShowUnread = true;   // the player's choice afterwards stays
+            tabs[0].Channels.Remove(ChatChannel.Npc); tabs[1].ShowUnread = false;   // the player's choice afterwards stays
             Tabs(settings);
-            Check(tabs[0].Shows(ChatChannel.Npc) && tabs[1].ShowUnread, "a choice made after the correction is kept");
+            Check(!tabs[0].Shows(ChatChannel.Npc) && !tabs[1].ShowUnread, "a choice made afterwards is kept");
         }),
         ("Chat review 1466 M3: without an Event tab, the old General keeps the NPC dialogue (nowhere else to see it)", () =>
         {
             var oldGeneral = ChatChannels.All.Where(channel => channel != ChatChannel.Combat).ToList();
-            var settings = new ChatSettings { TabsVersion = 1, Tabs = [new() { Name = "General", Channels = [.. oldGeneral] }] };
+            var settings = new ChatSettings { Tabs = [new() { Name = "General", Channels = [.. oldGeneral] }] };
             Check(Tabs(settings)[0].Shows(ChatChannel.Npc), "kept");
         }),
-        ("Chat review 1466 M3: tabs saved before 0.1458 get Battle and Event without an unread count, and the old General loses the dialogue", () =>
+        ("Chat review 1466 M3: tabs saved before 0.1458 stay as they are (X-574: no Battle nor Event added, the old General keeps the dialogue)", () =>
         {
             var oldGeneral = ChatChannels.All.Where(channel => channel != ChatChannel.Combat).ToList();
             var tabs = Tabs(new ChatSettings { Tabs = [new() { Name = "General", Channels = [.. oldGeneral] }] });
-            Check(tabs.Count == 3 && !tabs[1].ShowUnread && !tabs[2].ShowUnread && !tabs[0].Shows(ChatChannel.Npc), string.Join(" | ", tabs.Select(tab => tab.Name)));
+            Check(tabs.Count == 1 && tabs[0].Shows(ChatChannel.Npc), string.Join(" | ", tabs.Select(tab => tab.Name)));
         }),
         ("Chat review 1466 M4: an alliance raid's combat lines no longer push the spoken lines out (each its own limit)", () =>
         {

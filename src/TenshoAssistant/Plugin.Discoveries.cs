@@ -7,8 +7,8 @@ namespace TenshoAssistant;
 // persistence (0.1239), server bar (0.1240) and panel (0.1249) families. The local base of discoveries (X-43): its store, its folder, the
 // exchange through GitHub (X-77.1; one install path and one release path, in the plugin's registrations) and its loading off the frame,
 // moved as they were: the prices seen at the market board first (MarketSeen.json lives in the same folder), then the discoveries
-// (SQLite since X-172, the files of before converted once; a database that cannot be opened is never replaced; a base that cannot be read
-// is set aside, never overwritten by an empty one). Nothing is written before it is read. The item watcher that fills the base stays with
+// (SQLite since X-172; X-574, 0.1793: the files of before no longer converted, left aside; a database that cannot be opened is never replaced;
+// a base that cannot be read is set aside, never overwritten by an empty one). Nothing is written before it is read. The item watcher that fills the base stays with
 // the game's readers in Plugin.cs. DiscoveriesFamily1250Tests.
 public sealed partial class Plugin
 {
@@ -61,20 +61,20 @@ public sealed partial class Plugin
             }
             catch(Exception error){log.Warning(error,"The market prices seen could not be read.");}
             var saved=Path.Combine(discoveryFolder,"Discoveries.json");
-            // X-172 (0.1136, trial docs/evidence/x172-sqlite-trial.md): the discoveries in Discoveries.db (SQLite), the files of before converted once
-            // and kept aside. A database that exists but cannot be opened (SQLite not loaded, damaged, newer layout) is never replaced: nothing is
-            // saved this session; without a database (conversion failed), the JSON files stay in use as before.
+            // X-172 (0.1136, trial docs/evidence/x172-sqlite-trial.md): the discoveries in Discoveries.db (SQLite). A database that exists but cannot
+            // be opened (SQLite not loaded, damaged, newer layout) is never replaced: nothing is saved this session; without a database (it could not
+            // be created), the JSON files stay in use as before. X-574 (0.1793, the user's choice of 17/11): the files of before (Discoveries.json,
+            // Shared/) are no longer converted: still there beside the database, they are left aside, never read, moved nor removed (said once).
             var databasePath=Path.Combine(discoveryFolder,Discoveries.DiscoveryDatabase.FileName);
             Discoveries.DiscoveryDatabase? database=null;
             try
             {
-                var aside=Discoveries.DiscoveryDatabase.ConvertFiles(discoveryFolder,DateTimeOffset.UtcNow,(path,error)=>log.Warning(error,"Discoveries {0} could not be read while converting; set aside.",Path.GetFileName(path)),
-                    merged=>log.Information("Discoveries: Discoveries.json written again after the conversion (an older version); {0} facts merged into the database.",merged),
-                    (path,error)=>log.Information("Discoveries: {0} is held by another program for now and stays where it is; the next start sets it aside ({1}).",Path.GetFileName(path),error.Message));
                 database=new Discoveries.DiscoveryDatabase(databasePath);
                 var (mine,sharedCount)=database.Count();
-                log.Information("Discoveries: SQLite {0} database, {1} facts of yours, {2} shared{3}.",database.LibraryVersion(),mine,sharedCount,
-                    aside is null ? "":$"; the files of before kept in {Path.GetFileName(aside)}");
+                log.Information("Discoveries: SQLite {0} database, {1} facts of yours, {2} shared.",database.LibraryVersion(),mine,sharedCount);
+                if(Discoveries.DiscoveryFiles.OldFiles(saved) is { Length:>0 } old)
+                    log.Information(old.Length==1 ? "Discoveries: a file of an old format ({0}) was left aside, not read (X-574)."
+                        : "Discoveries: files of an old format ({0}) were left aside, not read (X-574).",string.Join(", ",old));
             }
             catch(Exception error)
             {
@@ -90,7 +90,7 @@ public sealed partial class Plugin
                     mainWindow.DiscoveriesLoaded=true;
                     return;
                 }
-                log.Error(error,"The discoveries could not be moved to SQLite: the JSON files stay in use this session.");
+                log.Error(error,"The discoveries database could not be created: the JSON files stay in use this session.");
             }
             mainWindow.DiscoveryDatabase=database;
             if(database is { } opened)

@@ -145,19 +145,8 @@ public sealed class ChatSettings
     public bool GameTabs{get;set;}=true;
     /// <summary>X-505 (0.1488): the lines a message wraps onto indented, as the game's chat.</summary>
     public bool WrapIndent{get;set;}=true;
-    /// <summary>X-505 (0.1488): <see cref="CurrentLook"/> once the look follows the game's (a configuration saved before gets the new defaults once).</summary>
-    public int LookVersion{get;set;}
-    public const int CurrentLook=1;
-    /// <summary>X-505 (0.1488): a configuration saved before gets the game's look once: the tabs under the lines (the user's answer to X-476), the
-    /// background lighter when it was still the old default (40 %); a background chosen by the player is kept. True when something changed.</summary>
-    public bool UpgradeLook()
-    {
-        if(LookVersion>=CurrentLook)return false;
-        if(Opacity==40)Opacity=DefaultOpacity;
-        TabsAtBottom=true;
-        LookVersion=CurrentLook;
-        return true;
-    }
+    // X-574 (0.1793, the user's choice of 17/11): the one-time upgrades of settings saved before 0.1488 (LookVersion: the game's look) and
+    // 0.1466 (TabsVersion: the Battle and Event tabs) are gone, with their markers; a marker still in a saved file is ignored at load.
     /// <summary>X-475: the chat history kept on this PC (ChatHistory), per character, so that the window shows it again after a reload or a
     /// restart. Off by default; the window turns it on only after the player said yes to what is kept, where, how long and how to erase it.</summary>
     public bool KeepHistory{get;set;}
@@ -175,11 +164,6 @@ public sealed class ChatSettings
     /// <summary>X-476 (0.1481, X-447 A3): a dark outline around the letters, readable on a light background, as the game's chat.</summary>
     public bool TextOutline{get;set;}=true;
     public List<ChatTabSettings>? Tabs{get;set;}
-    /// <summary>X-445 (0.1458): <see cref="CurrentTabs"/> once the tabs follow the game's default tabs (tabs saved before get Battle and Event
-    /// once).</summary>
-    public int TabsVersion{get;set;}
-    /// <summary>X-464 (0.1466): 2, the Battle and Event tabs count no unread line; the General tab saved before 0.1458 leaves the NPC dialogue to Event.</summary>
-    public const int CurrentTabs=2;
     public Dictionary<ChatChannel,uint>? Colors{get;set;}
     /// <summary>X-447 B4 (0.1621): a short name chosen per channel, shown in brackets before its messages instead of the game's own short name;
     /// empty or absent: the game's.</summary>
@@ -219,40 +203,11 @@ public sealed class ChatSettings
     public uint ColorOf(ChatChannel channel)=>Colors?.TryGetValue(channel,out var color)==true ? color&0xFFFFFF:ChatChannels.DefaultColor(channel);
     /// <summary>The tabs, made at first use. X-445 (0.1458): the game's three default log tabs (General: everything but the combat lines and the
     /// NPC dialogue; Battle: the combat lines; Event: the NPC dialogue), then Social (only what people say to you or your groups). Tabs saved
-    /// before get Battle and Event once, after the first tab, unless a tab already shows that channel alone; the others stay as they are.</summary>
+    /// stay as they are (X-574, 0.1793: no upgrade of tabs saved before 0.1466 any more).</summary>
     public List<ChatTabSettings> EnsureTabs(string generalName,string battleName,string eventName,string socialName)
     {
-        UpgradeLook();
-        if(Tabs is { Count:>0 })
-        {
-            if(TabsVersion<1)
-            {
-                var at=1;
-                foreach(var (name,channel) in new[]{(battleName,ChatChannel.Combat),(eventName,ChatChannel.Npc)})
-                {
-                    if(Tabs.Count>=MaximumTabs || Tabs.Any(tab=>tab.Channels is [var only] && only==channel))continue;
-                    Tabs.Insert(Math.Min(at,Tabs.Count),new(){Name=name,Channels=[channel],ShowUnread=false});
-                    at++;
-                }
-            }
-            if(TabsVersion<2)
-            {
-                // X-464 M2 (0.1466): the Battle and Event tabs made in 0.1458 (one channel) count no unread line, as the game counts none.
-                foreach(var tab in Tabs)
-                    if(tab.Channels is [var only] && only is ChatChannel.Combat or ChatChannel.Npc)tab.ShowUnread=false;
-                // X-464 M3 (0.1466): the General tab saved before 0.1458 (every channel but Combat, exactly) leaves the NPC dialogue to Event.
-                if(Tabs.Any(tab=>tab.Channels is [ChatChannel.Npc]))
-                {
-                    var oldGeneral=ChatChannels.All.Where(channel=>channel!=ChatChannel.Combat).ToHashSet();
-                    foreach(var tab in Tabs)
-                        if(tab.Channels is { Count:>1 } channels && channels.ToHashSet().SetEquals(oldGeneral))channels.Remove(ChatChannel.Npc);
-                }
-            }
-            TabsVersion=CurrentTabs;
-            return Tabs;
-        }
+        if(Tabs is { Count:>0 })return Tabs;
         Tabs=DefaultTabs(generalName,battleName,eventName,socialName);
-        TabsVersion=CurrentTabs;
         return Tabs;
     }
 
@@ -270,7 +225,6 @@ public sealed class ChatSettings
     public List<ChatTabSettings> ResetTabs(string generalName,string battleName,string eventName,string socialName)
     {
         Tabs=DefaultTabs(generalName,battleName,eventName,socialName);
-        TabsVersion=CurrentTabs;
         return Tabs;
     }
 

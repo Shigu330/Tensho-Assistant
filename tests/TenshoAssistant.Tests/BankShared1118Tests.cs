@@ -2,7 +2,8 @@ using TenshoAssistant.Inventory;
 
 // 0.1118 (X-141, audit A02): two game clients on the same profile share InventoryBank/. Every change writes only the character concerned,
 // read again under the profile's lock; a character is erased only by « Erase this character ». Behaviour tests (R28): two stores and two
-// services on one real folder, at the same time; the lock held by the other side; the former file split by two clients at once; .bak.
+// services on one real folder, at the same time; the lock held by the other side; the former file split by two clients at once; .bak. X-574
+// (0.1793, the user's choice of 17/11): the former shared file is no longer split: two clients starting at once leave it as it is.
 internal static class BankShared1118Tests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
@@ -104,13 +105,15 @@ internal static class BankShared1118Tests
             Import(bank,Entry(1,BankStorageKind.Retainer,3));
             Check(OnDisk(folder,legacy)[1].Count() == 2,"saved once the lock is free");
         })),
-        ("Bank 1118: the former shared file split by two clients starting at once, once; a restart from the .bak; a corrupt file still fails closed",() => InTemp((folder,legacy) =>
+        ("Bank 1118: the former shared file left as it is by two clients starting at once (X-574: never split nor read); a restart from the .bak; a corrupt file still fails closed",() => InTemp((folder,legacy) =>
         {
             new FileInventoryBankStore(legacy).Save([Entry(5,BankStorageKind.Saddlebag),Entry(6,BankStorageKind.Retainer,9),Entry(6,BankStorageKind.Bags)]);
+            var bytes = File.ReadAllBytes(legacy);
             var loads = Enumerable.Range(0,2).Select(_ => Task.Run(() => new PerCharacterBankStore(folder,legacy).Load())).ToArray();
             Task.WaitAll(loads,TimeSpan.FromSeconds(60));
-            Check(loads.All(load => load.Result.Length == 3),"both clients read the three storages");
-            Check(File.Exists(legacy + ".migrated") && !File.Exists(legacy + ".migrated.1") && !File.Exists(legacy) && !Directory.Exists(folder + ".migrating"),"split once, the former file kept beside");
+            Check(loads.All(load => load.IsCompletedSuccessfully && load.Result.Length == 0),"both clients start, nothing read from the former file");
+            Check(File.ReadAllBytes(legacy).SequenceEqual(bytes) && !File.Exists(legacy + ".migrated") && !Directory.Exists(folder) && !Directory.Exists(folder + ".migrating"),"the former file in place, unchanged, never split");
+            using (var bank = Ready(new PerCharacterBankStore(folder,legacy))) { Import(bank,Entry(5,BankStorageKind.Saddlebag)); Import(bank,Entry(6,BankStorageKind.Bags)); }
             // Restart after a lost main file: the .bak copy is read, then written back as the main file with the new storage.
             using (var bank = Ready(new PerCharacterBankStore(folder,legacy))) Import(bank,Entry(5,BankStorageKind.Retainer,1));
             File.Delete(Path.Combine(folder,"5.json"));

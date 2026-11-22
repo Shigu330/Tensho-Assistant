@@ -10,7 +10,8 @@ using TenshoAssistant.Inventory;
 // Behaviour tests (R28: data loss, concurrency), on real databases in a temporary folder: two clients on two companies keep each other's voyages;
 // an older reading of an achievement never takes back a newer one; a file of before written again after the conversion (an older version still
 // running) is merged, while a copy already set aside is not read again; a second client loading during a conversion counts every voyage once;
-// two conversions of the discoveries at once leave one whole base and no temporary file.
+// two conversions of the discoveries at once leave one whole base and no temporary file. X-574 (0.1793, the user's choice of 17/11): nothing is
+// converted any more: the cases about the files of before now say they are never read, moved nor merged, the data file's rows winning.
 internal static class ConcurrentData1169Tests
 {
     private static void Check(bool value, string message) { if (!value) throw new Exception(message); }
@@ -74,55 +75,53 @@ internal static class ConcurrentData1169Tests
             a.Save(7, new Dictionary<uint, AchievementProgress> { [1] = new(9, 10, At.AddHours(3)) }, []);
             Check(new AchievementProgressData(file, Data(root)).Load(At)[7][1].Current == 9, "a newer reading still replaces");
         })),
-        ("Concurrent data 1169: a file of before written again after the conversion is merged; a copy already set aside is not read again (N3)", () => InTemp(root =>
+        ("Concurrent data 1169: a file of before written again (an older version still running) is never read nor moved: the data file's rows win (X-574)", () => InTemp(root =>
         {
             // Voyages.
             var voyages = Path.Combine(root, "VoyageHistory.json");
-            VoyageHistory.Write(voyages, [Record(100, 0, At, 21)]);
-            new VoyageHistoryData(voyages, Data(root)).Load(At);
+            new VoyageHistoryData(voyages, Data(root)).Save([Record(100, 0, At, 21)]);
             VoyageHistory.Write(voyages, [Record(100, 1, At.AddHours(1), 22)]);   // an older version still running, its own session only
-            var merged = new VoyageHistoryData(voyages, Data(root)).Load(At);
-            Check(merged.Count == 2 && !File.Exists(voyages), "voyages: both kept, the file set aside: " + merged.Count);
-            File.Copy(Aside(root).First(path => File.ReadAllText(path).Contains("\"Slot\":0")), voyages);
-            Check(new VoyageHistoryData(voyages, Data(root)).Load(At).Count == 2, "a copy already set aside: not read again");
+            var voyageBytes = File.ReadAllBytes(voyages);
+            var kept = new VoyageHistoryData(voyages, Data(root)).Load(At);
+            Check(kept.Select(Key).SequenceEqual([Key(Record(100, 0, At, 21))]) && File.ReadAllBytes(voyages).SequenceEqual(voyageBytes), "voyages: the data file's only, the file left as it is");
             // Achievements.
             var achievements = Path.Combine(root, "AchievementProgress.json");
-            File.WriteAllText(achievements, AchievementProgressStore.Write(new() { [7] = new() { [1] = new(1, 10, At) } }));
-            new AchievementProgressData(achievements, Data(root)).Load(At);
+            new AchievementProgressData(achievements, Data(root)).Save(7, new Dictionary<uint, AchievementProgress> { [1] = new(1, 10, At) }, []);
             File.WriteAllText(achievements, AchievementProgressStore.Write(new() { [7] = new() { [2] = new(4, 10, At.AddHours(1)) }, [8] = new() { [1] = new(2, 10, At) } }));
+            var achievementBytes = File.ReadAllBytes(achievements);
             var progress = new AchievementProgressData(achievements, Data(root)).Load(At);
-            Check(progress[7].Count == 2 && progress[8].Count == 1, "achievements: merged");
+            Check(progress.Count == 1 && progress[7].Count == 1 && File.ReadAllBytes(achievements).SequenceEqual(achievementBytes), "achievements: the data file's only");
             // Gil journal.
             var folder = Path.Combine(root, "GilJournal"); Directory.CreateDirectory(folder);
             var gil = Path.Combine(folder, GilJournalStore.FileName(7));
             var one = new GilEntry(At, 100, 100, GilSource.Character, GilCategory.Other); var two = new GilEntry(At.AddHours(1), 50, 150, GilSource.Character, GilCategory.Other);
-            GilJournal.Write(gil, [one]);
-            new GilJournalStore(folder, Data(root)).Load(7, At);
+            new GilJournalStore(folder, Data(root)).Save(7, [one]);
             GilJournal.Write(gil, [two]);
+            var gilBytes = File.ReadAllBytes(gil);
             var journal = new GilJournalStore(folder, Data(root)).Load(7, At);
-            Check(journal.SequenceEqual([one, two]) && !File.Exists(gil), "gils: both entries, in time order, once");
-            Check(GilJournalStore.Merge([one, two], [two, one]).SequenceEqual([one, two]), "merge: every entry once");
+            Check(journal.SequenceEqual([one]) && File.ReadAllBytes(gil).SequenceEqual(gilBytes), "gils: the data file's entry only, the file left as it is");
+            Check(Aside(root).Length == 0 && Directory.GetDirectories(folder, "before-sqlite-*").Length == 0, "nothing set aside");
         })),
-        ("Concurrent data 1169: a second client loading during the conversion counts every voyage once (N28; 0.1171: 20 times, the file moved under it)", () => InTemp(top =>
+        ("Concurrent data 1169: a second client loading during a save sees the last save whole, never half of it (N28; 20 times)", () => InTemp(top =>
         {
           for (var round = 0; round < 20; round++)
           {
             var root = Path.Combine(top, "round" + round); Directory.CreateDirectory(root);
             var file = Path.Combine(root, "VoyageHistory.json");
-            VoyageHistory.Write(file, [Record(100, 0, At, 21), Record(100, 1, At.AddHours(1), 22), Record(200, 0, At.AddHours(2), 23)]);
+            var three = new List<VoyageRecord> { Record(100, 0, At, 21), Record(100, 1, At.AddHours(1), 22), Record(200, 0, At.AddHours(2), 23) };
             Task<List<VoyageRecord>>? other = null;
             var first = new VoyageHistoryData(file, Data(root));
+            first.Save(three.Take(1).ToList());
             first.DuringSave = () => other ??= Task.Run(() => new VoyageHistoryData(file, Data(root)).Load(At));
-            Check(first.Load(At).Count == 3, "converted: three voyages");
-            Check(other is not null && other.Wait(TimeSpan.FromSeconds(20)) && other.Result.Count == 3, "the second client: three voyages, never an empty history");
+            first.Save(three);
+            Check(other is not null && other.Wait(TimeSpan.FromSeconds(20)) && other.Result.Count is 1 or 3, "the second client: one save whole, never half: " + other?.Result.Count);
             using var open = new TenshoDataDatabase(Path.Combine(root, TenshoDataDatabase.FileName)).Open();
             Check(Convert.ToInt64(TenshoDataDatabase.Scalar(open, "SELECT COUNT(*) FROM voyage_records;")) == 3, "three rows");
           }
         })),
-        // 0.1197: this test failed once on a file « in use »: one conversion moved Discoveries.json aside while the other read it. Whatever
-        // the order the two threads take, the outcome is now the same (each race is replayed by hand in ConversionRaces1197Tests): twenty
-        // times here, where once showed little.
-        ("Concurrent data 1169: two conversions of the discoveries at once, 20 times: one whole base, the old files kept once, no temporary file left (N11)", () => InTemp(top =>
+        // 0.1197: two conversions of the discoveries at once failed once on a file « in use ». X-574 (0.1793): no conversion any more; two
+        // clients opening the database at once beside the files of before, twenty times: the files never touched.
+        ("Concurrent data 1169: two clients opening the discoveries database at once beside the files of before, 20 times: one whole base, the old files untouched, no temporary file (N11)", () => InTemp(top =>
         {
           for (var round = 0; round < 20; round++)
           {
@@ -130,19 +129,20 @@ internal static class ConcurrentData1169Tests
             var main = Path.Combine(root, "Discoveries.json");
             var store = new DiscoveryStore(); store.Merge([Fact(4869), Fact(4870)]);
             DiscoveryFiles.WriteSplit(main, store.Snapshot(At), []);
+            var before = Directory.GetFiles(root, "*", SearchOption.AllDirectories).Order(StringComparer.Ordinal).Select(path => (path, File.ReadAllBytes(path))).ToArray();
             var errors = new System.Collections.Concurrent.ConcurrentBag<Exception>();
-            Parallel.For(0, 2, _ => { try { DiscoveryDatabase.ConvertFiles(root, At, (_, error) => throw error); } catch (Exception error) { errors.Add(error); } });
-            Check(errors.IsEmpty, $"round {round}: no conversion failed: " + string.Join("; ", errors.Select(error => error.Message)));
-            Check(new DiscoveryDatabase(Path.Combine(root, DiscoveryDatabase.FileName)).Count().Shared == 2, $"round {round}: the base holds both facts");
-            Check(Directory.GetFiles(root, DiscoveryDatabase.FileName + ".converting*").Length == 0, $"round {round}: no temporary file left");
-            Check(!File.Exists(main) && Aside(root).Count(path => Path.GetFileName(path) == "Discoveries.json") == 1, $"round {round}: the old file kept aside once");
-            Check(!Directory.Exists(DiscoveryFiles.SharedFolder(main)) && Directory.GetDirectories(root, "before-sqlite-*").SelectMany(Directory.GetDirectories).Count(path => Path.GetFileName(path).StartsWith("Shared", StringComparison.Ordinal)) == 1, $"round {round}: the shared files kept aside once");
+            Parallel.For(0, 2, side => { try { new DiscoveryDatabase(Path.Combine(root, DiscoveryDatabase.FileName)).Write([Fact(5000 + (uint)side)], [], false); } catch (Exception error) { errors.Add(error); } });
+            Check(errors.IsEmpty, $"round {round}: no open failed: " + string.Join("; ", errors.Select(error => error.Message)));
+            Check(new DiscoveryDatabase(Path.Combine(root, DiscoveryDatabase.FileName)).Count() == (2, 0), $"round {round}: the base holds both clients' facts, none of the old files'");
+            Check(Directory.GetFiles(root, DiscoveryDatabase.FileName + ".converting*").Length == 0 && Directory.GetDirectories(root, "before-sqlite-*").Length == 0, $"round {round}: no temporary file, nothing set aside");
+            Check(before.All(file => File.Exists(file.path) && File.ReadAllBytes(file.path).SequenceEqual(file.Item2)), $"round {round}: the old files in place, unchanged");
+            Check(DiscoveryFiles.OldFiles(main).SequenceEqual(["Discoveries.json", "Shared/"]), $"round {round}: both named as left aside");
           }
         })),
-        ("Concurrent data 1169: wiring (a file of before moved only once the data file is synced; read in an immediate transaction)", () =>
+        ("Concurrent data 1169: wiring (saves in an immediate transaction; the whole table never deleted; no file of before moved any more)", () =>
         {
             var database = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/TenshoDataDatabase.cs"));
-            Check(database.Contains("PRAGMA wal_checkpoint(FULL);") && database.Contains("if(opened is not null && !opened.Durable())"), "durable before the move (N27)");
+            Check(database.Contains("PRAGMA wal_checkpoint(FULL);") && !database.Contains("public void SetAside(", StringComparison.Ordinal), "the durable check kept; nothing set aside (X-574)");
             foreach (var path in new[] { "src/TenshoAssistant/FreeCompany/VoyageHistory.cs", "src/TenshoAssistant/Collections/AchievementProgressData.cs" })
                 Check(File.ReadAllText(Path.GetFullPath(path)).Contains("BeginTransaction(deferred:false)"), path + ": immediate transaction");
             Check(!File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/FreeCompany/VoyageHistory.cs")).Contains("DELETE FROM voyage_records;"), "the whole table is never deleted");

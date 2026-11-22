@@ -87,20 +87,6 @@ public static class DiscordWebhook
         return mention.Success ? mention.Groups[1].Value : null;
     }
 
-    /// <summary>
-    /// Source of an alarm made before 0.319 (no stored source): a calendar reminder or a vessel return is recognized by its group,
-    /// the localized title of its tool; anything else stays as it is. Returns true when the alarm was changed.
-    /// </summary>
-    public static bool AssignLegacySource(TenshoAlarm alarm, string remindersTitle, string voyagesTitle)
-    {
-        ArgumentNullException.ThrowIfNull(alarm);
-        if (alarm.Source != AlarmSource.Other || alarm.JobId != 0 || alarm.ItemId != 0 || alarm.Group.Length == 0) return false;
-        if (alarm.Group == remindersTitle) alarm.Source = AlarmSource.Reminder;
-        else if (alarm.Group == voyagesTitle) alarm.Source = AlarmSource.Voyage;
-        else return false;
-        return true;
-    }
-
     /// <summary>Category of an alarm: its stored source, else its gathering job (16 miner, 17 botanist, 18 fisher), else other.</summary>
     public static AlarmSource SourceOf(TenshoAlarm alarm)
     {

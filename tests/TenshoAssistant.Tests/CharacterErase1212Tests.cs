@@ -6,7 +6,9 @@ using TenshoAssistant.Inventory;
 // 0.1212 (X-185 part 2, night review of 12/11, N10): « Erase this character » left its gil journal, its achievement progress, the copies of its files
 // set aside at the conversion and the freed pages of TenshoData.db and its journal. Behaviour test (R28, privacy): a real profile folder converted,
 // a marker name only that character holds, the erase, then no file of that character anywhere and no byte of the marker in the data file, its
-// journal or the copies kept; the other character untouched. The same without the data file (files as before).
+// journal or the copies kept; the other character untouched. The same without the data file (files as before). X-574 (0.1793): the folder of
+// before is no longer converted; the profile is set up as the conversions of before left it (the copies in before-sqlite-*), which the erase
+// still purges.
 internal static class CharacterErase1212Tests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
@@ -48,11 +50,15 @@ internal static class CharacterErase1212Tests
         ("Character erase 1212: behaviour: storages, gil journal, achievements, copies set aside and freed pages; the other character untouched (N10)",() => InTemp(root =>
         {
             var folder=Path.Combine(root,"InventoryBank");var legacy=Path.Combine(root,"InventoryBank.json");var database=Path.Combine(root,TenshoDataDatabase.FileName);
-            new PerCharacterBankStore(folder,legacy).Save([Entry(5,BankStorageKind.Saddlebag,Marker+" (World)"),Entry(6,BankStorageKind.Bags,"Other (World)")]);
-            File.Copy(Path.Combine(folder,"5.json"),Path.Combine(folder,"5.json.bak"));
+            // The copies of the bank's folder as the conversion of 0.1149 set them aside (before-sqlite-…/InventoryBank/), the marker in character 5's.
+            var kept=Path.Combine(root,"before-sqlite-20261110-120000","InventoryBank");
+            new PerCharacterBankStore(kept,Path.Combine(root,"none.json")).Save([Entry(5,BankStorageKind.Saddlebag,Marker+" (World)"),Entry(6,BankStorageKind.Bags,"Other (World)")]);
+            File.Copy(Path.Combine(kept,"5.json"),Path.Combine(kept,"5.json.bak"));
             GilCopy(root,5);GilCopy(root,6);
             var store=new PerCharacterBankStore(folder,legacy,10_000,new TenshoDataFile(database,(error,message)=>throw new Exception(message,error)));
-            Check(store.Load().Length==2 && !Directory.Exists(folder),"converted, the folder of before set aside");
+            Check(store.Load().Length==0,"nothing read from the copies (X-574)");
+            store.Save([Entry(5,BankStorageKind.Saddlebag,Marker+" (World)"),Entry(6,BankStorageKind.Bags,"Other (World)")]);
+            Check(store.Load().Length==2 && !Directory.Exists(folder),"the bank in the data file, no folder of before");
             Check(FilesOf(root,5).Length==3,"character 5's files kept aside before the erase (bank, its copy, gil journal): "+FilesOf(root,5).Length);
             using(var open=new TenshoDataDatabase(database).Open())
                 foreach(var character in new[]{5L,6L})

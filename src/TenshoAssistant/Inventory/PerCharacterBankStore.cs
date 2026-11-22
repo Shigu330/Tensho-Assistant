@@ -6,24 +6,21 @@ namespace TenshoAssistant.Inventory;
 /// g, I-03 (0.345, user's choice: one file per character): the bank kept as one file per character, InventoryBank/&lt;id&gt;.json,
 /// each read and written by its own <see cref="FileInventoryBankStore"/> (same bounds and checks, .bak copy, a corrupt file fails
 /// closed). The id is the local character id the game gives the logged-in character (ContentId), never an Account ID.
-/// The former shared file (InventoryBank.json) is split once: written into a temporary folder, moved into place only when complete,
-/// then kept beside as « .migrated »; a failed or interrupted split leaves the former file untouched and is redone at the next load.
 /// X-141 (0.1118, audit A02): two game clients on the same profile share this folder. Every change is targeted (Apply): under a lock file
 /// of the profile (InventoryBank.lock, beside the folder, held by one process at a time), only the character concerned is read again from
 /// its file, changed (one storage written or forgotten) and written back, so what the other client saved is kept; a character's files
-/// are deleted only on the player's explicit « Erase this character ». A whole-list Save never deletes anything. Load and the split of
-/// the former file run under the same lock.
+/// are deleted only on the player's explicit « Erase this character ». A whole-list Save never deletes anything. Load runs under the same lock.
 /// X-173 (0.1149, user's choice of 12/11): with the player's data file (<see cref="TenshoDataFile"/>, TenshoData.db), the bank and inventories are
 /// kept there instead: one row per stored place, a character's rows replaced whole in one transaction (a stop in the middle leaves the last save
-/// whole), still under the profile's lock and still one character at a time. The files of before (the folder, and the former shared file split
-/// first as before) are converted the first time they are met, under the lock: every character read with the file's checks (one that cannot be
-/// read fails the whole conversion: nothing written, files left), then all rows and a « bank » mark in one transaction; then the folder is moved,
-/// never removed, into before-sqlite-&lt;date&gt;/. A data file that is there but unusable is never replaced (the bank is unavailable, nothing written);
-/// when it cannot be created, or none is given, the files stay in use as before.
+/// whole), still under the profile's lock and still one character at a time. A data file that is there but unusable is never replaced (the bank
+/// is unavailable, nothing written); when it cannot be created, or none is given, the files stay in use as before.
+/// X-574 (0.1793, the user's choice of 17/11): the files of before are no longer converted: the former shared file (InventoryBank.json, split
+/// into the folder until then) is never read, and with the data file the folder is not either; each is left where it is, never moved nor
+/// removed, and said once (<see cref="TenshoDataFile.LeftAside"/>). The copies set aside by the conversions of before (before-sqlite-*,
+/// « .migrated ») are not looked at, except by « Erase this character » (<see cref="TenshoDataDatabase.PurgeSetAside"/>).
 /// </summary>
 public sealed class PerCharacterBankStore : IInventoryBankStore
 {
-    public const string Family="bank";
     private readonly string folder;
     private readonly string legacy;
     private readonly int lockWaitMs;
@@ -32,6 +29,7 @@ public sealed class PerCharacterBankStore : IInventoryBankStore
     private readonly Dictionary<ulong,FileInventoryBankStore> stores=[];
     private bool loadFailed;
 
+    /// <param name="legacyFile">The former shared file (InventoryBank.json): X-574 (0.1793), never read; only said when it is still there.</param>
     /// <param name="lockWaitMs">How long a change waits for the other client's lock before it fails (nothing written).</param>
     /// <param name="data">X-173 (0.1149): the player's data file; null keeps the files.</param>
     public PerCharacterBankStore(string folder,string legacyFile,int lockWaitMs=10_000,TenshoDataFile? data=null)
@@ -42,14 +40,11 @@ public sealed class PerCharacterBankStore : IInventoryBankStore
 
     public static string FileName(ulong character)=>character.ToString(System.Globalization.CultureInfo.InvariantCulture)+".json";
 
-    /// <summary>X-141: the profile's lock file (beside the folder: the folder's absence still means « not split yet »).</summary>
+    /// <summary>X-141: the profile's lock file (beside the folder).</summary>
     public string LockPath=>Path.TrimEndingDirectorySeparator(folder)+".lock";
 
     /// <summary>X-173: « sqlite », « json » or « blocked » (see <see cref="TenshoDataFile.Mode"/>); « json » without a data file.</summary>
     public string Mode=>data?.Mode ?? "json";
-
-    /// <summary>Test hook: run inside the conversion's transaction, after its rows and before the commit (a stop or an error there).</summary>
-    internal Action? DuringConversion { get; set; }
 
     public BankEntry[] Load()
     {
@@ -63,12 +58,13 @@ public sealed class PerCharacterBankStore : IInventoryBankStore
                     if(data?.Database() is { } opened)
                     {
                         using var open=opened.Open();
-                        Convert(open);
+                        data.LeftAside("Bank",OldFiles(withFolder:true));
                         result=[.. Rows(open,null)];
                     }
                     else
                     {
-                        Migrate();
+                        // X-574 (0.1793): the files of the folder are this mode's own; only the former shared file is left aside.
+                        data?.LeftAside("Bank",OldFiles(withFolder:false));
                         var all=new List<BankEntry>();
                         foreach(var id in Characters())all.AddRange(Read(id));
                         result=all.ToArray();
@@ -95,7 +91,6 @@ public sealed class PerCharacterBankStore : IInventoryBankStore
                 if(data?.Database() is { } opened)
                 {
                     using var open=opened.Open();
-                    Convert(open);
                     using var transaction=open.BeginTransaction();
                     foreach(var group in entries.GroupBy(entry=>entry.Key.CharacterId))
                     {
@@ -136,7 +131,6 @@ public sealed class PerCharacterBankStore : IInventoryBankStore
                 if(data?.Database() is { } opened)
                 {
                     using var open=opened.Open();
-                    Convert(open);
                     if(change.Erase!=0)
                     {
                         // X-414 (0.1386): the erase is the player's command and only removes rows: done first, whatever the other characters
@@ -213,76 +207,6 @@ public sealed class PerCharacterBankStore : IInventoryBankStore
         var entries=Store(id).Load();
         if(entries.Any(entry=>entry.Key.CharacterId!=id))throw new InvalidDataException("A character's bank file holds another character's entries.");
         return entries;
-    }
-
-    /// <summary>
-    /// X-173: the files of before (the folder, the former shared file split into it first, as before) converted once into the data file, under the
-    /// profile's lock (the caller holds it): every character read with the file's checks, then all rows and the « bank » mark in one transaction.
-    /// Then, or when already converted, the files of before are set aside (moved, never removed); a move that fails is retried at the next load.
-    /// </summary>
-    private void Convert(SqliteConnection open)
-    {
-        var bankFiles=Directory.Exists(folder) && Directory.EnumerateFileSystemEntries(folder).Any();
-        if(!bankFiles && !File.Exists(legacy) && !File.Exists(legacy+".bak"))return;
-        var now=DateTimeOffset.UtcNow;
-        if(!TenshoDataDatabase.Converted(open,Family))
-        {
-            Migrate();
-            var all=Characters().SelectMany(Read).ToArray();
-            InventoryBankService.ValidateEntries(all);
-            using var transaction=open.BeginTransaction();
-            // X-182 (0.1173, N3): rows already there without the mark (saved while no file of before existed, then an older version wrote the
-            // folder) are joined, never replaced by the file alone.
-            foreach(var group in all.GroupBy(entry=>entry.Key.CharacterId))
-            {
-                var rows=Rows(open,transaction,group.Key);
-                WriteRows(open,transaction,group.Key,rows.Length==0 ? group.ToArray():MergeNewest(rows,group.ToArray()));
-            }
-            TenshoDataDatabase.MarkConverted(open,transaction,Family,now);
-            DuringConversion?.Invoke();
-            transaction.Commit();
-            stores.Clear();
-        }
-        // X-182 (0.1173, night review N3): a character file written again after the conversion (an older version still running, which found no
-        // folder and saved only what it saw since): merged storage by storage, the newest reading of each kept; never WriteRows of the file alone.
-        else if(bankFiles && TenshoDataDatabase.ConvertedAt(open,Family) is { } converted)MergeWrittenAgain(open,converted);
-        foreach(var path in new[]{folder,legacy,legacy+".bak"})
-            if(Directory.Exists(path) || File.Exists(path))data!.SetAside(path,now,"bank");
-    }
-
-    // X-182 (0.1173, N3): each character file newer than the conversion and not a copy already set aside, read with the file's checks; one that
-    // cannot be read (moved meanwhile, damaged) is left to be set aside as it is (kept, never removed).
-    private void MergeWrittenAgain(SqliteConnection open,DateTimeOffset converted)
-    {
-        var keptIn=Path.GetFileName(folder);
-        foreach(var id in Characters())
-        {
-            var path=Path.Combine(folder,FileName(id));
-            if(!TenshoDataFile.WrittenAgain(path,converted,keptIn))continue;
-            BankEntry[]? again;
-            try{again=TenshoDataFile.StillThere(()=>new FileInventoryBankStore(path).Load());}
-            catch(Exception error) when(error is InvalidDataException or System.Text.Json.JsonException or ArgumentException or UnauthorizedAccessException){again=null;}
-            if(again is null || again.Any(entry=>entry.Key.CharacterId!=id))continue;
-            using var transaction=open.BeginTransaction();
-            var rows=Rows(open,transaction,id);
-            var merged=MergeNewest(rows,again);
-            InventoryBankService.ValidateEntries(merged);
-            if(!rows.SequenceEqual(merged))WriteRows(open,transaction,id,merged);
-            transaction.Commit();
-        }
-    }
-
-    /// <summary>X-182 (0.1173, N3): two readings of one character joined storage by storage: the newest (ObservedAt) of each kept, the others all stay.</summary>
-    internal static BankEntry[] MergeNewest(IReadOnlyList<BankEntry> saved,IReadOnlyList<BankEntry> found)
-    {
-        var result=saved.ToList();
-        foreach(var entry in found)
-        {
-            var index=result.FindIndex(kept=>kept.Key==entry.Key);
-            if(index<0)result.Add(entry);
-            else if(entry.Snapshot.ObservedAt>result[index].Snapshot.ObservedAt)result[index]=entry;
-        }
-        return [.. result];
     }
 
     /// <summary>
@@ -372,25 +296,18 @@ public sealed class PerCharacterBankStore : IInventoryBankStore
             .Where(id=>id!=0).Distinct().OrderBy(id=>id).ToArray();
     }
 
-    private void Migrate()
+    /// <summary>
+    /// X-574 (0.1793): the files of an old format still there, by name: the former shared file (and its copy « .bak »), and with the data file
+    /// (<paramref name="withFolder"/>) the folder of one file per character when it holds anything. Looked at only, never opened; a folder that
+    /// cannot be listed is left out (only a log line depends on it, never the load).
+    /// </summary>
+    private string[] OldFiles(bool withFolder)
     {
-        if(Directory.Exists(folder) || !File.Exists(legacy) && !File.Exists(legacy+".bak"))return;
-        var entries=new FileInventoryBankStore(legacy).Load();
-        var temporary=folder+".migrating";
-        if(Directory.Exists(temporary))Directory.Delete(temporary,true);
-        Directory.CreateDirectory(temporary);
-        foreach(var group in entries.GroupBy(entry=>entry.Key.CharacterId))
-            new FileInventoryBankStore(Path.Combine(temporary,FileName(group.Key))).Save(group.ToArray());
-        Directory.Move(temporary,folder);
-        foreach(var path in new[]{legacy,legacy+".bak"})
-            if(File.Exists(path))File.Move(path,FreeName(path+".migrated"));
-    }
-
-    private static string FreeName(string path)
-    {
-        var candidate=path;
-        for(var index=1;File.Exists(candidate);index++)candidate=$"{path}.{index}";
-        return candidate;
+        var found=new List<string>();
+        foreach(var path in new[]{legacy,legacy+".bak"})if(File.Exists(path))found.Add(Path.GetFileName(path));
+        try{if(withFolder && Directory.Exists(folder) && Directory.EnumerateFileSystemEntries(folder).Any())found.Add(Path.GetFileName(folder)+"/");}
+        catch(Exception error) when(error is IOException or UnauthorizedAccessException){}
+        return [.. found];
     }
 }
 

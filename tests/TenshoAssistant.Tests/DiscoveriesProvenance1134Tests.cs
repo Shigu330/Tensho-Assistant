@@ -14,11 +14,13 @@ internal static class DiscoveriesProvenance1134Tests
         Kind=kind,Subject=subject,Detail=detail,Territory=135,Map=16,CellX=DiscoveryStore.Cell(place.X,place.Z).X,CellZ=DiscoveryStore.Cell(place.X,place.Z).Z,
         X=place.X,Z=place.Z,LevelMin=min,LevelMax=max,Seen=2,First=first,Last=last,Values=new(){[min]=1,[max]=1}
     };
+    // X-574 (0.1793): what is sent, as the gist holds it (a v3 set, ExchangeV3) read back the same way; the v1/v2 Encode and Decode are gone.
     private static DiscoveryFact Sent(DiscoveryStore store,DiscoveryKind kind,uint subject)
     {
-        var encoded=CommunityDiscoveries.Encode(CommunityDiscoveries.Mine(store.Snapshot(At)));
-        var back=CommunityDiscoveries.Decode(encoded)!;
-        return back.Facts.Single(fact=>fact.Kind==kind && fact.Subject==subject);
+        var files=ExchangeV3.GistFiles(ExchangeV3.Build(CommunityDiscoveries.Mine(store.Snapshot(At))));
+        var index=ExchangeV3.ParseIndex(files[ExchangeV3.IndexName])!;
+        var back=index.Files.SelectMany(entry=>ExchangeV3.ReadKind(new MemoryStream(Convert.FromBase64String(files[entry.Name+ExchangeV3.GistSuffix])),entry).Facts);
+        return back.Single(fact=>fact.Kind==kind && fact.Subject==subject);
     }
 
     public static IEnumerable<(string Name,Action Run)> Cases =>

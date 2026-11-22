@@ -5,12 +5,13 @@ namespace TenshoAssistant;
 
 /// <summary>
 /// X-173 (0.1139, user's choice of 12/11: « two SQLite files, an erasable cache and the data to protect »): the player's data file,
-/// <c>TenshoData.db</c>, at the root of the plugin's configuration folder. The families of X-173 move into it one at a time, each with its own
-/// tables, its files of before converted once and kept aside: the gil journal (0.1139, <see cref="Inventory.GilJournalStore"/>), the achievement
-/// progress (0.1140, <see cref="Collections.AchievementProgressData"/>), the voyage history (0.1148, <see cref="FreeCompany.VoyageHistoryData"/>), the bank and
-/// inventories (0.1149, <see cref="Inventory.PerCharacterBankStore"/>). The discoveries keep their own file for now (Discoveries/Discoveries.db,
-/// X-172; choice noted as D-141). WAL journal: a stop in the middle of a save leaves the last one whole, another process may read while the game
-/// writes. Every call opens its own connection: safe from any thread.
+/// <c>TenshoData.db</c>, at the root of the plugin's configuration folder. The families of X-173 moved into it one at a time, each with its own
+/// tables: the gil journal (0.1139, <see cref="Inventory.GilJournalStore"/>), the achievement progress (0.1140, <see cref="Collections.AchievementProgressData"/>),
+/// the voyage history (0.1148, <see cref="FreeCompany.VoyageHistoryData"/>), the bank and inventories (0.1149, <see cref="Inventory.PerCharacterBankStore"/>).
+/// X-574 (0.1793, the user's choice of 17/11): their files of before are no longer converted; one still there is left aside, never read
+/// (<see cref="TenshoDataFile.LeftAside"/>). The discoveries keep their own file for now (Discoveries/Discoveries.db, X-172; choice noted as
+/// D-141). WAL journal: a stop in the middle of a save leaves the last one whole, another process may read while the game writes. Every call
+/// opens its own connection: safe from any thread.
 /// </summary>
 public sealed class TenshoDataDatabase
 {
@@ -39,8 +40,9 @@ public sealed class TenshoDataDatabase
             Run(open,"CREATE TABLE IF NOT EXISTS gil_entries(character INTEGER NOT NULL,seq INTEGER NOT NULL,at INTEGER NOT NULL,delta INTEGER NOT NULL,"
                 +"balance INTEGER NOT NULL,source INTEGER NOT NULL,category INTEGER NOT NULL,PRIMARY KEY(character,seq)) WITHOUT ROWID;",transaction);
             // A character whose journal file of before is in the table (written in the same transaction as its rows): never converted twice.
+            // X-574 (0.1793): no longer read nor written (nothing is converted); kept, with its rows, so the layout stays the same.
             Run(open,"CREATE TABLE IF NOT EXISTS gil_converted(character INTEGER PRIMARY KEY NOT NULL,at INTEGER NOT NULL);",transaction);
-            // 0.1140: a family kept in one file before (« achievements »…), converted: never converted twice.
+            // 0.1140: a family kept in one file before (« achievements »…), converted: never converted twice. X-574 (0.1793): as gil_converted.
             Run(open,"CREATE TABLE IF NOT EXISTS converted(family TEXT PRIMARY KEY NOT NULL,at INTEGER NOT NULL);",transaction);
             // 0.1140: the achievement progress seen, one row per character and achievement.
             Run(open,"CREATE TABLE IF NOT EXISTS achievement_progress(character INTEGER NOT NULL,achievement INTEGER NOT NULL,current INTEGER NOT NULL,"
@@ -84,31 +86,6 @@ public sealed class TenshoDataDatabase
         using var command=open.CreateCommand();command.CommandText=sql;return command.ExecuteScalar();
     }
 
-    /// <summary>Whether a family kept in one file before is already in the database.</summary>
-    public static bool Converted(SqliteConnection open,string family,SqliteTransaction? transaction=null)
-    {
-        using var command=open.CreateCommand();command.Transaction=transaction;
-        command.CommandText="SELECT COUNT(*) FROM converted WHERE family=$family;";
-        command.Parameters.AddWithValue("$family",family);
-        return System.Convert.ToInt64(command.ExecuteScalar(),CultureInfo.InvariantCulture)>0;
-    }
-    /// <summary>X-182 (0.1169): when a family was converted (its « converted » mark), or null when it is not.</summary>
-    public static DateTimeOffset? ConvertedAt(SqliteConnection open,string family,SqliteTransaction? transaction=null)
-    {
-        using var command=open.CreateCommand();command.Transaction=transaction;
-        command.CommandText="SELECT at FROM converted WHERE family=$family;";
-        command.Parameters.AddWithValue("$family",family);
-        return command.ExecuteScalar() is long at ? new DateTimeOffset(at,TimeSpan.Zero):null;
-    }
-    /// <summary>Marks a family converted, inside the transaction that wrote its rows.</summary>
-    public static void MarkConverted(SqliteConnection open,SqliteTransaction transaction,string family,DateTimeOffset at)
-    {
-        using var command=open.CreateCommand();command.Transaction=transaction;
-        command.CommandText="INSERT OR REPLACE INTO converted(family,at) VALUES($family,$at);";
-        command.Parameters.AddWithValue("$family",family);command.Parameters.AddWithValue("$at",at.UtcTicks);
-        command.ExecuteNonQuery();
-    }
-
     /// <summary>The SQLite library's version (for the log).</summary>
     /// <summary>X-185 (0.1211, N10): the tables that keep rows per character (« Erase this character » empties them all for one).</summary>
     public static readonly string[] CharacterTables=["bank_entries","gil_entries","achievement_progress","character_jobs","character_gearsets","completion_lists"];
@@ -128,6 +105,8 @@ public sealed class TenshoDataDatabase
     /// <summary>
     /// X-185 (0.1211, N10): the copies of one character's files of before (« id.json », « id.json.bak »…) removed from every before-sqlite-* folder
     /// in the profile folder or one level below it (the bank's and the gil journal's); a file that cannot be removed is left (never an error).
+    /// X-574 (0.1793): and from the folders the files of before were left in, no longer converted (<see cref="LeftInPlace"/>: InventoryBank/,
+    /// GilJournal/): « Erase this character » removes them too, as the conversion of before would have put them in before-sqlite-*.
     /// Returns how many were removed.
     /// </summary>
     public static int PurgeSetAside(string root,ulong character)
@@ -137,7 +116,8 @@ public sealed class TenshoDataDatabase
         try
         {
             var kept=Directory.EnumerateDirectories(root,"before-sqlite-*").Concat(Directory.EnumerateDirectories(root).SelectMany(folder=>Directory.EnumerateDirectories(folder,"before-sqlite-*"))).ToArray();
-            foreach(var file in kept.SelectMany(folder=>Directory.EnumerateFiles(folder,"*",SearchOption.AllDirectories)).ToArray())
+            var inPlace=LeftInPlace.Select(folder=>System.IO.Path.Combine(root,folder)).Where(Directory.Exists).SelectMany(folder=>Directory.EnumerateFiles(folder,"*",SearchOption.TopDirectoryOnly));
+            foreach(var file in kept.SelectMany(folder=>Directory.EnumerateFiles(folder,"*",SearchOption.AllDirectories)).Concat(inPlace).Distinct(StringComparer.OrdinalIgnoreCase).ToArray())
             {
                 var own=System.IO.Path.GetFileName(file);
                 if(own!=name && !own.StartsWith(name+".",StringComparison.Ordinal))continue;
@@ -149,11 +129,15 @@ public sealed class TenshoDataDatabase
         return removed;
     }
 
+    /// <summary>X-574 (0.1793): the folders of one file per character of before (the bank's, the gil journal's), under the profile folder.</summary>
+    public static readonly string[] LeftInPlace=["InventoryBank","GilJournal"];
+
     public string LibraryVersion(){using var open=Open();return Scalar(open,"SELECT sqlite_version();") as string ?? "";}
 
     /// <summary>
     /// X-182 (0.1169, night review N27): the journal written into the file and synced (a full checkpoint), so a conversion's commit survives a
     /// power cut before its file of before is moved; false when another connection kept it from finishing (the move then waits for the next start).
+    /// X-574 (0.1793): no conversion calls it any more; kept as the data file's « written and synced » check.
     /// </summary>
     public bool Durable()
     {
@@ -256,7 +240,7 @@ public sealed class TenshoDataDatabase
 /// X-173 (0.1140): the player's data file as the plugin uses it, one for every family: opened on first use (off the frame), once. A file that
 /// exists but cannot be opened (SQLite not loaded, damaged, newer layout) is never replaced: every family is then unavailable and writes nothing
 /// this session (<see cref="Database"/> throws); when the file cannot be created at all, <see cref="Database"/> gives null and each family keeps
-/// its JSON files as before.
+/// its JSON files as before (a mode of its own: those files are then read and written, X-574 changed nothing there).
 /// </summary>
 public sealed class TenshoDataFile
 {
@@ -310,91 +294,19 @@ public sealed class TenshoDataFile
     }
 
     /// <summary>
-    /// X-182 (0.1169, night review N3): a file of before found again after its family was converted, written after the conversion (by an older
-    /// version of the plugin, or another client still running one) and not a copy already set aside: its entries are merged, never dropped.
+    /// X-574 (0.1793, the user's choice of 17/11: « remove it, I am the only one using the plugin »): the files of before of a family (the bank's
+    /// InventoryBank.json and InventoryBank/, the gil journal's, the voyage history's, the achievement progress's), found while the data file
+    /// is in use, are no longer converted: each is left where it is, never read, moved nor removed. Said once per family for this data file
+    /// (one per plugin load), in English through the log; nothing when <paramref name="names"/> is empty. Returns true when it was said now.
     /// </summary>
-    /// <param name="keptIn">X-182 (0.1173, N3): the folder of the file when it was set aside whole (the bank's InventoryBank/): its copies are looked
-    /// for in before-sqlite-*/&lt;folder&gt;*/ beside that folder.</param>
-    public static bool WrittenAgain(string file,DateTimeOffset converted,string? keptIn=null)
+    public bool LeftAside(string family,params string[] names)
     {
-        try
-        {
-            if(!File.Exists(file) || File.GetLastWriteTimeUtc(file)<=converted.UtcDateTime)return false;
-            var length=new FileInfo(file).Length;
-            var name=System.IO.Path.GetFileNameWithoutExtension(file);var extension=System.IO.Path.GetExtension(file);
-            var directory=System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(file))!;
-            var places=keptIn is null ? Directory.EnumerateDirectories(directory,"before-sqlite-*")
-                : Directory.EnumerateDirectories(System.IO.Path.GetDirectoryName(directory)!,"before-sqlite-*").SelectMany(aside=>Directory.EnumerateDirectories(aside,keptIn+"*"));
-            foreach(var aside in places)
-                foreach(var kept in Directory.EnumerateFiles(aside,name+"*"+extension))
-                    if(SameBytes(kept,file,length))return false;
-            return true;
-        }
-        catch(Exception error) when(error is FileNotFoundException or DirectoryNotFoundException){return false;}
+        if(names.Length==0)return false;
+        lock(gate)if(!saidAside.Add(family))return false;
+        info?.Invoke(names.Length==1
+            ? $"{family}: a file of an old format ({names[0]}) was left aside, not read (X-574)."
+            : $"{family}: files of an old format ({string.Join(", ",names)}) were left aside, not read (X-574).");
+        return true;
     }
-
-    /// <summary>
-    /// 0.1306 (found by publish.sh on 14/11: « Concurrent data 1169 », a second client loading during the voyage conversion): a copy set aside
-    /// that another client is still writing (or the file itself, held) cannot be compared: it proves nothing, so the next copy is looked at
-    /// and, none equal, the file counts as written again; its entries are then merged, never twice (only those not in the database).
-    /// </summary>
-    private static bool SameBytes(string kept,string file,long length)
-    {
-        try{return new FileInfo(kept).Length==length && File.ReadAllBytes(kept).AsSpan().SequenceEqual(File.ReadAllBytes(file));}
-        catch(IOException error) when(error is not (FileNotFoundException or DirectoryNotFoundException)){return false;}
-        catch(UnauthorizedAccessException){return false;}
-    }
-
-    /// <summary>
-    /// X-182 (0.1171, found by the CI on 0.1169): a file of before read while another client may be moving it aside (it converted first): gone or
-    /// held meanwhile (not found, in use), it gives null and nothing is written nor marked; the file is moved only by a client that saw it converted.
-    /// </summary>
-    public static T? StillThere<T>(Func<T> read) where T:class
-    {
-        try{return read();}
-        catch(IOException){return null;}
-    }
-
-    /// <summary>
-    /// Relay 37 (0.1205): a save that finds its family's file of before not converted (held by another program at the load) converts it
-    /// first; false while it is still held. A file of before that cannot be read refuses the save as before (never written over it).
-    /// </summary>
-    public static bool ConvertBeforeSave(Func<bool> convert,string what)
-    {
-        try{return convert();}
-        catch(Exception error) when(error is InvalidDataException or System.Text.Json.JsonException or NotSupportedException or ArgumentException)
-        {
-            throw new InvalidOperationException($"The {what} file of before cannot be read; nothing written over it.",error);
-        }
-    }
-
-    /// <summary>
-    /// A file of before moved beside itself into before-sqlite-yyyyMMdd-HHmmss/, never removed (a name already taken there gets a suffix). A move
-    /// that fails is said and retried at the next start (the « converted » mark keeps the file from being read again). 0.1149: a folder of before
-    /// (the bank's InventoryBank/) is moved the same way, whole.
-    /// </summary>
-    public void SetAside(string file,DateTimeOffset now,string what)
-    {
-        try
-        {
-            file=System.IO.Path.TrimEndingDirectorySeparator(System.IO.Path.GetFullPath(file));
-            var folder=Directory.Exists(file);
-            // X-182 (0.1169): already moved by another client; N27: never moved before the rows that replace it are synced to the disk.
-            if(!folder && !File.Exists(file))return;
-            TenshoDataDatabase? opened;
-            lock(gate)opened=blocked is null ? database:null;
-            if(opened is not null && !opened.Durable()){info?.Invoke($"Tensho data: the {what} file of before stays until the next start (the data file was busy).");return;}
-            var aside=System.IO.Path.Combine(System.IO.Path.GetDirectoryName(file)!,$"before-sqlite-{now.ToUniversalTime():yyyyMMdd-HHmmss}");
-            Directory.CreateDirectory(aside);
-            var target=System.IO.Path.Combine(aside,System.IO.Path.GetFileName(file));
-            if(File.Exists(target) || Directory.Exists(target))
-                target=System.IO.Path.Combine(aside,System.IO.Path.GetFileNameWithoutExtension(file)+"-"+Guid.NewGuid().ToString("N")[..8]+System.IO.Path.GetExtension(file));
-            if(folder)Directory.Move(file,target);else File.Move(file,target);
-            info?.Invoke($"Tensho data: the {what} file of before moved to {TenshoDataDatabase.FileName}, kept in {System.IO.Path.GetFileName(aside)}.");
-        }
-        catch(Exception error) when(error is IOException or UnauthorizedAccessException)
-        {
-            warn(error,$"The {what} file of before could not be set aside; it is not read again.");
-        }
-    }
+    private readonly HashSet<string> saidAside=new(StringComparer.Ordinal);
 }

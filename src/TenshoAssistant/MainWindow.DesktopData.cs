@@ -139,30 +139,30 @@ internal sealed partial class MainWindow
     // shows the journal of the character with the newest entry (no character is logged in; choice D-142), its balances as last recorded. Read
     // off the frame; a newer reading replaces an older one, never the reverse. No copy: the page says offline, as before. The achievement
     // progress: since 0.1150 from the same copy (UseDesktopAchievements).
-    // X-173 (0.1148): the voyage history from the copy of the data file once the plugin converted it (no VoyageHistory.json left to copy), from
-    // the JSON copy before (the application never converts its copy itself: the next copy of the data file would undo it).
+    // X-173 (0.1148): the voyage history from the copy of the data file, from the JSON copy when there is none (the plugin keeps the JSON file
+    // only when its data file cannot be created). X-574 (0.1793): a VoyageHistory.json of before left in the plugin's folder (no longer
+    // converted nor moved) is never preferred to the data file.
     private void UseDesktopVoyages(string folder,Action<Exception,string> warn)
     {
         var json=Path.Combine(folder,"VoyageHistory.json");var file=Path.Combine(folder,TenshoDataDatabase.FileName);
-        VoyageHistorySource=new FreeCompany.VoyageHistoryStore(json,warn,!File.Exists(json) && File.Exists(file) ? new TenshoDataFile(file,warn):null);
+        VoyageHistorySource=new FreeCompany.VoyageHistoryStore(json,warn,File.Exists(file) ? new TenshoDataFile(file,warn):null);
     }
 
-    // X-173 (0.1149): the bank and inventories from the copy of the data file once the plugin converted them (no bank file left in the copy:
-    // DesktopMirror removes the copies of files gone from the plugin's folder), from the copy of the files before; the application never
-    // converts its copy itself (the data file is given only when no bank file is left, so there is nothing to convert).
+    // X-173 (0.1149): the bank and inventories from the copy of the data file, from the copy of the files when there is none (the plugin keeps
+    // its files only when its data file cannot be created). X-574 (0.1793): the files of before left in the plugin's folder (no longer converted
+    // nor moved) are never preferred to the data file; nothing is ever converted (the store no longer converts).
     private void UseDesktopBank(string folder,Action<Exception,string> warn)
     {
         var files=Path.Combine(folder,"InventoryBank");var legacy=Path.Combine(folder,"InventoryBank.json");var file=Path.Combine(folder,TenshoDataDatabase.FileName);
-        var json=File.Exists(legacy) || Directory.Exists(files) && Directory.EnumerateFiles(files,"*.json*").Any();
         var previousBank=bank;
-        bank=new InventoryBankService(new PerCharacterBankStore(files,legacy,data:!json && File.Exists(file) ? new TenshoDataFile(file,warn):null));
+        bank=new InventoryBankService(new PerCharacterBankStore(files,legacy,data:File.Exists(file) ? new TenshoDataFile(file,warn):null));
         previousBank?.Dispose();
     }
 
     // X-119 with X-173 (0.1150): the achievement progress from the copy of the data file (Collection › Achievements and the tracked list): the
     // character whose progress was seen last (no character is logged in; as the gil journal, D-142). Read off the frame; a newer reading replaces
-    // an older one, never the reverse. The copy holds only what the plugin converted: the application never converts (the file of before is not
-    // copied). No copy: « not seen yet », as before.
+    // an older one, never the reverse. The copy holds only what the plugin saved: the application never converts (X-574, 0.1793: nor does the
+    // plugin any more). No copy: « not seen yet », as before.
     private int desktopAchievementsGeneration;
     private void UseDesktopAchievements(string folder,Action<Exception,string> warn)
     {

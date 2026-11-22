@@ -8,7 +8,8 @@ using TenshoAssistant.Npcs;
 // X-336 (0.1380, review of 0.1279 to 0.1317, minors): M1 an alarm validated unchanged is not moved; M4 a file of before written again but
 // held is not set aside unmerged (behaviour test, R28.14: the file really held by another handle); M5 the map's quests read at most once a
 // second; M7 one line per row in the gear clipper; M8 a shorter ClassJobCategory sheet; M9 no enum name shown; M10 a quest place linked to
-// no quest stays shown; M12 the bank checked before the commit.
+// no quest stays shown; M12 the bank checked before the commit. X-574 (0.1793, the user's choice of 17/11): M4's files of before are no longer
+// read nor merged at all; its cases say that now (a file held by another program never in the way).
 internal static class ReviewMinors1380Tests
 {
     private static void Check(bool value, string message) { if (!value) throw new Exception(message); }
@@ -37,32 +38,28 @@ internal static class ReviewMinors1380Tests
             Check(!AlarmSchedule.Move(alarm, shown.AddSeconds(20), now), "same minute: unchanged");
             Check(AlarmSchedule.Move(alarm, shown.AddHours(1), now) && alarm.LastOccurrence == default, "a new time is a move");
         }),
-        ("Review minors 1380 M4: a voyage file written again but held is not set aside unmerged; once free it is merged", () => InTemp(root =>
+        ("Review minors 1380 M4: a voyage file written again and held by another program is never read nor set aside; free, still not read (X-574)", () => InTemp(root =>
         {
             var file = Path.Combine(root, "VoyageHistory.json");
             var at = DateTimeOffset.UtcNow.AddDays(-2);
-            VoyageHistory.Write(file, [Record(100, 0, at, 21)]);
-            new VoyageHistoryData(file, Data(root)).Load(DateTimeOffset.UtcNow.AddMinutes(-10));
-            Check(!File.Exists(file), "converted and set aside");
+            new VoyageHistoryData(file, Data(root)).Save([Record(100, 0, at, 21)]);
             VoyageHistory.Write(file, [Record(100, 1, at.AddHours(1), 24)]);
-            var hold = new FileStream(file, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
-            try
-            {
-                var second = new VoyageHistoryData(file, Data(root)) { DuringSave = () => hold.Dispose() };
-                second.Load(DateTimeOffset.UtcNow);
-            }
-            finally { hold.Dispose(); }
-            Check(File.Exists(file), "held while read: left in place, not set aside unmerged");
+            var bytes = File.ReadAllBytes(file);
+            using (new FileStream(file, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+                Check(new VoyageHistoryData(file, Data(root)).Load(DateTimeOffset.UtcNow).Select(record => record.Loot[0].ItemId).SequenceEqual([21u]), "held: the load goes on, the data file's voyage only");
+            Check(File.ReadAllBytes(file).SequenceEqual(bytes) && Directory.GetDirectories(root, "before-sqlite-*").Length == 0, "left in place, not set aside");
             var all = new VoyageHistoryData(file, Data(root)).Load(DateTimeOffset.UtcNow);
-            Check(all.Count == 2 && all.Any(record => record.Loot[0].ItemId == 24), "once free, its voyage is merged: " + all.Count);
-            Check(!File.Exists(file), "then set aside");
+            Check(all.Count == 1 && all[0].Loot[0].ItemId == 21, "free: still not read nor merged: " + all.Count);
+            Check(File.ReadAllBytes(file).SequenceEqual(bytes), "never moved");
         })),
-        ("Review minors 1380 M4: the achievements and the gil journal follow the same rule", () =>
+        ("Review minors 1380 M4: the achievements and the gil journal follow the same rule (X-574: their files of before never read, only said)", () =>
         {
-            Check(Read("src/TenshoAssistant/Collections/AchievementProgressData.cs").Contains("if(TenshoDataFile.StillThere(ReadOrSetAside) is { } found)", StringComparison.Ordinal), "achievements");
-            var gil = Read("src/TenshoAssistant/Inventory/GilJournalStore.cs");
-            Check(gil.Contains("else if(TenshoDataFile.WrittenAgain(json,converted))", StringComparison.Ordinal)
-                && System.Text.RegularExpressions.Regex.Matches(gil, "else marked=false;").Count == 2, "gil journal");
+            foreach (var path in new[] { "src/TenshoAssistant/Collections/AchievementProgressData.cs", "src/TenshoAssistant/Inventory/GilJournalStore.cs", "src/TenshoAssistant/FreeCompany/VoyageHistory.cs" })
+            {
+                var code = Read(path);
+                Check(code.Contains("data.LeftAside(\"", StringComparison.Ordinal) && !code.Contains("WrittenAgain", StringComparison.Ordinal)
+                    && !code.Contains("StillThere", StringComparison.Ordinal) && !code.Contains(".SetAside(", StringComparison.Ordinal), path);
+            }
         }),
         ("Review minors 1380 M8: a ClassJobCategory sheet shorter than a job's column gives no job, never an exception", () =>
         {

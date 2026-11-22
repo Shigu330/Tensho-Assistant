@@ -7,7 +7,9 @@ using TenshoAssistant.Discoveries;
 // failed, the database already in place, and the plugin took that for a database it could not open (nothing saved that session). A file
 // held for an instant was read as damaged, and renamed « .broken » the moment it was let go: an empty base converted in its place.
 // Behaviour tests (R28: data loss, concurrency), each race replayed by hand, without a clock: a handle held as the other program holds
-// it, and the stop between the temporary database and its move into place.
+// it, and the stop between the temporary database and its move into place. X-574 (0.1793, the user's choice of 17/11): the conversion is gone;
+// the races of the discoveries' start are now those of a database opened beside files of before that are never read, moved nor removed, even
+// held by another program; the races of AtomicFile and of the JSON mode's base stay as they were.
 internal static class ConversionRaces1197Tests
 {
     private static void Check(bool value, string message) { if (!value) throw new Exception(message); }
@@ -37,93 +39,70 @@ internal static class ConversionRaces1197Tests
     private static string[] Temporaries(string root) => Directory.GetFiles(root, DiscoveryDatabase.FileName + ".converting*");
     private static string[] Aside(string root) => Directory.GetDirectories(root, "before-sqlite-*").SelectMany(Directory.GetFiles).ToArray();
     private static string Kind(string main) => DiscoveryFiles.SharedPath(DiscoveryFiles.SharedFolder(main), DiscoveryKind.FishCatch);
+    // The start of the discoveries as the plugin does it (Plugin.Discoveries.cs): the database opened (made when missing), the files of before named.
+    private static (DiscoveryDatabase Database, string[] Old) Start(string root)
+        => (new DiscoveryDatabase(Path.Combine(root, DiscoveryDatabase.FileName)), DiscoveryFiles.OldFiles(Path.Combine(root, "Discoveries.json")));
+    private static (string Name, byte[] Bytes)[] Files(string root) => Directory.GetFiles(root, "*", SearchOption.AllDirectories)
+        .Where(path => !Path.GetFileName(path).StartsWith(DiscoveryDatabase.FileName, StringComparison.Ordinal)).Order(StringComparer.Ordinal).Select(path => (path, File.ReadAllBytes(path))).ToArray();
+    private static bool Same((string Name, byte[] Bytes)[] left, (string Name, byte[] Bytes)[] right)
+        => left.Length == right.Length && left.Zip(right).All(pair => pair.First.Name == pair.Second.Name && pair.First.Bytes.SequenceEqual(pair.Second.Bytes));
 
     public static IEnumerable<(string Name, Action Run)> Cases =>
     [
-        ("Conversion races 1197: behaviour: the other client still reads Discoveries.json when this one sets it aside: the conversion succeeds, the file stays, the next start sets it aside", () => InTemp(root =>
+        ("Conversion races 1197: behaviour: the other client still reads Discoveries.json while this one starts: the database opens, the file stays as it is (X-574)", () => InTemp(root =>
         {
             var main = Before(root);
-            string? stayed = null;
-            // The other client's read: opened as File.ReadAllText opens it (others may read, nobody may move it).
+            var before = Files(root);
             using (var reading = new FileStream(main, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
-                var aside = DiscoveryDatabase.ConvertFiles(root, At, (_, error) => throw error, null, (path, _) => stayed = path);
-                Check(Count(root) == (1, 2), "the database is whole: " + Count(root));
-                Check(File.Exists(main) && stayed == main, "the file held stays where it is, and it is said: " + stayed);
-                Check(aside is not null && Directory.Exists(Path.Combine(aside, "Shared")) && !File.Exists(Path.Combine(aside, "Discoveries.json")), "the shared files, which nobody held, are aside");
+                var (database, old) = Start(root);
+                Check(database.Count() == (0, 0), "the database opens, nothing read from the files of before: " + database.Count());
+                Check(old.SequenceEqual(["Discoveries.json", "Shared/"]), "both named as left aside: " + string.Join(", ", old));
             }
-            var written = 0;
-            var next = DiscoveryDatabase.ConvertFiles(root, At.AddMinutes(5), (_, error) => throw error, rows => written += rows);
-            Check(next is not null && !File.Exists(main) && Aside(root).Count(path => Path.GetFileName(path) == "Discoveries.json") == 1, "set aside by the next start, once");
-            Check(written == 0 && Count(root) == (1, 2), "nothing counted twice: " + Count(root));
-            Check(Temporaries(root).Length == 0, "no temporary file left");
+            Check(Same(Files(root), before) && Directory.GetDirectories(root, "before-sqlite-*").Length == 0, "every file of before in place, unchanged, nothing set aside");
+            Check(Temporaries(root).Length == 0, "no temporary file");
         })),
-        ("Conversion races 1197: behaviour: the other client converts between this one's reading and its move into place: the first base in stays, nothing fails, nothing is left behind", () => InTemp(root =>
+        ("Conversion races 1197: behaviour: two clients starting together beside the files of before: one database, both clients' facts, nothing moved (X-574)", () => InTemp(root =>
         {
             var main = Before(root);
-            string? other = null;
-            // The lost race, replayed whole at the stop: the other client reads a base one fact richer, puts its database in place and moves the
-            // old files aside; this client then comes with what it had read before.
-            var aside = DiscoveryDatabase.ConvertFiles(root, At, (_, error) => throw error, null, null, _ =>
-            {
-                Before(root, 1);
-                other = DiscoveryDatabase.ConvertFiles(root, At, (_, error) => throw error);
-            });
-            Check(other is not null && aside is null, "the other client set the files of before aside; this one had nothing left to move");
-            Check(Count(root) == (2, 2), "the first base in stays, never replaced by the later one: " + Count(root));
-            Check(Temporaries(root).Length == 0, "this client's temporary database is removed");
-            Check(!File.Exists(main) && Aside(root).Count(path => Path.GetFileName(path) == "Discoveries.json") == 1 && Directory.GetDirectories(root, "before-sqlite-*").Length == 1, "the files of before aside once, no empty folder beside");
+            var before = Files(root);
+            var errors = new System.Collections.Concurrent.ConcurrentBag<Exception>();
+            Parallel.For(0, 2, side => { try { Start(root).Database.Write([Fact(9000 + (uint)side)], [], false); } catch (Exception error) { errors.Add(error); } });
+            Check(errors.IsEmpty, "no start failed: " + string.Join("; ", errors.Select(error => error.Message)));
+            Check(Count(root) == (2, 0), "both clients' facts, none of the files of before: " + Count(root));
+            Check(Same(Files(root), before) && File.Exists(main) && Directory.GetDirectories(root, "before-sqlite-*").Length == 0, "the files of before as they were");
         })),
-        ("Conversion races 1197: behaviour: Discoveries.json held by another program for an instant is not a damaged file: not reported, not renamed, nothing converted; whole at the next start", () => InTemp(root =>
+        ("Conversion races 1197: behaviour: Discoveries.json held by another program (no sharing) is neither reported, renamed nor in the way: the database opens (X-574)", () => InTemp(root =>
         {
             var main = Before(root);
-            var reported = 0;
-            FileStream? holder = new FileStream(main, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
-            try
+            using (var holder = new FileStream(main, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
             {
-                var failed = false;
-                // The report of a damaged file is where the holder lets go. Before 0.1197 the file was reported, then renamed « .broken » the
-                // instant after, and the conversion went on from an empty base: the player's own discoveries out of the database.
-                try { DiscoveryDatabase.ConvertFiles(root, At, (_, _) => { reported++; holder?.Dispose(); holder = null; }); }
-                catch (IOException) { failed = true; }
-                Check(failed && reported == 0, "held is not damaged: nothing reported, the conversion waits for the next start (reported " + reported + ")");
-                Check(File.Exists(main) && Directory.GetFiles(root, "Discoveries.json.broken*").Length == 0, "the file as it was, under its name");
-                Check(!File.Exists(Path.Combine(root, DiscoveryDatabase.FileName)) && Temporaries(root).Length == 0 && Directory.GetDirectories(root, "before-sqlite-*").Length == 0, "no database from a part of the base, nothing moved");
+                var (database, old) = Start(root);
+                Check(database.Count() == (0, 0) && old.Contains("Discoveries.json"), "the database opens; the held file is still named");
+                database.Write([Fact(9100)], [], false);
             }
-            finally { holder?.Dispose(); }
-            Check(DiscoveryDatabase.ConvertFiles(root, At.AddMinutes(1), (_, error) => throw error) is not null && Count(root) == (1, 2), "converted whole once the file is free: " + Count(root));
+            Check(File.Exists(main) && Directory.GetFiles(root, "Discoveries.json.broken*").Length == 0 && Count(root) == (1, 0), "the file under its name, the fact saved");
         })),
-        ("Conversion races 1197: behaviour: a shared kind file held for an instant: nothing converted from a part of the base, the file neither renamed nor lost", () => InTemp(root =>
+        ("Conversion races 1197: behaviour: a shared kind file held for an instant: the database opens, the file neither renamed nor lost (X-574)", () => InTemp(root =>
         {
             var main = Before(root);
             var kind = Kind(main);
-            var reported = 0;
             using (var holder = new FileStream(kind, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
             {
-                var failed = false;
-                try { DiscoveryDatabase.ConvertFiles(root, At, (_, _) => reported++); }
-                catch (IOException) { failed = true; }
-                Check(failed && reported == 0, "nothing converted, nothing reported as damaged");
-                Check(File.Exists(kind) && !File.Exists(kind + ".broken") && File.Exists(main) && !File.Exists(Path.Combine(root, DiscoveryDatabase.FileName)), "the base of before as it was, no database without its shared facts");
+                var (database, old) = Start(root);
+                Check(database.Count() == (0, 0) && old.Contains("Shared/"), "the database opens; the folder of the shared files named");
             }
-            Check(DiscoveryDatabase.ConvertFiles(root, At.AddMinutes(1), (_, error) => throw error) is not null && Count(root) == (1, 2), "converted whole once the file is free: " + Count(root));
+            Check(File.Exists(kind) && !File.Exists(kind + ".broken") && File.Exists(main), "the files of before as they were");
         })),
-        ("Conversion races 1197: behaviour: the temporary database held when it is put in place: no database, the files of before untouched; the next start converts and removes the leftover once old", () => InTemp(root =>
+        ("Conversion races 1197: behaviour: a temporary database left by a conversion of before is never read nor removed (X-574)", () => InTemp(root =>
         {
-            var main = Before(root);
-            FileStream? holder = null;
-            var failed = false;
-            try { DiscoveryDatabase.ConvertFiles(root, At, (_, error) => throw error, null, null, temporary => holder = new FileStream(temporary, FileMode.Open, FileAccess.Read, FileShare.Read)); }
-            catch (IOException) { failed = true; }
-            finally { holder?.Dispose(); }
-            Check(failed && !File.Exists(Path.Combine(root, DiscoveryDatabase.FileName)), "given up after its attempts: no database");
-            Check(File.Exists(main) && File.Exists(Kind(main)) && Directory.GetDirectories(root, "before-sqlite-*").Length == 0, "the files of before whole and in place");
-            var leftover = Temporaries(root);
-            Check(leftover.Length == 1, "the temporary database, held, could not be removed: " + leftover.Length);
-            // Half an hour later, at a later start (a younger leftover may be another client's conversion under way: left alone).
-            Check(DiscoveryDatabase.ConvertFiles(root, At.AddMinutes(1), (_, error) => throw error) is not null && Count(root) == (1, 2) && Temporaries(root).Length == 1, "converted; a young leftover is left alone");
-            File.SetLastWriteTimeUtc(leftover[0], DateTime.UtcNow.AddMinutes(-31));
-            Check(DiscoveryDatabase.ConvertFiles(root, At.AddMinutes(40), (_, error) => throw error) is null && Temporaries(root).Length == 0, "removed once old, even with nothing left to convert");
+            Before(root);
+            var leftover = Path.Combine(root, DiscoveryDatabase.FileName + ".converting-" + Guid.NewGuid().ToString("N"));
+            File.WriteAllText(leftover, "left by a stopped conversion");
+            File.SetLastWriteTimeUtc(leftover, DateTime.UtcNow.AddHours(-2));
+            var (database, _) = Start(root);
+            Check(database.Count() == (0, 0), "nothing read from it");
+            Check(Temporaries(root).SequenceEqual([leftover]) && File.ReadAllText(leftover) == "left by a stopped conversion", "left where it is, even old");
         })),
         ("Conversion races 1197: behaviour: a move tried again while the file is held, done once it is let go; a destination that exists is neither waited for nor replaced; a removal never fails", () => InTemp(root =>
         {
@@ -171,15 +150,16 @@ internal static class ConversionRaces1197Tests
             Directory.Delete(DiscoveryFiles.SharedFolder(main), true);
             Check(!DiscoveryFiles.ReadShared(main, (_, _) => reported++).Any() && reported == 1, "no folder: nothing, no report");
         })),
-        ("Conversion races 1197: wiring: the plugin says a file that stays, and a failure once the database is in place can no longer come from the files of before", () =>
+        ("Conversion races 1197: wiring: the plugin opens the database without converting and says the files of before once; the JSON base read only without a database (X-574)", () =>
         {
-            var plugin = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Discoveries.cs")); // X-153 (0.1250): the discoveries family
-            Check(plugin.Contains("is held by another program for now and stays where it is; the next start sets it aside", StringComparison.Ordinal), "the file that stays is said in the log");
-            var database = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Discoveries/DiscoveryDatabase.cs")).ReplaceLineEndings("\n");
-            var convert = database[database.IndexOf("public static string? ConvertFiles(", StringComparison.Ordinal)..database.IndexOf("private static string Free(", StringComparison.Ordinal)];
-            Check(convert.Contains("AtomicFile.MoveWhenFree(temporary,target);", StringComparison.Ordinal) && convert.Contains("AtomicFile.DeleteWhenFree(mine);", StringComparison.Ordinal), "the temporary database: moved when free, removed without an error");
-            Check(!convert.Contains("File.Delete(mine)", StringComparison.Ordinal) && convert.Split("catch(Exception error) when(error is IOException or UnauthorizedAccessException)").Length == 3, "both moves aside are tolerant");
-            Check(convert.IndexOf("Directory.EnumerateFiles(folder,FileName+\".converting*\")", StringComparison.Ordinal) < convert.IndexOf("if(!File.Exists(target) && old)", StringComparison.Ordinal), "leftovers looked for at every start");
+            var plugin = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Discoveries.cs")).ReplaceLineEndings("\n"); // X-153 (0.1250): the discoveries family
+            Check(!plugin.Contains("ConvertFiles(", StringComparison.Ordinal) && plugin.Contains("database=new Discoveries.DiscoveryDatabase(databasePath);", StringComparison.Ordinal), "the database opened, nothing converted");
+            Check(plugin.Contains("if(Discoveries.DiscoveryFiles.OldFiles(saved) is { Length:>0 } old)", StringComparison.Ordinal)
+                && plugin.Contains("\"Discoveries: a file of an old format ({0}) was left aside, not read (X-574).\"", StringComparison.Ordinal), "the files of before said in the log");
+            Check(plugin.IndexOf("mainWindow.DiscoveryDatabase=database;", StringComparison.Ordinal) < plugin.IndexOf("var read=Discoveries.DiscoveryFiles.ReadBase(saved,", StringComparison.Ordinal)
+                && plugin.Contains("if(database is { } opened)", StringComparison.Ordinal), "the JSON base read only when no database could be made (its own mode)");
+            var database = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Discoveries/DiscoveryDatabase.cs"));
+            Check(!database.Contains("MergeFound", StringComparison.Ordinal) && !database.Contains("before-sqlite", StringComparison.Ordinal), "no merge, nothing set aside");
         }),
     ];
 }

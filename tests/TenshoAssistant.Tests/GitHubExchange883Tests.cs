@@ -11,9 +11,11 @@ internal static class GitHubExchange883Tests
             var store=new DiscoveryStore();
             store.SeeSource(DiscoveryKind.Venture,5,7,2,at);
             var first=CommunityDiscoveries.Mine(store.Snapshot(at,false));var second=CommunityDiscoveries.Mine(store.Snapshot(at.AddHours(1),false));
-            var payload=CommunityDiscoveries.Encode(first);
-            Check(CommunityDiscoveries.Hash(payload)==CommunityDiscoveries.Hash(CommunityDiscoveries.Encode(second)),"same facts, same payload");
-            Check(CommunityDiscoveries.Decode(payload) is { Facts.Count:1 },"round trip");
+            // X-574 (0.1793): the payload is the v3 set the exchange sends (ExchangeV3, since 0.1137); the v1/v2 Encode and Decode are gone.
+            var payload=ExchangeV3.GistFiles(ExchangeV3.Build(first));
+            Check(CommunityDiscoveries.Hash(payload[ExchangeV3.IndexName])==CommunityDiscoveries.Hash(ExchangeV3.GistFiles(ExchangeV3.Build(second))[ExchangeV3.IndexName]),"same facts, same payload");
+            var index=ExchangeV3.ParseIndex(payload[ExchangeV3.IndexName])!;
+            Check(index.Files.Sum(entry=>ExchangeV3.ReadKind(new MemoryStream(Convert.FromBase64String(payload[entry.Name+ExchangeV3.GistSuffix])),entry).Facts.Count)==1,"round trip");
             Check(!new DiscoverySettings().AutoExchange,"off by default");
             var folder=Path.Combine(Path.GetTempPath(),"tensho-exchange-"+Guid.NewGuid().ToString("N"));
             try

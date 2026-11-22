@@ -25,9 +25,8 @@ internal static class ChatBackground1490Tests
         {
             Check(ChatCover.Background(ChatCovered.Hide, false, new ChatSettings().BoundedOpacity) == 0.15f, "15 % by default");
             Check(ChatCover.Background(ChatCovered.Hide, false, 0) == 0f && ChatCover.Background(ChatCovered.Stay, false, 100) == 1f, "0 % to 100 %, as set");
-            var saved = new ChatSettings { Opacity = 40, LookVersion = 0 };
-            saved.UpgradeLook();
-            Check(saved.BoundedOpacity == 15, "a configuration still at the old default (40 %) gets the light one");
+            // X-574 (0.1793): the one-time upgrade of settings saved before 0.1488 is gone: a saved background stays as it is.
+            Check(new ChatSettings { Opacity = 40 }.BoundedOpacity == 40, "a saved background is kept as it is");
             var panel = Read("src/TenshoAssistant/PanelWindow.cs");
             Check(panel.Contains("if ((panel.Opacity?.Invoke() ?? panel.Alpha) is { } alpha) ImGui.SetNextWindowBgAlpha(alpha);", StringComparison.Ordinal), "the window's background takes it at each draw");
         }),

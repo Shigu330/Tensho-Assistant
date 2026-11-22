@@ -1,7 +1,8 @@
 using TenshoAssistant.Chat;
 
 // 0.1458 (X-445): the default tabs of Tensho's chat window are the game's three (General, Battle, Event; LogFilter sheet) plus Social; tabs saved
-// before get Battle and Event once; combat lines are copied and shown as the game shows them, never read nor counted.
+// before got Battle and Event once (X-574, 0.1793: no longer; tabs saved stay as they are); combat lines are copied and shown as the game shows
+// them, never read nor counted.
 internal static class ChatTabs1458Tests
 {
     private static void Check(bool value, string message) { if (!value) throw new Exception(message); }
@@ -19,7 +20,7 @@ internal static class ChatTabs1458Tests
             Check(ChatChannels.From(58) == ChatChannel.Combat && ChatChannels.From(68) == ChatChannel.Announcement && ChatChannels.From(61) == ChatChannel.Npc
                   && ChatChannels.From(41) == ChatChannel.Combat && ChatChannels.From(49) == ChatChannel.Combat, "kinds filed as the game's default tabs");
         }),
-        ("Chat tabs 1458: tabs saved before get Battle and Event once, after the first; the user's own tabs stay as they are", () =>
+        ("Chat tabs 1458: tabs saved stay as they are, the user's own tabs included (X-574: Battle and Event no longer added to tabs saved before)", () =>
         {
             var mine = new ChatTabSettings { Name = "Mine", Channels = [ChatChannel.FreeCompany, ChatChannel.Ls1], ShowUnread = false };
             var saved = new ChatSettings
@@ -28,15 +29,12 @@ internal static class ChatTabs1458Tests
                         new() { Name = "Social", Channels = ChatChannels.All.Where(ChatChannels.Spoken).ToList() }, mine],
             };
             var tabs = saved.EnsureTabs("Général", "Combat", "Événement", "Social");
-            Check(tabs.Select(tab => tab.Name).SequenceEqual(["Général", "Combat", "Événement", "Social", "Mine"]), "added after the first: " + string.Join(", ", tabs.Select(tab => tab.Name)));
-            Check(ReferenceEquals(tabs[4], mine) && mine.Channels.SequenceEqual([ChatChannel.FreeCompany, ChatChannel.Ls1]) && !mine.ShowUnread, "the user's tab untouched");
-            Check(saved.TabsVersion == ChatSettings.CurrentTabs, "marked done");
+            Check(tabs.Select(tab => tab.Name).SequenceEqual(["Général", "Social", "Mine"]), "nothing added: " + string.Join(", ", tabs.Select(tab => tab.Name)));
+            Check(ReferenceEquals(tabs[2], mine) && mine.Channels.SequenceEqual([ChatChannel.FreeCompany, ChatChannel.Ls1]) && !mine.ShowUnread, "the user's tab untouched");
             tabs.RemoveAt(1);
-            Check(saved.EnsureTabs("Général", "Combat", "Événement", "Social").Count == 4, "once: a Battle tab removed by the user does not come back");
-            var already = new ChatSettings { Tabs = [new() { Name = "Fights", Channels = [ChatChannel.Combat] }] };
-            Check(already.EnsureTabs("G", "B", "E", "S").Select(tab => tab.Name).SequenceEqual(["Fights", "E"]), "a tab that already shows the combat lines alone is enough");
+            Check(saved.EnsureTabs("Général", "Combat", "Événement", "Social").Count == 2, "a tab removed by the user does not come back");
             var full = new ChatSettings { Tabs = Enumerable.Range(0, ChatSettings.MaximumTabs).Select(index => new ChatTabSettings { Name = "T" + index }).ToList() };
-            Check(full.EnsureTabs("G", "B", "E", "S").Count == ChatSettings.MaximumTabs && full.TabsVersion == ChatSettings.CurrentTabs, "never past the most tabs");
+            Check(full.EnsureTabs("G", "B", "E", "S").Count == ChatSettings.MaximumTabs, "never past the most tabs");
         }),
         ("Chat tabs 1458: a combat line is copied as the game wrote it, shown in Battle only; nothing else reads the combat lines", () =>
         {

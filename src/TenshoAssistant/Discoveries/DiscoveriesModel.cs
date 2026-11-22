@@ -1046,6 +1046,19 @@ public static class DiscoveryFiles
                 if(KindOf(path) is { } kind && !byKind.ContainsKey(kind) && (held is null || held.Contains(kind))){File.Delete(path);written.Remove(kind);}
     }
 
+    /// <summary>
+    /// X-574 (0.1793): the files of before still there beside the database (Discoveries.json, and Shared/ when it holds a kind's file), by name:
+    /// left aside, never read while the database is in use. Looked at only, never opened.
+    /// </summary>
+    public static string[] OldFiles(string mainPath)
+    {
+        var found=new List<string>();
+        if(File.Exists(mainPath))found.Add(Path.GetFileName(mainPath));
+        try{if(SharedKindsOnDisk(mainPath).Count>0)found.Add(Path.GetFileName(SharedFolder(mainPath))+"/");}
+        catch(Exception error) when(error is IOException or UnauthorizedAccessException){}
+        return [.. found];
+    }
+
     /// <summary>X-93 (0.941): the shared kinds that have a file next to the main file.</summary>
     public static IReadOnlyList<DiscoveryKind> SharedKindsOnDisk(string mainPath)
         =>Directory.Exists(SharedFolder(mainPath)) ? Directory.GetFiles(SharedFolder(mainPath),"kind-*.json.gz").Select(KindOf).OfType<DiscoveryKind>().Distinct().ToArray():[];

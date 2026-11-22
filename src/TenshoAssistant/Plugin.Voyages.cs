@@ -15,8 +15,8 @@ public sealed partial class Plugin
         TenshoDataFile tenshoData,Action saveVoyages)
     {
         FreeCompany.VoyageWatcher? voyages=null;
-        // g, M-10 (0.379): voyage loot history, 180 days; since 0.1148 (X-173) in TenshoData.db, the file of before (VoyageHistory.json)
-        // converted at its first load and kept aside.
+        // g, M-10 (0.379): voyage loot history, 180 days; since 0.1148 (X-173) in TenshoData.db; the file of before (VoyageHistory.json)
+        // left aside, never read (X-574, 0.1793).
         var voyageHistory=new FreeCompany.VoyageHistoryStore(Path.Combine(pluginInterface.GetPluginConfigDirectory(),"VoyageHistory.json"),(error,message)=>log.Warning(error,message),tenshoData);
         registrations.Register(()=>voyages=new FreeCompany.VoyageWatcher(framework,data,configuration,saveVoyages,log){Observed=voyageHistory.Observe,
             // X-718 (0.1722): the vessels' stats and parts as read, in the developer-mode log.

@@ -69,18 +69,16 @@ internal static class ChatLook1488Tests
             var narrow = ChatFormat.Wrap(runs, 60, Measure, indent: 500);
             Check(narrow.Count > 1 && string.Concat(narrow.SelectMany(line => line).Select(run => run.Text)) == runs[0].Text, "an indent wider than the window keeps half of it");
         }),
-        ("Chat look 1488: a configuration saved before gets the game's look once; a background chosen by the player is kept", () =>
+        ("Chat look 1488: the game's look by default; a configuration saved keeps its own look (X-574: no upgrade of settings saved before 0.1488)", () =>
         {
-            var saved = new ChatSettings { Opacity = 40, TabsAtBottom = false, LookVersion = 0 };
-            Check(saved.UpgradeLook() && saved.BoundedOpacity == 15 && saved.TabsAtBottom && saved.LookVersion == ChatSettings.CurrentLook, "old default background lighter, tabs under");
-            saved.TabsAtBottom = false;
-            Check(!saved.UpgradeLook() && !saved.TabsAtBottom, "once: the player's later choice stays");
-            var chosen = new ChatSettings { Opacity = 70, LookVersion = 0 };
-            chosen.UpgradeLook();
+            var fresh = new ChatSettings();
+            Check(fresh.BoundedOpacity == 15 && fresh.TabsAtBottom, "a new player: the light background, the tabs under");
+            var saved = new ChatSettings { Opacity = 40, TabsAtBottom = false };
+            saved.EnsureTabs("General", "Battle", "Event", "Social");
+            Check(saved.BoundedOpacity == 40 && !saved.TabsAtBottom, "reading the tabs changes nothing of the saved look");
+            var chosen = new ChatSettings { Opacity = 70 };
             Check(chosen.BoundedOpacity == 70, "a background the player chose is kept");
-            var tabs = new ChatSettings { Opacity = 40, TabsAtBottom = false };
-            tabs.EnsureTabs("General", "Battle", "Event", "Social");
-            Check(tabs.TabsAtBottom && tabs.BoundedOpacity == 15, "done when the tabs are read (the window and the settings)");
+            Check(!typeof(ChatSettings).GetProperties().Any(property => property.Name is "LookVersion" or "TabsVersion"), "no upgrade marker left in the settings");
         }),
         ("Chat look 1488: the game's tabs: the one shown marked by a dot (a letter of the game font), the others as they are", () =>
         {

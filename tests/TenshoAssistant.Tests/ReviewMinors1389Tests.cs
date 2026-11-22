@@ -5,7 +5,8 @@ using TenshoAssistant.Inventory;
 
 // X-415 (0.1389, review of 0.1375 to 0.1382, minors): M1 the setting cited under its current name in the living documents (ratchet, both
 // languages); M2 behaviour tests (R28.14) of X-336 M4 for the achievements and the gil journal: a file of before written again but held by
-// another client is neither merged nor set aside, then merged once free; M4 one way to write the server bar's time left.
+// another client is neither merged nor set aside, then merged once free; M4 one way to write the server bar's time left. X-574 (0.1793, the
+// user's choice of 17/11): M2's files of before are no longer read nor merged at all, held or free; its cases say that now.
 internal static class ReviewMinors1389Tests
 {
     private static void Check(bool value, string message) { if (!value) throw new Exception(message); }
@@ -32,45 +33,43 @@ internal static class ReviewMinors1389Tests
                 .Where(file => old.Any(text => File.ReadAllText(Path.GetFullPath(file)).Contains(text, StringComparison.OrdinalIgnoreCase))).ToList();
             Check(found.Count == 0, "the former name in " + string.Join(", ", found));
         }),
-        ("Review minors 1389 M2: an achievement file written again but held is not set aside unmerged; once free it is merged", () => InTemp(root =>
+        ("Review minors 1389 M2: an achievement file written again and held is never read nor set aside; free, still not read (X-574)", () => InTemp(root =>
         {
             var file = Path.Combine(root, "AchievementProgress.json");
-            File.WriteAllText(file, AchievementProgressStore.Write(new() { [7] = new() { [1] = new(1, 10, At) } }));
-            new AchievementProgressData(file, Data(root)).Load(At);
-            Check(!File.Exists(file), "converted and set aside");
+            new AchievementProgressData(file, Data(root)).Save(7, new Dictionary<uint, AchievementProgress> { [1] = new(1, 10, At) }, []);
             File.WriteAllText(file, AchievementProgressStore.Write(new() { [7] = new() { [2] = new(4, 10, At.AddHours(1)) } }));
+            var bytes = File.ReadAllBytes(file);
             var hold = Hold(file);
             try
             {
                 var held = new AchievementProgressData(file, Data(root)).Load(At);
-                Check(!held[7].ContainsKey(2), "held: its reading not merged");
+                Check(held[7].Count == 1 && !held[7].ContainsKey(2), "held: its reading not read");
             }
             finally { hold.Dispose(); }
-            Check(File.Exists(file), "held while read: left in place, not set aside unmerged");
+            Check(File.ReadAllBytes(file).SequenceEqual(bytes), "held while read: left in place, unchanged");
             var all = new AchievementProgressData(file, Data(root)).Load(At);
-            Check(all[7].Count == 2 && all[7][2].Current == 4, "once free, merged: " + all[7].Count);
-            Check(!File.Exists(file), "then set aside");
+            Check(all[7].Count == 1 && all[7][1].Current == 1, "free: still not read nor merged: " + all[7].Count);
+            Check(File.ReadAllBytes(file).SequenceEqual(bytes) && Directory.GetDirectories(root, "before-sqlite-*").Length == 0, "never set aside");
         })),
-        ("Review minors 1389 M2: a gil journal written again but held is not set aside unmerged; once free it is merged", () => InTemp(root =>
+        ("Review minors 1389 M2: a gil journal written again and held is never read nor set aside; free, still not read (X-574)", () => InTemp(root =>
         {
             var folder = Path.Combine(root, "GilJournal"); Directory.CreateDirectory(folder);
             var file = Path.Combine(folder, GilJournalStore.FileName(7));
             var one = new GilEntry(At, 100, 100, GilSource.Character, GilCategory.Other);
             var two = new GilEntry(At.AddHours(1), 50, 150, GilSource.Character, GilCategory.Other);
-            GilJournal.Write(file, [one]);
-            new GilJournalStore(folder, Data(root)).Load(7, At);
-            Check(!File.Exists(file), "converted and set aside");
+            new GilJournalStore(folder, Data(root)).Save(7, [one]);
             GilJournal.Write(file, [two]);
+            var bytes = File.ReadAllBytes(file);
             var hold = Hold(file);
             try
             {
                 var held = new GilJournalStore(folder, Data(root)).Load(7, At);
-                Check(held.SequenceEqual([one]), "held: its entry not merged");
+                Check(held.SequenceEqual([one]), "held: its entry not read");
             }
             finally { hold.Dispose(); }
-            Check(File.Exists(file), "held while read: left in place, not set aside unmerged");
+            Check(File.ReadAllBytes(file).SequenceEqual(bytes), "held while read: left in place, unchanged");
             var journal = new GilJournalStore(folder, Data(root)).Load(7, At);
-            Check(journal.SequenceEqual([one, two]) && !File.Exists(file), "once free, merged and set aside");
+            Check(journal.SequenceEqual([one]) && File.ReadAllBytes(file).SequenceEqual(bytes) && Directory.GetDirectories(folder, "before-sqlite-*").Length == 0, "free: still not read, never set aside");
         })),
         ("Review minors 1389 M4: one way to write a time left in the server bar (no TenshoCulture.Days)", () =>
         {
