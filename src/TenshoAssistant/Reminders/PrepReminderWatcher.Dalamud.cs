@@ -12,6 +12,9 @@ namespace TenshoAssistant.Reminders;
 /// X-774: the companion out of sight while the player is mounted (Mounted, RidingPillion, Mounting…, InFlight), swimming or diving,
 /// in a duty, in a cutscene, loading or within <see cref="Settling"/> of it, or in a place without mounts (TerritoryType.Mount, through
 /// <see cref="MountAllowed"/>: it can only be out where it can be ridden, HowToPage row 361) is held: not taken for a companion sent away.
+/// X-777: loads, zone changes and the companion going out of sight are seen every frame (a few reads), so that what made it go is known
+/// when it goes (<see cref="PrepTracker.Watch"/>); the first few goings and comings after the plugin loads are written to the log with the game's timer
+/// (whether the game keeps it while the companion is out of sight is not known: the log is there to see it in the game).
 /// </summary>
 public sealed unsafe class PrepReminderWatcher : IDisposable
 {
@@ -29,6 +32,12 @@ public sealed unsafe class PrepReminderWatcher : IDisposable
     private DateTimeOffset nextRead,loadedAt;
     private uint lastTerritory;
     private bool disposed,warned;
+    // X-777: the log lines of the companion's goings and comings, a few per load of the plugin; when it went and the timer then.
+    private const int SightLogs=6;
+    private int sightLogs;
+    private bool watchWarned;
+    private DateTimeOffset sightAt;
+    private float sightLeft;
     /// <summary>Framework thread: a reminder to say (chat and sound with the alarm options).</summary>
     public Action<PrepNotice>? Due{get;set;}
     /// <summary>X-774: whether mounts are allowed in a territory (TerritoryType.Mount); null: unknown (then it does not hold the companion).</summary>
@@ -43,13 +52,18 @@ public sealed unsafe class PrepReminderWatcher : IDisposable
     private void OnUpdate(IFramework _)
     {
         var now=DateTimeOffset.UtcNow;
-        if(disposed || now<nextRead)return;
+        if(disposed)return;
+        // X-777: every frame, a few reads: a load or a zone change seen at once, and the moment the companion goes out of sight.
+        var loading=objects.LocalPlayer is null || condition[ConditionFlag.BetweenAreas] || condition[ConditionFlag.BetweenAreas51];
+        var territory=client.TerritoryType;
+        if(loading)loadedAt=now;
+        else if(territory!=lastTerritory){lastTerritory=territory;loadedAt=now;}
+        if(client.IsLoggedIn)WatchCompanion(now,territory,loading);
+        if(now<nextRead)return;
         nextRead=now.AddSeconds(5);
         if(!client.IsLoggedIn){meal.Reset();chocobo.Reset();return;}
         // A loading screen: nothing read, nothing forgotten (a meal that ran out meanwhile is still told after it).
-        if(objects.LocalPlayer is not { } me || condition[ConditionFlag.BetweenAreas] || condition[ConditionFlag.BetweenAreas51]){loadedAt=now;return;}
-        var territory=client.TerritoryType;
-        if(territory!=lastTerritory){lastTerritory=territory;loadedAt=now;}
+        if(objects.LocalPlayer is not { } me || loading)return;
         try
         {
             var options=settings();
@@ -75,6 +89,33 @@ public sealed unsafe class PrepReminderWatcher : IDisposable
         catch(Exception error)
         {
             if(!warned){warned=true;log.Warning(error,"Preparation reminder: the meal or the chocobo companion could not be read.");}
+        }
+    }
+
+    // X-777: every frame: the companion out or not; whether something holds it only the frame it goes and just after (PrepTracker.WantsHeld).
+    private void WatchCompanion(DateTimeOffset now,uint territory,bool loading)
+    {
+        try
+        {
+            if(!settings().Chocobo)return;
+            var ui=UIState.Instance();
+            if(ui==null)return;
+            var info=ui->Buddy.CompanionInfo;
+            var outNow=info.Companion!=null && info.Companion->EntityId is not (0 or NoEntity);
+            var held=chocobo.WantsHeld(now,outNow) && (loading || Held(now,territory));
+            var sight=chocobo.Watch(now,outNow,held);
+            if(sight==PrepSight.Same || sightLogs>=SightLogs)return;
+            sightLogs++;
+            if(sight==PrepSight.Went)
+            {
+                sightAt=now;sightLeft=info.TimeLeft;
+                log.Information("Chocobo companion out of sight (X-777): {0}, the game's timer then {1:0} s.",held ? "held (mounted, loading, a duty…)":"nothing held it",info.TimeLeft);
+            }
+            else log.Information("Chocobo companion back (X-777) after {0:0} s: the game's timer {1:0} s (it was {2:0} s when it went).",(now-sightAt).TotalSeconds,info.TimeLeft,sightLeft);
+        }
+        catch(Exception error)
+        {
+            if(!watchWarned){watchWarned=true;log.Warning(error,"Preparation reminder: the chocobo companion could not be watched.");}
         }
     }
 
