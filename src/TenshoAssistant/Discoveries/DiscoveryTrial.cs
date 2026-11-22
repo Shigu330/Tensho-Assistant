@@ -7,8 +7,9 @@ namespace TenshoAssistant.Discoveries;
 /// </summary>
 public static class DiscoveryTrial
 {
-    /// <summary>The day of the trial facts (fixed: the picture does not follow the clock).</summary>
-    public static readonly DateTimeOffset At=new(2026,11,20,0,0,0,TimeSpan.Zero);
+    /// <summary>The day of the trial facts (fixed: the picture does not follow the clock); before the fixed clock of the reference images
+    /// (References.Clock, 11/11/2026): a fact dated after « now » is refused (DiscoveryStore.Valid), and the picture showed an empty base.</summary>
+    public static readonly DateTimeOffset At=new(2026,11,1,0,0,0,TimeSpan.Zero);
     /// <summary>(players who saw it in the common set, your sightings) of each trial monster, in the order given.</summary>
     public static readonly (int Imported,int Seen)[] Counts=[(1,0),(5,0),(0,4),(3,2),(2,0),(1,1)];
 

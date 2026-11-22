@@ -55,6 +55,14 @@ internal static class DiscoveryReview1814Tests
             Check(witnesses.Count(n=>n>1)>=3 && witnesses.Count(n=>n==1)>=2,"both « seen by N players » and « by one player only » shown");
             Check(rows.Select(fact=>fact.Key).Distinct().Count()==6,"each at its own cell");
         }),
+        ("Discovery review 1815 M4: the trial facts are dated before the fixed clock of the reference images, so the picture holds them",() =>
+        {
+            var references=Read("src/TenshoAssistant.Desktop/References.cs");
+            var found=System.Text.RegularExpressions.Regex.Match(references,@"public static readonly DateTimeOffset Clock=new\((\d+),(\d+),(\d+),");
+            Check(found.Success,"the fixed clock found");
+            var clock=new DateTimeOffset(int.Parse(found.Groups[1].Value),int.Parse(found.Groups[2].Value),int.Parse(found.Groups[3].Value),0,0,0,TimeSpan.Zero);
+            Check(DiscoveryTrial.At<=clock,"the trial day "+DiscoveryTrial.At+" is not after the pictures' clock "+clock);
+        }),
         ("Discovery review 1814 M4: the picture planned once, given then taken back, never in the game",() =>
         {
             var plan=TenshoAssistant.Desktop.ReferencePlan.Plan(TenshoAssistant.Desktop.DesktopPages.AsIs.Concat(TenshoAssistant.Desktop.DesktopPages.NeedsLink));

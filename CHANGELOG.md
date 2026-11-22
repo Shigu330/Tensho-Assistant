@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1815.0
+- Plan global, X-807 : Correction de 0.1814 (X-807 M4) : les faits de la base d'essai de l'image « Discoveries-trial » étaient datés du 20/11, après l'horloge fixe des images de référence (11/11/2026) ; refusés comme « dans le futur », l'image montrait une base vide. Datés du 1/11, et un test lie les deux dates. Nouvelle image de référence.
+- Tests : DiscoveryReview1814Tests. Verify.ps1 (agent) : 3989/3989, 0 avertissement, 0 erreur ; DLL 0.1815.0.0. Rien à essayer en jeu.
+### English
+- Correction of 0.1814 (X-807 M4): the facts of the trial base of the « Discoveries-trial » picture were dated 20/11, after the fixed clock of the reference images (11/11/2026); refused as « in the future », the picture showed an empty base. Dated 1/11, and a test ties both dates. New reference picture.
+
 ## 0.1814.0
 - Plan global, X-807 : Relecture du bloc 0.1803 à 0.1806 (X-807), mineurs M1 à M4. M1 : `sync` de l'outil de fusion n'écrit plus lui-même les fichiers des joueurs avant `rebuild` : il les lui donne (`pending`), `rebuild` les lit à la place du disque et ne les écrit qu'une fois l'ensemble commun écrit ; un arrêt (garde contre git HEAD, sortie 2) laisse donc chaque fichier tel qu'il était, comme le disent le message « nothing written » et le README. M2 : une seule constante PRODUCER pour la mesure de `fit_bytes` et pour l'écriture (« t » mesurait 25 octets de moins), et `v3_build` refuse un fichier de genre de plus de 32 Mio compressés avant d'écrire (une telle entrée ferait refuser tout l'index au plugin). M3 : le README des découvertes (en et fr) et DEC-052 disent que les plugins jusqu'à 0.1804 refusent tout l'ensemble commun dès qu'un genre dépasse 200 000 faits ; l'outil le signale (WARN) au lieu de borner (l'ensemble compte environ 3 000 faits). M4 : nouvelle image de référence « Discoveries-trial » (base d'essai DiscoveryTrial : colonne « Joueurs », « vu par N joueurs », « vu par un seul joueur », ordre par joueurs). Tests de comportement dans l'auto-test de l'outil (arrêt dans le rebuild de sync : aucun fichier réécrit ni créé ; fichier mesuré égal au fichier écrit ; refus au-delà de la borne).
 - Tests : DiscoveryReview1814Tests. Verify.ps1 (agent) : 3988/3988, 0 avertissement, 0 erreur ; DLL 0.1814.0.0. Rien à essayer en jeu.
