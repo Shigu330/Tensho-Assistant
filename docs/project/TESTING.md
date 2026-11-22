@@ -2716,6 +2716,16 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1784) Planificateur d'équipement d'un job de combat : choisissez un repas que vous connaissez (bouton HQ ou NQ comme le vôtre) : une colonne « Avec repas » apparaît ; mangez ce repas en jeu et comparez la colonne aux stats de la fenêtre Personnage du jeu avec le même équipement (à rapporter si une stat diffère).
 
+- [ ] (0.1786) Avec votre compagnon chocobo sorti (plus de 5 min restantes) : renvoyez-le, puis téléportez-vous vers une autre zone et restez-y plus longtemps que le temps qu'il lui restait : aucun « est parti » ne doit être dit.
+
+- [ ] (0.1786) Compagnon sorti : montez sur une monture, chevauchez un moment puis descendez : il revient ; dans dalamud.log, les lignes « Chocobo companion out of sight (X-777) » puis « Chocobo companion back (X-777) » disent le minuteur du jeu au départ et au retour (à rapporter : le minuteur a-t-il continué pendant la monture ?).
+
+- [ ] (0.1787) Mangez un repas de combat, puis ouvrez le planificateur d'équipement du job porté et choisissez un autre repas : l'info-bulle de l'en-tête « Avec repas » nomme le repas mangé retiré, et la colonne montre vos stats avec le seul repas choisi (sans repas choisi différent, choisissez le même repas : la colonne doit égaler la colonne Prévu sans changement d'équipement).
+
+- [ ] (0.1788) Rangements › Rapport › Valeur estimée des stocks : cliquez « Estimer » ; sous les tableaux, « Dort et se vend » liste vos objets qui se vendent, avec prix vendu, ventes par jour, gils par jour et prix du PNJ ; comparez deux lignes au tableau du marché du jeu (ou à la fenêtre des prix de Tensho).
+
+- [ ] (0.1789) Collections › Mirage : vos pièces de la coiffeuse mirage, du bahut personnel, des sacs et des servants sont listées une fois chacune, avec où elles sont ; une pièce que vous avez en double, ou deux pièces de même apparence, montre « n autre(s) » dans « Même apparence » ; essayez la recherche et le filtre d'emplacement.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.

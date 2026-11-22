@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (788 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (795 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -385,8 +385,10 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-201 | User request of 2026-11-12 (« add an automatic route calculator for airships… | Done in 0.1248 |
 | X-204 | User request of 2026-11-12 (plugin comparison, the agent's notes; content… | Done in 0.1235 |
 | X-205 | User request of 2026-11-12 (plugin comparison, the agent's notes; content… | Done in 0.1241 |
+| X-207 | User request of 2026-11-12 (plugin comparison, K-14, accepted on 11/12)… | Done in 0.1788.0 |
 | X-212 | User request of 2026-11-12 (plugin comparison, K-21, accepted on 11/12): CSV… | Done in 0.1756.0 |
 | X-213 | User request of 2026-11-12 (plugin comparison, K-23, accepted on 11/12): shared… | Done in 0.1781.0 |
+| X-216 | User request of 2026-11-12 (plugin comparison, K-26, accepted on 11/12)… | Done in 0.1789.0 |
 | X-217 | User request of 2026-11-12 (plugin comparison, K-30, accepted on 11/12)… | Done in 0.1226 |
 | X-218 | User request of 2026-11-12 (plugin comparison, K-32, accepted on 11/12): job… | Done in 0.1228 |
 | X-219 | User request of 2026-11-12 (plugin comparison, K-34, accepted on 11/12): richer… | Done in 0.1229 |
@@ -856,12 +858,17 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-771 | Review of block 0.1769 to 0.1772 (review 0.1772, 22/11), minor M1, M2, M3, M4… | Done in 0.1773.0 |
 | X-773 | Review of block 0.1773 to 0.1775 (review 0.1775, 22/11), minor M1, M2, M3: M1… | Done in 0.1776.0 |
 | X-774 | Review of block 0.1776 to 0.1779 (review 0.1779, 22/11), I1: finding in… | Done in 0.1780.0 |
+| X-775 | Flaky CI test: SettingsFile1745Tests (two clients saving at once); its reader… | Done in 0.1785.0 |
+| X-776 | Intermittent check of the tool that verifies without reloading the game: twice… | Done in 0.1785.0 |
+| X-777 | Review of block 0.1780 to 0.1784 (review 0.1784, 22/11), I1: finding in… | Done in 0.1786.0 |
+| X-778 | Review of block 0.1780 to 0.1784 (review 0.1784, 22/11), I2: finding in… | Done in 0.1787.0 |
+| X-779 | Review of block 0.1780 to 0.1784 (review 0.1784, 22/11), minor M1: M1 in… | Done in 0.1788.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (788 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (795 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1244,8 +1251,10 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-201 | Demande de l'utilisateur du 2026-11-12 (« ajoute un calculateur de trajet auto… | Fait en 0.1248 |
 | X-204 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, notes de… | Fait en 0.1235 |
 | X-205 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, notes de… | Fait en 0.1241 |
+| X-207 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-14, accepté… | Fait en 0.1788.0 |
 | X-212 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-21, accepté… | Fait en 0.1756.0 |
 | X-213 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-23, accepté… | Fait en 0.1781.0 |
+| X-216 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-26, accepté… | Fait en 0.1789.0 |
 | X-217 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-30, accepté… | Fait en 0.1226 |
 | X-218 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-32, accepté… | Fait en 0.1228 |
 | X-219 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-34, accepté… | Fait en 0.1229 |
@@ -1715,3 +1724,8 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-771 | Relecture du bloc 0.1769 à 0.1772 (relecture 0.1772, 22/11), mineurs M1, M2… | Fait en 0.1773.0 |
 | X-773 | Relecture du bloc 0.1773 à 0.1775 (relecture 0.1775, 22/11), mineurs M1, M2, M3… | Fait en 0.1776.0 |
 | X-774 | Relecture du bloc 0.1776 à 0.1779 (relecture 0.1779, 22/11), I1 : Le compagnon… | Fait en 0.1780.0 |
+| X-775 | Test fragile en CI : SettingsFile1745Tests (« deux clients qui enregistrent… à… | Fait en 0.1785.0 |
+| X-776 | Contrôle intermittent de l'outil de vérification sans recharger le jeu : à deux… | Fait en 0.1785.0 |
+| X-777 | Relecture du bloc 0.1780 à 0.1784 (relecture 0.1784, 22/11), I1 : Un compagnon… | Fait en 0.1786.0 |
+| X-778 | Relecture du bloc 0.1780 à 0.1784 (relecture 0.1784, 22/11), I2 : La colonne «… | Fait en 0.1787.0 |
+| X-779 | Relecture du bloc 0.1780 à 0.1784 (relecture 0.1784, 22/11), mineurs M1 : M1… | Fait en 0.1788.0 |

@@ -152,8 +152,8 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1774-gil-duty.md](0.1774-gil-duty.md) | `src/TenshoAssistant/Inventory/GilJournal.cs`, `tests/TenshoAssistant.Tests/GilOther1774Tests.cs` | — |
 | [0.1777-chat-others-teleport.md](0.1777-chat-others-teleport.md) | `src/TenshoAssistant/Chat/ChatFilters.cs`, `tests/TenshoAssistant.Tests/ChatTravel1777Tests.cs` | `docs/changelog/CHANGELOG-0.1700-0.1799.md` |
 | [0.1778-prep-reminder.md](0.1778-prep-reminder.md) | — | `docs/changelog/CHANGELOG-0.1700-0.1799.md` |
-| [0.1780-companion-away.md](0.1780-companion-away.md) | — | `CHANGELOG.md` |
-| [0.1781-shared-fates.md](0.1781-shared-fates.md) | — | `CHANGELOG.md` |
+| [0.1780-companion-away.md](0.1780-companion-away.md) | — | `docs/changelog/CHANGELOG-0.1700-0.1799.md` |
+| [0.1781-shared-fates.md](0.1781-shared-fates.md) | — | `docs/changelog/CHANGELOG-0.1700-0.1799.md` |
 | [0.180.0-achievement-probe.log](0.180.0-achievement-probe.log) | `src/TenshoAssistant/Collections/CollectionReader.Completion.Dalamud.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.182.0-paramgrow-probe.log](0.182.0-paramgrow-probe.log) | `src/TenshoAssistant/Character/StatFormulas.cs`, `tests/TenshoAssistant.Tests/StatFormulaTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md`, `docs/evidence/0.320-credits.json`, `docs/project/REFERENCES.md`, `docs/project/ROADMAP.md` |
 | [0.199-adenium-shop.md](0.199-adenium-shop.md) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
