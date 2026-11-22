@@ -742,18 +742,43 @@ internal sealed partial class MainWindow
     /// <summary>X-486 (0.1529): the fights the game's board window shows (null: not read).</summary>
     internal Func<IReadOnlySet<uint>?>? BeastFightsShown { get; set; }
 
-    /// <summary>X-486 (0.1529): the whole board as the panel showed it before: the team taken first (X-550), then the advised plan.</summary>
+    /// <summary>
+    /// X-486 (0.1529): the whole board. X-800 (0.1808, the user's request of 22/11: the full team no longer stayed on top, and the two helps
+    /// followed one another without saying which was which): three tabs, each saying in a line what it shows: the 10 to bring (the advised
+    /// plan's team, among your beasts), the team taken (read in the game's team window: its three per fight, their call order, « Without X
+    /// (advised) »), and the best team (every beast of the game, those not yet yours marked). The tab shown is kept by the bar; the board's
+    /// other spaces stay folded under the tabs.
+    /// </summary>
     private void DrawBeastBoardWhole(Board board, BoardPlan plan, IReadOnlyList<BeastTeams.TeamMember>? team, BeastCatalog catalog, BeastState state, float wrapAt)
     {
-        // X-550 (0.1526): the team the player took (the game's team window) comes first: its three per fight, then the advised plan.
-        if (team is { Count: > 0 })
+        void Note(string key)
         {
             ImGui.PushTextWrapPos(wrapAt);
-            try { DrawBeastTeamRead(board, plan, team, catalog); }
+            try { ImGui.TextDisabled(localization.Get(key)); }
             finally { ImGui.PopTextWrapPos(); }
-            ImGui.Separator();
         }
-        DrawBeastPlan(plan, board, catalog, state.Obtained is null, wrapAt);
+        OrderedTabs("BeastBoardTabs",
+        [
+            new("Ten", localization.Get("BeastUi.TabTen"), () => { Note("BeastUi.TabTenNote"); DrawBeastPlan(plan, board, catalog, state.Obtained is null, wrapAt, fights: false); }),
+            new("Current", localization.Get("BeastUi.TabCurrent"), () =>
+            {
+                Note("BeastUi.TabCurrentNote");
+                // X-550 (0.1526): the team the player took (the game's team window): its three per fight.
+                if (team is not { Count: > 0 }) { EmptyState("BeastUi.TabCurrentNone"); return; }
+                ImGui.PushTextWrapPos(wrapAt);
+                try { DrawBeastTeamRead(board, plan, team, catalog); }
+                finally { ImGui.PopTextWrapPos(); }
+            }),
+            new("Best", localization.Get("BeastUi.TabBest"), () =>
+            {
+                Note("BeastUi.TabBestNote");
+                // Beasts not read: the plan already counts every beast of the game.
+                var held = state.Obtained;
+                if ((held is null ? plan : BeastBestPlanFor(board, state)) is not { } best) { EmptyState("BeastUi.TeamComputing"); return; }
+                DrawBeastPlan(best, board, catalog, false, wrapAt, notHeldOf: held);
+            }),
+        ]);
+        ImGui.Separator();
         ImGui.PushTextWrapPos(wrapAt);
         try
         {
@@ -947,16 +972,31 @@ internal sealed partial class MainWindow
         DrawBeastPlan(plan, board, catalog, state.Obtained is null);
     }
 
-    /// <summary>X-366 (0.1373): every line wraps at wrapAt (a position in the window; 0: its right edge), the fights' lines indented as a block.</summary>
-    internal void DrawBeastPlan(BoardPlan plan, Board board, BeastCatalog catalog, bool heldUnknown, float wrapAt = 0f)
+    /// <summary>X-366 (0.1373): every line wraps at wrapAt (a position in the window; 0: its right edge), the fights' lines indented as a block.
+    /// X-800 (0.1808): fights false draws the team only; notHeldOf (the beasts you have) marks the beasts of the plan you do not have yet.</summary>
+    internal void DrawBeastPlan(BoardPlan plan, Board board, BeastCatalog catalog, bool heldUnknown, float wrapAt = 0f, bool fights = true, IReadOnlySet<uint>? notHeldOf = null)
     {
         ImGui.PushTextWrapPos(wrapAt);
-        try { DrawBeastPlanLines(plan, board, catalog, heldUnknown); }
+        try { DrawBeastPlanLines(plan, board, catalog, heldUnknown, fights, notHeldOf); }
         finally { ImGui.PopTextWrapPos(); }
     }
 
-    private void DrawBeastPlanLines(BoardPlan plan, Board board, BeastCatalog catalog, bool heldUnknown)
+    private readonly Dictionary<uint, (string Key, Task<BoardPlan> Plan)> beastBestPlans = [];
+    /// <summary>X-800 (0.1808): the board's plan among every beast of the game (the best team), worked out once in the background per board,
+    /// ranks and rules (R07); null while it is worked out or when it failed.</summary>
+    private BoardPlan? BeastBestPlanFor(Board board, BeastState state)
     {
+        if (state.Catalog is not { } catalog) return null;
+        var floors = LoadBeastPlans().Floors; var ranks = BeastRanks;
+        var key = BeastTeams.Key(null, ranks, floors, BeastMarkOf(catalog));
+        if (!beastBestPlans.TryGetValue(board.Id, out var kept) || kept.Key != key)
+            beastBestPlans[board.Id] = kept = (key, Task.Run(() => BeastTeams.Plan(board, catalog.Beasts, null, ranks, floors)));
+        return kept.Plan.IsCompletedSuccessfully ? kept.Plan.Result : null;
+    }
+
+    private void DrawBeastPlanLines(BoardPlan plan, Board board, BeastCatalog catalog, bool heldUnknown, bool fights = true, IReadOnlySet<uint>? notHeldOf = null)
+    {
+        bool NotHeld(uint beast) => notHeldOf is not null && !notHeldOf.Contains(beast);
         Beast? Of(uint id) => catalog.Beasts.FirstOrDefault(beast => beast.Id == id);
         if (heldUnknown) ImGui.TextColored(Warning, localization.Get("BeastUi.TeamHeldUnknown"));
         // X-549 (0.1522): said only for the team's beasts whose rank is not known (the others' do not change the plan).
@@ -977,6 +1017,8 @@ internal sealed partial class MainWindow
                     ImGui.TableNextColumn(); ImGui.TextUnformatted(localization.Format("BeastUi.TeamRank", pick.Rank));
                     // X-575 part 5 (0.1545): a rank read below the board's recommended range is said; it never changes the choice.
                     if (BeastTeams.RankLow(board, pick.Rank, pick.RankKnown)) { ImGui.SameLine(); ImGui.TextColored(Warning, localization.Format(BeastTeams.RankLowKey(board, false), board.RankRecommended, board.RankLimit)); }
+                    // X-800 (0.1808): the best team: a beast you do not have yet.
+                    if (NotHeld(beast.Id)) { ImGui.SameLine(); ImGui.TextColored(Warning, localization.Get("BeastUi.NotHeld")); }
                     // X-551 (0.1574): the type of damage after the game's own icon of it (none for an unaspected magical attack).
                     ImGui.TableNextColumn(); DrawBeastElementIcon(catalog, beast.AutoAttack); ImGui.TextDisabled(beast.AutoAttack.Length > 0 ? beast.AutoAttack : localization.Get("BeastUi.Magical"));
                     DrawBeastEffects(catalog, beast);
@@ -987,6 +1029,7 @@ internal sealed partial class MainWindow
         // X-575 (0.1543): a weakness of the board no fight's three hits, and why: no beast held hits it, or the places went to weaknesses of more enemies.
         foreach (var left in plan.Left ?? [])
             ImGui.TextColored(Warning, localization.Format(left.Reason == LeftReason.NoneHeld ? "BeastUi.LeftNoneHeld" : "BeastUi.LeftNoRoom", left.Name, plan.Team.Count));
+        if (!fights) return;
         ImGui.Separator();
         foreach (var battle in plan.Battles)
         {
@@ -999,6 +1042,9 @@ internal sealed partial class MainWindow
             {
                 ImGui.TextDisabled(string.Join(", ", fight.Enemies.Select(enemy => enemy.Weakness.Length > 0 ? $"{enemy.Name} ({enemy.Weakness})" : enemy.Name)));
                 DrawBeastCallOrder(fight, battle.Team.Select(pick => pick.Beast).ToArray(), catalog);
+                // X-800 (0.1808): the best team: the fight's beasts you do not have yet.
+                if (battle.Team.Where(pick => NotHeld(pick.Beast)).Select(pick => Of(pick.Beast)?.Name ?? $"#{pick.Beast}").ToArray() is { Length: > 0 } missing)
+                    ImGui.TextColored(Warning, localization.Format("BeastUi.BestNotHeld", string.Join(", ", missing)));
                 // X-553 (0.1523): a weakness none of the three hits is said, with the beasts that would hit it. X-562 M3: worked out once per
                 // plan and beasts held, not at each frame (R07).
                 foreach (var miss in BeastMissed(plan, battle, fight, catalog))
