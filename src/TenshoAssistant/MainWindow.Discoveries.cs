@@ -570,7 +570,8 @@ internal sealed partial class MainWindow
         if(ImGui.SmallButton(localization.Get("DiscoveriesUi.ClearYes")))
         {
             // X-76 step 3 (0.945, user request): a zip copy of the Discoveries folder first (never the GitHub token nor its refresh token, X-175), then the base emptied.
-            try{DiscoveryDatabase?.Checkpoint();BackupZip.Create(folder,Path.Combine(Path.GetDirectoryName(folder) ?? folder,"Backups"),"discoveries",DateTimeOffset.UtcNow,GitHubExchange.SecretFiles);}
+            // X-784 (0.1797): the base copied by SQLite (it is kept open since 0.1794: reading the file failed every time).
+            try{DiscoveryBackup.Create(folder,DiscoveryDatabase,DateTimeOffset.UtcNow);}
             catch(Exception error){log.Warning(error,"The discoveries copy before emptying failed; nothing was removed.");discoveryClearAsked=false;return;}
             store.Clear();SaveDiscoveries(false);discoveryClearAsked=false;
         }

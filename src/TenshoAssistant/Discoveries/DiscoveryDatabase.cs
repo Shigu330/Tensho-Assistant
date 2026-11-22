@@ -275,6 +275,31 @@ public sealed class DiscoveryDatabase
     /// <summary>The journal folded into the file (at unload), so the folder holds one file when the game is closed.</summary>
     public void Checkpoint(){using var open=Open();Run(open,"PRAGMA wal_checkpoint(TRUNCATE);");}
 
+    /// <summary>X-784 (0.1797): a consistent copy of the whole base, the journal's saves included (SQLite's VACUUM INTO, one read transaction:
+    /// a save running meanwhile is in it whole or not at all), written in <paramref name="folder"/> and read once: the file goes when the
+    /// stream is closed. The live file, held open by the kept connection and maybe being saved, is never read as bytes.</summary>
+    public Stream Snapshot(string folder)
+    {
+        Directory.CreateDirectory(folder);
+        var copy=System.IO.Path.Combine(folder,"snapshot-"+Guid.NewGuid().ToString("N")+".db.tmp");
+        try
+        {
+            using(var open=Open())
+            using(var command=open.CreateCommand())
+            {
+                command.CommandText="VACUUM INTO $copy;";
+                command.Parameters.AddWithValue("$copy",copy);
+                command.ExecuteNonQuery();
+            }
+            return new FileStream(copy,FileMode.Open,FileAccess.Read,FileShare.Read | FileShare.Delete,81920,FileOptions.DeleteOnClose);
+        }
+        catch
+        {
+            try{if(File.Exists(copy))File.Delete(copy);}catch(IOException){}catch(UnauthorizedAccessException){}
+            throw;
+        }
+    }
+
     /// <summary>X-750 (0.1794): the file kept open while the plugin runs (<see cref="SqliteKeeper"/>): a save's close no longer folds the journal
     /// in. Called by the plugin off the frame; never by the tests nor the desktop application's copy.</summary>
     public bool KeepOpen()=>keeper.Keep();

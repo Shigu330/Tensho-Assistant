@@ -9,13 +9,16 @@ namespace TenshoAssistant;
 /// X-169 (0.1141, GPT audit R05): two copies in the same second no longer share a name (the second wrote over the first): a name already taken gets
 /// « -2 », « -3 »… before the label, and the move never writes over a file. The copies kept are the newest by the time they were written, not by
 /// name (a name is local time: it goes back an hour when summer time ends, and « -2 » sorts before the first copy).
+/// X-784 (0.1797, review of 0.1795, I1): a file another handle holds open for writing is read in shared mode (ZipArchive's
+/// CreateEntryFromFile asked for FileShare.Read and failed on Discoveries.db, kept open by the plugin since 0.1794: the copy, so the emptying,
+/// always refused); <c>read</c> gives the content of a file the caller copies its own way (a database's consistent snapshot), null for the others.
 /// </summary>
 public static class BackupZip
 {
     public const int Keep=5;
     private const int MaxSameSecond=1000;
 
-    public static string? Create(string source,string backups,string label,DateTimeOffset at,IReadOnlySet<string>? skip=null)
+    public static string? Create(string source,string backups,string label,DateTimeOffset at,IReadOnlySet<string>? skip=null,Func<string,Stream?>? read=null)
     {
         if(!Directory.Exists(source))return null;
         Directory.CreateDirectory(backups);
@@ -28,7 +31,12 @@ public static class BackupZip
                 foreach(var file in Directory.EnumerateFiles(source,"*",SearchOption.AllDirectories))
                 {
                     if(skip?.Contains(Path.GetFileName(file))==true || file.EndsWith(".tmp",StringComparison.Ordinal))continue;
-                    zip.CreateEntryFromFile(file,Path.GetRelativePath(source,file).Replace('\\','/'),CompressionLevel.Optimal);
+                    var entry=zip.CreateEntry(Path.GetRelativePath(source,file).Replace('\\','/'),CompressionLevel.Optimal);
+                    try{entry.LastWriteTime=File.GetLastWriteTime(file);}
+                    catch(ArgumentOutOfRangeException){}   // outside the zip format's dates (1980 to 2107): its default, as CreateEntryFromFile
+                    using var content=read?.Invoke(file) ?? new FileStream(file,FileMode.Open,FileAccess.Read,FileShare.ReadWrite | FileShare.Delete);
+                    using var target=entry.Open();
+                    content.CopyTo(target);
                 }
             for(var number=1;path is null;number++)
             {
