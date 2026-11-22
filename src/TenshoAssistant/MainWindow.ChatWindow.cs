@@ -1308,12 +1308,17 @@ internal sealed partial class MainWindow
     /// each frame of the first minute after the load timed (ChatLoadFrames: the frames of 16 ms or more said in the log, then the minute's line).</summary>
     private void DrawChatWindowLines()
     {
+        if(chatLoadFrames.Done){DrawChatWindowTabsAndLines();return;}
         var started=System.Diagnostics.Stopwatch.GetTimestamp();
+        // X-558 (0.1779): the runtime's pauses and this thread's compilations during the frame, apart from the chat's own time.
+        var paused=GC.GetTotalPauseDuration();
+        var compiled=System.Runtime.JitInfo.GetCompilationTime(true);
         chatRefreshMs=0;
         try{DrawChatWindowTabsAndLines();}
         finally
         {
-            foreach(var line in chatLoadFrames.Add(WarmupSinceMade,System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds,chatRefreshMs))log.Information("{0}",line);
+            foreach(var line in chatLoadFrames.Add(WarmupSinceMade,System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds,chatRefreshMs,
+                (GC.GetTotalPauseDuration()-paused).TotalMilliseconds,(System.Runtime.JitInfo.GetCompilationTime(true)-compiled).TotalMilliseconds))log.Information("{0}",line);
         }
     }
 

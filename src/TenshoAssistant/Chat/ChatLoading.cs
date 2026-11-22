@@ -57,30 +57,45 @@ public static class ChatLoading
 /// at 100 ms): the chat window's frames in the first minute after the load. Each frame of <see cref="ChatLoading.FrameBudgetMs"/> or more is
 /// said (at most <see cref="MaxSaid"/>, with its refresh part), then one line at the end of the minute: frames, the longest, how many over.
 /// Pure: the window gives the times, the log writes the lines.
+/// X-558 (0.1779): the slow frames of 22/11 (35 to 49.5 ms, 9.5 to 10.3 s after the load, the tabs' refresh 0.0 to 0.1 ms) each held a pause
+/// of the runtime for a collection (« Runtime suspended every managed thread 26 to 34 ms », the same frame in dalamud.log): every managed
+/// thread stopped, whatever code it ran. Each frame now also takes the runtime's pauses (GC.GetTotalPauseDuration) and the compilations on
+/// the game's thread (JitInfo.GetCompilationTime) during it: the chat's own time is the rest, and the minute's line counts the frames over the
+/// budget by that time apart.
 /// </summary>
 public sealed class ChatLoadFrames
 {
     public const double MinuteMs=60_000;
     public const int MaxSaid=8;
-    private int frames,over,said;
+    private int frames,over,overOwn,said;
     private double longest;
     private bool done;
 
+    /// <summary>X-558 (0.1779): the minute is over and its line written: the window no longer times its frames.</summary>
+    public bool Done=>done;
+
     /// <summary>One frame of the chat window, <paramref name="sinceLoadMs"/> after the load; the lines to write (none, one, or two at the end).</summary>
-    public IReadOnlyList<string> Add(double sinceLoadMs,double frameMs,double refreshMs)
+    /// <param name="pauseMs">X-558 (0.1779): the runtime's pauses for a collection during the frame (every managed thread stopped).</param>
+    /// <param name="compileMs">X-558 (0.1779): the methods compiled on the game's thread during the frame.</param>
+    public IReadOnlyList<string> Add(double sinceLoadMs,double frameMs,double refreshMs,double pauseMs=0,double compileMs=0)
     {
         if(done)return [];
         var lines=new List<string>();
         if(sinceLoadMs>=MinuteMs)
         {
             done=true;
-            lines.Add(FormattableString.Invariant($"Chat window in the first minute after the load (X-558): {frames} frames, the longest {longest:F1} ms, {over} of {ChatLoading.FrameBudgetMs:F0} ms or more."));
+            lines.Add(FormattableString.Invariant($"Chat window in the first minute after the load (X-558): {frames} frames, the longest {longest:F1} ms, {over} of {ChatLoading.FrameBudgetMs:F0} ms or more, {overOwn} by the chat's own time (the runtime's pauses and the compilations left out)."));
             return lines;
         }
         frames++;longest=Math.Max(longest,frameMs);
         if(frameMs<ChatLoading.FrameBudgetMs)return lines;
         over++;
-        if(said++<MaxSaid)lines.Add(FormattableString.Invariant($"Chat window frame of {frameMs:F1} ms {sinceLoadMs/1000:F1} s after the load (X-558, budget {ChatLoading.FrameBudgetMs:F0} ms): its tabs' refresh {refreshMs:F1} ms."));
+        var own=Own(frameMs,pauseMs,compileMs);
+        if(own>=ChatLoading.FrameBudgetMs)overOwn++;
+        if(said++<MaxSaid)lines.Add(FormattableString.Invariant($"Chat window frame of {frameMs:F1} ms {sinceLoadMs/1000:F1} s after the load (X-558, budget {ChatLoading.FrameBudgetMs:F0} ms): its tabs' refresh {refreshMs:F1} ms; the runtime's pauses {pauseMs:F1} ms, compilation on the game's thread {compileMs:F1} ms: the chat's own {own:F1} ms."));
         return lines;
     }
+
+    /// <summary>X-558 (0.1779): the chat's own part of a frame: what the runtime's pauses and the compilations leave (never below 0).</summary>
+    public static double Own(double frameMs,double pauseMs,double compileMs)=>Math.Max(0,frameMs-Math.Max(0,pauseMs)-Math.Max(0,compileMs));
 }
