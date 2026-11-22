@@ -158,6 +158,21 @@ def sighted(f):
     """X-183 (N5): a fact of a player's share is a sighting of theirs: Seen a whole count from 1 to MAX_SEEN, at least the values counted in it."""
     return whole(f.get("Seen")) and 1<=f["Seen"]<=MAX_SEEN and sum((f.get("Values") or {}).values())<=f["Seen"]
 
+# X-829 (security review X-810, I1): VistaSeen, FishCondition and FishTransition count the Eorzea minute of the sighting (levels and values); a share
+# keeps its Eorzea hour only (the plugin sends no more since 0.1831; an older plugin's gist is brought to the hour here, before anything is kept).
+EORZEA_TIME_KINDS={18,11,21}
+def eorzea_hour(f):
+    """X-829: a fact of EORZEA_TIME_KINDS with its levels and values brought to the Eorzea hour (minute // 60 * 60); any other fact unchanged."""
+    if f.get("Kind") not in EORZEA_TIME_KINDS:return f
+    for n in ("LevelMin","LevelMax"):
+        if whole(f.get(n)):f[n]=f[n]//60*60
+    if isinstance(f.get("Values"),dict):
+        hours={}
+        for k,c in sorted(f["Values"].items(),key=lambda kv:int(kv[0])):
+            h=str(int(k)//60*60);hours[h]=min(hours.get(h,0)+c,MAX_COUNT)
+        f["Values"]=hours
+    return f
+
 def capped(f):
     """X-183 (N5): one player's histogram of a fact brought to at most PLAYER_SIGHTINGS sightings, its shape kept (each value kept at 1 at least) and
     its HQ sightings in the same proportion; a histogram already within the bound is left as it is (the same file gives the same facts)."""
@@ -366,7 +381,9 @@ def clean(data,player=False):
     for f in data.get("Facts",[])[:MAX_FACTS*len(KINDS) if data.get("Version")==3 else MAX_FACTS]:
         # 0.1012: checked on the time as sent, then kept to the day (an older gist with times is accepted and brought to the day, not refused).
         if not isinstance(f,dict) or not valid(f) or not valid(daily(dict(f))) or player and not sighted(f):refused+=1;continue
-        g=capped(daily(dict(f)));g["Seen"]=0;g["Imported"]=1;facts[key(g)]=g
+        g=capped(daily(dict(f)));g["Seen"]=0;g["Imported"]=1
+        if player:g=eorzea_hour(g)   # X-829: a share keeps the Eorzea hour, never the minute
+        facts[key(g)]=g
     kinds=collections.Counter(f["Kind"] for f in facts.values())
     return list(facts.values()),{"facts":len(facts),"refused":refused,"kinds":dict(sorted(kinds.items()))}
 
@@ -907,6 +924,14 @@ def selftest():
     gid="0123456789abcdef0123";other="fedcba9876543210fedc"
     body=(f"Shared from Tensho Assistant 0.1146.0 (World › Discoveries › automatic exchange).\n\nGist: https://gist.github.com/{gid}\n\n"
           "- [x] I share these discoveries under CC0-1.0 (public domain, https://creativecommons.org/publicdomain/zero/1.0/).\n\nThe gist is updated at each exchange; this issue stays the same.")
+    # X-829: a share's Eorzea minutes (vista, fish weather, weather before) kept to the hour; another kind's values untouched.
+    minute={"Kind":11,"Subject":5,"Detail":2,"Territory":0,"Map":0,"CellX":0,"CellZ":0,"X":0,"Z":0,"LevelMin":1023,"LevelMax":1079,"Seen":3,"Imported":0,
+            "First":"2026-11-20T00:00:00+00:00","Last":"2026-11-21T00:00:00+00:00","Values":{"1023":1,"1050":1,"1079":1}}
+    other={**minute,"Kind":5,"Values":{"1023":1,"1050":1,"1079":1}}
+    got={f["Kind"]:f for f in clean({"Version":2,"Facts":[minute,other]},player=True)[0]}
+    check(got[11]["LevelMin"]==1020 and got[11]["LevelMax"]==1020 and got[11]["Values"]=={"1020":3} and got[5]["Values"]=={"1023":1,"1050":1,"1079":1}
+          and clean({"Version":2,"Facts":[minute]})[0][0]["Values"]=={"1023":1,"1050":1,"1079":1},
+          f"X-829: a share keeps the Eorzea hour only ({got[11]}), another kind and the common set as they are")
     share=lambda **k:{"number":7,"title":"Discoveries: Ann","body":body,"author":{"login":"Ann"},"labels":[],**k}
     check(is_share(share()) and is_share(share(labels=[{"name":"discoveries"}])),"a share without its label is found by its title")
     check(is_share(share(title="my discoveries")),"by its content when the title was changed")

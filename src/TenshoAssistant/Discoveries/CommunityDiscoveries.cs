@@ -22,6 +22,28 @@ public static class CommunityDiscoveries
     /// X-76 E1 (0.916): nor the imported HQ sightings and values (written as version 2).
     /// </summary>
     public static DateTimeOffset Day(DateTimeOffset at)=>new(at.UtcDateTime.Date,TimeSpan.Zero);
+
+    /// <summary>
+    /// X-829 (security review X-810, I1): the kinds whose value is the Eorzea minute of the sighting (ItemDiscoveryWatcher: EorzeaMinute). An Eorzea
+    /// minute lasts about 2.9 real seconds: with the day and the weather, it told the real moment of a sighting (and, for a fish, of the catch noted at
+    /// the character's exact place) to a few seconds. What leaves the PC keeps the Eorzea hour only (about 3 real minutes, recurring some twenty
+    /// times a day), still enough for a fish's or a vista's window; the local base keeps the minute.
+    /// </summary>
+    public static readonly IReadOnlySet<DiscoveryKind> EorzeaTimeKinds=new HashSet<DiscoveryKind>{DiscoveryKind.VistaSeen,DiscoveryKind.FishCondition,DiscoveryKind.FishTransition};
+    public static int EorzeaHour(int minute)=>minute<0 ? minute:minute/60*60;
+    /// <summary>X-829: a fact of <see cref="EorzeaTimeKinds"/> brought to the Eorzea hour (levels and values); any other fact left as it is.</summary>
+    public static void ToEorzeaHour(DiscoveryFact fact)
+    {
+        if(!EorzeaTimeKinds.Contains(fact.Kind))return;
+        fact.LevelMin=EorzeaHour(fact.LevelMin);fact.LevelMax=EorzeaHour(fact.LevelMax);
+        if(fact.Values is { } values)
+        {
+            Dictionary<int,int>? hours=null;
+            foreach(var (value,count) in values.OrderBy(pair=>pair.Key))ValueCounts.Add(ref hours,EorzeaHour(value),count);
+            fact.Values=hours;
+        }
+    }
+
     public static DiscoveryFile Mine(DiscoveryFile all)
     {
         // X-76 step 5 (0.949, user's go-ahead): what leaves the PC carries the day only, never the time of a sighting. X-167 (0.1134, audit R03): a fact
@@ -32,6 +54,8 @@ public static class CommunityDiscoveries
                 var copy=fact.Copy();
                 if(copy.Own is { } own){copy.First=own.First;copy.Last=own.Last;copy.LevelMin=own.LevelMin;copy.LevelMax=own.LevelMax;copy.X=own.X;copy.Z=own.Z;}
                 copy.Own=null;copy.Imported=0;copy.ImportedHq=0;copy.ImportedValues=null;
+                // X-829: the Eorzea minute of a sighting never leaves the PC, only its hour.
+                ToEorzeaHour(copy);
                 return copy;
             })
             .Where(DiscoveryStore.Valid).Select(copy=>{copy.First=Day(copy.First);copy.Last=Day(copy.Last);return copy;})
