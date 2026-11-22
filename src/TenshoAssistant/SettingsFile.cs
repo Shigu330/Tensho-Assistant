@@ -78,7 +78,8 @@ public static class SettingsJson
     /// wrote them, <paramref name="mine"/> as they are now, <paramref name="theirs"/> the file as it is now. A value this instance did not
     /// change is taken from the file (another's change kept, a name it does not know kept, a key another removed stays removed); a value it
     /// changed is its own, two objects both changed are merged the same way inside; a name it removed (it had it, it no longer has it) stays
-    /// removed. Arrays and plain values are taken whole. Mine's order first, then the file's other names.
+    /// removed. Arrays and plain values are taken whole, except X-831's lists of objects named by a unique « Id » (alarms, map bookmarks, personal
+    /// tasks): merged element by element (<see cref="MergeList"/>). Mine's order first, then the file's other names.
     /// </summary>
     public static JsonObject Merge(JsonObject? before,JsonObject mine,JsonObject theirs)=>Merge(before,mine,theirs,0);
 
@@ -95,7 +96,10 @@ public static class SettingsJson
                 if(there)result[name]=other?.DeepClone();
                 continue;
             }
-            result[name]=value is JsonObject own && other is JsonObject file && depth<MaxDepth ? Merge(old as JsonObject,own,file,depth+1) : value?.DeepClone();
+            result[name]=value is JsonObject own && other is JsonObject file && depth<MaxDepth ? Merge(old as JsonObject,own,file,depth+1)
+                : value is JsonArray list && other is JsonArray fileList && depth<MaxDepth && Identified(list) is not null && Identified(fileList) is not null
+                    && (old is null || old is JsonArray oldList && Identified(oldList) is not null) ? MergeList(old as JsonArray,list,fileList,depth+1)
+                : value?.DeepClone();
         }
         foreach(var (name,other) in theirs)
         {
@@ -105,6 +109,53 @@ public static class SettingsJson
         }
         return result;
     }
+
+    /// <summary>
+    /// X-831 (security review I3): two game clients on one profile, each changing a different element of the same list (A adds an alarm, B ticks
+    /// another): the list was taken whole from the last writer and A's alarm was lost without a word. A list whose elements are all objects with
+    /// a unique string « Id » is merged by that identity, three-way like the objects: an element this instance did not change is the file's (or
+    /// stays removed when the file removed it); one it added or changed is its own, merged inside with the file's when both changed it; one it
+    /// removed stays removed; one only the file has, that this instance never had, is kept (added by the other client). Mine's order first,
+    /// then the file's other elements in their order.
+    /// </summary>
+    private static JsonArray MergeList(JsonArray? before,JsonArray mine,JsonArray theirs,int depth)
+    {
+        var old=before is null ? null : Identified(before);
+        var file=Identified(theirs)!;
+        var result=new JsonArray();
+        foreach(var node in mine)
+        {
+            var own=(JsonObject)node!;var id=IdOf(own)!;
+            JsonObject? was=null;
+            var had=old is not null && old.TryGetValue(id,out was);
+            var there=file.TryGetValue(id,out var other);
+            if(had && JsonNode.DeepEquals(was,own))
+            {
+                if(there)result.Add(other!.DeepClone());
+                continue;
+            }
+            result.Add(there ? Merge(was,own,other!,depth) : own.DeepClone());
+        }
+        var mineIds=Identified(mine)!;
+        foreach(var node in theirs)
+        {
+            var other=(JsonObject)node!;var id=IdOf(other)!;
+            if(mineIds.ContainsKey(id) || old is not null && old.ContainsKey(id))continue;
+            result.Add(other.DeepClone());
+        }
+        return result;
+    }
+
+    /// <summary>X-831: the elements of a list by their « Id », or null when one is not an object with a string « Id », or an « Id » repeats.</summary>
+    private static Dictionary<string,JsonObject>? Identified(JsonArray list)
+    {
+        var byId=new Dictionary<string,JsonObject>(StringComparer.Ordinal);
+        foreach(var node in list)
+            if(node is not JsonObject item || IdOf(item) is not { } id || !byId.TryAdd(id,item))return null;
+        return byId;
+    }
+
+    private static string? IdOf(JsonObject item)=>item.TryGetPropertyValue("Id",out var id) && id is JsonValue value && value.TryGetValue<string>(out var text) && text.Length>0 ? text : null;
 }
 
 /// <summary>
