@@ -6350,6 +6350,22 @@
     "Elsewhere": "possédée, hors de la coiffeuse mirage",
     "NotOwned": "manquante"
   },
+  "GlamourCollection": {
+    "Title": "Mirage",
+    "Help": "Votre collection de mirage, pièce par pièce : chaque pièce d'équipement que ce personnage garde dans les rangements lus (coiffeuse mirage, bahut personnel, sacs, arsenal, sacoches, servants), où elle est, et les autres pièces de même apparence (mêmes modèles et emplacement ; teintures à part). Selon la dernière lecture : ouvrez un rangement une fois en jeu pour le mettre à jour. Rien n'est déplacé.",
+    "NotReady": "Rien à montrer pour l'instant : les apparences des objets ne sont pas prêtes, ou aucun rangement de ce personnage n'est lu.",
+    "Search": "Nom de la pièce…",
+    "SearchTip": "Filtre les pièces par nom.",
+    "SlotTip": "Garde seulement les pièces de cet emplacement (une pièce qui couvre plusieurs emplacements est rangée sous le premier).",
+    "Count": "{0} pièces affichées, {1} apparences ({2} pièces en tout).",
+    "None": "Aucune pièce ne correspond.",
+    "ColumnSlot": "Emplacement",
+    "ColumnPiece": "Pièce",
+    "ColumnWhere": "Où",
+    "ColumnSameLook": "Même apparence",
+    "SameLookCount": "{0} autre(s)",
+    "More": "{0} pièces de plus non affichées : précisez la recherche ou l'emplacement."
+  },
   "Leves": {
     "AetheryteClient": "Éthérite la plus proche du PNJ du mandat",
     "AetheryteStart": "Éthérite la plus proche du mandat",

@@ -59,6 +59,8 @@ internal sealed partial class MainWindow
         if(!blueMagic)DrawCollectionRecent(state);
         // 0.360 (g, C-09): the Outfits tab, set again by its tab on every frame it is shown. X-127 (0.1106): the wishlist has its own page.
         collectionOutfitTab=false;
+        // X-216 (0.1789): the Glamour tab, the same way.
+        collectionGlamourTab=false;
         // X-605 (0.1701): the tabs arranged with the mouse (OrderedTabs); each tab notes the kind shown, the page below draws it. A jump
         // selects its tab until it is open (focus kept until then).
         if (!blueMagic)
@@ -76,9 +78,11 @@ internal sealed partial class MainWindow
                 // X-190 (0.1178): these tabs follow a jump too (a jump to one of them stayed on the tab shown before).
                 ..ExtraKinds.Select(extraKind => Kind(extraKind.ToString(), extraKind, "ExtraCollections." + extraKind)),
                 new("Outfits", localization.Get("Outfits.Title"), () => collectionOutfitTab = true),
+                new("Glamour", localization.Get("GlamourCollection.Title"), () => collectionGlamourTab = true),
             ]);
         }
         if(collectionOutfitTab){DrawOutfits();return;}
+        if(collectionGlamourTab){DrawGlamourCollection();return;}
         var kind = blueMagic ? CollectionKind.BlueMagic : collectionKind;
         var extra = ExtraKinds.Contains(kind) ? ExtraCollections?.Invoke() : null;
         if (ExtraKinds.Contains(kind) && extra is null)

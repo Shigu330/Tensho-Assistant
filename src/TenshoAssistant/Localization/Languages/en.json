@@ -6350,6 +6350,22 @@
     "Elsewhere": "owned, outside the dresser",
     "NotOwned": "missing"
   },
+  "GlamourCollection": {
+    "Title": "Glamour",
+    "Help": "Your glamour collection, piece by piece: every equipable piece this character holds in the storages read (glamour dresser, armoire, bags, armoury, saddlebags, retainers), where it is, and the other pieces that look the same (same models and slot; dyes aside). As last read: open a storage once in game to bring it up to date. Nothing is moved.",
+    "NotReady": "Nothing to show yet: the item looks are not ready, or no storage of this character is read.",
+    "Search": "Piece name…",
+    "SearchTip": "Filters the pieces by name.",
+    "SlotTip": "Keeps only the pieces of this slot (a piece that covers several slots is shown under the first one).",
+    "Count": "{0} pieces shown, {1} looks ({2} pieces in all).",
+    "None": "No piece matches.",
+    "ColumnSlot": "Slot",
+    "ColumnPiece": "Piece",
+    "ColumnWhere": "Where",
+    "ColumnSameLook": "Same look",
+    "SameLookCount": "{0} other(s)",
+    "More": "{0} more pieces not shown: narrow the search or the slot."
+  },
   "Leves": {
     "AetheryteClient": "Nearest aetheryte to the leve's NPC",
     "AetheryteStart": "Nearest aetheryte to the leve",
