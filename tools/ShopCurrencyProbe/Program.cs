@@ -862,6 +862,17 @@ if(Environment.GetEnvironmentVariable("PROBE_GRACE") is { Length:>0 })
         Console.WriteLine($"DESC {id} {itemsEn.GetRowOrDefault(id)?.Description.ExtractText().Replace((char)10,' ')}");
     return;
 }
+// PROBE_TERRMOUNT (X-774, 0.1780): the TerritoryType sheet's Mount column (mounts allowed), by intended use, with named examples; the
+// chocobo companion can only be out where it can be ridden (HowToPage row 361). Read-only.
+if(Environment.GetEnvironmentVariable("PROBE_TERRMOUNT") is { Length:>0 })
+{
+    var places=data.Excel.GetSheet<TerritoryType>(Language.English).Where(row=>row.PlaceName.RowId!=0).ToArray();
+    foreach(var group in places.GroupBy(row=>row.TerritoryIntendedUse.RowId).OrderBy(group=>group.Key))
+        Console.WriteLine($"USE {group.Key}: mount {group.Count(row=>row.Mount)} of {group.Count()} e.g. "+string.Join(", ",group.Take(5).Select(row=>$"{row.RowId} '{row.PlaceName.ValueNullable?.Name.ExtractText()}' {(row.Mount ? "mount":"no mount")}")));
+    foreach(var id in new uint[]{128,129,130,131,132,133,134,135,137,138,139,140,141,144,148,177,178,179,339,340,341,418,419,478,628,635,819,820,962,963,1185,1186})
+        if(places.FirstOrDefault(row=>row.RowId==id) is { } row)Console.WriteLine($"TERRITORY {id} '{row.PlaceName.ValueNullable?.Name.ExtractText()}' use {row.TerritoryIntendedUse.RowId} mount {row.Mount}");
+    return;
+}
 // PROBE_MOUNT (X-219, 0.1229): the Mount sheet's seats (ExtraSeats), riding music (RideBGM -> BGM.File, matched to OrchestrionPath.File for the
 // orchestrion roll's name) and mount actions (MountAction -> Action names); read-only.
 if(Environment.GetEnvironmentVariable("PROBE_MOUNT") is { Length:>0 })

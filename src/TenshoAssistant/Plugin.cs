@@ -781,7 +781,9 @@ public sealed partial class Plugin : IDalamudPlugin
                 if(options.ChatAllowed(false))chat.Print("[Tensho] "+text);
                 if(options.SoundAllowed(false))Alarms.AlarmService.PlaySound(options.Sound,log);
                 if(options.ChatAllowed(false) || options.SoundAllowed(false))linkNotices.Add(text);
-            }},()=>prepReminders?.Dispose());
+            },
+            // X-774 (0.1780): the companion can only be out where mounts are allowed (HowToPage row 361; TerritoryType.Mount, probed).
+            MountAllowed=territory=>territory==0 ? null:data.GetExcelSheet<Lumina.Excel.Sheets.TerritoryType>().GetRowOrDefault(territory)?.Mount},()=>prepReminders?.Dispose());
             mainWindow.GearCatalog=()=>gear?.Catalog;
             mainWindow.GearCatalogFailed=()=>gear?.CatalogFailed==true;
             mainWindow.EquippedGear=()=>gear?.Equipped ?? [];
