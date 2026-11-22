@@ -11,7 +11,10 @@ internal sealed partial class MainWindow
 {
     private GameTimerSnapshot? homeTimers;
     private DateTimeOffset homeTodayAt;
-    private (string Key,string Text,Page Target,bool Good)[] homeToday=[];
+    private (string Key,string Text,TenshoAssistant.Help.NavTarget Target,bool Good)[] homeToday=[];
+    // X-809 (0.1807): the tab of the next alarm (by job, or the others), for the next deadline's link.
+    private string homeNextAlarmTarget="Home.AlarmsOther";
+    private string AlarmTarget(TenshoAssistant.Alarms.TenshoAlarm alarm)=>AlarmJob(alarm)!=0 ? "Home.AlarmsJobs":"Home.AlarmsOther";
     private static readonly string[] HomeTodayLines=["Next","Reminders","Finished","Vessels","Quests","Alarms"];
     // X-155 (0.1261): the nearest deadline, first; a brief outline when another one takes its place (none with reduced motion).
     private const int HomeNextPulseMs=250;
@@ -24,23 +27,25 @@ internal sealed partial class MainWindow
 
     private void BuildHomeToday(DateTimeOffset now)
     {
-        var lines=new List<(string,string,Page,bool)>();
+        var lines=new List<(string,string,TenshoAssistant.Help.NavTarget,bool)>();
+        static TenshoAssistant.Help.NavTarget To(string key)=>TenshoAssistant.Help.NavTargets.Of(key);
         var todo=ReminderTodoLines(now);
-        lines.Add(("Reminders",todo.Count==0 ? localization.Get("Home.TodayNoReminder"):localization.Format("Home.TodayReminders",HomeToday.Short(todo,4,localization.Get("Home.TodayMore"))),Page.Reminders,todo.Count==0));
+        lines.Add(("Reminders",todo.Count==0 ? localization.Get("Home.TodayNoReminder"):localization.Format("Home.TodayReminders",HomeToday.Short(todo,4,localization.Get("Home.TodayMore"))),To("Home.Reminders"),todo.Count==0));
         var timers=Volatile.Read(ref homeTimers);
         var finished=ReminderCounts.Finished(timers?.Ventures?.Select(venture=>venture.Done),configuration.Voyages,
             timers?.SquadronMission is { } mission ? (mission.Id,mission.Done):null,timers?.SquadronTraining is { } training ? (training.Id,training.Done):null,configuration.GardenBeds,now);
-        if(finished.Count>0)lines.Add(("Finished",string.Join(" · ",finished.Select(item=>localization.Format("Reminders.Bar"+item.Kind,item.Count))),Page.Reminders,true));
-        if(Voyages.NextReturn(configuration.Voyages,now) is { } vessel && vessel>now)lines.Add(("Vessels",localization.Format("Home.TodayVessel",vessel.ToLocalTime().ToString("g")),Page.FreeCompany,false));
+        if(finished.Count>0)lines.Add(("Finished",string.Join(" · ",finished.Select(item=>localization.Format("Reminders.Bar"+item.Kind,item.Count))),To("Home.Finished"),true));
+        if(Voyages.NextReturn(configuration.Voyages,now) is { } vessel && vessel>now)lines.Add(("Vessels",localization.Format("Home.TodayVessel",vessel.ToLocalTime().ToString("g")),To("Home.Vessels"),false));
         var followed=(configuration.FollowedQuests ?? []).Select(id=>QuestOf(id)?.Name).OfType<string>().Where(name=>name.Length>0).ToArray();
-        if(followed.Length>0)lines.Add(("Quests",localization.Format("Home.TodayQuests",HomeToday.Short(followed,3,localization.Get("Home.TodayMore"))),Page.Quests,false));
-        var alarms=(configuration.Alarms ?? []).Where(alarm=>alarm.Enabled).Select(alarm=>(alarm.Label,At:NextAlarm(alarm,now))).Where(row=>row.At is not null).OrderBy(row=>row.At!.Value).Take(3)
-            .Select(row=>localization.Format("Home.TodayAlarm",row.Label,row.At!.Value.ToLocalTime().ToString("t"))).ToArray();
-        if(alarms.Length>0)lines.Add(("Alarms",string.Join(" · ",alarms),Page.Alarms,false));
+        if(followed.Length>0)lines.Add(("Quests",localization.Format("Home.TodayQuests",HomeToday.Short(followed,3,localization.Get("Home.TodayMore"))),To("Home.Quests"),false));
+        // X-809 (0.1807): the Alarms tool's alarms (a reminder's alarm is not listed there); the line opens the tab of the first one.
+        var coming=(configuration.Alarms ?? []).Where(alarm=>alarm.Enabled && !IsReminderAlarm(alarm)).Select(alarm=>(Alarm:alarm,At:NextAlarm(alarm,now))).Where(row=>row.At is not null).OrderBy(row=>row.At!.Value).Take(3).ToArray();
+        var alarms=coming.Select(row=>localization.Format("Home.TodayAlarm",row.Alarm.Label,row.At!.Value.ToLocalTime().ToString("t"))).ToArray();
+        if(alarms.Length>0)lines.Add(("Alarms",string.Join(" · ",alarms),To(AlarmTarget(coming[0].Alarm)),false));
         homeToday=lines.ToArray();homeTodayAt=now;
         // X-155 (0.1261): the nearest of the next alarm, the next vessel back and the garden's next tending or harvest (when its reminders are on).
         var deadlines=new List<HomeDeadline>();
-        if(NextAlarm() is { } nextAlarm)deadlines.Add(new("Alarms",nextAlarm.Alarm.Label,nextAlarm.At));
+        if(NextAlarm() is { } nextAlarm){deadlines.Add(new("Alarms",nextAlarm.Alarm.Label,nextAlarm.At));homeNextAlarmTarget=AlarmTarget(nextAlarm.Alarm);}
         if(Voyages.NextReturn(configuration.Voyages,now) is { } back)deadlines.Add(new("Vessels",localization.Get("Home.DeadlineVessel"),back));
         if(configuration.GardenAlerts && GardenJournal.Alarms(configuration.GardenBeds,now) is { Count:>0 } garden)
             deadlines.Add(new("Garden",localization.Format(garden[0].Kind==GardenState.Ripe ? "Home.DeadlineRipe":"Home.DeadlineTend",garden[0].Bed.Seed),garden[0].At));
@@ -68,7 +73,7 @@ internal sealed partial class MainWindow
         {
             if(configuration.HomeTodayHidden?.Contains(key)==true)continue;
             ImGui.PushStyleColor(ImGuiCol.Text,good ? Success:UI.FfxivTheme.Text);
-            try{if(ImGui.Selectable(text+"###Today"+key))page=target;}
+            try{if(ImGui.Selectable(text+"###Today"+key))Open(target);}
             finally{ImGui.PopStyleColor();}
         }
     }
@@ -79,7 +84,8 @@ internal sealed partial class MainWindow
         if(homeNext is not { } next || next.At<=now || configuration.HomeTodayHidden?.Contains("Next")==true)return;
         var left=next.At-now;
         var when=left<TimeSpan.FromHours(1) ? TenshoAssistant.UI.Motion.Countdown(left):GardenLeftText(((int)left.TotalDays,left.Hours,left.Minutes));
-        if(ImGui.Selectable(localization.Format("Home.NextDeadline",next.Label,when)+"###TodayNext"))page=next.Kind switch{"Alarms"=>Page.Alarms,"Vessels"=>Page.FreeCompany,_=>Page.Garden};
+        if(ImGui.Selectable(localization.Format("Home.NextDeadline",next.Label,when)+"###TodayNext"))
+            Open(TenshoAssistant.Help.NavTargets.Of(next.Kind switch{"Alarms"=>homeNextAlarmTarget,"Vessels"=>"Home.Vessels",_=>"Home.Garden"}));
         Tip("Home.NextDeadlineTip");
         var pulse=TenshoAssistant.UI.Motion.Pulse(homeNextChangedAt,Environment.TickCount64,HomeNextPulseMs,ReducedMotion);
         if(pulse>0)ImGui.GetWindowDrawList().AddRect(ImGui.GetItemRectMin(),ImGui.GetItemRectMax(),ImGui.GetColorU32(Accent with{W=Accent.W*pulse}));

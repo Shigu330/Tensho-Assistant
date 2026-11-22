@@ -169,7 +169,8 @@ internal sealed partial class MainWindow
             try
             {
                 ImGui.TextWrapped(topic.Purpose);
-                if (Faq.PageOf(topic.Key) is { } name && Enum.TryParse<Page>(name, out var target) && ImGui.SmallButton(localization.Get("Help.OpenPage") + "##OpenFaq" + topic.Key)) page = target;
+                // X-809 (0.1807): the answer's place (Help/NavTargets.cs: a Settings answer opens its category), not only its page.
+                if (Faq.Entries.FirstOrDefault(entry => entry.Key == topic.Key) is { } faq && NavTargets.OfFaq(faq) is { } target && ImGui.SmallButton(localization.Get("Help.OpenPage") + "##OpenFaq" + topic.Key)) Open(target);
             }
             finally { ImGui.TreePop(); }
         }

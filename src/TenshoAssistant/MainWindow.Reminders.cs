@@ -117,7 +117,7 @@ internal sealed partial class MainWindow
                 :localization.Format("Reminders.VoyagesState",voyages.Count(vessel=>FreeCompany.Voyages.StateOf(vessel,now)==FreeCompany.VoyageState.Voyaging),voyages.Count(vessel=>FreeCompany.Voyages.StateOf(vessel,now)==FreeCompany.VoyageState.Returned)),
                 FreeCompany.Voyages.NextReturn(voyages,now),null,()=>
             {
-                if(ImGui.SmallButton(localization.Get("Reminders.VoyagesOpen")+"##VoyagesOpen"))page=Page.FreeCompany;
+                if(ImGui.SmallButton(localization.Get("Reminders.VoyagesOpen")+"##VoyagesOpen"))Open(TenshoAssistant.Help.NavTargets.Of("Reminders.Voyages"));
             });
             // X-225 (0.1719): the aetherial wheels on the company's stand, as last read in its window: when each one is primed.
             var wheels=configuration.AetherialWheels;
