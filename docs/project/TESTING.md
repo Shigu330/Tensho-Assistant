@@ -2680,6 +2680,16 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1772) Mode développeur actif, entrez dans votre maison (où sont vos sonnettes) et attendez 10 s : le journal (dalamud.log) a une ligne « Housing furniture probe (X-747, developer mode): … » ; notez où sont les sonnettes dans la pièce. Rien ne change encore sur la carte.
 
+- [ ] (0.1773) Dédale bestial, panneau à côté du plateau, section « Campements, marchands et coffres du plateau » : sous chaque marchand, la ligne « Ses offres ne sont pas lues… » ; sous chaque coffre, « Un objet temporaire au choix ; deux avec « Dague de voleur » » ; au survol, le texte du guide du jeu.
+
+- [ ] (0.1773) Ouvrez la page d'une bête de l'équipe dans le bestiaire du jeu, puis le panneau : sa ligne d'« Aliments de l'équipe » donne la satiété de la page (« (bestiaire) »), les autres bêtes « (à confirmer…) », et chaque ligne nomme les aliments de sa famille.
+
+- [ ] (0.1774) Faites une mission (donjon) jusqu'au bout : page Journal des gils, les gains de la fin et des coffres sont dans « Missions (récompenses) », plus dans « Autre ».
+
+- [ ] (0.1774) Mode développeur actif, faites un gain ou une dépense que Tensho classe « Autre » : 3 s après, dalamud.log a une ligne « Gil other context: … » avec les messages et fenêtres autour, sans aucun nom de personnage, de servant, de monde ni de compagnie.
+
+- [ ] (0.1775) Pendant que vous jouez, fenêtre de chat Tensho ouverte avec un long historique, rechargez Tensho : le chat montre ses lignes en moins de 3 s ; une minute après, dalamud.log a la ligne « Chat window in the first minute after the load (X-558): … » (combien d'images de 16 ms ou plus) et « Chat window: lines first drawn … ms after the load » (à rapporter si plus de 3000 ms ou des images de 16 ms ou plus).
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
