@@ -62,16 +62,10 @@ public static class VoyageHistory
         foreach(var record in records)
             foreach(var loot in record.Loot)
                 text.Append(string.Join(",",
-                    Quote(record.RegisteredAt.ToString("u",CultureInfo.InvariantCulture)),Quote(record.ReturnAt?.ToString("u",CultureInfo.InvariantCulture) ?? ""),
-                    Quote(record.Vessel),Quote(record.Kind.ToString()),record.Rank.ToString(CultureInfo.InvariantCulture),Quote(string.Join(" > ",record.Route)),
-                    loot.ItemId.ToString(CultureInfo.InvariantCulture),Quote(itemName(loot.ItemId)),loot.Count.ToString(CultureInfo.InvariantCulture))).Append('\n');
+                    CsvText.Field(record.RegisteredAt.ToString("u",CultureInfo.InvariantCulture)),CsvText.Field(record.ReturnAt?.ToString("u",CultureInfo.InvariantCulture) ?? ""),
+                    CsvText.Field(record.Vessel),CsvText.Field(record.Kind.ToString()),record.Rank.ToString(CultureInfo.InvariantCulture),CsvText.Field(string.Join(" > ",record.Route)),
+                    loot.ItemId.ToString(CultureInfo.InvariantCulture),CsvText.Field(itemName(loot.ItemId)),loot.Count.ToString(CultureInfo.InvariantCulture))).Append('\n');
         return text.ToString();
-    }
-    // Quoted, inner quotes doubled; a leading = + - @ is prefixed so a spreadsheet never reads a field as a formula.
-    private static string Quote(string value)
-    {
-        var safe=value.Length>0 && "=+-@".Contains(value[0]) ? "'"+value:value;
-        return "\""+safe.Replace("\"","\"\"")+"\"";
     }
 
     private static readonly JsonSerializerOptions Json=TenshoJson.Own(new(){MaxDepth=8});

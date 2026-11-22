@@ -42,16 +42,9 @@ public static class BankList
         var text=new System.Text.StringBuilder("Storage,ItemId,Item,Category,Quality,Quantity\n");
         foreach(var ((storage,item,hq),amount) in lines.OrderBy(line=>order.IndexOf(line.Key.Storage)).ThenBy(line=>name(line.Key.Item),StringComparer.OrdinalIgnoreCase)
             .ThenBy(line=>line.Key.Item).ThenBy(line=>line.Key.Hq))
-            text.Append(string.Join(",",Quote(storage),item.ToString(System.Globalization.CultureInfo.InvariantCulture),Quote(name(item)),Quote(category(item)),
+            text.Append(string.Join(",",CsvText.Field(storage),item.ToString(System.Globalization.CultureInfo.InvariantCulture),CsvText.Field(name(item)),CsvText.Field(category(item)),
                 hq ? "HQ":"NQ",amount.ToString(System.Globalization.CultureInfo.InvariantCulture))).Append('\n');
         return text.ToString();
-    }
-
-    // Quoted, inner quotes doubled; a leading = + - @ is prefixed so a spreadsheet never reads a field as a formula (as VoyageHistory).
-    private static string Quote(string value)
-    {
-        var safe=value.Length>0 && "=+-@".Contains(value[0]) ? "'"+value:value;
-        return "\""+safe.Replace("\"","\"\"")+"\"";
     }
 
     /// <summary>By name, by quantity (most first) or by category, then by name; Descending turns the order round.</summary>

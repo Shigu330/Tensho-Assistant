@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1812.0
+- Plan global, X-790 : Un seul échappement CSV pour les exports (X-790, idée I-054) : CsvText.Field (champ entre guillemets, guillemets doublés, apostrophe devant un = + - @ pour qu'un tableur n'y lise jamais une formule) remplace les quatre copies privées de BankList, VoyageHistory, Notebooks et MarketBoard ; les nombres et les dates restent écrits par chaque export. Sorties identiques à l'octet (tests existants des quatre exports verts) ; un test de la fonction commune et de l'absence de copie.
+- Tests : CsvText1812Tests. Verify.ps1 (agent) : 3977/3977, 0 avertissement, 0 erreur ; DLL 0.1812.0.0. Rien à essayer en jeu.
+### English
+- One CSV escape for the exports (X-790, idea I-054): CsvText.Field (field in quotes, quotes doubled, an apostrophe before a leading = + - @ so a spreadsheet never reads a formula in it) replaces the four private copies of BankList, VoyageHistory, Notebooks and MarketBoard; numbers and dates stay written by each export. Outputs identical to the byte (the four exports' existing tests green); a test of the shared function and that no copy is left.
+
 ## 0.1811.0
 - Plan global, X-798 : Rappel du compagnon chocobo : le temps passé en monture n'est plus compté (X-798, relevé de l'utilisateur du 22/11, essai T-0.1786-2 : « le minuteur s'arrête »). Pendant la monture, le minuteur du jeu du compagnon est figé ; Tensho le comptait comme écoulé et disait à tort « est parti » à la descente après une longue chevauchée. PrepTracker.Read reçoit « figé » (monture, en croupe, montée, vol : PrepReminderWatcher.Mounted) et retire ce temps du temps mesuré pendant l'absence ; les autres retenues gardent le temps qui court, comme avant. Preuve 0.1780 complétée (deux moitiés). Test de comportement : chevauchée de 20 minutes avec 5 minutes restantes, aucun « est parti » ni « finit » à la descente ; même chevauchée sans monture (nage) : l'ancien comportement.
 - Pour les joueurs : rappel du compagnon chocobo : plus de faux « est parti » après une longue chevauchée ; le temps en monture n'est pas compté, comme dans le jeu.
