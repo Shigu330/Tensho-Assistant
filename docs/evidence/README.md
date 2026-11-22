@@ -279,7 +279,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.684-island-kinds.md](0.684-island-kinds.md) | `src/TenshoAssistant/Maps/IslandResources.cs` | — |
 | [0.685-island-animals.md](0.685-island-animals.md) | `src/TenshoAssistant/Island/IslandAnimals.cs`, `src/TenshoAssistant/MainWindow.IslandPasture.cs` | `docs/evidence/0.874-probe-coverage.md` |
 | [0.686-island-workshops.md](0.686-island-workshops.md) | `src/TenshoAssistant/Island/IslandCatalog.cs` | — |
-| [0.688-beast-places.md](0.688-beast-places.md) | `src/TenshoAssistant/Beastmaster/BeastCatalog.cs` | `docs/evidence/0.804-beast-wiki.md`, `docs/evidence/0.874-probe-coverage.md` |
+| [0.688-beast-places.md](0.688-beast-places.md) | `src/TenshoAssistant/Beastmaster/BeastCapture.cs`, `src/TenshoAssistant/Beastmaster/BeastCatalog.cs` | `docs/evidence/0.804-beast-wiki.md`, `docs/evidence/0.874-probe-coverage.md` |
 | [0.694-workshop-sets.md](0.694-workshop-sets.md) | `src/TenshoAssistant/FreeCompany/WorkshopProjects.cs` | — |
 | [0.708-relic-weapons.md](0.708-relic-weapons.md) | `src/TenshoAssistant/MainWindow.RelicWeapons.cs`, `src/TenshoAssistant/Relics/RelicWeapons.cs` | — |
 | [0.710-market-pace.md](0.710-market-pace.md) | `src/TenshoAssistant/Market/MarketService.cs` | — |

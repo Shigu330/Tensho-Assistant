@@ -19,6 +19,10 @@ internal sealed partial class MainWindow
     private (BeastSort Sort, bool Descending) beastSort = (BeastSort.Name, false);
     private (object? Catalog, object? Obtained, string Query, string? Family, bool Only, int Rank, BeastSort Sort, bool Descending) beastViewKey;
     private IReadOnlyList<Beast> beastView = [];
+    // X-745 (0.1767): the « To capture » tab: only the beasts not captured yet (on by default), its rows worked out when something changes.
+    private bool beastCaptureMissing = true;
+    private (object? Catalog, object? Obtained, bool Missing) beastCaptureKey;
+    private IReadOnlyList<Beast> beastCaptureRows = [];
 
     private void DrawBeastmaster()
     {
@@ -28,6 +32,7 @@ internal sealed partial class MainWindow
         DetailTabs("BeastTabs",
         [
             ("Beasts", localization.Get("BeastUi.Beasts"), () => DrawBeastList(state, catalog)),
+            ("Capture", localization.Get("BeastUi.Capture"), () => DrawBeastCapture(state, catalog)),
             ("Boards", localization.Get("BeastUi.Boards"), () => DrawBeastBoards(catalog)),
             ("Team", localization.Get("BeastUi.Team"), () => DrawBeastTeam(state, catalog)),
         ], ref beastTabFocus);
@@ -521,6 +526,70 @@ internal sealed partial class MainWindow
             DrawGameIcon(BeastEffects.Order[at].Icon, side);
             if (at < catalog.EffectNames.Count && catalog.EffectNames[at].Length > 0) TipText(catalog.EffectNames[at]);
         }
+    }
+
+    // X-745 (0.1767, the user's idea I-027): the beasts to capture, those of the open world first, then those of duties: where the game says
+    // they are caught, the places seen in game (a click shows the first on Tensho's map, a right click gives every place's flag, aetheryte
+    // and map), their two techniques. A list only, nothing in combat.
+    private void DrawBeastCapture(BeastState state, BeastCatalog catalog)
+    {
+        var obtained = state.Obtained;
+        if (BeastCapture.Missing(catalog.Beasts, obtained) is { } missing) ImGui.TextDisabled(localization.Format("BeastUi.CaptureCount", missing));
+        else ImGui.TextDisabled(localization.Get(state.ObtainedUnavailable ? "BeastUi.ObtainedFailed" : "BeastUi.ObtainedUnknown"));
+        ImGui.Checkbox(localization.Get("BeastUi.CaptureMissing"), ref beastCaptureMissing); Tip("BeastUi.CaptureMissingTip");
+        var key = ((object?)catalog, (object?)obtained, beastCaptureMissing);
+        if (key != beastCaptureKey) { beastCaptureKey = key; beastCaptureRows = BeastCapture.Rows(catalog.Beasts, obtained, beastCaptureMissing); }
+        if (beastCaptureRows.Count == 0) { EmptyState("BeastUi.CaptureNone"); return; }
+        if (!TenshoAssistant.UI.UiComponents.BeginDataTable("BeastCaptureTable", 4, scrollHeight: Math.Max(200, ImGui.GetContentRegionAvail().Y))) return;
+        try
+        {
+            ImGui.TableSetupColumn(localization.Get("BeastUi.Name"), ImGuiTableColumnFlags.WidthStretch);
+            ImGui.TableSetupColumn(localization.Get("BeastUi.CatchPlace"));
+            ImGui.TableSetupColumn(localization.Get("BeastUi.CaptureWhere"));
+            ImGui.TableSetupColumn(localization.Get("BeastUi.CaptureTechniques"));
+            ImGui.TableSetupScrollFreeze(0, 1);
+            TenshoAssistant.UI.UiComponents.HeadersRow([localization.Get("BeastUi.Name"), localization.Get("BeastUi.CatchPlace"), localization.Get("BeastUi.CaptureWhere"), localization.Get("BeastUi.CaptureTechniques")], _ => false);
+            var kind = -1;
+            foreach (var beast in beastCaptureRows)
+            {
+                if (beast.CatchKind != kind)
+                {
+                    kind = beast.CatchKind;
+                    ImGui.TableNextRow(); ImGui.TableNextColumn();
+                    TenshoAssistant.UI.UiComponents.SubTitle(localization.Get(kind == BeastCapture.InZone ? "BeastUi.CaptureInZone" : "BeastUi.CaptureInDuty"));
+                }
+                ImGui.TableNextRow(); ImGui.TableNextColumn();
+                ImGui.PushID((int)beast.Id);
+                try
+                {
+                    DrawSmallGameIcon(beast.Icon);
+                    var known = obtained?.Contains(beast.Id);
+                    DrawStateMark(known); ImGui.SameLine();
+                    ImGui.TextColored(known == true ? Success : known == false ? Muted : Accent, beast.Name);
+                    ImGui.SameLine(); ImGui.TextDisabled(beast.Family);
+                    DrawBeastBorrowIcon(catalog, beast);
+                    ImGui.TableNextColumn(); ImGui.TextUnformatted(beast.CatchPlace);
+                    ImGui.TableNextColumn(); DrawBeastCapturePlaces(beast);
+                    ImGui.TableNextColumn(); ImGui.TextUnformatted(localization.Format("BeastUi.CaptureTechniquesLine", beast.Assault, beast.Volley));
+                }
+                finally { ImGui.PopID(); }
+            }
+        }
+        finally { ImGui.EndTable(); }
+    }
+
+    // X-745 (0.1767): the first place seen (its zone and coordinates) as a link to Tensho's map, the others in the right-click menu.
+    private void DrawBeastCapturePlaces(Beast beast)
+    {
+        if (beast.CatchKind != BeastCapture.InZone) { ImGui.TextDisabled(localization.Get("BeastUi.CaptureInDutyPlace")); return; }
+        var places = BeastPlacesOf(beast.Id);
+        if (places.Count == 0) { ImGui.TextDisabled(localization.Get("BeastUi.CaptureNotSeen")); Tip("BeastUi.CaptureNotSeenTip"); return; }
+        var first = places[0];
+        var text = NpcPlace(first) + (places.Count > 1 ? localization.Format("BeastUi.CaptureMore", places.Count - 1) : "");
+        if (ImGui.Selectable(text) && maps.State.Catalog?.Find(first.MapId) is { } map)
+        { ShowMapOnTenshoMap(map.MapId); mapCenterRequest = Maps.MapProjection.PixelFromCoordinate(new Vector2(first.X, first.Y), map); mapViewFollow = false; }
+        Tip("BeastUi.CapturePlaceTip");
+        NpcMenu($"BeastCapture{beast.Id}", beast.Name, 0, places);
     }
 
     // X-746 (0.1766): after a beast's family, the icon of the action Borrow gives with it, its name and effect on hover.

@@ -68,6 +68,17 @@ internal sealed partial class MainWindow
                 :read.Count(entry=>entry.IssuerName.Length>0) is var named && named*2<read.Count
                     ? Diagnostics.SelfCheck.Suspect("quest givers",$"{named} givers named of {read.Count} quests")
                     :Diagnostics.SelfCheck.Ok("quest givers",$"{read.Count} quests: {named} givers named, {read.Count(TenshoAssistant.Quests.QuestPlaces.HasGiverPlace)} placed, {read.Count(entry=>entry.EndName.Length>0)} end NPCs, {read.Count(entry=>entry.Jobs.Length>0)} with jobs, {read.Count(entry=>entry.Society.Length>0)} allied society"))),
+            // X-746 (0.1766) and X-745 (0.1767): the Beastmaster's data as read in the game (worked out off the frame at load: waited for, ten
+            // seconds at most): one action Borrow gives per family of the beasts, the beasts caught in a zone or a duty.
+            Page("beastmaster",async ()=>
+            {
+                for(var wait=0;wait<100 && Beasts?.State is { Catalog:null,Error:null };wait++)await Task.Delay(100);
+                if(Beasts?.State is not { Catalog:{ } beasts })return Diagnostics.SelfCheck.NotRead("beastmaster",Beasts?.State.Error ?? "Beastmaster data not read yet");
+                var families=beasts.Beasts.Select(beast=>beast.FamilyId).Where(family=>family>0).Distinct().Count();
+                var text=$"{beasts.Beasts.Count} beasts, {beasts.Boards.Count} boards, {beasts.Borrows.Count} Borrow actions for {families} families, "
+                    +$"{beasts.Beasts.Count(beast=>beast.CatchKind==TenshoAssistant.Beastmaster.BeastCapture.InZone)} caught in a zone, {beasts.Beasts.Count(beast=>beast.CatchKind==TenshoAssistant.Beastmaster.BeastCapture.InDuty)} in a duty";
+                return beasts.Borrows.Count!=families ? Diagnostics.SelfCheck.Suspect("beastmaster",text):Diagnostics.SelfCheck.Ok("beastmaster",text);
+            }),
             Page("lexicon",()=>Task.FromResult(LexiconLoad?.Invoke() is { Count:>0 } words
                 ? Diagnostics.SelfCheck.Ok("lexicon",$"{words.Count} words, {words.Select(word=>word.Kind).Distinct().Count()} kinds")
                 :Diagnostics.SelfCheck.Failed("lexicon","nothing read"))),

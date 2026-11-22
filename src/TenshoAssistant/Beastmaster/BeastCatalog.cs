@@ -24,6 +24,9 @@ public sealed record Beast(uint Id, string Name, uint Icon, string Family, strin
     /// <summary>X-746 (0.1766): its family's number (XBMPet column 1, 1 to 8; its name is Addon 17740 + it); 0 not known.</summary>
     public int FamilyId { get; init; }
 
+    /// <summary>X-745 (0.1767): where it is caught, XBMPet column 6: 1 a zone, 2 a duty (<see cref="CatchPlace"/> names it), 0 the beast the job starts with.</summary>
+    public int CatchKind { get; init; }
+
     /// <summary>Attributes at this rank; a rank outside the table is the nearest known one. Null when the table is empty.</summary>
     public BeastStats? At(int rank) => Ranks.Count == 0 ? null : Ranks[Math.Clamp(rank - 1, 0, Ranks.Count - 1)];
 }
@@ -167,7 +170,7 @@ public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Boa
             // 0.688 (user report): columns 6 and 7, where the beast is caught: docs/evidence/0.688-beast-places.md.
             catchPlace?.Invoke(row.Int(6), row.UInt(7)) ?? "", AutoRow(row.UInt(5)))
             // X-755 (0.1750): columns 11 to 21, the effects it inflicts, put in the game's order (BeastEffects).
-            { Effects = effectsRead ? BeastEffects.Of(column => row.Cells[column] is true) : [], FamilyId = row.Int(1) }).ToArray();
+            { Effects = effectsRead ? BeastEffects.Of(column => row.Cells[column] is true) : [], FamilyId = row.Int(1), CatchKind = row.Int(6) }).ToArray();
 
         var shapes = sheets["XBMActionEffectType"].ToDictionary(row => row.Row, row => row.Text(0));
         var targets = sheets["XBMActionTarget"].ToDictionary(row => row.Row, row => row.Text(0));
