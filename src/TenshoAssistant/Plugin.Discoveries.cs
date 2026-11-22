@@ -75,6 +75,8 @@ public sealed partial class Plugin
                 if(Discoveries.DiscoveryFiles.OldFiles(saved) is { Length:>0 } old)
                     log.Information(old.Length==1 ? "Discoveries: a file of an old format ({0}) was left aside, not read (X-574)."
                         : "Discoveries: files of an old format ({0}) were left aside, not read (X-574).",string.Join(", ",old));
+                // X-750 (0.1794): kept open while the plugin runs (this load runs off the frame); closed at unload (FlushDiscoveries).
+                database.KeepOpen();
             }
             catch(Exception error)
             {

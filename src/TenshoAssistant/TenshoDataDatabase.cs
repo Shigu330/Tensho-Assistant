@@ -22,6 +22,7 @@ public sealed class TenshoDataDatabase
     /// </summary>
     public const int Schema=1;
     private readonly string connection;
+    private readonly SqliteKeeper keeper;
     public string Path { get; }
 
     /// <summary>Opens (or creates) the file; throws when SQLite cannot be loaded or the file is of a newer layout or damaged.</summary>
@@ -29,6 +30,7 @@ public sealed class TenshoDataDatabase
     {
         Path=System.IO.Path.GetFullPath(path);
         connection=new SqliteConnectionStringBuilder{DataSource=Path,Mode=SqliteOpenMode.ReadWriteCreate,Pooling=false}.ToString();
+        keeper=new(Open);
         using var open=Open();
         Run(open,"PRAGMA journal_mode=WAL;");
         var version=System.Convert.ToInt32(Scalar(open,"PRAGMA user_version;"),CultureInfo.InvariantCulture);
@@ -63,6 +65,8 @@ public sealed class TenshoDataDatabase
             // 0.1387 (X-274): each character's titles and achievements as the game last sent them completely (ids obtained, comma-separated).
             Run(open,"CREATE TABLE IF NOT EXISTS completion_lists(character INTEGER NOT NULL,kind INTEGER NOT NULL,read_at INTEGER NOT NULL,ids TEXT NOT NULL,"
                 +"PRIMARY KEY(character,kind)) WITHOUT ROWID;",transaction);
+            // X-750 (0.1794): one row written again at each plugin load to time a save (SaveTimes); nothing else reads it.
+            Run(open,"CREATE TABLE IF NOT EXISTS save_probe(id INTEGER PRIMARY KEY NOT NULL,at INTEGER NOT NULL);",transaction);
             if(version<Schema)Run(open,$"PRAGMA user_version={Schema};",transaction);
             transaction.Commit();
         }
@@ -149,6 +153,46 @@ public sealed class TenshoDataDatabase
 
     /// <summary>The journal folded into the file (at unload), so the folder holds one file when the game is closed.</summary>
     public void Checkpoint(){using var open=Open();Run(open,"PRAGMA wal_checkpoint(TRUNCATE);");}
+
+    /// <summary>
+    /// X-750 (0.1794, idea I-024 chosen by the user on 21/11): the file kept open while the plugin runs (<see cref="SqliteKeeper"/>): a save's
+    /// connection is then never the last one, and its close no longer folds the journal into the file (Pooling=false: before, every close of
+    /// the last connection did, up to 1.7 s measured under load). The journal is folded in by SQLite's own checkpoints, on the saving thread
+    /// (never the game's: every save of this file runs off the frame), and at <see cref="Close"/>. Called by the plugin off the frame, once;
+    /// false when already kept or closed. The tests and the desktop application's copies never keep it.
+    /// </summary>
+    public bool KeepOpen()=>keeper.Keep();
+
+    /// <summary>X-750: the kept connection closed, the journal folded in first (at unload); a later save opens its own connection as before.</summary>
+    public void Close()=>keeper.Close();
+
+    /// <summary>X-750: whether the file is kept open now.</summary>
+    public bool Kept=>keeper.Held;
+
+    /// <summary>
+    /// X-750: one save timed both ways, for the log: Folded, the save then the journal folded in (what each close of the last connection did
+    /// before X-750); Kept, the save alone (what a close does while the file is kept open). One row of save_probe written each time.
+    /// </summary>
+    public (double Folded,double Kept) SaveTimes()
+    {
+        var started=System.Diagnostics.Stopwatch.GetTimestamp();
+        ProbeSave();
+        Checkpoint();
+        var folded=System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds;
+        started=System.Diagnostics.Stopwatch.GetTimestamp();
+        ProbeSave();
+        return (folded,System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds);
+    }
+
+    private void ProbeSave()
+    {
+        using var open=Open();using var transaction=open.BeginTransaction();using var command=open.CreateCommand();
+        command.Transaction=transaction;
+        command.CommandText="INSERT OR REPLACE INTO save_probe(id,at) VALUES(1,$at);";
+        command.Parameters.AddWithValue("$at",DateTimeOffset.UtcNow.UtcTicks);
+        command.ExecuteNonQuery();
+        transaction.Commit();
+    }
 
     /// <summary>The largest player's data file the desktop application copies.</summary>
     public const long MaxDesktopCopy=256L<<20;
@@ -293,6 +337,34 @@ public sealed class TenshoDataFile
         opened?.Checkpoint();
     }
 
+    private bool closing;
+
+    /// <summary>
+    /// X-750 (0.1794): the plugin's data file opened and kept open (<see cref="TenshoDataDatabase.KeepOpen"/>), off the frame, at the plugin's
+    /// start; one save timed both ways said in the log. Nothing when the JSON files are in use, the file is unusable, or after <see cref="Close"/>.
+    /// </summary>
+    public void KeepOpen()
+    {
+        TenshoDataDatabase? opened;
+        try{opened=Database();}catch(IOException){return;}
+        lock(gate)if(closing)return;
+        if(opened is null || !opened.KeepOpen())return;
+        try
+        {
+            var (folded,kept)=opened.SaveTimes();
+            info?.Invoke($"Tensho data: a save took {folded:0} ms with the journal folded in at its close (each save before X-750), {kept:0} ms with the file kept open (X-750).");
+        }
+        catch(Exception error) when(error is SqliteException or IOException or InvalidOperationException){warn(error,"Tensho data: a save could not be timed (X-750); the file stays kept open.");}
+    }
+
+    /// <summary>X-750: at unload, the kept connection closed and the journal folded in; a save after that opens its own connection.</summary>
+    public void Close()
+    {
+        TenshoDataDatabase? opened;
+        lock(gate){closing=true;opened=blocked is null ? database:null;}
+        opened?.Close();
+    }
+
     /// <summary>
     /// X-574 (0.1793, the user's choice of 17/11: « remove it, I am the only one using the plugin »): the files of before of a family (the bank's
     /// InventoryBank.json and InventoryBank/, the gil journal's, the voyage history's, the achievement progress's), found while the data file
@@ -309,4 +381,42 @@ public sealed class TenshoDataFile
         return true;
     }
     private readonly HashSet<string> saidAside=new(StringComparer.Ordinal);
+}
+
+/// <summary>
+/// X-750 (0.1794): one idle connection kept open on a SQLite file in WAL mode while the plugin runs, so that the connections of the saves
+/// (Pooling=false, one per call) are never the last one and their close does not fold the journal into the file. <see cref="Close"/> folds it
+/// in (TRUNCATE) and closes the kept connection (at unload: the load context then holds no handle on the file). Thread-safe; a keeper closed
+/// is never kept again. A file another process uses at the same time is not affected (WAL: readers and one writer at a time, as before).
+/// </summary>
+public sealed class SqliteKeeper(Func<SqliteConnection> open)
+{
+    private readonly object gate=new();
+    private SqliteConnection? held;
+    private bool closed;
+
+    public bool Held{get{lock(gate)return held is not null;}}
+
+    /// <summary>The connection opened and kept; false when it is already kept or the keeper was closed.</summary>
+    public bool Keep()
+    {
+        lock(gate)
+        {
+            if(closed || held is not null)return false;
+            held=open();
+            return true;
+        }
+    }
+
+    /// <summary>The journal folded in, then the kept connection closed; nothing when none is kept. A checkpoint that fails (busy) is left
+    /// to SQLite (the next start folds it in); the connection is closed whatever happens.</summary>
+    public void Close()
+    {
+        SqliteConnection? kept;
+        lock(gate){closed=true;kept=held;held=null;}
+        if(kept is null)return;
+        try{TenshoDataDatabase.Run(kept,"PRAGMA wal_checkpoint(TRUNCATE);");}
+        catch(SqliteException){}
+        finally{kept.Dispose();}
+    }
 }

@@ -31,7 +31,7 @@ internal static class PersistenceFamily1239Tests
                 Check(files.Sum(file => Count(file.Text,install)) == 1 && files.Sum(file => Count(file.Text,release)) == 1,service + ": one install and one release path");
                 Check(Count(home,install) == 1 && Count(home,release) == 1,service + ": in its family's file");
             }
-            Check(Count(home,@"registrations\.Register\(") == 2,"both through the plugin's registrations");
+            Check(Count(home,@"registrations\.Register\(") == 3 && home.Contains("registrations.Register(()=>_=Task.Run(tenshoData.KeepOpen),tenshoData.Close);",StringComparison.Ordinal),"both through the plugin's registrations, and the data file kept open then closed (X-750)");
             Check(home.IndexOf("bank=new InventoryBankService(",StringComparison.Ordinal) < home.IndexOf("bridge=new BankInventoryBridge(",StringComparison.Ordinal),"the bank first: released after its bridge");
             Check(files.Sum(file => Count(file.Text,@"new TenshoDataFile\(")) == 1 && Count(home,@"var tenshoData=new TenshoDataFile\(") == 1,"the player's data file made once, in the family");
             var plugin = files.Single(file => file.Name == "Plugin.cs").Text;

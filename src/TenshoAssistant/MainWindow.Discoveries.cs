@@ -90,6 +90,8 @@ internal sealed partial class MainWindow
         if(DiscoveryStore?.Dirty==true || SeenPrices?.Dirty==true)SaveDiscoveries(true);
         // X-172 (0.1136): the journal folded into the database file at unload.
         try{DiscoveryDatabase?.Checkpoint();}catch(Exception error){log.Warning(error,"The discoveries database journal could not be folded in; SQLite does it at the next start.");}
+        // X-750 (0.1794): the connection kept open closed (the journal folded in again first), so the unloaded plugin holds no handle on it.
+        try{DiscoveryDatabase?.Close();}catch(Exception error){log.Warning(error,"The discoveries database could not be closed cleanly; SQLite folds its journal in at the next start.");}
     }
 
     /// <summary>The base written off the frame (on unload: at once).</summary>

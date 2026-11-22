@@ -17,6 +17,7 @@ public sealed class DiscoveryDatabase
     public const int Schema=1;
     private static readonly JsonSerializerOptions Options=TenshoJson.Own(new(){WriteIndented=false});
     private readonly string connection;
+    private readonly SqliteKeeper keeper;
     public string Path { get; }
 
     /// <summary>Opens (or creates) the database; throws when SQLite cannot be loaded or the file is newer or damaged.</summary>
@@ -24,6 +25,7 @@ public sealed class DiscoveryDatabase
     {
         Path=System.IO.Path.GetFullPath(path);
         connection=new SqliteConnectionStringBuilder{DataSource=Path,Mode=SqliteOpenMode.ReadWriteCreate,Pooling=false}.ToString();
+        keeper=new(Open);
         using var open=Open();
         Run(open,"PRAGMA journal_mode=WAL;");
         var version=Convert.ToInt32(Scalar(open,"PRAGMA user_version;"));
@@ -272,4 +274,11 @@ public sealed class DiscoveryDatabase
 
     /// <summary>The journal folded into the file (at unload), so the folder holds one file when the game is closed.</summary>
     public void Checkpoint(){using var open=Open();Run(open,"PRAGMA wal_checkpoint(TRUNCATE);");}
+
+    /// <summary>X-750 (0.1794): the file kept open while the plugin runs (<see cref="SqliteKeeper"/>): a save's close no longer folds the journal
+    /// in. Called by the plugin off the frame; never by the tests nor the desktop application's copy.</summary>
+    public bool KeepOpen()=>keeper.Keep();
+
+    /// <summary>X-750: at unload, the journal folded in and the kept connection closed.</summary>
+    public void Close()=>keeper.Close();
 }
