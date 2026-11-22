@@ -91,6 +91,15 @@ public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Boa
     /// <summary>X-746 (0.1766): the game's own label of Borrow in the Beastmaster's windows (Addon 17749, « Assimilation (Nv 22) »); empty when not given.</summary>
     public string BorrowLabel { get; init; } = "";
 
+    /// <summary>X-744 (0.1768): the Crucible's ephemeral items (XBMItem), in the sheet's order; empty when not read (tests, a game update).</summary>
+    public IReadOnlyList<BeastItem> Items { get; init; } = [];
+
+    /// <summary>X-744 (0.1768): the names of the item kinds (XBMItemType rows 1 to 3: beast gear, Crucible items, feed), by kind.</summary>
+    public IReadOnlyDictionary<int, string> ItemKinds { get; init; } = new Dictionary<int, string>();
+
+    /// <summary>X-744 (0.1768): the game's guide rules of the board's spaces and of the item kinds (<see cref="BeastItems.Guide"/>), read ones only.</summary>
+    public IReadOnlyList<BeastGuideRule> Rules { get; init; } = [];
+
     /// <summary>X-746 (0.1766): the action Borrow gives with this beast; null when not known.</summary>
     public BeastBorrow? BorrowOf(Beast beast) => Borrows.GetValueOrDefault(beast.FamilyId);
 

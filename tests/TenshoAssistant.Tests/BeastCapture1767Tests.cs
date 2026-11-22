@@ -59,7 +59,7 @@ internal static class BeastCapture1767Tests
                     .All(key => text.Contains($"    \"{key}\": ", StringComparison.Ordinal)), "the words, " + language);
             }
             var check = Read("src/TenshoAssistant/MainWindow.SelfCheckPages.cs");
-            Check(check.Contains("Page(\"beastmaster\",async ()=>", StringComparison.Ordinal) && check.Contains("beasts.Borrows.Count!=families ? Diagnostics.SelfCheck.Suspect(\"beastmaster\",text)", StringComparison.Ordinal), "the self-check counts the actions Borrow gives");
+            Check(check.Contains("Page(\"beastmaster borrow and items\",async ()=>", StringComparison.Ordinal) && check.Contains("return beasts.Borrows.Count!=families || unread>0", StringComparison.Ordinal), "the self-check counts the actions Borrow gives");
         }),
     ];
 }

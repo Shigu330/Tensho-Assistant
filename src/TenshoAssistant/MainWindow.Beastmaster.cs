@@ -23,6 +23,12 @@ internal sealed partial class MainWindow
     private bool beastCaptureMissing = true;
     private (object? Catalog, object? Obtained, bool Missing) beastCaptureKey;
     private IReadOnlyList<Beast> beastCaptureRows = [];
+    // X-744 (0.1768): the « Ephemeral items » tab: a search, one family's feeds (0: every family), the lists worked out when something changes.
+    private string beastItemQuery = string.Empty;
+    private int beastItemFamily;
+    private (object? Catalog, int Family, string Query) beastItemKey;
+    private IReadOnlyDictionary<int, IReadOnlyList<BeastItem>> beastItemLists = new Dictionary<int, IReadOnlyList<BeastItem>>();
+    private (int Id, string Name)[] beastItemFamilies = [];
 
     private void DrawBeastmaster()
     {
@@ -34,6 +40,7 @@ internal sealed partial class MainWindow
             ("Beasts", localization.Get("BeastUi.Beasts"), () => DrawBeastList(state, catalog)),
             ("Capture", localization.Get("BeastUi.Capture"), () => DrawBeastCapture(state, catalog)),
             ("Boards", localization.Get("BeastUi.Boards"), () => DrawBeastBoards(catalog)),
+            ("Items", localization.Get("BeastUi.Items"), () => DrawBeastItems(catalog)),
             ("Team", localization.Get("BeastUi.Team"), () => DrawBeastTeam(state, catalog)),
         ], ref beastTabFocus);
     }
@@ -590,6 +597,77 @@ internal sealed partial class MainWindow
         { ShowMapOnTenshoMap(map.MapId); mapCenterRequest = Maps.MapProjection.PixelFromCoordinate(new Vector2(first.X, first.Y), map); mapViewFollow = false; }
         Tip("BeastUi.CapturePlaceTip");
         NpcMenu($"BeastCapture{beast.Id}", beast.Name, 0, places);
+    }
+
+    // X-744 (0.1768, the user's idea I-026, first part): the Crucible's ephemeral items as the game describes them, by kind; the feeds one
+    // family can eat (the families named in each feed's description); the game's own rules of the board's spaces (campsite, shop, treasure,
+    // random) and of each kind of item. Display only, nothing sent to the game (R03.3).
+    private void DrawBeastItems(BeastCatalog catalog)
+    {
+        if (catalog.Items.Count == 0) { EmptyState("BeastUi.ItemsNone"); return; }
+        var key = ((object?)catalog, beastItemFamily, beastItemQuery);
+        if (key != beastItemKey)
+        {
+            beastItemKey = key;
+            beastItemFamilies = catalog.Beasts.Where(beast => beast.FamilyId > 0 && beast.Family.Length > 0).GroupBy(beast => beast.FamilyId).OrderBy(group => group.Key).Select(group => (group.Key, group.First().Family)).ToArray();
+            beastItemLists = new[] { BeastItems.Gear, BeastItems.CrucibleItem, BeastItems.Feed }.ToDictionary(kind => kind, kind => BeastItems.Of(catalog.Items, kind, beastItemFamily, beastItemQuery));
+        }
+        ImGui.SetNextItemWidth(200); ImGui.InputTextWithHint("##BeastItemQuery", localization.Get("BeastUi.Search"), ref beastItemQuery, 64); Tip("BeastUi.ItemSearchTip");
+        ImGui.SameLine(); ImGui.SetNextItemWidth(220);
+        var chosen = beastItemFamilies.FirstOrDefault(family => family.Id == beastItemFamily).Name;
+        if (ImGui.BeginCombo("##BeastItemFamily", chosen ?? localization.Get("BeastUi.ItemAllFamilies")))
+        {
+            try
+            {
+                if (ImGui.Selectable(localization.Get("BeastUi.ItemAllFamilies"), beastItemFamily == 0)) beastItemFamily = 0;
+                foreach (var (id, name) in beastItemFamilies) if (ImGui.Selectable(name, beastItemFamily == id)) beastItemFamily = id;
+            }
+            finally { ImGui.EndCombo(); }
+        }
+        Tip("BeastUi.ItemFamilyTip");
+        if (TenshoAssistant.UI.UiComponents.Header(localization.Get("BeastUi.ItemSpaces"), ImGuiTreeNodeFlags.None))
+            foreach (var rule in catalog.Rules.Where(rule => rule.Key is "Campsite" or "Shop" or "Treasure" or "Random")) DrawBeastRule(rule);
+        foreach (var kind in new[] { BeastItems.Gear, BeastItems.CrucibleItem, BeastItems.Feed })
+        {
+            var shown = beastItemLists.GetValueOrDefault(kind) ?? [];
+            var title = catalog.ItemKinds.TryGetValue(kind, out var name) ? name : localization.Get("BeastUi.ItemKind" + kind);
+            if (!TenshoAssistant.UI.UiComponents.Header($"{title} ({shown.Count})##BeastItemKind{kind}", kind == BeastItems.Feed ? ImGuiTreeNodeFlags.DefaultOpen : ImGuiTreeNodeFlags.None)) continue;
+            var guideKey = kind == BeastItems.Gear ? "Gear" : kind == BeastItems.CrucibleItem ? "CrucibleItem" : "Feed";
+            if (catalog.Rules.FirstOrDefault(rule => rule.Key == guideKey) is { } guide) DrawBeastRule(guide);
+            foreach (var item in shown) DrawBeastItem(item);
+        }
+    }
+
+    // X-744 (0.1768): one item: the game's icon and name, its effect, and for a feed the families that can eat it.
+    private void DrawBeastItem(BeastItem item)
+    {
+        ImGui.PushID((int)item.Row);
+        try
+        {
+            ImGui.Spacing();
+            if (item.Icon != 0) { DrawGameIcon(item.Icon, new Vector2(ImGui.GetTextLineHeight() * 1.5f)); ImGui.SameLine(); }
+            ImGui.BeginGroup();
+            try
+            {
+                ImGui.TextUnformatted(item.Name);
+                if (item.Kind == BeastItems.Feed)
+                    ImGui.TextWrapped(item.Families.Count == 0 ? localization.Get("BeastUi.ItemFamiliesUnknown")
+                        : beastItemFamilies.Length > 0 && beastItemFamilies.All(family => item.Families.Contains(family.Id)) ? localization.Get("BeastUi.ItemEveryFamily")
+                        : localization.Format("BeastUi.ItemFamilies", string.Join(", ", item.Families.Select(family => beastItemFamilies.FirstOrDefault(known => known.Id == family).Name ?? family.ToString(Numbers)))));
+                if (item.Effect.Length > 0) { ImGui.PushStyleColor(ImGuiCol.Text, Muted); try { ImGui.TextWrapped(item.Effect); } finally { ImGui.PopStyleColor(); } }
+            }
+            finally { ImGui.EndGroup(); }
+        }
+        finally { ImGui.PopID(); }
+    }
+
+    // X-744 (0.1768): one rule of the game's guide of the Crucible, its title and text as the client gives them.
+    private void DrawBeastRule(BeastGuideRule rule)
+    {
+        TenshoAssistant.UI.UiComponents.SubTitle(rule.Title);
+        ImGui.PushStyleColor(ImGuiCol.Text, Muted);
+        try { ImGui.TextWrapped(rule.Text); }
+        finally { ImGui.PopStyleColor(); }
     }
 
     // X-746 (0.1766): after a beast's family, the icon of the action Borrow gives with it, its name and effect on hover.
