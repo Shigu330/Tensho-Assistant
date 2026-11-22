@@ -662,16 +662,27 @@ def rebuild(say=print,fresh=(),skip=(),history=None,pending=None,owners=None,not
     for name in names:
         path=os.path.join(PLAYERS,name);issue=stem(name)
         if name in pending:
-            given=pending[name][1]
+            given=[eorzea_hour(dict(f)) for f in pending[name][1]]   # X-841: a share read by sync is at the hour already (clean); kept so here
             player={"Issue":None,"Login":None,"Facts":[without_place(f) for f in given],"Old":False}
             was[name]=was_counted(path);written.add(name)
             later.append(lambda issue=issue,given=given,name=name:write_player(issue,given,now.get(name)))
         else:player=read_player(path);was[name]=player.get("Counted")
+        # X-841 (review of 0.1832, I2): X-829 brought the shares read after 0.1831 to the Eorzea hour; the facts already merged kept their minute,
+        # in the player files and so in the common set. A player file read here is brought to the hour too, and written again when it changed:
+        # the common set built from it holds the hour only (its levels and values; places and days unchanged).
+        hourly=[eorzea_hour(dict(f)) for f in player["Facts"]]
+        if hourly!=player["Facts"]:
+            player["Facts"]=hourly
+            if not player["Old"] and name not in written:
+                written.add(name)
+                later.append(lambda issue=issue,hourly=hourly,name=name:(write_player(issue,hourly,now.get(name)),
+                             say(f"{name}: written again at the Eorzea hour, never the minute (X-841)")))
         if player["Old"]:
             # 0.1005, 0.1012: a file of before follows the current rules and keeps the day only; X-772: its places and days kept for the
             # common set, then the file written again without them (or, beside its new file after a conversion cut short, removed).
             kept=[f for f in player["Facts"] if valid(dict(f))]
             kept=[daily(f) for f in kept]
+            kept=[eorzea_hour(f) for f in kept]   # X-841: the hour, never the minute
             sources+=[(issue+PLAYER_SUFFIX,f) for f in kept];written.add(name)
             if issue in renewed:
                 later.append(lambda path=path,name=name,issue=issue:(os.path.exists(path) and os.remove(path),say(f"{name}: removed (its {issue}{PLAYER_SUFFIX} is there: a conversion cut short)")))
@@ -1230,6 +1241,20 @@ def selftest():
               and any(l.startswith("100.jsonl.gz: FLAG") for l in said),f"N5: a player far outside the others' levels is left out, their facts unchanged ({said})")
         check(not os.path.exists(os.path.join(tmp,"discoveries.json")) and sorted(os.listdir(tmp))==["players","v3"],"X-357: rebuild writes the v3 set only, no v2 discoveries.json")
         said.clear();check(rebuild(say) is False and "v3: 1 kind files, 4 facts, unchanged" in said,f"X-357: the same facts again: the v3 set unchanged, nothing written ({said})")
+        # X-841 (review of 0.1832, I2): a player file merged before X-829 kept the Eorzea minute, and the common set built from it too: a rebuild
+        # brings the file and the common set to the hour (levels and values), the other facts and the place as they were; again: nothing changes.
+        timed={**f(11,5,128,60.0,140.0,"2026-11-03T00:00:00+00:00"),"Detail":2,"LevelMin":1023,"LevelMax":1079,"Values":{"1023":1,"1079":1}}
+        write_player("ab12cd34ef56ab78",[timed],True);anon=os.path.join(PLAYERS,"ab12cd34ef56ab78"+PLAYER_SUFFIX)
+        said.clear();rebuild(say,fresh=[timed]);held={key(g):g for g in common()}
+        check(read_player(anon)["Facts"]==[without_place({**timed,"LevelMin":1020,"LevelMax":1020,"Values":{"1020":2}})]
+              and (held[key(timed)]["LevelMin"],held[key(timed)]["LevelMax"],held[key(timed)]["Values"],held[key(timed)]["X"])==(1020,1020,{"1020":2},60.0)
+              and all(held[key(g)]["Values"]=={"10":2,"12":1} for g in first)
+              and "ab12cd34ef56ab78.jsonl.gz: written again at the Eorzea hour, never the minute (X-841)" in said,
+              f"X-841: a player file with the Eorzea minute: the file and the common set brought to the hour, the rest unchanged ({said})")
+        bytes_now=open(anon,"rb").read();said.clear()
+        check(rebuild(say) is False and open(anon,"rb").read()==bytes_now and not any("X-841" in l for l in said),
+              f"X-841: rebuilt again at the hour: nothing written ({said})")
+        os.remove(anon);rebuild(say)
         for n in os.listdir(PLAYERS):os.remove(os.path.join(PLAYERS,n))
         put(43,[{**first[0],"X":61.0}],"Ann");put(100,[{**first[0],"X":62.0,"First":"2026-11-02T00:00:00+00:00"}],"Bob")
         rebuild(say);got=common()[0]
