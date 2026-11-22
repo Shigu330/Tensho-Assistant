@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (800 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (804 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -868,12 +868,16 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-779 | Review of block 0.1780 to 0.1784 (review 0.1784, 22/11), minor M1: M1 in… | Done in 0.1788.0 |
 | X-780 | Review of block 0.1785 to 0.1789 (review 0.1789, 22/11), minor M2: M2 in… | Done in 0.1790.0 |
 | X-781 | Review of block 0.1785 to 0.1789 (review 0.1789, 22/11), pre-existing before… | Done in 0.1790.0 |
+| X-782 | Master tools (11/22, relay 177): (1) the pre-launch check accepts the previous… | Done in 0.1796.0 |
+| X-783 | Test process crashed once (quick test check: « tests exit 127 », trace « at… | Done in 0.1796.0 |
+| X-784 | Review of block 0.1790 to 0.1795 (review 0.1795, 22/11), I1: finding in… | Done in 0.1797.0 |
+| X-785 | Review of block 0.1790 to 0.1795 (review 0.1795, 22/11), minor M1, M2, M3, M4… | Done in 0.1798.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (800 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (804 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1739,3 +1743,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-779 | Relecture du bloc 0.1780 à 0.1784 (relecture 0.1784, 22/11), mineurs M1 : M1… | Fait en 0.1788.0 |
 | X-780 | Relecture du bloc 0.1785 à 0.1789 (relecture 0.1789, 22/11), mineurs M2 : M2… | Fait en 0.1790.0 |
 | X-781 | Relecture du bloc 0.1785 à 0.1789 (relecture 0.1789, 22/11), déjà là avant le… | Fait en 0.1790.0 |
+| X-782 | Outils de la maître (22/11, relais 177) : (1) le contrôle d'avant lancement… | Fait en 0.1796.0 |
+| X-783 | Processus des tests tombé une fois (contrôle rapide des tests : « tests exit… | Fait en 0.1796.0 |
+| X-784 | Relecture du bloc 0.1790 à 0.1795 (relecture 0.1795, 22/11), I1 : Depuis 0.1794… | Fait en 0.1797.0 |
+| X-785 | Relecture du bloc 0.1790 à 0.1795 (relecture 0.1795, 22/11), mineurs M1, M2… | Fait en 0.1798.0 |

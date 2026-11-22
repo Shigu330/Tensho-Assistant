@@ -2738,6 +2738,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1795) Magie bleue : ouvrez la fiche d'un sort appris dans une zone (ex. une zone de La Noscea) : le bouton « Carte » ouvre la bonne carte de Tensho ; un sort appris dans une mission : le bouton « Mission » ouvre sa page ; un lieu partagé par plusieurs cartes : aucun bouton.
 
+- [ ] (0.1797) Mode développeur, page Découvertes : « Vider la base », puis confirmez : la base est vidée, une copie backup-…-discoveries.zip apparaît dans le dossier Backups du plugin (avec Discoveries.db, sans jeton GitHub ni fichier -wal) ; rien dans le journal sur « nothing was removed ».
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
