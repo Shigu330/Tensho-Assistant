@@ -2766,6 +2766,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1817) Monde › Découvertes, connecté à GitHub, après la prochaine release qui fusionne votre ticket : « Échanger maintenant » ; sur github.com, votre ancien gist est supprimé, un nouveau ne contient que vos nouveautés et votre ticket « Discoveries » renvoie vers lui (ou, sans nouveauté, le message « Tout ce que vous avez vu est dans la base commune »).
 
+- [ ] (0.1822) Monde › Découvertes, sans être connecté à GitHub : l'avertissement avant de connecter et l'aide de déconnexion disent que le mainteneur retire le lien avec votre nom GitHub sur demande, et que le titre du ticket et l'historique du dépôt le montrent encore.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.

@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (830 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (834 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -893,17 +893,21 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-801 | User request of 11/22 around 13:40 (capture read: top the Tensho chat window… | Done in 0.1809.0 |
 | X-803 | User decision of 11/22 around 14:20 (follows D-220: the goal is a complete… | Done in 0.1816.0 |
 | X-804 | User decision of 11/22 around 14:35 (after the risks and the PlayerScope and… | Done in 0.1817.0 |
+| X-805 | User decision of 11/22 around 14:45 (rules R12.2 and R20.6 completed, journal… | Done in 0.1823.0 |
 | X-806 | Tool (R13.3), test text to rewrite: T-0.1780-1 (test page, 22/11 around 13:12)… | Done in 0.1806.0 |
 | X-807 | Review of block 0.1803 to 0.1806 (review 0.1806, 22/11), minor M1, M2, M3, M4… | Done in 0.1814.0 |
+| X-808 | Review of block 0.1803 to 0.1806 (review 0.1806, 22/11), pre-existing before… | Done in 0.1821.0 |
 | X-809 | Bug reported by the user on 11/22 around 15:00 (D-221 piloting): since the… | Done in 0.1807.0 |
 | X-811 | Tool (R13.3): method of natures (user's decision of 11/22 around 15:40). Done… | Done in 0.1812.0 |
 | X-812 | Tool (R13.3, R32.1), follow-up of the natures tool: user's request of 11/22… | Done in 0.1812.0 |
+| X-819 | Review of block 0.1813 to 0.1819 (review 0.1819, 22/11), I1: finding in… | Done in 0.1820.0 |
+| X-820 | Review of block 0.1813 to 0.1819 (review 0.1819, 22/11), minor M1, M2, M3: M1… | Done in 0.1822.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (830 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (834 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1794,8 +1798,12 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-801 | Demande de l'utilisateur du 22/11 vers 13 h 40 (capture lue : en haut la… | Fait en 0.1809.0 |
 | X-803 | Décision de l'utilisateur du 22/11 vers 14 h 20 (suite de D-220 : « le but est… | Fait en 0.1816.0 |
 | X-804 | Décision de l'utilisateur du 22/11 vers 14 h 35 (après l'explication des… | Fait en 0.1817.0 |
+| X-805 | Décision de l'utilisateur du 22/11 vers 14 h 45 (règles R12.2 et R20.6… | Fait en 0.1823.0 |
 | X-806 | Outil (R13.3), texte d'essai à réécrire : T-0.1780-1 (page des essais, 22/11… | Fait en 0.1806.0 |
 | X-807 | Relecture du bloc 0.1803 à 0.1806 (relecture 0.1806, 22/11), mineurs M1, M2… | Fait en 0.1814.0 |
+| X-808 | Relecture du bloc 0.1803 à 0.1806 (relecture 0.1806, 22/11), déjà là avant le… | Fait en 0.1821.0 |
 | X-809 | Bug signalé par l'utilisateur le 22/11 vers 15 h (pilotage D-221) : depuis la… | Fait en 0.1807.0 |
 | X-811 | Outil (R13.3) : méthode des natures (décision de l'utilisateur du 22/11 vers 15… | Fait en 0.1812.0 |
 | X-812 | Outil (R13.3, R32.1), suite de l'outil des natures : demande de l'utilisateur… | Fait en 0.1812.0 |
+| X-819 | Relecture du bloc 0.1813 à 0.1819 (relecture 0.1819, 22/11), I1 : Un gist créé… | Fait en 0.1820.0 |
+| X-820 | Relecture du bloc 0.1813 à 0.1819 (relecture 0.1819, 22/11), mineurs M1, M2, M3… | Fait en 0.1822.0 |
