@@ -2658,6 +2658,16 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1762) Rechargez Tensho : la liste du servant reste, avec sa date ; vendez ou retirez un objet puis rouvrez la liste de vente : la liste et sa date changent.
 
+- [ ] (0.1765) Avec un manuel compté (page Équipement, « environ N points de bonus restants ») : téléportez-vous ou changez de zone, puis fabriquez (ou récoltez) : la ligne garde son nombre et continue de baisser, elle ne revient jamais au plafond entier.
+
+- [ ] (0.1765) Si vous utilisez un manuel de compagnie (I ou II) ou un manuel révisé : le journal dit « Grace: 45 (Param N, … » (46 pour un manuel de récolte) ; N doit être 40, 50 ou 80 selon le manuel (à rapporter sinon), et la page Équipement part du plafond de ce manuel (250 000, 500 000 ou 2 000 000).
+
+- [ ] (0.1766) Page Dresseur, bestiaire : après la famille de chaque bête, une petite icône ; au survol « Assimilation (Nv 22) : Cuir de thérien » (ou l'action de sa famille) et son effet. Ouvrez le filtre des familles : chaque famille avec son action ; choisissez-en une : la ligne sous le filtre montre l'icône, le nom et l'effet. Comparez avec l'action que le jeu donne quand vous utilisez Assimilation avec une bête de cette famille.
+
+- [ ] (0.1767) Page Dresseur, onglet « À capturer » : les bêtes pas encore capturées, d'abord « Dans la nature » puis « En mission » ; pour chacune le lieu de capture du jeu, le premier lieu vu (zone et coordonnées) et ses deux techniques. Cliquez un lieu vu : la carte de Tensho s'ouvre sur ce lieu ; clic droit : drapeau et éthérite la plus proche. Décochez la case : les bêtes déjà capturées reviennent, marquées.
+
+- [ ] (0.1768) Page Dresseur, onglet « Objets temporaires » : le guide du jeu sur les cases du plateau, puis l'équipement de dressage, les objets du Dédale et les aliments, chacun avec son icône, son nom et son effet ; chaque aliment dit les familles qui peuvent le manger. Choisissez une famille : seuls ses aliments restent. Au Dédale bestial, comparez avec un marchand ou un coffre au trésor.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
