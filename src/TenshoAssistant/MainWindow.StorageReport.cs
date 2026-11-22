@@ -128,6 +128,8 @@ internal sealed partial class MainWindow
             }
             if(storageSameLook.Count>100)ImGui.TextDisabled(localization.Format("Events.More",storageSameLook.Count-100));
         }
+        // X-207 (0.1782): the estimated value of the stocks, on a click.
+        DrawStockValue();
         ImGui.TextDisabled(localization.Get("StorageReport.Nothing"));
     }
 }

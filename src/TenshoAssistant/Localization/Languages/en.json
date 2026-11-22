@@ -3882,7 +3882,9 @@
     "ExpansionQuests": "Expansion (from the quests giving it): {0}",
     "ExpansionBoth": "Expansion (from where it is gathered and the quests giving it): {0}",
     "NpcSale": "NPC sale (NQ): {0} gil each",
-    "NpcSaleStack": "NPC sale (NQ): {0} gil each, stack of {1}: {2} gil"
+    "NpcSaleStack": "NPC sale (NQ): {0} gil each, stack of {1}: {2} gil",
+    "MarketOverNpc": "The market pays {0}× the NPC's price.",
+    "NpcOverMarket": "The NPC pays more than the market."
   },
   "MapView": {
     "IconsNoMap": "Open a map to list the icons of that map.",
@@ -8371,6 +8373,30 @@
     "SharedNeverRead": "The Shared FATE window has not been read for this character yet.",
     "SharedLoading": "Reading the shared FATE sheets…",
     "SharedUnavailable": "The shared FATE sheets could not be read (game update?)."
+  },
+  "StockValue": {
+    "Title": "Estimated value of the stocks",
+    "Help": "What your storages would be worth at your world's market prices: the lowest listing of each item's quality, else its average sale. Advice only: nothing is sold. The prices are asked only when you click, by lists of 100.",
+    "Estimate": "Estimate with the market prices",
+    "EstimateTip": "Asks Universalis for the prices of every item of your storages that the market takes (your world), by lists of 100 with a pause between them. Nothing is sent about you.",
+    "EstimateOffTip": "Universalis is off (Settings › Data and sources): no price can be asked.",
+    "Asking": "Prices asked: {0} of {1} items…",
+    "Stop": "Stop",
+    "StopTip": "Stops asking; the value is made with the prices already there.",
+    "Stopped": "Stopped: the items not asked yet are counted without a price.",
+    "Failed": "The prices could not all be asked: the value is made with those already there.",
+    "NotYet": "Not estimated yet: click the button.",
+    "At": "Estimated on {0}, at the prices of {1}.",
+    "ColumnPlace": "Storage (this character)",
+    "ColumnCharacter": "Character",
+    "ColumnValue": "Value (gil)",
+    "ColumnUnpriced": "Without a price",
+    "ColumnOld": "Old prices",
+    "ValueTip": "{0} items priced; {1} not taken by the market (untradable or not on the board), not counted.",
+    "Unpriced": "{0} items",
+    "UnpricedTip": "Items the market takes but with no price known on your world: left out of the value, never counted as 0.",
+    "Old": "{0} items, since {1}",
+    "OldTip": "Prices whose market data is more than a day old: the value may have moved."
   },
   "Island": {
     "TabWorkshop": "Workshop",

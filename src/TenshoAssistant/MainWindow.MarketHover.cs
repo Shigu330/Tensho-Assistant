@@ -494,6 +494,9 @@ internal sealed partial class MainWindow
                 ImGui.TextUnformatted(localization.Format("HoverUi.Stack",count,(unit*count).ToString("N0",Numbers)));
                 DrawGilIcon();
             }
+            // X-207 (0.1782): the NPC's price against the market's, advice only (the item's quality; nothing when either is unknown).
+            if(itemCatalog.State.Catalog?.Find(hovered.ItemId) is { SellPrice:>0 } npcSold && Inventory.StockValue.MarketOverNpc(npcSold.SellPrice,Inventory.StockValue.FromQuote(prices,hovered.Hq)?.Unit) is { } ratio)
+                ImGui.TextColored(ratio>=1 ? Success:Warning,ratio>=1 ? localization.Format("HoverUi.MarketOverNpc",ratio.ToString(ratio>=10 ? "N0":"0.#",Numbers)):localization.Get("HoverUi.NpcOverMarket"));
             // X-292 (0.1291): the world's lines say where they come from: Universalis' upload, or the look at the game's board when newer.
             ImGui.TextDisabled(prices.UploadedAt is { } date ? localization.Format(prices.SeenAtBoard ? "HoverUi.SeenAtBoard":"HoverUi.Uploaded",date.ToLocalTime().ToString("g")):localization.Get("HoverUi.UnknownDate"));
             if(!prices.HasRecentUpload(now))StateLine(UI.UiState.Stale,localization.Get("HoverUi.Old"));

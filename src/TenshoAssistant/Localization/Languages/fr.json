@@ -3882,7 +3882,9 @@
     "ExpansionQuests": "Extension (d'après les quêtes qui le donnent) : {0}",
     "ExpansionBoth": "Extension (d'après ses lieux de récolte et les quêtes qui le donnent) : {0}",
     "NpcSale": "Vente au PNJ (NQ) : {0} gils l'unité",
-    "NpcSaleStack": "Vente au PNJ (NQ) : {0} gils l'unité, pile de {1} : {2} gils"
+    "NpcSaleStack": "Vente au PNJ (NQ) : {0} gils l'unité, pile de {1} : {2} gils",
+    "MarketOverNpc": "Le marché paie {0} fois le prix du PNJ.",
+    "NpcOverMarket": "Le PNJ paie plus que le marché."
   },
   "MapView": {
     "IconsNoMap": "Ouvrez une carte pour voir la liste de ses icônes.",
@@ -8371,6 +8373,30 @@
     "SharedNeverRead": "La fenêtre ALÉA n'a pas encore été lue pour ce personnage.",
     "SharedLoading": "Lecture des feuilles des ALÉA…",
     "SharedUnavailable": "Les feuilles des ALÉA sont illisibles (mise à jour du jeu ?)."
+  },
+  "StockValue": {
+    "Title": "Valeur estimée des stocks",
+    "Help": "Ce que vaudraient vos rangements aux prix du marché de votre monde : l'offre la plus basse de la qualité de chaque objet, sinon son prix de vente moyen. Conseil seulement : rien n'est vendu. Les prix ne sont demandés que sur votre clic, par listes de 100.",
+    "Estimate": "Estimer avec les prix du marché",
+    "EstimateTip": "Demande à Universalis les prix de chaque objet de vos rangements que le marché accepte (votre monde), par listes de 100 avec une pause entre elles. Rien n'est envoyé sur vous.",
+    "EstimateOffTip": "Universalis est coupé (Paramètres › Données et sources) : aucun prix ne peut être demandé.",
+    "Asking": "Prix demandés : {0} objets sur {1}…",
+    "Stop": "Arrêter",
+    "StopTip": "Arrête les demandes ; la valeur est faite avec les prix déjà là.",
+    "Stopped": "Arrêté : les objets pas encore demandés sont comptés sans prix.",
+    "Failed": "Les prix n'ont pas pu tous être demandés : la valeur est faite avec ceux déjà là.",
+    "NotYet": "Pas encore estimée : cliquez sur le bouton.",
+    "At": "Estimée le {0}, aux prix de {1}.",
+    "ColumnPlace": "Rangement (ce personnage)",
+    "ColumnCharacter": "Personnage",
+    "ColumnValue": "Valeur (gils)",
+    "ColumnUnpriced": "Sans prix",
+    "ColumnOld": "Prix anciens",
+    "ValueTip": "{0} objets avec un prix ; {1} que le marché n'accepte pas (non échangeables ou absents du tableau), non comptés.",
+    "Unpriced": "{0} objets",
+    "UnpricedTip": "Objets que le marché accepte mais sans prix connu sur votre monde : laissés hors de la valeur, jamais comptés 0.",
+    "Old": "{0} objets, depuis le {1}",
+    "OldTip": "Prix dont les données du marché ont plus d'un jour : la valeur a pu bouger."
   },
   "Island": {
     "TabWorkshop": "Atelier",
