@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (810 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (813 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -585,6 +585,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-464 | Review of block 0.1455 to 0.1461 (review 0.1461, 15/11), minor M1, M2, M3, M4… | Done in 0.1466 |
 | X-465 | Bug seen in the Beastmaster labyrinth by the user on 11/15 around 9:56 pm… | Done in 0.1465 |
 | X-466 | User request of 11/15 around 10:15 pm (Tensho chat window): the chat should… | Done in 0.1476 |
+| X-468 | User decision of 11/15 around 10:30 pm (D-172, shared discoveries beyond… | Done in 0.1806.0 |
 | X-469 | User decision of 11/15 around 10:30 pm (D-174, retainer table X-196): « items… | Done in 0.1762.0 |
 | X-470 | Tool, idea I-015 put on the plan by the user on 11/15 around 10:35 pm… | Done in 0.1467.0 |
 | X-471 | Tool, idea I-014 put on the plan by the user on 11/15 around 10:35 pm: the same… | Done in 0.1467.0 |
@@ -878,12 +879,14 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-789 | Idea I-058: fallback mode of the player's data (TenshoData.db missing and… | Done in 0.1802.0 |
 | X-793 | Review of block 0.1796 to 0.1799 (review 0.1799, 22/11), minor M2, M3: M2 in… | Done in 0.1800.0 |
 | X-794 | Review of block 0.1796 to 0.1799 (review 0.1799, 22/11), pre-existing before… | Done in 0.1800.0 |
+| X-795 | Review of block 0.1800 to 0.1802 (review 0.1802, 22/11), I1: finding in… | Done in 0.1803.0 |
+| X-799 | Tests' tool (11/22): importing the page's answers stops on an « I don't… | Done in 0.1803.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (810 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (813 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1466,6 +1469,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-464 | Relecture du bloc 0.1455 à 0.1461 (relecture 0.1461, 15/11), mineurs M1, M2… | Fait en 0.1466 |
 | X-465 | Bug vu au Dédale bestial par l'utilisateur le 15/11 vers 21 h 56 (mode… | Fait en 0.1465 |
 | X-466 | Demande de l'utilisateur du 15/11 vers 22 h 15 (fenêtre de chat Tensho) : « il… | Fait en 0.1476 |
+| X-468 | Décision de l'utilisateur du 15/11 vers 22 h 30 (D-172, découvertes partagées… | Fait en 0.1806.0 |
 | X-469 | Décision de l'utilisateur du 15/11 vers 22 h 30 (D-174, tableau des servants… | Fait en 0.1762.0 |
 | X-470 | Outil, idée I-015 mise au plan par l'utilisateur le 15/11 vers 22 h 35… | Fait en 0.1467.0 |
 | X-471 | Outil, idée I-014 mise au plan par l'utilisateur le 15/11 vers 22 h 35 : la… | Fait en 0.1467.0 |
@@ -1759,3 +1763,5 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-789 | Idée I-058 : mode de secours des données du joueur (TenshoData.db absent et… | Fait en 0.1802.0 |
 | X-793 | Relecture du bloc 0.1796 à 0.1799 (relecture 0.1799, 22/11), mineurs M2, M3… | Fait en 0.1800.0 |
 | X-794 | Relecture du bloc 0.1796 à 0.1799 (relecture 0.1799, 22/11), déjà là avant le… | Fait en 0.1800.0 |
+| X-795 | Relecture du bloc 0.1800 à 0.1802 (relecture 0.1802, 22/11), I1 : Depuis X-772… | Fait en 0.1803.0 |
+| X-799 | Outil des essais (22/11) : l'import des réponses de la page s'arrête sur une… | Fait en 0.1803.0 |

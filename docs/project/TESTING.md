@@ -2632,15 +2632,15 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1750) Tensho, page Dresseur (bestiaire) et panneau du Dédale bestial (équipe, bêtes appelées pour un combat) : après le texte de chaque bête, les icônes des effets qu'elle inflige, dans l'ordre de la fenêtre « Formation de l'équipe » du jeu, chacune nommée au survol (Mouton : Sommeil ; Mandragore : Pesanteur puis Poison ; Cu sith : aucune).
 
-- [ ] (0.1751) Tensho, page Banque, un onglet avec des objets (filtres au choix) : « Copier en CSV », puis collez dans un tableur : une ligne par rangement, objet et qualité, avec la quantité ; le message dit le nombre de lignes copiées.
+- [x] (0.1751) Tensho, page Banque, un onglet avec des objets (filtres au choix) : « Copier en CSV », puis collez dans un tableur : une ligne par rangement, objet et qualité, avec la quantité ; le message dit le nombre de lignes copiées.
 
 - [ ] (0.1752) Barre du serveur, entrée « Tensho » : après une séance avec plusieurs mises à jour de Tensho, la mémoire affichée ne grimpe plus d'environ 100 Mo à chaque mise à jour ; dites le nombre affiché après le démarrage du jeu et après cinq mises à jour.
 
-- [ ] (0.1756) Tensho, page Marché, un objet, onglet Historique (filtres au choix) : « Copier en CSV », puis collez dans un tableur : une ligne par vente affichée, dans l'ordre du tableau, avec la date, le monde, le prix unitaire, la quantité et la qualité ; le message dit le nombre de ventes copiées.
+- [x] (0.1756) Tensho, page Marché, un objet, onglet Historique (filtres au choix) : « Copier en CSV », puis collez dans un tableur : une ligne par vente affichée, dans l'ordre du tableau, avec la date, le monde, le prix unitaire, la quantité et la qualité ; le message dit le nombre de ventes copiées.
 
 - [ ] (0.1757) Près d'un autre joueur qui n'est pas Repu, quand il prend un repas : survolez l'effet « Repu » de sa ligne dans la fenêtre de chat de Tensho : l'info-bulle montre les bonus de ce repas ; si elle n'en montre aucun, la ligne du journal « … s from its full duration » dit l'écart vu (à rapporter).
 
-- [ ] (0.1758) Tensho, page Marché, un objet, onglet Historique : « Copier en CSV », la note « N vente(s) copiée(s) » s'affiche ; changez de filtre ou d'objet : la note disparaît. De même à la Banque après un changement d'onglet ou de filtre.
+- [x] (0.1758) Tensho, page Marché, un objet, onglet Historique : « Copier en CSV », la note « N vente(s) copiée(s) » s'affiche ; changez de filtre ou d'objet : la note disparaît. De même à la Banque après un changement d'onglet ou de filtre.
 
 - [ ] (0.1759) Près d'un autre joueur qui prend deux repas différents à moins de 3 s d'écart : survolez l'effet « Repu » de la deuxième ligne dans la fenêtre de chat de Tensho : l'info-bulle montre les bonus du deuxième repas, ou aucun, jamais ceux du premier ; le journal dit « the meal shown for that player's line of the 4 s before » quand c'est ce cas.
 
@@ -2650,9 +2650,9 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1760) Quand le jeu retire la Grâce (plafond atteint), la ligne disparaît ; le dernier nombre vu était proche de 0 (à rapporter s'il en était loin).
 
-- [ ] (0.1761) Survolez dans le jeu un objet recyclable (une pièce d'équipement fabriquée) : sous l'infobulle, « Recyclage : <artisan>, niveau de l'objet N, votre niveau M : au-dessus / en dessous de votre niveau » ; M est celui de la fenêtre de recyclage du jeu pour cet artisan.
+- [x] (0.1761) Survolez dans le jeu un objet recyclable (une pièce d'équipement fabriquée) : sous l'infobulle, « Recyclage : <artisan>, niveau de l'objet N, votre niveau M : au-dessus / en dessous de votre niveau » ; M est celui de la fenêtre de recyclage du jeu pour cet artisan.
 
-- [ ] (0.1761) Survolez un coffret ou un paquet de cartes : « Collections : les N obtenus » quand vous avez tout, sinon « n sur N pas encore obtenus » ; coupez chaque ligne dans Paramètres › infobulles : elle disparaît.
+- [x] (0.1761) Survolez un coffret ou un paquet de cartes : « Collections : les N obtenus » quand vous avez tout, sinon « n sur N pas encore obtenus » ; coupez chaque ligne dans Paramètres › infobulles : elle disparaît.
 
 - [ ] (0.1762) À une sonnette, ouvrez la liste des servants puis la liste de vente d'un servant qui vend quelque chose : page Personnages, tableau des servants, sous ce servant, « Objets en vente (relevés le …) » et chaque objet avec sa quantité et son prix (HQ dit) ; un servant jamais ouvert qui vend dit « pas encore relevés ».
 
@@ -2700,7 +2700,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1778) En combat ou dans une mission, laissez le repas passer sous 5 minutes : rien pendant le combat ou la mission ; le rappel vient une fois sorti, si l'effet tient encore.
 
-- [ ] (0.1780) Compagnon chocobo sorti, rappel à 5 min : quand « Votre compagnon chocobo part dans 5 min » a été dit, montez puis descendez deux fois (le compagnon revient) : l'avis n'est pas redit.
+- [ ] (0.1780) Où : une zone ouverte, hors combat et hors mission. Faire : 1) sortez votre compagnon chocobo ; 2) attendez le message de Tensho dans le chat qui dit que votre compagnon part bientôt (pour ne pas attendre longtemps, montez le seuil dans les réglages des rappels de Tensho) ; 3) montez sur une monture puis descendez, et refaites-le une seconde fois. Regarder : après chaque descente, Tensho ne redit pas ce message.
 
 - [ ] (0.1780) Réglez le rappel du compagnon à 0 min, appelez-le et montez sur une monture quand il lui reste 1 ou 2 minutes ; restez monté plus longtemps, puis descendez : « Votre compagnon chocobo est parti » une fois, une vingtaine de secondes après la descente.
 
@@ -2708,21 +2708,21 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1781) Survolez « n objets » d'une zone d'Endwalker ou de Dawntrail dont vous n'avez pas le rang maximal : les articles du comptoir de la zone que vous ne pouvez pas encore acheter, avec leur rang et leur prix, et le haut fait « Héros de grand chemin » ; comparez avec ce que le comptoir de la zone vous propose.
 
-- [ ] (0.1782) Rangements › Rapport, section « Valeur estimée des stocks », Universalis activé : cliquez « Estimer avec les prix du marché » : l'avancement « Prix demandés : n objets sur m » monte, puis un tableau par rangement de ce personnage et un par personnage ; les objets sans prix sont comptés à part, jamais dans la valeur ; Arrêter coupe les demandes.
+- [x] (0.1782) Rangements › Rapport, section « Valeur estimée des stocks », Universalis activé : cliquez « Estimer avec les prix du marché » : l'avancement « Prix demandés : n objets sur m » monte, puis un tableau par rangement de ce personnage et un par personnage ; les objets sans prix sont comptés à part, jamais dans la valeur ; Arrêter coupe les demandes.
 
-- [ ] (0.1782) Survolez dans un sac un objet vendable au PNJ et sur le marché, après que son prix a été lu : sous les prix du marché, « Le marché paie n fois le prix du PNJ » ou « Le PNJ paie plus que le marché ».
+- [x] (0.1782) Survolez dans un sac un objet vendable au PNJ et sur le marché, après que son prix a été lu : sous les prix du marché, « Le marché paie n fois le prix du PNJ » ou « Le PNJ paie plus que le marché ».
 
-- [ ] (0.1783) Survolez une pièce d'équipement dont vous avez la même apparence dans la coiffeuse mirage ou le bahut personnel (après les avoir ouverts une fois) : sous la partie collection, une coche « Même apparence déjà détenue : Coiffeuse mirage (nom de la pièce) » ; une pièce dont vous n'avez aucune apparence : une croix « Aucune pièce de même apparence dans vos rangements lus ».
+- [x] (0.1783) Survolez une pièce d'équipement dont vous avez la même apparence dans la coiffeuse mirage ou le bahut personnel (après les avoir ouverts une fois) : sous la partie collection, une coche « Même apparence déjà détenue : Coiffeuse mirage (nom de la pièce) » ; une pièce dont vous n'avez aucune apparence : une croix « Aucune pièce de même apparence dans vos rangements lus ».
 
 - [ ] (0.1784) Planificateur d'équipement d'un job de combat : choisissez un repas que vous connaissez (bouton HQ ou NQ comme le vôtre) : une colonne « Avec repas » apparaît ; mangez ce repas en jeu et comparez la colonne aux stats de la fenêtre Personnage du jeu avec le même équipement (à rapporter si une stat diffère).
 
 - [ ] (0.1786) Avec votre compagnon chocobo sorti (plus de 5 min restantes) : renvoyez-le, puis téléportez-vous vers une autre zone et restez-y plus longtemps que le temps qu'il lui restait : aucun « est parti » ne doit être dit.
 
-- [ ] (0.1786) Compagnon sorti : montez sur une monture, chevauchez un moment puis descendez : il revient ; dans dalamud.log, les lignes « Chocobo companion out of sight (X-777) » puis « Chocobo companion back (X-777) » disent le minuteur du jeu au départ et au retour (à rapporter : le minuteur a-t-il continué pendant la monture ?).
+- [x] (0.1786) Compagnon sorti : montez sur une monture, chevauchez un moment puis descendez : il revient ; dans dalamud.log, les lignes « Chocobo companion out of sight (X-777) » puis « Chocobo companion back (X-777) » disent le minuteur du jeu au départ et au retour (à rapporter : le minuteur a-t-il continué pendant la monture ?).
 
 - [ ] (0.1787) Mangez un repas de combat, puis ouvrez le planificateur d'équipement du job porté et choisissez un autre repas : l'info-bulle de l'en-tête « Avec repas » nomme le repas mangé retiré, et la colonne montre vos stats avec le seul repas choisi (sans repas choisi différent, choisissez le même repas : la colonne doit égaler la colonne Prévu sans changement d'équipement).
 
-- [ ] (0.1788) Rangements › Rapport › Valeur estimée des stocks : cliquez « Estimer » ; sous les tableaux, « Dort et se vend » liste vos objets qui se vendent, avec prix vendu, ventes par jour, gils par jour et prix du PNJ ; comparez deux lignes au tableau du marché du jeu (ou à la fenêtre des prix de Tensho).
+- [x] (0.1788) Rangements › Rapport › Valeur estimée des stocks : cliquez « Estimer » ; sous les tableaux, « Dort et se vend » liste vos objets qui se vendent, avec prix vendu, ventes par jour, gils par jour et prix du PNJ ; comparez deux lignes au tableau du marché du jeu (ou à la fenêtre des prix de Tensho).
 
 - [ ] (0.1789) Collections › Mirage : vos pièces de la coiffeuse mirage, du bahut personnel, des sacs et des servants sont listées une fois chacune, avec où elles sont ; une pièce que vous avez en double, ou deux pièces de même apparence, montre « n autre(s) » dans « Même apparence » ; essayez la recherche et le filtre d'emplacement.
 
@@ -2730,7 +2730,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1790) Compagnon chocobo dehors : téléportez-vous, attendez qu'il revienne, renvoyez-le, puis montez plus longtemps que le temps qu'il lui restait : aucun « est parti » à la descente.
 
-- [ ] (0.1793) Rechargement du plugin : vos données sont toutes là (banque et inventaires, journal des gils, avancement des hauts faits, historique des voyages, découvertes, onglets et apparence de la fenêtre de discussion, alarmes et leur envoi Discord) ; aucune ligne « left aside » attendue dans le journal pour vos fichiers.
+- [x] (0.1793) Rechargement du plugin : vos données sont toutes là (banque et inventaires, journal des gils, avancement des hauts faits, historique des voyages, découvertes, onglets et apparence de la fenêtre de discussion, alarmes et leur envoi Discord) ; aucune ligne « left aside » attendue dans le journal pour vos fichiers.
 
 - [ ] (0.1794) Après un rechargement : dans dalamud.log, la ligne « Tensho data: a save took … ms with the journal folded in at its close (each save before X-750), … ms with the file kept open (X-750). » ; vos données toutes là après un second rechargement (banque, gils, découvertes).
 
@@ -2739,6 +2739,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] (0.1795) Magie bleue : ouvrez la fiche d'un sort appris dans une zone (ex. une zone de La Noscea) : le bouton « Carte » ouvre la bonne carte de Tensho ; un sort appris dans une mission : le bouton « Mission » ouvre sa page ; un lieu partagé par plusieurs cartes : aucun bouton.
 
 - [ ] (0.1797) Mode développeur, page Découvertes : « Vider la base », puis confirmez : la base est vidée, une copie backup-…-discoveries.zip apparaît dans le dossier Backups du plugin (avec Discoveries.db, sans jeton GitHub ni fichier -wal) ; rien dans le journal sur « nothing was removed ».
+
+- [ ] (0.1806) Monde › Découvertes : cherchez un monstre ou un objet que vous avez noté ; la dernière colonne s'appelle « Joueurs » et dit « vu par un seul joueur » (ou « vu par N joueurs » pour un fait partagé par plusieurs) ; survolez ensuite cet objet ailleurs dans Tensho : sa ligne « vu en jeu » le dit aussi.
 
 **0.535 : interfaces** — à voir en jouant
 
