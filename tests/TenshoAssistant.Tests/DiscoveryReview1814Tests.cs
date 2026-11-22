@@ -23,7 +23,7 @@ internal static class DiscoveryReview1814Tests
             Check(sync.Length>0 && !sync.Contains("write_player(",StringComparison.Ordinal),"no write_player in sync");
             Check(sync.Contains("if not dry:rebuild(fresh=fresh,pending=pending)",StringComparison.Ordinal),"the pending files given to rebuild");
             var rebuild=Between(tool,"def rebuild(","def write_v3(");
-            Check(rebuild.Contains("later.append(lambda issue=issue,author=author,given=given:write_player(issue,author,given))",StringComparison.Ordinal)
+            Check(rebuild.Contains("later.append(lambda issue=issue,author=author,given=given,noted=noted:write_player(issue,author,given,noted))",StringComparison.Ordinal)
                 && rebuild.Contains("changed=write_v3(bounded(common[\"Facts\"],say=say),V3_DIR,say)\n    for write in later:write()",StringComparison.Ordinal),
                 "written in later, after the common set");
             Check(tool.Contains("X-807 M1: a stop in the rebuild of sync leaves every player file as it was",StringComparison.Ordinal),"the tool's behaviour case");

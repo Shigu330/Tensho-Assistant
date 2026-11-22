@@ -52,7 +52,9 @@ internal static class DiscoveryPlayers1801Tests
                 && tool.Contains("X-772: rebuilt from the new file: the common set the same bytes",StringComparison.Ordinal),"the tool's behaviour cases");
             var sources = Directory.GetFiles(Path.GetFullPath("src/TenshoAssistant"),"*.cs",SearchOption.AllDirectories)
                 .Where(path => File.ReadAllText(path).Contains("community-discoveries/players",StringComparison.Ordinal)).ToList();
-            Check(sources.Count == 0,"the plugin reads the common set only (v3/), never a player file: " + string.Join(", ",sources.Select(Path.GetFileName)));
+            // 0.1817 (X-804, user decision of 22/11): the plugin reads the header line of its own issue's player file (the gist merged), nothing else.
+            Check(sources.Select(Path.GetFileName).SequenceEqual(["GistRotation.cs"]) && File.ReadAllText(sources[0]).Contains("public static (string Gist,string Revision)? Note(byte[] compressed)",StringComparison.Ordinal),
+                "the plugin reads the common set (v3/), and of a player file only its own issue's header (X-804): " + string.Join(", ",sources.Select(Path.GetFileName)));
         }),
     ];
 }

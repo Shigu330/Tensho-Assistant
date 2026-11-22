@@ -26,8 +26,12 @@ only, so `v3/` is restored from git first. The places and days a player left out
 where that GitHub account was on that day. It keeps what the merge needs (the fact's identity, its levels, its HQ sightings and values), compressed:
 `<issue>.jsonl.gz`, gzip of UTF-8 lines, a header `{"Format":"tensho-discoveries-player","Version":1,"Issue":n,"Login":…,"Count":n}` then one fact
 per line. `v3/` keeps, without any name, each fact's earliest exact place and its days (from `v3/` as it is, the gists read by `sync`, and the
-`players/<issue>.json` files of before, which `rebuild` writes again in the new format). The gist an issue links still holds the player's own sightings
-with their day and place, as the player shared them.
+`players/<issue>.json` files of before, which `rebuild` writes again in the new format). The gist an issue links holds the player's own sightings
+with their day and place, as the player shared them, until they are merged: since Tensho 0.1817 the header of `players/<issue>.jsonl.gz` notes the gist
+and its revision merged last (`"Gist"`, `"Revision"`); the merge tool never reads that revision again, and the plugin, reading the note from `main`,
+deletes that gist whole (GitHub keeps no old revision of a deleted gist, but a copy or fork someone made of it before survives) and makes a new one
+with only what is new, the issue edited to link it (its history keeps the old link, now dead). The tool keeps a player's facts by key, so a fact
+missing from a newer gist is never taken out.
 The files reach players with the next release (they are read from `main`).
 Since Tensho 0.1210: one issue per GitHub account counts (the newest; an older one by the same author is left out); each field must have the
 plugin's type; a player counts for at most 1,000 sightings of a fact in the common histograms (the shape of theirs kept); the exact place kept is the one
@@ -88,8 +92,12 @@ du ticket, ils disaient où était ce compte GitHub ce jour-là. Il garde ce que
 et ses valeurs), compressé : `<ticket>.jsonl.gz`, gzip de lignes UTF-8, un en-tête
 `{"Format":"tensho-discoveries-player","Version":1,"Issue":n,"Login":…,"Count":n}` puis un fait par ligne. `v3/` garde, sans aucun nom, le premier
 lieu exact de chaque fait et ses jours (venus de `v3/` tel qu'il est, des gists lus par `sync` et des fichiers `players/<ticket>.json` d'avant, que
-`rebuild` réécrit au nouveau format). Le gist lié par un ticket contient toujours les observations du joueur avec leur jour et leur lieu, telles qu'il
-les a partagées.
+`rebuild` réécrit au nouveau format). Le gist lié par un ticket contient les observations du joueur avec leur jour et leur lieu, telles qu'il les a
+partagées, jusqu'à leur fusion : depuis Tensho 0.1817, l'en-tête de `players/<ticket>.jsonl.gz` note le gist et la révision fusionnés en dernier
+(`"Gist"`, `"Revision"`) ; l'outil de fusion ne relit jamais cette révision, et le plugin, qui lit cette note sur `main`, supprime ce gist en entier
+(GitHub ne garde aucune ancienne révision d'un gist supprimé, mais une copie ou un fork qu'une personne en aurait fait avant reste) et en crée un
+nouveau avec seulement les nouveautés, le ticket modifié pour y renvoyer (son historique garde l'ancien lien, devenu mort). L'outil garde les faits
+d'un joueur par clé : un fait absent d'un gist plus récent n'est jamais retiré.
 Depuis Tensho 0.1210 : un seul ticket par compte GitHub compte (le plus récent ; un plus ancien du même auteur est laissé de côté) ; chaque champ
 doit avoir le type du plugin ; un joueur compte pour 1 000 observations d'un fait au plus dans les histogrammes communs (la forme des siens gardée) ; le
 lieu exact gardé est celui du jour le plus ancien ; un joueur seul très loin des niveaux des autres joueurs sur plus de 5 % des faits qu'il partage avec

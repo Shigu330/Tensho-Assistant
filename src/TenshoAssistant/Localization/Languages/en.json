@@ -845,7 +845,7 @@
     "Footer": "Your prices come from the game. Tensho changes nothing."
   },
   "DiscoveriesUi": {
-    "PublicWarning": "Before connecting: sharing is public. Your GitHub name appears in a public issue of Tensho's repository, and the sightings you send (places, items, the day of each) can be read by anyone. No character name or id is sent, but a fish caught or a bite carries your character's exact spot: with the day, it tells where you fished that day. What you share stays in the common base, without your name, even if you stop sharing.",
+    "PublicWarning": "Before connecting: sharing is public. Your GitHub name appears in a public issue of Tensho's repository, and the sightings you send (places, items, the day of each) can be read by anyone. No character name or id is sent, but a fish caught or a bite carries your character's exact spot: with the day, it tells where you fished that day. Once your discoveries are in the common base, Tensho deletes your gist and makes a new one with only what is new. What you share stays in the common base, without your name, even if you stop sharing.",
     "SummarySpearShadow": "Spearfishing shadows seen: {0} ({1} seen by you, {2} imported only)",
     "SpearShadow": "{0}: spearfishing shadow {1}",
     "QuestAsked": "{0} asked by « {1} »",
@@ -879,7 +879,7 @@
     "ExchangeTitle": "Exchange with other players (GitHub)",
     "ExchangeHelp": "Share what you discovered and take what others found. Without connecting, the automatic exchange only takes the common discoveries. A discovery never holds a player's name or id, nor anything about other players. A fish caught or a bite is noted at your character's exact place: with its day, it can tell where you fished that day. What you share stays in the common base, without your name, even if you stop sharing.",
     "Connect": "Connect GitHub",
-    "ConnectTip": "Shows a short code to approve on github.com (no password is typed in the game). Tensho asks to create an unlisted gist (anyone with its link can read it, and the link is in a public issue) and to open an issue in its repository. The authorisation stays on this PC, protected by Windows, and can be revoked at any time on github.com › Settings › Applications. Only what you saw yourself is sent, with the day and never the time; a fish caught or a bite carries your character's exact place, so your issue can tell where you fished on a given day. What you send is published in Tensho's repository under CC0-1.0 (public domain): anyone may reuse it. What you share stays in the common base, without your name, even if you stop sharing.",
+    "ConnectTip": "Shows a short code to approve on github.com (no password is typed in the game). Tensho asks to create an unlisted gist (anyone with its link can read it, and the link is in a public issue) and to open an issue in its repository. The authorisation stays on this PC, protected by Windows, and can be revoked at any time on github.com › Settings › Applications. Only what you saw yourself is sent, with the day and never the time; a fish caught or a bite carries your character's exact place, so your issue can tell where you fished on a given day. What you send is published in Tensho's repository under CC0-1.0 (public domain): anyone may reuse it. Once your discoveries are in the common base, Tensho deletes your gist and makes a new one with only what is new. What you share stays in the common base, without your name, even if you stop sharing.",
     "ConnectCode": "Code to approve: {0}",
     "ConnectCopy": "Copy",
     "ConnectOpen": "Open github.com/login/device",
@@ -908,6 +908,7 @@
     "ExchangeFailed": "The exchange failed ({0}); see the log.",
     "CommonSame": "Already up to date: the common file has not changed.",
     "ShareEmpty": "Nothing seen by you yet to share.",
+    "ShareMerged": "Everything you saw is in the common base: your gist is deleted, a new one comes with your next discoveries.",
     "ShareBlocked": "Nothing sent: your discoveries file was not read whole this session, and sending would replace what you shared before with this session's finds only.",
     "ShareAsideWaiting": "Nothing sent this time: discoveries of yours were set aside as damaged, and their copy on your gist could not be read back (GitHub not reached). Sending now would remove them from your gist; tried again at the next exchange.",
     "ShareAsideRefused": "Nothing sent this time: discoveries of yours were set aside as damaged, and GitHub refused to give back their copy on your gist (gist.githubusercontent.com). Tried again at the next exchanges; after 3 refusals in a row, the send goes on without that copy.",
