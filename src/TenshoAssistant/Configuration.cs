@@ -85,6 +85,8 @@ public static class ConfigurationReset
         "WorkshopPanel", "WorkshopPanelProject", "WorkshopFollowed", "WorkshopDelivered", "PreparationPanel", "PreparationPanelItem", "PreparationPanelRecipe", "PreparationPanelTarget", "CraftListPanel", "CraftListPanelName", "ListPanelsHideInCombat", "ListPanelsHideBehindGame", "CurrencyValueMarket", "ListPanelsBase", "ListPanelsGathering", "ListPanelsVendor", "ListPanelsMonster", "ListPanelsOther", "ListPanelsCrystal", "ListPanelsCurrenciesOn", "ListPanelsMetOnly", "HoverVendors", "HoverVendorsMetOnly", "HoverVendorsByCurrency", "HoverVendorCurrenciesOn",
         // 0.376 (g, M-06): wear alert, bar and thresholds.
         "GearWear",
+        // X-226 (0.1778): the preparation reminder (meal, chocobo companion) and its thresholds.
+        "PrepReminders",
         // 0.386 (g, X-10): clocks of other time zones.
         "WorldClocks",
         // 0.388 (user request): sort button on the game's inventory window.
@@ -808,6 +810,8 @@ public sealed partial class Configuration
     public Dictionary<string,List<string>> TabOrders { get; set; } = new();
     // 0.376 (g, M-06): wear and spiritbond alert (on), on-screen bar (off) and thresholds; null = defaults.
     public Gear.GearWearSettings? GearWear { get; set; }
+    /// <summary>X-226 (0.1778): the preparation reminder outside fights and duties (meal, chocobo companion); null: the defaults.</summary>
+    public Reminders.PrepReminderSettings? PrepReminders { get; set; }
     // 0.370 (g, X-02): favourite orchestrion rolls (Orchestrion rows), 300 at most.
     private List<uint>? orchestrionFavorites;
     public List<uint>? OrchestrionFavorites { get=>Volatile.Read(ref orchestrionFavorites); set=>Volatile.Write(ref orchestrionFavorites,value); }

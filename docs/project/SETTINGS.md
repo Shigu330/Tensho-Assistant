@@ -36,6 +36,10 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 | `(ModuleSettings.MacroBook)` | — | — | Settings › Panels › CraftMacros | **Game macros used** — Where macros are copied in the game: individual (this character) or shared (all characters). Default: individual macros. |
 | `(ModuleSettings.MacroChain)` | — | — | Settings › Panels › CraftMacros | **Chain the pages (Tensho Macro Chain: /tenshonext as the last line)** — Ends each page with /tenshonext so Tensho's Macro chain starts the next page (long rotations). Default: on. |
 | `(ModuleSettings.MacroOverwrite)` | — | — | Settings › Panels › CraftMacros | **Allow overwriting existing macros in the range** — On: the copy may replace any macro in the chosen slots. Off: only empty slots or slots Tensho copied before. Default: off. |
+| `(PrepReminders.Chocobo)` | — | — | Settings › Tracking › Alarms | **Chocobo companion reminder** — Outside fights and duties, a [Tensho] line in the chat and the alarms' sound when your chocobo companion is about to leave, or has left once its time ran out (not when you send it away). Once each time; the alarm options (chat, sound) apply. Default: on. |
+| `(PrepReminders.ChocoboMinutes)` | — | — | Settings › Tracking › Alarms | **Minutes before the companion leaves** — The reminder comes when this many minutes of the companion's time are left; 0: only once it has left. Default: 5. |
+| `(PrepReminders.Meal)` | — | — | Settings › Tracking › Alarms | **Meal ending reminder** — Outside fights and duties, a [Tensho] line in the chat and the alarms' sound when your meal's effect is about to wear off, or has worn off by itself. Once per meal; the alarm options (chat, sound) apply. Default: on. |
+| `(PrepReminders.MealMinutes)` | — | — | Settings › Tracking › Alarms | **Minutes before the meal ends** — The reminder comes when this many minutes of the meal's effect are left; 0: only once it has worn off. Default: 5. |
 | `(Settings.TabOrderReset)` | — | — | Settings › General › Appearance | **Put the pages' tabs back in order** — The tabs of the pages (at the top of a family of pages: crafting, gathering, collections, the world…; inside a page: storage, market, alarms, the garden, settings…) and the entries of the side bar (inside their group) can be dragged with the mouse; their order is kept. This puts every bar and the side bar back in the list's order. Default: the list's order. |
 | `(Settings.TipActionDescription)` | — | — | Settings › General › OtherTooltips | **The game's description** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
 | `(Settings.TipActionDetail)` | — | — | Settings › General › OtherTooltips | **Level, cost and other details** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
@@ -389,7 +393,7 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 | `WishlistSaleAlert` | bool | false | page Wishlist | **Alert when a wish is on sale under my price** — When on: at most once every 30 minutes, Tensho asks Universalis for the wishes that have a price (20 a check) and writes a chat line when one is listed under your price, once each time it goes under. Needs Universalis on (Settings › Data and sources). Default: off. |
 | `WorkshopPanel` | bool | false | `MainWindow.WorkshopProjects.cs` | **Show this project on screen** — A small panel with the materials of your followed projects together, in stock over needed; when no project is followed, those of the project chosen here. Default: off. |
 
-Settings reset by « Restore every setting » without a control in the interface (36): state of the interface, choices written by a page or migration marks.
+Settings reset by « Restore every setting » without a control in the interface (37): state of the interface, choices written by a page or migration marks.
 
 | Setting | Type | Default |
 |---|---|---|
@@ -417,6 +421,7 @@ Settings reset by « Restore every setting » without a control in the interface
 | `PreparationPanelItem` | uint | 0 |
 | `PreparationPanelRecipe` | uint | 0 |
 | `PreparationPanelTarget` | int | 0 |
+| `PrepReminders` | PrepReminderSettings? | null |
 | `QuestList` | QuestListSettings | (object) |
 | `ReminderBarHidden` | List<string>? | null |
 | `SortPreviewDescending` | bool | false |
@@ -430,7 +435,7 @@ Settings reset by « Restore every setting » without a control in the interface
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Counted: 372 controls (315 linked to `Configuration`, 57 to another file), 36 settings without a control.
+Counted: 376 controls (315 linked to `Configuration`, 61 to another file), 37 settings without a control.
 <!-- /docgen:settings -->
 
 ---
@@ -472,6 +477,10 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 | `(ModuleSettings.MacroBook)` | — | — | Paramètres › Panneaux à côté du jeu › Macros d'artisanat | **Macros du jeu utilisées** — Où copier les macros dans le jeu : macros individuelles (ce personnage) ou partagées (tous les personnages). Par défaut : macros individuelles. |
 | `(ModuleSettings.MacroChain)` | — | — | Paramètres › Panneaux à côté du jeu › Macros d'artisanat | **Chaîner les pages (Macro Chain de Tensho : /tenshonext en dernière ligne)** — Termine chaque page par /tenshonext, pour que l'Enchaînement de macros de Tensho lance la page suivante (rotations longues). Par défaut : activé. |
 | `(ModuleSettings.MacroOverwrite)` | — | — | Paramètres › Panneaux à côté du jeu › Macros d'artisanat | **Autoriser l'écrasement de macros existantes dans la plage** — Coché : la copie peut remplacer n'importe quelle macro dans les emplacements choisis. Décoché : seulement les emplacements vides ou déjà copiés par Tensho. Par défaut : désactivé. |
+| `(PrepReminders.Chocobo)` | — | — | Paramètres › Suivi et notifications › Alerte | **Rappel du compagnon chocobo** — Hors combat et hors mission, une ligne [Tensho] dans le chat et le son des alarmes quand votre compagnon chocobo va partir, ou est parti à la fin de son temps (pas quand vous le renvoyez). Une fois à chaque fois ; les options des alarmes (chat, son) s'appliquent. Par défaut : oui. |
+| `(PrepReminders.ChocoboMinutes)` | — | — | Paramètres › Suivi et notifications › Alerte | **Minutes avant le départ du compagnon** — Le rappel vient quand il reste ce nombre de minutes au temps du compagnon ; 0 : seulement une fois parti. Par défaut : 5. |
+| `(PrepReminders.Meal)` | — | — | Paramètres › Suivi et notifications › Alerte | **Rappel de fin du repas** — Hors combat et hors mission, une ligne [Tensho] dans le chat et le son des alarmes quand l'effet de votre repas va finir, ou a fini de lui-même. Une fois par repas ; les options des alarmes (chat, son) s'appliquent. Par défaut : oui. |
+| `(PrepReminders.MealMinutes)` | — | — | Paramètres › Suivi et notifications › Alerte | **Minutes avant la fin du repas** — Le rappel vient quand il reste ce nombre de minutes à l'effet du repas ; 0 : seulement une fois fini. Par défaut : 5. |
 | `(Settings.TabOrderReset)` | — | — | Paramètres › Général › Langue et thème | **Remettre les onglets des pages dans l'ordre** — Les onglets des pages (en haut d'une famille de pages : artisanat, récolte, collections, le monde… ; dans une page : rangements, marché, alarmes, le jardin, paramètres…) et les entrées de la barre de côté (dans leur groupe) se déplacent à la souris ; leur ordre est gardé. Ceci remet chaque barre et la barre de côté dans l'ordre de la liste. Par défaut : l'ordre de la liste. |
 | `(Settings.TipActionDescription)` | — | — | Paramètres › Général › Autres infobulles | **Description du jeu** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
 | `(Settings.TipActionDetail)` | — | — | Paramètres › Général › Autres infobulles | **Niveau, coût et autres détails** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
@@ -825,7 +834,7 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 | `WishlistSaleAlert` | bool | false | page Souhaits | **Alerte quand un souhait est en vente sous mon prix** — Activée : au plus une fois toutes les 30 minutes, Tensho demande à Universalis les souhaits qui ont un prix (20 par vérification) et écrit une ligne dans le chat quand l'un est en vente sous votre prix, une fois à chaque passage sous ce prix. Il faut qu'Universalis soit activé (Paramètres › Données et sources). Par défaut : désactivé. |
 | `WorkshopPanel` | bool | false | `MainWindow.WorkshopProjects.cs` | **Afficher ce projet à l'écran** — Un petit panneau avec les matériaux de vos projets suivis, ensemble, en stock sur requis ; quand aucun projet n'est suivi, ceux du projet choisi ici. Par défaut : désactivé. |
 
-Réglages remis par « Tout remettre par défaut » sans case dans l'interface (36) : état de l'interface, choix écrits par une page ou marques de migration.
+Réglages remis par « Tout remettre par défaut » sans case dans l'interface (37) : état de l'interface, choix écrits par une page ou marques de migration.
 
 | Réglage | Type | Défaut |
 |---|---|---|
@@ -853,6 +862,7 @@ Réglages remis par « Tout remettre par défaut » sans case dans l'interface (
 | `PreparationPanelItem` | uint | 0 |
 | `PreparationPanelRecipe` | uint | 0 |
 | `PreparationPanelTarget` | int | 0 |
+| `PrepReminders` | PrepReminderSettings? | null |
 | `QuestList` | QuestListSettings | (object) |
 | `ReminderBarHidden` | List<string>? | null |
 | `SortPreviewDescending` | bool | false |
@@ -866,5 +876,5 @@ Réglages remis par « Tout remettre par défaut » sans case dans l'interface (
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Compté : 372 cases (315 reliées à `Configuration`, 57 à un autre fichier), 36 réglages sans case.
+Compté : 376 cases (315 reliées à `Configuration`, 61 à un autre fichier), 37 réglages sans case.
 <!-- /docgen:settings-fr -->

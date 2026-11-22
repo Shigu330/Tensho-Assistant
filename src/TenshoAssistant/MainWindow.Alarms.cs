@@ -614,6 +614,8 @@ internal sealed partial class MainWindow
             value=>(configuration.AlarmOptions??=new()).DesktopNotification=value,c=>c.AlarmOptions?.DesktopNotification!=false);
         // X-725 (0.1731): the pinned tracking window (the items of the active alarms), with the alarms.
         DrawTrackerWindowSetting();
+        // X-226 (0.1778): the preparation reminder (meal, chocobo companion), each setting saved on its own.
+        DrawPrepReminderSettings();
         // R-12 (0.319): Discord webhook, saved on its own.
         DrawDiscordSettings();
         if(page!=Page.Alarms && ImGui.SmallButton(localization.Get("Alarms.Open"))){page=Page.Alarms;}

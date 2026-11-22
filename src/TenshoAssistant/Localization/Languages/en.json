@@ -7263,6 +7263,21 @@
     "EveryHoursShort": "every {0}h",
     "PanelTitle": "Tensho — To do"
   },
+  "PrepReminders": {
+    "Meal": "Meal ending reminder",
+    "MealTip": "Outside fights and duties, a [Tensho] line in the chat and the alarms' sound when your meal's effect is about to wear off, or has worn off by itself. Once per meal; the alarm options (chat, sound) apply.\nDefault: on.",
+    "MealMinutes": "Minutes before the meal ends",
+    "MealMinutesTip": "The reminder comes when this many minutes of the meal's effect are left; 0: only once it has worn off.\nDefault: 5.",
+    "Chocobo": "Chocobo companion reminder",
+    "ChocoboTip": "Outside fights and duties, a [Tensho] line in the chat and the alarms' sound when your chocobo companion is about to leave, or has left once its time ran out (not when you send it away). Once each time; the alarm options (chat, sound) apply.\nDefault: on.",
+    "ChocoboMinutes": "Minutes before the companion leaves",
+    "ChocoboMinutesTip": "The reminder comes when this many minutes of the companion's time are left; 0: only once it has left.\nDefault: 5.",
+    "MealEnding": "{0} wears off in {1}.",
+    "MealEnded": "{0} has worn off.",
+    "ChocoboEnding": "Your chocobo companion leaves in {0}.",
+    "ChocoboEnded": "Your chocobo companion has left.",
+    "WellFed": "Your meal"
+  },
   "GearWear": {
     "Title": "Wear and spiritbond",
     "Help": "Condition and spiritbond of the worn pieces, read from the game every second. Condition is the game's percentage; spiritbond is read in points (10,000 = 100%, to confirm in game).",

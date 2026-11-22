@@ -302,6 +302,10 @@ public static class SettingsIndex
         ("Discord.Reminders","Tracking"),
         ("Discord.Voyages","Tracking"),
         ("GilJournal.ServerBar","Tracking"),
+        ("PrepReminders.Chocobo","Tracking"),
+        ("PrepReminders.ChocoboMinutes","Tracking"),
+        ("PrepReminders.Meal","Tracking"),
+        ("PrepReminders.MealMinutes","Tracking"),
         ("Tracker.Setting","Tracking"),
     ];
 
@@ -600,6 +604,10 @@ public static class SettingsIndex
         ["Discord.Reminders"]="Alarms",
         ["Discord.Voyages"]="Alarms",
         ["GilJournal.ServerBar"]="ServerBar",
+        ["PrepReminders.Chocobo"]="Alarms",
+        ["PrepReminders.ChocoboMinutes"]="Alarms",
+        ["PrepReminders.Meal"]="Alarms",
+        ["PrepReminders.MealMinutes"]="Alarms",
         ["Tracker.Setting"]="Alarms",
     };
 }

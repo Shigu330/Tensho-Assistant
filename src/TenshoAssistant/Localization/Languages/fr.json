@@ -7263,6 +7263,21 @@
     "EveryHoursShort": "toutes les {0} h",
     "PanelTitle": "Tensho — À faire"
   },
+  "PrepReminders": {
+    "Meal": "Rappel de fin du repas",
+    "MealTip": "Hors combat et hors mission, une ligne [Tensho] dans le chat et le son des alarmes quand l'effet de votre repas va finir, ou a fini de lui-même. Une fois par repas ; les options des alarmes (chat, son) s'appliquent.\nPar défaut : oui.",
+    "MealMinutes": "Minutes avant la fin du repas",
+    "MealMinutesTip": "Le rappel vient quand il reste ce nombre de minutes à l'effet du repas ; 0 : seulement une fois fini.\nPar défaut : 5.",
+    "Chocobo": "Rappel du compagnon chocobo",
+    "ChocoboTip": "Hors combat et hors mission, une ligne [Tensho] dans le chat et le son des alarmes quand votre compagnon chocobo va partir, ou est parti à la fin de son temps (pas quand vous le renvoyez). Une fois à chaque fois ; les options des alarmes (chat, son) s'appliquent.\nPar défaut : oui.",
+    "ChocoboMinutes": "Minutes avant le départ du compagnon",
+    "ChocoboMinutesTip": "Le rappel vient quand il reste ce nombre de minutes au temps du compagnon ; 0 : seulement une fois parti.\nPar défaut : 5.",
+    "MealEnding": "{0} : l'effet finit dans {1}.",
+    "MealEnded": "{0} : l'effet est fini.",
+    "ChocoboEnding": "Votre compagnon chocobo part dans {0}.",
+    "ChocoboEnded": "Votre compagnon chocobo est parti.",
+    "WellFed": "Votre repas"
+  },
   "GearWear": {
     "Title": "Usure et symbiose",
     "Help": "État et symbiose des pièces portées, lus dans le jeu chaque seconde. L'état vient du pourcentage du jeu ; la symbiose est lue en points (10 000 = 100 %, à confirmer en jeu).",

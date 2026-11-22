@@ -765,6 +765,23 @@ public sealed partial class Plugin : IDalamudPlugin
                     if(extractText is not null)linkNotices.Add(extractText);
                 }
             }},()=>gearWear?.Dispose());
+            // X-226 (0.1778): the preparation reminder (a meal's Well Fed status or the chocobo companion about to end, or ended by itself),
+            // outside fights and duties only, once per end: chat and sound with the alarm options, as the wear alert.
+            string WellFedName()=>data.GetExcelSheet<Lumina.Excel.Sheets.Status>().GetRowOrDefault(Reminders.PrepReminderWatcher.WellFed)?.Name.ExtractText() is { Length:>0 } fed ? fed:localization.Get("PrepReminders.WellFed");
+            Reminders.PrepReminderWatcher? prepReminders=null;
+            registrations.Register(()=>prepReminders=new Reminders.PrepReminderWatcher(framework,client,objects,condition,()=>configuration.PrepReminders ?? new(),log){Due=notice=>
+            {
+                var options=configuration.AlarmOptions ?? new();
+                // The minutes left in the common format (X-312).
+                var left=UI.TimeLeft.Write(TimeSpan.FromMinutes(notice.Minutes),(key,first,second)=>localization.Format(key,first,second));
+                var text=notice.Kind==Reminders.PrepKind.Meal
+                    ? localization.Format(notice.Ended ? "PrepReminders.MealEnded":"PrepReminders.MealEnding",WellFedName(),left)
+                    : notice.Ended ? localization.Get("PrepReminders.ChocoboEnded"):localization.Format("PrepReminders.ChocoboEnding",left);
+                // Never said in a duty (the watcher holds it back there): the alarm options as outside one.
+                if(options.ChatAllowed(false))chat.Print("[Tensho] "+text);
+                if(options.SoundAllowed(false))Alarms.AlarmService.PlaySound(options.Sound,log);
+                if(options.ChatAllowed(false) || options.SoundAllowed(false))linkNotices.Add(text);
+            }},()=>prepReminders?.Dispose());
             mainWindow.GearCatalog=()=>gear?.Catalog;
             mainWindow.GearCatalogFailed=()=>gear?.CatalogFailed==true;
             mainWindow.EquippedGear=()=>gear?.Equipped ?? [];
