@@ -313,6 +313,19 @@ internal sealed partial class MainWindow
         var totals = result.Total is { } total ? " · " + localization.Format("BeastUi.ResultTotal", result.Bonus ?? 0, result.Bonuses ?? 0, total) : "";
         if (!TenshoAssistant.UI.UiComponents.Header(localization.Format("BeastUi.ResultTitle", result.At.ToLocalTime().ToString("g"), result.Score) + totals + "###BeastResult", ImGuiTreeNodeFlags.None)) return;
         DrawBeastResultLines(result);
+        // X-135 (0.1771): the window's rewards (« Récompenses »): each item, its icon and its count (to confirm against the game's window);
+        // « not read » for a result kept before, or numbers never seen (R08), never « none ».
+        if (result.Rewards is { } rewards)
+        {
+            TenshoAssistant.UI.UiComponents.SubTitle(localization.Get("BeastUi.ResultRewards"));
+            foreach (var reward in rewards)
+            {
+                DrawSmallGameIcon(reward.Icon); ImGui.SameLine();
+                ImGui.TextUnformatted(localization.Format("BeastUi.ResultReward", itemCatalog.State.Catalog?.Find(reward.Item)?.Name ?? $"#{reward.Item}", reward.Count));
+                TipText(() => localization.Get("BeastUi.ResultRewardTip"));
+            }
+        }
+        else ImGui.TextDisabled(localization.Get("BeastUi.ResultRewardsUnread"));
         foreach (var gain in result.Beasts)
         {
             var beast = catalog.Beasts.FirstOrDefault(row => row.Id == gain.Beast);
