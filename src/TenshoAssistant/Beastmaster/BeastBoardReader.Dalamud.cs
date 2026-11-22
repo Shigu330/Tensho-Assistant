@@ -32,6 +32,7 @@ internal sealed class BeastBoardReader : IDisposable
     /// <summary>X-136 (0.1550): the beast the game's « Cornes d'appel » window details (its XBMPet row; 0: closed or not read).</summary>
     public uint ActiveBeast => activeBeast;
     private bool bookWarned;
+    private readonly HashSet<uint> satietySaid = [];
     private DateTimeOffset next;
     private bool warned;
     private bool resultWarned;
@@ -209,6 +210,12 @@ internal sealed class BeastBoardReader : IDisposable
         {
             log.Information("Beastmaster bestiary read: beast {0}, rank {1} (synchronised {2}).", read.Beast, read.Rank, read.Synced);
             bookRead(read);
+            // X-744 (0.1770): the satiety the page shows against XBMPet column 3, said once per beast (R06: each page read checks the column).
+            if (BeastSpaces.SatietyOfBook(texts) is var shown and > 0 && known.FirstOrDefault(beast => beast.Id == read.Beast) is { } beast && satietySaid.Add(read.Beast))
+            {
+                if (shown == beast.Satiety) log.Information("Beastmaster satiety checked: beast {0}, the bestiary shows {1}, as XBMPet column 3.", read.Beast, shown);
+                else log.Warning("Beastmaster satiety differs: beast {0}, the bestiary shows {1}, XBMPet column 3 holds {2} (the panel's satiety is not the game's).", read.Beast, shown, beast.Satiety);
+            }
         }
         else if (!bookWarned && texts.Any(text => text.Length > 2 && text[0] == '(' && text[^1] == ')'))
         {

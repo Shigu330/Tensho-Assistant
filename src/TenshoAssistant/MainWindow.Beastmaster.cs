@@ -742,8 +742,69 @@ internal sealed partial class MainWindow
         }
         DrawBeastPlan(plan, board, catalog, state.Obtained is null, wrapAt);
         ImGui.PushTextWrapPos(wrapAt);
-        try { ImGui.TextDisabled(localization.Get("BeastUi.TeamPanelNote")); }
+        try
+        {
+            DrawBeastSpaces(board, plan, team, catalog);
+            ImGui.TextDisabled(localization.Get("BeastUi.TeamPanelNote"));
+        }
         finally { ImGui.PopTextWrapPos(); }
+    }
+
+    /// <summary>
+    /// X-744 (0.1770, the user's idea I-026, second part): the board's spaces that are not fights, in its order (the game's « Étape N »): shops,
+    /// campsites with their places, treasure coffers, random spaces with what they may hold (XBMContentStageEvent and its sheets); under each
+    /// campsite, the familiars to rest from the HP the game's team window shows (BeastSpaces.Rest, the game's guide); then each familiar's
+    /// satiety and the feeds its family can eat. Folded; display only, nothing chosen nor sent to the game (R03.3).
+    /// </summary>
+    private void DrawBeastSpaces(Board board, BoardPlan plan, IReadOnlyList<BeastTeams.TeamMember>? team, BeastCatalog catalog)
+    {
+        if (!catalog.Spaces.TryGetValue(board.Id, out var spaces) || spaces.Count == 0) return;
+        if (!TenshoAssistant.UI.UiComponents.TreeNode(localization.Format("BeastUi.Spaces", spaces.Count) + "###BeastSpaces")) return;
+        try
+        {
+            Beast? Of(uint id) => catalog.Beasts.FirstOrDefault(beast => beast.Id == id);
+            string Names(IEnumerable<uint> ids) => string.Join(", ", ids.Select(id => Of(id)?.Name ?? $"#{id}"));
+            string Kind(int kind) => catalog.SpaceNames.TryGetValue(kind, out var name) && name.Length > 0 ? name : localization.Get("BeastUi.SpaceKind" + kind);
+            string Step(int step) => catalog.StepLabel.Length > 0 ? $"{catalog.StepLabel} {step.ToString(Numbers)}" : localization.Format("BeastUi.SpaceStep", step);
+            string Placed(int kind, int places) => kind != BeastSpaces.Campsite ? Kind(kind) : places > 0 ? localization.Format("BeastUi.SpacePlaces", Kind(kind), places) : localization.Format("BeastUi.SpacePlacesUnread", Kind(kind));
+            ImGui.TextDisabled(localization.Get("BeastUi.SpacesNote"));
+            foreach (var space in spaces)
+            {
+                var text = space.Kind == BeastSpaces.Random
+                    ? localization.Format("BeastUi.SpaceRandom", Kind(space.Kind), space.Options.Count == 0 ? localization.Get("BeastUi.SpaceRandomUnread")
+                        : string.Join(localization.Get("BeastUi.SpaceOr"), space.Options.Select(option => Placed(option.Kind, option.Places))))
+                    : Placed(space.Kind, space.Places);
+                ImGui.TextColored(space.Kind == BeastSpaces.Campsite ? Accent : Text, $"{Step(space.Step)} · {text}");
+                if (BeastSpaces.CampsitePlaces(space) is not (var places and > 0)) continue;
+                ImGui.Indent();
+                try
+                {
+                    if (team is not { Count: > 0 }) { ImGui.TextDisabled(localization.Get("BeastUi.RestNoTeam")); continue; }
+                    var advice = BeastSpaces.Rest(team, places);
+                    if (advice.Rest.Count > 0) ImGui.TextColored(Success, localization.Format("BeastUi.RestAdvice", Names(advice.Rest)));
+                    else ImGui.TextDisabled(localization.Get("BeastUi.RestNone"));
+                    if (advice.Full.Count > 0) ImGui.TextDisabled(localization.Format("BeastUi.RestFull", Names(advice.Full)));
+                    if (advice.Down.Count > 0)
+                        ImGui.TextColored(Warning, localization.Format("BeastUi.RestDown", Names(advice.Down), catalog.Items.FirstOrDefault(item => item.Row == BeastSpaces.ReviveItem)?.Name ?? localization.Get("BeastUi.ReviveItem")));
+                    if (advice.Unread.Count > 0) ImGui.TextDisabled(localization.Format("BeastUi.RestUnread", Names(advice.Unread)));
+                }
+                finally { ImGui.Unindent(); }
+            }
+            // The team taken (the game's team window), else the advised team: each one's satiety and the feeds its family can eat.
+            var beasts = team is { Count: > 0 } ? team.Select(member => member.Beast).ToArray() : plan.Team.Select(pick => pick.Beast).ToArray();
+            if (beasts.Length == 0) return;
+            TenshoAssistant.UI.UiComponents.SubTitle(localization.Get("BeastUi.FeedTeam"));
+            TipText(() => localization.Get("BeastUi.FeedTeamTip"));
+            var satiety = catalog.SatietyLabel.Length > 0 ? catalog.SatietyLabel : localization.Get("BeastUi.Satiety");
+            foreach (var id in BeastTeams.BookOrder(beasts))
+            {
+                if (Of(id) is not { } beast) continue;
+                var feeds = catalog.Items.Count(item => BeastItems.UsableBy(item, beast.FamilyId));
+                ImGui.TextUnformatted(beast.Satiety > 0 ? localization.Format("BeastUi.FeedLine", beast.Name, beast.Family, satiety, beast.Satiety, feeds)
+                    : localization.Format("BeastUi.FeedLineUnread", beast.Name, beast.Family, satiety, feeds));
+            }
+        }
+        finally { ImGui.TreePop(); }
     }
 
     /// <summary>

@@ -81,7 +81,14 @@ internal sealed partial class MainWindow
                 var feeds=beasts.Items.Where(item=>item.Kind==TenshoAssistant.Beastmaster.BeastItems.Feed).ToArray();
                 var unread=feeds.Count(feed=>feed.Families.Count==0);
                 text+=$"; {beasts.Items.Count} ephemeral items ({string.Join("+",beasts.ItemKinds.OrderBy(kind=>kind.Key).Select(kind=>beasts.Items.Count(item=>item.Kind==kind.Key)))}), {feeds.Length-unread} of {feeds.Length} feeds with their families, {beasts.Rules.Count} guide rules";
-                return beasts.Borrows.Count!=families || unread>0 || beasts.Items.Count==0 ? Diagnostics.SelfCheck.Suspect("beastmaster borrow and items",text):Diagnostics.SelfCheck.Ok("beastmaster borrow and items",text);
+                // X-744 (0.1770): the boards' spaces that are not fights, the campsites' places, the random spaces' options, the satiety.
+                var spaces=beasts.Spaces.Values.SelectMany(list=>list).ToArray();
+                int Count(int kind)=>spaces.Count(space=>space.Kind==kind);
+                var camps=spaces.Where(space=>space.Kind==TenshoAssistant.Beastmaster.BeastSpaces.Campsite).ToArray();
+                text+=$"; {beasts.Spaces.Count} boards with {spaces.Length} spaces ({Count(TenshoAssistant.Beastmaster.BeastSpaces.Shop)} shops, {camps.Length} campsites with {camps.Count(camp=>camp.Places>0)} places read, "
+                    +$"{Count(TenshoAssistant.Beastmaster.BeastSpaces.Treasure)} treasures, {Count(TenshoAssistant.Beastmaster.BeastSpaces.Random)} random with {spaces.Count(space=>space.Options.Count>0)} read), {beasts.Beasts.Count(beast=>beast.Satiety>0)} beasts with a satiety";
+                var spacesBad=beasts.Spaces.Count==0 || camps.Any(camp=>camp.Places==0) || spaces.Any(space=>space.Kind==TenshoAssistant.Beastmaster.BeastSpaces.Random && space.Options.Count==0) || beasts.Beasts.Any(beast=>beast.Satiety==0);
+                return beasts.Borrows.Count!=families || unread>0 || beasts.Items.Count==0 || spacesBad ? Diagnostics.SelfCheck.Suspect("beastmaster borrow and items",text):Diagnostics.SelfCheck.Ok("beastmaster borrow and items",text);
             }),
             Page("lexicon",()=>Task.FromResult(LexiconLoad?.Invoke() is { Count:>0 } words
                 ? Diagnostics.SelfCheck.Ok("lexicon",$"{words.Count} words, {words.Select(word=>word.Kind).Distinct().Count()} kinds")

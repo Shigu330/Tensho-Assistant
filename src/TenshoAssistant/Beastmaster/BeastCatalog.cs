@@ -27,6 +27,9 @@ public sealed record Beast(uint Id, string Name, uint Icon, string Family, strin
     /// <summary>X-745 (0.1767): where it is caught, XBMPet column 6: 1 a zone, 2 a duty (<see cref="CatchPlace"/> names it), 0 the beast the job starts with.</summary>
     public int CatchKind { get; init; }
 
+    /// <summary>X-744 (0.1770): its satiety, XBMPet column 3 (<see cref="BeastSpaces.Satiety"/>: the bestiary's « Satiété 0/3 » for Cu sith); 0 not read.</summary>
+    public int Satiety { get; init; }
+
     /// <summary>Attributes at this rank; a rank outside the table is the nearest known one. Null when the table is empty.</summary>
     public BeastStats? At(int rank) => Ranks.Count == 0 ? null : Ranks[Math.Clamp(rank - 1, 0, Ranks.Count - 1)];
 }
@@ -99,6 +102,16 @@ public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Boa
 
     /// <summary>X-744 (0.1768): the game's guide rules of the board's spaces and of the item kinds (<see cref="BeastItems.Guide"/>), read ones only.</summary>
     public IReadOnlyList<BeastGuideRule> Rules { get; init; } = [];
+
+    /// <summary>X-744 (0.1770): each board's spaces that are not fights (<see cref="BeastSpaces.Read"/>), by XBMContent row; empty when not read.</summary>
+    public IReadOnlyDictionary<uint, IReadOnlyList<BoardSpace>> Spaces { get; init; } = new Dictionary<uint, IReadOnlyList<BoardSpace>>();
+
+    /// <summary>X-744 (0.1770): the game's names of the spaces' kinds (Addon 17551 to 17557), by kind (2 to 8).</summary>
+    public IReadOnlyDictionary<int, string> SpaceNames { get; init; } = new Dictionary<int, string>();
+
+    /// <summary>X-744 (0.1770): the game's « Étape » of the board's layout (Addon 17771, without its number) and « Satiété » (Addon 17728).</summary>
+    public string StepLabel { get; init; } = "";
+    public string SatietyLabel { get; init; } = "";
 
     /// <summary>X-746 (0.1766): the action Borrow gives with this beast; null when not known.</summary>
     public BeastBorrow? BorrowOf(Beast beast) => Borrows.GetValueOrDefault(beast.FamilyId);
@@ -179,7 +192,7 @@ public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Boa
             // 0.688 (user report): columns 6 and 7, where the beast is caught: docs/evidence/0.688-beast-places.md.
             catchPlace?.Invoke(row.Int(6), row.UInt(7)) ?? "", AutoRow(row.UInt(5)))
             // X-755 (0.1750): columns 11 to 21, the effects it inflicts, put in the game's order (BeastEffects).
-            { Effects = effectsRead ? BeastEffects.Of(column => row.Cells[column] is true) : [], FamilyId = row.Int(1), CatchKind = row.Int(6) }).ToArray();
+            { Effects = effectsRead ? BeastEffects.Of(column => row.Cells[column] is true) : [], FamilyId = row.Int(1), CatchKind = row.Int(6), Satiety = BeastSpaces.Satiety(row) }).ToArray();
 
         var shapes = sheets["XBMActionEffectType"].ToDictionary(row => row.Row, row => row.Text(0));
         var targets = sheets["XBMActionTarget"].ToDictionary(row => row.Row, row => row.Text(0));

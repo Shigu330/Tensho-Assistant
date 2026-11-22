@@ -103,6 +103,30 @@ internal sealed class BeastCatalogLoader : IDisposable
             borrowActions: borrowActions,
             borrowLabel: addon.TryGetRow(BorrowLabelAddon, out var borrow) ? borrow.Text.ExtractText() : "",
             elementMacro: row => elementMacros.GetValueOrDefault(row, ""));
+        // X-744 (0.1770): each board's spaces that are not fights (XBMContentStageEvent), the campsites' places (XBMContentCamp), the random
+        // spaces' options (XBMContentRandomStageEvent, XBMRandomStageEvent) and the game's words (Addon 17551 to 17557, 17771, 17728):
+        // docs/evidence/0.1770-crucible-spaces.md. Read apart: a sheet with another column count, or a failure, leaves the spaces out.
+        try
+        {
+            var rows = new Dictionary<string, List<XbmRow>>();
+            foreach (var (name, columns) in BeastSpaces.Columns)
+            {
+                token.ThrowIfCancellationRequested();
+                if (data.Excel.GetRawSheet(name) is not RawSubrowExcelSheet || data.Excel.GetRawSheet(name).Columns.Count != columns) { rows.Clear(); break; }
+                var read = new List<XbmRow>();
+                foreach (var group in data.Excel.GetSubrowSheet<RawSubrow>(null, name))
+                    foreach (var row in group) read.Add(new(row.RowId, row.SubrowId, Enumerable.Range(0, columns).Select(index => Cell(row.ReadColumn(index))).ToArray()));
+                rows[name] = read;
+            }
+            if (rows.Count == BeastSpaces.Columns.Count)
+            {
+                var spaces = BeastSpaces.Read(rows["XBMContentStageEvent"], rows["XBMContentCamp"], rows["XBMContentRandomStageEvent"], rows["XBMRandomStageEvent"]);
+                string Word(uint row) => addon.TryGetRow(row, out var text) ? text.Text.ExtractText().Trim() : "";
+                var names = Enumerable.Range(BeastSpaces.Enemy, BeastSpaces.Random - BeastSpaces.Enemy + 1).ToDictionary(kind => kind, kind => Word(BeastSpaces.NameAddonBase + (uint)kind));
+                catalog = catalog with { Spaces = spaces, SpaceNames = names, StepLabel = Word(BeastSpaces.StepAddon), SatietyLabel = Word(BeastSpaces.SatietyAddon) };
+            }
+        }
+        catch (Exception error) when (error is not OperationCanceledException and not OutOfMemoryException) { }
         // X-744 (0.1768): the Crucible's ephemeral items (XBMItem, read raw: 14 columns, else none, R08), their kinds' names (XBMItemType)
         // and the game's guide rules of the board's spaces and items (DescriptionString): docs/evidence/0.1768-crucible-items.md.
         // A failure here leaves the items and rules out (said on the page), never the rest of the Beastmaster's data.
