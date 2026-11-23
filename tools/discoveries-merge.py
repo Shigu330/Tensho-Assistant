@@ -419,13 +419,27 @@ def clean(data,player=False):
     kinds=collections.Counter(f["Kind"] for f in facts.values())
     return list(facts.values()),{"facts":len(facts),"refused":refused,"kinds":dict(sorted(kinds.items()))}
 
-def write_atomic(path,data):
-    """X-183 (N16): a file replaced whole or not at all: written to a temporary file beside it, flushed to the disk, then renamed over it."""
+REPLACE_TRIES=6        # X-858 (M1): os.replace tried this many times on a refusal (WinError 5)
+REPLACE_WAIT=0.05      # seconds before the second try, doubled each time (about 1.5 s in all)
+
+def replace_retrying(rename,sleep=None):
+    """X-858 (M1): on Windows, os.replace is sometimes refused (WinError 5, access denied) while an antivirus or the indexer still holds the
+    new file for a moment: tried again a few times after a short wait; the last refusal is raised (the target file is left as it was)."""
+    sleep=sleep or time.sleep
+    for attempt in range(REPLACE_TRIES):
+        try:rename();return attempt+1
+        except PermissionError:
+            if attempt==REPLACE_TRIES-1:raise
+            sleep(REPLACE_WAIT*2**attempt)
+
+def write_atomic(path,data,replace=None,sleep=None):
+    """X-183 (N16): a file replaced whole or not at all: written to a temporary file beside it, flushed to the disk, then renamed over it
+    (X-858: the rename tried again on a passing refusal)."""
     folder=os.path.dirname(path) or ".";handle,temporary=tempfile.mkstemp(prefix="."+os.path.basename(path)+".",suffix=".tmp",dir=folder)
     try:
         with os.fdopen(handle,"wb") as out:
             out.write(data.encode("utf-8") if isinstance(data,str) else data);out.flush();os.fsync(out.fileno())
-        os.replace(temporary,path)
+        replace_retrying(lambda:os.replace(temporary,path) if replace is None else replace(temporary,path),sleep)
     except BaseException:
         try:os.remove(temporary)
         except OSError:pass
@@ -572,7 +586,7 @@ def player_of(name):
         if os.path.isfile(path):return read_player(path)
     return None
 
-def name_order(n):return (0,int(stem(n)),n) if stem(n).isdigit() else (1,0,n)
+def name_order(n):return (0,int(stem(n)),n) if numbered(n) else (1,0,n)   # X-858 (M2): 16 digits are a random id, sorted with the others
 
 def player_names():
     """The player files, in issue order (X-183: « 43 » before « 100 »); X-772: <issue>.jsonl.gz, and the <issue>.json of before."""
@@ -694,7 +708,7 @@ def rebuild(say=print,fresh=(),skip=(),history=None,pending=None,owners=None,not
             later.append(lambda issue=issue,kept=kept,name=name:(write_player(issue,kept,now.get(name)),
                          say(f"{name}: written again as {issue}{PLAYER_SUFFIX}, without exact places nor days (X-772)")))
         # X-830: the account from the private link; a file of version 1 or before still says it
-        owner=owners.get(issue+PLAYER_SUFFIX,((player.get("Login") or "").lower(),int(issue) if issue.isdigit() else -1))
+        owner=owners.get(issue+PLAYER_SUFFIX,((player.get("Login") or "").lower(),int(issue) if numbered(issue) else -1))   # X-858 (M2)
         files.append((issue+PLAYER_SUFFIX,issue,owner[0],owner[1],
                       [without_place(f) for f in kept] if player["Old"] else player["Facts"]))
     sources+=[pair if isinstance(pair,tuple) else (None,pair) for pair in fresh]
@@ -960,8 +974,8 @@ def withdraw(target,dry,links_path=None):
     links=read_links(links_path) or {}
     name=target[:-len(PLAYER_SUFFIX)] if target.endswith(PLAYER_SUFFIX) else target
     drop=None
-    if name.isdigit() and name in links:paths=[os.path.join(PLAYERS,links[name]["File"]+PLAYER_SUFFIX)];drop=name
-    elif name.isdigit():paths=[os.path.join(PLAYERS,f"{name}{suffix}") for suffix in (PLAYER_SUFFIX,".json")]
+    if numbered(name) and name in links:paths=[os.path.join(PLAYERS,links[name]["File"]+PLAYER_SUFFIX)];drop=name   # X-858 (M2): 16 digits are a file's id
+    elif numbered(name):paths=[os.path.join(PLAYERS,f"{name}{suffix}") for suffix in (PLAYER_SUFFIX,".json")]
     elif FILE_ID.fullmatch(name) or re.fullmatch(WITHDRAWN+r"[0-9a-f]{16}",name):paths=[os.path.join(PLAYERS,name+PLAYER_SUFFIX)]
     else:paths=[]
     present=[path for path in paths if os.path.isfile(path)]
@@ -1503,6 +1517,23 @@ def selftest():
         check(again==0 and sorted(os.listdir(PLAYERS))==names,"X-830: anonymize again: nothing to do")
         check("1234567890123456"+PLAYER_SUFFIX not in names and not numbered("1234567890123456"+PLAYER_SUFFIX) and numbered("43"+PLAYER_SUFFIX) and numbered("43.json"),
               f"X-857: a random id is never digits only, and 16 digits never read as an issue's number ({names})")
+        check(name_order("1234567890123456"+PLAYER_SUFFIX)[0]==1 and name_order("43"+PLAYER_SUFFIX)==(0,43,"43"+PLAYER_SUFFIX)
+              and sorted(["1234567890123456"+PLAYER_SUFFIX,"100"+PLAYER_SUFFIX,"43.json"],key=name_order)==["43.json","100"+PLAYER_SUFFIX,"1234567890123456"+PLAYER_SUFFIX],
+              "X-858 (M2): name_order sorts 16 digits as a random id, after the issues")
+        with tempfile.TemporaryDirectory() as box:
+            target=os.path.join(box,"t.json");open(target,"w",encoding="utf-8").write("before")
+            refusals=iter([True,True]);waits=[]
+            def flaky(a,b):
+                if next(refusals,False):raise PermissionError(5,"Access is denied")
+                os.replace(a,b)
+            write_atomic(target,"after",replace=flaky,sleep=waits.append)
+            check(open(target,encoding="utf-8").read()=="after" and os.listdir(box)==["t.json"] and len(waits)==2,
+                  f"X-858 (M1): write_atomic tries the rename again after two refusals (WinError 5) ({waits}, {os.listdir(box)})")
+            def denied(a,b):raise PermissionError(5,"Access is denied")
+            try:write_atomic(target,"lost",replace=denied,sleep=lambda s:None);kept=False
+            except PermissionError:kept=True
+            check(kept and open(target,encoding="utf-8").read()=="after" and os.listdir(box)==["t.json"],
+                  "X-858 (M1): a refusal that lasts is raised, the file left as it was, no temporary file left")
         bodies=lambda g:f"Shared from Tensho Assistant 0.1832.0\n\nGist: https://gist.github.com/{g}\n\n- [x] I share these discoveries under CC0-1.0 (public domain).\n"
         s43={"number":43,"title":"Discoveries: Ann","author":{"login":"Ann"},"labels":[],"body":bodies(gid)}
         s50={"number":50,"title":"Discoveries: Eve","author":{"login":"Eve"},"labels":[],"body":bodies("5"*20)}
