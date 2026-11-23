@@ -899,7 +899,7 @@ def plan(issues,links,merged,listing=None,reader=None,say=print):
         gist_facts=facts;facts=union((held or {}).get("Facts") or [],facts)   # X-804: a gist of news only loses nothing
         total=report["facts"]+report["refused"];flag=" FLAG: refusals over 5 %" if total and report["refused"]/total>0.05 else ""
         added,gone=news(entry["File"],facts)
-        what=" nothing new (same facts as its player file): no write, no « Merged » comment" if (added,gone)==(0,0) else f" {added} new or changed, {gone} gone"
+        what=" nothing new (same facts as its player file): the facts are not written again, no « Merged » comment; its gist is still noted as merged, a change that needs its pull request (X-837: so that the plugin deletes the gist)" if (added,gone)==(0,0) else f" {added} new or changed, {gone} gone"
         say(f"#{issue['number']} {issue['title']} (author {short(login(issue))}): {report['facts']} facts, {report['refused']} refused, kinds {report['kinds']};{what}{flag}")
         read.append({"number":issue["number"],"login":login(issue),"gist":gist,"revision":revision,"owner":owner,"facts":report["facts"],"refused":report["refused"],
                      "kinds":list(report["kinds"]),"new":(added,gone)!=(0,0),"flag":bool(flag)})
