@@ -22,7 +22,7 @@ internal static class VoyagePoints1095Tests
         }),
         ("Voyage points 1095: wiring of the panel, the result line and the bite",() =>
         {
-            string Read(string file)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+file));
+            string Read(string file)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+file)).ReplaceLineEndings("\n");
             var panel=Read("MainWindow.OceanVoyagePanel.cs");
             Check(panel.Contains("OceanVoyages.Totals(frame)") && !panel.Contains("frame.Points.ToString(\"N0\")"),"the line uses the totals");
             Check(panel.Contains("OceanCacheTick();") && panel.Contains("OceanSpectralSeen(stop)") && !panel.Contains("seenStore.Find(Discoveries.DiscoveryKind.SpectralBefore,fish=>stopFish.Contains(fish),3);\n"),"per-fish data kept, not rebuilt every frame");

@@ -98,14 +98,23 @@ internal static class TwoClients1843Tests
             var said=new List<string>();
             var store=new CraftListStore(path,(_,message)=>said.Add(message));
             Check(store.Lists.Count==0,"read");
+            // X-861 (0.1868): the shortest of three tries is measured: one try once took 1224 ms in Verify, its thread starved by the tests
+            // and the desktop pages run alongside; the old wait (LockWaitMs, 2000 ms) is still told apart from DrawLockWaitMs (100 ms).
+            const int tries=3;
+            var shortest=long.MaxValue;
             using(TenshoAssistant.FairFileLock.Hold(path+".lock",1000,error=>new IOException("held",error)))
             {
-                var watch=System.Diagnostics.Stopwatch.StartNew();
-                var saved=store.Set(0,new("Gear",[new(10,1)]));
-                watch.Stop();
-                Check(!saved && watch.ElapsedMilliseconds<1000,$"refused after {watch.ElapsedMilliseconds} ms (wait {CraftListStore.DrawLockWaitMs} ms)");
+                for(var i=0;i<tries;i++)
+                {
+                    var watch=System.Diagnostics.Stopwatch.StartNew();
+                    var saved=store.Set(0,new("Gear",[new(10,1)]));
+                    watch.Stop();
+                    Check(!saved,"refused while the lock is held");
+                    shortest=Math.Min(shortest,watch.ElapsedMilliseconds);
+                }
+                Check(shortest<1000,$"refused after {shortest} ms at best (wait {CraftListStore.DrawLockWaitMs} ms)");
             }
-            Check(said.Count==1 && said[0]=="Crafting lists could not be saved.","said once: "+string.Join(" | ",said));
+            Check(said.Count==tries && said.All(text=>text=="Crafting lists could not be saved."),"said at each refusal: "+string.Join(" | ",said));
             Check(store.Set(0,new("Gear",[new(10,1)])),"saved once the lock is free");
         })),
         ("X-842 M5: a gil journal read from its .bak is said; the store passes its data file's message",()=>InFolder(folder=>

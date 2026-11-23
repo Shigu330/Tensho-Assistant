@@ -5,8 +5,9 @@ using TenshoAssistant;
 
 // 0.1865 (X-859): the CI stayed red from 0.1864. 1) Replace1864Tests looked for a snippet with « \n » in a file read raw; the Windows
 // runner checks the files out with CRLF, so it failed there only. A ratchet over the tests' sources now refuses a file read raw and then
-// searched for a « \n » snippet without its « \r\n » form. 2) X-844 failed once on CI: the chat sweep deleted a lock file another program
-// still held, the file stayed « delete pending », and the client waiting for it got access denied. Behaviour test: a lock file made
+// searched for a « \n » snippet without its « \r\n » form. 2) X-844 failed once on CI: the chat sweep deleted a lock file, which is
+// « delete pending » for an instant during the sweep's own File.Delete (longer if another program holds it; not shown here), and the
+// client waiting for it got access denied (reproduced under load: 4 failures in 30 on the old code, same message). Behaviour test: a lock file made
 // « delete pending » by hand (the old way of deleting, kept open), the client waits, then gets the lock once it is let go.
 internal static class Pending1865Tests
 {
@@ -43,26 +44,99 @@ internal static class Pending1865Tests
         return Path.GetFullPath(relative);
     }
 
-    // A variable read by File.ReadAllText without its line endings made one form, then searched for a snippet holding « \n »: the statement
-    // (its line and the next) must also accept « \r\n ».
+    // A text read raw (File.ReadAllText, or a helper of the file that returns it raw), then searched for a snippet holding « \n »: the
+    // statement (its line and the next) must also accept « \r\n ». X-861 (0.1868, review 0.1866 M1): the read searched in line
+    // (« File.ReadAllText(…).Contains("…\n…") »), a « string x= » as well as a « var x= », and a helper of the file (« string Read=>… »,
+    // « string Read(…)=>… », « string Read(…){return …;} ») count too; only a normalisation of the line endings right after the read
+    // (ReplaceLineEndings, Replace("\r…") or Replace('\r'…)) lets it pass, not any Replace among the arguments; a « \n » that starts the
+    // snippet passes too (see NewlineSearch).
     internal static IReadOnlyList<string> RawNewlineSearches(string source)
     {
         var found=new List<string>();
-        foreach(Match read in Regex.Matches(source,@"var\s+(\w+)\s*=\s*File\.ReadAllText\(([^;]*?)\)\s*;"))
+        var readers=new List<(string Name,bool Property)>{("File.ReadAllText",false)};
+        foreach(Match helper in Regex.Matches(source,@"\bstring\s+(\w+)\s*(\([^)]*\))?\s*(?:=>|\{\s*return\b)\s*File\.ReadAllText\s*\("))
         {
-            if(read.Groups[2].Value.Contains("Replace",StringComparison.Ordinal))continue;
-            var name=read.Groups[1].Value;
-            var rest=source[(read.Index+read.Length)..];
-            var next=Regex.Match(rest,@"\bvar\s+"+Regex.Escape(name)+@"\s*=");
-            var lines=(next.Success ? rest[..next.Index]:rest).Split('\n');
-            for(var i=0;i<lines.Length;i++)
+            var end=CallEnd(source,helper.Index+helper.Length-1);
+            if(end>0 && !Normalised(source,end))readers.Add((helper.Groups[1].Value,!helper.Groups[2].Success));
+        }
+        foreach(var (reader,property) in readers)
+        {
+            var pattern=@"(?<![\w.])"+Regex.Escape(reader)+(property ? @"\b(?!\s*(?:\(|=>|\{))":@"\s*\(");
+            foreach(Match use in Regex.Matches(source,pattern))
             {
-                if(!Regex.IsMatch(lines[i],@"\b"+Regex.Escape(name)+@"\.Contains\(""(?:[^""\\]|\\.)*\\n"))continue;
-                var statement=lines[i]+(i+1<lines.Length ? lines[i+1]:"");
-                if(!statement.Contains(@"\r\n",StringComparison.Ordinal))found.Add(name+": "+lines[i].Trim());
+                if(Regex.IsMatch(source[..use.Index],@"\bstring\s+$"))continue;
+                if(source[(source.LastIndexOf('\n',Math.Max(0,use.Index-1))+1)..use.Index].TrimStart().StartsWith("//",StringComparison.Ordinal))continue;
+                var end=property ? use.Index+use.Length:CallEnd(source,use.Index+use.Length-1);
+                if(end<0 || Normalised(source,end))continue;
+                if(Regex.IsMatch(source[end..],@"^\s*"+NewlineSearch))
+                {
+                    if(!Statement(source,end).Contains(@"\r\n",StringComparison.Ordinal))found.Add(reader+": "+Line(source,end));
+                    continue;
+                }
+                var assigned=Regex.Match(source[..use.Index],@"\b(?:var|string)\s+(\w+)\s*=\s*$");
+                if(!assigned.Success)continue;
+                var name=assigned.Groups[1].Value;
+                var rest=source[end..];
+                var next=Regex.Match(rest,@"\b(?:var|string)\s+"+Regex.Escape(name)+@"\s*=");
+                var lines=(next.Success ? rest[..next.Index]:rest).Split('\n');
+                for(var i=0;i<lines.Length;i++)
+                {
+                    if(!Regex.IsMatch(lines[i],@"\b"+Regex.Escape(name)+NewlineSearch))continue;
+                    var statement=lines[i]+(i+1<lines.Length ? lines[i+1]:"");
+                    if(!statement.Contains(@"\r\n",StringComparison.Ordinal))found.Add(name+": "+lines[i].Trim());
+                }
             }
         }
         return found;
+    }
+
+    // A search for a snippet with a « \n » after another character of the snippet: « \r\n » breaks it. A « \n » that starts the snippet
+    // still matches a CRLF text (the « \r » comes before it), so it is not refused.
+    private const string NewlineSearch=@"\.Contains\(""(?:[^""\\]|\\.)*(?:[^""\\]|\\.)\\n";
+
+    // The line endings made one form right after the read.
+    private static bool Normalised(string source,int end)=>
+        Regex.IsMatch(source[end..],@"^\s*\.(?:ReplaceLineEndings\s*\(|Replace\s*\(\s*(?:""\\r|'\\r'))");
+
+    // The index just after the parenthesis that closes the one at « open » (string and character literals skipped), or -1.
+    private static int CallEnd(string source,int open)
+    {
+        var depth=0;
+        for(var i=open;i<source.Length;i++)
+        {
+            var c=source[i];
+            if(c=='@' && i+1<source.Length && source[i+1]=='"')
+            {
+                for(i+=2;i<source.Length;i++)
+                {
+                    if(source[i]!='"')continue;
+                    if(i+1<source.Length && source[i+1]=='"'){i++;continue;}
+                    break;
+                }
+            }
+            else if(c=='"' || c=='\'')
+            {
+                for(i++;i<source.Length && source[i]!=c;i++)if(source[i]=='\\')i++;
+            }
+            else if(c=='(')depth++;
+            else if(c==')' && --depth==0)return i+1;
+        }
+        return -1;
+    }
+
+    private static string Line(string source,int at)
+    {
+        var start=source.LastIndexOf('\n',Math.Max(0,at-1))+1;
+        var stop=source.IndexOf('\n',at);
+        return source[start..(stop<0 ? source.Length:stop)].Trim();
+    }
+
+    // The line of « at » and the next one.
+    private static string Statement(string source,int at)
+    {
+        var stop=source.IndexOf('\n',at);
+        if(stop>=0){var after=source.IndexOf('\n',stop+1);stop=after<0 ? source.Length:after;}
+        return Line(source,at)+(stop<0 ? "":source[source.IndexOf('\n',at)..stop]);
     }
 
     public static IEnumerable<(string Name,Action Run)> Cases =>

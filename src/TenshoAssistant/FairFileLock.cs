@@ -85,9 +85,11 @@ public static class FairFileLock
         Path.GetFileName(Path.GetFullPath(path))+MarkInfix+arrival.ToUniversalTime().Ticks.ToString("D19",System.Globalization.CultureInfo.InvariantCulture)
         +"-"+id.ToString("N")+MarkEnd;
 
-    // X-859 (0.1865): a lock file deleted while another program (antivirus, indexer) still holds it is « delete pending » until that program
-    // lets it go, and opening it is refused with access denied, not a sharing violation (CI run 45147821072, after the chat sweep deleted
-    // a history's lock). Both are « not yet »: tried again until the wait ends; the last open, past it, raises what Windows says.
+    // X-859 (0.1865): a lock file being deleted is « delete pending », and opening it is then refused with access denied, not a sharing
+    // violation (CI run 45147821072, after the chat sweep deleted a history's lock). X-861 (0.1868): the sweep's own File.Delete is enough:
+    // between setting the deletion and closing its handle the file is « delete pending » for an instant, which a client trying every 20 ms
+    // can hit (reproduced under load on the old code: 4 failures in 30); another program holding the file (antivirus, indexer) would make it
+    // last, not proven. Both are « not yet »: tried again until the wait ends; past it, see Hold (X-862).
     private static FileStream? TryOpen(string full)
     {
         try{return new FileStream(full,FileMode.OpenOrCreate,FileAccess.ReadWrite,FileShare.None);}
