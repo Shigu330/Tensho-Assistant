@@ -540,13 +540,16 @@ def owners_of(links):
     return {v["File"]+PLAYER_SUFFIX:((v.get("Login") or "").lower(),int(k)) for k,v in (links or {}).items()}
 
 def new_file_id(taken=()):
+    """X-830: 16 random hex digits. X-857: never digits only (about one draw in 1,800): such a name reads as an issue number (numbered,
+    name_order, withdraw « N »), and anonymize then took the anonymous file for one still to rename."""
     while True:
         found=secrets.token_hex(8)
-        if found not in taken and not os.path.exists(os.path.join(PLAYERS,found+PLAYER_SUFFIX)):return found
+        if not found.isdigit() and found not in taken and not os.path.exists(os.path.join(PLAYERS,found+PLAYER_SUFFIX)):return found
 
 def numbered(name):
-    """X-830: a player file named after its issue (before the migration): <issue>.jsonl.gz or <issue>.json."""
-    return stem(name).isdigit()
+    """X-830: a player file named after its issue (before the migration): <issue>.jsonl.gz or <issue>.json. X-857: 16 digits are a random id
+    (one drawn before X-857), never an issue's number."""
+    return stem(name).isdigit() and not FILE_ID.fullmatch(stem(name))
 
 def union(held,given):
     """X-804: a player's facts by key: those of their file, replaced by the gist's for the same key. Since a gist once merged is deleted and a new
@@ -1479,7 +1482,13 @@ def selftest():
             kept=read_player(os.path.join(PLAYERS,f"{n}.jsonl.gz"))["Facts"]
             write_atomic(os.path.join(PLAYERS,f"{n}.jsonl.gz"),gzip.compress("".join(v3_line(o)+chr(10) for o in [{"Format":PLAYER_FORMAT,"Version":1,"Issue":n,"Login":who,**note,"Count":len(kept)},*kept]).encode("utf-8"),mtime=0))
         v3_before={k:v for k,v in snapshot().items() if k[0]==V3_DIR}
-        with contextlib.redirect_stdout(io.StringIO()):code=anonymize(False,links_file)
+        # X-857: the first id drawn is digits only, as 16 random hex digits are about once in 1,800 draws (the run of 23/11 that failed
+        # « anonymize again »): it must never be taken for an issue number, so the second anonymize below has nothing to do.
+        real_hex=secrets.token_hex;draws=iter(["1234567890123456"])
+        secrets.token_hex=lambda n:next(draws,None) or real_hex(n)
+        try:
+            with contextlib.redirect_stdout(io.StringIO()):code=anonymize(False,links_file)
+        finally:secrets.token_hex=real_hex
         names=sorted(os.listdir(PLAYERS));links=read_links(links_file)
         check(code==0 and len(names)==4 and all(FILE_ID.fullmatch(stem(n)) for n in names) and {k:v for k,v in snapshot().items() if k[0]==V3_DIR}==v3_before,
               f"X-830: anonymize: every file under a random id, the common set the same bytes ({names})")
@@ -1492,6 +1501,8 @@ def selftest():
         said.clear();check(rebuild(say,owners=owners_of(links)) is False,f"X-830: rebuilt through the link: unchanged (41 and 43 one account) ({said})")
         with contextlib.redirect_stdout(io.StringIO()):again=anonymize(False,links_file)
         check(again==0 and sorted(os.listdir(PLAYERS))==names,"X-830: anonymize again: nothing to do")
+        check("1234567890123456"+PLAYER_SUFFIX not in names and not numbered("1234567890123456"+PLAYER_SUFFIX) and numbered("43"+PLAYER_SUFFIX) and numbered("43.json"),
+              f"X-857: a random id is never digits only, and 16 digits never read as an issue's number ({names})")
         bodies=lambda g:f"Shared from Tensho Assistant 0.1832.0\n\nGist: https://gist.github.com/{g}\n\n- [x] I share these discoveries under CC0-1.0 (public domain).\n"
         s43={"number":43,"title":"Discoveries: Ann","author":{"login":"Ann"},"labels":[],"body":bodies(gid)}
         s50={"number":50,"title":"Discoveries: Eve","author":{"login":"Eve"},"labels":[],"body":bodies("5"*20)}
