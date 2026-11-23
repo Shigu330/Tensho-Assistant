@@ -110,33 +110,62 @@ public sealed class MarketService : IDisposable
             await Task.Delay(wait,token).ConfigureAwait(false);
         }
         // X-815: the packets still to ask, the first one the whole list; a packet refused by a 400 comes back as its two halves.
+        // X-846 (review 0.1848, I1): at most MaxBadRequests answers 400 for one list (then it stops, as before 0.1847); each packet asked again
+        // waits its turn like any request (the path's own pause, a request in flight, a pause asked by the server); the packets asked again
+        // are read without their sale speed, asked once for all of them at the end.
         var packets=new Stack<uint[]>();
         packets.Push(missing);
         var first=true;
+        var badRequests=0;
+        var split=new List<MarketQuote>();
         while(packets.Count>0)
         {
             var packet=packets.Pop();
-            if(!first)
-            {
-                await Task.Delay(SplitPause,token).ConfigureAwait(false);
-                if(Enabled?.Invoke()==false)return null;
-                lock(gate)
-                {
-                    if(disposed || state.WorldId!=world || expectedOwner!=owner)return null;
-                    lastRequest=Stopwatch.GetTimestamp();
-                }
-            }
+            if(!first && await NextTurnAsync(world,expectedOwner,bulk,token).ConfigureAwait(false) is { Go:false } stopped)return stopped.Failure;
+            var (badRequest,failure,unread,quotes)=await FillPacketAsync(world,packet,first,token).ConfigureAwait(false);
+            if(!first)split.AddRange(quotes);
             first=false;
-            var (badRequest,failure,unread)=await FillPacketAsync(world,packet,token).ConfigureAwait(false);
             if(failure is not null)return failure;
             refused?.UnionWith(unread);
             if(!badRequest)continue;
+            if(++badRequests>=MaxBadRequests)return PricesUnread;
             if(packet.Length==1){refused?.Add(packet[0]);continue;}
             var half=packet.Length/2;
             packets.Push(packet[half..]);
             packets.Push(packet[..half]);
         }
+        if(split.Count>0 && await NextTurnAsync(world,expectedOwner,bulk,token).ConfigureAwait(false) is { Go:true })
+        {
+            var speed=await SpeedAsync(world,split.Select(quote=>quote.ItemId).ToArray(),token).ConfigureAwait(false);
+            if(speed is not null)Store(world,split.Select(quote=>quote.WithSpeed(speed)).ToList());
+        }
         return null;
+    }
+
+    /// <summary>X-846 (review 0.1848, I1): the answers 400 one list may get before it stops. One item refused in a list of 100 takes 8
+    /// (the list, then one half at each of 7 levels); a server that refuses everything costs 10 requests, not 2n-1 (199 for 100 items).</summary>
+    public const int MaxBadRequests=10;
+
+    // X-846: the turn of the next request of a list already started, under the same rules as its first one: the setting, the character and
+    // the world unchanged; no pause asked by Universalis; no request in flight; the path's pause (ListPause/SplitPause for a long list,
+    // RequestPause otherwise) since the last request of the service. Go false: stop (Failure null when the list is no longer wanted).
+    private async Task<(bool Go,string? Failure)> NextTurnAsync(uint world,ulong expectedOwner,bool bulk,CancellationToken token)
+    {
+        while(true)
+        {
+            if(Enabled?.Invoke()==false)return (false,null);
+            TimeSpan wait;
+            lock(gate)
+            {
+                if(disposed || state.WorldId!=world || expectedOwner!=owner)return (false,null);
+                if(serverPauseUntil is { } until && Stopwatch.GetTimestamp()<until)return (false,"Universalis asked for a pause.");
+                var pause=bulk ? SplitPause:RequestPause;
+                var since=lastRequest is { } last ? Stopwatch.GetElapsedTime(last):pause;
+                wait=requestActive ? TimeSpan.FromMilliseconds(250):since<pause ? pause-since:TimeSpan.Zero;
+                if(wait==TimeSpan.Zero){lastRequest=Stopwatch.GetTimestamp();return (true,null);}
+            }
+            await Task.Delay(wait,token).ConfigureAwait(false);
+        }
     }
 
     /// <summary>X-815: whether the market knows an item; a failing answer counts as known (the request then says).</summary>
@@ -155,8 +184,9 @@ public sealed class MarketService : IDisposable
     public const string PricesUnread="Prices could not be read.";
 
     // X-815: one aggregated request for a packet: its quotes to the cache. BadRequest when Universalis answered 400 (the caller splits the
-    // packet); the message of any other failure (the list stops there).
-    private async Task<(bool BadRequest,string? Failure,IReadOnlyList<uint> Unread)> FillPacketAsync(uint world,uint[] packet,CancellationToken token)
+    // packet); the message of any other failure (the list stops there). X-846: withSpeed false (a packet asked again after a 400): no sale
+    // speed request here, the caller asks it once for all those packets (their quotes returned).
+    private async Task<(bool BadRequest,string? Failure,IReadOnlyList<uint> Unread,IReadOnlyList<MarketQuote> Quotes)> FillPacketAsync(uint world,uint[] packet,bool withSpeed,CancellationToken token)
     {
         try
         {
@@ -165,13 +195,13 @@ public sealed class MarketService : IDisposable
             if(ServerPause((int)response.StatusCode,response.Headers.RetryAfter?.Delta) is { } room)
             {
                 lock(gate)serverPauseUntil=Stopwatch.GetTimestamp()+(long)(room.TotalSeconds*Stopwatch.Frequency);
-                return (false,$"Universalis asked for a pause ({(int)response.StatusCode}).",[]);
+                return (false,$"Universalis asked for a pause ({(int)response.StatusCode}).",[],[]);
             }
-            if(response.StatusCode==System.Net.HttpStatusCode.BadRequest)return (true,null,[]);
+            if(response.StatusCode==System.Net.HttpStatusCode.BadRequest)return (true,null,[],[]);
             response.EnsureSuccessStatusCode();
             var json=await response.Content.ReadAsStringAsync(token).ConfigureAwait(false);
             var at=DateTimeOffset.UtcNow;
-            var speed=await SpeedAsync(world,packet,token).ConfigureAwait(false);
+            var speed=withSpeed ? await SpeedAsync(world,packet,token).ConfigureAwait(false):null;
             // Read off the lock: a page reads the cache on every frame.
             var quotes=new List<MarketQuote>(packet.Length);
             // X-815: an item the answer has no line for (Universalis' failedItems) stays without a price, as a refused one.
@@ -181,21 +211,27 @@ public sealed class MarketService : IDisposable
                 try{quotes.Add(MarketQuote.Parse(json,world,id,at).WithSpeed(speed));}
                 catch(InvalidDataException){unread.Add(id);}
             }
-            lock(gate)
-            {
-                if(disposed || state.WorldId!=world)return (false,null,[]);
-                foreach(var quote in quotes)
-                {
-                    var id=quote.ItemId;
-                    if(!cache.ContainsKey((world,id)) && cache.Count>=CacheCapacity)cache.Remove(cache.MinBy(pair=>pair.Value.FetchedAt).Key);
-                    cache[(world,id)]=quote;
-                    if(disk is { } diskStore)_=diskStore.WriteAsync("market",$"{world}:{id}","universalis-aggregated-v4",quote,quote.FetchedAt);
-                }
-                lastRequest=Stopwatch.GetTimestamp();
-            }
-            return (false,null,unread);
+            return Store(world,quotes) ? (false,null,unread,quotes):(false,null,[],[]);
         }
-        catch(Exception error) when(error is HttpRequestException or System.Text.Json.JsonException or InvalidDataException){return (false,PricesUnread,[]);}
+        catch(Exception error) when(error is HttpRequestException or System.Text.Json.JsonException or InvalidDataException){return (false,PricesUnread,[],[]);}
+    }
+
+    // X-846: quotes read to the cache (memory and disk), unless the service is gone or the world changed.
+    private bool Store(uint world,IReadOnlyList<MarketQuote> quotes)
+    {
+        lock(gate)
+        {
+            if(disposed || state.WorldId!=world)return false;
+            foreach(var quote in quotes)
+            {
+                var id=quote.ItemId;
+                if(!cache.ContainsKey((world,id)) && cache.Count>=CacheCapacity)cache.Remove(cache.MinBy(pair=>pair.Value.FetchedAt).Key);
+                cache[(world,id)]=quote;
+                if(disk is { } diskStore)_=diskStore.WriteAsync("market",$"{world}:{id}","universalis-aggregated-v4",quote,quote.FetchedAt);
+            }
+            lastRequest=Stopwatch.GetTimestamp();
+            return true;
+        }
     }
 
     // 0.725: the second answer of a price request. Refused or failed: the prices stay, the speed stays unknown, and a server asking for room gets it.
