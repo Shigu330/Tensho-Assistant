@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (857 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (860 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -787,6 +787,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-682 | Tool: the plan tool (public cells, the agent's paths list) does not refuse an… | Done in 0.1656.0 |
 | X-683 | User request (chat, 20/11 about 9:50 pm, screenshot « Water Cluster »): the… | Done in 0.1664.0 |
 | X-684 | User request (chat, 20/11 about 9:52 pm), after the chat item tooltip point: «… | Done in 0.1696.0 |
+| X-685 | Memory (server bar « Tensho: to look at · 2,181 MB », user's screenshot of… | Done in 0.1846.0 |
 | X-686 | User-reported bug (chat, 20/11 about 10 pm): a chat tab removed by mistake («… | Done in 0.1656.0 |
 | X-687 | User request (chat, 20/11 about 10:05 pm): « no way to arrange the tabs » of… | Done in 0.1663.0 |
 | X-688 | In-game test T-0.1526-2 (test page, 20/11 around 22:08): problem reported by… | Done in 0.1661.0 |
@@ -901,6 +902,8 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-810 | Security review before the alpha (user's decision of 11/22 around 15:30: a… | Done in 0.1830.0 |
 | X-811 | Tool (R13.3): method of natures (user's decision of 11/22 around 15:40). Done… | Done in 0.1812.0 |
 | X-812 | Tool (R13.3, R32.1), follow-up of the natures tool: user's request of 11/22… | Done in 0.1812.0 |
+| X-814 | Review of block 0.1807 to 0.1812 (review 0.1812, 22/11), minor M1, M2, M3: M1… | Done in 0.1848.0 |
+| X-815 | Bug seen by the user on 11/22 around 17:15 (capture read: Free company › Best… | Done in 0.1847.0 |
 | X-819 | Review of block 0.1813 to 0.1819 (review 0.1819, 22/11), I1: finding in… | Done in 0.1820.0 |
 | X-820 | Review of block 0.1813 to 0.1819 (review 0.1819, 22/11), minor M1, M2, M3: M1… | Done in 0.1822.0 |
 | X-822 | Finding of the user's local AI (Roslyn audit of Devloppement, 11/22 around… | Done in 0.1825.0 |
@@ -930,7 +933,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (857 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (860 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1715,6 +1718,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-682 | Outil : l'outil du plan (cellules publiques, liste des chemins de l'agent) ne… | Fait en 0.1656.0 |
 | X-683 | Demande de l'utilisateur (chat, 20/11 vers 21 h 50, capture « Agrégat d'eau »)… | Fait en 0.1664.0 |
 | X-684 | Demande de l'utilisateur (chat, 20/11 vers 21 h 52), suite du point sur… | Fait en 0.1696.0 |
+| X-685 | Mémoire (barre du serveur « Tensho : à voir · 2 181 Mo », capture de… | Fait en 0.1846.0 |
 | X-686 | Bug signalé par l'utilisateur (chat, 20/11 vers 22 h) : un onglet du chat… | Fait en 0.1656.0 |
 | X-687 | Demande de l'utilisateur (chat, 20/11 vers 22 h 05) : « aucun moyen de ranger… | Fait en 0.1663.0 |
 | X-688 | Essai T-0.1526-2 en jeu (page des essais, 20/11 vers 22 h 08) : problème… | Fait en 0.1661.0 |
@@ -1829,6 +1833,8 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-810 | Revue de sécurité avant l'alpha (décision de l'utilisateur du 22/11 vers 15 h… | Fait en 0.1830.0 |
 | X-811 | Outil (R13.3) : méthode des natures (décision de l'utilisateur du 22/11 vers 15… | Fait en 0.1812.0 |
 | X-812 | Outil (R13.3, R32.1), suite de l'outil des natures : demande de l'utilisateur… | Fait en 0.1812.0 |
+| X-814 | Relecture du bloc 0.1807 à 0.1812 (relecture 0.1812, 22/11), mineurs M1, M2, M3… | Fait en 0.1848.0 |
+| X-815 | Bug vu par l'utilisateur le 22/11 vers 17 h 15 (capture lue : Compagnie libre ›… | Fait en 0.1847.0 |
 | X-819 | Relecture du bloc 0.1813 à 0.1819 (relecture 0.1819, 22/11), I1 : Un gist créé… | Fait en 0.1820.0 |
 | X-820 | Relecture du bloc 0.1813 à 0.1819 (relecture 0.1819, 22/11), mineurs M1, M2, M3… | Fait en 0.1822.0 |
 | X-822 | Constat de l'IA locale de l'utilisateur (audit Roslyn de Devloppement, 22/11… | Fait en 0.1825.0 |

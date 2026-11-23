@@ -2780,6 +2780,14 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1843) Deux clients du jeu sur le même profil, Mes outils : cocher une case ou changer un compteur dans l'un, attendre 2 s : l'autre le montre ; « + » dans l'autre part de la nouvelle valeur
 
+- [ ] (0.1845) Mode développeur, six rechargements de suite (publications) : aucun plantage ; dans dalamud.log, dix secondes après chaque chargement, une ligne « Earlier instance … » par instance précédente et plus aucune ligne « Earlier instance … static … » ni « registrations disposed »
+
+- [ ] (0.1846) Barre du serveur : « Tensho : ok · Dalamud N Mo » (le chiffre est nommé Dalamud) ; la carte de Tensho ouverte quelques minutes : icônes, info-bulles au survol et clic droit sur une icône comme avant
+
+- [ ] (0.1847) Compagnie libre › Meilleurs trajets, sous-marin, une mer avec des prix manquants : « Prix du marché (N sur M manquants) » lit les prix ; s'il en manque, la ligne dit en français combien manquent (« N prix manquent : Universalis ne vend pas ces objets ou les a refusés ; les autres ont été lus. »), jamais « Prices could not be read » en anglais
+
+- [ ] (0.1848) Stocks › « Dort et se vend » : une ligne HQ d'un objet aussi vendu par un PNJ montre le prix PNJ sans couleur verte ni info-bulle « moins cher chez un PNJ » ; la même ligne NQ garde la comparaison
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
