@@ -111,17 +111,34 @@ public static class RetiredCopies
         return true;
     }
 
-    /// <summary>X-854: an entry's whole content, or null when it cannot be read (broken data, an unknown method, fewer bytes than its size).</summary>
+    /// <summary>X-854: an entry's whole content, or null when it cannot be read (broken data, an unknown method, fewer bytes than its size).
+    /// X-856 (review 0.1860, M1): or when its bytes do not match the entry's CRC-32 (.NET's reader does not check it): an entry changed in
+    /// silence, at the right length, is left out instead of being copied with a new, valid CRC that would hide its damage from any zip tool.</summary>
     private static MemoryStream? Content(ZipArchiveEntry entry)
     {
         try
         {
             var content=new MemoryStream();
             using(var from=entry.Open())from.CopyTo(content);
-            if(content.Length!=entry.Length)return null;
+            if(content.Length!=entry.Length || Crc32(content.GetBuffer().AsSpan(0,(int)content.Length))!=entry.Crc32)return null;
             content.Position=0;
             return content;
         }
         catch(Exception error) when(error is InvalidDataException or NotSupportedException){return null;}
+    }
+
+    // X-856: the zip format's CRC-32 (polynomial 0xEDB88320, reflected, as ZipArchiveEntry.Crc32 states it).
+    private static readonly uint[] CrcTable=Enumerable.Range(0,256).Select(index=>
+    {
+        var value=(uint)index;
+        for(var bit=0;bit<8;bit++)value=(value&1)!=0 ? 0xEDB88320u^(value>>1):value>>1;
+        return value;
+    }).ToArray();
+
+    internal static uint Crc32(ReadOnlySpan<byte> bytes)
+    {
+        var crc=0xFFFFFFFFu;
+        foreach(var value in bytes)crc=CrcTable[(crc^value)&0xFF]^(crc>>8);
+        return ~crc;
     }
 }
