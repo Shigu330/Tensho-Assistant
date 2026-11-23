@@ -107,10 +107,11 @@ internal static class PreparationCostTests
             using var client=new HttpClient(new MarketTestHandler((request,_)=>{times.Add(DateTimeOffset.UtcNow);return Task.FromResult(Reply(uint.Parse(request.RequestUri!.Segments.Last().Split(',')[0])));}));
             // 0.1202: the market's pause at 1.5 s instead of 3 (still above the list's 1 s pause; the 3 s is checked by VerifySpeed1202Tests).
             using var market=new MarketService(client){RequestPause=TimeSpan.FromSeconds(1.5)};market.SetWorld(1,71,"World");using var session=new PreparationPriceSession();
-            // 0.608 (I4): one request for both, answering only the first: the other is asked alone, after the pause.
+            // 0.608 (I4): one request for both, answering only the first. X-815 (0.1847): the other, without a line in the answer (Universalis'
+            // failedItems: an item its market does not know), is refused, not asked alone (alone, it is refused by a 400 that stopped the list).
             session.StartAsync(market,Context,[42,42,43]).GetAwaiter().GetResult();
-            Check(session.State.Completed==2 && !session.State.Loading && session.State.Error is null && times.Count==2,"each unique ingredient fetched once");
-            Check(times[1]-times[0]>=TimeSpan.FromSeconds(1.4) && market.State.ItemId==0,"queue shares network spacing without changing manual item");
+            Check(session.State.Completed==2 && !session.State.Loading && session.State.Error is null && times.Count==1 && session.State.Refused==1,"each unique ingredient fetched once");
+            Check(market.GetCached(71,42) is not null && market.GetCached(71,43) is null && market.State.ItemId==0,"the refused item stays without a price, without changing manual item");
         }),
         ("Preparation batch clears context cancels in flight work and is inert after disposal",()=>
         {

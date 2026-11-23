@@ -45,9 +45,9 @@ internal static class MarketServiceTests
         ("Market batch: fills the cache first, then the list goes on as before",() =>
         {
             var session=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Market/PreparationPriceSession.cs"));
-            Check(session.Contains("if(await market.FillCacheAsync(copied,context.CharacterId,context.WorldId,token).ConfigureAwait(false) is { } failed)throw"),"before the loop; a server failure ends the list");
+            Check(session.Contains("if(await market.FillCacheAsync(copied,context.CharacterId,context.WorldId,token,false,refused).ConfigureAwait(false) is { } failed)throw"),"before the loop; a server failure ends the list");
             var service=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Market/MarketService.cs"));
-            Check(service.Contains("api/v2/aggregated/{world}/{string.Join(',',missing)}"),"one request");
+            Check(service.Contains("api/v2/aggregated/{world}/{string.Join(',',packet)}") && service.Contains("packets.Push(missing);"),"one request for the list (X-815: its halves only after a 400)");
             Check(service.Contains("Enabled?.Invoke()==false"),"respects the source's switch");
         }),
         // From MarketPace710Tests: 0.710 (user request): faster on a long list, without troubling Universalis.
@@ -96,7 +96,7 @@ internal static class MarketServiceTests
         }),
         ("Market pace: a long list asks nothing more for an item with no price",() =>
         {
-            Check(HasCode(Read("Market/PreparationPriceSession.cs"),"state=new(context,list,copied.Length,0,false,null); } return;"),"stops after its request");
+            Check(HasCode(Read("Market/PreparationPriceSession.cs"),"state=new(context,list,copied.Length,0,false,null,refused.Count); } return;"),"stops after its request");
         }),
         ("0.567: the market page copies the lowest offer minus 1, without your retainers",() =>
         {

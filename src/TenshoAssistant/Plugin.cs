@@ -232,6 +232,10 @@ public sealed partial class Plugin : IDalamudPlugin
             // X-834: the desktop application sets the same switches from CommunitySources.SwitchFor (SourceSwitches1839Tests keeps both alike).
             garland.Enabled=()=>configuration.CommunityGarland;
             market.Enabled=()=>configuration.CommunityUniversalis;
+            // X-815 (0.1847): the items the market sells (tradable and in a market search category, the item catalog's IsMarketable rule);
+            // the others are not asked to Universalis, which answers 400 to a list of them. An item the sheet does not have is asked.
+            var marketItems=data.GetExcelSheet<Lumina.Excel.Sheets.Item>();
+            market.Marketable=id=>marketItems.GetRowOrDefault(id) is not { } row || (!row.IsUntradable && row.ItemSearchCategory.RowId!=0);
             // X-122, D-101: duty and monster loot follow their own use of Garland Tools too.
             dutyLoot.Enabled=()=>CommunitySources.Allowed(configuration,SourceUse.GarlandDutyLoot);
             monsterLoot.Enabled=()=>CommunitySources.Allowed(configuration,SourceUse.GarlandMonsterLoot);

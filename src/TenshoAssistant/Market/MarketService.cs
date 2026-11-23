@@ -61,7 +61,18 @@ public sealed class MarketService : IDisposable
     /// 0.608 (I4): one request for a list: its quotes go to the cache, and the usual requests then find them. Under the same pause as the others. An item
     /// without a price stays theirs. The message of a server failure is returned: the list stops there rather than asking again for each item.
     /// </summary>
-    public async Task<string?> FillCacheAsync(IReadOnlyList<uint> ids,ulong expectedOwner,uint expectedWorld,CancellationToken token,bool bulk=false)
+    public Task<string?> FillCacheAsync(IReadOnlyList<uint> ids,ulong expectedOwner,uint expectedWorld,CancellationToken token,bool bulk=false)
+        =>FillCacheAsync(ids,expectedOwner,expectedWorld,token,bulk,null);
+
+    /// <summary>
+    /// X-815 (0.1847, the user's capture of 22/11: the submarine routes' « Market prices » answered « 400 (Bad Request) », no price of 32
+    /// read). Universalis answers 400 to a list made only of items its market does not know, and now and then to any list (dry runs of
+    /// 23/11 on /api/v2/aggregated: « 1 » and « 10155 » always 400; « 2 », « 2,3 », « 2,1 » sometimes 400, else 200; a known item beside an
+    /// unknown one: 200 with the unknown one in failedItems; docs/evidence/0.1847-universalis-400.md). So the items the game does not sell on
+    /// the market (<see cref="Marketable"/>) are not asked, and a list refused by a 400 is asked again in two halves, down to the one item
+    /// refused: the other prices are read anyway, and only the refused items stay without a price (added to <paramref name="refused"/>).
+    /// </summary>
+    public async Task<string?> FillCacheAsync(IReadOnlyList<uint> ids,ulong expectedOwner,uint expectedWorld,CancellationToken token,bool bulk,ISet<uint>? refused)
     {
         if(Enabled?.Invoke()==false)return null;
         uint world;uint[] missing;
@@ -85,35 +96,94 @@ public sealed class MarketService : IDisposable
                     var now=DateTimeOffset.UtcNow;
                     missing=BatchIds(ids,id=>cache.TryGetValue((world,id),out var known) && IsFresh(known,now),bulk ? 1:2);
                     if(missing.Length==0)return null;
+                    // X-815: an item the market does not know is refused here, without a request.
+                    if(Marketable is { } sold && missing.Where(id=>!Sells(sold,id)).ToArray() is { Length:>0 } unsold)
+                    {
+                        refused?.UnionWith(unsold);
+                        missing=missing.Except(unsold).ToArray();
+                        if(missing.Length==0)return null;
+                    }
                     lastRequest=Stopwatch.GetTimestamp();
                     break;
                 }
             }
             await Task.Delay(wait,token).ConfigureAwait(false);
         }
+        // X-815: the packets still to ask, the first one the whole list; a packet refused by a 400 comes back as its two halves.
+        var packets=new Stack<uint[]>();
+        packets.Push(missing);
+        var first=true;
+        while(packets.Count>0)
+        {
+            var packet=packets.Pop();
+            if(!first)
+            {
+                await Task.Delay(SplitPause,token).ConfigureAwait(false);
+                if(Enabled?.Invoke()==false)return null;
+                lock(gate)
+                {
+                    if(disposed || state.WorldId!=world || expectedOwner!=owner)return null;
+                    lastRequest=Stopwatch.GetTimestamp();
+                }
+            }
+            first=false;
+            var (badRequest,failure,unread)=await FillPacketAsync(world,packet,token).ConfigureAwait(false);
+            if(failure is not null)return failure;
+            refused?.UnionWith(unread);
+            if(!badRequest)continue;
+            if(packet.Length==1){refused?.Add(packet[0]);continue;}
+            var half=packet.Length/2;
+            packets.Push(packet[half..]);
+            packets.Push(packet[..half]);
+        }
+        return null;
+    }
+
+    /// <summary>X-815: whether the market knows an item; a failing answer counts as known (the request then says).</summary>
+    private static bool Sells(Func<uint,bool> sold,uint id)
+    {
+        try{return sold(id);}
+        catch(Exception error) when(error is InvalidOperationException or ArgumentException or KeyNotFoundException){return true;}
+    }
+
+    /// <summary>X-815: whether the market knows an item (tradable, in a market search category: the game's Item sheet, as the item catalog's
+    /// IsMarketable); set by the plugin. Null: every item is asked.</summary>
+    public Func<uint,bool>? Marketable { get; set; }
+    /// <summary>X-815: the pause before each packet asked again after a 400 (the list's own pace).</summary>
+    internal TimeSpan SplitPause{get;init;}=ListPause;
+    /// <summary>X-815: the one message of a list that could not be read (translated by the window; the detail is not shown).</summary>
+    public const string PricesUnread="Prices could not be read.";
+
+    // X-815: one aggregated request for a packet: its quotes to the cache. BadRequest when Universalis answered 400 (the caller splits the
+    // packet); the message of any other failure (the list stops there).
+    private async Task<(bool BadRequest,string? Failure,IReadOnlyList<uint> Unread)> FillPacketAsync(uint world,uint[] packet,CancellationToken token)
+    {
         try
         {
             Community.BoundedHttp.Count("universalis.app");
-            using var response=await client.GetAsync($"https://universalis.app/api/v2/aggregated/{world}/{string.Join(',',missing)}",token).ConfigureAwait(false);
+            using var response=await client.GetAsync($"https://universalis.app/api/v2/aggregated/{world}/{string.Join(',',packet)}",token).ConfigureAwait(false);
             if(ServerPause((int)response.StatusCode,response.Headers.RetryAfter?.Delta) is { } room)
             {
                 lock(gate)serverPauseUntil=Stopwatch.GetTimestamp()+(long)(room.TotalSeconds*Stopwatch.Frequency);
-                return $"Universalis asked for a pause ({(int)response.StatusCode}).";
+                return (false,$"Universalis asked for a pause ({(int)response.StatusCode}).",[]);
             }
+            if(response.StatusCode==System.Net.HttpStatusCode.BadRequest)return (true,null,[]);
             response.EnsureSuccessStatusCode();
             var json=await response.Content.ReadAsStringAsync(token).ConfigureAwait(false);
             var at=DateTimeOffset.UtcNow;
-            var speed=await SpeedAsync(world,missing,token).ConfigureAwait(false);
+            var speed=await SpeedAsync(world,packet,token).ConfigureAwait(false);
             // Read off the lock: a page reads the cache on every frame.
-            var quotes=new List<MarketQuote>(missing.Length);
-            foreach(var id in missing)
+            var quotes=new List<MarketQuote>(packet.Length);
+            // X-815: an item the answer has no line for (Universalis' failedItems) stays without a price, as a refused one.
+            var unread=new List<uint>();
+            foreach(var id in packet)
             {
                 try{quotes.Add(MarketQuote.Parse(json,world,id,at).WithSpeed(speed));}
-                catch(InvalidDataException){}
+                catch(InvalidDataException){unread.Add(id);}
             }
             lock(gate)
             {
-                if(disposed || state.WorldId!=world)return null;
+                if(disposed || state.WorldId!=world)return (false,null,[]);
                 foreach(var quote in quotes)
                 {
                     var id=quote.ItemId;
@@ -123,9 +193,9 @@ public sealed class MarketService : IDisposable
                 }
                 lastRequest=Stopwatch.GetTimestamp();
             }
-            return null;
+            return (false,null,unread);
         }
-        catch(Exception error) when(error is HttpRequestException or System.Text.Json.JsonException or InvalidDataException){return $"Prices could not be read: {error.Message}";}
+        catch(Exception error) when(error is HttpRequestException or System.Text.Json.JsonException or InvalidDataException){return (false,PricesUnread,[]);}
     }
 
     // 0.725: the second answer of a price request. Refused or failed: the prices stay, the speed stays unknown, and a server asking for room gets it.

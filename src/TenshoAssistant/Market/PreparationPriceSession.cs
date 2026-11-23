@@ -2,8 +2,9 @@ namespace TenshoAssistant.Market;
 
 public sealed record PreparationPriceContext(ulong CharacterId, uint WorldId, uint ContextItemId, uint RecipeId, int Requested, int Mode, int Quality,
     bool IsChain = false, int ChainRevision = 0);
+// X-815 (0.1847): Refused, the items Universalis refused or does not sell (they stay without a price; the others are read).
 public sealed record PreparationPriceState(PreparationPriceContext? Context, IReadOnlyList<uint> Items, int Completed,
-    uint CurrentItem, bool Loading, string? Error);
+    uint CurrentItem, bool Loading, string? Error, int Refused = 0);
 
 /// <summary>Owns one user-started, bounded price list, using the shared service cache and network cadence.</summary>
 public sealed class PreparationPriceSession : IDisposable
@@ -46,19 +47,22 @@ public sealed class PreparationPriceSession : IDisposable
             return Task.Run(async ()=>
             {
                 var completed=0;
+                var refused=new HashSet<uint>();
                 try
                 {
                     if(bulk)
                     {
-                        if(await market.FillCacheAsync(copied,context.CharacterId,context.WorldId,token,true).ConfigureAwait(false) is { } refused)throw new InvalidOperationException(refused);
-                        lock (gate) { if (!disposed && ticket==generation) state=new(context,list,copied.Length,0,false,null); }
+                        if(await market.FillCacheAsync(copied,context.CharacterId,context.WorldId,token,true,refused).ConfigureAwait(false) is { } failedList)throw new InvalidOperationException(failedList);
+                        lock (gate) { if (!disposed && ticket==generation) state=new(context,list,copied.Length,0,false,null,refused.Count); }
                         return;
                     }
                     // 0.608 (I4): one request for the list; the loop below then finds them in the cache, and asks for the others as before.
-                    if(await market.FillCacheAsync(copied,context.CharacterId,context.WorldId,token).ConfigureAwait(false) is { } failed)throw new InvalidOperationException(failed);
+                    if(await market.FillCacheAsync(copied,context.CharacterId,context.WorldId,token,false,refused).ConfigureAwait(false) is { } failed)throw new InvalidOperationException(failed);
                     foreach (var id in copied)
                     {
                         token.ThrowIfCancellationRequested();
+                        // X-815: an item refused by the list's request is not asked again alone (the same 400 would stop the list).
+                        if (refused.Contains(id)) { completed++; continue; }
                         lock (gate) { if (disposed || ticket!=generation) return; state=new(context,list,completed,id,true,null); }
                         while (true)
                         {
@@ -75,13 +79,13 @@ public sealed class PreparationPriceSession : IDisposable
                         }
                         completed++;
                     }
-                    lock (gate) { if (!disposed && ticket==generation) state=new(context,list,completed,0,false,null); }
+                    lock (gate) { if (!disposed && ticket==generation) state=new(context,list,completed,0,false,null,refused.Count); }
                 }
                 catch (Exception error)
                 {
                     lock (gate)
                         if (!disposed && ticket==generation) state=new(context,list,completed,0,false,
-                            error is OperationCanceledException ? "Lookup cancelled or two-minute limit reached." : error.Message);
+                            error is OperationCanceledException ? "Lookup cancelled or two-minute limit reached." : error.Message,refused.Count);
                 }
                 finally
                 {

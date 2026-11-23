@@ -107,6 +107,7 @@ internal static class InternalMessages
         ["Invalid preparation."]="InternalMessages.InvalidPreparation",
         ["Character or world changed."]="InternalMessages.CharacterOrWorldChanged",
         ["Lookup cancelled or two-minute limit reached."]="InternalMessages.LookupCancelledOrTwoMinuteLimit",
+        ["Prices could not be read."]="InternalMessages.PricesCouldNotBeRead",
         ["Observed board incomplete, out of bounds or with repeated numbers."]="InternalMessages.ObservedBoardIncompleteOutOfBounds",
         ["Enter nine cells, without duplicates among the numbers 1 to 9."]="InternalMessages.EnterNineCellsWithoutDuplicatesAmong",
         ["Enter between one and four revealed numbers."]="InternalMessages.EnterBetweenOneAndFourRevealed",

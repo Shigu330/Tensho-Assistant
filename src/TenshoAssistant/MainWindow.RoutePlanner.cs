@@ -367,7 +367,15 @@ internal sealed partial class MainWindow
         }
         finally{ImGui.EndDisabled();}
         Tip(world.WorldId==0 || character==0 ? "RoutePlanner.FetchPricesNoWorld":"RoutePlanner.FetchPricesTip");
-        if(prices.Error is { } failed){ImGui.SameLine();ImGui.TextColored(UI.FfxivTheme.Gold,failed);}
+        // X-815 (0.1847): the line in the plugin's language with how many prices are missing (the service's message was English); the
+        // items Universalis does not sell or refused are said apart, the others being read.
+        if(prices.Error is { } failed)
+        {
+            ImGui.SameLine();
+            ImGui.TextColored(UI.FfxivTheme.Gold,localization.Format("RoutePlanner.PricesFailed",prices.Items.Count-prices.Completed+prices.Refused));
+            Tip(UI.UiMessages.Key(failed) ?? "RoutePlanner.PricesFailedTip");
+        }
+        else if(!prices.Loading && prices.Refused>0){ImGui.SameLine();ImGui.TextDisabled(localization.Format("RoutePlanner.PricesRefused",prices.Refused));}
     }
 
     // Unit values copied on the UI thread before the worker runs: NPC price, or the best of NPC and the fresh market minimum (NQ).
