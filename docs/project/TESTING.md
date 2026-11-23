@@ -2776,6 +2776,10 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1839) Application de bureau : dans le jeu, activer « Données du jeu et ce que vous avez observé seulement » ; dans l'application, relire les réglages puis cliquer « Fetch » sur un donjon ou la mode : la page dit que la source est coupée, aucune donnée n'arrive
 
+- [ ] (0.1840) Marché : ouvrir le tableau des ventes d'un objet (Universalis), recharger Tensho dans les 5 minutes et rouvrir le même objet : la colonne Servant montre « — » avec son aide, « Copier … (le plus bas moins 1) » ne compte que les offres vues en jeu ; « Actualiser » remet les noms
+
+- [ ] (0.1843) Deux clients du jeu sur le même profil, Mes outils : cocher une case ou changer un compteur dans l'un, attendre 2 s : l'autre le montre ; « + » dans l'autre part de la nouvelle valeur
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.

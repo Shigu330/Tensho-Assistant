@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (852 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (857 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -917,15 +917,20 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-833 | Review  (revue-securite-alpha.md, 22/11), I5: finding in… | Done in 0.1836.0 |
 | X-834 | Review  (revue-securite-alpha.md, 22/11), I6: finding in… | Done in 0.1839.0 |
 | X-835 | Review  (revue-securite-alpha.md, 22/11), I7: finding in… | Done in 0.1835.0 |
+| X-836 | Review  (revue-securite-alpha.md, 22/11), minor M1, M2, M3, M4, M5: M1 in… | Done in 0.1840.0 |
+| X-837 | Review of block 0.1827 to 0.1830 (review 0.1830, 22/11), minor M1, M2, M3: M1… | Done in 0.1841.0 |
 | X-838 | Red CI on 0.1832 (Build and test, Verify and New tool skeleton): the… | Done in 0.1833.0 |
 | X-839 | Review of block 0.1831 to 0.1832 (review 0.1832, 22/11), I1: finding in… | Done in 0.1833.0 |
+| X-840 | Review of block 0.1831 to 0.1832 (review 0.1832, 22/11), minor M1, M2, M3, M4… | Done in 0.1842.0 |
 | X-841 | Review of block 0.1831 to 0.1832 (review 0.1832, 22/11), pre-existing before… | Done in 0.1834.0 |
+| X-842 | Review of block 0.1833 to 0.1839 (review 0.1839, 23/11), minor M1, M2, M4, M5… | Done in 0.1843.0 |
+| X-843 | Review of block 0.1833 to 0.1839 (review 0.1839, 23/11), pre-existing before… | Done in 0.1844.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (852 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (857 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1840,6 +1845,11 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-833 | Relecture  (revue-securite-alpha.md, 22/11), I5 : L'écriture « atomique » fait… | Fait en 0.1836.0 |
 | X-834 | Relecture  (revue-securite-alpha.md, 22/11), I6 : L'application de bureau… | Fait en 0.1839.0 |
 | X-835 | Relecture  (revue-securite-alpha.md, 22/11), I7 : Le conseil de coup à la… | Fait en 0.1835.0 |
+| X-836 | Relecture  (revue-securite-alpha.md, 22/11), mineurs M1, M2, M3, M4, M5 : M1… | Fait en 0.1840.0 |
+| X-837 | Relecture du bloc 0.1827 à 0.1830 (relecture 0.1830, 22/11), mineurs M1, M2, M3… | Fait en 0.1841.0 |
 | X-838 | CI rouge sur 0.1832 (Build and test, Verify et New tool skeleton) : le test… | Fait en 0.1833.0 |
 | X-839 | Relecture du bloc 0.1831 à 0.1832 (relecture 0.1832, 22/11), I1 : La CI « Build… | Fait en 0.1833.0 |
+| X-840 | Relecture du bloc 0.1831 à 0.1832 (relecture 0.1832, 22/11), mineurs M1, M2… | Fait en 0.1842.0 |
 | X-841 | Relecture du bloc 0.1831 à 0.1832 (relecture 0.1832, 22/11), déjà là avant le… | Fait en 0.1834.0 |
+| X-842 | Relecture du bloc 0.1833 à 0.1839 (relecture 0.1839, 23/11), mineurs M1, M2… | Fait en 0.1843.0 |
+| X-843 | Relecture du bloc 0.1833 à 0.1839 (relecture 0.1839, 23/11), déjà là avant le… | Fait en 0.1844.0 |

@@ -80,7 +80,9 @@ in-game readings through GitHub, on the player's click or the opt-in daily excha
 <!-- gen:decisions:en -->
 Open points, produced by script from the agent's source of decisions. Choices already taken: [DECISIONS](DECISIONS.md); the former tables: [archive](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/archive/DECISIONS-EN-ATTENTE-2026-11-09.md).
 
-Nothing open.
+| No. | Point | Choice applied, or record awaited | Where |
+|---|---|---|---|
+| D-228 | Discoveries: two clients of one profile, a damaged line of the shared copy settled at once (0.1830) | Applied: the damaged line is settled without reading the copy again; the other client's observations come back at its next sending (reading again would count them twice) |  |
 <!-- /gen:decisions:en -->
 
 ## In-game tests
@@ -177,7 +179,9 @@ donnée prise sur des sites web).
 <!-- gen:decisions:fr -->
 Points ouverts, produits par script depuis la source des décisions de l'agent. Choix déjà faits : [DECISIONS](DECISIONS.md) ; anciens tableaux : [archive](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/archive/DECISIONS-EN-ATTENTE-2026-11-09.md).
 
-Aucune en attente.
+| N° | Point | Choix appliqué, ou relevé attendu | Où |
+|---|---|---|---|
+| D-228 | Découvertes : deux clients du même profil, une ligne abîmée de la copie partagée réglée tout de suite (0.1830, X-828 M2) | Appliqué : la ligne abîmée est réglée sans relire la copie ; les observations de l'autre client reviennent à son prochain envoi (une relecture les compterait deux fois) |  |
 <!-- /gen:decisions:fr -->
 
 ## Tests en jeu
