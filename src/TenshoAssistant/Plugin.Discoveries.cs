@@ -68,6 +68,15 @@ public sealed partial class Plugin
                 if(removed>0)log.Information("Backups: {0} file(s) left by a copy cut short (the game closed or crashed during it) removed.",removed);
             }
             catch(Exception error){log.Warning(error,"The Backups folder could not be looked through for copies cut short.");}
+            // X-845 (0.1854, review 0.1844 M1): the zip copies of the cache taken before 0.1840 written again once without the market boards
+            // of v1 (other players' retainer names); a mark in Backups says the pass is done.
+            try
+            {
+                var cleaned=Caching.RetiredCopies.Clean(Discoveries.DiscoveryBackup.Folder(discoveryFolder),gameDataCancel.Token);
+                if(cleaned>0)log.Information("Backups: {0} old cache copy(ies) written again without the market boards that kept other players' retainer names.",cleaned);
+            }
+            catch(OperationCanceledException){}
+            catch(Exception error){log.Warning(error,"The old cache copies in Backups could not be looked through.");}
             var saved=Path.Combine(discoveryFolder,"Discoveries.json");
             // X-172 (0.1136, trial docs/evidence/x172-sqlite-trial.md): the discoveries in Discoveries.db (SQLite). A database that exists but cannot
             // be opened (SQLite not loaded, damaged, newer layout) is never replaced: nothing is saved this session; without a database (it could not

@@ -193,7 +193,7 @@ public sealed class DataCache : IDisposable
         var moved=new List<PatchMove>();var keptOld=new HashSet<(string,string)>();
         foreach(var (file,identity) in files)
         {
-            if(identity is { Version:{ } version } retired && Retired.Contains((retired.Family,version))){Delete(file);continue;}
+            if(IsRetired(identity)){Delete(file);continue;}
             if(identity is { } id)
             {
                 var key=(id.Family,id.Scope);
@@ -287,14 +287,33 @@ public sealed class DataCache : IDisposable
     {
         try
         {
-            using var stream=file.OpenRead();var buffer=new byte[8192];var read=stream.ReadAtLeast(buffer,buffer.Length,false);
-            var head=System.Text.Encoding.UTF8.GetString(buffer,0,read);
-            var family=System.Text.RegularExpressions.Regex.Match(head,@"""Family"":""((?:[^""\\]|\\.)*)""");
-            var version=System.Text.RegularExpressions.Regex.Match(head,@"""Version"":""((?:[^""\\]|\\.)*)""");
-            var scope=System.Text.RegularExpressions.Regex.Match(head,@"""Scope"":""((?:[^""\\]|\\.)*)""");
-            return family.Success && scope.Success ? (family.Groups[1].Value,scope.Groups[1].Value,PatchCatalogDiff.GameVersion(head),version.Success ? version.Groups[1].Value:null):null;
+            using var stream=file.OpenRead();
+            return IdentityOf(stream);
         }
         catch(Exception error) when(error is IOException or UnauthorizedAccessException){return null;}
+    }
+    /// <summary>X-845 (0.1854): the identity read from a cached file's first bytes, wherever the file is (the cache folder, a zip copy of it).</summary>
+    internal static (string Family,string Scope,string? Game,string? Version)? IdentityOf(Stream stream)
+    {
+        var buffer=new byte[8192];var read=stream.ReadAtLeast(buffer,buffer.Length,false);
+        var head=System.Text.Encoding.UTF8.GetString(buffer,0,read);
+        var family=System.Text.RegularExpressions.Regex.Match(head,@"""Family"":""((?:[^""\\]|\\.)*)""");
+        var version=System.Text.RegularExpressions.Regex.Match(head,@"""Version"":""((?:[^""\\]|\\.)*)""");
+        var scope=System.Text.RegularExpressions.Regex.Match(head,@"""Scope"":""((?:[^""\\]|\\.)*)""");
+        return family.Success && scope.Success ? (family.Groups[1].Value,scope.Groups[1].Value,PatchCatalogDiff.GameVersion(head),version.Success ? version.Groups[1].Value:null):null;
+    }
+    /// <summary>X-845 (0.1854): a family's version no longer written whose copies are removed (<see cref="Retired"/>).</summary>
+    internal static bool IsRetired((string Family,string Scope,string? Game,string? Version)? identity)
+        =>identity is { Version:{ } version } known && Retired.Contains((known.Family,version));
+    /// <summary>X-845 (0.1854, review 0.1844 M1): the names of the retired copies still in a cache folder (not yet trimmed), left out of the zip
+    /// that « Empty the cache » takes (<see cref="BackupZip.Create"/>'s skip): a new copy never holds them.</summary>
+    public static IReadOnlySet<string> RetiredFiles(string root)
+    {
+        var names=new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        if(!Directory.Exists(root))return names;
+        foreach(var file in new DirectoryInfo(root).EnumerateFiles("*.json"))
+            if(IsRetired(Identity(file)))names.Add(file.Name);
+        return names;
     }
     public Task FlushAsync(){lock(gate)return writes;}
     /// <summary>X-76 step 3 (0.945): the cache folder.</summary>

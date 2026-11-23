@@ -59,7 +59,7 @@ internal static class CacheClear1122Tests
         ("Cache 1122: wiring (the window gives the copy to the purge, a partial purge is said in en and fr)",() =>
         {
             var window=Read("src/TenshoAssistant/MainWindow.Caching.cs");
-            Check(window.Contains("var done=await store.ClearAsync(()=>BackupZip.Create(root,backups,\"cache\",DateTimeOffset.UtcNow)).ConfigureAwait(false);") && !window.Contains("var copy=BackupZip.Create(root,backups"),"one operation");
+            Check(window.Contains("var done=await store.ClearAsync(()=>BackupZip.Create(root,backups,\"cache\",DateTimeOffset.UtcNow,DataCache.RetiredFiles(root))).ConfigureAwait(false);") && !window.Contains("var copy=BackupZip.Create(root,backups"),"one operation");
             Check(window.Contains("localization.Format(\"CacheUi.ClearedPartial\",done.Removed,done.Failed,done.Backup ?? \"—\")"),"partial purge said");
             foreach(var lang in new[]{"en","fr"})Check(Read($"src/TenshoAssistant/Localization/Languages/{lang}.json").Contains("\"ClearedPartial\": "),"text in "+lang);
         }),
