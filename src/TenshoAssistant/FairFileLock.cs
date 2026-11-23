@@ -43,6 +43,11 @@ public static class FairFileLock
                 {
                     try{return new FileStream(full,FileMode.OpenOrCreate,FileAccess.ReadWrite,FileShare.None);}
                     catch(IOException error){throw busy(error);}
+                    // X-862 (0.1867): still « delete pending » past the wait: busy too (the caller tries again, as for a held lock), never a
+                    // hard failure (the bank would refuse its writes until a reload). A file that is there and refused (read only, rights)
+                    // still raises access denied.
+                    catch(UnauthorizedAccessException error) when(DeletePending(full))
+                    {throw busy(new IOException("The lock file is still being deleted by another program (access denied past the wait).",error));}
                 }
                 if(!cancel.CanBeCanceled)Thread.Sleep(PollMs);
                 else if(cancel.WaitHandle.WaitOne(PollMs))cancel.ThrowIfCancellationRequested();
@@ -88,6 +93,17 @@ public static class FairFileLock
         try{return new FileStream(full,FileMode.OpenOrCreate,FileAccess.ReadWrite,FileShare.None);}
         catch(IOException){return null;}
         catch(UnauthorizedAccessException){return null;}
+    }
+
+    // X-862 (0.1867): a « delete pending » file refuses every open, even to read it with all sharing allowed (access denied; not found once
+    // it is gone), while a file really there that refuses the lock's write (read only) still opens that way. Its attributes do not tell:
+    // Windows still shows them for a « delete pending » file.
+    internal static bool DeletePending(string full)
+    {
+        try{using(File.OpenHandle(full,FileMode.Open,FileAccess.Read,FileShare.ReadWrite|FileShare.Delete)){}return false;}
+        catch(FileNotFoundException){return true;}
+        catch(UnauthorizedAccessException){return true;}
+        catch(IOException){return false;}
     }
 
     // The mark stays open while this client waits; deleted on close (and by Windows when the process ends). A mark that cannot be made: the
