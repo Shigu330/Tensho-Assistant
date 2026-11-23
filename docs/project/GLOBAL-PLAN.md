@@ -357,7 +357,7 @@ Noted in the order the user made them; to be done after the current task, one ve
 | X-821 | Tool: the next-relay proposal (plan tool view, X-812) puts a read-only review point (X-810, security review, done by the reviewer) into a code relay; seen by the master on 11/22 around 18:45. Done when: a point can be marked « review » (read-only, reviewer session); the proposal takes it out of the relay and proposes it apart to the reviewer, after the code points of its nature; self-test | Tool: defect found (relay proposal) |
 | X-852 | Plan tool: the « picture asked » check reads « image » meaning a frame (« without a slow frame », « frames over 16 ms ») as a requested picture: X-564 stayed open in 0.1858 though its measure met it (marked done by hand by the master). Done when: the check does not count « image lente », « image(s) au-delà de N ms », « première image », « par image »; a test of the plan tool with X-564's definition (no gap) and X-448's (gap). | Wished: tool |
 
-767 done points of this table: [the done points](GLOBAL-PLAN-DONE.md#requests-of-2026-11-07-while-playing).
+769 done points of this table: [the done points](GLOBAL-PLAN-DONE.md#requests-of-2026-11-07-while-playing).
 <!-- /gen:plan:x-en -->
 
 ## In-game survey reminders, by moment
@@ -788,7 +788,7 @@ Notées dans l'ordre où l'utilisateur les a faites ; à faire après la tâche 
 | X-821 | Outil : la proposition du relais suivant (vue de l'outil du plan, X-812) met dans un relais de code un point de revue en lecture seule (X-810, revue de sécurité, faite par le relecteur) ; vu par la maître le 22/11 vers 18 h 45. Fait quand : un point peut être marqué « revue » (lecture seule, session du relecteur) ; la proposition le sort du relais et le propose à part au relecteur, après les points de code de sa nature ; auto-test | Outil : défaut constaté (proposition du relais) |
 | X-852 | Outil du plan : le contrôle « image demandée » prend « image » au sens de trame (« sans image lente », « images au-delà de 16 ms ») pour une capture demandée : X-564 est resté ouvert en 0.1858 alors que sa mesure le remplissait (validé à la main par la maître). Fait quand : ce contrôle ne compte pas « image lente », « image(s) au-delà de N ms », « première image », « par image » ; un test de l'outil du plan avec la définition de X-564 (pas de trou) et celle de X-448 (trou). | Souhaitable : outil |
 
-767 points faits de ce tableau : [les points faits](GLOBAL-PLAN-DONE.md#demandes-du-2026-11-07-en-jouant).
+769 points faits de ce tableau : [les points faits](GLOBAL-PLAN-DONE.md#demandes-du-2026-11-07-en-jouant).
 <!-- /gen:plan:x -->
 
 ## Rappels de relevés en jeu, par moment

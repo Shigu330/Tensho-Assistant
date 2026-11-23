@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (877 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (879 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -945,12 +945,14 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-856 | Review of block 0.1859 to 0.1860 (review 0.1860, 23/11), pre-existing before… | Done in 0.1862.0 |
 | X-857 | Flaky test Anonymous 1832 (the internal check of tools/discoveries-merge.py, «… | Done in 0.1863.0 |
 | X-858 | Review  (review 0.1863, 23/11), pre-existing before the block M1, M2: M1 in… | Done in 0.1864.0 |
+| X-859 | CI red since 0.1864 (GitHub Windows runner): test « Replace 1864 » fails every… | Done in 0.1865.0 |
+| X-860 | Review  (review 0.1864, 23/11), pre-existing before the block M1: M1 in… | Done in 0.1866.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (877 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (879 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1893,3 +1895,5 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-856 | Relecture du bloc 0.1859 à 0.1860 (relecture 0.1860, 23/11), déjà là avant le… | Fait en 0.1862.0 |
 | X-857 | Test fragile Anonymous 1832 (« the merge tool's behaviour… », essai interne de… | Fait en 0.1863.0 |
 | X-858 | Relecture  (relecture 0.1863, 23/11), déjà là avant le bloc M1, M2 : M1 : Une… | Fait en 0.1864.0 |
+| X-859 | CI rouge depuis 0.1864 (runs 45147282638 et 45147821072, Build and test… | Fait en 0.1865.0 |
+| X-860 | Relecture  (relecture 0.1864, 23/11), déjà là avant le bloc M1 : M1 : Sur un… | Fait en 0.1866.0 |
