@@ -874,12 +874,17 @@ def plan(issues,links,merged,listing=None,reader=None,say=print):
         gist,doubt=triage(issue)
         if doubt:manual(doubt);continue
         # X-830: the issue's player file from the private link; a newer issue of a linked account takes over the older one's file
-        entry=links.get(number)
+        entry=links.get(number);older=None
         if entry is None and author in by_login and by_login[author]!=number:
-            older=by_login[author];entry=links.pop(older)
-            say(f"#{issue['number']}: same account as #{older}: its player file goes on with this issue")
+            older=by_login[author];entry=dict(links[older])
         if entry is None:entry={"File":new_file_id({v["File"] for v in links.values()}),"Login":login(issue)}
-        entry["Login"]=login(issue);links[number]=entry;by_login[author]=number
+        entry["Login"]=login(issue)
+        def link(number=number,entry=entry,older=older,author=author,issue=issue):
+            # X-840 M2: the link moves (or is made) only once the gist is read or known merged: a share that fails (gist unreadable, owner in
+            # doubt) leaves the older issue's link as it was (« withdraw <older issue> » still finds it).
+            if older is not None and links.get(older) is not None:
+                links.pop(older);say(f"#{issue['number']}: same account as #{older}: its player file goes on with this issue")
+            links[number]=entry;by_login[author]=number
         name=entry["File"]+PLAYER_SUFFIX
         try:held=player_of(entry["File"])
         except (OSError,ValueError):held=None
@@ -887,15 +892,15 @@ def plan(issues,links,merged,listing=None,reader=None,say=print):
         except Exception as error:
             # X-804: the merged gist deleted by the plugin (its issue still links it until a new gist comes): nothing to read, its facts stay.
             if held is not None and entry.get("Gist")==gist:
-                taken[author]=issue["number"];say(f"#{issue['number']} {issue['title']}: its merged gist was deleted by the plugin (X-804): nothing new to read");continue
+                link();taken[author]=issue["number"];say(f"#{issue['number']} {issue['title']}: its merged gist was deleted by the plugin (X-804): nothing new to read");continue
             say(f"#{issue['number']} {issue['title']}: gist unreadable ({type(error).__name__}), skipped");continue
         doubt=owner_doubt(owner,issue)
         if doubt:manual(doubt);continue
         if already_merged(merged,gist,revision):
-            taken[author]=issue["number"];say(f"#{issue['number']} {issue['title']}: gist revision already merged (X-804): not read again");continue
+            link();taken[author]=issue["number"];say(f"#{issue['number']} {issue['title']}: gist revision already merged (X-804): not read again");continue
         try:facts,report=clean(reader(files),player=True)
         except Exception as error:say(f"#{issue['number']} {issue['title']}: gist unreadable ({type(error).__name__}), skipped");continue
-        taken[author]=issue["number"];entry["Gist"]=gist
+        link();taken[author]=issue["number"];entry["Gist"]=gist
         gist_facts=facts;facts=union((held or {}).get("Facts") or [],facts)   # X-804: a gist of news only loses nothing
         total=report["facts"]+report["refused"];flag=" FLAG: refusals over 5 %" if total and report["refused"]/total>0.05 else ""
         added,gone=news(entry["File"],facts)
@@ -1518,6 +1523,10 @@ def selftest():
               f"X-830: behaviour: the batch's pull request names no issue nor account ({pr['branch']}, {pr['title']})")
         check(names_in(["Discoveries: merge issue #43 (Ann)"],[s43,s50])==["#43","Ann"] and names_in(["travailleur/discoveries-43"],[s43])==["#43"]
               and names_in(["travailleur/discoveries-batch-a43fa43f","Eve-like eveline"],[s43,s50])==[],"X-830: names_in finds an issue or a login, not a part of a word")
+        s61={"number":61,"title":"Discoveries: ann","author":{"login":"ann"},"labels":[],"body":bodies("7"*20)};owners["7"*20]="mallory"
+        said_=synced([s61,s50]);links=read_links(links_file)
+        check("43" in links and "61" not in links and "same account as #43" not in said_ and "MANUAL" in said_,
+              f"X-840 M2: a newer issue of the same account whose gist fails the owner check leaves the older issue's link as it was ({said_[-300:]})")
         s60={"number":60,"title":"Discoveries: ann","author":{"login":"ann"},"labels":[],"body":bodies("6"*20)}
         said_=synced([s60,s50]);links=read_links(links_file)
         check("43" not in links and links["60"]["File"]+PLAYER_SUFFIX==mine[1] and "same account as #43" in said_ and len(read_player(os.path.join(*mine))["Facts"])==4,

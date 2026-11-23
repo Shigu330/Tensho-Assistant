@@ -49,7 +49,8 @@ The gists merged are listed in `merged.txt`, each as the SHA-256 of « gist:revi
 A `sync` reads every open share at once, and the worker opens one pull request per batch (for example once a week) whose branch, title, body and
 commits name no issue nor account (`python tools/discoveries-merge.py pr-text`). The limit, said plainly: `v3/` keeps each fact's exact place and
 days, so a fact one player alone shares tells where they were that day; with few players, a batch can still be tied to a player by its date; and
-the pull requests and files of before (the issue-numbered player files among them) stay in the git history.
+the pull requests and files of before (the issue-numbered player files among them) stay in the git history. A player file keeps its random name from one merge to the next: a file that the change to random names renamed (its commit removed the
+issue-numbered file and added the new one with the same facts) stays tied to that issue in the git history for all its later merges too.
 The files reach players with the next release (they are read from `main`).
 Since Tensho 0.1210: one issue per GitHub account counts (the newest; an older one by the same author is left out); each field must have the
 plugin's type; a player counts for at most 1,000 sightings of a fact in the common histograms (the shape of theirs kept); the exact place kept is the one
@@ -137,7 +138,9 @@ partages ouverts à la fois, et le travailleur ouvre une seule demande de fusion
 le corps et les commits ne nomment aucun ticket ni compte (`python tools/discoveries-merge.py pr-text`). La limite, dite franchement : `v3/` garde le
 lieu exact et les jours de chaque fait, donc un fait qu'un seul joueur partage dit où il était ce jour-là ; avec peu de joueurs, un lot peut encore
 être relié à un joueur par sa date ; et les demandes de fusion et les fichiers d'avant (dont les fichiers de joueur nommés par leur ticket) restent dans
-l'historique git.
+l'historique git. Un fichier de joueur garde son nom au hasard d'une fusion à l'autre : un fichier renommé par le passage aux noms au hasard (son commit
+a retiré le fichier nommé par le ticket et ajouté le nouveau avec les mêmes faits) reste relié à ce ticket dans l'historique git pour toutes ses
+fusions suivantes aussi.
 Depuis Tensho 0.1210 : un seul ticket par compte GitHub compte (le plus récent ; un plus ancien du même auteur est laissé de côté) ; chaque champ
 doit avoir le type du plugin ; un joueur compte pour 1 000 observations d'un fait au plus dans les histogrammes communs (la forme des siens gardée) ; le
 lieu exact gardé est celui du jour le plus ancien ; un joueur seul très loin des niveaux des autres joueurs sur plus de 5 % des faits qu'il partage avec
