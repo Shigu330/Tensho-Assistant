@@ -80,10 +80,14 @@ public static class FairFileLock
         Path.GetFileName(Path.GetFullPath(path))+MarkInfix+arrival.ToUniversalTime().Ticks.ToString("D19",System.Globalization.CultureInfo.InvariantCulture)
         +"-"+id.ToString("N")+MarkEnd;
 
+    // X-859 (0.1865): a lock file deleted while another program (antivirus, indexer) still holds it is « delete pending » until that program
+    // lets it go, and opening it is refused with access denied, not a sharing violation (CI run 45147821072, after the chat sweep deleted
+    // a history's lock). Both are « not yet »: tried again until the wait ends; the last open, past it, raises what Windows says.
     private static FileStream? TryOpen(string full)
     {
         try{return new FileStream(full,FileMode.OpenOrCreate,FileAccess.ReadWrite,FileShare.None);}
         catch(IOException){return null;}
+        catch(UnauthorizedAccessException){return null;}
     }
 
     // The mark stays open while this client waits; deleted on close (and by Windows when the process ends). A mark that cannot be made: the

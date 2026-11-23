@@ -10,7 +10,7 @@ internal static class Replace1864Tests
     [
         ("Replace 1864: write_atomic tries the rename again on a passing refusal; 16 digits never read as an issue number anywhere",() =>
         {
-            var tool=File.ReadAllText(Path.GetFullPath("tools/discoveries-merge.py"));
+            var tool=File.ReadAllText(Path.GetFullPath("tools/discoveries-merge.py")).ReplaceLineEndings("\n");   // X-859: CRLF on the CI runner
             Check(tool.Contains("replace_retrying(lambda:os.replace(temporary,path) if replace is None else replace(temporary,path),sleep)",StringComparison.Ordinal)
                 && tool.Contains("except PermissionError:\n            if attempt==REPLACE_TRIES-1:raise",StringComparison.Ordinal),"write_atomic retries on PermissionError, then raises");
             Check(tool.Contains("X-858 (M1): write_atomic tries the rename again after two refusals",StringComparison.Ordinal)
