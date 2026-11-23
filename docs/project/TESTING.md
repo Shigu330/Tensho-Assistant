@@ -2794,6 +2794,10 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1852) Liens vers un onglet, un par famille : clic droit sur un objet › « Stocks » ouvre sa fiche sur Stocks ; Monnaies (barre du serveur ou alerte) ouvre Stockage › Monnaies ; « Valeur » d'une monnaie ouvre Stockage › Valeur d'une monnaie ; un rouleau d'orchestrion ouvert depuis un objet ouvre Collections › Musique ; un haut fait d'une source ouvre Collections › Hauts faits ; « Paramètres » d'un outil de fabrication ouvre Paramètres › Panneaux › Fabrication ; « Détails » de l'état de Tensho ouvre Paramètres › Suivi › Barre du serveur
 
+- [ ] (0.1856) Triple Triad : depuis la carte, menu d'un PNJ de Triple Triad › outil Triple Triad : la page s'ouvre sur l'onglet « PNJ et cartes » ; depuis Paramètres › bouton Deck : onglet Deck ; depuis le menu d'une carte, « Afficher dans Triple Triad » : onglet Carnet, carte choisie
+
+- [ ] (0.1856) Artisanat : depuis la fiche d'un objet, ouvrir sa recette en simulation puis en préparation : la page d'artisanat s'ouvre chaque fois sur le bon onglet
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.

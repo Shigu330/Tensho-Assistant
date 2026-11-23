@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (867 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (870 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -935,12 +935,15 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-846 | Review of block 0.1845 to 0.1848 (review 0.1848, 23/11), I1: finding in… | Done in 0.1849.0 |
 | X-847 | Review of block 0.1845 to 0.1848 (review 0.1848, 23/11), I2: finding in… | Done in 0.1850.0 |
 | X-848 | Review of block 0.1845 to 0.1848 (review 0.1848, 23/11), minor M1, M2, M3, M4… | Done in 0.1851.0 |
+| X-849 | Review of block 0.1849 to 0.1852 (review 0.1852, 23/11), minor M1, M2: M1 in… | Done in 0.1855.0 |
+| X-850 | Review of block 0.1849 to 0.1852 (review 0.1852, 23/11), pre-existing before… | Done in 0.1856.0 |
+| X-851 | Review of block 0.1853 to 0.1854 (review 0.1854, 23/11), minor M1: M1 in… | Done in 0.1857.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (867 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (870 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1873,3 +1876,6 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-846 | Relecture du bloc 0.1845 à 0.1848 (relecture 0.1848, 23/11), I1 : Un 400… | Fait en 0.1849.0 |
 | X-847 | Relecture du bloc 0.1845 à 0.1848 (relecture 0.1848, 23/11), I2 : Test existant… | Fait en 0.1850.0 |
 | X-848 | Relecture du bloc 0.1845 à 0.1848 (relecture 0.1848, 23/11), mineurs M1, M2… | Fait en 0.1851.0 |
+| X-849 | Relecture du bloc 0.1849 à 0.1852 (relecture 0.1852, 23/11), mineurs M1, M2… | Fait en 0.1855.0 |
+| X-850 | Relecture du bloc 0.1849 à 0.1852 (relecture 0.1852, 23/11), déjà là avant le… | Fait en 0.1856.0 |
+| X-851 | Relecture du bloc 0.1853 à 0.1854 (relecture 0.1854, 23/11), mineurs M1 : M1… | Fait en 0.1857.0 |

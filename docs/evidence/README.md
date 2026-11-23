@@ -157,7 +157,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.180.0-achievement-probe.log](0.180.0-achievement-probe.log) | `src/TenshoAssistant/Collections/CollectionReader.Completion.Dalamud.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.1809-chat-combat-tones.md](0.1809-chat-combat-tones.md) | `src/TenshoAssistant/Chat/ChatCombatTones.cs`, `tests/TenshoAssistant.Tests/ChatTones1809Tests.cs` | — |
 | [0.182.0-paramgrow-probe.log](0.182.0-paramgrow-probe.log) | `src/TenshoAssistant/Character/StatFormulas.cs`, `tests/TenshoAssistant.Tests/StatFormulaTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md`, `docs/evidence/0.320-credits.json`, `docs/project/REFERENCES.md`, `docs/project/ROADMAP.md` |
-| [0.1845-crash-unload-statics.md](0.1845-crash-unload-statics.md) | `src/TenshoAssistant/Diagnostics/UnloadWatch.cs` | `CHANGELOG.md`, `docs/changelog/CHANGELOG-0.1800-0.1899.md`, `docs/project/GLOBAL-PLAN.md` |
+| [0.1845-crash-unload-statics.md](0.1845-crash-unload-statics.md) | `src/TenshoAssistant/Diagnostics/UnloadWatch.cs` | `CHANGELOG.md`, `docs/changelog/CHANGELOG-0.1800-0.1899.md` |
 | [0.1846-memory-measure.md](0.1846-memory-measure.md) | `src/TenshoAssistant/MainWindow.MapView.cs`, `tests/TenshoAssistant.Tests/ReviewMinors1851Tests.cs` | `docs/changelog/CHANGELOG-0.1800-0.1899.md` |
 | [0.1847-universalis-400.md](0.1847-universalis-400.md) | `src/TenshoAssistant/Market/MarketService.cs` | `docs/changelog/CHANGELOG-0.1800-0.1899.md` |
 | [0.1858-chat-load-measures.md](0.1858-chat-load-measures.md) | — | `CHANGELOG.md` |
