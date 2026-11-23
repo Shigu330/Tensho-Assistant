@@ -119,4 +119,11 @@ public static class StockValue
     /// or 0. The NPC sells normal quality: compared with the market's normal quality.
     /// </summary>
     public static long? MarketOverNpcBuy(uint? npcBuy,long? marketUnit)=>npcBuy is > 0 and var buy && marketUnit is > 0 and var unit ? unit-buy:null;
+
+    /// <summary>
+    /// X-814 M2 (0.1848, review of 0.1812): the « sleeps and sells » list's gap with the NPC for one of its lines: a line of high quality has its
+    /// market price in high quality, and an NPC sells normal quality only: no gap is told for it (it compared two different goods: an item sold
+    /// HQ on the market and NQ by an NPC read « cheaper at an NPC » on a false gap). A line of normal quality: <see cref="MarketOverNpcBuy"/>.
+    /// </summary>
+    public static long? NpcBuyGap(uint? npcBuy,long sold,bool hq)=>hq ? null:MarketOverNpcBuy(npcBuy,sold);
 }

@@ -982,6 +982,8 @@ internal sealed partial class MainWindow
     }
 
     private readonly Dictionary<uint, (string Key, Task<BoardPlan> Plan)> beastBestPlans = [];
+    /// <summary>X-814 M3 (0.1848): when a failed best-team calculation of a board is worked out again (Environment.TickCount64).</summary>
+    private readonly Dictionary<uint, long> beastBestRetry = [];
     /// <summary>X-800 (0.1808): the board's plan among every beast of the game (the best team), worked out once in the background per board,
     /// ranks and rules (R07); null while it is worked out or when it failed.</summary>
     private BoardPlan? BeastBestPlanFor(Board board, BeastState state)
@@ -989,6 +991,19 @@ internal sealed partial class MainWindow
         if (state.Catalog is not { } catalog) return null;
         var floors = LoadBeastPlans().Floors; var ranks = BeastRanks;
         var key = BeastTeams.Key(null, ranks, floors, BeastMarkOf(catalog));
+        // X-814 M3 (0.1848, review of 0.1812): a calculation that failed was kept as long as the key did not change: the tab read « working out
+        // the team » for good and the exception was never logged. It is logged once, then worked out again 10 s later (the held team's plan
+        // is worked out again at the next turn too).
+        if (beastBestPlans.TryGetValue(board.Id, out var failed) && failed.Key == key && failed.Plan is { IsFaulted: true } or { IsCanceled: true })
+        {
+            var now = Environment.TickCount64;
+            if (!beastBestRetry.TryGetValue(board.Id, out var retryAt))
+            {
+                beastBestRetry[board.Id] = now + 10_000;
+                log.Warning(failed.Plan.Exception, "Beastmaster: the best team of board {0} could not be worked out; worked out again in 10 s.", board.Id);
+            }
+            else if (now >= retryAt) { beastBestRetry.Remove(board.Id); beastBestPlans.Remove(board.Id); }
+        }
         if (!beastBestPlans.TryGetValue(board.Id, out var kept) || kept.Key != key)
             beastBestPlans[board.Id] = kept = (key, Task.Run(() => BeastTeams.Plan(board, catalog.Beasts, null, ranks, floors)));
         return kept.Plan.IsCompletedSuccessfully ? kept.Plan.Result : null;

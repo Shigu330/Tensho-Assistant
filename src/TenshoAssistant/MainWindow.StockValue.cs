@@ -113,7 +113,8 @@ internal sealed partial class MainWindow
                 ImGui.TableNextColumn();
                 if(line.NpcBuy is { } buy)
                 {
-                    if(Inventory.StockValue.MarketOverNpcBuy(buy,line.Sold) is > 0 and var less)
+                    // X-814 M2 (0.1848): a high-quality line is not compared with the NPC (it sells normal quality only).
+                    if(Inventory.StockValue.NpcBuyGap(buy,line.Sold,line.Hq) is > 0 and var less)
                     {
                         ImGui.TextColored(Success,buy.ToString("N0",Numbers));
                         TipText(localization.Format("HoverUi.NpcBuyCheaper",less.ToString("N0",Numbers)));

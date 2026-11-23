@@ -52,7 +52,12 @@ internal static class BeastTeamRead1526Tests
             var reader = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Beastmaster/BeastBoardReader.Dalamud.cs"));
             Check(reader.Contains("team = BeastTeams.ParseTeam(texts, known);"), "read with the ranks");
             var page = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Beastmaster.cs"));
-            Check(page.Contains("var team = BeastTeamRead?.Invoke();") && page.Contains("if (team is not { Count: > 0 })") && page.Contains("BeastTeams.FromTeam(board, plan, team, catalog.Beasts)"), "drawn in its own tab (X-800: the user asked for tabs)");
+            // X-814 M1 (0.1848): the team read is drawn in the « Current » tab, after its own « none read » line, by DrawBeastTeamRead.
+            var current = page.IndexOf("new(\"Current\", localization.Get(\"BeastUi.TabCurrent\"), () =>", StringComparison.Ordinal);
+            var none = current < 0 ? -1 : page.IndexOf("if (team is not { Count: > 0 }) { EmptyState(\"BeastUi.TabCurrentNone\"); return; }", current, StringComparison.Ordinal);
+            var drawn = none < 0 ? -1 : page.IndexOf("DrawBeastTeamRead(board, plan, team, catalog);", none, StringComparison.Ordinal);
+            var best = current < 0 ? -1 : page.IndexOf("new(\"Best\"", current, StringComparison.Ordinal);
+            Check(page.Contains("var team = BeastTeamRead?.Invoke();") && current > 0 && none > current && drawn > none && best > drawn && page.Contains("BeastTeams.FromTeam(board, plan, team, catalog.Beasts)"), "the team read drawn in its own tab, the « Current » one (X-800: the user asked for tabs)");
             Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs")).Contains("mainWindow.BeastTeamRead=()=>boardReader?.State.Team;"), "wired");
         }),
     ];
