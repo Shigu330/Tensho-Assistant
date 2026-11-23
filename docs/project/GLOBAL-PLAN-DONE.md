@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (860 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (865 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -892,6 +892,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-799 | Tests' tool (11/22): importing the page's answers stops on an « I don't… | Done in 0.1803.0 |
 | X-800 | User request of 11/22 around 13:25 (Beastmaster's Crucible, Tensho panel beside… | Done in 0.1808.0 |
 | X-801 | User request of 11/22 around 13:40 (capture read: top the Tensho chat window… | Done in 0.1809.0 |
+| X-802 | Game crash on 11/22 at 13:46:56 (« Dalamud Crash Handler » window, user's… | Done in 0.1849.0 |
 | X-803 | User decision of 11/22 around 14:20 (follows D-220: the goal is a complete… | Done in 0.1816.0 |
 | X-804 | User decision of 11/22 around 14:35 (after the risks and the PlayerScope and… | Done in 0.1817.0 |
 | X-805 | User decision of 11/22 around 14:45 (rules R12.2 and R20.6 completed, journal… | Done in 0.1823.0 |
@@ -902,6 +903,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-810 | Security review before the alpha (user's decision of 11/22 around 15:30: a… | Done in 0.1830.0 |
 | X-811 | Tool (R13.3): method of natures (user's decision of 11/22 around 15:40). Done… | Done in 0.1812.0 |
 | X-812 | Tool (R13.3, R32.1), follow-up of the natures tool: user's request of 11/22… | Done in 0.1812.0 |
+| X-813 | Review of block 0.1807 to 0.1812 (review 0.1812, 22/11), I1: finding in… | Done in 0.1852.0 |
 | X-814 | Review of block 0.1807 to 0.1812 (review 0.1812, 22/11), minor M1, M2, M3: M1… | Done in 0.1848.0 |
 | X-815 | Bug seen by the user on 11/22 around 17:15 (capture read: Free company › Best… | Done in 0.1847.0 |
 | X-819 | Review of block 0.1813 to 0.1819 (review 0.1819, 22/11), I1: finding in… | Done in 0.1820.0 |
@@ -928,12 +930,15 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-841 | Review of block 0.1831 to 0.1832 (review 0.1832, 22/11), pre-existing before… | Done in 0.1834.0 |
 | X-842 | Review of block 0.1833 to 0.1839 (review 0.1839, 23/11), minor M1, M2, M4, M5… | Done in 0.1843.0 |
 | X-843 | Review of block 0.1833 to 0.1839 (review 0.1839, 23/11), pre-existing before… | Done in 0.1844.0 |
+| X-846 | Review of block 0.1845 to 0.1848 (review 0.1848, 23/11), I1: finding in… | Done in 0.1849.0 |
+| X-847 | Review of block 0.1845 to 0.1848 (review 0.1848, 23/11), I2: finding in… | Done in 0.1850.0 |
+| X-848 | Review of block 0.1845 to 0.1848 (review 0.1848, 23/11), minor M1, M2, M3, M4… | Done in 0.1851.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (860 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (865 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1823,6 +1828,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-799 | Outil des essais (22/11) : l'import des réponses de la page s'arrête sur une… | Fait en 0.1803.0 |
 | X-800 | Demande de l'utilisateur du 22/11 vers 13 h 25 (Dédale bestial, panneau Tensho… | Fait en 0.1808.0 |
 | X-801 | Demande de l'utilisateur du 22/11 vers 13 h 40 (capture lue : en haut la… | Fait en 0.1809.0 |
+| X-802 | Plantage du jeu le 22/11 à 13 h 46 min 56 s (fenêtre « Dalamud Crash Handler »… | Fait en 0.1849.0 |
 | X-803 | Décision de l'utilisateur du 22/11 vers 14 h 20 (suite de D-220 : « le but est… | Fait en 0.1816.0 |
 | X-804 | Décision de l'utilisateur du 22/11 vers 14 h 35 (après l'explication des… | Fait en 0.1817.0 |
 | X-805 | Décision de l'utilisateur du 22/11 vers 14 h 45 (règles R12.2 et R20.6… | Fait en 0.1823.0 |
@@ -1833,6 +1839,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-810 | Revue de sécurité avant l'alpha (décision de l'utilisateur du 22/11 vers 15 h… | Fait en 0.1830.0 |
 | X-811 | Outil (R13.3) : méthode des natures (décision de l'utilisateur du 22/11 vers 15… | Fait en 0.1812.0 |
 | X-812 | Outil (R13.3, R32.1), suite de l'outil des natures : demande de l'utilisateur… | Fait en 0.1812.0 |
+| X-813 | Relecture du bloc 0.1807 à 0.1812 (relecture 0.1812, 22/11), I1 : X-809 : la… | Fait en 0.1852.0 |
 | X-814 | Relecture du bloc 0.1807 à 0.1812 (relecture 0.1812, 22/11), mineurs M1, M2, M3… | Fait en 0.1848.0 |
 | X-815 | Bug vu par l'utilisateur le 22/11 vers 17 h 15 (capture lue : Compagnie libre ›… | Fait en 0.1847.0 |
 | X-819 | Relecture du bloc 0.1813 à 0.1819 (relecture 0.1819, 22/11), I1 : Un gist créé… | Fait en 0.1820.0 |
@@ -1859,3 +1866,6 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-841 | Relecture du bloc 0.1831 à 0.1832 (relecture 0.1832, 22/11), déjà là avant le… | Fait en 0.1834.0 |
 | X-842 | Relecture du bloc 0.1833 à 0.1839 (relecture 0.1839, 23/11), mineurs M1, M2… | Fait en 0.1843.0 |
 | X-843 | Relecture du bloc 0.1833 à 0.1839 (relecture 0.1839, 23/11), déjà là avant le… | Fait en 0.1844.0 |
+| X-846 | Relecture du bloc 0.1845 à 0.1848 (relecture 0.1848, 23/11), I1 : Un 400… | Fait en 0.1849.0 |
+| X-847 | Relecture du bloc 0.1845 à 0.1848 (relecture 0.1848, 23/11), I2 : Test existant… | Fait en 0.1850.0 |
+| X-848 | Relecture du bloc 0.1845 à 0.1848 (relecture 0.1848, 23/11), mineurs M1, M2… | Fait en 0.1851.0 |

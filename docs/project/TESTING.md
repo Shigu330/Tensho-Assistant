@@ -2788,6 +2788,12 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1848) Stocks › « Dort et se vend » : une ligne HQ d'un objet aussi vendu par un PNJ montre le prix PNJ sans couleur verte ni info-bulle « moins cher chez un PNJ » ; la même ligne NQ garde la comparaison
 
+- [ ] (0.1849) Sous-marins › trajets › « Prix du marché » : les prix des objets du trajet arrivent comme avant ; si une ligne dit « N manquent », un nouveau clic relit les manquants
+
+- [ ] (0.1851) Sous-marins › trajets › « Prix du marché » : si une ligne « N manquent » paraît, N ne dépasse jamais le nombre d'objets demandés, et les prix déjà lus servent au classement sans nouveau clic
+
+- [ ] (0.1852) Liens vers un onglet, un par famille : clic droit sur un objet › « Stocks » ouvre sa fiche sur Stocks ; Monnaies (barre du serveur ou alerte) ouvre Stockage › Monnaies ; « Valeur » d'une monnaie ouvre Stockage › Valeur d'une monnaie ; un rouleau d'orchestrion ouvert depuis un objet ouvre Collections › Musique ; un haut fait d'une source ouvre Collections › Hauts faits ; « Paramètres » d'un outil de fabrication ouvre Paramètres › Panneaux › Fabrication ; « Détails » de l'état de Tensho ouvre Paramètres › Suivi › Barre du serveur
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
