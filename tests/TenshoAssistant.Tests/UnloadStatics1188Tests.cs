@@ -78,11 +78,12 @@ internal static class UnloadStatics1188Tests
             finally { Statics1188.Hook = null; Statics1188.Kept = null; Statics1188.Data = null; Statics1188.Many.Clear(); Statics1188.Wrappers.Clear(); }
             Check(!UnloadWatch.Statics(typeof(UnloadStatics1188Tests).Assembly, 100000).Any(line => line.Contains("Statics1188.", StringComparison.Ordinal)), "emptied: nothing named");
         }),
-        ("Unload statics 1188: wiring: ten seconds after a load, developer mode, the newest earlier instance still alive gets its unload state and its statics; the constructor's locals are noted", () =>
+        ("Unload statics 1188: wiring: ten seconds after a load, developer mode, no earlier instance is taken to read its unload state or its statics (X-802, 0.1845); the constructor's locals are noted", () =>
         {
             var plugin = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"));
-            Check(plugin.Contains("log.Information(\"Earlier instance {0}: {1}.\",held.Key,Diagnostics.UnloadWatch.Released(alive));", StringComparison.Ordinal), "unload state");
-            Check(plugin.Contains("foreach(var line in Diagnostics.UnloadWatch.Statics(alive.GetType().Assembly))log.Information(\"Earlier instance {0}: static {1}.\",held.Key,line);", StringComparison.Ordinal), "statics of the earlier assembly");
+            // X-802 (0.1845): the game crashed in that reflection on a load context being unloaded (22/11 13:46): both calls are gone.
+            Check(!plugin.Contains("Diagnostics.UnloadWatch.Released(", StringComparison.Ordinal), "no unload state read from an earlier instance");
+            Check(!plugin.Contains("Diagnostics.UnloadWatch.Statics(", StringComparison.Ordinal), "no statics read from an earlier assembly");
             Check(plugin.Contains("Diagnostics.UnloadWatch.Note(parts,\"locals\",developerAtUnload.Target,typeof(Plugin).Assembly);", StringComparison.Ordinal), "captured locals noted");
             var watch = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Diagnostics/UnloadWatch.cs"));
             // 0.1196: the one write of 0.1189 (the emptying of old instances) is gone with the search: nothing is run, written or collected.

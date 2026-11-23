@@ -1586,13 +1586,9 @@ public sealed partial class Plugin : IDalamudPlugin
                 if(TenshoAssistant.Competitive.CompetitiveGate.CompilerState?.Waiting>0)_=Task.Delay(TimeSpan.FromSeconds(20)).ContinueWith(_=>SayReaders(),TaskScheduler.Default);
                 // 0.1196: one short line per earlier instance: « 0 of N parts alive » when it was collected whole, else its first 24 parts held.
                 foreach(var earlier in instances.Skip(1))log.Information("Earlier instance {0}.",Diagnostics.UnloadWatch.Describe(earlier.Key,earlier.Value,24));
-                // 0.1188: the newest earlier instance whose plugin object is still alive: did its unload finish, and which of its static
-                // fields still hold something an instance could hang from (read only, nothing of that instance is run or changed).
-                if(instances.Skip(1).Select(earlier=>(earlier.Key,Plugin:earlier.Value.GetValueOrDefault("plugin")?.Target)).FirstOrDefault(earlier=>earlier.Plugin is not null) is { Plugin:{ } alive } held)
-                {
-                    log.Information("Earlier instance {0}: {1}.",held.Key,Diagnostics.UnloadWatch.Released(alive));
-                    foreach(var line in Diagnostics.UnloadWatch.Statics(alive.GetType().Assembly))log.Information("Earlier instance {0}: static {1}.",held.Key,line);
-                }
+                // X-802 (0.1845): the newest earlier instance still alive is no longer taken to read its unload state and the static fields
+                // of its assembly (0.1188): that reflection ran in a load context being unloaded, and the game's runtime crashed in it
+                // (22/11 13:46, the dump's faulting thread). Its parts alive are named above, by their names only.
             },TaskScheduler.Default);
         }
         catch

@@ -93,10 +93,10 @@ internal static class UnloadShared1195Tests
                 var parts = Noted(false);
                 Collect(() => parts.Values.Any(part => part.IsAlive));
                 Check(UnloadWatch.Describe("i", parts) == "i: context unknown, 0 of 5 parts alive", UnloadWatch.Describe("i", parts));
-                // The same instance as noted before 0.1195: collected as well, and its shared values are counted apart, not as held.
+                // The same instance as noted before 0.1195: collected as well; X-802 (0.1845): its shared values are alive parts like any other (no target is taken to tell them apart).
                 var before = NotedBefore(false);
                 Collect(() => before["plugin"].IsAlive || before["plugin.Service"].IsAlive);
-                Check(UnloadWatch.Describe("o", before) == "o: context unknown, 4 of 6 parts alive, 4 shared (empty arrays: 3, static values: 1)", UnloadWatch.Describe("o", before));
+                Check(UnloadWatch.Describe("o", before) == "o: context unknown, 4 of 6 parts alive; collected: plugin, plugin.Service", UnloadWatch.Describe("o", before));
             }
             finally { OutsideRoot.Clear(); }
         }),
@@ -110,7 +110,7 @@ internal static class UnloadShared1195Tests
                 Check(UnloadWatch.Describe("i", parts) == "i: context unknown, 1 of 5 parts alive: plugin.Service", UnloadWatch.Describe("i", parts));
                 var before = NotedBefore(true);
                 Collect(() => before["plugin"].IsAlive);
-                Check(UnloadWatch.Describe("o", before) == "o: context unknown, 5 of 6 parts alive, 4 shared (empty arrays: 3, static values: 1), 1 held: plugin.Service", UnloadWatch.Describe("o", before));
+                Check(UnloadWatch.Describe("o", before) == "o: context unknown, 5 of 6 parts alive; collected: plugin", UnloadWatch.Describe("o", before));
             }
             finally { OutsideRoot.Clear(); }
         }),

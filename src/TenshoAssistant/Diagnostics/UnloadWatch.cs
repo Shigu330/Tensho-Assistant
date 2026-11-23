@@ -119,22 +119,17 @@ public static class UnloadWatch
         if(FullCollectionsSinceUnload(parts,MachineMemory.FullCollections) is { } since)context+=$" after {since} full collection(s) since its unload";
         var noted=parts.Where(part=>part.Key!=Context && !part.Key.StartsWith(UnloadedAt,StringComparison.Ordinal)).ToList();
         if(noted.Count==0)return $"{label}: context {context}, parts not noted";
-        // 0.1195: each part read once (a target taken is alive for the line); a part shared by construction is counted apart from those a
-        // root holds (an instance noted before 0.1195 has its empty arrays and static values among its parts; none is noted since).
+        // X-802 (0.1845, the game's crash of 22/11 13:46:56, read in its dump: an access violation inside the runtime on a pool thread, in
+        // FieldInfo.GetValue of a static field, the second after this line was due): each part is asked IsAlive only, never its Target. An
+        // earlier instance is a copy of Tensho whose load context is unloading: taking one of its objects and reading the static fields of
+        // its types (0.1195's « shared » count, by reflection) ran in a dying collectible assembly (its class constructors, its statics'
+        // storage) on a thread of the runtime. Nothing of an earlier instance is taken, read or run: its parts are counted by their names.
+        // Evidence: docs/evidence/0.1845-crash-unload-statics.md.
         var alive=new List<string>();
         var collected=new List<string>();
-        int empties=0,statics=0;
-        var cache=new Dictionary<Type,HashSet<object>>();
         foreach(var part in noted.OrderBy(part=>part.Key,StringComparer.Ordinal))
-        {
-            if(part.Value.Target is not { } target){collected.Add(part.Key);continue;}
-            if(target is Array { Length:0 })empties++;
-            else if(Shared(target,null,cache))statics++;
-            else alive.Add(part.Key);
-        }
-        var shared=empties+statics;
-        var head=$"{label}: context {context}, {alive.Count+shared} of {noted.Count} parts alive";
-        if(shared>0)head+=$", {shared} shared (empty arrays: {empties}, static values: {statics})"+(alive.Count>0 ? $", {alive.Count} held":"");
+            (part.Value.IsAlive ? alive:collected).Add(part.Key);
+        var head=$"{label}: context {context}, {alive.Count} of {noted.Count} parts alive";
         if(alive.Count==0)return head;
         // 0.1188: the shorter list tells more: the parts collected when most are alive (what the root does not reach), the parts alive otherwise.
         var (word,list)=collected.Count>0 && collected.Count<alive.Count ? ("; collected: ",collected):(": ",alive);
@@ -144,6 +139,7 @@ public static class UnloadWatch
     /// <summary>
     /// 0.1188: whether an earlier instance's plugin object finished its unload: its registration scope disposed and how many releases were
     /// left in it (read by name, without running anything of that instance); « unknown » when the fields are not there.
+    /// X-802 (0.1845): no longer called on an earlier instance (its objects are never taken, see <see cref="Describe"/>); kept for tests.
     /// </summary>
     public static string Released(object plugin)
     {
@@ -162,6 +158,8 @@ public static class UnloadWatch
     /// 0.1188: the static fields of an assembly that hold something an instance could hang from: a delegate with a target, an object of the
     /// assembly's own classes that has reference fields, a non-empty collection of such objects or of delegates. One text per field
     /// (« Type.field: what »), the first <paramref name="max"/>. Read only; a field that cannot be read is skipped.
+    /// X-802 (0.1845): never on the assembly of an earlier instance: reading the statics of a load context being unloaded crashed the
+    /// game's runtime (22/11 13:46). Only an assembly that is loaded and kept (the tests' own).
     /// </summary>
     public static List<string> Statics(Assembly assembly,int max=40)
     {
