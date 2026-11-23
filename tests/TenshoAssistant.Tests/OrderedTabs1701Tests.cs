@@ -53,7 +53,7 @@ internal static class OrderedTabs1701Tests
             var settings = Read("MainWindow.Settings.cs");
             Check(settings.Contains("if(requestedSettingsTab==key)requestedSettingsTab=null;", StringComparison.Ordinal) && settings.Contains("},selected);", StringComparison.Ordinal), "Settings");
             var triad = Read("MainWindow.TripleTriad.cs");
-            Check(triad.Contains("new(\"Deck\", localization.Get(\"TriadUi.Deck\"), () => { DrawTriadSavedDecks(); DrawTriadDeck(); }, asked == \"Deck\"),", StringComparison.Ordinal) && !triad.Contains("TriadTabFlags", StringComparison.Ordinal), "Triple Triad");
+            Check(triad.Contains("new(\"Deck\", localization.Get(\"TriadUi.Deck\"), () => { DrawTriadSavedDecks(); DrawTriadDeck(); }),", StringComparison.Ordinal) && TenshoAssistant.Help.NavTargets.Bars["TripleTriad"] == "TriadNotebook" && !triad.Contains("TriadTabFlags", StringComparison.Ordinal), "Triple Triad");
             Check(Read("MainWindow.Bank.cs").Contains("origins.Add(new(entry.Key.Kind + \".\" + entry.Key.StorageId.ToString(System.Globalization.CultureInfo.InvariantCulture), BankEntryName(entry),", StringComparison.Ordinal), "bank: a storage's tab known by its kind and number, not its place");
         }),
     ];

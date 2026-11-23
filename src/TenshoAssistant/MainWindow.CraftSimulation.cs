@@ -139,7 +139,7 @@ internal sealed partial class MainWindow
             simulationLevel=100; simulationManipulation=false;
             craftSolveTarget=recipe.Simulation?.Quality ?? 0;
         }
-        simulationRecipe=recipe; SelectItem(recipe.ResultItemId); page=Page.CraftSimulation; focusCraftPage=CraftPageTab.Simulation;
+        simulationRecipe=recipe; SelectItem(recipe.ResultItemId); OpenLink("Craft.Simulation");
     }
     private void ValidateCraftCopy()
     {
@@ -148,8 +148,6 @@ internal sealed partial class MainWindow
         simulationLevel=1; simulationResult=null; simulationManipulation=false;
         simulationError=localization.Get("SimulationHelp.Changed");
     }
-    private enum CraftPageTab { None, Simulation, Preparation }
-    private CraftPageTab focusCraftPage;
     /// <summary>0.424 (user report): « Back to the item » — the recipe's item sheet, Craft tab. X-600: the button at the end of the family's tab bar.</summary>
     private void BackToCraftItem(){if(simulationRecipe is { } shown)SelectItem(shown.ResultItemId);OpenLink("Item.Craft");}
 
@@ -166,12 +164,11 @@ internal sealed partial class MainWindow
         // X-605 (0.1701): the tabs arranged with the mouse (OrderedTabs); each tab notes that it is open, the page below draws it.
         OrderedTabs("CraftPageTabs",
         [
-            new("Simulation",localization.Get("CraftSimulation.SimulationTab"),()=>{},focusCraftPage==CraftPageTab.Simulation),
-            new("Preparation",localization.Get("CraftSimulation.PreparationTab"),()=>preparation=true,focusCraftPage==CraftPageTab.Preparation),
+            new("Simulation",localization.Get("CraftSimulation.SimulationTab"),()=>{}),
+            new("Preparation",localization.Get("CraftSimulation.PreparationTab"),()=>preparation=true),
             new("Lists",localization.Get("CraftSimulation.ListsTab"),()=>listsTab=true),
             new("Stock",localization.Get("CraftSimulation.StockTab"),()=>stockTab=true),
         ]);
-        focusCraftPage=CraftPageTab.None;
         if(listsTab) { DrawCraftLists(); return; }
         if(stockTab) { DrawCraftFromStock(); return; }
         DrawSimulationRecipeSearch();

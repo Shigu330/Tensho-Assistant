@@ -36,7 +36,7 @@ internal sealed partial class MainWindow
     private void OpenCraftPreparation(RecipeDefinition recipe)
     {
         OpenCraftSimulation(recipe);
-        focusCraftPage=CraftPageTab.Preparation;
+        OpenLink("Craft.Preparation");
     }
 
     // An item named in the preparation opens its sheet in Items, on its recipes when it has some.

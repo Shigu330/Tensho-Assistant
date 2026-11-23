@@ -290,7 +290,7 @@ internal sealed partial class MainWindow
             ImGui.PushStyleColor(ImGuiCol.Text,locked || (beaten==true && missing.Count==0) ? UI.FfxivTheme.TextMuted:UI.FfxivTheme.Text);
             try{if(ImGui.Selectable($"{mark}  {npc.Name}  ({MapProjection.CoordinateText(new(npc.X,npc.Y))}){lacking}##LocalTriad{npc.MatchId}")){PlaceFlagFromMapView(map,npc.X,npc.Y);ImGui.CloseCurrentPopup();}}
             finally{ImGui.PopStyleColor();}
-            NpcMenu($"TriadTool{npc.MatchId}",npc.Name,0,[new(map.TerritoryId,map.MapId,map.Zone,npc.X,npc.Y,0,0,0)],("MapLocal.OpenTriadTool",()=>OpenTriadTab("Npcs")));
+            NpcMenu($"TriadTool{npc.MatchId}",npc.Name,0,[new(map.TerritoryId,map.MapId,map.Zone,npc.X,npc.Y,0,0,0)],("MapLocal.OpenTriadTool",()=>OpenLink("Triad.Npcs")));
             if(ImGui.IsItemHovered())DrawNpcTooltip(TriadTipFacts(npc,beaten,missing.Count,questsDone,id=>entries.TryGetValue(id,out var entry) ? entry.Name:id.ToString()),
                 localization.Get("MapLocal.ClickFlag")+"\n"+localization.Get("MapLocal.RightClickTool"));
         }

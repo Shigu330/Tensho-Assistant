@@ -15,6 +15,9 @@ public sealed record NavTarget(string Page,string? Tab=null,string? Category=nul
 /// X-813 (review 0.1812): the links that chose a tab by a flag (the item sheet's Stocks, Craft, Uses and Gathering; the Storage tabs; the
 /// collections' Music, Titles and Achievements) and the Settings categories written in the code (the server bar's details, the tools'
 /// « Settings ») are rows of this table too, followed by MainWindow.OpenLink(key); NavTargets1852Tests refuses a flag or a category in the code.
+/// X-850 (review 0.1852, I1): Triple Triad's and the crafting page's tabs too (NavTargets1855Tests). One jump stays outside, on purpose: a
+/// collection kind (focusCollectionKind) chosen from an item's kind at run time (a mount, a minion, a card of the extra collections…); it is an
+/// enum, so a renamed kind breaks the build, and it is kept until its tab is open, as the table's requests are.
 /// </summary>
 public static class NavTargets
 {
@@ -29,6 +32,9 @@ public static class NavTargets
         ["Items"]="ItemSheet",
         ["Storage"]="StorageTabs",
         ["Collections"]="CollectionKinds",
+        // X-850 (review 0.1852, I1): Triple Triad and the crafting page.
+        ["TripleTriad"]="TriadNotebook",
+        ["CraftSimulation"]="CraftPageTabs",
     };
 
     public static readonly IReadOnlyDictionary<string,NavTarget> Table=new Dictionary<string,NavTarget>
@@ -78,6 +84,13 @@ public static class NavTargets
         ["Panels.Gathering"]=new("Settings","Panels","Gathering"),
         ["Panels.Macros"]=new("Settings","Panels","Macros"),
         ["Panels.Games"]=new("Settings","Panels","Games"),
+        // X-850 (review 0.1852, I1): Triple Triad's tabs (an NPC's « Triple Triad tool », the Deck button of the settings, « Show in Triple
+        // Triad » from the menus) and the crafting page's (a recipe opened in the simulation or its preparation).
+        ["Triad.Notebook"]=new("TripleTriad","Notebook"),
+        ["Triad.Deck"]=new("TripleTriad","Deck"),
+        ["Triad.Npcs"]=new("TripleTriad","Npcs"),
+        ["Craft.Simulation"]=new("CraftSimulation","Simulation"),
+        ["Craft.Preparation"]=new("CraftSimulation","Preparation"),
     };
 
     /// <summary>A target of the table (a key not in it is a fault, refused by the test that reads the code's keys).</summary>

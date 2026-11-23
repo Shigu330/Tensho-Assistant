@@ -9,7 +9,7 @@ namespace TenshoAssistant;
 // Triple Triad page (Gold Saucer), like TriadBuddy. Tabs: Notebook (game cards with owned state from the collection observation,
 // values, filters and sorts by side, total, weakest side or rule score; « Cards » and « Cards Ex. » tabs, 0.277–0.279), Deck (saved
 // Tensho decks + the 5-card deck editor), Simulation, NPCs and cards, Observation (MainWindow.Triad*.cs). Other tools reach a card
-// or a tab through ShowTriadCard / OpenTriadTab.
+// or a tab through ShowTriadCard and the table of links (Help/NavTargets.cs: Triad.Notebook, Triad.Deck, Triad.Npcs).
 internal sealed partial class MainWindow
 {
     private CollectionState? triadViewState;
@@ -25,7 +25,7 @@ internal sealed partial class MainWindow
     private uint? triadType;
     private uint? triadPreviousType;
     private uint selectedTriad;
-    private bool focusTriadNotebook,triadScrollToSelected;
+    private bool triadScrollToSelected;
     // 0.277 (user request): card values in the notebook list, sort by a side, the total, the weakest side or the rule score.
     private int triadSort, triadPreviousSort = -1;
     // 0.279 (user request): two tabs, ordinary cards and the Ex. series (numbered apart).
@@ -66,12 +66,11 @@ internal sealed partial class MainWindow
         finally { ImGui.EndPopup(); }
     }
     // 0.273: a link can ask for the Deck or « NPCs and cards » tab (an NPC's « Triple Triad tool », the Deck button of the settings).
-    private string? triadFocusTab;
-    private void OpenTriadTab(string tab){page=Page.TripleTriad;triadFocusTab=tab;}
+    // X-850 (review 0.1852, I1): through the table of links (Triad.Deck, Triad.Npcs), kept until the tab is open.
     // 0.267: « Show in Triple Triad » from any menu — the notebook tab, filters cleared so the card cannot be hidden, card selected.
     private void ShowTriadCard(uint cardId)
     {
-        page=Page.TripleTriad;selectedTriad=cardId;focusTriadNotebook=true;triadScrollToSelected=true;
+        OpenLink("Triad.Notebook");selectedTriad=cardId;triadScrollToSelected=true;
         // 0.331 (audit): the series comes from the live collection; triadCards stays empty until the page was drawn once.
         triadExSeries=TriadCard(cardId)?.Extra==true;focusTriadSeries=true;
         triadQuery="";triadStars=0;triadAcquisition=0;triadType=null;
@@ -96,15 +95,14 @@ internal sealed partial class MainWindow
             triadCards = state.Entries.Where(entry => entry.Kind == CollectionKind.TripleTriad && entry.Card is { IsValid: true })
                 .OrderBy(entry => entry.Card!.Extra).ThenBy(entry => entry.Card!.Number).ThenBy(entry => entry.Id).ToArray();
         }
-        // X-605 (0.1701): the tabs arranged with the mouse (OrderedTabs). A tab asked (the notebook, a deck, an NPC) is selected once.
-        var notebook = focusTriadNotebook; var asked = triadFocusTab;
-        focusTriadNotebook = false; triadFocusTab = null;
+        // X-605 (0.1701): the tabs arranged with the mouse (OrderedTabs). X-850: a tab asked by a link (the notebook, a deck, an NPC) comes
+        // from the table of links and stays asked until it is open.
         OrderedTabs("TriadNotebook",
         [
-            new("Notebook", localization.Get("TriadUi.Notebook"), () => DrawTriadNotebook(state), notebook),
-            new("Deck", localization.Get("TriadUi.Deck"), () => { DrawTriadSavedDecks(); DrawTriadDeck(); }, asked == "Deck"),
+            new("Notebook", localization.Get("TriadUi.Notebook"), () => DrawTriadNotebook(state)),
+            new("Deck", localization.Get("TriadUi.Deck"), () => { DrawTriadSavedDecks(); DrawTriadDeck(); }),
             new("Simulation", localization.Get("TriadUi.Simulation"), DrawTriadSimulation),
-            new("Npcs", localization.Get("TriadNpcs.Tab"), DrawTriadNpcs, asked == "Npcs"),
+            new("Npcs", localization.Get("TriadNpcs.Tab"), DrawTriadNpcs),
             new("Observation", localization.Get("TriadUi.Observation"), DrawTriadObservation),
         ]);
         if (state.CharacterId == 0) ImGui.TextDisabled(localization.Get("TriadUi.Login"));

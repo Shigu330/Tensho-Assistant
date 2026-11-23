@@ -12,10 +12,10 @@ internal static class CraftPreparation408Tests
             var items=Read("MainWindow.Items.cs");
             Check(items.Contains("if (!showOutputs) DrawCraftLinks(recipe);") && !items.Contains("DrawCraftPlan("),"item sheet keeps the short view only");
             var plan=Read("MainWindow.CraftPlan.cs");
-            Check(plan.Contains("OpenCraftPreparation(recipe)") && plan.Contains("focusCraftPage=CraftPageTab.Preparation"),"link to the Crafting tab");
+            Check(plan.Contains("OpenCraftPreparation(recipe)") && plan.Contains("OpenLink(\"Craft.Preparation\");"),"link to the Crafting tab");
             Check(plan.Contains("OpenCraftItem(material.ItemId)") && Read("MainWindow.CraftChain.cs").Contains("OpenCraftItem(id)"),"items named in the preparation open their sheet");
             var page=Read("MainWindow.CraftSimulation.cs");
-            Check(page.Contains("new(\"Preparation\",localization.Get(\"CraftSimulation.PreparationTab\"),()=>preparation=true,focusCraftPage==CraftPageTab.Preparation),") && page.Contains("if(preparation) { DrawCraftPlan(recipe); return; }"),"Crafting page tab");
+            Check(page.Contains("new(\"Preparation\",localization.Get(\"CraftSimulation.PreparationTab\"),()=>preparation=true),") && page.Contains("if(preparation) { DrawCraftPlan(recipe); return; }"),"Crafting page tab");
             // X-710 (0.1704): the tab's old id is gone since 0.1701 (IndexOf -1, before everything): the order of the code itself.
             Check(SourceOrder.Before(page,"if(preparation) { DrawCraftPlan(recipe); return; }","CraftSimulation.Unsupported(recipe)"),
                 "the preparation does not depend on the simulator's support of the recipe");
