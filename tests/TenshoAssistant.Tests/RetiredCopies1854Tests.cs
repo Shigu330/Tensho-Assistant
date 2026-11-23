@@ -110,7 +110,7 @@ internal static class RetiredCopies1854Tests
             var caching=File.ReadAllText(Path.GetFullPath(Path.Combine("src","TenshoAssistant","MainWindow.Caching.cs")));
             Check(caching.Contains("BackupZip.Create(root,backups,\"cache\",DateTimeOffset.UtcNow,DataCache.RetiredFiles(root))",StringComparison.Ordinal),"the skip given");
             var load=File.ReadAllText(Path.GetFullPath(Path.Combine("src","TenshoAssistant","Plugin.Discoveries.cs")));
-            Check(load.Contains("Caching.RetiredCopies.Clean(Discoveries.DiscoveryBackup.Folder(discoveryFolder),gameDataCancel.Token)",StringComparison.Ordinal),"the pass at load");
+            Check(load.Contains("Caching.RetiredCopies.Clean(Discoveries.DiscoveryBackup.Folder(discoveryFolder),out var damaged,gameDataCancel.Token)",StringComparison.Ordinal),"the pass at load");
         }),
     ];
 }

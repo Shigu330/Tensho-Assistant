@@ -72,8 +72,10 @@ public sealed partial class Plugin
             // of v1 (other players' retainer names); a mark in Backups says the pass is done.
             try
             {
-                var cleaned=Caching.RetiredCopies.Clean(Discoveries.DiscoveryBackup.Folder(discoveryFolder),gameDataCancel.Token);
+                var cleaned=Caching.RetiredCopies.Clean(Discoveries.DiscoveryBackup.Folder(discoveryFolder),out var damaged,gameDataCancel.Token);
                 if(cleaned>0)log.Information("Backups: {0} old cache copy(ies) written again without the market boards that kept other players' retainer names.",cleaned);
+                // X-851: a damaged zip is left as it is, said once (the pass ends; it is not read again at the next loads).
+                if(damaged>0)log.Information("Backups: {0} old cache copy(ies) could not be read (damaged zip), left as they are.",damaged);
             }
             catch(OperationCanceledException){}
             catch(Exception error){log.Warning(error,"The old cache copies in Backups could not be looked through.");}

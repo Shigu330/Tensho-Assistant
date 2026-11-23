@@ -16,8 +16,17 @@ public static class RetiredCopies
     private const string MarkText="Tensho Assistant: the old zip copies of the cache were checked once and the retired copies (market boards of v1) removed.\n";
 
     /// <summary>The cache zips written again (0 when none held a retired copy, or the pass was done before).</summary>
-    public static int Clean(string backups,CancellationToken cancel=default)
+    public static int Clean(string backups,CancellationToken cancel=default)=>Clean(backups,out _,cancel);
+
+    /// <summary>
+    /// X-851 (review 0.1854, M1): a zip damaged for good (not a zip, a broken entry, an unknown compression method) is left as it is and counted
+    /// in <paramref name="damaged"/>: nothing can read it, it does not stop the zips after it, and it does not keep the pass from ending (before,
+    /// it kept the mark away for ever and every « cache » zip was read again at each load). Only a zip held by another program (IOException,
+    /// UnauthorizedAccessException) leaves the pass to the next load.
+    /// </summary>
+    public static int Clean(string backups,out int damaged,CancellationToken cancel=default)
     {
+        damaged=0;
         if(!Directory.Exists(backups))return 0;
         var mark=Path.Combine(backups,MarkName);
         if(File.Exists(mark))return 0;
@@ -26,7 +35,8 @@ public static class RetiredCopies
         {
             cancel.ThrowIfCancellationRequested();
             try{if(CleanOne(zip,cancel))cleaned++;}
-            catch(Exception error) when(error is IOException or UnauthorizedAccessException or InvalidDataException){whole=false;}
+            catch(Exception error) when(error is InvalidDataException or NotSupportedException){damaged++;}
+            catch(Exception error) when(error is IOException or UnauthorizedAccessException){whole=false;}
         }
         if(whole)
             try{File.WriteAllText(mark,MarkText);}
