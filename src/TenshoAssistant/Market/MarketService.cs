@@ -125,7 +125,13 @@ public sealed class MarketService : IDisposable
             while(packets.Count>0)
             {
                 var packet=packets.Pop();
-                if(!first && await NextTurnAsync(world,expectedOwner,bulk,token).ConfigureAwait(false) is { Go:false } stopped)return end=stopped.Failure ?? "not wanted any more";
+                // X-849 (review 0.1852, M1): a list no longer wanted (setting off, world or character changed, service released) ends
+                // without a failure, as before 0.1847 (the prices already read stay, the window says nothing); the log line still says why.
+                if(!first && await NextTurnAsync(world,expectedOwner,bulk,token).ConfigureAwait(false) is { Go:false } stopped)
+                {
+                    end=stopped.Failure ?? "the list was no longer wanted";
+                    return stopped.Failure;
+                }
                 var (badRequest,failure,unread,quotes)=await FillPacketAsync(world,packet,first,token).ConfigureAwait(false);
                 if(!first)split.AddRange(quotes);
                 first=false;
