@@ -112,6 +112,12 @@ internal static class PreparationCostTests
             session.StartAsync(market,Context,[42,42,43]).GetAwaiter().GetResult();
             Check(session.State.Completed==2 && !session.State.Loading && session.State.Error is null && times.Count==1 && session.State.Refused==1,"each unique ingredient fetched once");
             Check(market.GetCached(71,42) is not null && market.GetCached(71,43) is null && market.State.ItemId==0,"the refused item stays without a price, without changing manual item");
+            // X-847 (review 0.1848, I2): the cadence checked again. A list started inside the pause of the request before is left to the
+            // usual requests: each item is asked alone, RequestPause after the request before, never sooner.
+            session.StartAsync(market,Context,[44,45]).GetAwaiter().GetResult();
+            Check(session.State.Completed==2 && session.State.Error is null && session.State.Refused==0 && times.Count==3,"two items asked alone after the list: "+times.Count);
+            Check(times[1]-times[0]>=TimeSpan.FromSeconds(1.4) && times[2]-times[1]>=TimeSpan.FromSeconds(1.4),"queue shares network spacing: "+(times[1]-times[0]).TotalMilliseconds+" ms, "+(times[2]-times[1]).TotalMilliseconds+" ms");
+            Check(market.GetCached(71,44) is not null && market.GetCached(71,45) is not null && market.State.ItemId==0,"both read, without changing manual item");
         }),
         ("Preparation batch clears context cancels in flight work and is inert after disposal",()=>
         {
