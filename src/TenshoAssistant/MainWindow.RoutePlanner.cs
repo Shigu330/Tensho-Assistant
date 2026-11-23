@@ -115,7 +115,8 @@ internal sealed partial class MainWindow
         if(prices.Context is { } fetching
             && (!ReferenceEquals(prices.Items,routeQuotesList) || prices.Completed!=routeQuotesCaptured || prices.Loading!=routeQuotesLoading))
         {
-            foreach(var id in prices.Items.Take(prices.Completed))
+            // X-848 M1: every item of the list (a list that stopped has its read prices anywhere in it, not only in the first Completed).
+            foreach(var id in prices.Items)
                 if(market.GetCached(fetching.WorldId,id) is { } quote)routeQuotes[(fetching.WorldId,id)]=quote;
             routeQuotesList=prices.Items;routeQuotesCaptured=prices.Completed;routeQuotesLoading=prices.Loading;
             if(!prices.Loading)submarineSearch.Again();
@@ -372,7 +373,7 @@ internal sealed partial class MainWindow
         if(prices.Error is { } failed)
         {
             ImGui.SameLine();
-            ImGui.TextColored(UI.FfxivTheme.Gold,localization.Format("RoutePlanner.PricesFailed",prices.Items.Count-prices.Completed+prices.Refused));
+            ImGui.TextColored(UI.FfxivTheme.Gold,localization.Format("RoutePlanner.PricesFailed",prices.Missing));
             Tip(UI.UiMessages.Key(failed) ?? "RoutePlanner.PricesFailedTip");
         }
         else if(!prices.Loading && prices.Refused>0){ImGui.SameLine();ImGui.TextDisabled(localization.Format("RoutePlanner.PricesRefused",prices.Refused));}

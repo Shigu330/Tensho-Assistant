@@ -4,7 +4,14 @@ public sealed record PreparationPriceContext(ulong CharacterId, uint WorldId, ui
     bool IsChain = false, int ChainRevision = 0);
 // X-815 (0.1847): Refused, the items Universalis refused or does not sell (they stay without a price; the others are read).
 public sealed record PreparationPriceState(PreparationPriceContext? Context, IReadOnlyList<uint> Items, int Completed,
-    uint CurrentItem, bool Loading, string? Error, int Refused = 0);
+    uint CurrentItem, bool Loading, string? Error, int Refused = 0)
+{
+    /// <summary>X-848 M1 (review 0.1848): the items left without a price: the ones not done, and the refused ones (counted in Completed).</summary>
+    public int Missing => Math.Max(0, Items.Count - Completed) + Refused;
+    /// <summary>X-848 M1: the items done (read or refused) once a list stopped: every item with a fresh price or refused, so that a failure
+    /// after some packets were read counts them (Completed stayed 0 when the grouped request failed, and the refused ones were counted twice).</summary>
+    public static int Done(IEnumerable<uint> items, IReadOnlySet<uint> refused, Func<uint, bool> priced) => items.Count(id => refused.Contains(id) || priced(id));
+}
 
 /// <summary>Owns one user-started, bounded price list, using the shared service cache and network cadence.</summary>
 public sealed class PreparationPriceSession : IDisposable
@@ -83,6 +90,9 @@ public sealed class PreparationPriceSession : IDisposable
                 }
                 catch (Exception error)
                 {
+                    // X-848 M1: the items read before the failure are done (their prices are in the cache), the refused ones too.
+                    var now=DateTimeOffset.UtcNow;
+                    completed=Math.Max(completed,PreparationPriceState.Done(copied,refused,id=>market.GetCached(context.WorldId,id) is { } quote && market.IsFresh(quote,now)));
                     lock (gate)
                         if (!disposed && ticket==generation) state=new(context,list,completed,0,false,
                             error is OperationCanceledException ? "Lookup cancelled or two-minute limit reached." : error.Message,refused.Count);

@@ -118,29 +118,44 @@ public sealed class MarketService : IDisposable
         var first=true;
         var badRequests=0;
         var split=new List<MarketQuote>();
-        while(packets.Count>0)
+        var alone=new List<uint>();
+        string? end=null;
+        try
         {
-            var packet=packets.Pop();
-            if(!first && await NextTurnAsync(world,expectedOwner,bulk,token).ConfigureAwait(false) is { Go:false } stopped)return stopped.Failure;
-            var (badRequest,failure,unread,quotes)=await FillPacketAsync(world,packet,first,token).ConfigureAwait(false);
-            if(!first)split.AddRange(quotes);
-            first=false;
-            if(failure is not null)return failure;
-            refused?.UnionWith(unread);
-            if(!badRequest)continue;
-            if(++badRequests>=MaxBadRequests)return PricesUnread;
-            if(packet.Length==1){refused?.Add(packet[0]);continue;}
-            var half=packet.Length/2;
-            packets.Push(packet[half..]);
-            packets.Push(packet[..half]);
+            while(packets.Count>0)
+            {
+                var packet=packets.Pop();
+                if(!first && await NextTurnAsync(world,expectedOwner,bulk,token).ConfigureAwait(false) is { Go:false } stopped)return end=stopped.Failure ?? "not wanted any more";
+                var (badRequest,failure,unread,quotes)=await FillPacketAsync(world,packet,first,token).ConfigureAwait(false);
+                if(!first)split.AddRange(quotes);
+                first=false;
+                if(failure is not null)return end=failure;
+                refused?.UnionWith(unread);
+                if(!badRequest)continue;
+                if(++badRequests>=MaxBadRequests)return PricesUnread;
+                if(packet.Length==1){refused?.Add(packet[0]);alone.Add(packet[0]);continue;}
+                var half=packet.Length/2;
+                packets.Push(packet[half..]);
+                packets.Push(packet[..half]);
+            }
+            if(split.Count>0 && await NextTurnAsync(world,expectedOwner,bulk,token).ConfigureAwait(false) is { Go:true })
+            {
+                var speed=await SpeedAsync(world,split.Select(quote=>quote.ItemId).ToArray(),token).ConfigureAwait(false);
+                if(speed is not null)Store(world,split.Select(quote=>quote.WithSpeed(speed)).ToList());
+            }
+            return null;
         }
-        if(split.Count>0 && await NextTurnAsync(world,expectedOwner,bulk,token).ConfigureAwait(false) is { Go:true })
+        finally
         {
-            var speed=await SpeedAsync(world,split.Select(quote=>quote.ItemId).ToArray(),token).ConfigureAwait(false);
-            if(speed is not null)Store(world,split.Select(quote=>quote.WithSpeed(speed)).ToList());
+            // X-848 M2 (review 0.1848): a list that got answers 400 leaves one line in the log (no player data: the world's and the items'
+            // numbers), so that the next refusal can be told apart (a refused item, or a server refusing everything).
+            end??=badRequests>=MaxBadRequests ? "the ceiling of answers 400":null;
+            if(badRequests>0)Trace?.Invoke($"Universalis prices: a list of {missing.Length} item(s) on world {world} got {badRequests} answer(s) 400; refused alone: {(alone.Count==0 ? "none":string.Join(",",alone))}; {(end is null ? "the others read":"stopped: "+end)}.");
         }
-        return null;
     }
+
+    /// <summary>X-848 M2: where the service writes its line about a list refused by answers 400 (set by the plugin: the log).</summary>
+    public Action<string>? Trace { get; set; }
 
     /// <summary>X-846 (review 0.1848, I1): the answers 400 one list may get before it stops. One item refused in a list of 100 takes 8
     /// (the list, then one half at each of 7 levels); a server that refuses everything costs 10 requests, not 2n-1 (199 for 100 items).</summary>

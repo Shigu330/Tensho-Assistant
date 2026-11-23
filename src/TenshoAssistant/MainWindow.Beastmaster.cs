@@ -982,8 +982,9 @@ internal sealed partial class MainWindow
     }
 
     private readonly Dictionary<uint, (string Key, Task<BoardPlan> Plan)> beastBestPlans = [];
-    /// <summary>X-814 M3 (0.1848): when a failed best-team calculation of a board is worked out again (Environment.TickCount64).</summary>
-    private readonly Dictionary<uint, long> beastBestRetry = [];
+    /// <summary>X-814 M3 (0.1848): when a failed best-team calculation of a board is worked out again. X-848 M3: logged once per key, then
+    /// worked out again less and less often (BestTeamRetry).</summary>
+    private readonly BestTeamRetry beastBestRetry = new();
     /// <summary>X-800 (0.1808): the board's plan among every beast of the game (the best team), worked out once in the background per board,
     /// ranks and rules (R07); null while it is worked out or when it failed.</summary>
     private BoardPlan? BeastBestPlanFor(Board board, BeastState state)
@@ -996,16 +997,17 @@ internal sealed partial class MainWindow
         // is worked out again at the next turn too).
         if (beastBestPlans.TryGetValue(board.Id, out var failed) && failed.Key == key && failed.Plan is { IsFaulted: true } or { IsCanceled: true })
         {
-            var now = Environment.TickCount64;
-            if (!beastBestRetry.TryGetValue(board.Id, out var retryAt))
+            switch (beastBestRetry.Failed(board.Id, key, Environment.TickCount64))
             {
-                beastBestRetry[board.Id] = now + 10_000;
-                log.Warning(failed.Plan.Exception, "Beastmaster: the best team of board {0} could not be worked out; worked out again in 10 s.", board.Id);
+                case BestTeamRetry.Step.Log:
+                    log.Warning(failed.Plan.Exception, "Beastmaster: the best team of board {0} could not be worked out; worked out again in 10 s, then less often, without this line.", board.Id);
+                    break;
+                case BestTeamRetry.Step.Retry: beastBestPlans.Remove(board.Id); break;
             }
-            else if (now >= retryAt) { beastBestRetry.Remove(board.Id); beastBestPlans.Remove(board.Id); }
         }
         if (!beastBestPlans.TryGetValue(board.Id, out var kept) || kept.Key != key)
             beastBestPlans[board.Id] = kept = (key, Task.Run(() => BeastTeams.Plan(board, catalog.Beasts, null, ranks, floors)));
+        if (kept.Plan.IsCompletedSuccessfully) beastBestRetry.Succeeded(board.Id);
         return kept.Plan.IsCompletedSuccessfully ? kept.Plan.Result : null;
     }
 

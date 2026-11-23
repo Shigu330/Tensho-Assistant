@@ -236,6 +236,8 @@ public sealed partial class Plugin : IDalamudPlugin
             // the others are not asked to Universalis, which answers 400 to a list of them. An item the sheet does not have is asked.
             var marketItems=data.GetExcelSheet<Lumina.Excel.Sheets.Item>();
             market.Marketable=id=>marketItems.GetRowOrDefault(id) is not { } row || (!row.IsUntradable && row.ItemSearchCategory.RowId!=0);
+            // X-848 M2: the line of a list refused by answers 400, in the log.
+            market.Trace=line=>log.Information(line);
             // X-122, D-101: duty and monster loot follow their own use of Garland Tools too.
             dutyLoot.Enabled=()=>CommunitySources.Allowed(configuration,SourceUse.GarlandDutyLoot);
             monsterLoot.Enabled=()=>CommunitySources.Allowed(configuration,SourceUse.GarlandMonsterLoot);

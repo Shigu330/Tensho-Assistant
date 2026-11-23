@@ -22,8 +22,9 @@ internal static class ReviewMinors1848Tests
         {
             var page = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Beastmaster.cs"));
             Check(page.Contains("failed.Plan is { IsFaulted: true } or { IsCanceled: true }", StringComparison.Ordinal), "a failure is seen");
-            Check(page.Contains("log.Warning(failed.Plan.Exception, \"Beastmaster: the best team of board {0} could not be worked out; worked out again in 10 s.\", board.Id);", StringComparison.Ordinal), "logged once");
-            Check(page.Contains("else if (now >= retryAt) { beastBestRetry.Remove(board.Id); beastBestPlans.Remove(board.Id); }", StringComparison.Ordinal), "worked out again");
+            // X-848 M3: « logged once » is now true (BestTeamRetry, its behaviour in ReviewMinors1851Tests): the log line on Step.Log only.
+            Check(page.Contains("case BestTeamRetry.Step.Log:", StringComparison.Ordinal) && page.Contains("could not be worked out; worked out again in 10 s, then less often, without this line.\", board.Id);", StringComparison.Ordinal), "logged once");
+            Check(page.Contains("case BestTeamRetry.Step.Retry: beastBestPlans.Remove(board.Id); break;", StringComparison.Ordinal), "worked out again");
         }),
     ];
 }
