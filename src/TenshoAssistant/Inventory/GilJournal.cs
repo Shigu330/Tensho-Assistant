@@ -165,7 +165,7 @@ public static class GilJournal
     private sealed record FileDto(int Schema,GilEntry[] Entries);
 
     /// <summary>Reads a journal file (a missing file is an empty journal; a bad one throws, so it is never overwritten by mistake). X-833: or its previous version (« .bak ») when it is missing or does not read (AtomicFile.ReadKept).</summary>
-    public static List<GilEntry> Read(string path)=>AtomicFile.ReadKept(path,ReadFile);
+    public static List<GilEntry> Read(string path,Action<string,Exception>? recovered=null)=>recovered is null ? AtomicFile.ReadKept(path,ReadFile) : AtomicFile.ReadKept(path,ReadFile,recovered);
 
     private static List<GilEntry> ReadFile(string path)
     {

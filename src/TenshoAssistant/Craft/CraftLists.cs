@@ -14,6 +14,9 @@ public sealed record CraftList(string Name,IReadOnlyList<CraftListEntry> Entries
 public static class CraftLists
 {
     public const int MaxLists=32,MaxEntries=64,MaxName=40;
+    /// <summary>X-842 M2 (0.1843, review of 0.1838): the most lists the file holds when two game clients each added theirs (each client still adds
+    /// only up to <see cref="MaxLists"/>); a merge past it is not saved and said, never cut in silence.</summary>
+    public const int MaxListsMerged=2*MaxLists;
     public const long MaxQuantity=999999;
     private static readonly JsonSerializerOptions Json=TenshoJson.Own(new(){WriteIndented=true});
     private sealed record FileDto(int Schema,CraftList[] Lists);
@@ -80,7 +83,7 @@ public static class CraftLists
         if(new FileInfo(path).Length>2*1024*1024)throw new InvalidDataException("Crafting lists file too large.");
         var dto=JsonSerializer.Deserialize<FileDto>(File.ReadAllBytes(path),Json) ?? throw new InvalidDataException("Empty crafting lists file.");
         if(dto.Schema!=1 || dto.Lists is null)throw new InvalidDataException("Unknown crafting lists schema.");
-        return dto.Lists.Where(list=>CleanName(list.Name) is not null && list.Entries is not null).Take(MaxLists)
+        return dto.Lists.Where(list=>CleanName(list.Name) is not null && list.Entries is not null).Take(MaxListsMerged)
             .Select(list=>list with {Entries=list.Entries.Where(entry=>entry.ItemId!=0 && entry.Quantity is >0 and <=MaxQuantity).Take(MaxEntries).ToArray()}).ToArray();
     }
 
@@ -124,7 +127,7 @@ public static class CraftLists
 
     public static void Write(string path,IReadOnlyList<CraftList> lists)
     {
-        AtomicFile.Write(path,JsonSerializer.SerializeToUtf8Bytes(new FileDto(1,lists.Take(MaxLists).ToArray()),Json),keep:true);
+        AtomicFile.Write(path,JsonSerializer.SerializeToUtf8Bytes(new FileDto(1,lists.Take(MaxListsMerged).ToArray()),Json),keep:true);
     }
 }
 
@@ -137,6 +140,9 @@ public sealed class CraftListStore(string path,Action<Exception,string> warn,boo
 {
     /// <summary>X-832: the wait for another game client's save (a save takes milliseconds); past it, this save is refused and said.</summary>
     public const int LockWaitMs=2000;
+    /// <summary>X-842 M4 (0.1843, review of 0.1838): Set runs on the window's thread (drawing): it waits a tenth of a second at most (the other
+    /// client's save takes milliseconds), as the settings do (SettingsFile.GameThreadLockWaitMs); past it the change is refused and said.</summary>
+    public const int DrawLockWaitMs=100;
     private List<CraftList>? lists;
     private IReadOnlyList<CraftList>? before;
     private bool failed;
@@ -156,10 +162,12 @@ public sealed class CraftListStore(string path,Action<Exception,string> warn,boo
         else next[index]=list;
         try
         {
-            using(FairFileLock.Hold(path+".lock",LockWaitMs,error=>new IOException("The crafting lists' lock is held by another game client.",error)))
+            using(FairFileLock.Hold(path+".lock",DrawLockWaitMs,error=>new IOException("The crafting lists' lock is held by another game client.",error)))
             {
                 var onDisk=CraftLists.Read(path,Recovered);
-                var merged=CraftLists.Merge(before,next,onDisk).Take(CraftLists.MaxLists).ToList();
+                var merged=CraftLists.Merge(before,next,onDisk).ToList();
+                if(merged.Count>CraftLists.MaxListsMerged)
+                    throw new InvalidDataException($"With the other game client's lists there would be {merged.Count} lists, more than {CraftLists.MaxListsMerged}: nothing was saved; remove a list first.");
                 CraftLists.Write(path,merged);
                 lists=merged;before=merged;
             }

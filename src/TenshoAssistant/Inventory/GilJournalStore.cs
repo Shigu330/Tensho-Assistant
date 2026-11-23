@@ -34,7 +34,8 @@ public sealed class GilJournalStore
     public List<GilEntry> Load(ulong character,DateTimeOffset now)
     {
         var json=Path.Combine(folder,FileName(character));
-        if(data.Database() is not { } opened)return GilJournal.Read(json);
+        // X-842 M5 (0.1843): a file read from its .bak is said, as the other kept stores do.
+        if(data.Database() is not { } opened)return GilJournal.Read(json,data.Recovered("The gil journal"));
         // X-574 (0.1793): a file of before still there is left aside, never read (the journal is the data file's).
         if(File.Exists(json))data.LeftAside("Gil journal",Path.Combine(Path.GetFileName(folder),"*.json"));
         return ReadRows(opened,character);

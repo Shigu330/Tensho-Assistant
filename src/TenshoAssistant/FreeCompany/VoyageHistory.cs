@@ -72,7 +72,7 @@ public static class VoyageHistory
     private sealed record FileDto(int Schema,VoyageRecord[] Records);
 
     /// <summary>Reads the history file (missing = empty; a bad one throws, so it is never overwritten by mistake). X-833: or its previous version (« .bak ») when it is missing or does not read (AtomicFile.ReadKept).</summary>
-    public static List<VoyageRecord> Read(string path)=>AtomicFile.ReadKept(path,ReadFile);
+    public static List<VoyageRecord> Read(string path,Action<string,Exception>? recovered=null)=>recovered is null ? AtomicFile.ReadKept(path,ReadFile) : AtomicFile.ReadKept(path,ReadFile,recovered);
 
     private static List<VoyageRecord> ReadFile(string path)
     {
@@ -111,7 +111,8 @@ public sealed class VoyageHistoryData(string file,TenshoDataFile? data)
     /// <summary>The history, as saved (throws when it cannot be read: the caller then never writes over it).</summary>
     public List<VoyageRecord> Load(DateTimeOffset now)
     {
-        if(data?.Database() is not { } opened)return VoyageHistory.Read(file);
+        // X-842 M5 (0.1843): a file read from its .bak is said, as the other kept stores do (through the data file's log; none without a data file).
+        if(data?.Database() is not { } opened)return VoyageHistory.Read(file,data?.Recovered("The voyage history"));
         // X-574 (0.1793): a file of before still there is left aside, never read (the history is the data file's).
         if(File.Exists(file))data.LeftAside("Voyage history",Path.GetFileName(file));
         return ReadRows(opened);

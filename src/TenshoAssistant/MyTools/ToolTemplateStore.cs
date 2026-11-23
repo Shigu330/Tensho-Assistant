@@ -48,9 +48,16 @@ public sealed class ToolTemplateStore:IDisposable
     private readonly List<SavedTool> refused=[];
     private Task writes=Task.CompletedTask;
     private bool disposed;
+    // X-842 M1 (0.1843, review of 0.1838): the edits made here (a write or a look at the file that began before the last one does not replace
+    // the memory), the file's time last seen, and when the file is looked at again.
+    private long edits;
+    private DateTime seen;
+    private long nextLook=-100_000;
+    /// <summary>X-842 M1: how often the file is looked at again for another game client's change (off the drawing, on the write chain).</summary>
+    internal int LookEveryMs{get;init;}=2000;
     public bool Unavailable{get;private set;}
     public int RefusedCount{get{lock(gate)return refused.Count;}}
-    public IReadOnlyList<InstalledTool> Tools{get{lock(gate)return tools;}}
+    public IReadOnlyList<InstalledTool> Tools{get{lock(gate){LookAgain();return tools;}}}
 
     /// <summary>X-180 (0.1168): read-only (the desktop application's copy, overwritten from the game): nothing is added, removed, changed or written.</summary>
     public bool ReadOnly{get;}
@@ -64,12 +71,8 @@ public sealed class ToolTemplateStore:IDisposable
             if(!File.Exists(path) && !File.Exists(AtomicFile.BackupOf(path)))return;
             var dto=AtomicFile.ReadKept(path,ReadFile,Recovered);
             before=new FileDto(1,dto.Tools.Take(MaxTools).ToArray());
-            foreach(var saved in dto.Tools.Take(MaxTools))
-            {
-                if(saved?.Json is not null && ToolTemplateFormat.Parse(saved.Json).Template is { } template && tools.All(tool=>tool.Template.Id!=template.Id))
-                    tools.Add(new(template,saved.Json,saved.Done ?? [],saved.Counts ?? []));
-                else if(saved?.Json is not null)refused.Add(saved);
-            }
+            (tools,var notRead)=Installed(dto);refused.AddRange(notRead);
+            seen=File.GetLastWriteTimeUtc(path);
         }
         catch(Exception error) when(error is IOException or UnauthorizedAccessException or JsonException or InvalidDataException or NotSupportedException)
         {Unavailable=true;tools=[];warn(error,"My tools could not be read; the file is left as it is.");}
@@ -83,6 +86,50 @@ public sealed class ToolTemplateStore:IDisposable
     /// seen here, is kept; one it changed is its own, and when the file holds the same tool (same text) its ticks and counters are merged key
     /// by key the same way (each client's ticks of the day kept). Mine's order first, then the file's other tools.
     /// </summary>
+    private static (List<InstalledTool> Tools,List<SavedTool> Refused) Installed(FileDto dto)
+    {
+        var installed=new List<InstalledTool>();var notRead=new List<SavedTool>();
+        foreach(var saved in dto.Tools.Take(MaxTools))
+        {
+            if(saved?.Json is not null && ToolTemplateFormat.Parse(saved.Json).Template is { } template && installed.All(tool=>tool.Template.Id!=template.Id))
+                installed.Add(new(template,saved.Json,saved.Done ?? [],saved.Counts ?? []));
+            else if(saved?.Json is not null)notRead.Add(saved);
+        }
+        return (installed,notRead);
+    }
+    /// <summary>X-842 M1 (0.1843): the file written or read becomes the memory, unless an edit was made here meanwhile (its own write follows and
+    /// merges it): another client's ticks, counts and removals are seen, and a « + » starts from the file's count, not from a stale one.</summary>
+    private void Adopt(FileDto dto,long at)
+    {
+        if(disposed || at!=edits)return;
+        before=new FileDto(1,dto.Tools.Take(MaxTools).ToArray());
+        var (installed,notRead)=Installed(dto);tools=installed;refused.Clear();refused.AddRange(notRead);
+    }
+    /// <summary>X-842 M1 (0.1843): at most every <see cref="LookEveryMs"/>, the file is read again on the write chain when its time changed (under the
+    /// profile's lock: never half another client's write).</summary>
+    private void LookAgain()
+    {
+        var tick=Environment.TickCount64;
+        if(disposed || Unavailable || ReadOnly || tick-nextLook<LookEveryMs)return;
+        nextLook=tick;var at=edits;
+        writes=writes.ContinueWith(_=>Look(at),TaskScheduler.Default);
+    }
+    private void Look(long at)
+    {
+        try
+        {
+            DateTime known;lock(gate)known=seen;
+            if(!File.Exists(path) || File.GetLastWriteTimeUtc(path)==known)return;
+            using(FairFileLock.Hold(path+".lock",LockWaitMs,error=>new IOException("My tools' lock is held by another game client.",error)))
+            {
+                var time=File.GetLastWriteTimeUtc(path);
+                var dto=AtomicFile.ReadKept(path,ReadFile,Recovered);
+                lock(gate){seen=time;Adopt(dto,at);}
+            }
+        }
+        catch(Exception error) when(error is IOException or UnauthorizedAccessException or JsonException or InvalidDataException or NotSupportedException)
+        {warn(error,"My tools could not be read again.");}
+    }
     internal static FileDto Merge(FileDto? before,FileDto mine,FileDto theirs)
     {
         var old=ByKey(before?.Tools ?? []);var file=ByKey(theirs.Tools);var own=ByKey(mine.Tools);
@@ -183,9 +230,10 @@ public sealed class ToolTemplateStore:IDisposable
     private void Save()
     {
         var snapshot=new FileDto(1,tools.Select(tool=>new SavedTool(tool.Json,new(tool.Done),new(tool.Counts))).Concat(refused).ToArray());
-        writes=writes.ContinueWith(_=>Write(snapshot),TaskScheduler.Default);
+        var at=++edits;
+        writes=writes.ContinueWith(_=>Write(snapshot,at),TaskScheduler.Default);
     }
-    private void Write(FileDto snapshot)
+    private void Write(FileDto snapshot,long at)
     {
         try
         {
@@ -196,7 +244,8 @@ public sealed class ToolTemplateStore:IDisposable
                 var onDisk=File.Exists(path) || File.Exists(AtomicFile.BackupOf(path)) ? AtomicFile.ReadKept(path,ReadFile,Recovered) : null;
                 var merged=onDisk is null ? snapshot : Merge(before,snapshot,onDisk);
                 AtomicFile.Write(path,JsonSerializer.SerializeToUtf8Bytes(merged,Options),keep:true);
-                before=snapshot;
+                // X-842 M1: the merged file becomes the memory (no edit since); else the lineage of this client's copy stays the base.
+                lock(gate){before=snapshot;seen=File.GetLastWriteTimeUtc(path);Adopt(merged,at);}
             }
         }
         catch(Exception error) when(error is IOException or UnauthorizedAccessException or JsonException or InvalidDataException or NotSupportedException)

@@ -291,6 +291,9 @@ public sealed class TenshoDataDatabase
 /// </summary>
 public sealed class TenshoDataFile
 {
+    /// <summary>X-842 M5 (0.1843, review of 0.1836): a JSON file of a family read from its previous version (« .bak »), the damaged file set aside:
+    /// said in the log, as the crafting lists, my tools, the teams and the duties say it.</summary>
+    public Action<string,Exception> Recovered(string family)=>(aside,error)=>warn(error,$"{family} did not read; its previous version (.bak) was read, the damaged file kept as {System.IO.Path.GetFileName(aside)}.");
     private readonly string path;
     private readonly Action<Exception,string> warn;
     private readonly Action<string>? info;
