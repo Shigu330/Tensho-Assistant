@@ -17,10 +17,10 @@ internal sealed partial class MainWindow
         ImGui.SameLine(); ImGui.TextUnformatted(SelectedItem?.Name ?? $"ID {itemId}");
         // 0.270: summary (lowest price and last sale on the world), every listing with filters, recent sales; only the open tab works.
         // X-605 (0.1701): the tabs arranged with the mouse (OrderedTabs).
-        var summary = marketFocusSummary; marketFocusSummary = false;
+        // X-855 (review 0.1860, M2): « Market prices » from an item asks for the Summary tab through the table of links (Item.Market).
         OrderedTabs("MarketTabs",
         [
-            new("Summary", localization.Get("MarketBoard.TabSummary"), () => DrawMarketSummary(state), summary),
+            new("Summary", localization.Get("MarketBoard.TabSummary"), () => DrawMarketSummary(state)),
             new("Listings", localization.Get("MarketBoard.TabListings"), DrawMarketListings),
             new("History", localization.Get("MarketBoard.TabHistory"), DrawMarketHistory),
         ]);

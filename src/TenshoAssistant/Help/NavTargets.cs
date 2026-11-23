@@ -23,6 +23,10 @@ public sealed record NavTarget(string Page,string? Tab=null,string? Category=nul
 /// are rows now; NavTargets1859Tests refuses any tab request field but MainWindow.Open's two, and any assignment of them outside a link followed.
 /// One jump stays outside, on purpose: a collection kind (focusCollectionKind) chosen from an item's kind at run time (a mount, a minion, a card
 /// of the extra collections…); it is an enum, so a renamed kind breaks the build, and it is kept until its tab is open, as the table's requests are.
+/// X-855 (review 0.1860, M2): the item menu's « Market prices » chose the Market page's Summary tab by a flag of its own (set by the menu, dropped once read);
+/// it is a row now (Item.Market). NavTargets1861Tests no longer knows the guards by a field's name: a variable passed by ref to DetailTabs is
+/// only declared, and an OrderedTab's Select is one of a written list (focusCollectionKind; Triple Triad's series, chosen from a card's series
+/// at run time, also by « Ex. » typed in the search, inside the page; the recipes' default tab; Open's Settings tab; DetailTabs' own focus).
 /// </summary>
 public static class NavTargets
 {
@@ -42,6 +46,8 @@ public static class NavTargets
         ["CraftSimulation"]="CraftPageTabs",
         // X-853 (review 0.1858, I1): the Maps page.
         ["Maps"]="MapsTabs",
+        // X-855 (review 0.1860, M2): the Market page.
+        ["Market"]="MarketTabs",
     };
 
     public static readonly IReadOnlyDictionary<string,NavTarget> Table=new Dictionary<string,NavTarget>
@@ -75,6 +81,8 @@ public static class NavTargets
         ["Item.Craft"]=new("Items","Craft"),
         ["Item.Uses"]=new("Items","Uses"),
         ["Item.Gathering"]=new("Items","Gathering"),
+        // X-855: the item menu's « Market prices »: the Market page's Summary tab, not the tab last used (0.273).
+        ["Item.Market"]=new("Market","Summary"),
         // X-813: Storage's tabs (a character's storages, the currencies and what a currency buys).
         ["Storage.Bank"]=new("Storage","Bank"),
         ["Storage.Currencies"]=new("Storage","Currencies"),

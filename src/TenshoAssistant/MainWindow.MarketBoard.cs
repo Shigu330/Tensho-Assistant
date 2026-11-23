@@ -11,8 +11,6 @@ namespace TenshoAssistant;
 internal sealed partial class MainWindow
 {
     private MarketBoardService? marketBoard;
-    // 0.273: « Market prices » from an item opens the Summary tab, not the last tab used.
-    private bool marketFocusSummary;
     internal void ConfigureMarketBoard(MarketBoardService service)=>marketBoard=service;
     // e) (audit 2026-11-02): the scope is saved (Configuration.MarketBoardScope, also in Settings › Interface) and the page opens on
     // it next time; an unknown saved value (hand-edited file) falls back to the data centre, the scope used before e).

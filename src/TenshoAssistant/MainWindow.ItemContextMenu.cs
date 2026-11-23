@@ -28,7 +28,7 @@ internal sealed partial class MainWindow
             case ItemContextRoute.Gathering:OpenContextTool("GatherBuddy");break;
             case ItemContextRoute.Tools:toolQuery=string.Empty;page=Page.Home;break;
             case ItemContextRoute.NpcVendors:page=Page.NpcVendors;break;
-            case ItemContextRoute.Market:OpenContextTool("Price Insight");marketFocusSummary=true;break;
+            case ItemContextRoute.Market:OpenLink("Item.Market");break;
             case ItemContextRoute.MonsterLoot:OpenContextTool("Monster Loot Hunter");break;
             case ItemContextRoute.DutyLoot:
                 // First duty that drops it (LuminaSupplemental, then Garland), filtered on the item; else the duty list searched by name.
