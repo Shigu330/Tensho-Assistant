@@ -43,6 +43,8 @@ internal sealed unsafe class MacroChainBridge : IDisposable
                     throw new InvalidOperationException("Command /tenshonext already registered.");
             }, () => commands.RemoveHandler(MacroDefinition.Marker));
             registrations.Register(() => TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update), () => TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,Update));
+            // X-836 M2 (0.1840): the cut stops Update; the chain is cancelled when it starts, so it never resumes by itself at the exit.
+            registrations.Register(() => TenshoAssistant.Competitive.CompetitiveGate.Changed += OnCut, () => TenshoAssistant.Competitive.CompetitiveGate.Changed -= OnCut);
         }
         catch { registrations.Dispose(); throw; }
     }
@@ -166,6 +168,16 @@ internal sealed unsafe class MacroChainBridge : IDisposable
             }
         }
     }
+    private void OnCut(bool isCut)
+    {
+        if (!isCut) return;
+        lock (gate)
+        {
+            if (disposed) return;
+            sequence.StopForCompetitive();
+            service.Publish(owner, false, null, sequence.State);
+        }
+    }
     private void OnMarker(string command, string arguments)
     {
         lock (gate)
@@ -182,6 +194,8 @@ internal sealed unsafe class MacroChainBridge : IDisposable
     private void AcceptMarker(string arguments)
     {
             if (disposed || sequence.State.Pending is not { } pending) return;
+            // X-836 M2 (0.1840): a marker read during the cut (the command is not filtered) never moves the chain on.
+            if (TenshoAssistant.Competitive.CompetitiveGate.Cut) { sequence.StopForCompetitive(); return; }
             if (!framework.IsInFrameworkUpdateThread || arguments.Length != 0 || ReadOwner() != pending.CharacterId)
             { sequence.Fail("Marker received outside the expected context."); return; }
             var shell = RaptureShellModule.Instance();

@@ -83,6 +83,11 @@ public sealed class MacroSequence : IDisposable
     { lock (gate) { if (Active) StopCore(MacroSequenceStatus.Failed, message); } }
     public void Cancel()
     { lock (gate) { if (Active) StopCore(MacroSequenceStatus.Cancelled, "Next steps cancelled."); } }
+    /// <summary>X-836 M2 (0.1840, security review before the alpha): PvP or ranked content started: the chain is cancelled, never paused (it
+    /// does not start again by itself when the cut ends).</summary>
+    public void StopForCompetitive()
+    { lock (gate) { if (Active) StopCore(MacroSequenceStatus.Cancelled, CompetitiveMessage); } }
+    public const string CompetitiveMessage = "PvP or ranked content: the chain is cancelled.";
     private void StopCore(MacroSequenceStatus status, string message) => state = state with { Status = status, Pending = null, Message = message };
     public void Dispose()
     {

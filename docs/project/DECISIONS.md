@@ -62,6 +62,7 @@ Index produced by `tools/docgen.py` (one row per DEC, its problem):
 | DEC-053 | 2026-11-15 | DEC-030 removed the customisable chat (« I will take Chat 2 if I need it »); the chat study of 2026-11-15 (X-388: an audit of Chat 2 and of what Tensho could add to it) asked how far a Tensho chat should go, and when. |
 | DEC-054 | 2026-11-16 | DEC-048 grouped the settings in seven tabs with a search; the tabs had grown long (General held the window, the header, the fonts, the language, the theme, the item tooltips and the market in one scroll; Panels held every tool's aids and the chat), so a setting was hard to find. |
 | DEC-055 | 2026-11-18 | DEC-009 removed the Combat domain and DEC-041 said « nothing during a fight »; since then the user asked for help that stays visible in PvE fights (the Crucible of the Unbroken, deep dungeons), and Dalamud's own rule only asks that combat elements stay informative, what the player would already know. |
+| DEC-056 | 2026-11-23 | Since 0.1113 (X-126) Tensho can download, install and open the desktop application, a program (.exe). Dalamud's rules do not let a plugin download and run a program; the exception was recorded only in the agent's notes, not in a public decision, and PUBLISHING.md did not name it. |
 <!-- /docgen:decisions-en -->
 
 ID: DEC-001
@@ -616,6 +617,16 @@ Reason: User's choice; it is what Dalamud's rule « combat elements informative 
 Consequences: Replaces DEC-009 in part (the Combat domain is no longer « removed »: information from the game is allowed in PvE fights; ACT and IINACT stay out) and the « nothing during a fight » of DEC-041 and DEC-046 as a general rule. A feature that hides itself in a fight today (duty notes, alerts held until the end of a fight, the team panel that stands beside the board window) keeps doing so until its own point changes it. PUBLISHING.md says the rule in its Dalamud table; a test refuses the functions a parser or a boss timer would need (combat log, action effects, enemy cast times).
 References: DEC-009, DEC-032, DEC-033, DEC-038, DEC-041, DEC-046, DEC-047, docs/project/PUBLISHING.md, tests/TenshoAssistant.Tests/DalamudRulesCombat1575Tests.cs, GLOBAL-PLAN X-608
 
+
+ID: DEC-056
+Timestamp: 2026-11-23 Europe/Brussels (written in 0.1840; the user's decision of 2026-11-11)
+Problem: Since 0.1113 (X-126) Tensho can download, install and open the desktop application, a program (.exe). Dalamud's rules do not let a plugin download and run a program; the exception was recorded only in the agent's notes, not in a public decision, and PUBLISHING.md did not name it.
+Evidence: User, 2026-11-11, asked for the desktop application to be installed from Tensho and accepted the exception, Tensho being on its own repository (DEC-039). Security review before the alpha (2026-11-22, M5).
+Options: (a) Keep the installer, declared as an exception. (b) Only a link to the release page; the player downloads and unpacks it.
+Decision: Option (a). On the player's clicks only (Settings › Advanced › Desktop application), Tensho downloads TenshoAssistant.Desktop.zip from this repository's GitHub release of its own version (else the latest Stable release), checks its SHA-256 against the one published in the same release, unpacks it in the install folder and opens it. Never mandatory, never started without a click. The check proves integrity (the file is the one of the release), not authenticity (no signature): this is said to the player in the tooltip, the FAQ and the README.
+Reason: The user's choice; Tensho is not on the official repository (DEC-039).
+Consequences: PUBLISHING.md names the exception. Should Tensho ever aim at the official repository, a build with `-p:TenshoDesktopInstall=false` creates no installer and leaves only a link to the release page.
+References: DEC-039, docs/project/PUBLISHING.md, docs/FAQ.md, src/TenshoAssistant/Link/DesktopInstaller.cs, GLOBAL-PLAN X-126 and X-836
 ---
 
 # Décisions durables
@@ -680,6 +691,7 @@ Index produit par `tools/docgen.py` (une ligne par DEC, son problème) :
 | DEC-053 | 2026-11-15 | DEC-030 a retiré le chat personnalisable (« je prendrai Chat 2 si j'en ai besoin ») ; l'étude du chat du 2026-11-15 (X-388 : audit de Chat 2 et de ce que Tensho pourrait y ajouter) demandait jusqu'où irait un chat de Tensho, et quand. |
 | DEC-054 | 2026-11-16 | DEC-048 a regroupé les réglages en sept onglets avec une recherche ; les onglets étaient devenus longs (Général tenait la fenêtre, l'en-tête, les polices, la langue, le thème, les infobulles des objets et le marché dans un seul défilement ; Panneaux tenait les aides de chaque outil et le chat), donc un réglage était difficile à trouver. |
 | DEC-055 | 2026-11-18 | DEC-009 a retiré le domaine Combat et DEC-041 disait « rien pendant un combat » ; depuis, l'utilisateur a demandé des aides qui restent visibles en combat JcE (Dédale bestial, donjons profonds), et la règle de Dalamud demande seulement que les éléments de combat restent informatifs, ce que le joueur saurait déjà. |
+| DEC-056 | 2026-11-23 | Depuis 0.1113 (X-126), Tensho peut télécharger, installer et ouvrir l'application de bureau, un programme (.exe). Les règles de Dalamud ne laissent pas un plugin télécharger et lancer un programme ; l'exception n'était notée que dans les notes de l'agent, pas dans une décision publique, et PUBLISHING.md ne la nommait pas. |
 <!-- /docgen:decisions -->
 
 DEC-ID: DEC-001
@@ -1233,3 +1245,13 @@ Decision: Option (b). En combat JcE, Tensho peut montrer ce que le joueur saurai
 Reason: Choix de l'utilisateur ; c'est ce que permet la règle de Dalamud « éléments de combat seulement informatifs ».
 Consequences: Remplace en partie DEC-009 (le domaine Combat n'est plus « retiré » : les informations du jeu sont permises en combat JcE ; ACT et IINACT restent dehors) et le « rien pendant un combat » de DEC-041 et DEC-046 comme règle générale. Une fonction qui se masque en combat aujourd'hui (notes de mission, alertes retenues jusqu'à la fin d'un combat, panneau d'équipe posé à côté de la fenêtre du plateau) continue de le faire tant que son propre point ne la change pas. PUBLISHING.md dit la règle dans son tableau Dalamud ; un test refuse les fonctions dont un parser ou un minuteur de boss aurait besoin (journal de combat, effets d'action, temps d'incantation des ennemis).
 References: DEC-009, DEC-032, DEC-033, DEC-038, DEC-041, DEC-046, DEC-047, docs/project/PUBLISHING.md, tests/TenshoAssistant.Tests/DalamudRulesCombat1575Tests.cs, GLOBAL-PLAN X-608
+
+DEC-ID: DEC-056
+Timestamp: 2026-11-23 Europe/Brussels (écrite en 0.1840 ; décision de l'utilisateur du 2026-11-11)
+Problem: Depuis 0.1113 (X-126), Tensho peut télécharger, installer et ouvrir l'application de bureau, un programme (.exe). Les règles de Dalamud ne laissent pas un plugin télécharger et lancer un programme ; l'exception n'était notée que dans les notes de l'agent, pas dans une décision publique, et PUBLISHING.md ne la nommait pas.
+Evidence: Utilisateur, 2026-11-11 : demande d'installer l'application de bureau depuis Tensho, et exception acceptée, Tensho étant sur son propre dépôt (DEC-039). Revue de sécurité avant l'alpha (2026-11-22, M5).
+Options: (a) Garder l'installation, déclarée comme une exception. (b) Seulement un lien vers la page de la release ; le joueur télécharge et décompresse lui-même.
+Decision: Option (a). Sur les clics du joueur seulement (Paramètres › Avancé › Application de bureau), Tensho télécharge TenshoAssistant.Desktop.zip depuis la release GitHub de ce dépôt de sa propre version (sinon la dernière release Stable), vérifie son SHA-256 contre celui publié dans la même release, la décompresse dans le dossier d'installation et l'ouvre. Jamais obligatoire, jamais lancée sans un clic. La vérification prouve l'intégrité (le fichier est celui de la release), pas l'authenticité (aucune signature) : c'est dit au joueur dans l'info-bulle, la FAQ et le README.
+Reason: Choix de l'utilisateur ; Tensho n'est pas sur le dépôt officiel (DEC-039).
+Consequences: PUBLISHING.md nomme l'exception. Si Tensho visait un jour le dépôt officiel, une compilation avec `-p:TenshoDesktopInstall=false` ne crée aucun installateur et ne laisse qu'un lien vers la page de la release.
+References: DEC-039, docs/project/PUBLISHING.md, docs/FAQ.md, src/TenshoAssistant/Link/DesktopInstaller.cs, GLOBAL-PLAN X-126 et X-836

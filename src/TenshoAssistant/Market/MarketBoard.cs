@@ -13,10 +13,15 @@ public sealed record MarketOffer(long UnitPrice,int Quantity,bool Hq,string Worl
     public long Cost=>Total+Tax;
 }
 public sealed record MarketSale(long UnitPrice,int Quantity,bool Hq,string World,DateTimeOffset At);
+/// <summary>X-836 M1 (0.1840, security review before the alpha): NamesDropped: the copy kept on disk, written without the sellers' retainer
+/// names (other players' names, kept in memory only for the display and to recognise one's own offers).</summary>
 public sealed record MarketBoard(string Scope,uint ItemId,DateTimeOffset FetchedAt,IReadOnlyList<MarketOffer> Offers,IReadOnlyList<MarketSale> Sales,
-    double? UnitsPerDay,double? NqUnitsPerDay,double? HqUnitsPerDay)
+    double? UnitsPerDay,double? NqUnitsPerDay,double? HqUnitsPerDay,bool NamesDropped=false)
 {
     public const int MaximumOffers=100,MaximumSales=100;
+
+    /// <summary>X-836 M1 (0.1840): the same board without any retainer name, as it is written to the disk cache.</summary>
+    public MarketBoard WithoutNames()=>this with{Offers=Offers.Select(offer=>offer with{Retainer=""}).ToArray(),NamesDropped=true};
 
     public static MarketBoard Parse(string json,string scope,uint itemId,DateTimeOffset now)
     {

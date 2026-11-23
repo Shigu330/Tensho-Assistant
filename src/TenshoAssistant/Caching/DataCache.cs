@@ -169,20 +169,23 @@ public sealed class DataCache : IDisposable
     // X-147 (0.1217, audit A14): measured on a copy of a real cache (2 053 files, 69 MB): each write read the header of every file again, about
     // 150 ms under the disk lock (reads wait behind it). The identity read from a file is now kept while its name, time and size stay the same:
     // only new or changed files are read again. The copies kept in « previous » count in the byte limit.
-    private readonly Dictionary<string,(DateTime Written,long Length,(string Family,string Scope,string? Game)? Identity)> identities=new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string,(DateTime Written,long Length,(string Family,string Scope,string? Game,string? Version)? Identity)> identities=new(StringComparer.OrdinalIgnoreCase);
+    /// <summary>X-836 M1 (0.1840, security review before the alpha): versions of a family no longer written, whose copies are removed at the next
+    /// trim (any write) instead of staying until the byte limit: the market boards of v1 kept other players' retainer names.</summary>
+    internal static readonly IReadOnlySet<(string Family,string Version)> Retired=new HashSet<(string,string)>{("market-board","universalis-board-v1")};
     /// <summary>X-147: how many file headers were read (tests).</summary>
     internal long HeaderReads;
-    private (string Family,string Scope,string? Game)? KnownIdentity(FileInfo file,Dictionary<string,(DateTime,long,(string,string,string?)?)> next)
+    private (string Family,string Scope,string? Game,string? Version)? KnownIdentity(FileInfo file,Dictionary<string,(DateTime,long,(string,string,string?,string?)?)> next)
     {
         var written=file.LastWriteTimeUtc;var length=file.Length;
         var identity=identities.TryGetValue(file.Name,out var known) && known.Written==written && known.Length==length ? known.Identity:ReadIdentity(file);
         next[file.Name]=(written,length,identity);
         return identity;
     }
-    private (string Family,string Scope,string? Game)? ReadIdentity(FileInfo file){HeaderReads++;return Identity(file);}
+    private (string Family,string Scope,string? Game,string? Version)? ReadIdentity(FileInfo file){HeaderReads++;return Identity(file);}
     private List<PatchMove> Trim()
     {
-        var next=new Dictionary<string,(DateTime,long,(string,string,string?)?)>(StringComparer.OrdinalIgnoreCase);
+        var next=new Dictionary<string,(DateTime,long,(string,string,string?,string?)?)>(StringComparer.OrdinalIgnoreCase);
         var files=new DirectoryInfo(root).EnumerateFiles("*.json").Where(file=>file.Name.Length==69 && file.Name[..64].All(Uri.IsHexDigit))
             .OrderByDescending(file=>file.LastWriteTimeUtc).Select(file=>(File:file,Identity:KnownIdentity(file,next))).ToArray();
         identities.Clear();foreach(var (name,known) in next)identities[name]=known;
@@ -190,6 +193,7 @@ public sealed class DataCache : IDisposable
         var moved=new List<PatchMove>();var keptOld=new HashSet<(string,string)>();
         foreach(var (file,identity) in files)
         {
+            if(identity is { Version:{ } version } retired && Retired.Contains((retired.Family,version))){Delete(file);continue;}
             if(identity is { } id)
             {
                 var key=(id.Family,id.Scope);
@@ -279,15 +283,16 @@ public sealed class DataCache : IDisposable
     private static void Delete(FileInfo file){try{file.Delete();}catch(Exception error) when(error is IOException or UnauthorizedAccessException){}}
     // Family, scope and game version from the file header ({"Schema":1,"Family":"…","Scope":"…","Version":"…",…}); null when unreadable
     // (then only the limits apply).
-    private static (string Family,string Scope,string? Game)? Identity(FileInfo file)
+    private static (string Family,string Scope,string? Game,string? Version)? Identity(FileInfo file)
     {
         try
         {
             using var stream=file.OpenRead();var buffer=new byte[8192];var read=stream.ReadAtLeast(buffer,buffer.Length,false);
             var head=System.Text.Encoding.UTF8.GetString(buffer,0,read);
             var family=System.Text.RegularExpressions.Regex.Match(head,@"""Family"":""((?:[^""\\]|\\.)*)""");
+            var version=System.Text.RegularExpressions.Regex.Match(head,@"""Version"":""((?:[^""\\]|\\.)*)""");
             var scope=System.Text.RegularExpressions.Regex.Match(head,@"""Scope"":""((?:[^""\\]|\\.)*)""");
-            return family.Success && scope.Success ? (family.Groups[1].Value,scope.Groups[1].Value,PatchCatalogDiff.GameVersion(head)):null;
+            return family.Success && scope.Success ? (family.Groups[1].Value,scope.Groups[1].Value,PatchCatalogDiff.GameVersion(head),version.Success ? version.Groups[1].Value:null):null;
         }
         catch(Exception error) when(error is IOException or UnauthorizedAccessException){return null;}
     }

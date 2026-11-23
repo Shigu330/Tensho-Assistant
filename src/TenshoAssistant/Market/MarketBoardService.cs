@@ -15,7 +15,9 @@ public sealed record MarketBoardState(string Scope,uint ItemId,MarketBoard? Boar
 // marked as old, instead of an error alone. The data-center → region table (/api/v2/data-centers) is read once per session.
 public sealed class MarketBoardService : IDisposable
 {
-    private const string Family="market-board",Version="universalis-board-v1";
+    // X-836 M1 (0.1840, security review before the alpha): v2 is written without the sellers' retainer names (MarketBoard.WithoutNames);
+    // the v1 copies, which kept them, are removed by the cache (DataCache.Retired).
+    internal const string Family="market-board",Version="universalis-board-v2";
     private readonly object gate=new();
     private readonly HttpClient client;
     // X-76 (step 2): a client given by the caller is the caller's to dispose (as MarketService).
@@ -129,7 +131,7 @@ public sealed class MarketBoardService : IDisposable
                 Community.BoundedHttp.Count(new Uri(url).Host);
                 var json=await client.GetStringAsync(url,token).ConfigureAwait(false);
                 var board=MarketBoard.Parse(json,scope,itemId,DateTimeOffset.UtcNow);
-                if(store is not null)_=store.WriteAsync(Family,$"{scope}:{itemId}",Version,board,board.FetchedAt);
+                if(store is not null)_=store.WriteAsync(Family,$"{scope}:{itemId}",Version,board.WithoutNames(),board.FetchedAt);
                 Publish(scope,itemId,board,null,false);
             }
             catch(OperationCanceledException) when (token.IsCancellationRequested){lock(gate)busy=false;}

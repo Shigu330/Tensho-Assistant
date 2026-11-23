@@ -361,6 +361,39 @@ public static class ChatHistory
     /// history: left as it is.</summary>
     public static void Trim(string path,ulong character,DateTimeOffset now,int messages,int days)
     {
+        TrimCore(path,character,now,messages,days);
+    }
+
+    /// <summary>X-836 M3 (0.1840, security review before the alpha): the other characters' files are trimmed when they have not been written for
+    /// this long: no client plays them now (a file another client still writes is never written over).</summary>
+    public static readonly TimeSpan SweepIdle=TimeSpan.FromDays(1);
+
+    /// <summary>X-836 M3 (0.1840): the files of the characters other than <paramref name="open"/>, idle for <see cref="SweepIdle"/>, brought within
+    /// the days kept: a file left with no message is deleted, one with older messages trimmed. Before, a character no longer played kept the other
+    /// players' messages past the days said. Nothing with « No limit » days; files of another format or character left as they are.
+    /// Returns the files deleted or trimmed.</summary>
+    public static int Sweep(string folder,ulong open,DateTimeOffset now,int messages,int days)
+    {
+        if(days==NoLimit || !Directory.Exists(folder))return 0;
+        var done=0;
+        foreach(var path in Directory.EnumerateFiles(folder,"*.jsonl"))
+        {
+            if(!ulong.TryParse(Path.GetFileNameWithoutExtension(path),NumberStyles.None,CultureInfo.InvariantCulture,out var who) || who==0 || who==open)continue;
+            try
+            {
+                if(now.UtcDateTime-File.GetLastWriteTimeUtc(path)<SweepIdle)continue;
+                var read=Read(path,who,now,messages,days);
+                if(!read.Ours)continue;
+                if(read.Records.Count==0){File.Delete(path);done++;}
+                else if(read.Trim){Trim(path,who,now,messages,days);done++;}
+            }
+            catch(Exception error) when(error is IOException or UnauthorizedAccessException or InvalidDataException){}
+        }
+        return done;
+    }
+
+    private static void TrimCore(string path,ulong character,DateTimeOffset now,int messages,int days)
+    {
         if(!File.Exists(path) || IsOurs(FirstLineOf(path),character)==false)return;
         var limit=Limit(messages);
         var oldest=Oldest(now,days);
@@ -494,6 +527,7 @@ public static class ChatHistory
 /// <param name="append">The write of a file's lines (<see cref="ChatHistory.Append"/>; a test puts its own in, to act while it writes).</param>
 public sealed class ChatHistoryWriter(string folder,Action<string,Action> run,Action<Exception,string> warn,Func<string,ulong,IReadOnlyList<string>,long>? append=null)
 {
+    private bool swept;
     /// <summary>The most lines waiting (a disk that keeps failing): past it, the oldest go.</summary>
     public const int MaximumPending=2*ChatHistory.MaximumMessages;
     private readonly object gate=new();
@@ -561,6 +595,13 @@ public sealed class ChatHistoryWriter(string folder,Action<string,Action> run,Ac
             appended=0;
             Measure(who);
             loaded(read);
+            // X-836 M3 (0.1840): once per load, the files of the characters no longer played brought within the days kept.
+            if(!swept)
+            {
+                swept=true;
+                try{ChatHistory.Sweep(folder,who,now,messages,days);}
+                catch(Exception error) when(error is IOException or UnauthorizedAccessException){Failed(error,"The other characters' chat histories could not be trimmed; they are kept as they were.");}
+            }
         });
     }
 

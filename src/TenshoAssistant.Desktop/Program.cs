@@ -47,12 +47,7 @@ internal static class Program
         if(Option(args,"--plugin=") is { } given)return Path.GetFullPath(given);
         var packaged=Path.Combine(AppContext.BaseDirectory,"plugin",DesktopVersionCheck.PluginFile);
         if(File.Exists(packaged))return packaged;
-        for(var folder=new DirectoryInfo(AppContext.BaseDirectory);folder is not null;folder=folder.Parent)
-        {
-            var built=Path.Combine(folder.FullName,"src","TenshoAssistant","bin","x64","Release",DesktopVersionCheck.PluginFile);
-            if(File.Exists(built))return built;
-        }
-        return null;
+        return DesktopPaths.RepositoryBuild(AppContext.BaseDirectory,File.Exists);
     }
 
     [STAThread]

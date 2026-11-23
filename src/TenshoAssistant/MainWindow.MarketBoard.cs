@@ -222,7 +222,8 @@ internal sealed partial class MainWindow
         var ownRetainers=bankBridge.State.KnownRetainers?.Select(known=>known.Name).ToHashSet(StringComparer.Ordinal) ?? [];
         // X-73.12 (0.868): the offers seen in game have no seller name, so your own cannot be told apart: only Universalis' offers count here.
         // X-73.14 (0.870): a seen offer counts when known not to be yours.
-        if(Undercut.Price(board.Offers.Where(offer=>(offer.Seen ? offer.Own==false:!ownRetainers.Contains(offer.Retainer)) && offer.UnitPrice is >0 and <=uint.MaxValue).Select(offer=>new UndercutListing((uint)offer.UnitPrice,offer.Hq,0)),new HashSet<ulong>()) is { } lowest)
+        // X-836 M1 (0.1840): a board read back from the disk cache has no seller name: its Universalis offers cannot be told apart from yours.
+        if(Undercut.Price(board.Offers.Where(offer=>(offer.Seen ? offer.Own==false:!ownRetainers.Contains(offer.Retainer)) && (offer.Seen || !board.NamesDropped) && offer.UnitPrice is >0 and <=uint.MaxValue).Select(offer=>new UndercutListing((uint)offer.UnitPrice,offer.Hq,0)),new HashSet<ulong>()) is { } lowest)
         {
             CopyButton(localization.Format("MarketBoard.CopyUndercut",lowest.Paste.ToString("N0")),()=>lowest.Paste.ToString(System.Globalization.CultureInfo.InvariantCulture));
             if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("MarketBoard.CopyUndercutTip",lowest.Lowest.ToString("N0",Numbers),board.FetchedAt.ToLocalTime().ToString("g")));
@@ -252,6 +253,7 @@ internal sealed partial class MainWindow
                 ImGui.TableNextColumn();ImGui.TextUnformatted(offer.World);
                 ImGui.TableNextColumn();
                 if(offer.Seen){ImGui.TextDisabled(localization.Get(offer.Own==true ? "MarketBoard.SeenYours":"MarketBoard.SeenInGame"));Tip("MarketBoard.SeenHelp");}
+                else if(board.NamesDropped && offer.Retainer.Length==0){ImGui.TextDisabled("—");Tip("MarketBoard.NameNotKeptTip");}
                 else ImGui.TextUnformatted(offer.Retainer);
                 ImGui.TableNextColumn();ImGui.TextDisabled(offer.ReviewedAt?.ToLocalTime().ToString("g") ?? "—");
             }
