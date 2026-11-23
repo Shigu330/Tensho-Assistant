@@ -432,17 +432,27 @@ def replace_retrying(rename,sleep=None):
             if attempt==REPLACE_TRIES-1:raise
             sleep(REPLACE_WAIT*2**attempt)
 
-def write_atomic(path,data,replace=None,sleep=None):
+def remove_retrying(path,remove=None,sleep=None):
+    """X-860: a temporary file removed, tried again on a refusal like the rename (the program holding the new file may still hold it);
+    True once it is gone (or was never there), False when it is still refused."""
+    remove=remove or os.remove
+    try:replace_retrying(lambda:remove(path),sleep);return True
+    except FileNotFoundError:return True
+    except OSError:return False
+
+def write_atomic(path,data,replace=None,sleep=None,remove=None,warn=None):
     """X-183 (N16): a file replaced whole or not at all: written to a temporary file beside it, flushed to the disk, then renamed over it
-    (X-858: the rename tried again on a passing refusal)."""
+    (X-858: the rename tried again on a passing refusal). X-860: on a failure the temporary file's removal is tried again too; one that
+    stays refused is said, with the file's name (warn, else the error output), never left unsaid."""
     folder=os.path.dirname(path) or ".";handle,temporary=tempfile.mkstemp(prefix="."+os.path.basename(path)+".",suffix=".tmp",dir=folder)
     try:
         with os.fdopen(handle,"wb") as out:
             out.write(data.encode("utf-8") if isinstance(data,str) else data);out.flush();os.fsync(out.fileno())
         replace_retrying(lambda:os.replace(temporary,path) if replace is None else replace(temporary,path),sleep)
     except BaseException:
-        try:os.remove(temporary)
-        except OSError:pass
+        if not remove_retrying(temporary,remove,sleep):
+            (warn or (lambda text:print(text,file=sys.stderr)))(
+                f"write_atomic: the temporary file {temporary} is still held by another program and was left; delete it once it is free")
         raise
 def write_json(path,obj):write_atomic(path,json.dumps(obj,ensure_ascii=False,separators=(",",":")))
 
@@ -1534,6 +1544,49 @@ def selftest():
             except PermissionError:kept=True
             check(kept and open(target,encoding="utf-8").read()=="after" and os.listdir(box)==["t.json"],
                   "X-858 (M1): a refusal that lasts is raised, the file left as it was, no temporary file left")
+            # X-860: the removal of the temporary file refused twice, then done: nothing left, nothing said.
+            removals=iter([True,True]);said=[];waits=[]
+            def stubborn(p):
+                if next(removals,False):raise PermissionError(5,"Access is denied")
+                os.remove(p)
+            try:write_atomic(target,"lost",replace=denied,sleep=waits.append,remove=stubborn,warn=said.append)
+            except PermissionError:pass
+            check(os.listdir(box)==["t.json"] and said==[] and len(waits)==REPLACE_TRIES-1+2,
+                  f"X-860: the temporary file's removal is tried again after two refusals ({os.listdir(box)}, {said})")
+            # X-860: a removal that stays refused leaves the file and says so, with its name; the rename's error is still raised.
+            def never(p):raise PermissionError(5,"Access is denied")
+            said=[]
+            try:write_atomic(target,"lost",replace=denied,sleep=lambda s:None,remove=never,warn=said.append);kept=False
+            except PermissionError:kept=True
+            left=[n for n in os.listdir(box) if n.endswith(".tmp")]
+            check(kept and len(left)==1 and len(said)==1 and left[0] in said[0] and open(target,encoding="utf-8").read()=="after",
+                  f"X-860: a temporary file whose removal stays refused is said, with its name, and the rename's error raised ({left}, {said})")
+            for n in left:os.remove(os.path.join(box,n))
+            if os.name=="nt":
+                # X-860: the .tmp really held by another handle (Windows refuses both the rename and the removal while it is open), let go
+                # during the removal's waits: the rename's error raised, the target as it was, no temporary file left, nothing said.
+                held=[];waits=[];said=[]
+                def holding(a,b):
+                    if not held:held.append(open(a,"rb"))
+                    os.replace(a,b)
+                def letgo(s):
+                    waits.append(s)
+                    if len(waits)==REPLACE_TRIES-1+2:held[0].close()
+                try:write_atomic(target,"lost",replace=holding,sleep=letgo,warn=said.append);kept=False
+                except PermissionError:kept=True
+                finally:
+                    for h in held:h.close()
+                check(kept and os.listdir(box)==["t.json"] and said==[] and open(target,encoding="utf-8").read()=="after",
+                      f"X-860: a .tmp held by another program, let go during the removal's waits, is removed ({os.listdir(box)}, {said}, {len(waits)})")
+                # Held for good: left and said.
+                held=[];said=[]
+                try:write_atomic(target,"lost",replace=holding,sleep=lambda s:None,warn=said.append);kept=False
+                except PermissionError:kept=True
+                for h in held:h.close()
+                left=[n for n in os.listdir(box) if n.endswith(".tmp")]
+                check(kept and len(left)==1 and len(said)==1 and left[0] in said[0],
+                      f"X-860: a .tmp held for good is left, and said with its name ({left}, {said})")
+                for n in left:os.remove(os.path.join(box,n))
         bodies=lambda g:f"Shared from Tensho Assistant 0.1832.0\n\nGist: https://gist.github.com/{g}\n\n- [x] I share these discoveries under CC0-1.0 (public domain).\n"
         s43={"number":43,"title":"Discoveries: Ann","author":{"login":"Ann"},"labels":[],"body":bodies(gid)}
         s50={"number":50,"title":"Discoveries: Eve","author":{"login":"Eve"},"labels":[],"body":bodies("5"*20)}
