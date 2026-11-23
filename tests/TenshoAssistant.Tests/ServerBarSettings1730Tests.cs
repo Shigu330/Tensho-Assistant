@@ -46,7 +46,7 @@ internal static class ServerBarSettings1730Tests
             Check(en.Contains("\"ServerBar\": \"Currencies over their threshold in the server bar\"", StringComparison.Ordinal) && en.Contains("\"ServerBarAlerts\": \"Chat alerts in the server bar\"", StringComparison.Ordinal), "en");
             Check(!fr.Contains("\"ServerBar\": \"Dans la barre du serveur\"", StringComparison.Ordinal) && !en.Contains("\"ServerBar\": \"In the server bar\"", StringComparison.Ordinal), "no label without its object");
             Check(Read("MainWindow.SettingsCategories.cs").Contains("new(\"Tracking\",\"ServerBar\",DrawServerBarSettings),", StringComparison.Ordinal), "the category");
-            Check(Read("MainWindow.cs").Contains("internal void OpenStateSettings(){page=Page.Settings;OpenSettingsCategory(\"Tracking\",\"ServerBar\");IsOpen=true;}", StringComparison.Ordinal), "the state's links");
+            Check(Read("MainWindow.cs").Contains("internal void OpenStateSettings(){OpenLink(\"Dashboard.ServerBar\");IsOpen=true;}", StringComparison.Ordinal) && TenshoAssistant.Help.NavTargets.Of("Dashboard.ServerBar")==new TenshoAssistant.Help.NavTarget("Settings","Tracking","ServerBar"), "the state's links");
             var chat = Read("MainWindow.ChatWindow.cs");
             Check(chat.Contains("{DrawChatPlayers(options);DrawChatServerBarSetting();}", StringComparison.Ordinal), "the chat window's own settings keep the row");
             var players = chat[chat.IndexOf("private void DrawChatPlayers(ChatSettings options)", StringComparison.Ordinal)..chat.IndexOf("private void DrawChatServerBarSetting()", StringComparison.Ordinal)];

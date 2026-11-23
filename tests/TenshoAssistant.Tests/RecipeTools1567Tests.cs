@@ -24,7 +24,7 @@ internal static class RecipeTools1567Tests
             {
                 Check(tools.Contains("\"" + reference + "\""), reference + " is no longer listed");
                 var line = open.Split('\n').FirstOrDefault(row => row.Contains("case \"" + reference + "\":")) ?? "";
-                var leadsBack = line.Contains("focusCraftTab = true");
+                var leadsBack = line.Contains("OpenLink(\"Item.Craft\")"); // X-813: the craft tab asked through the links table
                 Check(!leadsBack || tools.Contains("if (tool.Reference == \"" + reference + "\" && simulated is not null) OpenCraftSimulation(simulated);"),
                     reference + " leads back to the recipes tab where it is drawn");
             }

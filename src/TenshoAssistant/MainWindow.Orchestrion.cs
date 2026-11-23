@@ -12,7 +12,7 @@ internal sealed partial class MainWindow
 {
     private uint? orchestrionCategoryFilter;
     private uint selectedOrchestrion;
-    private bool focusOrchestrionTab,openOrchestrionDetailsRequested;
+    private bool openOrchestrionDetailsRequested;
     private CollectionState? orchestrionCategoryState;
     private CollectionEntry[] orchestrionCategories=[];
 
@@ -20,7 +20,7 @@ internal sealed partial class MainWindow
     {
         selectedOrchestrion=entry.Id;orchestrionCategoryFilter=entry.Music?.CategoryId;
         collectionQuery=entry.Name;collectionFilter=0;collectionKind=CollectionKind.Orchestrion;
-        focusOrchestrionTab=true;openOrchestrionDetailsRequested=true;page=Page.Collections;
+        OpenLink("Collections.Music");openOrchestrionDetailsRequested=true;
     }
 
     private void DrawOrchestrionCategories(CollectionState state)
@@ -73,7 +73,7 @@ internal sealed partial class MainWindow
                     if(items.Count==0)EmptyState("OrchestrionDetails.Empty");
                     foreach(var item in items)
                     {
-                        if(ItemCell(item,item.Id,32)){page=Page.Items;focusStocksTab=true;ImGui.CloseCurrentPopup();}
+                        if(ItemCell(item,item.Id,32)){OpenLink("Item.Stocks");ImGui.CloseCurrentPopup();}
                     }
                 }
             }

@@ -19,11 +19,11 @@ internal sealed partial class MainWindow
     private void OpenRoute(ItemContextRoute route,uint itemId)
     {
         // Reuse the same tabs, history, queries and future-tool directory as an ordinary item click.
-        focusCraftTab=false;focusUsesTab=false;focusStocksTab=false;focusGatherTab=false;focusBankTab=false;
+        navTabRequest=null;
         switch(route)
         {
             case ItemContextRoute.Usages: OpenContextTool("Item Use");break;
-            case ItemContextRoute.Stocks:page=Page.Items;focusStocksTab=true;break;
+            case ItemContextRoute.Stocks:OpenLink("Item.Stocks");break;
             case ItemContextRoute.Craft:OpenContextTool("Craftimizer");break;
             case ItemContextRoute.Gathering:OpenContextTool("GatherBuddy");break;
             case ItemContextRoute.Tools:toolQuery=string.Empty;page=Page.Home;break;
@@ -40,7 +40,7 @@ internal sealed partial class MainWindow
                 if(CollectionOf(SelectedItem) is { } entry)
                 {
                     if(entry.Kind==Collections.CollectionKind.TripleTriad)ShowTriadCard(entry.Id);
-                    else{page=Page.Collections;collectionKind=entry.Kind;focusCollectionKind=entry.Kind;collectionFilter=0;if(entry.Kind==Collections.CollectionKind.Orchestrion){focusOrchestrionTab=true;orchestrionCategoryFilter=entry.Music?.CategoryId;}}
+                    else{page=Page.Collections;collectionKind=entry.Kind;focusCollectionKind=entry.Kind;collectionFilter=0;if(entry.Kind==Collections.CollectionKind.Orchestrion){OpenLink("Collections.Music");orchestrionCategoryFilter=entry.Music?.CategoryId;}}
                     collectionQuery=entry.Name;
                 }
                 else OpenItemSheet();

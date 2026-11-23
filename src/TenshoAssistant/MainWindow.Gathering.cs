@@ -16,9 +16,8 @@ internal sealed partial class MainWindow
     private void OpenGathering(uint id)
     {
         SelectItem(id);
-        page = Page.Items;
+        OpenLink("Item.Gathering");
         gatheringTypeFilter = null;
-        focusGatherTab = true;
     }
 
     private void DrawGathering()

@@ -43,8 +43,8 @@ internal sealed partial class MainWindow
     private void OpenCraftItem(uint id)
     {
         SelectItem(id);
-        page=Page.Items;
-        focusCraftTab=recipeCatalog.State.Catalog?.ForResult(id).Count>0;
+        // X-813: on its recipes when it has some, else on the tab last shown (Help/NavTargets.cs).
+        if(recipeCatalog.State.Catalog?.ForResult(id).Count>0)OpenLink("Item.Craft");else OpenLink("Item.Sheet");
     }
 
     private void DrawCraftPlan(RecipeDefinition recipe)

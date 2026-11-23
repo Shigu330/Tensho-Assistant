@@ -12,7 +12,7 @@ internal static class CraftReports424Tests
             Check(plan.IndexOf("RefreshRecipeHoldingsCache();",plan.IndexOf("private void DrawCraftPlan(",StringComparison.Ordinal),StringComparison.Ordinal)
                 < plan.IndexOf("CraftPlan.Build(recipe",StringComparison.Ordinal),"cache refreshed before the plan reads it");
             // X-600 (0.1573): one button, at the end of the crafting family's tab bar, on its three pages.
-            Check(Read("MainWindow.CraftSimulation.cs").Contains("private void BackToCraftItem(){if(simulationRecipe is { } shown)SelectItem(shown.ResultItemId);page=Page.Items;focusCraftTab=true;}")
+            Check(Read("MainWindow.CraftSimulation.cs").Contains("private void BackToCraftItem(){if(simulationRecipe is { } shown)SelectItem(shown.ResultItemId);OpenLink(\"Item.Craft\");}")
                 && Read("MainWindow.Pages.cs").Contains("TabAction:(PageLabel(\"CraftSimulation.Notebook\"),BackToCraftItem)"),"the button of the tab bar");
             Check(Read("Localization/Languages/fr.json").Contains("\"Notebook\": \"Retour à l'objet\""),"named after what it does");
         }),

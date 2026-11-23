@@ -25,6 +25,6 @@ internal sealed partial class MainWindow
     {
         if(item is 0 or > int.MaxValue)return;
         SelectItem(item);
-        page=Page.Items;focusGatherTab=true;
+        OpenLink("Item.Gathering");
     }
 }

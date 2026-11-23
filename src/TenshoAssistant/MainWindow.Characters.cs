@@ -83,7 +83,7 @@ internal sealed partial class MainWindow
                     ImGui.TableNextColumn();ImGui.TextUnformatted(summary.Retainers.ToString());
                     ImGui.TableNextColumn();DrawCharacterJobsCell(summary.Id);
                     ImGui.TableNextColumn();
-                    if(ImGui.SmallButton(localization.Get("CharactersUi.See"))){bankViewCharacter=summary.Id==current ? null:summary.Id;focusBankTab=true;}
+                    if(ImGui.SmallButton(localization.Get("CharactersUi.See"))){bankViewCharacter=summary.Id==current ? null:summary.Id;OpenLink("Storage.Bank");}
                     Tip("CharactersUi.SeeTip");
                     ImGui.SameLine();
                     var armed=characterEraseArmed==summary.Id;

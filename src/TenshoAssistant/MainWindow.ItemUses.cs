@@ -18,7 +18,6 @@ internal sealed partial class MainWindow
         TenshoAssistant.Items.GcSupplyStatus.NotListed=>"GcSupply.NotListed",
         _=>"GcSupply.NotObserved",
     });
-    private bool focusUsesTab;
     private void DrawItemUses()
     {
         Heading(localization.Get("ItemUsesUi.Title"),localization.Get("ItemUsesUi.Description"));
@@ -37,7 +36,7 @@ internal sealed partial class MainWindow
         if(recipeCatalog.State.Catalog is { } recipes)
         {
             var count=recipes.ForIngredient(id).Count;
-            if(ImGui.SmallButton(localization.Format("ItemUseCounts.Recipes",count)))focusCraftTab=true;
+            if(ImGui.SmallButton(localization.Format("ItemUseCounts.Recipes",count)))OpenLink("Item.Craft");
         }
         else ImGui.TextDisabled(localization.Get("ItemUsesUi.LoadingRecipes"));
         DrawUseReferences(id);
@@ -73,7 +72,7 @@ internal sealed partial class MainWindow
                     try
                     {
                         var quantityText=request.Quantity is { } quantity ? $"× {quantity}":localization.Get("ItemUsesUi.Quantity");
-                        if(ItemCell(item,request.ItemId,28,$"{item?.Name ?? localization.Format("BankUi.Item",request.ItemId)}  {quantityText}"))focusUsesTab=true;
+                        if(ItemCell(item,request.ItemId,28,$"{item?.Name ?? localization.Format("BankUi.Item",request.ItemId)}  {quantityText}"))OpenLink("Item.Uses");
                     }
                     finally{ImGui.PopID();}
                 }
@@ -106,7 +105,7 @@ internal sealed partial class MainWindow
                         var bought=items?.Find(offer.Sale.ItemId);
                         var cost=offer.Sale.Costs.FirstOrDefault(entry=>entry.CurrencyItemId==id);
                         ImGui.PushID((int)offer.Sale.ShopId);
-                        try{if(ItemCell(bought,offer.Sale.ItemId,20,$"{bought?.Name ?? offer.Sale.ItemId.ToString()} · {cost?.Amount.ToString("N0",Numbers) ?? "?"}"))focusUsesTab=false;}
+                        try{ItemCell(bought,offer.Sale.ItemId,20,$"{bought?.Name ?? offer.Sale.ItemId.ToString()} · {cost?.Amount.ToString("N0",Numbers) ?? "?"}");}
                         finally{ImGui.PopID();}
                     }
                     ImGui.Unindent();
@@ -123,7 +122,7 @@ internal sealed partial class MainWindow
             {
                 var got=items?.Find(result);
                 ImGui.PushID((int)result);
-                try{if(ItemCell(got,result,20,got is null ? result.ToString():null))focusUsesTab=true;}
+                try{if(ItemCell(got,result,20,got is null ? result.ToString():null))OpenLink("Item.Uses");}
                 finally{ImGui.PopID();}
             }
             ImGui.Unindent();
@@ -140,7 +139,7 @@ internal sealed partial class MainWindow
                     {
                         var got=items?.Find(result);
                         ImGui.PushID(kind.ToString());
-                        try{if(ItemCell(got,result,20,got is null ? result.ToString():null))focusUsesTab=true;}
+                        try{if(ItemCell(got,result,20,got is null ? result.ToString():null))OpenLink("Item.Uses");}
                         finally{ImGui.PopID();}
                     }
                     ImGui.Unindent();

@@ -72,9 +72,9 @@ internal sealed partial class MainWindow
                 Kind("Mounts", CollectionKind.Mount, "CollectionsBrowser.Mounts"),
                 Kind("Minions", CollectionKind.Companion, "CollectionsBrowser.Companions"),
                 Kind("Emotes", CollectionKind.Emote, "CollectionsBrowser.Emotes"),
-                new("Music", localization.Get("CollectionsBrowser.Orchestrion"), () => { focusOrchestrionTab = false; collectionKind = CollectionKind.Orchestrion; }, focusOrchestrionTab),
-                new("Titles", localization.Get("CollectionsBrowser.Titles"), () => { focusTitleTab = false; collectionKind = CollectionKind.Title; }, focusTitleTab),
-                new("Achievements", localization.Get("CollectionsBrowser.Achievements"), () => { focusAchievementTab = false; collectionKind = CollectionKind.Achievement; }, focusAchievementTab),
+                new("Music", localization.Get("CollectionsBrowser.Orchestrion"), () => collectionKind = CollectionKind.Orchestrion),
+                new("Titles", localization.Get("CollectionsBrowser.Titles"), () => collectionKind = CollectionKind.Title),
+                new("Achievements", localization.Get("CollectionsBrowser.Achievements"), () => collectionKind = CollectionKind.Achievement),
                 // X-190 (0.1178): these tabs follow a jump too (a jump to one of them stayed on the tab shown before).
                 ..ExtraKinds.Select(extraKind => Kind(extraKind.ToString(), extraKind, "ExtraCollections." + extraKind)),
                 new("Outfits", localization.Get("Outfits.Title"), () => collectionOutfitTab = true),

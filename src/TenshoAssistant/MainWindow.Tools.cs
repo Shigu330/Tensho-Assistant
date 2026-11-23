@@ -149,10 +149,10 @@ internal sealed partial class MainWindow
         page = tool.Page;
         switch(tool.Reference)
         {
-            case "Craftimizer":focusCraftTab=true;break;
+            case "Craftimizer":OpenLink("Item.Craft");break;
             case "GatherBuddy":gatheringTypeFilter=null;break;
-            case "Banque d'objets":focusBankTab=true;break;
-            case "Item Use":focusUsesTab=true;break;
+            case "Banque d'objets":OpenLink("Storage.Bank");break;
+            case "Item Use":OpenLink("Item.Uses");break;
         }
     }
 
@@ -170,9 +170,9 @@ internal sealed partial class MainWindow
     {
         switch (reference)
         {
-            case "Craftimizer": page = Page.Items; focusCraftTab = true; break;
-            case "Item Use": page = Page.Items; focusUsesTab = true; break;
-            case "GatherBuddy": page = Page.Items; gatheringTypeFilter = null; focusGatherTab = true; break;
+            case "Craftimizer": OpenLink("Item.Craft"); break;
+            case "Item Use": OpenLink("Item.Uses"); break;
+            case "GatherBuddy": OpenLink("Item.Gathering"); gatheringTypeFilter = null; break;
             case "Price Insight": page = Page.Market; break;
             case "Monster Loot Hunter": page = Page.MonsterLoot; break;
             case "LazyGatherer": page = Page.GatheringGp; break;
@@ -317,8 +317,7 @@ internal sealed partial class MainWindow
                 if (ImGui.IsItemClicked())
                 {
                     SelectItem(recipe.ResultItemId);
-                    focusCraftTab = true;
-                    page = Page.Items;
+                    OpenLink("Item.Craft");
                     ImGui.CloseCurrentPopup();
                 }
                 ImGui.SameLine();
@@ -326,8 +325,7 @@ internal sealed partial class MainWindow
                 if (ImGui.SmallButton($"{label}##ItemUseResult"))
                 {
                     SelectItem(recipe.ResultItemId);
-                    focusCraftTab = true;
-                    page = Page.Items;
+                    OpenLink("Item.Craft");
                     ImGui.CloseCurrentPopup();
                 }
                 ImGui.SameLine();

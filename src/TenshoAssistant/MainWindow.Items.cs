@@ -31,11 +31,8 @@ internal sealed partial class MainWindow
     private void DrawItems()
     {
         DrawAnnotatedItems();
-        // 0.272 (R-06 step 3): the item sheet holds Stocks, Craft, Usages and Gathering; requests for those tabs (focus flags set
-        // by menus and other tools) open the sheet on the matching tab.
-        string? sheetTab = focusStocksTab ? "Stocks" : focusCraftTab ? "Craft" : focusUsesTab ? "Uses" : focusGatherTab ? "Gathering" : null;
-        focusStocksTab = focusCraftTab = focusUsesTab = focusGatherTab = false;
-        if (sheetTab is not null) itemSheetFocus = sheetTab;
+        // 0.272 (R-06 step 3): the item sheet holds Stocks, Craft, Usages and Gathering. X-813: a link to one of them goes through
+        // MainWindow.Open (Help/NavTargets.cs, bar « ItemSheet »), no longer through focus flags.
         // 0.280 (R-06 step 3): « Items » is the search and the item sheet; storages, crystals and imports moved to « Storage ».
         DrawItemSearch();
         DrawManualItemId();
@@ -674,7 +671,7 @@ internal sealed partial class MainWindow
         ImGui.TextDisabled(ToolText("Related"));
         var tools = PlannedTools.Where(tool => tool.Reference is "Craftimizer" or "Item Use" or "GatherBuddy" or "Price Insight" or "Monster Loot Hunter").ToArray();
         // X-599 (0.1567, the user's report of 18/11: a dead button): this line is drawn in the item's recipes tab, where « Craftimizer » led
-        // back (OpenContextTool: focusCraftTab). Here it opens the craft simulation on the item's recipe, and is not shown without one.
+        // back (OpenContextTool: the craft tab, OpenLink("Item.Craft")). Here it opens the craft simulation on the item's recipe, and is not shown without one.
         var simulated = recipeCatalog.State.Catalog?.ForResult((uint)itemId).FirstOrDefault();
         foreach (var tool in tools)
         {

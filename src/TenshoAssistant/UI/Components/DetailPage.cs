@@ -39,7 +39,9 @@ internal sealed partial class MainWindow
         var dragged=false;var fresh=drag.TakeFresh();
         // X-809 (0.1807): a link's tab (MainWindow.Open), asked of this bar once.
         var linked=TakeNavTab(id);
-        var asked=linked is not null && arranged.Any(tab=>tab.Key==linked);
+        // X-813: a tab this bar does not have (none for this item) ends the request instead of keeping it.
+        if(linked is not null && !arranged.Any(tab=>tab.Key==linked)){NavTabReached(id);linked=null;}
+        var asked=linked is not null;
         foreach(var tab in arranged)asked|=tab.Select;
         drag.Places.Clear();
         try
@@ -50,6 +52,7 @@ internal sealed partial class MainWindow
                 drag.Places.Add((key,ImGui.GetItemRectMin().X));
                 if(ImGui.IsItemActive() && ImGui.IsMouseDragging(ImGuiMouseButton.Left))dragged=true;
                 if(!open)continue;
+                if(key==linked)NavTabReached(id);
                 drag.Shown=key;
                 try{draw();}
                 finally{ImGui.EndTabItem();}

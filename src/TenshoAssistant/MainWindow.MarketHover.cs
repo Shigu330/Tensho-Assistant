@@ -167,7 +167,7 @@ internal sealed partial class MainWindow
                 {
                     // 0.331: the state filter and the roll's category are reset to the entry's, which they could hide (as OpenOrchestrionFromItem).
                     page=Page.Collections;collectionKind=entry.Kind;focusCollectionKind=entry.Kind;collectionFilter=0;
-                    if(entry.Kind==Collections.CollectionKind.Orchestrion){focusOrchestrionTab=true;orchestrionCategoryFilter=entry.Music?.CategoryId;}
+                    if(entry.Kind==Collections.CollectionKind.Orchestrion){OpenLink("Collections.Music");orchestrionCategoryFilter=entry.Music?.CategoryId;}
                 }
                 collectionQuery=entry.Name;IsOpen=true;
             }

@@ -151,7 +151,7 @@ internal sealed partial class MainWindow
     private enum CraftPageTab { None, Simulation, Preparation }
     private CraftPageTab focusCraftPage;
     /// <summary>0.424 (user report): « Back to the item » — the recipe's item sheet, Craft tab. X-600: the button at the end of the family's tab bar.</summary>
-    private void BackToCraftItem(){if(simulationRecipe is { } shown)SelectItem(shown.ResultItemId);page=Page.Items;focusCraftTab=true;}
+    private void BackToCraftItem(){if(simulationRecipe is { } shown)SelectItem(shown.ResultItemId);OpenLink("Item.Craft");}
 
     private void DrawCraftSimulation()
     {

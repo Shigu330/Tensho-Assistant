@@ -48,7 +48,7 @@ internal sealed partial class MainWindow
     // Mount or minion items among the rows: owned (true) or not confirmed (false); computed with the rows, not per frame.
     private Dictionary<uint,bool> currencyValueOwned=[];
 
-    private bool focusCurrencyValueTab,currencyPricesWanted;
+    private bool currencyPricesWanted;
     // 0.697 (user request): 0 everything, 1 collection, 2 collection still missing, 3 sold on the market.
     private int currencyValueFilter;
     private string currencyValueSearch="";
@@ -63,7 +63,7 @@ internal sealed partial class MainWindow
     private void DrawCurrencyValueButton(uint currency)
     {
         ImGui.SameLine();
-        if(ImGui.SmallButton(localization.Get("CurrencyValue.Open")+$"##Value{currency}")){ChooseCurrencyValue(currency);focusCurrencyValueTab=true;}
+        if(ImGui.SmallButton(localization.Get("CurrencyValue.Open")+$"##Value{currency}")){ChooseCurrencyValue(currency);OpenLink("Storage.CurrencyValue");}
         Tip("CurrencyValue.OpenTip");
     }
 

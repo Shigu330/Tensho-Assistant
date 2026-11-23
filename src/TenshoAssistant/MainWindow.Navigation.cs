@@ -23,11 +23,14 @@ internal sealed partial class MainWindow
         if(target.Tab is { } key && NavTargets.Bars.TryGetValue(target.Page,out var bar))navTabRequest=(bar,key);
     }
 
-    /// <summary>The tab a link asks of this bar, taken once (null when none).</summary>
-    private string? TakeNavTab(string bar)
-    {
-        if(navTabRequest is not { } request || request.Bar!=bar)return null;
-        navTabRequest=null;
-        return request.Tab;
-    }
+    /// <summary>X-813: follows a link of the table (Help/NavTargets.cs) by its key; a key not in the table is a fault (NavTargets1852Tests
+    /// reads every key the code passes here).</summary>
+    private void OpenLink(string key)=>Open(NavTargets.Of(key));
+
+    /// <summary>The tab a link asks of this bar (null when none). X-813: kept until that tab is open (<see cref="NavTabReached"/>), as the
+    /// focus flags it replaces were: a bar not drawn yet, or drawn in a frame where the tab cannot be selected, still gets it.</summary>
+    private string? TakeNavTab(string bar)=>navTabRequest is { } request && request.Bar==bar ? request.Tab:null;
+
+    /// <summary>X-813: the tab a link asked of this bar is open, or the bar has no such tab (gone or hidden for this item): the request ends.</summary>
+    private void NavTabReached(string bar){if(navTabRequest is { } request && request.Bar==bar)navTabRequest=null;}
 }

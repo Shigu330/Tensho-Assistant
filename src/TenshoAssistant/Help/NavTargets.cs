@@ -9,9 +9,12 @@ public sealed record NavTarget(string Page,string? Tab=null,string? Category=nul
 
 /// <summary>
 /// X-809: the one table of Tensho's links to a tab or a section (FAQ answers, Home's « Today » lines and next deadline, the voyages link of
-/// Reminders). MainWindow.Open(target) follows a target: the page, then its tab (asked of the page's bar once) or its Settings category.
-/// NavTargets1809Tests reads every target against the pages, tab bars and Settings categories as they are now, and refuses a key used in
-/// the code that is not in the table: a tab renamed or moved fails the test instead of opening the wrong place.
+/// Reminders). MainWindow.Open(target) follows a target: the page, then its tab (asked of the page's bar until it is open) or its Settings
+/// category. NavTargets1809Tests reads every target against the pages, tab bars and Settings categories as they are now, and refuses a key used
+/// in the code that is not in the table: a tab renamed or moved fails the test instead of opening the wrong place.
+/// X-813 (review 0.1812): the links that chose a tab by a flag (the item sheet's Stocks, Craft, Uses and Gathering; the Storage tabs; the
+/// collections' Music, Titles and Achievements) and the Settings categories written in the code (the server bar's details, the tools'
+/// « Settings ») are rows of this table too, followed by MainWindow.OpenLink(key); NavTargets1852Tests refuses a flag or a category in the code.
 /// </summary>
 public static class NavTargets
 {
@@ -22,6 +25,10 @@ public static class NavTargets
         ["FreeCompany"]="FreeCompanyTabs",
         ["Garden"]="GardenTabs",
         ["Reminders"]="ReminderTabs",
+        // X-813: the item sheet, Storage and the collections.
+        ["Items"]="ItemSheet",
+        ["Storage"]="StorageTabs",
+        ["Collections"]="CollectionKinds",
     };
 
     public static readonly IReadOnlyDictionary<string,NavTarget> Table=new Dictionary<string,NavTarget>
@@ -48,6 +55,29 @@ public static class NavTargets
         ["Home.Garden"]=new("Garden","Garden"),
         // Reminders › Timers › voyages: « Details ».
         ["Reminders.Voyages"]=new("FreeCompany","Vessels"),
+        // X-813: the item sheet's tabs (an item's links from the menus, the tools and the other pages); « Sheet » keeps the tab last shown.
+        ["Item.Sheet"]=new("Items"),
+        ["Item.Overview"]=new("Items","Overview"),
+        ["Item.Stocks"]=new("Items","Stocks"),
+        ["Item.Craft"]=new("Items","Craft"),
+        ["Item.Uses"]=new("Items","Uses"),
+        ["Item.Gathering"]=new("Items","Gathering"),
+        // X-813: Storage's tabs (a character's storages, the currencies and what a currency buys).
+        ["Storage.Bank"]=new("Storage","Bank"),
+        ["Storage.Currencies"]=new("Storage","Currencies"),
+        ["Storage.CurrencyValue"]=new("Storage","CurrencyValue"),
+        // X-813: the collections' tabs opened by a link (a roll, a title, an achievement).
+        ["Collections.Music"]=new("Collections","Music"),
+        ["Collections.Titles"]=new("Collections","Titles"),
+        ["Collections.Achievements"]=new("Collections","Achievements"),
+        // X-813: the server bar's « Details » and its family's click (X-724: its category).
+        ["Dashboard.ServerBar"]=new("Settings","Tracking","ServerBar"),
+        // X-813: the tools' « Settings » button (DrawToolSettingsLink): « Panels. » and the category of the Panels tab.
+        ["Panels.Crafting"]=new("Settings","Panels","Crafting"),
+        ["Panels.CraftMacros"]=new("Settings","Panels","CraftMacros"),
+        ["Panels.Gathering"]=new("Settings","Panels","Gathering"),
+        ["Panels.Macros"]=new("Settings","Panels","Macros"),
+        ["Panels.Games"]=new("Settings","Panels","Games"),
     };
 
     /// <summary>A target of the table (a key not in it is a fault, refused by the test that reads the code's keys).</summary>

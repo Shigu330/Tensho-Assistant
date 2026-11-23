@@ -253,7 +253,7 @@ internal sealed partial class MainWindow
         foreach (var item in itemCatalog.State.Catalog?.ForTriadCard(card.Id) ?? [])
         {
             if (ImGui.Button(localization.Format("CompletionDetails.Item",item.Name)+$"###TriadItem{item.Id}"))
-            { SelectItem(item.Id); page = Page.Items; focusStocksTab = true; }
+            { SelectItem(item.Id); OpenLink("Item.Stocks"); }
         }
         if (ImGui.SmallButton(localization.Get("TriadUi.Copy")))
             ImGui.SetClipboardText(localization.Format("UiFragments.CardCopy",card.Label,entry.Name,card.Stars,TriadCardDefinition.Value(card.Top),TriadCardDefinition.Value(card.Right),TriadCardDefinition.Value(card.Bottom),TriadCardDefinition.Value(card.Left)));

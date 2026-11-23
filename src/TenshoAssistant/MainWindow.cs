@@ -80,7 +80,6 @@ internal sealed partial class MainWindow : Window, IDisposable
     private string collectionQuery = string.Empty;
     private int collectionFilter;
     private uint selectedBlueSpell;
-    private bool focusGatherTab;
     private uint? gatheringTypeFilter;
     private BankKey? sortPreviewOrigin;
     // X-119 (0.1131): replaced by the desktop application when it reads its copy of the bank (UseDesktopData); the plugin sets it once.
@@ -103,9 +102,6 @@ internal sealed partial class MainWindow : Window, IDisposable
     private bool bankPersonalFilter;
     private string bankCategoryFilter = string.Empty;
     private int bankQualityFilter;
-    private bool focusCraftTab;
-    private bool focusStocksTab;
-    private bool focusBankTab;
     // 0.292: last 120 draw times of each page (ring); Diagnostics shows the median (steady cost) and the maximum (spikes such as a
     // first icon load), a moving average mixed both and kept the spike of a page left just after opening it.
     private readonly Dictionary<Page, (double[] Samples, int Next, int Count)> pageDrawMs = [];
@@ -246,13 +242,13 @@ internal sealed partial class MainWindow : Window, IDisposable
     internal void OpenSettings(){page=Page.Settings;IsOpen=true;}
     /// <summary>X-724 (0.1730): Tensho's state and its dashboard live in Settings › Tracking › Server bar: the dashboard's « Details » and
     /// the state entry's click open that category.</summary>
-    internal void OpenStateSettings(){page=Page.Settings;OpenSettingsCategory("Tracking","ServerBar");IsOpen=true;}
+    internal void OpenStateSettings(){OpenLink("Dashboard.ServerBar");IsOpen=true;}
     internal void OpenAlarms(){page=Page.Alarms;IsOpen=true;}
     internal void OpenReminders(){page=Page.Reminders;IsOpen=true;}
     // 0.344 (g, I-02): from the currency entry of the server bar.
-    internal void OpenCurrencies(){page=Page.Storage;focusCurrencyTab=true;IsOpen=true;}
+    internal void OpenCurrencies(){OpenLink("Storage.Currencies");IsOpen=true;}
     // X-190 (0.1178): Storage › What to do with it, for one currency (the island's coins).
-    internal void OpenCurrencyValue(uint currency){page=Page.Storage;ChooseCurrencyValue(currency);focusCurrencyValueTab=true;IsOpen=true;}
+    internal void OpenCurrencyValue(uint currency){ChooseCurrencyValue(currency);OpenLink("Storage.CurrencyValue");IsOpen=true;}
     /// <summary>X-107 (0.986): the server bar's gil entry opens the storage page (gil journal tab).</summary>
     internal void OpenGilJournal(){page=Page.Storage;IsOpen=true;}
     /// <summary>X-217 (0.1226): from the server bar's gear condition and place entries.</summary>
@@ -447,7 +443,7 @@ internal sealed partial class MainWindow : Window, IDisposable
             DrawItemIcon(selected, new Vector2(32));
             ImGui.TextWrapped(selected.Name);
             if(ShowIds)ImGui.TextDisabled($"ID {selected.Id}");
-            if (ImGui.SmallButton(localization.Get("Navigation.ViewQuantities"))) { page = Page.Items; focusStocksTab = true; }
+            if (ImGui.SmallButton(localization.Get("Navigation.ViewQuantities"))) { OpenLink("Item.Stocks"); }
             DrawContextTools();
         }
         else if (itemId > 0) ImGui.TextWrapped(localization.Format("BankUi.Item",itemId));

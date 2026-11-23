@@ -10,7 +10,6 @@ namespace TenshoAssistant;
 internal sealed partial class MainWindow
 {
     internal Func<CurrencyWatcher?>? Currencies { get; set; }
-    private bool focusCurrencyTab;
     // Threshold being typed (saved once the field is left, as IntSetting does: not on every keystroke, 0.344 review).
     private readonly Dictionary<uint,int> currencyEdits=[];
 

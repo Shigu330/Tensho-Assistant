@@ -175,7 +175,7 @@ internal sealed partial class MainWindow
                 {
                     if (itemId > 0)
                     {
-                        if (ImGui.SmallButton(localization.Get("GatheringBrowser.Stocks")+"###SourceStocks")) { page = Page.Items; focusStocksTab = true; }
+                        if (ImGui.SmallButton(localization.Get("GatheringBrowser.Stocks")+"###SourceStocks")) { OpenLink("Item.Stocks"); }
                         ImGui.SameLine();
                         if (ImGui.SmallButton(localization.Get("GatheringBrowser.Recipes")+"###SourceRecipes")) OpenContextTool("Craftimizer");
                         ImGui.SameLine();

@@ -11,10 +11,14 @@ namespace TenshoAssistant;
 // catalogue changes.
 internal sealed partial class MainWindow
 {
-    private string? itemSheetFocus;
     // Tabs of the sheet that have content, recomputed when the item or a catalogue changes (not every frame).
     private (uint Item,object? Recipes,object? Uses,object? Gathering,object? Lumina,object? Vendors) sheetTabsKey;
     private HashSet<string> sheetTabs=[];
+    /// <summary>X-813: the sheet's tabs that have something to show (0.282: Craft, Uses and Gathering decided like the right-click menu, an
+    /// unloaded catalogue keeping its tab; 0.281: no Market tab for an item the market board does not sell).</summary>
+    private List<(string Key,string Label,Action Draw)> SheetTabs(uint id,TenshoAssistant.Items.ItemDefinition? item,IReadOnlyList<(string Key,string Label,Action Draw)> tabs)=>
+        tabs.Where(tab=>tab.Key switch{"Craft" or "Uses" or "Gathering"=>SheetHas(id,tab.Key),"Market"=>item is not { IsMarketable:false },_=>true}).ToList();
+
     private bool SheetHas(uint id,string tab)
     {
         var key=(id,(object?)recipeCatalog.State.Catalog,(object?)itemUses.State.Catalog,(object?)gatheringCatalog.State.Catalog,(object?)lumina?.State.Data,(object?)npcVendors?.State.Catalog);
@@ -34,7 +38,7 @@ internal sealed partial class MainWindow
 
     // 0.273: every link to an item lands on the item's sheet, open on the requested tab (Overview by default); since 0.280 the
     // « Items » page has no other top tab.
-    private void OpenItemSheet(string tab="Overview"){page=Page.Items;itemSheetFocus=tab;}
+    private void OpenItemSheet()=>OpenLink("Item.Overview");
 
     /// <summary>
     /// X-224 (0.1227), X-313 (0.1317): « Added in patch 7.4 (Garland Tools) », the one way to write it (item sheet header, common item tooltip);
@@ -92,7 +96,10 @@ internal sealed partial class MainWindow
             ImGui.NewLine();
         }
         finally{ImGui.EndGroup();}
-        DetailTabs("ItemSheet",
+        // X-813: a link chooses the tab through MainWindow.Open (bar « ItemSheet » of Help/NavTargets.cs); one tab per line, those without
+        // anything to show taken out by SheetTabs.
+        string? noFocus=null;
+        DetailTabs("ItemSheet",SheetTabs(id,item,
         [
             ("Overview",localization.Get("ItemSheet.Overview"),()=>
             {
@@ -105,11 +112,11 @@ internal sealed partial class MainWindow
             ("Note",localization.Get("ItemNotes.Tab"),()=>DrawItemNoteTab(id)),
             // 0.282: only the tabs with something to show, decided like the right-click menu (RelevantRoutes); an unloaded
             // catalogue keeps its tab (unknown is not « none »).
-            ..(SheetHas(id,"Craft") ? [("Craft",localization.Get("ItemsUi.Craft"),(Action)DrawCraftTab)]:Array.Empty<(string,string,Action)>()),
-            ..(SheetHas(id,"Uses") ? [("Uses",localization.Get("ItemsUi.Uses"),(Action)DrawItemUses)]:Array.Empty<(string,string,Action)>()),
-            ..(SheetHas(id,"Gathering") ? [("Gathering",localization.Get("ItemsUi.Gathering"),(Action)DrawGathering)]:Array.Empty<(string,string,Action)>()),
+            ("Craft",localization.Get("ItemsUi.Craft"),DrawCraftTab),
+            ("Uses",localization.Get("ItemsUi.Uses"),DrawItemUses),
+            ("Gathering",localization.Get("ItemsUi.Gathering"),DrawGathering),
             // 0.281: no Market tab for an item that cannot be sold on the market board.
-            ..(item is { IsMarketable:false } ? Array.Empty<(string,string,Action)>():[("Market",localization.Get("Navigation.Market"),DrawMarketListings)]),
-        ],ref itemSheetFocus);
+            ("Market",localization.Get("Navigation.Market"),DrawMarketListings),
+        ]),ref noFocus);
     }
 }

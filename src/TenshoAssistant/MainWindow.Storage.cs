@@ -10,16 +10,15 @@ internal sealed partial class MainWindow
     {
         // X-01 C5 (0.1206, analysis of 12/11: « page Storage 3 137 ms », no tab timed): each tab timed in developer mode (Slow frame line).
         // X-605 (0.1701): the tabs arranged with the mouse (OrderedTabs).
-        var bank = focusBankTab; var currency = focusCurrencyTab; var value = focusCurrencyValueTab;
-        focusBankTab = focusCurrencyTab = focusCurrencyValueTab = false;
+        // X-813: a link to a tab (Bank, Currencies, CurrencyValue) goes through MainWindow.Open (Help/NavTargets.cs).
         OrderedTabs("StorageTabs",
         [
-            new("Bank", localization.Get("ItemsUi.Bank"), () => MeasureMap("storage bank", DrawBankBrowser), bank),
+            new("Bank", localization.Get("ItemsUi.Bank"), () => MeasureMap("storage bank", DrawBankBrowser)),
             new("Crystals", localization.Get("ItemsUi.Crystals"), () => MeasureMap("storage crystals", DrawCrystalsTab)),
             // 0.344 (g, I-02): currencies, caps and threshold alerts.
-            new("Currencies", localization.Get("Currencies.Tab"), () => MeasureMap("storage currencies", DrawCurrenciesTab), currency),
+            new("Currencies", localization.Get("Currencies.Tab"), () => MeasureMap("storage currencies", DrawCurrenciesTab)),
             // 0.695 (user request): what a currency buys, in its own tab.
-            new("CurrencyValue", localization.Get("CurrencyValue.Tab"), () => MeasureMap("storage currency value", DrawCurrencyValueTab), value),
+            new("CurrencyValue", localization.Get("CurrencyValue.Tab"), () => MeasureMap("storage currency value", DrawCurrencyValueTab)),
             new("Imports", localization.Get("ItemsUi.Imports"), () => MeasureMap("storage imports", DrawImportManager)),
             // 0.345 (g, I-03): every character seen, with « See its storages » and « Erase this character ».
             new("Characters", localization.Get("CharactersUi.Tab"), () => MeasureMap("storage characters", DrawCharactersTab)),

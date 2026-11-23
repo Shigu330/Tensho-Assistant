@@ -54,7 +54,7 @@ internal sealed partial class MainWindow
             ImGui.TextUnformatted(localization.Format("CraftLiveCounts.Recipe",recipe.CraftType,recipe.Level));
             if(developerMode)ImGui.TextDisabled(localization.Format("DevMode.RecipeId",recipe.RecipeId));
             ImGui.BeginDisabled(!fresh || frame.Animating);
-            try {if(ImGui.SmallButton(localization.Get("CraftLiveUi.Context"))){SelectItem(recipe.ResultItemId);page=Page.Items;focusCraftTab=true;}}
+            try {if(ImGui.SmallButton(localization.Get("CraftLiveUi.Context"))){SelectItem(recipe.ResultItemId);OpenLink("Item.Craft");}}
             finally {ImGui.EndDisabled();}
         }
         else { ImGui.TextWrapped(localization.Format("LiveDetails.Unresolved",raw.ItemName)); if(developerMode)ImGui.TextDisabled(localization.Format("DevMode.RecipeItem",raw.RecipeId,raw.ResultItemId)); }

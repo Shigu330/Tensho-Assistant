@@ -9,7 +9,7 @@ namespace TenshoAssistant;
 // game sheets with the unlock state Collections/CollectionReader copies; nothing native is read here.
 internal sealed partial class MainWindow
 {
-    private bool focusTitleTab,focusAchievementTab,completionDetailsRequested;
+    private bool completionDetailsRequested;
     private uint selectedCompletionId;
     private CollectionKind selectedCompletionKind;
     private uint? achievementCategoryFilter;
@@ -29,9 +29,11 @@ internal sealed partial class MainWindow
     private void OpenCompletion(CollectionEntry entry)
     {
         selectedCompletionKind=entry.Kind;selectedCompletionId=entry.Id;completionDetailsRequested=true;
-        focusTitleTab=entry.Kind==CollectionKind.Title;focusAchievementTab=entry.Kind==CollectionKind.Achievement;
         collectionKind=entry.Kind;collectionQuery=entry.Name;collectionFilter=0;achievementCategoryFilter=entry.Achievement?.CategoryId;
-        page=Page.Collections;
+        // X-813: a title or an achievement opens its tab of the collections (Help/NavTargets.cs).
+        if(entry.Kind==CollectionKind.Title)OpenLink("Collections.Titles");
+        else if(entry.Kind==CollectionKind.Achievement)OpenLink("Collections.Achievements");
+        else page=Page.Collections;
     }
 
     private void DrawAchievementCategories(CollectionState state)
@@ -98,7 +100,7 @@ internal sealed partial class MainWindow
                         if(item is null)ImGui.TextWrapped(localization.Get("CompletionDetails.MissingItem"));
                         else
                         {
-                            if(ItemCell(item,item.Id,32,localization.Format("CompletionDetails.Item",item.Name))){page=Page.Items;focusStocksTab=true;ImGui.CloseCurrentPopup();}
+                            if(ItemCell(item,item.Id,32,localization.Format("CompletionDetails.Item",item.Name))){OpenLink("Item.Stocks");ImGui.CloseCurrentPopup();}
                         }
                     }
                     if(achievement.RewardTitleId!=0 && relatedCompletion.Length==0)ImGui.TextWrapped(localization.Get("CompletionDetails.MissingTitle"));

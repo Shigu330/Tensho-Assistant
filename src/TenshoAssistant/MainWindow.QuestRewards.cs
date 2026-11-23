@@ -49,7 +49,7 @@ internal sealed partial class MainWindow
                     ItemLinksMenu($"RewardLinks{line.Slot}",item);
                     if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("QuestRewards.Quality",line.HighQuality is null ? localization.Get("QuestRewards.Unspecified"):line.HighQuality==true ? "HQ":"NQ")+"\n"+localization.Get(line.StainId==0 ? "QuestRewards.NoStain":"QuestRewards.Stain")+"\n"+localization.Get("QuestRewards.Click"));
                     ImGui.SameLine();ImGui.TextDisabled(line.Quantity is { } quantity ? $"× {(quantity).ToString("N0",Numbers)}{(line.HighQuality==true ? " HQ":"")}":localization.Get("QuestRewards.Quantity"));
-                    if(clicked && item is not null){SelectItem(item.Id);page=Page.Items;focusStocksTab=true;}
+                    if(clicked && item is not null){SelectItem(item.Id);OpenLink("Item.Stocks");}
                 }
             }
             finally{ImGui.PopID();}

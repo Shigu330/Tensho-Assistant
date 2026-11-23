@@ -423,6 +423,6 @@ internal sealed partial class MainWindow
 
     private void DrawToolSettingsLink(string id,string category)
     {
-        if(ImGui.SmallButton(localization.Get("Settings.Title")+"###ToolSettings"+id)){page=Page.Settings;OpenSettingsCategory("Panels",category);IsOpen=true;}
+        if(ImGui.SmallButton(localization.Get("Settings.Title")+"###ToolSettings"+id)){OpenLink("Panels."+category);IsOpen=true;}
     }
 }

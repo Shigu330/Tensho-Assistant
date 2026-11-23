@@ -127,7 +127,7 @@ internal sealed partial class MainWindow
         if(itemId>0)
         {
             ImGui.TextDisabled(localization.Format("UiFragments.Context",SelectedItem?.Name ?? localization.Format("BankUi.Item",itemId)));
-            if(ImGui.SmallButton(localization.Get("FashionUi.Stocks"))) { page=Page.Items; focusStocksTab=true; }
+            if(ImGui.SmallButton(localization.Get("FashionUi.Stocks"))) { OpenLink("Item.Stocks"); }
             ImGui.SameLine(); if(ImGui.SmallButton(localization.Get("FashionUi.Recipes"))) OpenContextTool("Craftimizer");
             ImGui.SameLine(); if(ImGui.SmallButton(localization.Get("FashionUi.Prices"))) OpenContextTool("Price Insight");
         }

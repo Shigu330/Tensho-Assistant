@@ -55,7 +55,7 @@ internal sealed partial class MainWindow
     // 0.331: the state filter and the category are reset to the achievement's, which they could hide (as OpenCompletion).
     private void OpenAchievement(CollectionEntry achievement)
     {
-        page=Page.Collections;collectionKind=CollectionKind.Achievement;focusCollectionKind=CollectionKind.Achievement;focusAchievementTab=true;collectionQuery=achievement.Name;
+        page=Page.Collections;collectionKind=CollectionKind.Achievement;focusCollectionKind=CollectionKind.Achievement;OpenLink("Collections.Achievements");collectionQuery=achievement.Name;
         collectionFilter=0;achievementCategoryFilter=achievement.Achievement?.CategoryId;IsOpen=true;
     }
 
