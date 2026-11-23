@@ -24,9 +24,18 @@ public static class RetiredCopies
     /// it kept the mark away for ever and every « cache » zip was read again at each load). Only a zip held by another program (IOException,
     /// UnauthorizedAccessException) leaves the pass to the next load.
     /// </summary>
-    public static int Clean(string backups,out int damaged,CancellationToken cancel=default)
+    public static int Clean(string backups,out int damaged,CancellationToken cancel=default)=>Clean(backups,out damaged,out _,cancel);
+
+    /// <summary>
+    /// X-854 (review 0.1858, M1): a zip whose damage shows only when it is copied (an entry broken after the head the first reading takes, or an
+    /// entry that is not .json) no longer counts as damaged as a whole, keeping its retired copies for ever: the zip is written again without
+    /// them, and the entries that cannot be read are left out (nothing could read them), counted in <paramref name="dropped"/>.
+    /// <paramref name="damaged"/> counts the zips left as they are because nothing in them could be read (not a zip, entries unreadable from
+    /// their start and no retired copy to remove).
+    /// </summary>
+    public static int Clean(string backups,out int damaged,out int dropped,CancellationToken cancel=default)
     {
-        damaged=0;
+        damaged=0;dropped=0;
         if(!Directory.Exists(backups))return 0;
         var mark=Path.Combine(backups,MarkName);
         if(File.Exists(mark))return 0;
@@ -34,7 +43,11 @@ public static class RetiredCopies
         foreach(var zip in Directory.GetFiles(backups,"backup-*-cache.zip"))
         {
             cancel.ThrowIfCancellationRequested();
-            try{if(CleanOne(zip,cancel))cleaned++;}
+            try
+            {
+                if(CleanOne(zip,out var broken,cancel)){cleaned++;dropped+=broken;}
+                else if(broken>0)damaged++;
+            }
             catch(Exception error) when(error is InvalidDataException or NotSupportedException){damaged++;}
             catch(Exception error) when(error is IOException or UnauthorizedAccessException){whole=false;}
         }
@@ -46,17 +59,32 @@ public static class RetiredCopies
 
     /// <summary>True when the zip was written again without its retired entries; its time is kept (the five copies kept are the newest).
     /// Through a passing file named as BackupZip's (BackupZip.Leftover: removed by its sweep when a crash cuts the copy short).</summary>
-    public static bool CleanOne(string zip,CancellationToken cancel=default)
+    public static bool CleanOne(string zip,CancellationToken cancel=default)=>CleanOne(zip,out _,cancel);
+
+    /// <summary>
+    /// X-854 (review 0.1858, M1): as <see cref="CleanOne(string,CancellationToken)"/>; an entry that cannot be read (its head, or its whole
+    /// content when copied: broken data, an unknown compression method, fewer bytes than its size says) no longer stops the copy: it is left
+    /// out of the zip written again (nothing can read it), counted in <paramref name="broken"/>. With no retired entry the zip is left as it is,
+    /// and <paramref name="broken"/> counts the .json entries whose head could not be read. A zip that cannot be opened still throws.
+    /// </summary>
+    public static bool CleanOne(string zip,out int broken,CancellationToken cancel=default)
     {
+        broken=0;
         var retired=new HashSet<string>(StringComparer.Ordinal);
+        var unreadable=new HashSet<string>(StringComparer.Ordinal);
         using(var archive=ZipFile.OpenRead(zip))
             foreach(var entry in archive.Entries)
             {
                 cancel.ThrowIfCancellationRequested();
                 if(!entry.FullName.EndsWith(".json",StringComparison.OrdinalIgnoreCase))continue;
-                using var stream=entry.Open();
-                if(DataCache.IsRetired(DataCache.IdentityOf(stream)))retired.Add(entry.FullName);
+                try
+                {
+                    using var stream=entry.Open();
+                    if(DataCache.IsRetired(DataCache.IdentityOf(stream)))retired.Add(entry.FullName);
+                }
+                catch(Exception error) when(error is InvalidDataException or NotSupportedException){unreadable.Add(entry.FullName);}
             }
+        broken=unreadable.Count;
         if(retired.Count==0)return false;
         var written=File.GetLastWriteTimeUtc(zip);
         var temporary=zip+"."+Guid.NewGuid().ToString("N")+".tmp";
@@ -67,17 +95,33 @@ public static class RetiredCopies
                 foreach(var entry in source.Entries)
                 {
                     cancel.ThrowIfCancellationRequested();
-                    if(retired.Contains(entry.FullName))continue;
+                    if(retired.Contains(entry.FullName) || unreadable.Contains(entry.FullName))continue;
+                    // X-854: read whole before its copy is made, so that an entry broken further in leaves nothing half written.
+                    using var content=Content(entry);
+                    if(content is null){broken++;continue;}
                     var copy=target.CreateEntry(entry.FullName,CompressionLevel.Optimal);
                     copy.LastWriteTime=entry.LastWriteTime;
-                    using var from=entry.Open();
                     using var to=copy.Open();
-                    from.CopyTo(to);
+                    content.CopyTo(to);
                 }
             File.SetLastWriteTimeUtc(temporary,written);
             AtomicFile.OverwriteWhenFree(temporary,zip);
         }
         finally{AtomicFile.DeleteWhenFree(temporary);}
         return true;
+    }
+
+    /// <summary>X-854: an entry's whole content, or null when it cannot be read (broken data, an unknown method, fewer bytes than its size).</summary>
+    private static MemoryStream? Content(ZipArchiveEntry entry)
+    {
+        try
+        {
+            var content=new MemoryStream();
+            using(var from=entry.Open())from.CopyTo(content);
+            if(content.Length!=entry.Length)return null;
+            content.Position=0;
+            return content;
+        }
+        catch(Exception error) when(error is InvalidDataException or NotSupportedException){return null;}
     }
 }

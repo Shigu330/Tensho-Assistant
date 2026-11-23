@@ -89,7 +89,7 @@ internal static class DamagedCacheZip1855Tests
         ("X-851: wiring: the load says the damaged zips once",()=>
         {
             var load=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Discoveries.cs"));
-            Check(load.Contains("Caching.RetiredCopies.Clean(Discoveries.DiscoveryBackup.Folder(discoveryFolder),out var damaged,gameDataCancel.Token)",StringComparison.Ordinal),"the pass at load");
+            Check(load.Contains("Caching.RetiredCopies.Clean(Discoveries.DiscoveryBackup.Folder(discoveryFolder),out var damaged,out var dropped,gameDataCancel.Token)",StringComparison.Ordinal),"the pass at load (X-854: and the entries left out)");
             Check(load.Contains("if(damaged>0)log.Information(",StringComparison.Ordinal),"said in the log, not a warning at each load");
         }),
     ];
