@@ -8195,7 +8195,7 @@
   },
   "Dashboard": {
     "Title": "Tableau de bord",
-    "Bar": "Tensho : {0} · {1} Mo",
+    "Bar": "Tensho : {0} · Dalamud {1} Mo",
     "BarNoMemory": "Tensho : {0}",
     "BarOk": "ok",
     "BarWatch": "à voir",

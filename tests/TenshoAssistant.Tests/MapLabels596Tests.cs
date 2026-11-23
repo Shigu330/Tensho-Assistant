@@ -39,7 +39,7 @@ internal static class MapLabels596Tests
             Check(!TenshoAssistant.Maps.MapLabels.IsZoneImage(855,64),"a small link icon stays one");
             Check(!TenshoAssistant.Maps.MapLabels.IsZoneImage(0,1024),"not a link");
             var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.MapView.cs"));
-            Check(view.IndexOf("0.631: the zones of a region map")<view.IndexOf("var icons=new List<MapIconDraw>();"),"under every icon");
+            Check(view.IndexOf("0.631: the zones of a region map")<view.IndexOf("var icons=mapIconList;icons.Clear();"),"under every icon");
         }),
         ("Map labels (0.632): zones and crystals on a region map, the world's own choice",() =>
         {

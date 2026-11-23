@@ -1442,7 +1442,9 @@ internal sealed partial class MainWindow
             // Every game icon in one list sorted by priority (0.124: quests used to be drawn above everything whatever the
             // setting). Equal priorities keep the game's layer order: fixed icons, gathering, FATEs, quests, game target.
             MapMark("canvas areas");
-            var icons=new List<MapIconDraw>();
+            // X-685 (0.1846, the game thread's largest allocation in the 120 s after a load: MapIconDraw[] 29 MB): the frame's lists
+            // are kept and emptied, no longer made anew (and grown) each frame. Evidence: docs/evidence/0.1846-memory-measure.md.
+            var icons=mapIconList;icons.Clear();
             // worldRadius: area of a quest, FATE or gathering point; hovering inside it lists the icon too (like Mappy).
             void Add(uint icon,int layer,Vector2 pixel,string? label,MapIconMarker? fixedMarker=null,MapLocalGatheringPoint? point=null,float worldRadius=0,Vector2? flag=null,float height=float.NaN)
             {
@@ -1504,7 +1506,7 @@ internal sealed partial class MainWindow
                 Add(upperTarget.Icon,4,upper.Pixel,localization.Get("MapView.GameTarget"),new MapIconMarker(upper.Pixel.X,upper.Pixel.Y,upperTarget.Icon,"",upper.Link));
             MapMark("canvas icon list");
             icons.Sort((left,right)=>left.Priority!=right.Priority ? left.Priority.CompareTo(right.Priority):left.Layer!=right.Layer ? left.Layer.CompareTo(right.Layer):left.Order.CompareTo(right.Order));
-            MapIconDraw? top=null;var hits=new List<MapIconDraw>();
+            MapIconDraw? top=null;var hits=mapIconHits;hits.Clear();
             if(hovered && ImGui.IsMouseClicked(ImGuiMouseButton.Right))mapIconContext=null;
             var iconNames=new List<(Vector2 At,Vector2 Size,bool MapLink,string Text,float FontSize,uint Link)>();
             foreach(var item in icons)
@@ -1951,6 +1953,8 @@ internal sealed partial class MainWindow
     // One game icon to draw on the canvas, sorted by priority then layer then insertion.
     private readonly record struct MapIconDraw(int Priority,int Layer,int Order,uint Icon,Vector2 At,float Size,string? Label,MapIconMarker? Fixed,MapLocalGatheringPoint? Point,float Area=0,Vector2? Flag=null,
         float Height=float.NaN);
+    // X-685 (0.1846): the canvas's icon list and hovered icons, reused from frame to frame (DrawMapCanvas is never nested).
+    private readonly List<MapIconDraw> mapIconList=[];private readonly List<MapIconDraw> mapIconHits=[];
     private (MapIconDraw Icon,Vector2 Pixel)? mapIconContext;private bool mapGeneralMenuRequested;
 
     // R-04 (0.245): the menu of one map icon — its name, flag there, then what the icon offers (teleport, open the linked map,
