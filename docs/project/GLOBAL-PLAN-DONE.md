@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (875 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (876 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -943,12 +943,13 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-854 | Review of block 0.1855 to 0.1858 (review 0.1858, 23/11), minor M1: M1 in… | Done in 0.1860.0 |
 | X-855 | Review of block 0.1859 to 0.1860 (review 0.1860, 23/11), minor M2: M2 in… | Done in 0.1861.0 |
 | X-856 | Review of block 0.1859 to 0.1860 (review 0.1860, 23/11), pre-existing before… | Done in 0.1862.0 |
+| X-857 | Flaky test Anonymous 1832 (the internal check of tools/discoveries-merge.py, «… | Done in 0.1863.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (875 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (876 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1889,3 +1890,4 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-854 | Relecture du bloc 0.1855 à 0.1858 (relecture 0.1858, 23/11), mineurs M1 : M1… | Fait en 0.1860.0 |
 | X-855 | Relecture du bloc 0.1859 à 0.1860 (relecture 0.1860, 23/11), mineurs M2 : M2… | Fait en 0.1861.0 |
 | X-856 | Relecture du bloc 0.1859 à 0.1860 (relecture 0.1860, 23/11), déjà là avant le… | Fait en 0.1862.0 |
+| X-857 | Test fragile Anonymous 1832 (« the merge tool's behaviour… », essai interne de… | Fait en 0.1863.0 |
