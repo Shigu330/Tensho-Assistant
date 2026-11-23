@@ -361,8 +361,18 @@ public static class ChatHistory
     /// history: left as it is.</summary>
     public static void Trim(string path,ulong character,DateTimeOffset now,int messages,int days)
     {
-        TrimCore(path,character,now,messages,days);
+        using var held=Hold(path,LockWaitMs);
+        TrimCore(path,character,now,messages,days,null);
     }
+
+    /// <summary>X-844 (0.1853, review 0.1844 M2): the lock file of a character's history, shared by every client of the profile
+    /// (<see cref="FairFileLock"/>, like the lists and the tools). Each write of the file (lines added, trimmed, a write taken back) and
+    /// the sweep of another character's file hold it, so the lines another client adds while this one rewrites the file wait for it
+    /// and are never written over.</summary>
+    public static string LockOf(string path)=>path+".lock";
+    /// <summary>X-844: the longest a write waits for the lock before it fails (its lines are kept for the next flush).</summary>
+    public const int LockWaitMs=2000;
+    private static FileStream Hold(string path,int waitMs)=>FairFileLock.Hold(LockOf(path),waitMs,error=>error);
 
     /// <summary>X-836 M3 (0.1840, security review before the alpha): the other characters' files are trimmed when they have not been written for
     /// this long: no client plays them now (a file another client still writes is never written over).</summary>
@@ -371,28 +381,39 @@ public static class ChatHistory
     /// <summary>X-836 M3 (0.1840): the files of the characters other than <paramref name="open"/>, idle for <see cref="SweepIdle"/>, brought within
     /// the days kept: a file left with no message is deleted, one with older messages trimmed. Before, a character no longer played kept the other
     /// players' messages past the days said. Nothing with « No limit » days; files of another format or character left as they are.
-    /// Returns the files deleted or trimmed.</summary>
-    public static int Sweep(string folder,ulong open,DateTimeOffset now,int messages,int days)
+    /// Returns the files deleted or trimmed.
+    /// X-844 (0.1853): each file is swept under its lock (<see cref="LockOf"/>), taken only when free (a client writing it now: the file is
+    /// left for the next load), and its idle time read again once the lock is held; a client that starts to write it during the sweep waits
+    /// for the lock, its lines added to the file as swept. <paramref name="replacing"/>: called once the file is read, just before it is
+    /// replaced or deleted (a test acts there as the other client).</summary>
+    public static int Sweep(string folder,ulong open,DateTimeOffset now,int messages,int days,Action<string>? replacing=null)
     {
         if(days==NoLimit || !Directory.Exists(folder))return 0;
         var done=0;
-        foreach(var path in Directory.EnumerateFiles(folder,"*.jsonl"))
+        foreach(var path in Directory.EnumerateFiles(folder,"*.jsonl").ToList())
         {
             if(!ulong.TryParse(Path.GetFileNameWithoutExtension(path),NumberStyles.None,CultureInfo.InvariantCulture,out var who) || who==0 || who==open)continue;
+            var deleted=false;
             try
             {
                 if(now.UtcDateTime-File.GetLastWriteTimeUtc(path)<SweepIdle)continue;
-                var read=Read(path,who,now,messages,days);
-                if(!read.Ours)continue;
-                if(read.Records.Count==0){File.Delete(path);done++;}
-                else if(read.Trim){Trim(path,who,now,messages,days);done++;}
+                using(Hold(path,0))
+                {
+                    if(!File.Exists(path) || now.UtcDateTime-File.GetLastWriteTimeUtc(path)<SweepIdle)continue;
+                    var read=Read(path,who,now,messages,days);
+                    if(!read.Ours)continue;
+                    if(read.Records.Count==0){replacing?.Invoke(path);File.Delete(path);done++;deleted=true;}
+                    else if(read.Trim){TrimCore(path,who,now,messages,days,replacing);done++;}
+                }
             }
             catch(Exception error) when(error is IOException or UnauthorizedAccessException or InvalidDataException){}
+            // The lock of a history deleted goes too (a client holding it keeps it: the delete fails and nothing changes).
+            if(deleted)try{File.Delete(LockOf(path));}catch(Exception error) when(error is IOException or UnauthorizedAccessException){}
         }
         return done;
     }
 
-    private static void TrimCore(string path,ulong character,DateTimeOffset now,int messages,int days)
+    private static void TrimCore(string path,ulong character,DateTimeOffset now,int messages,int days,Action<string>? replacing)
     {
         if(!File.Exists(path) || IsOurs(FirstLineOf(path),character)==false)return;
         var limit=Limit(messages);
@@ -415,6 +436,7 @@ public static class ChatHistory
                     output.Write(Encode(record));output.Write('\n');
                 }
             }
+            replacing?.Invoke(path);
             AtomicFile.OverwriteWhenFree(temporary,path);
         }
         finally{AtomicFile.DeleteWhenFree(temporary);}
@@ -453,6 +475,8 @@ public static class ChatHistory
     {
         if(lines.Count==0)return File.Exists(path) ? new FileInfo(path).Length:0;
         if(Path.GetDirectoryName(path) is { Length:>0 } folder)Directory.CreateDirectory(folder);
+        // X-844: under the file's lock, so another client's sweep never rewrites the file while these lines are added.
+        using var held=Hold(path,LockWaitMs);
         using var stream=new FileStream(path,FileMode.OpenOrCreate,FileAccess.ReadWrite,FileShare.Read);
         var before=stream.Length;
         var text=new StringBuilder();
@@ -477,6 +501,7 @@ public static class ChatHistory
     public static void Undo(string path,long before)
     {
         if(!File.Exists(path))return;
+        using var held=Hold(path,LockWaitMs);
         if(before<=0){AtomicFile.DeleteWhenFree(path);return;}
         using var stream=new FileStream(path,FileMode.Open,FileAccess.ReadWrite,FileShare.Read);
         if(stream.Length>before)stream.SetLength(before);
@@ -507,6 +532,9 @@ public static class ChatHistory
         var all=true;
         foreach(var file in Directory.EnumerateFiles(folder,"*.jsonl").Concat(Directory.EnumerateFiles(folder,"*.tmp")).ToList())
             all&=AtomicFile.DeleteWhenFree(file);
+        // X-844: the lock files go too when no client holds them (one held is left; the history itself is what « Erase » promises).
+        foreach(var file in Directory.EnumerateFiles(folder,"*.jsonl.lock").ToList())
+            try{File.Delete(file);}catch(Exception error) when(error is IOException or UnauthorizedAccessException){}
         try{if(!Directory.EnumerateFileSystemEntries(folder).Any())Directory.Delete(folder);}
         catch(Exception error) when(error is IOException or UnauthorizedAccessException){}
         return all;
