@@ -2798,6 +2798,12 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1856) Artisanat : depuis la fiche d'un objet, ouvrir sa recette en simulation puis en préparation : la page d'artisanat s'ouvre chaque fois sur le bon onglet
 
+- [ ] (0.1859) Cartes : Paramètres › bouton « Favoris des cartes » : la page Cartes s'ouvre sur l'onglet Repères ; sur la carte de Tensho, clic droit › « Utiliser ces coordonnées dans la page Carte » et, dans la page Monstres, le lieu d'un monstre sans position : la page Cartes s'ouvre sur l'onglet Cartes, même si elle était fermée ou sur un autre onglet
+
+- [ ] (0.1859) Carte de Tensho : l'engrenage ouvre Paramètres sur l'onglet Carte, à la catégorie choisie en dernier
+
+- [ ] (0.1859) Compagnie libre : onglet « Secteurs d'aéronef » › « Planifier les trajets d'aéronef » ouvre l'onglet « Meilleurs trajets » ; là, « Montage » d'un trajet ouvre l'onglet Montages
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
