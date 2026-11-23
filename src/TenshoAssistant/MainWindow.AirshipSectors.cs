@@ -25,7 +25,7 @@ internal sealed partial class MainWindow
         var catalog=AirshipCatalog?.Invoke();
         if(catalog is null){ImGui.TextDisabled(localization.Get(AirshipCatalogFailed?.Invoke()==true ? "AirshipSectors.Unavailable":"AirshipSectors.Loading"));return;}
         ImGui.TextWrapped(localization.Get("AirshipSectors.Help"));
-        if(ImGui.SmallButton(localization.Get("AirshipSectors.PlanRoutes"))){plannerKind=VesselKind.Airship;freeCompanyTabRequest=1;}
+        if(ImGui.SmallButton(localization.Get("AirshipSectors.PlanRoutes"))){plannerKind=VesselKind.Airship;OpenLink("FreeCompany.Routes");}
         Tip("AirshipSectors.PlanRoutesTip");
         if(airshipChosen.Count>0){ImGui.SameLine();ImGui.TextDisabled(localization.Format("AirshipSectors.ChosenCount",airshipChosen.Count));}
         ImGui.Separator();

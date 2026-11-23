@@ -59,7 +59,7 @@ internal static class RoutePlanner1706Tests
             var planner = Read("MainWindow.Planner.cs");
             Check(planner.Contains("if(plannerKind==VesselKind.Airship)DrawAirshipRoutes();", StringComparison.Ordinal) && planner.Contains("else DrawSubmarineRoutes();", StringComparison.Ordinal), "the kind chooses the part");
             Check(planner.Contains("VesselBuilds.EffectivePlan(VesselBuild.FromList(kind,", StringComparison.Ordinal), "the planned build for both kinds");
-            Check(Read("MainWindow.FreeCompany.cs").Contains("new(\"Routes\",localization.Get(\"FreeCompany.TabRoutes\"),DrawRoutePlanner,request==1),", StringComparison.Ordinal), "in the Routes tab");
+            Check(Read("MainWindow.FreeCompany.cs").Contains("new(\"Routes\",localization.Get(\"FreeCompany.TabRoutes\"),DrawRoutePlanner),", StringComparison.Ordinal), "in the Routes tab (X-853: asked through the table of links)");
             var submarines = Read("MainWindow.RoutePlanner.cs");
             Check(submarines.Contains("var chosen=DrawPlannerVessel(VesselKind.Submarine,", StringComparison.Ordinal) && submarines.Contains("DrawPlannerStats(VesselKind.Submarine);", StringComparison.Ordinal), "submarines: the common part");
             Check(submarines.Contains("submarineSearch.Start(key,token=>VoyagePlanner.Plan(", StringComparison.Ordinal), "submarines: PlannerSearch");
@@ -67,7 +67,7 @@ internal static class RoutePlanner1706Tests
             Check(airships.Contains("DrawPlannerVessel(VesselKind.Airship);", StringComparison.Ordinal) && airships.Contains("DrawPlannerStats(VesselKind.Airship);", StringComparison.Ordinal), "airships: the common part");
             Check(!airships.Contains("Task.Run(", StringComparison.Ordinal) && !submarines.Contains("Task.Run(", StringComparison.Ordinal), "no search written by hand any more");
             var sectors = Read("MainWindow.AirshipSectors.cs");
-            Check(!sectors.Contains("DrawAirshipPlanner(catalog);", StringComparison.Ordinal) && sectors.Contains("{plannerKind=VesselKind.Airship;freeCompanyTabRequest=1;}", StringComparison.Ordinal), "the airship sectors tab opens the planner");
+            Check(!sectors.Contains("DrawAirshipPlanner(catalog);", StringComparison.Ordinal) && sectors.Contains("{plannerKind=VesselKind.Airship;OpenLink(\"FreeCompany.Routes\");}", StringComparison.Ordinal), "the airship sectors tab opens the planner");
             Check(Read("MainWindow.Lifetime.cs").Contains("submarineSearch.Cancel();", StringComparison.Ordinal), "the searches stop with the window");
             var en = Read("Localization/Languages/en.json"); var fr = Read("Localization/Languages/fr.json");
             foreach (var key in new[] { "KindTip", "PlanRoutes", "PlanRoutesTip", "ChosenCount" })

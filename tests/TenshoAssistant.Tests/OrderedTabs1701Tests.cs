@@ -46,9 +46,10 @@ internal static class OrderedTabs1701Tests
         }),
         ("Ordered tabs 1701: the links that open a tab still do (a route's Build button, a map request, a collection jump, a settings tab, a Triple Triad tab)", () =>
         {
-            Check(Read("MainWindow.FreeCompany.cs").Contains("new(\"Builds\",localization.Get(\"FreeCompany.TabBuilds\"),DrawVesselBuilds,request==2),", StringComparison.Ordinal)
-                && Read("MainWindow.FreeCompany.cs").Contains("if(drawn && request>=0 && freeCompanyTabRequest==request)freeCompanyTabRequest=-1;", StringComparison.Ordinal), "Free Company");
-            Check(Read("MainWindow.Maps.cs").Contains("if(drawn && request>=0 && mapsTabRequest==request)mapsTabRequest=-1;", StringComparison.Ordinal), "Maps");
+            // X-853 (review 0.1858, I1): the Free Company's and the Maps page's tabs are asked through the table of links (OpenLink).
+            Check(Read("MainWindow.FreeCompany.cs").Contains("new(\"Builds\",localization.Get(\"FreeCompany.TabBuilds\"),DrawVesselBuilds),", StringComparison.Ordinal)
+                && Read("MainWindow.RoutePlanner.cs").Contains("OpenLink(\"FreeCompany.Builds\");", StringComparison.Ordinal) && TenshoAssistant.Help.NavTargets.Bars["FreeCompany"] == "FreeCompanyTabs", "Free Company");
+            Check(Read("MainWindow.Settings.cs").Contains("OpenLink(\"Maps.Markers\");", StringComparison.Ordinal) && TenshoAssistant.Help.NavTargets.Bars["Maps"] == "MapsTabs", "Maps");
             Check(Read("MainWindow.Collections.cs").Contains("() => { collectionKind = kind; if (focusCollectionKind == kind) focusCollectionKind = null; }, focusCollectionKind == kind);", StringComparison.Ordinal), "Collections: selected until open");
             var settings = Read("MainWindow.Settings.cs");
             Check(settings.Contains("if(requestedSettingsTab==key)requestedSettingsTab=null;", StringComparison.Ordinal) && settings.Contains("},selected);", StringComparison.Ordinal), "Settings");

@@ -182,7 +182,7 @@ internal sealed partial class MainWindow
                 ImGui.SameLine();
                 if(ImGui.SmallButton(localization.Get("RoutePlanner.ToBuild")+$"##ToBuild{index}"))
                 {
-                    buildRoute=[..route.Sectors];buildSearchKey=null;freeCompanyTabRequest=2;
+                    buildRoute=[..route.Sectors];buildSearchKey=null;OpenLink("FreeCompany.Builds");
                     // Always a submarine in Builds: the planner's vessel, else the one already chosen, else the manual one at the planner's rank.
                     if(chosen is not null)buildVesselKey=VesselKey(chosen);
                     else if(buildVesselKey is null || KindOfKey(buildVesselKey)!=VesselKind.Submarine)

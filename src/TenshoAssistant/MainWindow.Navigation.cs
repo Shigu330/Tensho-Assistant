@@ -17,7 +17,12 @@ internal sealed partial class MainWindow
         navTabRequest=null;
         if(next==Page.Settings)
         {
-            if(target.Tab is { } tab && target.Category is { } category)OpenSettingsCategory(tab,category,target.SettingKey);
+            // X-853: a Settings tab named alone opens on the category chosen last there.
+            if(target.Tab is { } tab)
+            {
+                if(target.Category is { } category)OpenSettingsCategory(tab,category,target.SettingKey);
+                else requestedSettingsTab=tab;
+            }
             return;
         }
         if(target.Tab is { } key && NavTargets.Bars.TryGetValue(target.Page,out var bar))navTabRequest=(bar,key);

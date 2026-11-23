@@ -43,8 +43,8 @@ internal sealed partial class MainWindow
     private void DesktopOpenSettings(string tab,string category,bool developer)
     {
         developerMode=developer;
-        page=Page.Settings;
-        if(category.Length>0)OpenSettingsCategory(tab,category);else requestedSettingsTab=tab;
+        // X-853: through the one way to follow a link (a tab alone keeps the category chosen there).
+        Open(new TenshoAssistant.Help.NavTarget("Settings",tab,category.Length>0 ? category:null));
         // X-520 (0.1537): the chat's tabs pictured with the first tab's channels unfolded (X-560's grid).
         desktopChatChannelsOpen=category=="ChatTabs";
     }

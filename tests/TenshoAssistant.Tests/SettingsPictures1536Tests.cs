@@ -49,7 +49,7 @@ internal static class SettingsPictures1536Tests
             Check(references.Contains("if(ReferencePlan.SettingsSetup(shot.Setup) is { } settings)host.Surface.OpenSettings(settings.Tab,settings.Category,settings.Developer);")
                   && references.Contains("if(ReferencePlan.SettingsSetup(shot.Setup) is not null)host.Surface.OpenSettings(\"General\",\"\",false);"), "opened before the picture, given back after");
             var window = Read("src/TenshoAssistant/MainWindow.DesktopData.cs");
-            Check(window.Contains("OpenSettings=DesktopOpenSettings,") && window.Contains("if(category.Length>0)OpenSettingsCategory(tab,category);else requestedSettingsTab=tab;"), "the window opens the tab and the category");
+            Check(window.Contains("OpenSettings=DesktopOpenSettings,") && window.Contains("Open(new TenshoAssistant.Help.NavTarget(\"Settings\",tab,category.Length>0 ? category:null));"), "the window opens the tab and the category");
         }),
     ];
 }

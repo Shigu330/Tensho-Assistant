@@ -42,7 +42,14 @@ internal static class NavTargets1809Tests
                 Check(pages.Contains(target.Page),$"{key}: no page {target.Page}");
                 if(target.Page=="Settings")
                 {
-                    Check(target.Tab is not null && target.Category is not null,$"{key}: a Settings link names its tab and category");
+                    // X-853: a Settings link names its tab, and its category unless it keeps the one chosen last there (the map's cog); an FAQ
+                    // answer always names its category (below).
+                    Check(target.Tab is not null,$"{key}: a Settings link names its tab");
+                    if(target.Category is null)
+                    {
+                        Check(target.SettingKey is null && categories.Contains($"new(\"{target.Tab}\",",StringComparison.Ordinal),$"{key}: no Settings tab {target.Tab}");
+                        continue;
+                    }
                     Check(categories.Contains($"new(\"{target.Tab}\",\"{target.Category}\",",StringComparison.Ordinal),$"{key}: no category {target.Tab} › {target.Category}");
                     if(target.SettingKey is { } setting)
                         Check(SettingsIndex.Categories.GetValueOrDefault(setting)==target.Category && SettingsIndex.Entries.Any(entry=>entry.Key==setting && entry.Tab==target.Tab),$"{key}: the setting {setting} is not in {target.Tab} › {target.Category}");
@@ -59,7 +66,7 @@ internal static class NavTargets1809Tests
         ("Nav targets 1809: an FAQ answer about settings opens its category; a key unknown to the table is refused",() =>
         {
             foreach(var entry in Faq.Entries.Where(entry=>entry.Page=="Settings"))
-                Check(NavTargets.Table.ContainsKey("Faq."+entry.Key),$"{entry.Key}: a Settings answer without its category would open the one last shown");
+                Check(NavTargets.Table.TryGetValue("Faq."+entry.Key,out var answer) && answer.Category is not null,$"{entry.Key}: a Settings answer without its category would open the one last shown");
             foreach(var key in NavTargets.Table.Keys.Where(key=>key.StartsWith("Faq.",StringComparison.Ordinal)))
                 Check(Faq.Entries.Any(entry=>"Faq."+entry.Key==key && entry.Page==NavTargets.Table[key].Page),$"{key}: no such FAQ answer with that page");
             var language=NavTargets.OfFaq(Faq.Entries.First(entry=>entry.Key=="Language"));

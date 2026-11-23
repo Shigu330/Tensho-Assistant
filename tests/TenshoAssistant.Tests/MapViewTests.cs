@@ -74,10 +74,11 @@ internal static class MapViewTests
         }),
         ("Maps page: a click that fills the coordinates brings the Maps tab forward",() =>
         {
-            Check(Read("MainWindow.MapBookmarks.cs").Contains("selectedBookmark = point.Id; selectedMapId = point.MapId; mapsTabRequest = 0;"),"a chosen bookmark");
-            Check(Read("MainWindow.MapView.cs").Contains("selectedMapId=map.MapId;mapsTabRequest=0;"),"the map's context menu");
-            Check(Read("MainWindow.Monsters.cs").Contains("selectedMapId=chosen.MapId; mapsTabRequest=0;"),"a monster's place");
-            Check(Read("MainWindow.Settings.cs").Contains("{page=Page.Maps;mapsTabRequest=1;}"),"settings go to the bookmarks");
+            // X-853 (review 0.1858, I1): through the table of links (Maps.Maps, Maps.Markers), kept until the tab is open.
+            Check(Read("MainWindow.MapBookmarks.cs").Contains("selectedBookmark = point.Id; selectedMapId = point.MapId; OpenLink(\"Maps.Maps\");"),"a chosen bookmark");
+            Check(Read("MainWindow.MapView.cs").Contains("bookmarkSaved=false;OpenLink(\"Maps.Maps\");IsOpen=true;"),"the map's context menu");
+            Check(Read("MainWindow.Monsters.cs").Contains("mapOpenError=null; OpenLink(\"Maps.Maps\");"),"a monster's place");
+            Check(Read("MainWindow.Settings.cs").Contains("OpenLink(\"Maps.Markers\");"),"settings go to the bookmarks");
         }),
         // From MapCoordinates905Tests: 0.905 (X-76): one shared world-to-map conversion and one shared coordinate text, always with a dot as the game writes it.
         ("Map coordinate text: one decimal with a dot, even on a French Windows",() =>

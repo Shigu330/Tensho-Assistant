@@ -27,7 +27,6 @@ internal sealed partial class MainWindow
     private Task<IReadOnlyList<BuildCandidate>>? buildSearch;
     private CancellationTokenSource? buildSearchCancel;
     private IReadOnlyList<BuildCandidate> buildCandidates=[];
-    private int freeCompanyTabRequest=-1;
 
     private static string VesselKey(VoyageVessel vessel)=>$"{(vessel.Kind==VesselKind.Submarine ? "sub":"air")}:{vessel.HouseId}:{vessel.Slot}";
     private static string ManualKey(VesselKind kind)=>kind==VesselKind.Submarine ? "sub:manual":"air:manual";

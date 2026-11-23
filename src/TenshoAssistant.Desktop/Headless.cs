@@ -390,12 +390,13 @@ internal static class Headless
         return read.GetValue(host.Window) is System.Collections.IEnumerable list && list.GetEnumerator().MoveNext();
     }
 
-    /// <summary>X-604 (0.1706): the Free Company page opens this tab once (the « FreeCompany-routes » picture: 1, Best routes). False when the field cannot be reached.</summary>
-    public static bool FreeCompanyTab(Host host,int tab)
+    /// <summary>X-604 (0.1706): a page opens a tab (the « FreeCompany-routes » picture: Best routes). X-853 (review 0.1858, I1): through the plugin's
+    /// table of links (MainWindow.OpenLink and its key, e.g. « FreeCompany.Routes »), as a link in the game does. False when the method cannot be reached.</summary>
+    public static bool OpenLink(Host host,string key)
     {
-        var field=host.Window.GetType().GetField("freeCompanyTabRequest",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic);
-        if(field is null)return false;
-        field.SetValue(host.Window,tab);
+        var method=host.Window.GetType().GetMethod("OpenLink",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic,[typeof(string)]);
+        if(method is null)return false;
+        method.Invoke(host.Window,[key]);
         return true;
     }
 

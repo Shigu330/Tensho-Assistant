@@ -57,7 +57,7 @@ internal static class SettingsCategories1496Tests
             var panels=SettingsTabs999Tests.CategoryList().Where(category=>category.Tab=="Panels").Select(category=>category.Id).ToHashSet();
             var linked=Directory.GetFiles(Path.GetFullPath("src/TenshoAssistant"),"MainWindow*.cs").SelectMany(file=>Regex.Matches(File.ReadAllText(file),@"DrawToolSettingsLink\(""\w+"",""(\w+)""\)").Select(match=>match.Groups[1].Value)).ToArray();
             Check(linked.Length>=8 && linked.All(panels.Contains),"a tool link names a category that does not exist: "+string.Join(",",linked.Where(id=>!panels.Contains(id))));
-            Check(Read("src/TenshoAssistant/MainWindow.MapView.cs").Contains("requestedSettingsTab=\"Map\";") && SettingsTabs999Tests.CategoryList().Any(category=>category.Tab=="Map"),"the map's cog opens the Map tab, on the category the player chose last");
+            Check(Read("src/TenshoAssistant/MainWindow.MapView.cs").Contains("OpenLink(\"MapView.Settings\");") && TenshoAssistant.Help.NavTargets.Of("MapView.Settings").Category is null && SettingsTabs999Tests.CategoryList().Any(category=>category.Tab=="Map"),"the map's cog opens the Map tab, on the category the player chose last");
         }),
     ];
 }

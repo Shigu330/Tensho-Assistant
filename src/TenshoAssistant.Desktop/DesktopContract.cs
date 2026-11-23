@@ -82,7 +82,7 @@ internal static class DesktopContract
         new("TenshoAssistant.Reminders.GardenBed",Kind.Property,"TendHours",false,null,"the trial patch of the garden views (X-178)"),
         new(Main,Kind.Field,"desktopCharacters",false,null,"the trial retainers of the « Reminders-retainers » picture (X-430)"),
         new(Main,Kind.Field,"reminderTabFocus",false,null,"the « Reminders-retainers » picture opens the Status tab (X-430)"),
-        new(Main,Kind.Field,"freeCompanyTabRequest",false,null,"the « FreeCompany-routes » picture opens the Best routes tab (X-604)"),
+        new(Main,Kind.Method,"OpenLink",false,["System.String"],"the « FreeCompany-routes » picture opens the Best routes tab through the table of links (X-604, X-853)"),
         new(Main,Kind.Method,"DesktopQuestTrial",false,["System.Boolean"],"the trial quests of the « Quests-details » picture (X-606)"),
         new(Main,Kind.Method,"DesktopDiscoveriesTrial",false,["System.Boolean"],"the trial base of the « Discoveries-trial » picture (X-807 M4)"),
         new("TenshoAssistant.Character.CharacterStatus",Kind.Property,"Retainers",false,null,"the trial retainers' character file (X-430)"),

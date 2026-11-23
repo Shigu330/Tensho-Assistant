@@ -69,7 +69,7 @@ internal static class References
                 if(shot.Setup=="error" && !host.SheetsFail(true))Console.WriteLine($"  {shot.Id}: the sheets could not be made to fail");
                 if(shot.Page=="Weather")Headless.OpenZone(host,155);
                 if(shot.Setup=="sort-trial")host.Surface.SortTrial(true);
-                if(shot.Setup=="fc-routes" && !Headless.FreeCompanyTab(host,1))Console.WriteLine($"  {shot.Id}: the Best routes tab could not be asked");
+                if(shot.Setup=="fc-routes" && !Headless.OpenLink(host,"FreeCompany.Routes"))Console.WriteLine($"  {shot.Id}: the Best routes tab could not be asked");
                 if(shot.Setup=="quest-trial" && !Headless.QuestTrial(host,true))Console.WriteLine($"  {shot.Id}: the trial quests could not be given");
                 if(shot.Setup=="discoveries-trial" && !Headless.DiscoveriesTrial(host,true))Console.WriteLine($"  {shot.Id}: the trial discoveries could not be given");
                 // X-520 (0.1536): a tab and a category of the Settings page (the Debug tab in developer mode).

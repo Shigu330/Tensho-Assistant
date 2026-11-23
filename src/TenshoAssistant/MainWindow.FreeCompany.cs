@@ -20,19 +20,18 @@ internal sealed partial class MainWindow
     private void DrawFreeCompany()
     {
         Heading(localization.Get("FreeCompany.Title"),localization.Get("FreeCompany.Description"));
-        // 0.315: a route's « Build » button selects the Builds tab once. X-605 (0.1701): the tabs arranged with the mouse (OrderedTabs).
-        var request=freeCompanyTabRequest;
-        var drawn=OrderedTabs("FreeCompanyTabs",
+        // 0.315: a route's « Build » button selects the Builds tab. X-605 (0.1701): the tabs arranged with the mouse (OrderedTabs). X-853
+        // (review 0.1858, I1): « Build » and the airship sectors' « Plan routes » are rows of Help/NavTargets.cs (FreeCompany.Builds, .Routes).
+        OrderedTabs("FreeCompanyTabs",
         [
-            new("Vessels",localization.Get("FreeCompany.TabVessels"),DrawFreeCompanyVessels,request==0),
-            new("Routes",localization.Get("FreeCompany.TabRoutes"),DrawRoutePlanner,request==1),
-            new("Builds",localization.Get("FreeCompany.TabBuilds"),DrawVesselBuilds,request==2),
-            new("Airships",localization.Get("FreeCompany.TabAirships"),DrawAirshipSectors,request==3),
+            new("Vessels",localization.Get("FreeCompany.TabVessels"),DrawFreeCompanyVessels),
+            new("Routes",localization.Get("FreeCompany.TabRoutes"),DrawRoutePlanner),
+            new("Builds",localization.Get("FreeCompany.TabBuilds"),DrawVesselBuilds),
+            new("Airships",localization.Get("FreeCompany.TabAirships"),DrawAirshipSectors),
             new("Workshop",localization.Get("FreeCompany.TabWorkshop"),DrawWorkshopProjects),
             // 0.379 (g, M-10): loot history.
             new("History",localization.Get("VoyageHistory.Tab"),DrawVoyageHistory),
         ]);
-        if(drawn && request>=0 && freeCompanyTabRequest==request)freeCompanyTabRequest=-1;
     }
 
     private void DrawFreeCompanyVessels()

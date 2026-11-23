@@ -4,6 +4,7 @@ namespace TenshoAssistant.Help;
 /// X-809 (the user's report of 22/11: since the new look, a link or an « Open this page » button often opened the wrong tab or section):
 /// where a link goes. <see cref="Page"/> is a page's name; <see cref="Tab"/> is the key of a tab of the page's bar (<see cref="NavTargets.Bars"/>),
 /// or, on Settings, the Settings tab; <see cref="Category"/> is a Settings category and <see cref="SettingKey"/> a setting shown in it.
+/// X-853: a Settings target may name its tab alone; the tab then opens on the category the player chose last there.
 /// </summary>
 public sealed record NavTarget(string Page,string? Tab=null,string? Category=null,string? SettingKey=null);
 
@@ -15,9 +16,13 @@ public sealed record NavTarget(string Page,string? Tab=null,string? Category=nul
 /// X-813 (review 0.1812): the links that chose a tab by a flag (the item sheet's Stocks, Craft, Uses and Gathering; the Storage tabs; the
 /// collections' Music, Titles and Achievements) and the Settings categories written in the code (the server bar's details, the tools'
 /// « Settings ») are rows of this table too, followed by MainWindow.OpenLink(key); NavTargets1852Tests refuses a flag or a category in the code.
-/// X-850 (review 0.1852, I1): Triple Triad's and the crafting page's tabs too (NavTargets1855Tests). One jump stays outside, on purpose: a
-/// collection kind (focusCollectionKind) chosen from an item's kind at run time (a mount, a minion, a card of the extra collections…); it is an
-/// enum, so a renamed kind breaks the build, and it is kept until its tab is open, as the table's requests are.
+/// X-850 (review 0.1852, I1): Triple Triad's and the crafting page's tabs too (NavTargets1855Tests).
+/// X-853 (review 0.1858, I1): X-850 said one jump was left outside; four more were: Settings › Bookmarks to the Maps page's Markers tab, the map's
+/// « Use in tool », a monster's place and a chosen bookmark to its Maps tab (a request number of the page's own, dropped after one frame), the
+/// map's cog to the Settings tab « Map » in plain text, and the Free Company page's « Plan routes » and « Build » (a request number too). They
+/// are rows now; NavTargets1859Tests refuses any tab request field but MainWindow.Open's two, and any assignment of them outside a link followed.
+/// One jump stays outside, on purpose: a collection kind (focusCollectionKind) chosen from an item's kind at run time (a mount, a minion, a card
+/// of the extra collections…); it is an enum, so a renamed kind breaks the build, and it is kept until its tab is open, as the table's requests are.
 /// </summary>
 public static class NavTargets
 {
@@ -35,6 +40,8 @@ public static class NavTargets
         // X-850 (review 0.1852, I1): Triple Triad and the crafting page.
         ["TripleTriad"]="TriadNotebook",
         ["CraftSimulation"]="CraftPageTabs",
+        // X-853 (review 0.1858, I1): the Maps page.
+        ["Maps"]="MapsTabs",
     };
 
     public static readonly IReadOnlyDictionary<string,NavTarget> Table=new Dictionary<string,NavTarget>
@@ -91,6 +98,14 @@ public static class NavTargets
         ["Triad.Npcs"]=new("TripleTriad","Npcs"),
         ["Craft.Simulation"]=new("CraftSimulation","Simulation"),
         ["Craft.Preparation"]=new("CraftSimulation","Preparation"),
+        // X-853 (review 0.1858, I1): the Maps page's tabs (Settings › Bookmarks; the map's « Use in tool », a monster's place, a chosen
+        // bookmark), the Free Company page's (« Plan routes » of the airship sectors, a route's « Build ») and the map's cog (the Map tab of
+        // Settings, on the category chosen last there).
+        ["Maps.Maps"]=new("Maps","Maps"),
+        ["Maps.Markers"]=new("Maps","Markers"),
+        ["FreeCompany.Routes"]=new("FreeCompany","Routes"),
+        ["FreeCompany.Builds"]=new("FreeCompany","Builds"),
+        ["MapView.Settings"]=new("Settings","Map"),
     };
 
     /// <summary>A target of the table (a key not in it is a fault, refused by the test that reads the code's keys).</summary>

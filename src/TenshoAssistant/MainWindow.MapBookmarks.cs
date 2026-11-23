@@ -185,7 +185,7 @@ internal sealed partial class MainWindow
     }
     private void SelectBookmark(MapBookmark point)
     {
-        selectedBookmark = point.Id; selectedMapId = point.MapId; mapsTabRequest = 0;
+        selectedBookmark = point.Id; selectedMapId = point.MapId; OpenLink("Maps.Maps");
         mapX = point.X; mapY = point.Y; bookmarkName = point.Name ?? ""; mapOpenError = null;
         bookmarkNote = point.Note ?? ""; bookmarkGroup = point.Group ?? "";
     }

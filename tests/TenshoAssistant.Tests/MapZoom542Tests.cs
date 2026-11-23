@@ -11,7 +11,7 @@ internal static class MapZoom542Tests
         ("Map (0.587): the cog opens the Map tab of Settings; its settings have one home",() =>
         {
             var view=Read("MainWindow.MapView.cs");
-            Check(view.Contains("page=Page.Settings;requestedSettingsTab=\"Map\";IsOpen=true;BringToFront();"),"to Settings");
+            Check(view.Contains("{OpenLink(\"MapView.Settings\");IsOpen=true;BringToFront();}") && TenshoAssistant.Help.NavTargets.Of("MapView.Settings")==new TenshoAssistant.Help.NavTarget("Settings","Map"),"to Settings (X-853: through the table)");
             Check(!view.Contains("BeginPopup(\"MapViewSettings\")"),"no popup any more");
             // X-449: the Map tab lists the categories of the map's settings, one method each, where the one body was.
             var categories=Read("MainWindow.SettingsCategories.cs");

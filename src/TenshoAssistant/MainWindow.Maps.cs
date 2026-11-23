@@ -18,8 +18,6 @@ internal sealed partial class MainWindow
     private float mapX = 20.5f;
     private float mapY = 20.5f;
     private string? mapOpenError;
-    // 0.677 (user request): one tab to select once, when a click elsewhere fills another tab's fields. 0 maps, 1 markers.
-    private int mapsTabRequest=-1;
 
     private void DrawMaps()
     {
@@ -31,18 +29,18 @@ internal sealed partial class MainWindow
             return;
         }
         if (ImGui.Button(localization.Get("MapView.OpenCurrent"))) OpenMapView(0);
-        // X-605 (0.1701): the tabs arranged with the mouse (OrderedTabs).
-        var request=mapsTabRequest;
-        var drawn=OrderedTabs("MapsTabs",
+        // X-605 (0.1701): the tabs arranged with the mouse (OrderedTabs). X-853 (review 0.1858, I1): a link to one of them (a click elsewhere
+        // that fills another tab's fields) is a row of Help/NavTargets.cs, kept until the tab is open (it was dropped after one frame).
+        OrderedTabs("MapsTabs",
         [
-            new("Maps",localization.Get("MapsUi.TabMaps"),()=>DrawMapsPicker(catalog),request==0),
+            new("Maps",localization.Get("MapsUi.TabMaps"),()=>DrawMapsPicker(catalog)),
             new("Markers",localization.Get("MapsUi.TabMarkers"),()=>
             {
                 DrawMapBookmarks(catalog);
                 DrawChatMapLinks(catalog);
                 // X-09 (0.444): place directory.
                 DrawPlaceDirectory();
-            },request==1),
+            }),
             new("Hunt",localization.Get("MapsUi.TabHunt"),()=>
             {
                 // N-15 (0.442): hunt train recorder.
@@ -53,7 +51,6 @@ internal sealed partial class MainWindow
             // N-05 (0.445): plots for sale (PaissaDB).
             ..(Paissa is not null ? [new OrderedTab("Plots",localization.Get("Plots.Title"),DrawPlots)]:Array.Empty<OrderedTab>()),
         ]);
-        if(drawn && request>=0 && mapsTabRequest==request)mapsTabRequest=-1;
     }
 
     private void DrawMapsPicker(MapCatalog catalog)

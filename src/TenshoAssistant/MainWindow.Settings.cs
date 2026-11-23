@@ -354,7 +354,7 @@ internal sealed partial class MainWindow
         ImGui.TextWrapped(localization.Get("ModuleSettings.ProfilesHelp"));
         if(ImGui.Button(localization.Get("ModuleSettings.SortProfiles")))page=Page.SortPreview;
         if(ImGui.Button(localization.Get("ModuleSettings.Presets")))page=Page.CraftPresets;
-        if(ImGui.Button(localization.Get("ModuleSettings.Bookmarks"))){page=Page.Maps;mapsTabRequest=1;}
+        if(ImGui.Button(localization.Get("ModuleSettings.Bookmarks")))OpenLink("Maps.Markers");
         if(ImGui.Button(localization.Get("ModuleSettings.Deck")))OpenLink("Triad.Deck");
         if(ImGui.Button(localization.Get("ModuleSettings.Quests")))page=Page.Quests;
         if(ImGui.Button(localization.Get("ModuleSettings.MacroSequence")))page=Page.MacroChain;

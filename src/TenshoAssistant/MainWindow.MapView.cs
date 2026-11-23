@@ -527,7 +527,7 @@ internal sealed partial class MainWindow
             Place();if(ToolButton(FontAwesomeIcon.LayerGroup,"MapView.Layers",true,ImGui.IsPopupOpen("MapViewLayers")))ImGui.OpenPopup("MapViewLayers");
             DrawMapLayers();
             // 0.587 (user request): too many settings for a popup: the cog opens the Map tab of Settings.
-            Place();if(ToolButton(FontAwesomeIcon.Cog,"MapView.Settings",true,false)){page=Page.Settings;requestedSettingsTab="Map";IsOpen=true;BringToFront();}
+            Place();if(ToolButton(FontAwesomeIcon.Cog,"MapView.Settings",true,false)){OpenLink("MapView.Settings");IsOpen=true;BringToFront();}
             if(slider>0)ImGui.Spacing();
             Place();if(ToolButton(FontAwesomeIcon.Plus,"MapView.ZoomIn",true))ZoomTo(mapZoom*1.25f);
             // Slider centred in the column (when there is room for it), the zoom percentage written under the − button.
@@ -1916,7 +1916,7 @@ internal sealed partial class MainWindow
                 // 0.242 (R-01, first part): the journal target icon could not be removed; right click › remove it.
                 if(mapGameTarget is not null && ImGui.Selectable(localization.Get("MapView.RemoveGameTarget")))mapGameTarget=null;
                 ImGui.BeginDisabled(map.TerritoryId==0);
-                try{if(ImGui.Selectable(localization.Get("MapView.UseInTool"))){selectedMapId=map.MapId;mapsTabRequest=0;mapX=coordinate.X;mapY=coordinate.Y;bookmarkSaved=false;page=Page.Maps;IsOpen=true;}}
+                try{if(ImGui.Selectable(localization.Get("MapView.UseInTool"))){selectedMapId=map.MapId;mapX=coordinate.X;mapY=coordinate.Y;bookmarkSaved=false;OpenLink("Maps.Maps");IsOpen=true;}}
                 finally{ImGui.EndDisabled();}
                 // 0.378 (g, M-08): add a bookmark at the clicked point, named here.
                 if(map.TerritoryId!=0)
