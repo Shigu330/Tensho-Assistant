@@ -35,6 +35,9 @@ internal sealed class Host
     public readonly IReadOnlyList<string> SurfaceMissing;
     private readonly string? settingsPath;
     private readonly Type configurationType;
+    /// <summary>X-843 M3 (0.1844, review of 0.1839): the player's saved settings were read (at start, or by a reading applied since); until then
+    /// every network service is closed (DesktopPaths.SourceSwitch).</summary>
+    private volatile bool settingsKnown;
 
     /// <summary>The plugin's catalogue loaders that need only (service, IDataManager, IFramework, IPluginLog[, DataCache]) (Plugin.cs).</summary>
     public static readonly string[] Loaders=["MapCatalogLoader","WeatherCatalogLoader","DutyCatalogLoader","GpCatalogLoader","CraftActionCatalogLoader","FashionHintLoader",
@@ -48,6 +51,7 @@ internal sealed class Host
         this.settingsPath=settingsPath;
         var saved=ReadSettings(settingsPath,configurationType,out SettingsNote);
         if(saved is not null)made[configurationType]=saved;
+        settingsKnown=saved is not null;
         var savedCode=saved is null ? null : configurationType.GetProperty("LanguageCode")?.GetValue(saved) as string;
         TextCode=DesktopPaths.TextLanguage(textLanguage ?? savedCode,CultureInfo.CurrentUICulture.TwoLetterISOLanguageName);
         GameLanguage=Enum.Parse<Language>(gameLanguage ?? DesktopPaths.GameLanguage(TextCode),true);
@@ -99,7 +103,14 @@ internal sealed class Host
         foreach(var service in made.Values.ToArray())
         {
             if(service is null || service.GetType().GetProperty("Enabled") is not { CanWrite:true } property || property.PropertyType!=typeof(Func<bool>))continue;
-            if(configuration is not null && wire.Invoke(null,[service,configuration]) is true)continue;
+            // X-843 M3 (0.1844): with no saved settings read (no file, a reading refused by SettingsGuard), the window's settings are the
+            // defaults, every source open: « Game data only », ticked in the game, was not followed. Each switch is now closed until the
+            // player's settings are read, then it is the plugin's own.
+            if(configuration is not null && wire.Invoke(null,[service,configuration]) is true)
+            {
+                if(property.GetValue(service) is Func<bool> wired)property.SetValue(service,DesktopPaths.SourceSwitch(wired,()=>settingsKnown));
+                continue;
+            }
             property.SetValue(service,(Func<bool>)(()=>false));
             SourcesOff.Add(service.GetType().Name);
         }
@@ -239,6 +250,7 @@ internal sealed class Host
             property.SetValue(target,property.GetValue(fresh));
         foreach(var field in configurationType.GetFields(BindingFlags.Instance|BindingFlags.Public).Where(f=>!f.IsInitOnly))
             field.SetValue(target,field.GetValue(fresh));
+        settingsKnown=true;
         return "read again from "+settingsPath;
     }
 

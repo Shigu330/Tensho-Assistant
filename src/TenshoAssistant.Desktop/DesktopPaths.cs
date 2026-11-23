@@ -8,6 +8,13 @@ namespace TenshoAssistant.Desktop;
 public static class DesktopPaths
 {
     /// <summary>
+    /// X-843 M3 (0.1844, review of 0.1839): a network service's switch in the application: closed while the player's saved settings are not read
+    /// (no settings file, or a reading refused), then the plugin's own switch (CommunitySources.Wire). The safe side when the settings are
+    /// unknown: no request leaves, rather than every source open.
+    /// </summary>
+    public static Func<bool> SourceSwitch(Func<bool> wired,Func<bool> settingsKnown)=>()=>settingsKnown() && wired();
+
+    /// <summary>
     /// X-836 M4 (0.1840, security review before the alpha): the plugin's Release build of the repository the app runs from (development only).
     /// Before, an app without its plugin/ copy (removed by an antivirus) walked up to the drive's root and loaded any
     /// src/TenshoAssistant/bin/x64/Release/TenshoAssistant.dll found on the way, and every signed-in user may create C:/src on a default Windows.
