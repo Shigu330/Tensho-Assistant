@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (881 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (884 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -907,8 +907,10 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-813 | Review of block 0.1807 to 0.1812 (review 0.1812, 22/11), I1: finding in… | Done in 0.1852.0 |
 | X-814 | Review of block 0.1807 to 0.1812 (review 0.1812, 22/11), minor M1, M2, M3: M1… | Done in 0.1848.0 |
 | X-815 | Bug seen by the user on 11/22 around 17:15 (capture read: Free company › Best… | Done in 0.1847.0 |
+| X-817 | Tool: the version publishing tool (and Verify.ps1) do not run the merge tool's… | Done in 0.1868.0 |
 | X-819 | Review of block 0.1813 to 0.1819 (review 0.1819, 22/11), I1: finding in… | Done in 0.1820.0 |
 | X-820 | Review of block 0.1813 to 0.1819 (review 0.1819, 22/11), minor M1, M2, M3: M1… | Done in 0.1822.0 |
+| X-821 | Tool: the next-relay proposal (plan tool view, X-812) puts a read-only review… | Done in 0.1868.0 |
 | X-822 | Finding of the user's local AI (Roslyn audit of Devloppement, 11/22 around… | Done in 0.1825.0 |
 | X-823 | Review of block 0.1820 to 0.1823 (review 0.1823, 22/11), I1: finding in… | Done in 0.1824.0 |
 | X-824 | Review of block 0.1820 to 0.1823 (review 0.1823, 22/11), minor M1, M2: M1 in… | Done in 0.1826.0 |
@@ -939,6 +941,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-849 | Review of block 0.1849 to 0.1852 (review 0.1852, 23/11), minor M1, M2: M1 in… | Done in 0.1855.0 |
 | X-850 | Review of block 0.1849 to 0.1852 (review 0.1852, 23/11), pre-existing before… | Done in 0.1856.0 |
 | X-851 | Review of block 0.1853 to 0.1854 (review 0.1854, 23/11), minor M1: M1 in… | Done in 0.1857.0 |
+| X-852 | Plan tool: the « picture asked » check reads « image » meaning a frame («… | Done in 0.1868.0 |
 | X-853 | Review of block 0.1855 to 0.1858 (review 0.1858, 23/11), I1: finding in… | Done in 0.1859.0 |
 | X-854 | Review of block 0.1855 to 0.1858 (review 0.1858, 23/11), minor M1: M1 in… | Done in 0.1860.0 |
 | X-855 | Review of block 0.1859 to 0.1860 (review 0.1860, 23/11), minor M2: M2 in… | Done in 0.1861.0 |
@@ -954,7 +957,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (881 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (884 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1859,8 +1862,10 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-813 | Relecture du bloc 0.1807 à 0.1812 (relecture 0.1812, 22/11), I1 : X-809 : la… | Fait en 0.1852.0 |
 | X-814 | Relecture du bloc 0.1807 à 0.1812 (relecture 0.1812, 22/11), mineurs M1, M2, M3… | Fait en 0.1848.0 |
 | X-815 | Bug vu par l'utilisateur le 22/11 vers 17 h 15 (capture lue : Compagnie libre ›… | Fait en 0.1847.0 |
+| X-817 | Outil : l'outil de publication des versions (et Verify.ps1) ne lance pas… | Fait en 0.1868.0 |
 | X-819 | Relecture du bloc 0.1813 à 0.1819 (relecture 0.1819, 22/11), I1 : Un gist créé… | Fait en 0.1820.0 |
 | X-820 | Relecture du bloc 0.1813 à 0.1819 (relecture 0.1819, 22/11), mineurs M1, M2, M3… | Fait en 0.1822.0 |
+| X-821 | Outil : la proposition du relais suivant (vue de l'outil du plan, X-812) met… | Fait en 0.1868.0 |
 | X-822 | Constat de l'IA locale de l'utilisateur (audit Roslyn de Devloppement, 22/11… | Fait en 0.1825.0 |
 | X-823 | Relecture du bloc 0.1820 à 0.1823 (relecture 0.1823, 22/11), I1 : La fusion… | Fait en 0.1824.0 |
 | X-824 | Relecture du bloc 0.1820 à 0.1823 (relecture 0.1823, 22/11), mineurs M1, M2… | Fait en 0.1826.0 |
@@ -1891,6 +1896,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-849 | Relecture du bloc 0.1849 à 0.1852 (relecture 0.1852, 23/11), mineurs M1, M2… | Fait en 0.1855.0 |
 | X-850 | Relecture du bloc 0.1849 à 0.1852 (relecture 0.1852, 23/11), déjà là avant le… | Fait en 0.1856.0 |
 | X-851 | Relecture du bloc 0.1853 à 0.1854 (relecture 0.1854, 23/11), mineurs M1 : M1… | Fait en 0.1857.0 |
+| X-852 | Outil du plan : le contrôle « image demandée » prend « image » au sens de trame… | Fait en 0.1868.0 |
 | X-853 | Relecture du bloc 0.1855 à 0.1858 (relecture 0.1858, 23/11), I1 : X-850 n'est… | Fait en 0.1859.0 |
 | X-854 | Relecture du bloc 0.1855 à 0.1858 (relecture 0.1858, 23/11), mineurs M1 : M1… | Fait en 0.1860.0 |
 | X-855 | Relecture du bloc 0.1859 à 0.1860 (relecture 0.1860, 23/11), mineurs M2 : M2… | Fait en 0.1861.0 |
