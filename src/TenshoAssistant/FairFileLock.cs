@@ -44,8 +44,8 @@ public static class FairFileLock
                     try{return new FileStream(full,FileMode.OpenOrCreate,FileAccess.ReadWrite,FileShare.None);}
                     catch(IOException error){throw busy(error);}
                     // X-862 (0.1867): still « delete pending » past the wait: busy too (the caller tries again, as for a held lock), never a
-                    // hard failure (the bank would refuse its writes until a reload). A file that is there and refused (read only, rights)
-                    // still raises access denied.
+                    // hard failure (the bank would refuse its writes until a reload). A file that is there and refused (read only, rights:
+                    // X-863, 0.1869) still raises access denied, a clear failed load rather than « busy » for ever.
                     catch(UnauthorizedAccessException error) when(DeletePending(full))
                     {throw busy(new IOException("The lock file is still being deleted by another program (access denied past the wait).",error));}
                 }
@@ -97,15 +97,58 @@ public static class FairFileLock
         catch(UnauthorizedAccessException){return null;}
     }
 
-    // X-862 (0.1867): a « delete pending » file refuses every open, even to read it with all sharing allowed (access denied; not found once
-    // it is gone), while a file really there that refuses the lock's write (read only) still opens that way. Its attributes do not tell:
-    // Windows still shows them for a « delete pending » file.
+    // X-862 (0.1867): a « delete pending » file refuses every open with access denied (not found once it is gone). Its attributes do not
+    // tell: Windows still shows them for a « delete pending » file. X-863 (0.1869, review 0.1868 M1): « even a read is refused » did not
+    // tell either, since a lock really there whose rights (ACL) refuse reading and writing answers the same, and was taken for « busy » for
+    // ever. Windows' own status tells them apart: an open asking only to read the attributes gets STATUS_DELETE_PENDING for the first, and
+    // succeeds or gets STATUS_ACCESS_DENIED for the second (Win32 maps both statuses to the same « access denied »). Elsewhere (no
+    // « delete pending » there): gone only.
     internal static bool DeletePending(string full)
     {
-        try{using(File.OpenHandle(full,FileMode.Open,FileAccess.Read,FileShare.ReadWrite|FileShare.Delete)){}return false;}
-        catch(FileNotFoundException){return true;}
-        catch(UnauthorizedAccessException){return true;}
-        catch(IOException){return false;}
+        if(!OperatingSystem.IsWindows())return !File.Exists(full);
+        return OpenStatus(full) is StatusDeletePending or StatusNameNotFound or StatusPathNotFound;
+    }
+
+    private const uint StatusDeletePending=0xC0000056;
+    private const uint StatusNameNotFound=0xC0000034;
+    private const uint StatusPathNotFound=0xC000003A;
+    private const uint ReadAttributes=0x80;
+    private const uint ShareAll=7;
+    private const uint CaseInsensitive=0x40;
+
+    [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+    private struct NtName { public ushort Length; public ushort MaximumLength; public IntPtr Buffer; }
+    [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+    private struct NtObject { public int Length; public IntPtr Root; public IntPtr Name; public uint Attributes; public IntPtr Security; public IntPtr Quality; }
+    [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+    private struct NtIo { public IntPtr Status; public IntPtr Information; }
+    [System.Runtime.InteropServices.DllImport("ntdll.dll")]
+    private static extern uint NtOpenFile(out IntPtr handle,uint access,ref NtObject attributes,out NtIo io,uint share,uint options);
+    [System.Runtime.InteropServices.DllImport("ntdll.dll")]
+    private static extern uint NtClose(IntPtr handle);
+
+    /// <summary>The NT status of opening <paramref name="full"/> to read its attributes only, every sharing allowed (0: opened, then closed).</summary>
+    internal static uint OpenStatus(string full)
+    {
+        var native=full.StartsWith(@"\\?\",StringComparison.Ordinal) ? @"\??\"+full[4..]
+            :full.StartsWith(@"\\",StringComparison.Ordinal) ? @"\??\UNC\"+full[2..]
+            :@"\??\"+full;
+        if(native.Length>short.MaxValue/2-1)return 0; // longer than a native name can be: no answer, taken as « there »
+        var text=System.Runtime.InteropServices.Marshal.StringToHGlobalUni(native);
+        var name=System.Runtime.InteropServices.Marshal.AllocHGlobal(System.Runtime.InteropServices.Marshal.SizeOf<NtName>());
+        try
+        {
+            System.Runtime.InteropServices.Marshal.StructureToPtr(new NtName{Length=(ushort)(native.Length*2),MaximumLength=(ushort)(native.Length*2+2),Buffer=text},name,false);
+            var attributes=new NtObject{Length=System.Runtime.InteropServices.Marshal.SizeOf<NtObject>(),Name=name,Attributes=CaseInsensitive};
+            var status=NtOpenFile(out var handle,ReadAttributes,ref attributes,out _,ShareAll,0);
+            if(status==0)NtClose(handle);
+            return status;
+        }
+        finally
+        {
+            System.Runtime.InteropServices.Marshal.FreeHGlobal(name);
+            System.Runtime.InteropServices.Marshal.FreeHGlobal(text);
+        }
     }
 
     // The mark stays open while this client waits; deleted on close (and by Windows when the process ends). A mark that cannot be made: the
