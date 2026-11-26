@@ -146,7 +146,7 @@ internal static class GilJournalSqlite1139Tests
             var watcher=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Inventory/GilWatcher.Dalamud.cs"));
             Check(watcher.Contains("()=>store.Save(id,copy)",StringComparison.Ordinal) && watcher.Contains("store.Checkpoint();",StringComparison.Ordinal)
                 && watcher.Contains("if(!dirty || character==0 || loadFailed)return;",StringComparison.Ordinal),"watcher");
-            var security=File.ReadAllText(Path.GetFullPath("SECURITY.md"));
+            var security=File.ReadAllText(Path.GetFullPath("SECURITY.md")).ReplaceLineEndings("\n");
             var halves=security.Split("\n---",2);
             Check(halves.Length==2 && halves[0].Contains("TenshoData.db",StringComparison.Ordinal) && halves[1].Contains("TenshoData.db",StringComparison.Ordinal),"SECURITY, both halves");
         }),

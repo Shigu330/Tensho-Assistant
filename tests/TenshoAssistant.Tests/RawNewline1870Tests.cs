@@ -18,7 +18,8 @@ internal static class RawNewline1870Tests
                 Check(Count("var s=File.ReadAllText(\"a\");\nCheck(s."+search+"(\"a;\\n b\")<0,\"x\");\n")==1,search+" through a variable");
                 Check(Count("var s=File.ReadAllText(\"a\");\nCheck(s."+search+"(\"a;\\n b\")<0 && s."+search+"(\"a;\\r\\n b\")<0,\"x\");\n")==0,search+" taking both forms passes");
             }
-            Check(Count("var s=File.ReadAllText(\"a\");\nvar lines=s.Split(\"\\n\");\n")==0,"a split on « \\n » alone passes (a snippet that starts with « \\n »)");
+            // X-866 (0.1871, review 0.1870 M1): a split on « \n » alone leaves a « \r » at the end of each piece of a CRLF text: found.
+            Check(Count("var s=File.ReadAllText(\"a\");\nvar lines=s.Split(\"\\n\");\n")==1,"a split on « \\n » alone is found (it leaves a « \\r » in each piece)");
         }),
         ("Raw newline 1870: a read chained before its search is found; a normalisation anywhere in the chain lets it pass",() =>
         {

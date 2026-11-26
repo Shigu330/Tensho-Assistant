@@ -137,7 +137,7 @@ internal static class PrivateValues1607Tests
         }),
         ("Private values 1613: no hash, digest or other form of the user's values is in this file",()=>
         {
-            var text=File.ReadAllText(Path.GetFullPath("tests/TenshoAssistant.Tests/PrivateValues1607Tests.cs"));
+            var text=File.ReadAllText(Path.GetFullPath("tests/TenshoAssistant.Tests/PrivateValues1607Tests.cs")).ReplaceLineEndings("\n");
             Check(!Regex.IsMatch(text,@"""[0-9a-f]{16,}"""),"a hexadecimal digest is written here");
             Check(!text.Contains("SHA256"+".HashData",StringComparison.Ordinal) && !text.Contains("HM"+"AC",StringComparison.Ordinal),"a hash of the values is computed here");
         }),

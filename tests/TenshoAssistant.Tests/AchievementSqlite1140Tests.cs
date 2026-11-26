@@ -136,7 +136,7 @@ internal static class AchievementSqlite1140Tests
             Check(watcher.Contains("loading=data is null ? null:Task.Run(()=>data.Load(DateTimeOffset.UtcNow));",StringComparison.Ordinal)
                 && watcher.Contains("if(!read.IsCompleted)return;",StringComparison.Ordinal) && watcher.Contains("if(data is { } store && !saveBlocked && character!=0)",StringComparison.Ordinal)
                 && !watcher.Contains("File.ReadAllText",StringComparison.Ordinal),"watcher");
-            var security=File.ReadAllText(Path.GetFullPath("SECURITY.md")).Split("\n---",2);
+            var security=File.ReadAllText(Path.GetFullPath("SECURITY.md")).ReplaceLineEndings("\n").Split("\n---",2);
             Check(security[0].Contains("achievement progress",StringComparison.Ordinal) && security[0].Contains("AchievementProgress.json",StringComparison.Ordinal)
                 && security[1].Contains("progression des hauts faits",StringComparison.Ordinal),"SECURITY, both halves");
         }),

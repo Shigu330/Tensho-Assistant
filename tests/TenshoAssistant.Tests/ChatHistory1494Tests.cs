@@ -36,7 +36,7 @@ internal static class ChatHistory1494Tests
 
     private static List<string> Texts(IEnumerable<ChatRecord> records) => [.. records.Select(record => string.Concat(record.Body.Select(segment => segment.Text)))];
 
-    private static int Lines(string path) => File.ReadAllText(path).Split('\n', StringSplitOptions.RemoveEmptyEntries).Length;
+    private static int Lines(string path) => File.ReadAllText(path).ReplaceLineEndings("\n").Split('\n', StringSplitOptions.RemoveEmptyEntries).Length;
 
     /// <summary>A history file written at once: its first line, then <paramref name="count"/> messages, one in ten a combat line, the last the newest.</summary>
     private static void Big(string path, int count, double minutesApart = 0.01)

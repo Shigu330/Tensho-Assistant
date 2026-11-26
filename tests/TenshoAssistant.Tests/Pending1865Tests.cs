@@ -61,21 +61,24 @@ internal static class Pending1865Tests
         var readers=new List<(string Name,bool Property)>{("File.ReadAllText",false)};
         foreach(var helper in RawHelpers(source))readers.Add((helper.Name,helper.Property));
         readers.AddRange(foreign);
+        // X-866: reads looked for in the code only (comments and literals blanked), so a « File.ReadAllText( » written in a comment or
+        // a string is not a read.
+        var code=CodeOnly(source);
         foreach(var (reader,property) in readers)
         {
             var pattern=@"(?<![\w.])"+Regex.Escape(reader)+(property ? @"\b(?!\s*(?:\(|=>|\{))":@"\s*\(");
-            foreach(Match use in Regex.Matches(source,pattern))
+            foreach(Match use in Regex.Matches(code,pattern))
             {
-                if(Regex.IsMatch(source[..use.Index],@"\bstring\s+$"))continue;
-                if(source[(source.LastIndexOf('\n',Math.Max(0,use.Index-1))+1)..use.Index].TrimStart().StartsWith("//",StringComparison.Ordinal))continue;
+                if(Regex.IsMatch(code[..use.Index],@"\bstring\s+$"))continue;
                 var end=property ? use.Index+use.Length:CallEnd(source,use.Index+use.Length-1);
                 if(end<0)continue;
                 var (chained,normalised)=Chain(source,end);
                 if(normalised)continue;
                 end=chained;
-                if(Regex.IsMatch(source[end..],@"^\s*"+NewlineSearch))
+                var inline=Regex.Match(source[end..],@"^\s*"+NewlineSearch);
+                if(inline.Success)
                 {
-                    if(!Statement(source,end).Contains(@"\r\n",StringComparison.Ordinal))found.Add(reader+": "+Line(source,end));
+                    if(!Handled(Statement(source,end),inline.Groups["m"].Value))found.Add(reader+": "+Line(source,end));
                     continue;
                 }
                 var assigned=Regex.Match(source[..use.Index],@"\b(?:var|string)\s+(\w+)\s*=\s*$");
@@ -86,18 +89,93 @@ internal static class Pending1865Tests
                 var lines=(next.Success ? rest[..next.Index]:rest).Split('\n');
                 for(var i=0;i<lines.Length;i++)
                 {
-                    if(!Regex.IsMatch(lines[i],@"\b"+Regex.Escape(name)+VariableChain+NewlineSearch))continue;
+                    var search=Regex.Match(lines[i],@"\b"+Regex.Escape(name)+VariableChain+NewlineSearch);
+                    if(!search.Success)continue;
                     var statement=lines[i]+(i+1<lines.Length ? lines[i+1]:"");
-                    if(!statement.Contains(@"\r\n",StringComparison.Ordinal))found.Add(name+": "+lines[i].Trim());
+                    if(!Handled(statement,search.Groups["m"].Value))found.Add(name+": "+lines[i].Trim());
                 }
             }
         }
         return found;
     }
 
-    // A search for a snippet with a « \n » after another character of the snippet: « \r\n » breaks it. A « \n » that starts the snippet
-    // still matches a CRLF text (the « \r » comes before it), so it is not refused.
-    private const string NewlineSearch=@"\s*\.\s*(?:Contains|IndexOf|LastIndexOf|StartsWith|EndsWith|Split)\s*\(\s*""(?:[^""\\]|\\.)*(?:[^""\\]|\\.)\\n";
+    // A search that « \r\n » breaks, its method in group « m ». Contains, IndexOf, LastIndexOf, EndsWith and Replace: a snippet with a
+    // « \n » after another character of the snippet; a « \n » that starts the snippet still matches a CRLF text (the « \r » comes
+    // before it), so it is not refused. X-866 (review 0.1870 M1): StartsWith and Split, any « \n », string or character: a CRLF text
+    // never starts with « \n », and a split on « \n » leaves a « \r » at the end of each piece, so a comparison or an absence check
+    // made on the pieces fails or always passes. Replace (X-866): a « …x\n… » snippet is never found, the text stays as it was.
+    // Not covered, on purpose: Regex calls (a pattern's « \n » may be the text « \\n » of a JSON file, and « \s » or « \r? » before
+    // it takes the « \r »: the source alone cannot tell; Clarity1363Tests holds such a pattern), « == » or Equals against a whole read
+    // (none in the tests), and reads other than File.ReadAllText (ReadAllTextAsync, StreamReader.ReadToEnd, Encoding.GetString:
+    // their texts are parsed, not searched for snippets, in the tests of today). Not a fault: a snippet in a verbatim or raw literal
+    // (its « \n » is the text « \n », and a line break written in it has the line ending of the test file's own checkout, the same as
+    // the file it searches).
+    private const string NewlineSearch=@"\s*\.\s*(?:(?<m>Contains|IndexOf|LastIndexOf|EndsWith|Replace)\s*\(\s*""(?:[^""\\]|\\.)*(?:[^""\\]|\\.)\\n"
+        +@"|(?<m>StartsWith|Split)\s*\(\s*(?:""(?:[^""\\]|\\.)*\\n|'\\n'))";
+
+    // The statement (the line of the search and the next) takes the « \r » into account. A search for a snippet: its « \r\n » form
+    // too. A split: a « \r » among the separators or trimmed after (« TrimEnd('\r') »), or each piece trimmed (Trim(), TrimEnd(),
+    // StringSplitOptions.TrimEntries).
+    private static bool Handled(string statement,string method)=>method=="Split"
+        ? statement.Contains(@"\r",StringComparison.Ordinal) || Regex.IsMatch(statement,@"\.\s*Trim(?:End)?\s*\(\s*\)|\bTrimEntries\b")
+        : statement.Contains(@"\r\n",StringComparison.Ordinal);
+
+    /// <summary>X-866: <paramref name="source"/> with its comments and the contents of its string and character literals blanked
+    /// (same length, line breaks kept), so a word written in them (« class », « File.ReadAllText(») is not taken for code. Regular,
+    /// verbatim, interpolated and raw (« """ ») literals; an interpolation hole is blanked with its literal.</summary>
+    internal static string CodeOnly(string source)
+    {
+        var code=source.ToCharArray();
+        void Blank(int from,int to){for(var k=from;k<to && k<code.Length;k++)if(code[k]!='\n' && code[k]!='\r')code[k]=' ';}
+        var i=0;
+        while(i<source.Length)
+        {
+            var c=source[i];
+            var next=i+1<source.Length ? source[i+1]:'\0';
+            if(c=='/' && next=='/')
+            {
+                var stop=source.IndexOf('\n',i);
+                stop=stop<0 ? source.Length:stop;
+                Blank(i,stop);i=stop;
+            }
+            else if(c=='/' && next=='*')
+            {
+                var stop=source.IndexOf("*/",i+2,StringComparison.Ordinal);
+                stop=stop<0 ? source.Length:stop+2;
+                Blank(i,stop);i=stop;
+            }
+            else if(c=='"' && source.AsSpan(i).StartsWith("\"\"\""))
+            {
+                var quotes=0;
+                while(i+quotes<source.Length && source[i+quotes]=='"')quotes++;
+                var stop=source.IndexOf(new string('"',quotes),i+quotes,StringComparison.Ordinal);
+                stop=stop<0 ? source.Length:stop+quotes;
+                Blank(i+quotes,stop-quotes);i=stop;
+            }
+            else if(c=='@' && next=='"')
+            {
+                var k=i+2;
+                for(;k<source.Length;k++)
+                {
+                    if(source[k]!='"')continue;
+                    if(k+1<source.Length && source[k+1]=='"'){k++;continue;}
+                    break;
+                }
+                Blank(i+2,k);i=k+1;
+            }
+            else if(c=='"' || c=='\'')
+            {
+                var k=i+1;
+                for(;k<source.Length && source[k]!=c && source[k]!='\n';k++)if(source[k]=='\\')k++;
+                Blank(i+1,k);i=k+1;
+            }
+            else i++;
+        }
+        return new string(code);
+    }
+
+    // A class, struct, record (« record class », « record struct ») or interface declaration and its name.
+    private static readonly Regex TypeDeclaration=new(@"\b(?:(?:record\s+)?(?:class|struct)|record|interface)\s+(\w+)");
 
     // Calls between a variable and its search (« x.Trim().IndexOf(…) »), none of them a normalisation of the line endings; simple
     // arguments only (no parenthesis inside).
@@ -108,7 +186,7 @@ internal static class Pending1865Tests
         Regex.IsMatch(source[end..],@"^\s*\.(?:ReplaceLineEndings\s*\(|Replace\s*\(\s*(?:""\\r|'\\r'))");
 
     private static readonly Regex ChainedCall=new(@"\G\s*\.\s*(\w+)\s*\(");
-    private static readonly HashSet<string> Searches=["Contains","IndexOf","LastIndexOf","StartsWith","EndsWith","Split"];
+    private static readonly HashSet<string> Searches=["Contains","IndexOf","LastIndexOf","StartsWith","EndsWith","Split","Replace"];
 
     // X-864: the end of the calls chained after a read (« .Trim() », « .Substring(3) »…), up to a search; normalised when one of them
     // makes the line endings one form.
@@ -127,15 +205,31 @@ internal static class Pending1865Tests
 
     /// <summary>X-864: the helpers of <paramref name="source"/> that return a file's text raw (« string Read=>File.ReadAllText(…) »,
     /// « string Read(…)=>… », « string Read(…){return …;} », calls chained after the read allowed), with the class that holds each and
-    /// whether another file can call it (internal or public), so the ratchet also finds them used from another file (« Class.Read(…) »).</summary>
+    /// whether another file can call it (internal or public), so the ratchet also finds them used from another file (« Class.Read(…) »).
+    /// X-866 (review 0.1870 M2): the class is the type whose body holds the helper (class, struct, record or interface; nested types
+    /// joined by dots, « Outer.Inner »), found in the code only (CodeOnly): a « class » in a comment or a string before the helper no
+    /// longer names it. Not covered, on purpose: a nested helper called from its outer type by the short name (« Inner.Read(…) »).</summary>
     internal static IReadOnlyList<(string Name,bool Property,string Class,bool Shared)> RawHelpers(string source)
     {
         var found=new List<(string,bool,string,bool)>();
-        foreach(Match helper in Regex.Matches(source,@"\bstring\s+(\w+)\s*(\([^)]*\))?\s*(?:=>|\{\s*return\b)\s*File\.ReadAllText\s*\("))
+        var code=CodeOnly(source);
+        var types=new List<(string Name,int Open,int Close)>();
+        foreach(Match type in TypeDeclaration.Matches(code))
+        {
+            var body=code.IndexOfAny(['{',';'],type.Index+type.Length);
+            if(body<0 || code[body]!='{')continue;
+            var depth=0;
+            for(var k=body;k<code.Length;k++)
+            {
+                if(code[k]=='{')depth++;
+                else if(code[k]=='}' && --depth==0){types.Add((type.Groups[1].Value,body,k));break;}
+            }
+        }
+        foreach(Match helper in Regex.Matches(code,@"\bstring\s+(\w+)\s*(\([^)]*\))?\s*(?:=>|\{\s*return\b)\s*File\.ReadAllText\s*\("))
         {
             var end=CallEnd(source,helper.Index+helper.Length-1);
             if(end<0 || Chain(source,end).Normalised)continue;
-            var owner=Regex.Matches(source[..helper.Index],@"\bclass\s+(\w+)").LastOrDefault()?.Groups[1].Value ?? "";
+            var owner=string.Join(".",types.Where(type=>type.Open<helper.Index && helper.Index<type.Close).OrderBy(type=>type.Open).Select(type=>type.Name));
             var start=source.LastIndexOf('\n',Math.Max(0,helper.Index-1))+1;
             var shared=Regex.IsMatch(source[start..helper.Index],@"\b(?:internal|public)\b");
             found.Add((helper.Groups[1].Value,!helper.Groups[2].Success,owner,shared));

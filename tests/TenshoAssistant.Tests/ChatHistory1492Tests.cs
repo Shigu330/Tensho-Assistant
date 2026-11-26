@@ -39,7 +39,7 @@ internal static class ChatHistory1492Tests
 
     private static List<string> Texts(IEnumerable<ChatRecord> records) => [.. records.Select(record => string.Concat(record.Body.Select(segment => segment.Text)))];
 
-    private static string[] Lines(string path) => File.ReadAllText(path).Split('\n', StringSplitOptions.RemoveEmptyEntries);
+    private static string[] Lines(string path) => File.ReadAllText(path).ReplaceLineEndings("\n").Split('\n', StringSplitOptions.RemoveEmptyEntries);
 
     public static IEnumerable<(string Name, Action Run)> Cases =>
     [
