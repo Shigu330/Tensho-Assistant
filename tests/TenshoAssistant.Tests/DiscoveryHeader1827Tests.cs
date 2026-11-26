@@ -144,7 +144,7 @@ print(json.dumps({"share":name}))
                 Check(share.Header!.Value.GetProperty("Counted").GetBoolean() && share.Facts.Count==1,"the share's file: counted, its facts, no login nor gist: "+share.Header);
                 var gone=players.Single(player=>player.File!=shareName);
                 Check(gone.Facts.Count==2,"the withdrawn player's facts kept without any name: "+gone.Header);
-                var merged=File.ReadAllText(Path.Combine(folder,"out","merged.txt"));
+                var merged=File.ReadAllText(Path.Combine(folder,"out","merged.txt")).ReplaceLineEndings("\n");
                 Check(merged.StartsWith("# tensho-discoveries-merged 1\n",StringComparison.Ordinal) && !merged.Contains("0123456789abcdef0123456789abcdef",StringComparison.Ordinal)
                     && merged.Contains(TenshoAssistant.Discoveries.GistRotation.NoteHash("0123456789abcdef0123456789abcdef","0123456789abcdef0123456789abcdef01234567"),StringComparison.Ordinal),
                     "the gist merged listed apart, hashed as the plugin computes it: "+merged);

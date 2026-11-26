@@ -49,16 +49,18 @@ internal static class Pending1865Tests
     // (« File.ReadAllText(…).Contains("…\n…") »), a « string x= » as well as a « var x= », and a helper of the file (« string Read=>… »,
     // « string Read(…)=>… », « string Read(…){return …;} ») count too; only a normalisation of the line endings right after the read
     // (ReplaceLineEndings, Replace("\r…") or Replace('\r'…)) lets it pass, not any Replace among the arguments; a « \n » that starts the
-    // snippet passes too (see NewlineSearch).
-    internal static IReadOnlyList<string> RawNewlineSearches(string source)
+    // snippet passes too (see NewlineSearch). X-864 (0.1870, review 0.1868 M2): every search that a « \n » snippet breaks on a CRLF text
+    // (Contains, IndexOf, LastIndexOf, StartsWith, EndsWith, Split), a read or a variable followed by other calls before the search
+    // (« File.ReadAllText(…).Trim().Contains(…) », « x.Trim().IndexOf(…) »; a normalisation anywhere in that chain lets it pass), and a
+    // helper of another file (« Other.Read(…) », given by <paramref name="foreign"/>, see RawHelpers) count too.
+    internal static IReadOnlyList<string> RawNewlineSearches(string source)=>RawNewlineSearches(source,[]);
+
+    internal static IReadOnlyList<string> RawNewlineSearches(string source,IEnumerable<(string Name,bool Property)> foreign)
     {
         var found=new List<string>();
         var readers=new List<(string Name,bool Property)>{("File.ReadAllText",false)};
-        foreach(Match helper in Regex.Matches(source,@"\bstring\s+(\w+)\s*(\([^)]*\))?\s*(?:=>|\{\s*return\b)\s*File\.ReadAllText\s*\("))
-        {
-            var end=CallEnd(source,helper.Index+helper.Length-1);
-            if(end>0 && !Normalised(source,end))readers.Add((helper.Groups[1].Value,!helper.Groups[2].Success));
-        }
+        foreach(var helper in RawHelpers(source))readers.Add((helper.Name,helper.Property));
+        readers.AddRange(foreign);
         foreach(var (reader,property) in readers)
         {
             var pattern=@"(?<![\w.])"+Regex.Escape(reader)+(property ? @"\b(?!\s*(?:\(|=>|\{))":@"\s*\(");
@@ -67,7 +69,10 @@ internal static class Pending1865Tests
                 if(Regex.IsMatch(source[..use.Index],@"\bstring\s+$"))continue;
                 if(source[(source.LastIndexOf('\n',Math.Max(0,use.Index-1))+1)..use.Index].TrimStart().StartsWith("//",StringComparison.Ordinal))continue;
                 var end=property ? use.Index+use.Length:CallEnd(source,use.Index+use.Length-1);
-                if(end<0 || Normalised(source,end))continue;
+                if(end<0)continue;
+                var (chained,normalised)=Chain(source,end);
+                if(normalised)continue;
+                end=chained;
                 if(Regex.IsMatch(source[end..],@"^\s*"+NewlineSearch))
                 {
                     if(!Statement(source,end).Contains(@"\r\n",StringComparison.Ordinal))found.Add(reader+": "+Line(source,end));
@@ -81,7 +86,7 @@ internal static class Pending1865Tests
                 var lines=(next.Success ? rest[..next.Index]:rest).Split('\n');
                 for(var i=0;i<lines.Length;i++)
                 {
-                    if(!Regex.IsMatch(lines[i],@"\b"+Regex.Escape(name)+NewlineSearch))continue;
+                    if(!Regex.IsMatch(lines[i],@"\b"+Regex.Escape(name)+VariableChain+NewlineSearch))continue;
                     var statement=lines[i]+(i+1<lines.Length ? lines[i+1]:"");
                     if(!statement.Contains(@"\r\n",StringComparison.Ordinal))found.Add(name+": "+lines[i].Trim());
                 }
@@ -92,11 +97,51 @@ internal static class Pending1865Tests
 
     // A search for a snippet with a « \n » after another character of the snippet: « \r\n » breaks it. A « \n » that starts the snippet
     // still matches a CRLF text (the « \r » comes before it), so it is not refused.
-    private const string NewlineSearch=@"\.Contains\(""(?:[^""\\]|\\.)*(?:[^""\\]|\\.)\\n";
+    private const string NewlineSearch=@"\s*\.\s*(?:Contains|IndexOf|LastIndexOf|StartsWith|EndsWith|Split)\s*\(\s*""(?:[^""\\]|\\.)*(?:[^""\\]|\\.)\\n";
+
+    // Calls between a variable and its search (« x.Trim().IndexOf(…) »), none of them a normalisation of the line endings; simple
+    // arguments only (no parenthesis inside).
+    private const string VariableChain=@"(?:\s*\.\s*(?!ReplaceLineEndings\b|Replace\s*\(\s*(?:""\\r|'\\r'))\w+\s*\([^()]*\))*";
 
     // The line endings made one form right after the read.
     private static bool Normalised(string source,int end)=>
         Regex.IsMatch(source[end..],@"^\s*\.(?:ReplaceLineEndings\s*\(|Replace\s*\(\s*(?:""\\r|'\\r'))");
+
+    private static readonly Regex ChainedCall=new(@"\G\s*\.\s*(\w+)\s*\(");
+    private static readonly HashSet<string> Searches=["Contains","IndexOf","LastIndexOf","StartsWith","EndsWith","Split"];
+
+    // X-864: the end of the calls chained after a read (« .Trim() », « .Substring(3) »…), up to a search; normalised when one of them
+    // makes the line endings one form.
+    private static (int End,bool Normalised) Chain(string source,int end)
+    {
+        while(true)
+        {
+            if(Normalised(source,end))return (end,true);
+            var call=ChainedCall.Match(source,end);
+            if(!call.Success || Searches.Contains(call.Groups[1].Value))return (end,false);
+            var close=CallEnd(source,call.Index+call.Length-1);
+            if(close<0)return (end,false);
+            end=close;
+        }
+    }
+
+    /// <summary>X-864: the helpers of <paramref name="source"/> that return a file's text raw (« string Read=>File.ReadAllText(…) »,
+    /// « string Read(…)=>… », « string Read(…){return …;} », calls chained after the read allowed), with the class that holds each and
+    /// whether another file can call it (internal or public), so the ratchet also finds them used from another file (« Class.Read(…) »).</summary>
+    internal static IReadOnlyList<(string Name,bool Property,string Class,bool Shared)> RawHelpers(string source)
+    {
+        var found=new List<(string,bool,string,bool)>();
+        foreach(Match helper in Regex.Matches(source,@"\bstring\s+(\w+)\s*(\([^)]*\))?\s*(?:=>|\{\s*return\b)\s*File\.ReadAllText\s*\("))
+        {
+            var end=CallEnd(source,helper.Index+helper.Length-1);
+            if(end<0 || Chain(source,end).Normalised)continue;
+            var owner=Regex.Matches(source[..helper.Index],@"\bclass\s+(\w+)").LastOrDefault()?.Groups[1].Value ?? "";
+            var start=source.LastIndexOf('\n',Math.Max(0,helper.Index-1))+1;
+            var shared=Regex.IsMatch(source[start..helper.Index],@"\b(?:internal|public)\b");
+            found.Add((helper.Groups[1].Value,!helper.Groups[2].Success,owner,shared));
+        }
+        return found;
+    }
 
     // The index just after the parenthesis that closes the one at « open » (string and character literals skipped), or -1.
     private static int CallEnd(string source,int open)
@@ -150,8 +195,13 @@ internal static class Pending1865Tests
                 "a normalised read, or a search that takes both forms, passes");
             var folder=FindRepositoryFile("tests/TenshoAssistant.Tests");
             var bad=new List<string>();
-            foreach(var file in Directory.EnumerateFiles(folder,"*.cs"))
-                foreach(var line in RawNewlineSearches(File.ReadAllText(file)))bad.Add(Path.GetFileName(file)+": "+line);
+            // X-864 (0.1870): the raw helpers that other files can call (internal or public), found from them too (« Class.Read(…) »).
+            var sources=Directory.EnumerateFiles(folder,"*.cs").ToDictionary(file=>file,File.ReadAllText);
+            var helpers=sources.SelectMany(source=>RawHelpers(source.Value).Where(helper=>helper.Shared && helper.Class.Length>0)
+                .Select(helper=>(File:source.Key,Name:helper.Class+"."+helper.Name,helper.Property))).ToList();
+            foreach(var (file,source) in sources)
+                foreach(var line in RawNewlineSearches(source,helpers.Where(helper=>helper.File!=file).Select(helper=>(helper.Name,helper.Property))))
+                    bad.Add(Path.GetFileName(file)+": "+line);
             Check(bad.Count==0,"raw reads searched with « \\n »: "+string.Join(" | ",bad));
         }),
         ("Pending 1865: a lock file left « delete pending » by another program: the client waits, then holds the lock once it is let go",() =>
