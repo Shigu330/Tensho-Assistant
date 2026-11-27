@@ -121,8 +121,11 @@ internal sealed partial class MainWindow
                     ImGui.TableNextColumn();
                     // Single alarm at the start of this period (not for the current one, already started).
                     if(i>0 && entry.Weather is { } named)
-                        AlarmButton($"Period{entry.StartsAt.ToUnixTimeSeconds()}",localization.Format("Alarms.PeriodTooltip",named.Name,entry.StartsAt.ToLocalTime().ToString("g")),
+                    {
+                        AlarmButton($"Period{entry.StartsAt.ToUnixTimeSeconds()}",
                             ()=>WeatherPeriodAlarm(entry,named));
+                        if(TipHovered())AlarmTip(localization.Format("Alarms.PeriodTooltip",named.Name,entry.StartsAt.ToLocalTime().ToString("g")));
+                    }
                 }
             }
             finally{ImGui.EndTable();}
@@ -179,17 +182,21 @@ internal sealed partial class MainWindow
             }
             weatherSearchResult=found;weatherSearchKey=key;
         }
-        AlarmButton("WeatherDaily",localization.Format("Alarms.WeatherDailyTooltip",wanted.Name),
+        AlarmButton("WeatherDaily",
             ()=>AlarmSchedule.ForWindows($"{wanted.Name} · {weatherZone}",[0,480,960],DefaultAlarmLead,weatherTerritory,0,[wanted.Id])
-                .Select(created=>{created.Group=$"{wanted.Name} · {weatherZone}";created.IconId=wanted.Icon;return created;}).ToArray(),daily:true);
+                .Select(created=>{created.Group=$"{wanted.Name} · {weatherZone}";created.IconId=wanted.Icon;return created;}).ToArray());
+        if(TipHovered())AlarmTip(localization.Format("Alarms.WeatherDailyTooltip",wanted.Name),daily:true);
         ImGui.SameLine();ImGui.TextUnformatted(localization.Format("Weather.EveryTime",wanted.Name));
         if(weatherSearchResult.Count==0)ImGui.TextDisabled(localization.Get("Weather.NotSoon"));
         foreach(var entry in weatherSearchResult)
         {
             // 0.330: no bell for a period already started (a single alarm in the past never rings), as in the forecast table; its space keeps the list aligned.
             if(entry.StartsAt>now)
-                AlarmButton($"Search{entry.StartsAt.ToUnixTimeSeconds()}",localization.Format("Alarms.PeriodTooltip",wanted.Name,entry.StartsAt.ToLocalTime().ToString("g")),
+            {
+                AlarmButton($"Search{entry.StartsAt.ToUnixTimeSeconds()}",
                     ()=>[new TenshoAlarm{Label=$"{wanted.Name} · {weatherZone}",Group=$"{wanted.Name} · {weatherZone}",IconId=wanted.Icon,Repeat=AlarmRepeat.Once,At=entry.StartsAt,LeadMinutes=AlarmSchedule.ClampLead(AlarmRepeat.Once,DefaultAlarmLead),TerritoryId=weatherTerritory}]);
+                if(TipHovered())AlarmTip(localization.Format("Alarms.PeriodTooltip",wanted.Name,entry.StartsAt.ToLocalTime().ToString("g")));
+            }
             else AlarmButtonSpace();
             ImGui.SameLine();
             ImGui.TextUnformatted(localization.Format("Weather.Occurrence",entry.StartsAt.ToLocalTime().ToString("g"),entry.EndsAt.ToLocalTime().ToString("t"),entry.EtHours,

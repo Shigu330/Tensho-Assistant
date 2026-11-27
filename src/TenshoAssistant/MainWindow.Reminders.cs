@@ -142,14 +142,16 @@ internal sealed partial class MainWindow
                         {
                             ImGui.TextUnformatted(localization.Format("Reminders.VentureAt",name,at.ToLocalTime().ToString("g")));
                             ImGui.SameLine();
-                            AlarmButton("Venture"+name,localization.Format("Reminders.AlarmTip",name),()=>[new TenshoAlarm{ReminderRow="Ventures",Label=name,Group=localization.Get("Reminders.Title"),Source=AlarmSource.Reminder,Repeat=AlarmRepeat.Once,At=at,LeadMinutes=0}]);
+                            AlarmButton("Venture"+name,()=>[new TenshoAlarm{ReminderRow="Ventures",Label=name,Group=localization.Get("Reminders.Title"),Source=AlarmSource.Reminder,Repeat=AlarmRepeat.Once,At=at,LeadMinutes=0}]);
+                            if(TipHovered())AlarmTip(localization.Format("Reminders.AlarmTip",name));
                         }
                     }
                     if(ventures.Where(venture=>venture.Done>now).Select(venture=>venture.Done).Max() is { } lastBack)
                     {
                         ImGui.TextUnformatted(localization.Format("Reminders.VenturesAllAt",lastBack.ToLocalTime().ToString("g")));
                         ImGui.SameLine();
-                        AlarmButton("VenturesAll",localization.Get("Reminders.VenturesAllTip"),()=>[new TenshoAlarm{ReminderRow="Ventures",Label=localization.Get("Reminders.Ventures"),Group=localization.Get("Reminders.Title"),Source=AlarmSource.Reminder,Repeat=AlarmRepeat.Once,At=lastBack,LeadMinutes=0}]);
+                        AlarmButton("VenturesAll",()=>[new TenshoAlarm{ReminderRow="Ventures",Label=localization.Get("Reminders.Ventures"),Group=localization.Get("Reminders.Title"),Source=AlarmSource.Reminder,Repeat=AlarmRepeat.Once,At=lastBack,LeadMinutes=0}]);
+                        if(TipHovered())AlarmTip(localization.Get("Reminders.VenturesAllTip"));
                     }
                 }
                 finally{ImGui.TreePop();}
@@ -244,10 +246,13 @@ internal sealed partial class MainWindow
             Tip("Reminders.DiscordRowTip");
             ImGui.TableNextColumn();
             if(next is { } alarmAt && alarmAt>now)
-                AlarmButton("Reminder"+key,localization.Format("Reminders.AlarmTip",localization.Get("Reminders."+key)),
-                    // 0.331: the vessels' return goes to Discord under « Free company », as from the Free company page.
+            {
+                // 0.331: the vessels' return goes to Discord under « Free company », as from the Free company page.
+                AlarmButton("Reminder"+key,
                     ()=>[new TenshoAlarm{ReminderRow=key,Label=localization.Get("Reminders."+key),Group=localization.Get("Reminders.Title"),Source=key=="Voyages" ? AlarmSource.Voyage:AlarmSource.Reminder,Repeat=AlarmRepeat.Once,At=alarmAt,
                         LeadMinutes=AlarmSchedule.ClampLead(AlarmRepeat.Once,DefaultAlarmLead)}]);
+                if(TipHovered())AlarmTip(localization.Format("Reminders.AlarmTip",localization.Get("Reminders."+key)));
+            }
         }
     }
 

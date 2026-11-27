@@ -112,26 +112,8 @@ internal sealed partial class MainWindow
         alarmStatus+=" "+localization.Format("Alarms.GameQueued",queued)+(skipped>0 ? " "+localization.Format("Alarms.GameSkippedWeather",skipped):"");
     }
 
-    // Bell button that creates the alarms; the tooltip says what will be created. 0.331: daily = alarms every ET day, whose lead is
-    // bounded to 60 min (ClampLead): the tooltip gives the lead they really get.
-    private void AlarmButton(string id,string tooltip,Func<IReadOnlyList<TenshoAlarm>> create,bool daily=false)
-    {
-        ImGui.PushFont(UiBuilder.IconFont);
-        bool clicked;
-        try{clicked=ImGui.SmallButton(FontAwesomeIcon.Bell.ToIconString()+"##Alarm"+id);}
-        finally{ImGui.PopFont();}
-        if(TipHovered())TipText(tooltip+"\n"+localization.Format("Alarms.LeadHint",MinutesText(AlarmSchedule.ClampLead(daily ? AlarmRepeat.EorzeaDaily:AlarmRepeat.Once,DefaultAlarmLead))));
-        if(clicked)AddAlarms(create());
-    }
     // 0.331: a copy in the game keeps ringing there as it was sent; turning the alarm off or changing its lead here does not reach it.
     private void NoteGameCopy(IEnumerable<TenshoAlarm> edited){if(edited.Any(alarm=>alarm.GameName.Length>0))alarmStatus=localization.Get("Alarms.GameCopyUnchanged");}
-    // 0.330: empty space the size of the bell (SmallButton: text plus the frame's side padding) where no alarm can be made, so a list stays aligned.
-    private static void AlarmButtonSpace()
-    {
-        ImGui.PushFont(UiBuilder.IconFont);
-        try{ImGui.Dummy(ImGui.CalcTextSize(FontAwesomeIcon.Bell.ToIconString())+new Vector2(ImGui.GetStyle().FramePadding.X*2,0));}
-        finally{ImGui.PopFont();}
-    }
 
     // Weather ids for community weather names of a zone; null when one name is not proven in this zone (condition then not checked).
     private static IReadOnlyList<uint>? WeatherIds(WeatherCatalog catalog,IReadOnlyList<string>? names,uint territory)
@@ -147,9 +129,10 @@ internal sealed partial class MainWindow
     {
         var starts=fish.StartMinute is { } minute ? [minute]:(fish.Weathers.Count+fish.Transitions.Count>0 ? new[]{0,480,960}:[]);
         if(starts.Length==0)return false;
-        AlarmButton(id,localization.Format("Alarms.FishTooltip",starts.Length),
+        AlarmButton(id,
             ()=>AlarmSchedule.ForWindows(label,starts,DefaultAlarmLead,territory,fish.FishId,fish.Weathers,fish.Transitions)
-                .Select(created=>{created.JobId=18;return created;}).ToArray(),daily:true);
+                .Select(created=>{created.JobId=18;return created;}).ToArray());
+        if(TipHovered())AlarmTip(localization.Format("Alarms.FishTooltip",starts.Length),daily:true);
         return true;
     }
 
@@ -164,8 +147,9 @@ internal sealed partial class MainWindow
         if(starts.Length==0)return;
         var unproven=weathers is null || previous is null;
         var label=SelectedItem?.Name ?? itemId.ToString();
-        AlarmButton(id,localization.Format("Alarms.FishTooltip",starts.Length)+(unproven ? "\n"+localization.Get("Alarms.WeatherUnproven"):""),
-            ()=>AlarmSchedule.ForWindows(label,starts,DefaultAlarmLead,territory,(uint)itemId,weathers ?? [],previous ?? []).Select(created=>{created.JobId=18;return created;}).ToArray(),daily:true);
+        AlarmButton(id,
+            ()=>AlarmSchedule.ForWindows(label,starts,DefaultAlarmLead,territory,(uint)itemId,weathers ?? [],previous ?? []).Select(created=>{created.JobId=18;return created;}).ToArray());
+        if(TipHovered())AlarmTip(localization.Format("Alarms.FishTooltip",starts.Length)+(unproven ? "\n"+localization.Get("Alarms.WeatherUnproven"):""),daily:true);
         ImGui.SameLine();ImGui.TextDisabled(localization.Format("Alarms.Windows",starts.Length));
     }
 
@@ -176,9 +160,10 @@ internal sealed partial class MainWindow
         var place=string.IsNullOrWhiteSpace(source.Place) ? source.Zone:source.Place;
         var label=$"{SelectedItem?.Name ?? itemId.ToString()} · {place}";
         var job=AlarmSchedule.JobOf(source.TypeId,source.IsFishing);
-        AlarmButton(id,localization.Format("Alarms.GatherTooltip",timing.OpeningMinutes.Count)+(job!=0 ? "\n"+JobName(job):""),
+        AlarmButton(id,
             ()=>AlarmSchedule.ForWindows(label,timing.OpeningMinutes,DefaultAlarmLead,source.TerritoryId,(uint)itemId)
-                .Select(created=>{created.JobId=job;return created;}).ToArray(),daily:true);
+                .Select(created=>{created.JobId=job;return created;}).ToArray());
+        if(TipHovered())AlarmTip(localization.Format("Alarms.GatherTooltip",timing.OpeningMinutes.Count)+(job!=0 ? "\n"+JobName(job):""),daily:true);
     }
 
     // Gathering job names from the game (ClassJob), given by the plugin.

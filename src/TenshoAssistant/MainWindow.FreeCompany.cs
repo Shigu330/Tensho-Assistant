@@ -185,8 +185,11 @@ internal sealed partial class MainWindow
         }
         ImGui.TableNextColumn();
         if(state==VoyageState.Voyaging && vessel.ReturnAt is { } alarmAt)
-            AlarmButton("Voyage"+id,localization.Format("FreeCompany.AlarmTip",vessel.Name),
+        {
+            AlarmButton("Voyage"+id,
                 ()=>[new TenshoAlarm{Label=localization.Format("FreeCompany.AlarmLabel",vessel.Name),Group=localization.Get("FreeCompany.Title"),Source=AlarmSource.Voyage,Repeat=AlarmRepeat.Once,At=alarmAt,
                     LeadMinutes=AlarmSchedule.ClampLead(AlarmRepeat.Once,DefaultAlarmLead)}]);
+            if(TipHovered())AlarmTip(localization.Format("FreeCompany.AlarmTip",vessel.Name));
+        }
     }
 }

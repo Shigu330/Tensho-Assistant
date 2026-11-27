@@ -6,23 +6,25 @@ using System.Text.RegularExpressions;
 // frame, hovered or not: the help is then built by the caller behind « if(TipHovered())TipText(…) », after the item.
 // Limit, written: one step only (a parameter passed on to another helper is not followed), and a pattern variable (« is { } name »)
 // passes as ready: it is the value the line needs anyway (MacroChain's validation marker, Gear's hint field).
+// X-881 (0.1892): this one follows the bare form only; a parameter used inside a guarded or composed help text
+// (« if(TipHovered())TipText(tooltip+…) ») is traced by TipTextParameters1892Tests.
 internal static class TipTextNames1891Tests
 {
     private static void Check(bool value, string message) { if (!value) throw new Exception(message); }
     private static readonly string Root = Path.GetFullPath("src/TenshoAssistant");
 
-    private static IReadOnlyList<(string Name, string Text)> Sources()
+    internal static IReadOnlyList<(string Name, string Text)> Sources()
         => Directory.EnumerateFiles(Root, "*.cs", SearchOption.AllDirectories)
             .Select(path => Path.GetRelativePath(Root, path).Replace('\\', '/'))
             .Where(name => name != "UI/Components/Tooltip.cs" && !name.Split('/').Any(part => part is "obj" or "bin"))
             .Select(name => (name, File.ReadAllText(Path.Combine(Root, name)).Replace("\r\n", "\n"))).ToArray();
 
-    private static readonly Regex Ready = new(@"^(?:[A-Za-z_][\w.]*(?:\[[\w.+-]+\])?|localization\.Get\(""[^""]*""\)|null|""[^""\\]*"")$");
+    internal static readonly Regex Ready = new(@"^(?:[A-Za-z_][\w.]*(?:\[[\w.+-]+\])?|localization\.Get\(""[^""]*""\)|null|""[^""\\]*"")$");
     private static readonly Regex NameCall = new(@"(?<![\w.])TipText\(([A-Za-z_]\w*)\);");
-    private static readonly Regex Signature = new(@"(?m)^[ \t]*(?:(?:private|public|internal|protected|static|override)\s+)*(?:void|bool|string|int|float|[A-Z]\w*(?:<[^>\n]*>)?\??)\s+(\w+)\(([^()\n]*)\)[ \t]*$");
+    internal static readonly Regex Signature = new(@"(?m)^[ \t]*(?:(?:private|public|internal|protected|static|override)\s+)*(?:void|bool|string|int|float|[A-Z]\w*(?:<[^>\n]*>)?\??)\s+(\w+)\(([^()\n]*)\)[ \t]*$");
 
-    private static int Line(string text, int index) => text[..index].Count(c => c == '\n') + 1;
-    private static bool Guarded(string line) => line.Contains("TipHovered()", StringComparison.Ordinal) || line.Contains("IsItemHovered(", StringComparison.Ordinal);
+    internal static int Line(string text, int index) => text[..index].Count(c => c == '\n') + 1;
+    internal static bool Guarded(string line) => line.Contains("TipHovered()", StringComparison.Ordinal) || line.Contains("IsItemHovered(", StringComparison.Ordinal);
 
     /// <summary>Splits at the top-level commas (parentheses, brackets, braces, angle brackets in types and strings respected).</summary>
     internal static List<string> Split(string list, bool types)
@@ -42,7 +44,7 @@ internal static class TipTextNames1891Tests
     }
 
     /// <summary>The arguments of the call whose opening parenthesis is at <paramref name="open"/>, or null when it is not closed.</summary>
-    private static List<string>? Arguments(string text, int open)
+    internal static List<string>? Arguments(string text, int open)
     {
         var depth = 0; var quoted = false;
         for (var at = open; at < text.Length; at++)

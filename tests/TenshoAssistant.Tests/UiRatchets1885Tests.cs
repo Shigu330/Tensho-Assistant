@@ -18,7 +18,8 @@ internal static class UiRatchets1885Tests
             .Select(name => (name, File.ReadAllText(Path.Combine(Root, name))));
 
     // Written by hand on 27/11, outside UI/: lower a number when its gesture moves to its component.
-    private const int HandHeaders = 4, HandGlyphFonts = 27, HandTooltips = 26;
+    // X-881 (0.1892): the alarm bell and its empty space moved to UI/Components/AlarmBell.cs: two glyph fonts fewer by hand.
+    private const int HandHeaders = 4, HandGlyphFonts = 25, HandTooltips = 26;
 
     private static int Count(string piece) => Pages().Sum(page => Regex.Matches(page.Text, piece).Count);
 

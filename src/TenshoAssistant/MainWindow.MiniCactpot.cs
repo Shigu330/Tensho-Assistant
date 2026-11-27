@@ -77,8 +77,9 @@ internal sealed partial class MainWindow
         ImGui.TextUnformatted(localization.Format("CactpotUi.NextGate",gate.ToLocalTime().ToString("t"),TimeLeftUp(gate-now)));
         Tip("CactpotUi.NextGateTip");
         ImGui.SameLine();
-        AlarmButton("Gate",localization.Get("CactpotUi.GateAlarmTip"),()=>[new Alarms.TenshoAlarm{Label=localization.Get("CactpotUi.GateAlarm"),Group=localization.Get("Category.GoldSaucer"),
+        AlarmButton("Gate",()=>[new Alarms.TenshoAlarm{Label=localization.Get("CactpotUi.GateAlarm"),Group=localization.Get("Category.GoldSaucer"),
             Repeat=Alarms.AlarmRepeat.Once,At=gate,LeadMinutes=Alarms.AlarmSchedule.ClampLead(Alarms.AlarmRepeat.Once,Math.Min(DefaultAlarmLead,5))}]);
+        if(TipHovered())AlarmTip(localization.Get("CactpotUi.GateAlarmTip"));
         if(MiniGames.GoldSaucerTimes.NextDraw(HomeRegion?.Invoke() ?? 0,now) is { } draw)
         {
             var left=draw-now;
@@ -86,8 +87,9 @@ internal sealed partial class MainWindow
                 TimeLeftText(left)));
             Tip("CactpotUi.NextDrawTip");
             ImGui.SameLine();
-            AlarmButton("JumboDraw",localization.Get("CactpotUi.DrawAlarmTip"),()=>[new Alarms.TenshoAlarm{Label=localization.Get("CactpotUi.DrawAlarm"),Group=localization.Get("Category.GoldSaucer"),
+            AlarmButton("JumboDraw",()=>[new Alarms.TenshoAlarm{Label=localization.Get("CactpotUi.DrawAlarm"),Group=localization.Get("Category.GoldSaucer"),
                 Repeat=Alarms.AlarmRepeat.RealWeekly,At=draw,LeadMinutes=Alarms.AlarmSchedule.ClampLead(Alarms.AlarmRepeat.RealWeekly,DefaultAlarmLead)}]);
+            if(TipHovered())AlarmTip(localization.Get("CactpotUi.DrawAlarmTip"));
         }
         else ImGui.TextDisabled(localization.Get("CactpotUi.DrawUnknown"));
         ImGui.Separator();

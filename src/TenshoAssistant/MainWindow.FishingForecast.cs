@@ -54,10 +54,11 @@ internal sealed partial class MainWindow
             if(span.StartsAt>now)
             {
                 var name=SelectedItem?.Name ?? itemId.ToString();
-                AlarmButton($"FishSpan{span.StartsAt.ToUnixTimeSeconds()}",localization.Format("Alarms.PeriodTooltip",name,span.StartsAt.ToLocalTime().ToString("g")),
+                AlarmButton($"FishSpan{span.StartsAt.ToUnixTimeSeconds()}",
                     ()=>[new TenshoAssistant.Alarms.TenshoAlarm{Label=name,Repeat=TenshoAssistant.Alarms.AlarmRepeat.Once,At=span.StartsAt,
                         LeadMinutes=TenshoAssistant.Alarms.AlarmSchedule.ClampLead(TenshoAssistant.Alarms.AlarmRepeat.Once,DefaultAlarmLead),TerritoryId=territory,ItemId=(uint)itemId,
                         JobId=18}]);
+                if(TipHovered())AlarmTip(localization.Format("Alarms.PeriodTooltip",name,span.StartsAt.ToLocalTime().ToString("g")));
                 ImGui.SameLine();
             }
             ImGui.TextColored(span.ReportedConditionsMatch==true ? Accent:Muted,$"{spanStart.ToLocalTime():g}–{span.EndsAt.ToLocalTime():g} · {label}");

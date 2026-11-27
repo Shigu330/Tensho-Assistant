@@ -39,9 +39,10 @@ internal sealed partial class MainWindow
                     var left=window.StartsAt-now;
                     ImGui.TextUnformatted(text+" · "+localization.Format("FishWindows.In",TimeLeftText(left)));
                     ImGui.SameLine();
-                    AlarmButton("FishWindow",localization.Format("Alarms.PeriodTooltip",name,window.StartsAt.ToLocalTime().ToString("g")),
+                    AlarmButton("FishWindow",
                         ()=>[new TenshoAlarm{Label=name,Repeat=AlarmRepeat.Once,At=window.StartsAt,LeadMinutes=AlarmSchedule.ClampLead(AlarmRepeat.Once,DefaultAlarmLead),
                             TerritoryId=territory,ItemId=fish.FishId,JobId=18,Source=AlarmSource.Fishing}]);
+                    if(TipHovered())AlarmTip(localization.Format("Alarms.PeriodTooltip",name,window.StartsAt.ToLocalTime().ToString("g")));
                 }
             }
             finally{ImGui.PopID();}

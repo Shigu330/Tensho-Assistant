@@ -83,7 +83,8 @@ internal sealed partial class MainWindow
             if(index>0)
             {
                 ImGui.SameLine();
-                AlarmButton($"Banner{entry.StartsAt.ToUnixTimeSeconds()}",localization.Format("Alarms.PeriodTooltip",weather.Name,entry.StartsAt.ToLocalTime().ToString("g")),()=>WeatherPeriodAlarm(entry,weather));
+                AlarmButton($"Banner{entry.StartsAt.ToUnixTimeSeconds()}",()=>WeatherPeriodAlarm(entry,weather));
+                if(TipHovered())AlarmTip(localization.Format("Alarms.PeriodTooltip",weather.Name,entry.StartsAt.ToLocalTime().ToString("g")));
             }
         }
         else

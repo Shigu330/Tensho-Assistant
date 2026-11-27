@@ -59,10 +59,13 @@ internal sealed partial class MainWindow
                     ImGui.TableNextColumn();DrawOceanRoute(departure.Othard,baseSchedule,index,OceanPort.Othard,states.Othard);
                     ImGui.TableNextColumn();
                     if(departure.At>now)
-                        AlarmButton("Ocean",localization.Get("OceanFishing.AlarmTip"),()=>[new TenshoAlarm{
+                    {
+                        AlarmButton("Ocean",()=>[new TenshoAlarm{
                             Label=localization.Format("OceanFishing.AlarmLabel",departure.Aldenard is { } indigo ? RouteLabel(indigo):"—",departure.Othard is { } ruby ? RouteLabel(ruby):"—"),
                             Group=localization.Get("OceanFishing.Title"),Source=AlarmSource.Other,Repeat=AlarmRepeat.Once,At=departure.At,
                             LeadMinutes=AlarmSchedule.ClampLead(AlarmRepeat.Once,DefaultAlarmLead)}]);
+                        if(TipHovered())AlarmTip(localization.Get("OceanFishing.AlarmTip"));
+                    }
                 }
                 finally{ImGui.PopID();}
             }
