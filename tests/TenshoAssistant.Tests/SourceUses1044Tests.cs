@@ -9,7 +9,7 @@ internal static class SourceUses1044Tests
         (SourceUse.GarlandDutyLoot,"Plugin.cs"),(SourceUse.GarlandMonsterLoot,"Plugin.cs"),(SourceUse.GarlandItemSources,"Plugin.cs"),
         (SourceUse.WikiMonsters,"Plugin.cs"),(SourceUse.WikiDutyGuides,"Plugin.cs"),(SourceUse.WikiBlueMagic,"Plugin.cs"),
         (SourceUse.WikiBeastmaster,"Plugin.cs"),(SourceUse.WikiItemAcquisition,"Plugin.cs"),(SourceUse.WikiVistas,"Plugin.cs"),
-        (SourceUse.WikiIslandAnimals,"Plugin.cs"),(SourceUse.UniversalisRetainerCompare,"Plugin.cs"),
+        (SourceUse.WikiIslandAnimals,"Plugin.cs"),(SourceUse.UniversalisRetainerCompare,"Plugin.Market.cs"),
         (SourceUse.UniversalisToolPrices,"MainWindow.CraftFromStock.cs"),(SourceUse.UniversalisToolPrices,"MainWindow.CurrencyValue.cs"),
         (SourceUse.UniversalisToolPrices,"MainWindow.MyTools.cs"),(SourceUse.UniversalisToolPrices,"MainWindow.RoutePlanner.cs"),
         (SourceUse.UniversalisRetainerCompare,"MainWindow.RetainerSales.cs"),(SourceUse.GarlandDutyLoot,"MainWindow.DutyFinder.cs"),

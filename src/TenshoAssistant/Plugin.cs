@@ -557,18 +557,8 @@ public sealed partial class Plugin : IDalamudPlugin
             if(unreadableKey is not null)SettingsNotice(unreadableKey,keptAside ?? "?");
             // X-765 M4 (review of 0.1751): its previous copy unreadable too, kept aside under its own name (no longer written over).
             if(settingsFile.BackupKeptAside is { } backupAside)SettingsNotice("Plugin.SettingsBackupKeptAside",backupAside);
-            // 0.508 (I-05): the retainer sale list. Read only while it is open; Universalis on the panel's button only.
-            Market.RetainerSalesReader? retainerSales=null;
-            registrations.Register(()=>retainerSales=new Market.RetainerSalesReader(framework,gameGui,client,player,log,()=>configuration.RetainerSalesPanel,()=>configuration.DeveloperMode),()=>retainerSales?.Dispose());
-            mainWindow.RetainerSalesSource=()=>retainerSales?.State ?? new(Market.RetainerSalesStatus.Closed,[],new HashSet<string>(),"",false);
-            Market.RetainerCompareService? retainerCompare=null;
-            registrations.Register(()=>mainWindow.RetainerCompare=retainerCompare=new Market.RetainerCompareService{Enabled=()=>CommunitySources.Allowed(configuration,SourceUse.UniversalisRetainerCompare)},()=>retainerCompare?.Dispose());
-            // X-698 M1 (0.1671): the sale list's own requests (its answers added up), apart from the panel's; M4: the market tax rates the game sends.
-            Market.RetainerCompareService? retainerSaleListCompare=null;
-            registrations.Register(()=>mainWindow.RetainerSaleListCompare=retainerSaleListCompare=new Market.RetainerCompareService{Accumulate=true,Enabled=()=>CommunitySources.Allowed(configuration,SourceUse.UniversalisRetainerCompare)},()=>retainerSaleListCompare?.Dispose());
-            Market.MarketTaxReader? marketTaxes=null;
-            registrations.Register(()=>marketTaxes=new Market.MarketTaxReader(marketBoardEvents,log),()=>marketTaxes?.Dispose());
-            mainWindow.MarketTaxRatesSource=()=>marketTaxes?.Rates;
+            // 0.508 (I-05): the retainer sale list; X-153 (0.1887): its family (and the market tax rates) in Plugin.Market.cs.
+            var retainerSales=RegisterRetainerMarket(configuration,framework,gameGui,client,player,marketBoardEvents);
             Help.CommunityHelpIndex? communityHelp=null;
             registrations.Register(()=>mainWindow.CommunityHelp=communityHelp=new Help.CommunityHelpIndex(),()=>communityHelp?.Dispose());
             // X-747 (0.1772): the furniture placed in a house and its event objects, in the log (developer mode only), before any code.

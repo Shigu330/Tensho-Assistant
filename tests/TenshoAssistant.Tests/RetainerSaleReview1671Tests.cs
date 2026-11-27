@@ -25,7 +25,7 @@ internal static class RetainerSaleReview1671Tests
             Check(failed.Items!.Count==3 && failed.Error=="Network" && failed.FetchedAt==At && !failed.Loading,"an error keeps what the list knew");
             var panelFailed=RetainerCompareService.Merged(before,"World",[4],null,"Data",null,false);
             Check(panelFailed.Items is null && panelFailed.Error=="Data","the panel's error: as before");
-            var plugin=Read("src/TenshoAssistant/Plugin.cs");
+            var plugin=Read("src/TenshoAssistant/Plugin.cs")+Read("src/TenshoAssistant/Plugin.Market.cs");
             Check(plugin.Contains("mainWindow.RetainerSaleListCompare=retainerSaleListCompare=new Market.RetainerCompareService{Accumulate=true,")
                   && plugin.Contains("mainWindow.RetainerCompare=retainerCompare=new Market.RetainerCompareService{Enabled="),"two services: the panel's and the list's");
             var service=Read("src/TenshoAssistant/Market/RetainerSales.cs");
