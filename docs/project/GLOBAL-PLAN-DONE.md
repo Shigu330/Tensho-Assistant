@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (891 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (893 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -959,12 +959,14 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-866 | Review of block 0.1869 to 0.1870 (review 0.1870, 27/11), minor M1, M2: M1 in… | Done in 0.1871.0 |
 | X-867 | Review  (review 0.1871, 27/11), minor M1, M3: M1 in… | Done in 0.1872.0 |
 | X-868 | Review  (review 0.1871, 27/11), pre-existing before the block M2: M2 in… | Done in 0.1873.0 |
+| X-870 | Review  (review 0.1874, 27/11), minor M1: M1 in… | Done in 0.1875.0 |
+| X-871 | Review  (review 0.1874, 27/11), pre-existing before the block M2: M2 in… | Done in 0.1876.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (891 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (893 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1921,3 +1923,5 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-866 | Relecture du bloc 0.1869 à 0.1870 (relecture 0.1870, 27/11), mineurs M1, M2… | Fait en 0.1871.0 |
 | X-867 | Relecture  (relecture 0.1871, 27/11), mineurs M1, M3 : M1 : Handled laisse… | Fait en 0.1872.0 |
 | X-868 | Relecture  (relecture 0.1871, 27/11), déjà là avant le bloc M2 : M2 : Un… | Fait en 0.1873.0 |
+| X-870 | Relecture  (relecture 0.1874, 27/11), mineurs M1 : M1 : La copie reçoit le… | Fait en 0.1875.0 |
+| X-871 | Relecture  (relecture 0.1874, 27/11), déjà là avant le bloc M2 : M2 : Le… | Fait en 0.1876.0 |
