@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-## Overview (checked against the code on 2026-11-09)
+## Overview (checked against the code on 2026-11-27)
 
 > A map of the code, not a journal: the detail of each version is in the [CHANGELOG](../../CHANGELOG.md), the in-game state in the
 > [global plan](GLOBAL-PLAN.md) and [TESTING](TESTING.md). The code is the reference. The design notes written for each goal from
@@ -11,7 +11,8 @@
 
 One plugin project (`src/TenshoAssistant`, .NET 10, Dalamud.NET.Sdk 15, a single DLL, plus the native library of the optional Raphael
 solver next to it) and a test program without native dependency (`tests/TenshoAssistant.Tests`) that compiles the pure C# files of the
-plugin by link and reads the embedded data files from the sources.
+plugin by link and reads the embedded data files from the sources. A third project, the desktop application
+(`src/TenshoAssistant.Desktop`), draws the plugin's own pages in a window of Windows, game closed (see « Desktop application » below).
 
 | Files | Role |
 |---|---|
@@ -21,15 +22,17 @@ plugin by link and reads the embedded data files from the sources.
 
 ### Host and life cycle (`Plugin.cs`)
 
-- `Plugin` receives the Dalamud services by injection, loads `Configuration` v1 (another version raises an error, the file is not
-  overwritten), creates the services, `MainWindow`, `MapViewWindow`, `GuideWindow`, the free-standing `PanelWindow`s and `AttachedPanels`
+- `Plugin` receives the Dalamud services by injection, loads the settings (`Configuration` v1) from Tensho's own file `Settings.json`
+  (`SettingsFile`, see « Configuration and persistence »), creates the services, `MainWindow`, `MapViewWindow`, `GuideWindow`, the Tensho
+  chat windows (`Chat/`), the Beastmaster board panel (`BeastBoardWindow`), the free-standing `PanelWindow`s and `AttachedPanels`
   (panels beside the game's windows, in the same `WindowSystem`), and registers every reader, loader, bridge and network service in
   `RegistrationScope`: cleanup in reverse order, idempotent, continued after an error; a failure of the constructor triggers the same
   cleanup.
 - Competitive cut (DEC-038): every framework subscription goes through `Competitive/CompetitiveGate`; while the player is in PvP or
   ranked content (`CompetitiveZones`, from the game's data), the whole plugin stops, with no setting, and starts again after.
 - Command `/tensho`: opens the window; `peche`, `pêche`, `fish` or `fishing` open or close the fishing help; `todo <task>` (or `tache`,
-  `tâche`) adds a task to Reminders; `wiki <item>` and `lodestone <item>` open the item's page in the browser; `item`, `price`, `gather`
+  `tâche`) adds a task to Reminders; `chat` shows or hides the Tensho chat window and `chat hide` hides every Tensho chat window
+  for a moment, or shows them back; `wiki <item>` and `lodestone <item>` open the item's page in the browser; `item`, `price`, `gather`
   or `recipe` (also `craft` and the French words) followed by an item name open the first matching item in that tool
   (`MainWindow.CommandRoute`); `selftest` writes the self-check to the log; `linktest` (developer mode) prints test links.
   `OpenMainUi`, `OpenConfigUi` (Settings), opening at login (`OpenOnLogin`). Fonts of the Tensho window built by `UI/FontManager`
@@ -44,7 +47,7 @@ plugin by link and reads the embedded data files from the sources.
 | Folder | Main content |
 |---|---|
 | `Items/` | shared item catalogue (`ItemCatalog` + loader + cache, mount / minion / orchestrion unlocks), uses (`ItemUseCatalog`), hover (`ItemHover`, `ItemHoverReader`), context menu of the game's inventory (`ItemContextMenuBridge`, `ItemContextMenuSession`), crystals, slots, `TryOn` (the game's Try On window), item notes and wishlist (`ItemNotes`, `Wishlist`), Grand Company supply of the day (`GcSupplyToday`), external links (`ExternalLinks`), search filters |
-| `Inventory/` | live inventory (`InventoryService`, `DalamudInventoryReader`), Bank (`InventoryBankService`, `PerCharacterBankStore` + `FileInventoryBankStore`: one file per character; `BankInventoryBridge`: retainers, saddlebags, armoury chest, glamour dresser, armoire), ownership (`ItemHoldings`, `OtherCharacterStocks`), native visual sort (rules, scopes, templates, preview, `InventoryVisualSort` + bridge), currencies (`Currencies`, `CurrencyWatcher`), gil journal (`GilJournal`, `GilWatcher`), storage highlight and report |
+| `Inventory/` | live inventory (`InventoryService`, `DalamudInventoryReader`), Bank (`InventoryBankService`, `PerCharacterBankStore`: one row per stored place in `TenshoData.db`; `BankInventoryBridge`: retainers, saddlebags, armoury chest, glamour dresser, armoire), ownership (`ItemHoldings`, `OtherCharacterStocks`), native visual sort (rules, scopes, templates, preview, `InventoryVisualSort` + bridge), currencies (`Currencies`, `CurrencyWatcher`), gil journal (`GilJournal`, `GilWatcher`), storage highlight and report |
 | `Market/` | Universalis: summary and hover price (`MarketService`, `MarketWorldReader`, `MarketHover`, `ItemHoverCoordinator`); listings, history and cost for N units (`MarketBoard`, `MarketBoardService`); preparation cost (`PreparationCost`, `PreparationPriceSession`); retainer sales (`RetainerSales` + reader), undercut watch (`Undercut` + watcher), prices seen at the market board (`SeenPrices` + reader), craft profit (`CraftProfit`), currency value (`CurrencyValue`) |
 | `Craft/` | recipes and actions (catalogues + loaders), simulator, solver (`CraftSolveSession`) and the optional Raphael solver (`RaphaelCraftSolver`, `RaphaelSequenceCache`), conditions envelope, live synthesis (`CraftLive*`, opt-in), crafting log help (`CraftLog*`), plan and chain (`CraftPlan`, `CraftChain*`), presets, macro export and import, crafting lists (`CraftLists`), crafting recorder (`CraftRecorder`, `CraftRecording`), Teamcraft export link (`TeamcraftExport`), crafting from stock, consumables |
 | `Gathering/` | gathering and fishing points (catalogue + cache), time windows (`GatheringSchedule`, `GatheringTimeline`), weather (`WeatherCatalogLoader`, `WeatherForecast`), fishing log and forecasts (`FishingNotebook`, `FishingForecast`, `FishNow`, `FishWindows`), observation of the gathering window, GP (`GpActions`, `GpOptimizer`, `GpNextAction`), Bountiful Yield II estimate (`BountifulEstimate`), collectables, spearfishing, ocean fishing (`OceanFishing`, `OceanVoyage` + reader), notebooks, gathering route, GP regeneration tick |
@@ -61,7 +64,7 @@ plugin by link and reads the embedded data files from the sources.
 | `Deliveries/`, `GrandCompanies/`, `Societies/`, `Leves/`, `Hunting/` | custom and special deliveries; Grand Companies; allied societies; guildleves (`LeveCatalog`, `LeveProgressReader`); hunting log (`HuntingLog` + reader) and S rank conditions (`SRankConditions`) |
 | `Carnivale/`, `Relics/`, `Fields/`, `DeepDungeons/`, `Lexicon/` | Masked Carnivale; relic weapons and armour; Eureka and Bozja (`FieldBoard`) and FATEs; deep dungeons; lexicon of the game's words — each a model and its `*.Dalamud.cs` reader |
 | `Events/` | seasonal events (`Festivals`, `FestivalReader`), `Data/festival-names.csv` (embedded) |
-| `Discoveries/` | local discoveries base (`DiscoveriesModel`: facts with their provenance, import with merge, export; the player's own facts in `Discoveries.json`, the shared ones in `Shared/`, one compressed file per kind, read only when a page needs that kind), its settings (`DiscoverySettings`), what it notes from the game (`ItemDiscoveryWatcher`, `ItemGains`), and the exchange with other players (`GitHubExchange`, `CommunityDiscoveries`: GitHub sign-in on the player's click, own facts sent to the player's gist with an issue, the common file `community-discoveries/discoveries.json` joined as imported; « Exchange now » or the opt-in daily exchange); game rows and places only, never another player |
+| `Discoveries/` | local discoveries base (`DiscoveriesModel`: facts with their provenance, import with merge, export; the player's own facts and the shared ones in one SQLite file, `Discoveries.db` (`DiscoveryDatabase`: one row per fact, its kind and whether it is shared as columns; a shared kind read only when a page needs it)), its settings (`DiscoverySettings`), what it notes from the game (`ItemDiscoveryWatcher`, `ItemGains`), and the exchange with other players (`GitHubExchange`, `CommunityDiscoveries`: GitHub sign-in on the player's click, own facts sent to the player's gist with an issue, the common set `community-discoveries/v3/` joined as imported; « Exchange now » or the opt-in daily exchange); game rows and places only, never another player |
 | `Competitive/` | PvP and ranked content cut (`CompetitiveGate`, `CompetitiveZones`, DEC-038) |
 | `Credits/` | the single list of credits (`CreditCatalog`: the game, libraries, embedded data, online data, rules taken up, references read, tools), shown by `MainWindow.Credits.cs` and checked by the tests (embedded data, network hosts, settings, MIT notices) |
 | `Alarms/`, `Reminders/` | Tensho alarms (`TenshoAlarm`, `AlarmService`, the game's `/alarm` command through `GameAlarmCommand`, automatic alarms `AutoAlarms` + watcher, server info bar entries for alarms, reminders and currencies, Discord webhook `DiscordWebhook` (pure rules) and `DiscordNotifier` (queue and sending on a worker), tracked alarms, world clocks); reminders of the calendar (`ResetSchedule`, `GameTimers`), garden (journal, seeds, crossbreeds, chat watcher), squadron planner and reader, hunt bills, personal tasks, Wondrous Tails odds, company benefits, `Data/` (embedded garden files) |
@@ -71,26 +74,38 @@ plugin by link and reads the embedded data files from the sources.
 | `Localization/` | `LocalizationManager`, `LocalizationValidator`, `Languages/*.json` (embedded) |
 | `Help/`, `Guide/` | help of each page and search (`HelpIndex`), report a problem (`ProblemReport`, prefilled GitHub form), community videos (`CommunityHelpIndex`, read on a click); first-run guide (`GuideFlow`; `GuideWindow.cs`, at the root, in the `WindowSystem`) |
 | `Diagnostics/` | self-check at reload in developer mode (`SelfCheck`, `SelfCheckRunner`), page sweep (`PageSweep`, `PageSweepWindow`, DEC-040), slow frame log (`SlowFrame`), blink watch, temporary in-game readings (`ReadingCapture`) |
-| `Beastmaster/` | Beastmaster page, the game's data read raw (`BeastCatalog` + loader); window probe (`BeastWindowProbe`), without an advice panel (DEC-032) |
+| `Beastmaster/` | Beastmaster page, the game's data read raw (`BeastCatalog` + loader); the team calculated out of combat (`BeastTeams`, `BestTeamRetry`, DEC-046) and its plans (`BeastPlansFile`); the board, the beasts and the combo skills read from the game's windows (`BeastBoardReader`, `BeastFamiliarReader`, `BeastInstinct`); the team panel beside the game's board window (`BeastBoardWindow.cs`, at the root); the Crucible of the Unbroken is not switched off (DEC-038, addition of 2026-11-11) |
+| `Chat/` | the Tensho chat window and its tabs, each one detachable into a window of its own (`ChatWindows`): the game's lines read (`ChatReader`), channels and the game's own filters (`ChatChannels`, `ChatFilters`), looks per context (`ChatLook`, `ChatContexts`), search, copy, links (`ChatLinkPress`), the game's log window hidden while Tensho's shows (`GameChatHider`); optional history on this PC only (`ChatHistory`, off by default, one file per character in `ChatHistory/`) |
+| `Link/` | the local link with the desktop application (`LocalLink`: a named pipe for the current Windows user only, one way, plugin to application; off by default, Settings › Advanced) and the installation of the application from the plugin (`DesktopInstaller`, `DesktopCopySlot`) |
 | `MyTools/` | the player's tools and the community gallery, data only (`ToolTemplate`, `ToolTemplateStore`, `ToolGallery` read on a click) |
 | `UI/` | theme (`FfxivTheme`, `ThemePalettes`, `GameThemeReader`), fonts (`FontManager`, `FontSettings`), `UiComponents`, `UiMessages`, `InternalMessages`, setting save with rollback (`SettingSave`), the game's visible windows (`GameWindowsReader`, `GameWindowFollower`), shared templates `Components/`, navigation bar `Navigation/` |
-| root | `Plugin`, `Configuration` (+ `Configuration.Dalamud.cs`), `CommunitySources` (« game data and what you observed only »), `RegistrationScope`, saved files (`AtomicFile`: temporary file then swap; `BackgroundWriter`: writes off the framework thread, in order; `BackupZip`: zip copy before a folder is emptied), `OnceSet` (bounded « once per event »), `MainWindow.*.cs` (one partial per page or part), `MapViewWindow`, `GuideWindow`, `PanelWindow`, `AttachedPanels`, `BankImportOverlay` |
+| root | `Plugin` (and its `Plugin.*.cs` parts), `Configuration` (+ `Configuration.Dalamud.cs`), the settings file (`SettingsFile`, `SettingsSaver`, `FairFileLock`), the player's data file (`TenshoDataDatabase`), `CommunitySources` (« game data and what you observed only »), `RegistrationScope`, saved files (`AtomicFile`: temporary file then swap; `BackgroundWriter`: writes off the framework thread, in order; `BackupZip`: zip copy before a folder is emptied), `OnceSet` (bounded « once per event »), `MainWindow.*.cs` (one partial per page or part), `MapViewWindow`, `GuideWindow`, `PanelWindow`, `AttachedPanels`, `BankImportOverlay`, `BeastBoardWindow` |
 
 ### Main window
 
-`MainWindow`: a side bar sorted in foldable groups (state kept in `NavigationCollapsed`), « item in context » under the bar, content page
-on the right. Every page is one line of `MainWindow.Pages.cs` (`PageEntries`): its group, its label, its draw method and its source; the
-navigation, the drawing and the source shown to contributors all read it. Today:
+`MainWindow`: a side bar, « item in context » under the bar, content page on the right. Every page is one line of `MainWindow.Pages.cs`
+(`PageEntries`): its group, its label, its draw method, its source, and, for a page of a family, its parent and its tab; the navigation,
+the drawing and the source shown to contributors all read it. Since X-601 (0.1677 to 0.1681), most pages are tabs of one navigation
+entry, under one page header (`DrawPageHeader`: the family's title, the page's description, the tab bar); the only group left in the side
+bar is « Tracking », shown as TIMERS (`UI/PageFamilies.cs`). Today, in the order of the side bar:
 
-| Group | Pages (pages reached only from tabs in brackets) |
+| Navigation entry | Its tabs |
 |---|---|
-| — | Home, My tools |
-| ITEMS | Items (search + item sheet), Storage, Inventory sorting, Market, Lexicon |
-| PRODUCTION | Crafting (live synthesis, presets), Gathering (GP planning, collectables), Ocean fishing, Island sanctuary, Custom deliveries, Macro chain |
-| WORLD | Map, Weather, FATEs, Alarms, Reminders, Garden, Free company, NPC vendors, Duty loot, Monster loot, Discoveries |
-| PROGRESSION | Quests, Events, Collections (Blue magic), Masked Carnivale, Relics, Allied societies, Grand Companies, Special deliveries, Eureka and Bozja, Deep dungeons, Gear, Chocobo, Guildleves, Hunting log, Beastmaster |
-| GOLD SAUCER | Fashion Report, Triple Triad, Mini Cactpot |
-| PREFERENCES | Help, Settings (General, Interface, Modules, Map, Data, Advanced; Debug in developer mode), Credits, Diagnostics (developer mode) |
+| Home, My tools | — |
+| Character | Collections, Blue Magic Spellbook, The Masked Carnivale, Beastmaster, Chocobo, Hunting Log, Gear, Relic Weapons |
+| Items | Item Search (item sheet), Storage, Sort, Markets |
+| Wishlist | — |
+| Crafting | Crafting simulation, Saved sequences, Current synthesis, User Macros (macro chain) |
+| Gathering | Gathering & fishing, GP planning, collectables, Ocean Fishing |
+| Island Sanctuary | — |
+| World | Map, Weather, FATEs, Shops, Duty loot, Monster loot, Discoveries |
+| TIMERS (group) | Alarm, Reminders, Gardening, Free Company |
+| Quests | Journal, Levequests, Seasonal Events, Society Quests, Grand Companies |
+| Deliveries | Special deliveries, Custom Deliveries |
+| Duty | Eureka and Bozja, Deep Dungeons |
+| Gold Saucer | Fashion Report, Triple Triad, Mini Cactpot |
+| Help | Help, Lexicon, Credits |
+| Settings | Settings (General, Panels beside the game, Map, Tracking and notifications, Data and sources, Advanced; Debug in developer mode), Diagnostics (developer mode) |
 
 The map has its own window (`MapViewWindow`), whose content and open state stay in `MainWindow.MapView.cs`.
 
@@ -100,7 +115,7 @@ Shared templates (`UI/Components/`):
   collection items (unknown = no badge), right click = useful tools (`RelevantRoutes`) and grouped sources (`SourceLines`,
   `MainWindow.SourceLinks.cs`), unique menu id (`UniqueMenuId`). The same content (`DrawItemInfoBody`) serves the panel under the game's
   tooltip; the same sources, the Tensho menu of the game's inventory.
-- `SettingRow.cs`: setting with tooltip and ↺ button (default read on a new `Configuration`); « Reset everything to default ». A failed
+- `SettingRow.cs`: setting with tooltip and ↺ button (default read on a new `Configuration`); « Restore all defaults ». A failed
   save puts the previous value back and shows one error line at the bottom of the main window (`UI/SettingSave.cs`).
 - `Tooltip.cs`: one tooltip helper (also on greyed controls); `StatusLines.cs`: one look for empty or loading lines.
 - `DetailPage.cs`: header then tabs, only the open tab is computed (item sheet, Triple Triad sub-tabs).
@@ -156,19 +171,28 @@ Known gaps to the rule « Draw reads neither pointer nor Excel sheet » (noted o
 ### Configuration and persistence
 
 - `Configuration` v1 (`Configuration.cs`, pure C# shared with the tests; `Configuration.Dalamud.cs` adds `IPluginConfiguration`), saved
-  by `SavePluginConfig`. `MainWindow` writes settings through `SaveSetting`, which puts the former value back if saving fails.
+  in Tensho's own file `Settings.json` (`SettingsFile`, X-685, 0.1745; Dalamud's `TenshoAssistant.json` is read once at the first load,
+  then left as it was): written whole through `AtomicFile`, the version before kept as `.bak`, under a lock shared by the game clients of
+  the PC (`FairFileLock`) and merged with the file as it is, so two clients keep each other's changes; a file that cannot be read is kept
+  aside, never written over. `MainWindow` writes settings through `SaveSetting`, which puts the former value back if saving fails.
 - Content: settings (including `MapViewSettings`, `Cache`, the switches of the community sources, `Discovery`) and some user data
   (alarms, reminders done, vessels read, unlocked sectors, build plans, gear and materia plans, presets, decks, followed quests,
   bookmarks, macro plan, sort profiles and templates, item notes, wishlist, garden beds, personal tasks…).
-- Defaults: a new `Configuration` is the reference of the ↺ buttons. « Reset everything to default » (Settings › Advanced,
+- Defaults: a new `Configuration` is the reference of the ↺ buttons. « Restore all defaults » (Settings › Advanced,
   `UI/Components/SettingRow.cs`) copies by reflection, from a new configuration, only the properties listed in `ConfigurationReset.Reset`
   (`Configuration.cs`); the Discord webhook address typed is kept. `ConfigurationReset.Kept` keeps the user's data and the interface
   state. A test requires every public property to be in exactly one of the two lists: **every new property of `Configuration` must be
   placed in one of them**.
-- Separate files in the plugin's configuration folder, never touched by the reset: `InventoryBank/` (one file per character, schema 1,
-  16 MiB at most, bounded entries and containers; written through a temporary file then replaced, with `.bak`), `GilJournal/`,
-  `Characters/`, `Discoveries/` (`Discoveries.json`, `Shared/`, `MarketSeen.json`; with the GitHub exchange, `github.json` and the token
-  `github.token`, protected for this Windows user by DPAPI), `VoyageHistory.json`, `MyTools.json`, `CraftLists.json`, `Exports/`,
+- The player's data in SQLite (X-172, X-173), WAL journal (a stop in the middle of a save leaves the last one whole; the desktop
+  application reads while the game writes): `TenshoData.db` at the root of the configuration folder (`TenshoDataDatabase`: gil journal,
+  achievement progress, voyage history, bank and inventories, job levels and gear sets, titles and achievements obtained), and
+  `Discoveries/Discoveries.db` (the discoveries, own and shared). Their files of before (`GilJournal/`, `InventoryBank/`,
+  `VoyageHistory.json`, `AchievementProgress.json`, `Discoveries.json`…) are no longer converted since X-574 (0.1793): one still there is
+  left aside, never read.
+- Other separate files in the plugin's configuration folder, never touched by the reset: `Characters/` (what Tensho last read for each
+  character), `Discoveries/` (`MarketSeen.json`; with the GitHub exchange, `github.json` and the token `github.token`, protected for this
+  Windows user by DPAPI), `ChatHistory/` (only when the chat history is on), `MyTools.json`, `CraftLists.json`, `BeastTeams.json`,
+  `DutyProgress.json`, `OceanVoyage.json`, `GameDataSnapshot.json`, `PlayState.json`, `Exports/`,
   `DataCache-v1/`, `Backups/` (zip copies taken before the cache or the discoveries are emptied, GitHub token left out); in developer
   mode, `SelfCheckSeen.json` and `PageSweepLast.txt` (see [SECURITY](../../SECURITY.md)). Saved files are written through `AtomicFile`
   (temporary file, then swapped in).
@@ -182,7 +206,7 @@ Known gaps to the rule « Draw reads neither pointer nor Excel sheet » (noted o
   game data + language + shape of the copy (`CatalogCacheKeys`), never the plugin version.
 - Snapshots per character (quests, collections): key `GameCacheIdentity` (plugin version + language + data versions), so read again
   after each new plugin version.
-- Durations per area (`CacheArea`, Settings › Data), defaults since 0.750 (X-02): Prices 1 day, Quests 1 h, Collections 7 days, Sources
+- Durations per area (`CacheArea`, Settings › Data and sources), defaults since 0.750 (X-02): Prices 1 day, Quests 1 h, Collections 7 days, Sources
   « Only when missing, or on Refresh », Fashion Report 7 days, Imported stock 1 day (only flags the age), Crafting computations 7 days,
   Titles and achievements 7 days; choices 5 min, 1 h, 24 h, 7 days or « Only when missing, or on Refresh ». Full record of the sources and
   rates at the time of the audit: [https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/evidence/0.246-cache-audit.md](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/evidence/0.246-cache-audit.md).
@@ -240,7 +264,7 @@ Order: game data (NPC vendors including free company shops, exchanges, quests, a
 (duties, monsters, FATEs, ventures, shop, items from items), then Garland Tools, then the « Acquisition » section of the wiki. « How to get
 it » shows Garland only if no other source is known, and the wiki only if Garland knows nothing either; but Garland is asked for almost
 every item put in context (selected item, sheet, Tensho and game menus), because the useful tools (`RelevantRoutes`: duties, monsters) and
-`SourceLines` (duties, exchanges) read it. Garland and the wiki are turned off in Settings › Advanced. Seals of another Grand Company than
+`SourceLines` (duties, exchanges) read it. Garland and the wiki are turned off in Settings › Data and sources › Community sources. Seals of another Grand Company than
 the character's are left out (unknown company = everything shown). The market is a criterion, not a source. The rows are computed once
 (`SourceLines`) and shown in the Tensho menu as in the menu of the game's inventory.
 
@@ -253,7 +277,20 @@ data (items, actions, places) comes from the game's catalogue, in the game's lan
 See [Localization/README.md](../../src/TenshoAssistant/Localization/README.md). Dates shown in local time; computations in UTC and Eorzea time.
 
 The build and the managed tests do not validate the ImGui rendering nor the native reads: only the in-game test does (state per version:
-[global plan](GLOBAL-PLAN.md), [TESTING](TESTING.md), [CHANGELOG](../../CHANGELOG.md)).
+[global plan](GLOBAL-PLAN.md), [TESTING](TESTING.md), [CHANGELOG](../../CHANGELOG.md)). The desktop application draws every page without a
+window at each run of `scripts/Verify.ps1` (`--headless`): a page that throws or blocks fails it.
+
+### Desktop application (`src/TenshoAssistant.Desktop`, X-119)
+
+- The plugin's own `MainWindow` and pages, loaded from the built plugin's DLL, in a window of Windows with the game closed (`Host`,
+  `DesktopPages`: each page classified as shown as is, with the local link, or in the game only). Game data from the game's files on
+  disk; the player's data read read-only from the plugin's files (`MainWindow.DesktopData.cs`); its version is the plugin's (one source,
+  the plugin's csproj).
+- The local link (`Link/LocalLink.cs`, compiled into both): a named pipe for the current Windows user only, one way from the plugin to the
+  application, off by default (Settings › Advanced); it carries small live states, notices of a saved file that changed (by category,
+  never a file name nor a content), the alerts that rang in the game and Tensho's state; the application then reads the files itself.
+- Installed and updated from the plugin's GitHub release (`DesktopInstaller`, `DesktopUpdate`, SHA-256 checked); `Plugin.Desktop.cs` and
+  `MainWindow.DesktopInstall.cs` hold the plugin's side.
 
 ### Competitive switch-off (`Competitive/`, DEC-038)
 
@@ -293,7 +330,7 @@ Known gaps:
 
 # Architecture (français)
 
-## Vue d'ensemble (relue contre le code le 2026-11-09)
+## Vue d'ensemble (relue contre le code le 2026-11-27)
 
 > Carte du code, pas un journal : le détail par version est dans le [CHANGELOG](../../CHANGELOG.md), l'état en jeu dans le
 > [plan global](GLOBAL-PLAN.md) et [TESTING](TESTING.md). Le code fait foi. Les notes de conception écrites pour chaque objectif du
@@ -312,15 +349,17 @@ purs du plugin et lit les fichiers de données embarqués depuis les sources.
 
 ### Hôte et cycle de vie (`Plugin.cs`)
 
-- `Plugin` reçoit les services Dalamud par injection, charge `Configuration` v1 (une autre version lève une erreur, le fichier n'est pas
-  écrasé), crée les services, `MainWindow`, `MapViewWindow`, `GuideWindow`, les `PanelWindow` libres et `AttachedPanels` (panneaux à côté
+- `Plugin` reçoit les services Dalamud par injection, charge les réglages (`Configuration` v1) depuis le fichier propre à Tensho
+  `Settings.json` (`SettingsFile`, voir « Configuration et persistance »), crée les services, `MainWindow`, `MapViewWindow`, `GuideWindow`,
+  les fenêtres de chat Tensho (`Chat/`), le panneau du plateau du dresseur (`BeastBoardWindow`), les `PanelWindow` libres et `AttachedPanels` (panneaux à côté
   des fenêtres du jeu, dans le même `WindowSystem`), et enregistre chaque lecteur, chargeur, pont et service réseau dans
   `RegistrationScope` : nettoyage en ordre inverse, idempotent, poursuivi après erreur ; un échec du constructeur déclenche le même
   nettoyage.
 - Coupure compétitive (DEC-038) : chaque abonnement au framework passe par `Competitive/CompetitiveGate` ; tant que le joueur est en JcJ
   ou en contenu classé (`CompetitiveZones`, d'après les données du jeu), le plugin entier s'arrête, sans réglage, et reprend ensuite.
 - Commande `/tensho` : ouvre la fenêtre ; `peche`, `pêche`, `fish` ou `fishing` ouvrent ou ferment l'aide à la pêche ; `todo <tâche>` (ou
-  `tache`, `tâche`) ajoute une tâche aux Rappels ; `wiki <objet>` et `lodestone <objet>` ouvrent la page de l'objet dans le navigateur ;
+  `tache`, `tâche`) ajoute une tâche aux Rappels ; `chat` montre ou cache la fenêtre de chat Tensho et `chat hide` cache un moment
+  toutes les fenêtres de chat Tensho, ou les remontre ; `wiki <objet>` et `lodestone <objet>` ouvrent la page de l'objet dans le navigateur ;
   `objet`, `prix`, `recolte` ou `recette` (aussi les mots anglais `item`, `price`, `gather`, `recipe`, `craft`) suivis d'un nom d'objet
   ouvrent le premier objet trouvé dans cet outil (`MainWindow.CommandRoute`) ; `selftest` écrit l'auto-contrôle au journal ; `linktest` (mode
   développeur) affiche des liens d'essai. `OpenMainUi`, `OpenConfigUi` (Paramètres), ouverture à la connexion (`OpenOnLogin`). Polices de
@@ -336,7 +375,7 @@ purs du plugin et lit les fichiers de données embarqués depuis les sources.
 | Dossier | Contenu principal |
 |---|---|
 | `Items/` | catalogue d'objets commun (`ItemCatalog` + chargeur + cache, déblocages monture / mascotte / orchestrion), usages (`ItemUseCatalog`), survol (`ItemHover`, `ItemHoverReader`), menu contextuel de l'inventaire du jeu (`ItemContextMenuBridge`, `ItemContextMenuSession`), cristaux, emplacements, `TryOn` (cabine d'essayage du jeu), notes d'objets et liste d'envies (`ItemNotes`, `Wishlist`), approvisionnement du jour de la Grande Compagnie (`GcSupplyToday`), liens externes (`ExternalLinks`), filtres de recherche |
-| `Inventory/` | inventaire live (`InventoryService`, `DalamudInventoryReader`), Banque (`InventoryBankService`, `PerCharacterBankStore` + `FileInventoryBankStore` : un fichier par personnage ; `BankInventoryBridge` : servants, sacoches, arsenal, coffre à apparence, armoire), possession (`ItemHoldings`, `OtherCharacterStocks`), tri visuel natif (règles, portées, modèles, aperçu, `InventoryVisualSort` + pont), monnaies (`Currencies`, `CurrencyWatcher`), journal des gils (`GilJournal`, `GilWatcher`), mise en évidence et rapport des rangements |
+| `Inventory/` | inventaire live (`InventoryService`, `DalamudInventoryReader`), Banque (`InventoryBankService`, `PerCharacterBankStore` : une ligne par lieu de rangement dans `TenshoData.db` ; `BankInventoryBridge` : servants, sacoches, arsenal, coffre à apparence, armoire), possession (`ItemHoldings`, `OtherCharacterStocks`), tri visuel natif (règles, portées, modèles, aperçu, `InventoryVisualSort` + pont), monnaies (`Currencies`, `CurrencyWatcher`), journal des gils (`GilJournal`, `GilWatcher`), mise en évidence et rapport des rangements |
 | `Market/` | Universalis : résumé et prix au survol (`MarketService`, `MarketWorldReader`, `MarketHover`, `ItemHoverCoordinator`) ; annonces, historique et coût pour N unités (`MarketBoard`, `MarketBoardService`) ; coût de préparation (`PreparationCost`, `PreparationPriceSession`) ; ventes des servants (`RetainerSales` + lecteur), surveillance des prix cassés (`Undercut` + veilleur), prix vus au tableau des ventes (`SeenPrices` + lecteur), rentabilité des fabrications (`CraftProfit`), valeur des monnaies (`CurrencyValue`) |
 | `Craft/` | recettes et actions (catalogues + chargeurs), simulateur, solveur (`CraftSolveSession`) et solveur Raphael facultatif (`RaphaelCraftSolver`, `RaphaelSequenceCache`), enveloppe des conditions, synthèse en direct (`CraftLive*`, sur option), aide du carnet (`CraftLog*`), plan et chaîne (`CraftPlan`, `CraftChain*`), préréglages, export et import de macros, listes d'artisanat (`CraftLists`), enregistreur d'artisanat (`CraftRecorder`, `CraftRecording`), lien d'export Teamcraft (`TeamcraftExport`), fabrication depuis le stock, consommables |
 | `Gathering/` | points de récolte et de pêche (catalogue + cache), horaires (`GatheringSchedule`, `GatheringTimeline`), météo (`WeatherCatalogLoader`, `WeatherForecast`), carnet et prévisions de pêche (`FishingNotebook`, `FishingForecast`, `FishNow`, `FishWindows`), observation de la fenêtre de récolte, PR (`GpActions`, `GpOptimizer`, `GpNextAction`), estimation d'Abondance II (`BountifulEstimate`), objets de collection, pêche au harpon, pêche en mer (`OceanFishing`, `OceanVoyage` + lecteur), carnets, itinéraire de récolte, tic de régénération des PR |
@@ -353,7 +392,7 @@ purs du plugin et lit les fichiers de données embarqués depuis les sources.
 | `Deliveries/`, `GrandCompanies/`, `Societies/`, `Leves/`, `Hunting/` | commandes et livraisons spéciales ; Grandes compagnies ; peuples alliés ; mandats (`LeveCatalog`, `LeveProgressReader`) ; bestiaire (`HuntingLog` + lecteur) et conditions des rangs S (`SRankConditions`) |
 | `Carnivale/`, `Relics/`, `Fields/`, `DeepDungeons/`, `Lexicon/` | Grande Mascarade ; armes et armures reliques ; Eureka et Bozja (`FieldBoard`) et ALÉA ; donjons profonds ; lexique des mots du jeu — chacun un modèle et son lecteur `*.Dalamud.cs` |
 | `Events/` | événements saisonniers (`Festivals`, `FestivalReader`), `Data/festival-names.csv` (embarqué) |
-| `Discoveries/` | base locale de découvertes (`DiscoveriesModel` : faits avec leur provenance, import avec fusion, export ; les faits du joueur dans `Discoveries.json`, les faits partagés dans `Shared/`, un fichier compressé par sorte, lu seulement quand une page a besoin de cette sorte), ses réglages (`DiscoverySettings`), ce qu'elle relève dans le jeu (`ItemDiscoveryWatcher`, `ItemGains`), et l'échange avec les autres joueurs (`GitHubExchange`, `CommunityDiscoveries` : connexion GitHub sur clic du joueur, ses faits envoyés dans son gist avec un ticket, le fichier commun `community-discoveries/discoveries.json` joint comme importé ; « Échanger maintenant » ou l'échange quotidien sur option) ; des lignes du jeu et des lieux seulement, jamais un autre joueur |
+| `Discoveries/` | base locale de découvertes (`DiscoveriesModel` : faits avec leur provenance, import avec fusion, export ; les faits du joueur et les faits partagés dans un seul fichier SQLite, `Discoveries.db` (`DiscoveryDatabase` : une ligne par fait, sa sorte et s'il est partagé en colonnes ; une sorte partagée lue seulement quand une page en a besoin)), ses réglages (`DiscoverySettings`), ce qu'elle relève dans le jeu (`ItemDiscoveryWatcher`, `ItemGains`), et l'échange avec les autres joueurs (`GitHubExchange`, `CommunityDiscoveries` : connexion GitHub sur clic du joueur, ses faits envoyés dans son gist avec un ticket, l'ensemble commun `community-discoveries/v3/` joint comme importé ; « Échanger maintenant » ou l'échange quotidien sur option) ; des lignes du jeu et des lieux seulement, jamais un autre joueur |
 | `Competitive/` | coupure en JcJ et en contenu classé (`CompetitiveGate`, `CompetitiveZones`, DEC-038) |
 | `Credits/` | liste unique des crédits (`CreditCatalog` : le jeu, bibliothèques, données intégrées, données en ligne, règles reprises, références lues, outils), affichée par `MainWindow.Credits.cs` et vérifiée par les tests (données intégrées, hôtes réseau, réglages, avis MIT) |
 | `Alarms/`, `Reminders/` | alarmes Tensho (`TenshoAlarm`, `AlarmService`, commande `/alarm` du jeu via `GameAlarmCommand`, alarmes automatiques `AutoAlarms` + veilleur, entrées de la barre d'infos du serveur pour les alarmes, les rappels et les monnaies, webhook Discord `DiscordWebhook` (règles pures) et `DiscordNotifier` (file et envoi sur un worker), alarmes suivies, horloges du monde) ; rappels du calendrier (`ResetSchedule`, `GameTimers`), jardinage (journal, graines, croisements, veilleur du chat), planificateur et lecteur de l'escouade, contrats de chasse, tâches personnelles, chances du Carnet mystérieux, avantages de compagnie, `Data/` (fichiers de jardinage embarqués) |
@@ -363,26 +402,39 @@ purs du plugin et lit les fichiers de données embarqués depuis les sources.
 | `Localization/` | `LocalizationManager`, `LocalizationValidator`, `Languages/*.json` (embarqués) |
 | `Help/`, `Guide/` | aide de chaque page et recherche (`HelpIndex`), signaler un problème (`ProblemReport`, formulaire GitHub prérempli), vidéos de la communauté (`CommunityHelpIndex`, lues sur clic) ; guide de première prise en main (`GuideFlow` ; `GuideWindow.cs`, à la racine, dans le `WindowSystem`) |
 | `Diagnostics/` | auto-contrôle au rechargement en mode développeur (`SelfCheck`, `SelfCheckRunner`), passage des pages (`PageSweep`, `PageSweepWindow`, DEC-040), relevé des images lentes (`SlowFrame`), surveillance des clignotements, relevés en jeu temporaires (`ReadingCapture`) |
-| `Beastmaster/` | page dresseur, données du jeu lues brutes (`BeastCatalog` + chargeur) ; sonde des fenêtres (`BeastWindowProbe`), sans panneau de conseil (DEC-032) |
+| `Beastmaster/` | page dresseur, données du jeu lues brutes (`BeastCatalog` + chargeur) ; l'équipe calculée hors combat (`BeastTeams`, `BestTeamRetry`, DEC-046) et ses plans (`BeastPlansFile`) ; le plateau, les bêtes et les techniques de combo lus dans les fenêtres du jeu (`BeastBoardReader`, `BeastFamiliarReader`, `BeastInstinct`) ; le panneau d'équipe à côté de la fenêtre du plateau du jeu (`BeastBoardWindow.cs`, à la racine) ; le Dédale bestial n'est pas coupé (DEC-038, ajout du 2026-11-11) |
+| `Chat/` | la fenêtre de chat Tensho et ses onglets, chacun détachable dans sa propre fenêtre (`ChatWindows`) : lignes du jeu lues (`ChatReader`), canaux et filtres du jeu (`ChatChannels`, `ChatFilters`), aspects par contexte (`ChatLook`, `ChatContexts`), recherche, copie, liens (`ChatLinkPress`), fenêtre de discussion du jeu cachée pendant que celle de Tensho s'affiche (`GameChatHider`) ; historique sur option, sur ce PC seulement (`ChatHistory`, coupé par défaut, un fichier par personnage dans `ChatHistory/`) |
+| `Link/` | le lien local avec l'application de bureau (`LocalLink` : un tube nommé réservé à l'utilisateur Windows courant, à sens unique, du plugin vers l'application ; coupé par défaut, Paramètres › Avancé) et l'installation de l'application depuis le plugin (`DesktopInstaller`, `DesktopCopySlot`) |
 | `MyTools/` | outils du joueur et galerie de la communauté, données seulement (`ToolTemplate`, `ToolTemplateStore`, `ToolGallery` lue sur clic) |
 | `UI/` | thème (`FfxivTheme`, `ThemePalettes`, `GameThemeReader`), polices (`FontManager`, `FontSettings`), `UiComponents`, `UiMessages`, `InternalMessages`, enregistrement d'un réglage avec retour arrière (`SettingSave`), fenêtres visibles du jeu (`GameWindowsReader`, `GameWindowFollower`), modèles communs `Components/`, barre de navigation `Navigation/` |
-| racine | `Plugin`, `Configuration` (+ `Configuration.Dalamud.cs`), `CommunitySources` (« Données du jeu et vos observations seulement »), `RegistrationScope`, fichiers enregistrés (`AtomicFile` : fichier temporaire puis échange ; `BackgroundWriter` : écritures hors du thread framework, dans l'ordre ; `BackupZip` : copie zip avant de vider un dossier), `OnceSet` (« une fois par événement » borné), `MainWindow.*.cs` (un partiel par page ou partie), `MapViewWindow`, `GuideWindow`, `PanelWindow`, `AttachedPanels`, `BankImportOverlay` |
+| racine | `Plugin` (et ses parties `Plugin.*.cs`), `Configuration` (+ `Configuration.Dalamud.cs`), le fichier des réglages (`SettingsFile`, `SettingsSaver`, `FairFileLock`), le fichier des données du joueur (`TenshoDataDatabase`), `CommunitySources` (« Données du jeu et vos observations seulement »), `RegistrationScope`, fichiers enregistrés (`AtomicFile` : fichier temporaire puis échange ; `BackgroundWriter` : écritures hors du thread framework, dans l'ordre ; `BackupZip` : copie zip avant de vider un dossier), `OnceSet` (« une fois par événement » borné), `MainWindow.*.cs` (un partiel par page ou partie), `MapViewWindow`, `GuideWindow`, `PanelWindow`, `AttachedPanels`, `BankImportOverlay`, `BeastBoardWindow` |
 
 ### Fenêtre principale
 
-`MainWindow` : barre latérale rangée par groupes repliables (état gardé dans `NavigationCollapsed`), « objet en contexte » sous la barre,
-page de contenu à droite. Chaque page est une ligne de `MainWindow.Pages.cs` (`PageEntries`) : son groupe, son libellé, sa méthode de
-dessin et sa source ; la navigation, le dessin et la source montrée aux contributeurs la lisent tous. Aujourd'hui :
+`MainWindow` : barre latérale, « objet en contexte » sous la barre, page de contenu à droite. Chaque page est une ligne de
+`MainWindow.Pages.cs` (`PageEntries`) : son groupe, son libellé, sa méthode de dessin, sa source et, pour une page d'une famille, son parent
+et son onglet ; la navigation, le dessin et la source montrée aux contributeurs la lisent tous. Depuis X-601 (0.1677 à 0.1681), la plupart
+des pages sont des onglets d'une seule entrée de navigation, sous un seul en-tête de page (`DrawPageHeader` : le titre de la famille, la
+description de la page, la barre d'onglets) ; le seul groupe resté dans la barre latérale est « Suivi », affiché CALENDRIER
+(`UI/PageFamilies.cs`). Aujourd'hui, dans l'ordre de la barre latérale :
 
-| Groupe | Pages (entre parenthèses, les pages atteintes seulement par des onglets) |
+| Entrée de navigation | Ses onglets |
 |---|---|
-| — | Accueil & outils, Mes outils |
-| OBJETS | Objets (recherche + fiche objet), Rangements, Tri de l'inventaire, Marché, Lexique |
-| PRODUCTION | Artisanat (synthèse en direct, préréglages), Récolte (planification des PR, objets de collection), Pêche en mer, Félicité insulaire, Commandes spéciales, Enchaînement de macros |
-| MONDE | Carte, Météo, ALÉA, Alarmes, Rappels, Jardinage, Compagnie libre, PNJ vendeurs, Butin des contenus, Butin des monstres, Découvertes |
-| PROGRESSION | Quêtes, Événements, Collections (magie bleue), La Grande Mascarade, Reliques, Peuples alliés, Grandes compagnies, Livraisons spéciales, Eureka et Bozja, Donjons profonds, Équipement, Chocobo, Mandats, Bestiaire, Dresseur |
-| GOLD SAUCER | Revue de mode, Triple Triade, Mini Cactpot |
-| PRÉFÉRENCES | Aide, Paramètres (Général, Interface, Modules, Carte, Données, Avancé ; Debug en mode développeur), Crédits, Diagnostics (mode développeur) |
+| Accueil, Mes outils | — |
+| Personnage | Collections, Grimoire de magie bleue, La Grande Mascarade, Dresseur, Chocobo, Bestiaire, Équipement, Armes antiques |
+| Objets | Recherche d'objets (fiche objet), Rangements, Trier, Marchés |
+| Souhaits | — |
+| Artisanat | Simulation d'artisanat, Séquences sauvegardées, Synthèse en cours, Macros (enchaînement de macros) |
+| Récolte | Récolte & pêche, Planification des PR, objets de collection, Pêche en mer |
+| Félicité insulaire | — |
+| Monde | Carte, Météo, ALÉA, Échoppes, Butin des missions, Butin des monstres, Découvertes |
+| CALENDRIER (groupe) | Alerte, Rappels, Jardinage, Compagnie libre |
+| Quêtes | Journal, Mandats, Événements saisonniers, Peuples alliés, Grandes compagnies |
+| Livraisons | Livraisons spéciales, Commandes spéciales |
+| Missions | Eurêka et Bozja, Donjons sans fond |
+| Gold Saucer | Revue de mode, Triple Triade, Mini Cactpot |
+| Aide | Aide, Lexique, Crédits |
+| Paramètres | Paramètres (Général, Panneaux à côté du jeu, Carte, Suivi et notifications, Données et sources, Avancé ; Débogage en mode développeur), Diagnostics (mode développeur) |
 
 La carte a sa propre fenêtre (`MapViewWindow`), dont le contenu et l'état d'ouverture restent dans `MainWindow.MapView.cs`.
 
@@ -450,8 +502,11 @@ actions du joueur (retrait du drapeau, téléportation, /alarm, macros, tri, imp
 ### Configuration et persistance
 
 - `Configuration` v1 (`Configuration.cs`, C# pur partagé avec les tests ; `Configuration.Dalamud.cs` ajoute `IPluginConfiguration`),
-  enregistrée par `SavePluginConfig`. `MainWindow` écrit les réglages par `SaveSetting`, qui remet l'ancienne valeur si l'enregistrement
-  échoue.
+  enregistrée dans le fichier propre à Tensho `Settings.json` (`SettingsFile`, X-685, 0.1745 ; le `TenshoAssistant.json` de Dalamud est lu
+  une fois au premier chargement, puis laissé tel quel) : écrit en entier par `AtomicFile`, la version d'avant gardée en `.bak`, sous un
+  verrou partagé par les clients du jeu du PC (`FairFileLock`) et fusionné avec le fichier tel qu'il est, si bien que deux clients gardent
+  les changements l'un de l'autre ; un fichier illisible est mis de côté, jamais écrasé. `MainWindow` écrit les réglages par
+  `SaveSetting`, qui remet l'ancienne valeur si l'enregistrement échoue.
 - Contenu : réglages (dont `MapViewSettings`, `Cache`, les interrupteurs des sources de la communauté, `Discovery`) et une partie des
   données de l'utilisateur (alarmes, rappels faits, vaisseaux lus, secteurs débloqués, plans de montage, plans d'équipement et de
   matérias, préréglages, decks, quêtes suivies, favoris, plan de macros, profils et modèles de tri, notes d'objets, liste d'envies,
@@ -461,10 +516,16 @@ actions du joueur (retrait du drapeau, téléportation, /alarm, macros, tri, imp
   `ConfigurationReset.Reset` (`Configuration.cs`) ; l'adresse du webhook Discord tapée est gardée. `ConfigurationReset.Kept` garde les
   données de l'utilisateur et l'état de l'interface. Un test exige que chaque propriété publique soit dans exactement une des deux
   listes : **toute nouvelle propriété de `Configuration` doit être placée dans l'une d'elles**.
-- Fichiers à part dans le dossier de configuration du plugin, jamais touchés par la remise à zéro : `InventoryBank/` (un fichier par
-  personnage, schéma 1, 16 Mio au plus, entrées et conteneurs bornés ; écriture par fichier temporaire puis remplacement, avec `.bak`),
-  `GilJournal/`, `Characters/`, `Discoveries/` (`Discoveries.json`, `Shared/`, `MarketSeen.json` ; avec l'échange GitHub, `github.json` et
-  le jeton `github.token`, protégé pour cet utilisateur Windows par DPAPI), `VoyageHistory.json`, `MyTools.json`, `CraftLists.json`,
+- Les données du joueur en SQLite (X-172, X-173), journal WAL (un arrêt au milieu d'un enregistrement laisse le dernier entier ;
+  l'application de bureau lit pendant que le jeu écrit) : `TenshoData.db` à la racine du dossier de configuration (`TenshoDataDatabase` :
+  journal des gils, progression des hauts faits, historique des voyages, banque et inventaires, niveaux des classes et équipements
+  enregistrés, titres et hauts faits obtenus), et `Discoveries/Discoveries.db` (les découvertes, à soi et partagées). Leurs fichiers d'avant
+  (`GilJournal/`, `InventoryBank/`, `VoyageHistory.json`, `AchievementProgress.json`, `Discoveries.json`…) ne sont plus convertis depuis
+  X-574 (0.1793) : un fichier encore là est laissé de côté, jamais lu.
+- Autres fichiers à part dans le dossier de configuration du plugin, jamais touchés par la remise à zéro : `Characters/` (ce que Tensho a lu
+  en dernier pour chaque personnage), `Discoveries/` (`MarketSeen.json` ; avec l'échange GitHub, `github.json` et le jeton `github.token`,
+  protégé pour cet utilisateur Windows par DPAPI), `ChatHistory/` (seulement si l'historique du chat est activé), `MyTools.json`,
+  `CraftLists.json`, `BeastTeams.json`, `DutyProgress.json`, `OceanVoyage.json`, `GameDataSnapshot.json`, `PlayState.json`,
   `Exports/`, `DataCache-v1/`, `Backups/` (copies zip prises avant de vider le cache ou les découvertes, jeton GitHub exclu) ; en mode
   développeur, `SelfCheckSeen.json` et `PageSweepLast.txt` (voir [SECURITY](../../SECURITY.md)). Les fichiers enregistrés sont écrits par
   `AtomicFile` (fichier temporaire, puis échangé d'un coup).
@@ -478,7 +539,7 @@ actions du joueur (retrait du drapeau, téléportation, /alarm, macros, tri, imp
   = données du jeu + langue + forme de la copie (`CatalogCacheKeys`), jamais la version du plugin.
 - Instantanés par personnage (quêtes, collections) : clé `GameCacheIdentity` (version du plugin + langue + versions des données), donc
   relus après chaque nouvelle version du plugin.
-- Durées par domaine (`CacheArea`, Paramètres › Données), valeurs par défaut depuis la 0.750 (X-02) : Prix 1 j, Quêtes 1 h, Collections
+- Durées par domaine (`CacheArea`, Paramètres › Données et sources), valeurs par défaut depuis la 0.750 (X-02) : Prix 1 j, Quêtes 1 h, Collections
   7 j, Sources « Seulement si absent, ou sur Actualiser », Revue de mode 7 j, Stock importé 1 j (signale seulement l'ancienneté), Calculs
   d'artisanat 7 j, Titres et succès 7 j ; choix 5 min, 1 h, 24 h, 7 j ou « Seulement si absent, ou sur Actualiser ». Relevé complet des
   sources et cadences au moment de l'audit : [https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/evidence/0.246-cache-audit.md](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/evidence/0.246-cache-audit.md).
@@ -540,7 +601,7 @@ LuminaSupplemental (contenus, monstres, ALÉA, entreprises, boutique, objets d'o
 du wiki. « Comment l'obtenir » n'affiche Garland que si aucune autre source n'est connue, et le wiki que si Garland ne connaît rien non
 plus ; mais Garland est interrogé pour presque chaque objet mis en contexte (objet sélectionné, fiche, menus Tensho et du jeu), car les
 outils utiles (`RelevantRoutes` : contenus, monstres) et `SourceLines` (contenus, échanges) le lisent. Garland et le wiki se coupent dans
-Paramètres › Avancé. Les sceaux d'une autre Grande Compagnie que celle du personnage sont écartés (compagnie inconnue = tout affiché). Le
+Paramètres › Données et sources › Sources communautaires. Les sceaux d'une autre Grande Compagnie que celle du personnage sont écartés (compagnie inconnue = tout affiché). Le
 marché est un critère, pas une source. Les lignes sont calculées une fois (`SourceLines`) et affichées dans le menu Tensho comme dans le
 menu de l'inventaire du jeu.
 
@@ -554,7 +615,21 @@ sont dans la langue du plugin. Voir [Localization/README.md](../../src/TenshoAss
 UTC et heure d'Éorzéa.
 
 La compilation et les tests managés ne valident pas le rendu ImGui ni la lecture native : seul l'essai en jeu le fait (état par version :
-[plan global](GLOBAL-PLAN.md), [TESTING](TESTING.md), [CHANGELOG](../../CHANGELOG.md)).
+[plan global](GLOBAL-PLAN.md), [TESTING](TESTING.md), [CHANGELOG](../../CHANGELOG.md)). L'application de bureau dessine toutes les pages sans
+fenêtre à chaque passage de `scripts/Verify.ps1` (`--headless`) : une page qui lève une erreur ou bloque le fait échouer.
+
+### Application de bureau (`src/TenshoAssistant.Desktop`, X-119)
+
+- La `MainWindow` et les pages du plugin lui-même, chargées depuis la DLL du plugin compilé, dans une fenêtre de Windows, jeu fermé
+  (`Host`, `DesktopPages` : chaque page classée telle quelle, avec le lien local, ou en jeu seulement). Données du jeu tirées des fichiers
+  du jeu sur le disque ; données du joueur lues en lecture seule dans les fichiers du plugin (`MainWindow.DesktopData.cs`) ; son numéro est
+  celui du plugin (une seule source, le csproj du plugin).
+- Le lien local (`Link/LocalLink.cs`, compilé dans les deux) : un tube nommé réservé à l'utilisateur Windows courant, à sens unique du
+  plugin vers l'application, coupé par défaut (Paramètres › Avancé) ; il porte de petits états en direct, l'avis d'un fichier enregistré
+  qui a changé (par catégorie, jamais un nom de fichier ni un contenu), les alertes qui ont sonné en jeu et l'état de Tensho ;
+  l'application lit ensuite les fichiers elle-même.
+- Installée et mise à jour depuis la release GitHub du plugin (`DesktopInstaller`, `DesktopUpdate`, SHA-256 vérifié) ; `Plugin.Desktop.cs`
+  et `MainWindow.DesktopInstall.cs` portent le côté du plugin.
 
 ### Coupure en JcJ et en contenu classé (`Competitive/`, DEC-038)
 
