@@ -338,9 +338,8 @@ public sealed partial class Plugin : IDalamudPlugin
             var beastWiki=new Monsters.BeastWikiIndex(dataCache,()=>CommunitySources.Allowed(configuration,SourceUse.WikiBeastmaster));
             registrations.Register(()=>{},beastWiki.Dispose);
             mainWindow.BeastWiki=beastWiki;
-            // X-54 (0.820): the storage windows' cells holding what the lists need.
-            Inventory.StorageHighlightReader? storageHighlight=null;
-            registrations.Register(()=>mainWindow.StorageHighlight=storageHighlight=new Inventory.StorageHighlightReader(framework,gameGui,log,()=>configuration.DeveloperMode,inventory),()=>storageHighlight?.Dispose());
+            // X-153 (0.1897): the inventory family (storage highlight, inventory window, gear sets) in Plugin.Inventory.cs.
+            RegisterStorageHighlight(configuration,framework,gameGui,inventory);
             // X-43 (0.807): the local base of discoveries; X-153 (0.1250): its family in Plugin.Discoveries.cs (store, GitHub exchange, loading).
             var (discoveries,discoveryFolder)=RegisterDiscoveries(pluginInterface);
             mainWindow.MonsterName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.BNpcName>().GetRowOrDefault(id)?.Singular.ExtractText() ?? "";
@@ -689,10 +688,7 @@ public sealed partial class Plugin : IDalamudPlugin
             mainWindow.UseSheetLoaders(data,log);
             // X-153 (0.1417, ninth slice): the ocean fishing family (Plugin.Ocean.cs), at the same place as before.
             RegisterOcean(pluginInterface,configuration,data,framework,client,condition);
-            // 0.388 (user request): position of the game's inventory window, for the sort button drawn above it.
-            Inventory.InventoryWindowReader? inventoryWindow=null;
-            registrations.Register(()=>inventoryWindow=new Inventory.InventoryWindowReader(framework,gameGui,()=>configuration.InventorySortButton,log),()=>inventoryWindow?.Dispose());
-            mainWindow.InventoryWindow=inventoryWindow;
+            RegisterInventoryWindow(configuration,framework,gameGui);
             // g, M-06 (0.376): repair and materia extraction alert (chat and sound with the alarm options), once per crossing.
             Gear.GearWearWatcher? gearWear=null;
             registrations.Register(()=>gearWear=new Gear.GearWearWatcher(framework,client,()=>gear?.Equipped ?? [],()=>configuration.GearWear ?? new(),log){Crossed=(repair,extract,state)=>
@@ -742,10 +738,7 @@ public sealed partial class Plugin : IDalamudPlugin
             Events.FestivalReader? festivals=null;
             registrations.Register(()=>festivals=new Events.FestivalReader(framework,client,data,log),()=>festivals?.Dispose());
             mainWindow.Festivals=()=>festivals;
-            // 0.348 (g, I-10): gear sets read on request for the storage report; stack sizes from the game data.
-            Inventory.GearsetReader? gearsets=null;
-            registrations.Register(()=>gearsets=new Inventory.GearsetReader(framework,player,log),()=>gearsets?.Dispose());
-            mainWindow.Gearsets=()=>gearsets;
+            RegisterGearsets(framework,player);
             // 0.353 (g, I-12): key items (EventItem) by name, from the game data, the list built once.
             (uint Id,string Name,uint Icon)[]? keyItems=null;
             mainWindow.KeyItemSearch=text=>

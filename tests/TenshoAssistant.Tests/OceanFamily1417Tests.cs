@@ -40,7 +40,8 @@ internal static class OceanFamily1417Tests
             var plugin = files.Single(file => file.Name == "Plugin.cs").Text;
             var loaders = plugin.IndexOf("mainWindow.UseSheetLoaders(data,log);",StringComparison.Ordinal);
             var call = plugin.IndexOf("RegisterOcean(",StringComparison.Ordinal);
-            var inventory = plugin.IndexOf("inventoryWindow=new Inventory.InventoryWindowReader(",StringComparison.Ordinal);
+            // X-153 (0.1897): the inventory window is made by its family, called at the same place.
+            var inventory = plugin.IndexOf("RegisterInventoryWindow(configuration,framework,gameGui);",StringComparison.Ordinal);
             Check(loaders > 0 && call > loaders && inventory > call && Count(plugin,@"RegisterOcean\(") == 1,"Plugin.cs calls the family once, where the block stood");
             Check(!Regex.IsMatch(plugin,@"(OceanVoyageReader|PlayStateWriter|IKDSpot|IKDFishParam|OceanVoyageData|voyageWriter)\b"),"Plugin.cs creates none of them");
         }),
