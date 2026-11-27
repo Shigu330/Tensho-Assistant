@@ -20,7 +20,7 @@ Plan first written on 2026-11-05 (then at 0.539) from the review done with the u
 | 7 | Just before 1.0.0: tool lists, documents, help |  | No | Mostly done before phase 6, at the user's request; last review just before 1.0.0 |
 | Then | Version 1.0.0, on the custom repository (no submission, DEC-039) |  |  | When the user decides |
 
-Total before 1.0.0 (phases 1 to 6): 101 points, a count produced by a script from the plan's source.
+Open before 1.0.0: 96 points (893 done), phases 1 to 6, W and X; a count produced by a script from the plan's source.
 <!-- /gen:plan:phases-en -->
 
 **Nothing is planned after 1.0.0 (user's request, 2026-11-09)**: C10, the only point that was there, moved to phase 5. Porting to Dalamud API 16 is not a point of the plan: it is done as soon as Dalamud publishes it, whatever the Tensho version (https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/evidence/0.1009-dalamud-api16-watch.md). The button to show or hide icons on the map already exists (user's report): the request is withdrawn.
@@ -402,9 +402,67 @@ This table is the one list of the pending in-game readings: the test route (step
 
 ## Kept for later
 
-Nothing for now. The "Île de Lunule", kept here on 2026-11-06, moved to phase 5 on 2026-11-09: nothing is planned after 1.0.0 (user's request).
+The open points sorted « later » (a class of the point, not a phase: each stays in its own table above). They remain before 1.0.0: nothing is planned after it (user's request, 2026-11-09). The list is produced by a script from the plan's source.
 
 <!-- gen:plan:later-en -->
+| Phase | Point | Title |
+|---|---|---|
+| 5 | C33 | A single in-game reading session for crafting and gathering, before coding |
+| 5 | C30 | Local record of your catches and personal bite times |
+| 5 | T5 | An in-game reading session for these tools, before coding |
+| 5 | N-04 | N-04, housing lottery |
+| 5 | N-07 | N-07, island resources |
+| 5 | LUNULE | Crescent Isle (Occult Crescent) |
+| 6 | P19 | Map in-game tests still pending |
+| X | X-43 | Local discovery database: record what is within range (monsters and their… |
+| X | X-108 | Request of 2026-11-09: gardening parser to fill the gaps by discovery… |
+| X | X-119 | Follow-up of X-118 (plan 4), steps 1 to 4: 1) application with the game closed… |
+| X | X-134 | Request of 2026-11-11 (grade 3 Thanalan topsoil): gathering help GP plan, items… |
+| X | X-139 | Request of 2026-11-11: PluginUiTest (repository Shigu330/PluginUiTest) shows… |
+| X | X-193 | User request of 2026-11-12 (plugin comparison, K-02, accepted on 11/12)… |
+| X | X-194 | User choice already made (GAPS M-13), found again on 2026-11-12 by the plugin… |
+| X | X-195 | User request of 2026-11-12 (plugin comparison, K-04, accepted on 11/12)… |
+| X | X-198 | User request of 2026-11-12 (plugin comparison, K-07, accepted on 11/12)… |
+| X | X-199 | User request of 2026-11-12 (plugin comparison, K-08, accepted on 11/12): Plots… |
+| X | X-202 | User request of 2026-11-12 (plugin comparison, K-11, accepted on 11/12): Cosmic… |
+| X | X-203 | User request of 2026-11-12 (plugin comparison, K-12, accepted on 11/12)… |
+| X | X-206 | User request of 2026-11-12 (plugin comparison, K-13, accepted on 11/12)… |
+| X | X-208 | User request of 2026-11-12 (plugin comparison, K-16, accepted on 11/12): "My… |
+| X | X-209 | User request of 2026-11-12 (plugin comparison, K-18, accepted on 11/12): import… |
+| X | X-210 | User request of 2026-11-12 (plugin comparison, K-19, accepted on 11/12): ocean… |
+| X | X-214 | User request of 2026-11-12 (plugin comparison, K-24, accepted on 11/12): an… |
+| X | X-227 | User request of 2026-11-12 (plugin comparison, K-17, accepted on 11/12; user's… |
+| X | X-228 | User request of 2026-11-12 (plugin comparison, K-22, accepted on 11/12; user's… |
+| X | X-230 | User request of 2026-11-12 (plugin comparison, K-42, accepted on 11/12; user's… |
+| X | X-231 | User request of 2026-11-12 (plugin comparison, K-43, accepted on 11/12; user's… |
+| X | X-232 | User request of 2026-11-12 (plugin comparison, K-44, accepted on 11/12; user's… |
+| X | X-233 | User request of 2026-11-12 (plugin comparison, K-47, accepted on 11/12; user's… |
+| X | X-234 | User's choice of 2026-11-12 (plugin comparison, section 5: idea declined… |
+| X | X-235 | User's choice of 2026-11-12 (plugin comparison, section 5: idea declined… |
+| X | X-236 | User's choice of 2026-11-12 (plugin comparison, section 5: idea declined… |
+| X | X-237 | User's choice of 2026-11-12 (plugin comparison, section 5: idea declined… |
+| X | X-238 | User's choice of 2026-11-12 (plugin comparison, section 5: idea declined… |
+| X | X-239 | User's choice of 2026-11-12 (plugin comparison, section 5: idea declined… |
+| X | X-240 | User's choice of 2026-11-12 (plugin comparison, section 5: idea declined… |
+| X | X-241 | User's choice of 2026-11-12 (plugin comparison, section 5: idea declined… |
+| X | X-242 | User's choice of 2026-11-12 (plugin comparison, section 5: idea declined… |
+| X | X-243 | User's choice of 2026-11-12 (plugin comparison, section 5: idea declined… |
+| X | X-244 | User's choice of 2026-11-12 (plugin comparison, section 5: idea declined… |
+| X | X-245 | User's choice of 2026-11-12 (plugin comparison, section 5: idea declined… |
+| X | X-246 | User's choice of 2026-11-12 (plugin comparison, section 5: idea declined… |
+| X | X-247 | User's choice of 2026-11-12 (plugin comparison, section 5: idea declined… |
+| X | X-248 | User's choice of 2026-11-12 (plugin comparison, section 5: idea declined… |
+| X | X-297 | User's decision, 14/11 about 1 am (idea box sorting, I-002, comparison with… |
+| X | X-298 | User's decision, 14/11 about 1 am (idea box sorting, I-003, comparison with… |
+| X | X-299 | User's decision, 14/11 about 1 am (idea box sorting, I-004, comparison with… |
+| X | X-300 | User's decision, 14/11 about 1 am (idea box sorting, I-005, comparison with… |
+| X | X-301 | User's decision, 14/11 about 1 am (idea box sorting, I-006, comparison with… |
+| X | X-302 | User's decision, 14/11 about 1 am (idea box sorting, I-007, comparison with… |
+| X | X-303 | User's decision, 14/11 about 1 am (idea box sorting, I-008, comparison with… |
+| X | X-305 | User's decision, 14/11 about 1 am (idea box sorting, I-010, comparison with… |
+| X | X-306 | User's decision, 14/11 about 1 am (idea box sorting, I-011, comparison with… |
+
+54 open points sorted « later », still before 1.0.0 (nothing is planned after it).
 <!-- /gen:plan:later-en -->
 
 ## Dropped at review
@@ -448,7 +506,7 @@ Plan écrit d'abord le 2026-11-05 (alors en 0.539), issu de la revue faite avec 
 | 7 | Juste avant la 1.0.0 : listes d'outils, documents, aide |  | Non | Faite en grande partie avant la phase 6, à la demande de l'utilisateur ; dernière relecture juste avant la 1.0.0 |
 | Ensuite | Version 1.0.0, sur le dépôt personnalisé (pas de soumission, DEC-039) |  |  | Quand l'utilisateur le décide |
 
-Total avant la 1.0.0 (phases 1 à 6) : 101 points, compte produit par script depuis la source du plan.
+Ouverts avant la 1.0.0 : 96 points (893 faits), phases 1 à 6, W et X ; compte produit par script depuis la source du plan.
 <!-- /gen:plan:phases -->
 
 **Rien n'est prévu après la 1.0.0 (demande de l'utilisateur, 2026-11-09)** : C10, seul point qui y était, est passé en phase 5. Le portage à l'API 16 de Dalamud n'est pas un point du plan : il se fait dès que Dalamud la publie, quelle que soit la version de Tensho (https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/evidence/0.1009-dalamud-api16-watch.md). Le bouton pour afficher ou cacher des icônes sur la carte existe déjà (rapport de l'utilisateur) : la demande est retirée.
@@ -830,9 +888,67 @@ Ce tableau est la seule liste des relevés en jeu en attente : le parcours des e
 
 ## Retenu pour plus tard
 
-Rien pour l'instant. L'Île de Lunule, gardée ici le 2026-11-06, est passée en phase 5 le 2026-11-09 : rien n'est prévu après la 1.0.0 (demande de l'utilisateur).
+Les points ouverts rangés « plus tard » (une classe du point, pas une phase : chacun reste dans son tableau plus haut). Ils restent avant la 1.0.0 : rien n'est prévu après (demande de l'utilisateur, 2026-11-09). La liste est produite par script depuis la source du plan.
 
 <!-- gen:plan:later -->
+| Phase | Point | Titre |
+|---|---|---|
+| 5 | C33 | Une seule séance de relevés en jeu pour l'artisanat et la récolte, avant de… |
+| 5 | C30 | Relevé local de vos prises et temps de touche personnels |
+| 5 | T5 | Une séance de relevés en jeu pour ces outils, avant de coder |
+| 5 | N-04 | N-04, loterie immobilière |
+| 5 | N-07 | N-07, ressources de l'île |
+| 5 | LUNULE | Île de Lunule (Croissant occulte) |
+| 6 | P19 | Tests en jeu de la carte encore en attente |
+| X | X-43 | Base locale de découvertes : relever ce qui est à portée (monstres et leurs… |
+| X | X-108 | Demande du 2026-11-09 : parseur du jardinage pour combler les trous par… |
+| X | X-119 | Suite de X-118 (plan 4), étapes 1 à 4 : 1) application jeu fermé, pages de… |
+| X | X-134 | Demande du 2026-11-11 (terreau thanalan 3) : plan de PR de l'aide à la récolte… |
+| X | X-139 | Demande du 2026-11-11 : PluginUiTest (dépôt Shigu330/PluginUiTest) montre le… |
+| X | X-193 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-02, accepté… |
+| X | X-194 | Choix de l'utilisateur déjà fait (GAPS M-13), retrouvé le 2026-11-12 par la… |
+| X | X-195 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-04, accepté… |
+| X | X-198 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-07, accepté… |
+| X | X-199 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-08, accepté… |
+| X | X-202 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-11, accepté… |
+| X | X-203 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-12, accepté… |
+| X | X-206 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-13, accepté… |
+| X | X-208 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-16, accepté… |
+| X | X-209 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-18, accepté… |
+| X | X-210 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-19, accepté… |
+| X | X-214 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-24, accepté… |
+| X | X-227 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-17, accepté… |
+| X | X-228 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-22, accepté… |
+| X | X-230 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-42, accepté… |
+| X | X-231 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-43, accepté… |
+| X | X-232 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-44, accepté… |
+| X | X-233 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-47, accepté… |
+| X | X-234 | Choix de l'utilisateur du 2026-11-12 (comparaison aux plugins, section 5 : idée… |
+| X | X-235 | Choix de l'utilisateur du 2026-11-12 (comparaison aux plugins, section 5 : idée… |
+| X | X-236 | Choix de l'utilisateur du 2026-11-12 (comparaison aux plugins, section 5 : idée… |
+| X | X-237 | Choix de l'utilisateur du 2026-11-12 (comparaison aux plugins, section 5 : idée… |
+| X | X-238 | Choix de l'utilisateur du 2026-11-12 (comparaison aux plugins, section 5 : idée… |
+| X | X-239 | Choix de l'utilisateur du 2026-11-12 (comparaison aux plugins, section 5 : idée… |
+| X | X-240 | Choix de l'utilisateur du 2026-11-12 (comparaison aux plugins, section 5 : idée… |
+| X | X-241 | Choix de l'utilisateur du 2026-11-12 (comparaison aux plugins, section 5 : idée… |
+| X | X-242 | Choix de l'utilisateur du 2026-11-12 (comparaison aux plugins, section 5 : idée… |
+| X | X-243 | Choix de l'utilisateur du 2026-11-12 (comparaison aux plugins, section 5 : idée… |
+| X | X-244 | Choix de l'utilisateur du 2026-11-12 (comparaison aux plugins, section 5 : idée… |
+| X | X-245 | Choix de l'utilisateur du 2026-11-12 (comparaison aux plugins, section 5 : idée… |
+| X | X-246 | Choix de l'utilisateur du 2026-11-12 (comparaison aux plugins, section 5 : idée… |
+| X | X-247 | Choix de l'utilisateur du 2026-11-12 (comparaison aux plugins, section 5 : idée… |
+| X | X-248 | Choix de l'utilisateur du 2026-11-12 (comparaison aux plugins, section 5 : idée… |
+| X | X-297 | Décision de l'utilisateur du 14/11 vers 1 h (tri de la boîte à idées, I-002… |
+| X | X-298 | Décision de l'utilisateur du 14/11 vers 1 h (tri de la boîte à idées, I-003… |
+| X | X-299 | Décision de l'utilisateur du 14/11 vers 1 h (tri de la boîte à idées, I-004… |
+| X | X-300 | Décision de l'utilisateur du 14/11 vers 1 h (tri de la boîte à idées, I-005… |
+| X | X-301 | Décision de l'utilisateur du 14/11 vers 1 h (tri de la boîte à idées, I-006… |
+| X | X-302 | Décision de l'utilisateur du 14/11 vers 1 h (tri de la boîte à idées, I-007… |
+| X | X-303 | Décision de l'utilisateur du 14/11 vers 1 h (tri de la boîte à idées, I-008… |
+| X | X-305 | Décision de l'utilisateur du 14/11 vers 1 h (tri de la boîte à idées, I-010… |
+| X | X-306 | Décision de l'utilisateur du 14/11 vers 1 h (tri de la boîte à idées, I-011… |
+
+54 points ouverts rangés « plus tard », toujours avant la 1.0.0 (rien n'est prévu après).
 <!-- /gen:plan:later -->
 
 ## Écartés à la revue

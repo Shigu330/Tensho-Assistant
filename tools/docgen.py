@@ -122,11 +122,27 @@ PROJECT_WORKING = [
     ("REFERENCES", "verified APIs and sources", "API et sources vérifiées"),
 ]
 WORKING_INTRO = {
-    "en": "Working documents of [project/](project/), changed with almost every version and written in French for now (their English "
-          "translation is planned just before 1.0.0): ",
-    "fr": "Documents de travail de [project/](project/), changés à presque chaque version et écrits en français pour l'instant (leur "
-          "traduction anglaise est prévue juste avant la 1.0.0) : ",
+    "en": "Working documents of [project/](project/), changed with almost every version: ",
+    "fr": "Documents de travail de [project/](project/), changés à presque chaque version : ",
 }
+# X-568 G1: the working documents written in French only (no « French translation below » line), found in the files themselves.
+FRENCH_ONLY = {
+    "en": " Written in French only for now (their English translation is planned just before 1.0.0): {names}; the others are in "
+          "English, then in French.",
+    "fr": " Écrits en français seulement pour l'instant (leur traduction anglaise est prévue juste avant la 1.0.0) : {names} ; les "
+          "autres sont en anglais, puis en français.",
+}
+TRANSLATED_MARK = "Traduction française plus bas"
+
+
+def french_only():
+    """X-568 G1: the working documents of project/ without the line that announces their French half."""
+    out = []
+    for name, _, _ in PROJECT_WORKING:
+        path = ROOT / "docs" / project_link(name)
+        if path.is_file() and TRANSLATED_MARK not in path.read_text(encoding="utf-8")[:2000]:
+            out.append(name)
+    return out
 # Public .md files that are not rows of the index, with the reason.
 INDEX_LEFT_OUT = {
     ".github/pull_request_template.md": "the pull request form, opened by GitHub",
@@ -152,7 +168,9 @@ def index_block(code):
         label = name.rstrip("/") + ("/" if name.endswith("/") else "")
         desc = desc_en if en else desc_fr
         working.append(f"[{label}]({project_link(name)})" + (f" ({desc})" if desc else ""))
-    return "\n".join(rows) + "\n\n" + WORKING_INTRO[code] + ", ".join(working) + "."
+    only = french_only()
+    tail = FRENCH_ONLY[code].format(names=", ".join(only)) if only else ""
+    return "\n".join(rows) + "\n\n" + WORKING_INTRO[code] + ", ".join(working) + "." + tail
 
 
 def git_files(pattern):
@@ -451,6 +469,57 @@ def settings_categories():
     return dict(re.findall(r'\["([\w.]+)"\]="(\w+)"', read_source(SETTINGS_INDEX)))
 
 
+def page_of_files():
+    """X-568 B8: the page of each source file pattern of the page list (« MainWindow.Fashion*.cs » → Fashion), in the list's order."""
+    out = []
+    for line in PAGES.read_text(encoding="utf-8").splitlines():
+        found = re.match(r'\s*new\(Page\.(\w+),', line)
+        files = re.search(r'"([^"]*\.cs[^"]*)"', line)
+        if found and files:
+            out += [(pattern.strip(), found.group(1)) for pattern in files.group(1).split(",") if pattern.strip().endswith(".cs")]
+    return out
+
+
+def page_listed(file):
+    """The page whose source patterns name this file (an exact name first), or None."""
+    import fnmatch
+    exact = [page for pattern, page in page_of_files() if pattern == file]
+    return (exact or [page for pattern, page in page_of_files() if fnmatch.fnmatchcase(file, pattern)] or [None])[0]
+
+
+@functools.lru_cache(maxsize=None)
+def window_words():
+    """Each MainWindow file: (the methods it declares, every word it holds)."""
+    decl = re.compile(r"^[ 	]*(?:(?:private|internal|public|protected|static)[ 	]+)+[\w<>?,.\[\] ]+?[ 	]+(\w+)[ 	]*\(", re.M)
+    keywords = {"readonly", "static", "void", "new", "async", "unsafe", "override", "partial", "operator", "implicit", "explicit"}
+    read = {path.name: path.read_text(encoding="utf-8") for path in sorted((ROOT / "src/TenshoAssistant").glob("MainWindow*.cs"))}
+    declared = {name: set(decl.findall(text)) - keywords for name, text in read.items()}
+    # A method name declared in one file only (an overload or a common name like Section would link every page).
+    count = {}
+    for names in declared.values():
+        for n in names:
+            count[n] = count.get(n, 0) + 1
+    return {name: (frozenset(n for n in declared[name] if count[n] == 1), frozenset(re.findall(r"\w+", text))) for name, text in read.items()}
+
+
+@functools.lru_cache(maxsize=None)
+def pages_of_file(file):
+    """X-568 B8: the pages that draw a file the page list does not name: the files that use one of its methods, one step at a time
+    (up to three); the first step that reaches a listed page gives the answer."""
+    listed = page_listed(file)
+    if listed or file not in window_words():
+        return frozenset([listed] if listed else [])
+    level, seen = {file}, {file}
+    for _ in range(3):
+        methods = frozenset().union(*(window_words()[f][0] for f in level))
+        level = {other for other, (_, words) in window_words().items() if other not in seen and methods & words}
+        seen |= level
+        pages = {page_listed(f) for f in level} - {None}
+        if pages:
+            return frozenset(pages)
+    return frozenset()
+
+
 def settings_rows():
     """[(path or label key, kind, default, places, en text, fr text, has path)] sorted by path."""
     classes, tabs, categories = declarations(), settings_tabs(), settings_categories()
@@ -472,12 +541,14 @@ def settings_rows():
         def one(place):
             tab, page, file, category = place
             if tab:
-                return (f"Settings › {tab} › {category}" if code == "en" else
-                        f"{(text_of(lang, 'PageHelp.SettingsTitle') or 'Paramètres').strip()} › "
+                return (f"{(text_of(lang, 'PageHelp.SettingsTitle') or ('Settings' if code == 'en' else 'Paramètres')).strip()} › "
                         f"{(text_of(lang, 'SettingsSections.' + tab) or tab).strip()} › "
                         f"{(text_of(lang, 'SettingsCategories.' + category) or category).strip()}")
-            title = text_of(lang, f"PageHelp.{page}Title")
-            return f"page {title.strip()}" if title else f"`{file}`"
+            own = text_of(lang, f"PageHelp.{page}Title")
+            titles = [own] if own else sorted(filter(None, (text_of(lang, f"PageHelp.{p}Title") for p in pages_of_file(file))))
+            if not titles:
+                return f"`{file}`"
+            return f"page {titles[0].strip()}" if len(titles) == 1 else "pages " + ", ".join(x.strip() for x in titles)
         return one
     for key in sorted(rows, key=str.lower):
         row = rows[key]
@@ -487,7 +558,7 @@ def settings_rows():
             label = text_of(lang, row["label"]) or row["label"]
             tip = text_of(lang, row["tip"]) if row["tip"] else None
             return f"**{cell(label)}**" + (f" — {cell(tip)}" if tip else "")
-        places = {"en": [where(en, "en")(p) for p in row["places"]], "fr": [where(fr, "fr")(p) for p in row["places"]]}
+        places = {code: list(dict.fromkeys(where(texts_, code)(p) for p in row["places"])) for code, texts_ in (("en", en), ("fr", fr))}
         out.append((key, kind, default, places, texts(en), texts(fr), bool(row["path"])))
     return out
 
