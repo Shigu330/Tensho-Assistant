@@ -19,7 +19,9 @@ internal static class TestTrace1913Tests
         ("Test trace 1913: behaviour: a write that fails stops the trace without throwing; the next lines are dropped, the reason kept (X-892 M4)", () =>
         {
             var stream = new Filling();
-            var trace = new TestTrace(stream);
+            // X-900 (0.1923): the stop is said to a writer of the test, not to the runner's real error output.
+            var said = new StringWriter();
+            var trace = new TestTrace(stream, said);
             trace.Line("BEGIN", "First");
             Check(trace.Failure is null && stream.Length > 0, "the first line written");
             stream.Full = true;
@@ -33,6 +35,7 @@ internal static class TestTrace1913Tests
             Check(thread.Join(TimeSpan.FromSeconds(60)), "the thread ended");
             Check(thrown is null, "no exception out of the trace: " + thrown);
             Check(trace.Failure == "IOException" && stream.Refused == 1, $"stopped at the failed write, the next line not tried: {trace.Failure} {stream.Refused}");
+            Check(said.ToString().Split('\n', StringSplitOptions.RemoveEmptyEntries) is [var stop] && stop.StartsWith("TRACE stopped: IOException", StringComparison.Ordinal), "the stop said once: " + said);
             trace.Dispose();
         }),
         ("Test trace 1913: behaviour: a line after the end of the run (a test thread left behind) is dropped without throwing (X-892 M4)", () =>

@@ -403,12 +403,16 @@ internal sealed class TestTrace : IDisposable
     private readonly object gate = new();
     private readonly StreamWriter writer;
     private readonly Stopwatch clock = Stopwatch.StartNew();
+    private readonly TextWriter report;
     private string? failure;
     public TestTrace(string path) : this(new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.ReadWrite)) { }
-    /// <summary>X-892 M4: the trace on any stream (the behaviour test gives one whose writes fail).</summary>
-    internal TestTrace(Stream stream)
+    /// <summary>X-892 M4: the trace on any stream (the behaviour test gives one whose writes fail). X-900 (0.1923): where its stop is said,
+    /// the error output by default; the behaviour test gives its own writer, or its simulated « not enough space on the disk » reached the
+    /// runner's real error output in every full run (artifacts/tests-errors.txt of Verify, the 0.1919 release) as if the disk were full.</summary>
+    internal TestTrace(Stream stream, TextWriter? report = null)
     {
         writer = new StreamWriter(stream, new System.Text.UTF8Encoding(false)) { AutoFlush = true, NewLine = "\n" };
+        this.report = report ?? Console.Error;
     }
     /// <summary>X-892 M4 (review of 0.1912): why the trace stopped writing (the exception's type), null while it writes.</summary>
     public string? Failure { get { lock (gate) return failure; } }
@@ -427,7 +431,7 @@ internal sealed class TestTrace : IDisposable
             catch (Exception error) when (error is IOException or ObjectDisposedException or UnauthorizedAccessException)
             {
                 failure = error.GetType().Name;
-                Console.Error.WriteLine($"TRACE stopped: {failure} ({error.Message}); the tests go on without it.");
+                report.WriteLine($"TRACE stopped: {failure} ({error.Message}); the tests go on without it.");
             }
         }
     }
