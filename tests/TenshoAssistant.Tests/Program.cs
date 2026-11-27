@@ -935,6 +935,9 @@ var groups = TestRegistry.Groups(tests, typeof(TestRegistry).Assembly);
 // (Verify.ps1, publish.sh, the CI) never passes it.
 groups = GroupFilter.Only(groups, args);
 // X-889 M4 (review of 0.1909): what stops the process during the run, measured (StallMeter, TestRunner.cs), said after the slowest tests.
+// X-889 M4 (0.1912): each test's start and end in a file as they happen, when a sweep under load asks (a stopped process prints nothing).
+using var trace = Environment.GetEnvironmentVariable("TENSHO_TEST_TRACE") is { Length: > 0 } tracePath ? new TestTrace(tracePath) : null;
+ParallelTests.Trace = trace;
 var stalls = StallMeter.Start();
 var run = ParallelTests.Run(groups, Environment.ProcessorCount, Quarantine.Entries, DateOnly.FromDateTime(DateTime.Now), GroupFilter.Full(args));
 stalls.Dispose();

@@ -95,6 +95,10 @@ internal static class ParallelTests
     /// once in 0.1637): a test still running after this long is said hung (FAIL, with its name); the tests after it in its class are said not
     /// run, and the run goes on without its thread.</summary>
     public static readonly TimeSpan HangAfter = TimeSpan.FromMinutes(5);
+    /// <summary>X-889 M4 (0.1912): each test's start and end written to a file as they happen (TENSHO_TEST_TRACE, a sweep under load): a run
+    /// whose whole process stops (27/11 on 0.1911: every thread waiting with no processor, the watch above included, killed after 16 min)
+    /// prints none of its results; the file still says which tests were running.</summary>
+    public static TestTrace? Trace { get; set; }
 
     // X-671: what one thread runs now (its group and test, and since when), read by the watch.
     // X-673 M2 (review of 0.1643): and whether the watch left it behind, decided under the same lock as the start of a test: a thread left
@@ -240,10 +244,12 @@ internal static class ParallelTests
             var started = Stopwatch.GetTimestamp();
             string? error = null;
             string? skipped = null;
+            Trace?.Line("BEGIN", name);
             try { run(); }
             catch (SkipTestException skip) { skipped = skip.Message; }
             catch (Exception failure) { error = failure.ToString(); }
             var seconds = Stopwatch.GetElapsedTime(started).TotalSeconds;
+            Trace?.Line("END", name);
             TestResult result;
             if (skipped is not null) result = new(group.Name, name, false, null, seconds, $"SKIP {name}: {skipped}", true);
             else if (error is not null && held.TryGetValue(name, out var quarantine))
@@ -385,4 +391,23 @@ internal sealed class StallRecord
                 + $"{Seconds(wait)} s (at {Seconds(waitAt)} s; {waitQueued} waiting before it); {wakes} wakes, {probes} probes"
                 + (failure is null ? "." : $"; the meter stopped on {failure}.");
     }
+}
+
+/// <summary>X-889 M4 (0.1912): the trace of a run, one line per test start and end (« seconds thread BEGIN|END name »), written at once (a
+/// stop of the whole process leaves it as it was). Only when TENSHO_TEST_TRACE names the file.</summary>
+internal sealed class TestTrace : IDisposable
+{
+    private readonly object gate = new();
+    private readonly StreamWriter writer;
+    private readonly Stopwatch clock = Stopwatch.StartNew();
+    public TestTrace(string path)
+    {
+        writer = new StreamWriter(new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.ReadWrite), new System.Text.UTF8Encoding(false)) { AutoFlush = true, NewLine = "\n" };
+    }
+    public void Line(string what, string test)
+    {
+        var line = string.Create(System.Globalization.CultureInfo.InvariantCulture, $"{clock.Elapsed.TotalSeconds:0.000} {Environment.CurrentManagedThreadId} {what} {test}");
+        lock (gate) writer.WriteLine(line);
+    }
+    public void Dispose() { lock (gate) writer.Dispose(); }
 }
