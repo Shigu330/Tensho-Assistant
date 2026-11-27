@@ -37,8 +37,8 @@ internal static class PinnedHost1874Tests
                   && !rewrite.Contains("class HostClock",StringComparison.Ordinal) && File.Exists(Path.GetFullPath(Host+"HostClock.cs")),"stamp, clock reads rewritten, HostClock in its own file");
             Check(Read("src/TenshoAssistant.Desktop/Program.cs").Contains("stamp:References.Stamp,clock:References.Clock",StringComparison.Ordinal),"the desktop application names its arguments");
             var readme = Read("tools/PluginUiTest/README.md");
-            Check(readme.Split("\n---\n").All(half=>half.Contains("v0.2.0",StringComparison.Ordinal) && half.Contains("`e52a707`",StringComparison.Ordinal)),"each half gives v0.2.0 and commit e52a707");
-            Check(Read(Host+"PluginUiTest.Host.csproj").Contains("v0.2.0 plus commit e52a707",StringComparison.Ordinal),"the project's comment gives the same");
+            Check(readme.Split("\n---\n").All(half=>half.Contains("v0.2.0",StringComparison.Ordinal) && half.Contains("`602838a`",StringComparison.Ordinal) && half.Contains("`e52a707`",StringComparison.Ordinal)),"each half gives v0.2.0, commit e52a707 and the copy's commit 602838a (X-870)");
+            Check(Read(Host+"PluginUiTest.Host.csproj").Contains("v0.2.0 plus commit 602838a",StringComparison.Ordinal),"the project's comment gives the copy's commit (X-870)");
         }),
     ];
 }

@@ -103,7 +103,8 @@ public sealed class AbsentDataManager:Dalamud.Plugin.Services.IDataManager
     public bool FileExists(string path)=>Absent("FileExists",false);
 }
 
-/// <summary>Work handed to IFramework.RunOnFrameworkThread, RunOnTick or Run: kept, and run by the host when it chooses (0.2.0).</summary>
+/// <summary>Work handed to IFramework.RunOnFrameworkThread, RunOnTick or Run: kept, and run by the host when it chooses (0.2.0), when
+/// <see cref="FrameworkProxy.KeepWork"/> is set.</summary>
 public sealed class FrameworkWork(string api,Delegate work,Type? result,TaskCompletionSource<object?> done)
 {
     public string Api=>api;
@@ -114,15 +115,20 @@ public sealed class FrameworkWork(string api,Delegate work,Type? result,TaskComp
 }
 
 /// <summary>
-/// IFramework stand-in: always on the framework thread; keeps the Update handlers so the host can tick them. Since 0.2.0, the work handed
-/// to RunOnFrameworkThread, RunOnTick and Run is kept in <see cref="Queued"/> (the plugin gets a task that completes when the host runs
-/// it): a plugin that builds its windows there (SimpleTweaks: RunOnFrameworkThread(Initialize)) can then be drawn. The host decides what
-/// runs (the test tool scans each piece of work for game memory first); work never run leaves its task pending, as a game that never ticks.
+/// IFramework stand-in: always on the framework thread; keeps the Update handlers so the host can tick them. The work handed to
+/// RunOnFrameworkThread, RunOnTick and Run is not run by the stand-in. When <see cref="KeepWork"/> is set (the test tool, 0.2.0), it is
+/// kept in <see cref="Queued"/> and the plugin gets a task that completes when the host runs it: a plugin that builds its windows there
+/// (SimpleTweaks: RunOnFrameworkThread(Initialize)) can then be drawn; the host decides what runs (the test tool scans each piece of work
+/// for game memory first), and work never run leaves its task pending, as a game that never ticks. Otherwise (the default, a host that never
+/// runs that work), nothing is kept and the task is already complete, with the default value (0, false, null), as before 0.2.0: a plugin
+/// that waits for it is not held, and the list does not grow.
 /// </summary>
 public class FrameworkProxy:DispatchProxy
 {
     public Dalamud.Plugin.Services.IFramework.OnUpdateDelegate? Handlers;
     public static readonly List<FrameworkWork> Queued=[];
+    /// <summary>Set by a host that runs the work it is handed (the test tool): work kept in <see cref="Queued"/>, tasks pending until run.</summary>
+    public static bool KeepWork;
     public static Dalamud.Plugin.Services.IFramework Create()=>Create<Dalamud.Plugin.Services.IFramework,FrameworkProxy>();
     protected override object? Invoke(MethodInfo? method,object?[]? args)
     {
@@ -132,6 +138,9 @@ public class FrameworkProxy:DispatchProxy
             case "get_IsFrameworkUnloading":return false;
             case "add_Update":Handlers+=(Dalamud.Plugin.Services.IFramework.OnUpdateDelegate)args![0]!;return null;
             case "remove_Update":Handlers-=(Dalamud.Plugin.Services.IFramework.OnUpdateDelegate)args![0]!;return null;
+            case "RunOnFrameworkThread" or "RunOnTick" or "Run" when !KeepWork:
+                AbsentProxy.Note("IFramework."+method.Name);
+                return StandInDefaults.For(method.ReturnType);
             case "RunOnFrameworkThread" or "RunOnTick" or "Run" when args is { Length:>0 } && args[0] is Delegate work:
             {
                 AbsentProxy.Note("IFramework."+method.Name);

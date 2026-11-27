@@ -1,5 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <!-- Pinned copy (X-124) of PluginUiTest v0.2.0 plus commit e52a707 (X-309), from https://github.com/Shigu330/PluginUiTest (the source: change it
+  <!-- Pinned copy (X-124) of PluginUiTest v0.2.0 plus commit 602838a (X-309, X-870), from https://github.com/Shigu330/PluginUiTest (the source: change it
        there first, then copy it back here with the new version and commit; tools/PluginUiTest/README.md).
        X-120: the generic part of drawing a Dalamud plugin's windows without the game (moved out of src/TenshoAssistant.Desktop, X-119):
        where Dalamud and the game data are (DalamudPaths), the run-time resolution of Dalamud's assemblies and of cimgui.dll from the user's

@@ -60,6 +60,24 @@ internal static class Headless
     private static TimeSpan limit=TimeSpan.FromSeconds(60);
     private static void Beat(string what,TimeSpan allowed){lock(Gate){doing=what;since=DateTime.UtcNow;limit=allowed;}}
 
+    /// <summary>X-870: what is wrong with the IFramework stand-in as this application uses it (never running the work), or null.</summary>
+    internal static string? FrameworkCheck()
+    {
+        if(FrameworkProxy.KeepWork)return "FrameworkProxy.KeepWork is set: the work would be kept and never run";
+        int before;lock(FrameworkProxy.Queued)before=FrameworkProxy.Queued.Count;
+        var framework=FrameworkProxy.Create();
+        var ran=0;
+        var plain=framework.RunOnFrameworkThread(()=>{ran++;});
+        var typed=framework.RunOnFrameworkThread(()=>{ran++;return 7;});
+        var tick=framework.RunOnTick(()=>{ran++;});
+        var run=framework.Run(()=>{ran++;});
+        int after;lock(FrameworkProxy.Queued)after=FrameworkProxy.Queued.Count;
+        if(!plain.Wait(TimeSpan.Zero) || !typed.Wait(TimeSpan.Zero) || !tick.Wait(TimeSpan.Zero) || !run.Wait(TimeSpan.Zero))return "a task handed back is still pending";
+        if(typed.Result!=0)return $"RunOnFrameworkThread<int> gave {typed.Result}, not the default value";
+        if(ran!=0)return "the stand-in ran the work";
+        return after!=before ? $"{after-before} piece(s) of work kept in FrameworkProxy.Queued" : null;
+    }
+
     public static int Run(Host host,StatusBar status,string cache,string[] args)
     {
         if(Program.Option(args,"--step=") is { } steps)return Steps(host,steps);
@@ -79,6 +97,10 @@ internal static class Headless
         // X-151 (0.1238): every entry of the typed contract is given by the plugin, with its type (DesktopSurface).
         if(host.SurfaceMissing.Count>0){report.Fail("typed contract: the plugin does not give "+string.Join("; ",host.SurfaceMissing));return 1;}
         Console.WriteLine("PASS typed contract: every entry of DesktopSurface given by the plugin, with its type");
+        // X-870 (0.1875): the application never runs the work a plugin hands to IFramework (RunOnFrameworkThread, RunOnTick, Run): the
+        // stand-in must not keep it, and its task must be complete at once (a class of the plugin that waits for it is not held).
+        if(FrameworkCheck() is { } framework){report.Fail("framework: "+framework);return 1;}
+        Console.WriteLine("PASS framework: work handed to IFramework is not kept by the app's stand-in and its task is already complete");
         var code=-1;
         var worker=new Thread(()=>{try{code=Body(host,status,cache,args,report);}catch(Exception error){report.Fail($"{error.GetType().Name}: {error.Message}");code=1;}}){IsBackground=true,Name="headless"};
         worker.Start();
