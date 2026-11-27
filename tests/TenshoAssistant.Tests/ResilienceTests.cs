@@ -12,7 +12,7 @@ internal static class ResilienceTests
         // Native code is outside the test project: pinned in the source, like the earlier R-14 tests.
         ("Plugin draw: each overlay fails alone, logged once; sheets read at load turn their own feature off",() =>
         {
-            var plugin=Read("Plugin.cs");
+            var plugin=Read("Plugin.cs")+Read("Plugin.Gear.cs");
             var draw=plugin[plugin.IndexOf("private void Draw()",StringComparison.Ordinal)..];
             Check(draw.Contains("try{draw();}") && draw.Contains("brokenOverlays.Add(name);log.Error(error,") && draw.Contains("if(brokenOverlays.Contains(name))continue;"),"isolated");
             foreach(var overlay in new[]{"DrawCraftLogHelper","DrawItemHover","DrawGatheringPanel","DrawFishingPanel","ObserveGarden","WatchPlots","ObserveHuntTrain"})

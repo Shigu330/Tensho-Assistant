@@ -45,7 +45,7 @@ internal static class ServerBarFamily1240Tests
             var plugin = files.Single(file => file.Name == "Plugin.cs").Text;
             var call = plugin.IndexOf("RegisterServerBar(dtrBar,framework,gameGui,player,client,inventory,configuration,localization,()=>currencies?.State,()=>gilWatcher?.State?.Entries,()=>gear?.Equipped ?? []);",StringComparison.Ordinal);
             Check(call > 0 && Count(plugin,@"RegisterServerBar\(") == 1,"Plugin.cs calls the family once");
-            foreach (var service in new[] { "currencies=new Inventory.CurrencyWatcher(","gilWatcher=new Inventory.GilWatcher(","gear=new Gear.GearLoader(","var discord=new Alarms.DiscordNotifier();" })
+            foreach (var service in new[] { "currencies=new Inventory.CurrencyWatcher(","gilWatcher=new Inventory.GilWatcher(","var (gear,gameGearsets,graceWatcher)=RegisterGear(","var discord=new Alarms.DiscordNotifier();" })
                 Check(plugin.IndexOf(service,StringComparison.Ordinal) is > 0 and var made && made < call,"after what it shows (released before it): " + service);
             Check(plugin.Contains("(\"AlarmBar\",()=>alarmBar?.Invoke()?.DrawTooltip()),",StringComparison.Ordinal) && plugin.Contains("(\"GilBar\",()=>gilBar?.Invoke()?.DrawTooltip()),",StringComparison.Ordinal),"tooltips drawn as before");
         }),

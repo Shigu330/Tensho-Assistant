@@ -75,7 +75,7 @@ internal static class GearPlanSets593Tests
         }),
         ("0.585: job levels leave out the sheet's empty rows; the gear page's label comes before its list",() =>
         {
-            Check(Read("Plugin.cs").Contains("Where(row=>row.ExpArrayIndex>=0 && !row.Name.IsEmpty)"),"rows 44 and 45 of ClassJob have no name, and share the first level slot");
+            Check(Read("Plugin.Gear.cs").Contains("Where(row=>row.ExpArrayIndex>=0 && !row.Name.IsEmpty)"),"rows 44 and 45 of ClassJob have no name, and share the first level slot");
             var gear=Read("MainWindow.Gear.cs");
             Check(gear.IndexOf("ImGui.TextUnformatted(localization.Get(\"Gear.PlanFor\"))")<gear.IndexOf("ImGui.BeginCombo(\"###GearJob\""),"label first");
         }),

@@ -88,7 +88,7 @@ internal static class Grace1760Tests
             Check(watcher.Contains("if(changed)save();", StringComparison.Ordinal) && watcher.Contains("all[character]=next", StringComparison.Ordinal), "saved per character when it changes");
             var config = Read("src/TenshoAssistant/Configuration.cs");
             Check(config.Contains("public Dictionary<ulong,List<TenshoAssistant.Gear.GraceCount>>? GraceCounts { get; set; }", StringComparison.Ordinal) && TenshoAssistant.ConfigurationReset.Kept.Contains("GraceCounts"), "the player's data, kept by « reset all »");
-            var plugin = Read("src/TenshoAssistant/Plugin.cs");
+            var plugin = Read("src/TenshoAssistant/Plugin.cs") + Read("src/TenshoAssistant/Plugin.Gear.cs");
             Check(plugin.Contains("graceWatcher=new Gear.GraceWatcher(", StringComparison.Ordinal) && plugin.Contains("()=>graceWatcher?.Dispose()", StringComparison.Ordinal) && plugin.Contains("mainWindow.GraceSource=()=>graceWatcher?.Shown;", StringComparison.Ordinal), "registered");
             var page = Read("src/TenshoAssistant/MainWindow.JobProgress.cs");
             Check(page.Contains("if(boosted==0 || index+1<rows.Count && ManualGrace.StatusFor(rows[index+1].Job)==boosted)continue;", StringComparison.Ordinal) && page.Contains("if(grace.Status==boosted)DrawGrace(grace);", StringComparison.Ordinal), "under the last job it boosts");

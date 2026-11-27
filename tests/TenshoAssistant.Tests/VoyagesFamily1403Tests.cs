@@ -41,7 +41,7 @@ internal static class VoyagesFamily1403Tests
             var plugin = files.Single(file => file.Name == "Plugin.cs").Text;
             var pop = plugin.IndexOf("registrations.Register(()=>client.CfPop+=OnDutyPop,()=>client.CfPop-=OnDutyPop);",StringComparison.Ordinal);
             var call = plugin.IndexOf("RegisterVoyages(",StringComparison.Ordinal);
-            var gear = plugin.IndexOf("registrations.Register(()=>gear=new Gear.GearLoader(",StringComparison.Ordinal);
+            var gear = plugin.IndexOf("var (gear,gameGearsets,graceWatcher)=RegisterGear(",StringComparison.Ordinal);
             Check(pop > 0 && call > pop && gear > call && Count(plugin,@"RegisterVoyages\(") == 1,"Plugin.cs calls the family once, where the block stood");
             Check(!Regex.IsMatch(plugin,@"FreeCompany\.(VoyageWatcher|AirshipVoyageTable|SubmarineVoyageProbe|VoyageHistoryStore)\b"),"Plugin.cs creates none of them");
         }),
