@@ -40,7 +40,9 @@ internal static class SRankKills1232Tests
             Check(watcher.Contains("message.LogMessageId!=ItemGains.DefeatMessage") && watcher.Contains("ItemGains.DefeatedByMe(") && watcher.Contains("ItemGains.Corpse(")
                   && watcher.Contains("if(!SRankKills.AnyIn(client.TerritoryType))return;"),"own defeats, matched to a corpse, only where a mark counts");
             Check(Source("src/TenshoAssistant/Configuration.cs").Contains("\"GearPlans\", \"SRankKills\","),"cleared with the player's data");
-            Check(Source("src/TenshoAssistant/Plugin.cs").Contains("Hunting.SRankKills.Add(configuration.SRankKills ??= [],keys))SaveTimed(\"S rank kills\")"),"saved on a counted kill");
+            // X-153 (0.1896): the hunting family saves through the constructor's SaveTimed, passed in.
+            Check(Source("src/TenshoAssistant/Plugin.Hunting.cs").Contains("Hunting.SRankKills.Add(configuration.SRankKills ??= [],keys))save();")
+                && Source("src/TenshoAssistant/Plugin.cs").Contains("RegisterSRankKills(configuration,framework,client,objects,chat,()=>SaveTimed(\"S rank kills\"));"),"saved on a counted kill");
             var page=Source("src/TenshoAssistant/MainWindow.SRankConditions.cs");
             Check(page.Contains("if(SRankKills.Counted(mark))DrawSRankKills(mark);") && page.Contains("DesktopEditBegin();"),"page lines, clear greyed in the desktop application");
         }),

@@ -78,7 +78,7 @@ internal static class HuntTests
             Check(HuntingLog.Killed(entry,0,new HuntSlot(2,counts)) == 3 && HuntingLog.Killed(entry,1,new HuntSlot(2,counts)) == 1
                 && HuntingLog.Done(entry,new HuntSlot(2,counts)) == false && HuntingLog.Done(entry,null) is null,"current rank from memory; not read = unknown");
             Check(Read("Hunting/HuntingLogReader.Dalamud.cs").Contains("MonsterNoteManager.Instance()",StringComparison.Ordinal)
-                && Read("Plugin.cs").Contains("()=>huntReader?.Dispose()",StringComparison.Ordinal),"reader guarded and disposed");
+                && Read("Plugin.Hunting.cs").Contains("()=>huntReader?.Dispose()",StringComparison.Ordinal),"reader guarded and disposed (X-153, 0.1896: by the hunting family)");
             Check(File.Exists(Path.GetFullPath("docs/evidence/0.364-hunting-log.md")),"evidence");
         }),
         // From HuntingLogCompany393Tests: 0.393 (user reports): the hunting log shows only the character's own Grand Company log; French name « Bestiaire » (not « chasse »).

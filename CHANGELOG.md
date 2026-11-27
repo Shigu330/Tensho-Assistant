@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1896.0
+- Plan global, X-153 : Branchement des services de Plugin.cs par famille (X-153, revue GPT du 11/11) : famille de la chasse. Le compte des monstres vaincus pour les rangs S et la lecture du carnet de chasse passent de Plugin.cs au nouveau Plugin.Hunting.cs : chaque bloc déplacé tel quel, appelé à l'endroit où il était, l'ordre des branchements gardé ; l'enregistrement des rangs S est passé en paramètre. Nouveau test `HuntingFamily1896Tests` : un seul chemin d'installation et un seul de libération pour chacun, tous dans Plugin.Hunting.cs ; Plugin.cs n'en crée aucun et appelle chacun une fois, à sa place d'avant. Rien de visible ne change.
+- Tests : HuntingFamily1896Tests. Verify.ps1 (agent) : 4195/4195, 0 avertissement, 0 erreur ; DLL 0.1896.0.0. Non validé en jeu.
+### English
+- Wiring of Plugin.cs's services by family (X-153, GPT review of 11/11): the hunting family. The S rank kills watcher and the hunting log reader move from Plugin.cs to the new Plugin.Hunting.cs: each block moved as it was, called where it stood, the order of the registrations kept; the S rank kills' save is passed in. New test `HuntingFamily1896Tests`: one install path and one release path for each, all in Plugin.Hunting.cs; Plugin.cs creates none and calls each once, at its place of before. Nothing visible changes.
+
 ## 0.1895.0
 - Plan global, X-153 : Branchement des services de Plugin.cs par famille (X-153, revue GPT du 11/11) : famille des contenus de terrain. Les rangs des FATE partagés et l'état du Croissant occulte passent de Plugin.cs au nouveau Plugin.Fields.cs : chaque bloc déplacé tel quel, appelé à l'endroit où il était, l'ordre des branchements gardé ; l'enregistrement des FATE partagés est passé en paramètre. Nouveau test `FieldsFamily1895Tests` : un seul chemin d'installation et un seul de libération pour chacun, tous dans Plugin.Fields.cs ; Plugin.cs n'en crée aucun et appelle chacun une fois, à sa place d'avant ; comportement : l'enregistrement passé à la famille est celui de l'appelant, appelé par le service seulement. Rien de visible ne change.
 - Tests : FieldsFamily1895Tests. Verify.ps1 (agent) : 4192/4192, 0 avertissement, 0 erreur ; DLL 0.1895.0.0. Non validé en jeu.

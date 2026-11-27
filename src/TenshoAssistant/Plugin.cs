@@ -646,12 +646,8 @@ public sealed partial class Plugin : IDalamudPlugin
             mainWindow.DesynthLevelOf=job=>desynthLevels?.Of(job);
             // X-223 (0.1233): the region of the home world's data centre (WorldRegionGroup row), for the Jumbo Cactpot's draw time.
             mainWindow.HomeRegion=()=>player.HomeWorld.ValueNullable?.DataCenter.ValueNullable?.Region.RowId ?? 0;
-            // X-222 (0.1232): the player's own kills for the S ranks counted by kills, from the game's « You defeat » message.
-            Hunting.SRankKillWatcher? srankKills=null;
-            registrations.Register(()=>srankKills=new Hunting.SRankKillWatcher(framework,client,objects,chat){Killed=(monster,territory)=>
-            {
-                if(Hunting.SRankKills.KeysFor(monster,territory) is { Count:>0 } keys && Hunting.SRankKills.Add(configuration.SRankKills ??= [],keys))SaveTimed("S rank kills");
-            }},()=>srankKills?.Dispose());
+            // X-153 (0.1896): the hunting family (S rank kills, hunting log) in Plugin.Hunting.cs.
+            RegisterSRankKills(configuration,framework,client,objects,chat,()=>SaveTimed("S rank kills"));
             // X-218 (0.1228): each character's job levels and gear sets kept in TenshoData.db at login and when they change (Storage › Characters).
             var characterJobs=new Character.CharacterJobsData(tenshoData);
             mainWindow.CharacterJobs=characterJobs;
@@ -903,11 +899,7 @@ public sealed partial class Plugin : IDalamudPlugin
                 try{_=huntEntries.Value.Count;_=englishMonsters.Value.Count;}
                 catch(Exception error){log.Warning(error,"Monster sheets not read ahead (perhaps after a game update); they are read when first asked.");}
             });
-            Hunting.HuntingLogReader? huntReader=null;
-            registrations.Register(()=>huntReader=new Hunting.HuntingLogReader(framework,client,log),()=>huntReader?.Dispose());
-            mainWindow.HuntGrandCompany=()=>huntReader?.GrandCompany;
-            mainWindow.HuntSlots=()=>{huntReader?.Want();return huntReader?.State;};
-            mainWindow.HuntUnavailable=()=>huntReader?.Unavailable==true;
+            RegisterHuntingLog(framework,client);
             mainWindow.LeveProgress=()=>{leveReader?.Want();return leveReader?.State;};
             mainWindow.LeveProgressUnavailable=()=>leveReader?.Unavailable==true;
             // g, C-05 (0.362): glamour dresser outfits (MirageStoreSetItem: outfit item → pieces), read once.
