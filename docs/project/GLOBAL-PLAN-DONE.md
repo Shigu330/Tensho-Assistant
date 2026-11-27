@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (889 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (891 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -451,6 +451,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-304 | User's decision, 14/11 about 1 am (idea box sorting, I-009, comparison with… | Done in 0.1392 |
 | X-307 | User's decision, 14/11 about 1 am (comparison with four plugins, section 2)… | Done in 0.1409.0 |
 | X-308 | User's decision, 14/11 about 2:45 am (« Yes, tools first », idea I-012)… | Done in 0.1301.0 |
+| X-309 | Relay 52: the pinned copy of PluginUiTest.Host (tools/PluginUiTest) diverges… | Done in 0.1874.0 |
 | X-310 | Master's finding, 14/11 about 3:40 am (CI of a9df76e « 0.1308.0 · suite », run… | Done in 0.1309 |
 | X-311 | Tooling (master's finding, 14/11 about 3:45 am): plan.py add takes the id… | Done in 0.1335.0 |
 | X-312 | Master's finding, 14/11 morning (test T-0.1241-2, Eureka and Bozja › Weather… | Done in 0.1316 |
@@ -954,6 +955,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-862 | Review of block 0.1865 to 0.1866 (review 0.1866, 23/11), pre-existing before… | Done in 0.1867.0 |
 | X-863 | Review of block 0.1867 to 0.1868 (review 0.1868, 23/11), minor M1: M1 in… | Done in 0.1869.0 |
 | X-864 | Review of block 0.1867 to 0.1868 (review 0.1868, 23/11), pre-existing before… | Done in 0.1870.0 |
+| X-865 | Review of block 6e7e453f..f6053d89 (26/11), M1, tool: the reviewer's brief tool… | Done in 0.1873.0 |
 | X-866 | Review of block 0.1869 to 0.1870 (review 0.1870, 27/11), minor M1, M2: M1 in… | Done in 0.1871.0 |
 | X-867 | Review  (review 0.1871, 27/11), minor M1, M3: M1 in… | Done in 0.1872.0 |
 | X-868 | Review  (review 0.1871, 27/11), pre-existing before the block M2: M2 in… | Done in 0.1873.0 |
@@ -962,7 +964,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (889 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (891 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1411,6 +1413,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-304 | Décision de l'utilisateur du 14/11 vers 1 h (tri de la boîte à idées, I-009… | Fait en 0.1392 |
 | X-307 | Décision de l'utilisateur du 14/11 vers 1 h (comparaison avec quatre plugins… | Fait en 0.1409.0 |
 | X-308 | Décision de l'utilisateur du 14/11 vers 2 h 45 (« Oui, outils d'abord », idée… | Fait en 0.1301.0 |
+| X-309 | Relais 52 : la copie figée de PluginUiTest.Host (tools/PluginUiTest) diverge de… | Fait en 0.1874.0 |
 | X-310 | Constat de la maître du 14/11 vers 3 h 40 (CI de a9df76e « 0.1308.0 · suite »… | Fait en 0.1309 |
 | X-311 | Outillage (constat de la maître du 14/11 vers 3 h 45) : plan.py add prend… | Fait en 0.1335.0 |
 | X-312 | Constat de la maître du 14/11 au matin (essai T-0.1241-2, page Eurêka et Bozja… | Fait en 0.1316 |
@@ -1914,6 +1917,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-862 | Relecture du bloc 0.1865 à 0.1866 (relecture 0.1866, 23/11), déjà là avant le… | Fait en 0.1867.0 |
 | X-863 | Relecture du bloc 0.1867 à 0.1868 (relecture 0.1868, 23/11), mineurs M1 : M1… | Fait en 0.1869.0 |
 | X-864 | Relecture du bloc 0.1867 à 0.1868 (relecture 0.1868, 23/11), déjà là avant le… | Fait en 0.1870.0 |
+| X-865 | Relecture du bloc 6e7e453f..f6053d89 (26/11), M1, outil : l'outil des consignes… | Fait en 0.1873.0 |
 | X-866 | Relecture du bloc 0.1869 à 0.1870 (relecture 0.1870, 27/11), mineurs M1, M2… | Fait en 0.1871.0 |
 | X-867 | Relecture  (relecture 0.1871, 27/11), mineurs M1, M3 : M1 : Handled laisse… | Fait en 0.1872.0 |
 | X-868 | Relecture  (relecture 0.1871, 27/11), déjà là avant le bloc M2 : M2 : Un… | Fait en 0.1873.0 |
