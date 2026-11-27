@@ -92,6 +92,10 @@ On the project's GitHub, in Discussions › Q&A (github.com/Shigu330/Tensho-Assi
 
 Use « Report a problem or help » on the Help page, then « Send on GitHub… »: the exact text is shown first. With GitHub connected (World › Discoveries), the issue leaves in one click; otherwise the GitHub form opens in your browser, filled in.
 
+## Why does Tensho ask me to connect GitHub again?
+
+GitHub is connected in World › Discoveries, to share your discoveries (and to send a report in one click). Tensho renews the sign-in by itself and keeps it on this PC, protected by Windows. Connect again with « Connect GitHub » after « Disconnect », if you revoked the authorisation on github.com › Settings › Applications, or when the exchange says the sign-in expired and could not be renewed. Known limit: if the disk refuses to write the renewed sign-in (disk full, file locked, no rights) at the very moment the game crashes, the sign-in left on this PC is the old one, which GitHub no longer accepts: connect GitHub again. Nothing else is lost: your discoveries stay on this PC and leave at the next exchange.
+
 ## How can I help translate Tensho?
 
 In « Report a problem or help » on the Help page, choose « A translation »: it opens the GitHub form. To translate a whole language, the steps are in src/TenshoAssistant/Localization/README.md on GitHub.
@@ -221,6 +225,10 @@ Sur le GitHub du projet, dans Discussions › Q&A (github.com/Shigu330/Tensho-As
 ## Quelque chose ne va pas.
 
 Utilisez « Signaler un problème ou aider » de la page Aide, puis « Envoyer sur GitHub… » : le texte exact est montré d'abord. Si GitHub est connecté (Monde › Découvertes), le ticket part en un clic ; sinon le formulaire GitHub s'ouvre rempli dans votre navigateur.
+
+## Pourquoi Tensho me demande-t-il de connecter GitHub à nouveau ?
+
+GitHub se connecte dans Monde › Découvertes, pour partager vos découvertes (et envoyer un signalement en un clic). Tensho renouvelle seul la connexion et la garde sur ce PC, protégée par Windows. Connectez-vous à nouveau avec « Connecter GitHub » après « Déconnecter », si vous avez retiré l'autorisation sur github.com › Settings › Applications, ou quand l'échange dit que la connexion a expiré et n'a pas pu être renouvelée. Limite connue : si le disque refuse d'écrire la connexion renouvelée (disque plein, fichier verrouillé, pas de droits) au moment même où le jeu plante, la connexion restée sur ce PC est l'ancienne, que GitHub n'accepte plus : connectez GitHub à nouveau. Rien d'autre n'est perdu : vos découvertes restent sur ce PC et partent au prochain échange.
 
 ## Comment aider à traduire Tensho ?
 

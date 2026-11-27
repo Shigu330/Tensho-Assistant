@@ -41,6 +41,9 @@ public static class Faq
         new("Official"),
         new("Ask"),
         new("Report"),
+        // X-893 (0.1914, D-239): why GitHub asks to be connected again, with the known limit of a renewed sign-in the disk refused to
+        // write while the game crashed.
+        new("GitHubSignIn", "Discoveries"),
         new("Translate"),
         new("Wishlist", "Wishlist"),
         // X-292 (0.1291): « old » prices after Ctrl+Alt (essay of 13/11).
