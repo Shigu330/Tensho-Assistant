@@ -56,7 +56,7 @@ internal static class Tooltips913Tests
             Check(Source("Alarms/AlarmDtrEntry.Dalamud.cs").Contains("TooltipScope.UnderBox(bounds,configuration.ServerBarTooltipAbove)",StringComparison.Ordinal)
                 && Source("Alarms/ReminderDtrEntry.Dalamud.cs").Contains("TooltipScope.UnderBox(bounds,configuration.ServerBarTooltipAbove)",StringComparison.Ordinal),"server bar tooltips placed by one helper");
             var log=Source("MainWindow.CraftLog.cs");
-            Check(log.Contains("HelpMarkerText(help);",StringComparison.Ordinal) && !log.Contains("TextDisabled(\"(?)\")",StringComparison.Ordinal),"craft log help marker");
+            Check(log.Contains("ImGui.SameLine();DrawHelpIcon();",StringComparison.Ordinal) && !log.Contains("TextDisabled(\"(?)\")",StringComparison.Ordinal),"craft log help marker");
             Check(Source("MainWindow.DutyFinder.cs").Contains("HelpMarker(\"DutyUi.Source\");",StringComparison.Ordinal),"duty finder help marker");
             var map=Source("MainWindow.MapView.cs");
             Check(map.Contains("Tip(key+\"Help\");",StringComparison.Ordinal) && map.Contains("if(localization.Has(key+\"Help\"))Tip(key+\"Help\");",StringComparison.Ordinal),"map area and setting rows: help also when greyed");

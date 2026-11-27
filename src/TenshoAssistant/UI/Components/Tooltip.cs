@@ -42,13 +42,8 @@ internal sealed partial class MainWindow
         Tip(key);
     }
 
-    // The same marker for a help text already built (formatted or made of several parts).
-    private static void HelpMarkerText(string text)
-    {
-        DrawHelpIcon();
-        TipText(text);
-    }
-
+    // The bare « info » icon. X-880 (0.1891): a help text built of several parts follows it behind its guard,
+    // « DrawHelpIcon();if(TipHovered())TipText(…) » (HelpMarkerText took that text built, at each frame).
     private static void DrawHelpIcon()
     {
         ImGui.PushFont(UiBuilder.IconFont);

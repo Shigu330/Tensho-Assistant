@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 // X-879 (0.1890, review of 0.1889, M1): the ratchet reads the argument written inside the TipText call only. Its limit: any name
 // passes as a ready text, so a text formatted in a local variable or a parameter just before the call is not seen (DrawGardenCrossNote
 // took a formatted text as a parameter until 0.1890). Such a text is the author's and the reviewer's to guard; the case titles say so.
+// X-880 (0.1891): such names are now traced one step back by TipTextNames1891Tests (a local assigned before, a parameter its callers fill).
 internal static class TipText1889Tests
 {
     private static void Check(bool value, string message) { if (!value) throw new Exception(message); }

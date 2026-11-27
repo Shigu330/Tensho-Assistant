@@ -14,16 +14,16 @@ internal sealed partial class MainWindow
 
     /// <summary>
     /// One gauge: its title, its dial filled to <paramref name="amount"/> out of <paramref name="max"/>, its value as text in the middle.
-    /// <paramref name="watchAt"/> and <paramref name="problemAt"/>: Tensho's rule for this value, null when it has none. Its help on hover
-    /// or focus; true when it was clicked.
+    /// <paramref name="watchAt"/> and <paramref name="problemAt"/>: Tensho's rule for this value, null when it has none. True when it was
+    /// clicked. Its help is the caller's, right after: « if(TipHovered())TipText(…) » (its last item is the gauge's button), so a formatted
+    /// help is built only on hover (X-880).
     /// </summary>
-    private bool Gauge(string id,string title,string value,double? amount,double max,double? watchAt,double? problemAt,string tip,bool chosen=false)
+    private bool Gauge(string id,string title,string value,double? amount,double max,double? watchAt,double? problemAt,bool chosen=false)
     {
         var width=GaugeMath.BaseWidth*Dalamud.Interface.Utility.ImGuiHelpers.GlobalScale;
         var origin=ImGui.GetCursorScreenPos();
         var (centre,radius,thickness,size)=GaugeMath.Layout(origin,width,ImGui.GetTextLineHeight());
         var clicked=ImGui.InvisibleButton("##Gauge"+id,size);
-        TipText(tip);
         var draw=ImGui.GetWindowDrawList();
         var ruled=watchAt is not null || problemAt is not null;
         var colour=ruled ? LevelColour(GaugeMath.Zone(amount,watchAt,problemAt)):Accent;

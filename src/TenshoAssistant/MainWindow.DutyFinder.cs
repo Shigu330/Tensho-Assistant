@@ -82,7 +82,7 @@ internal sealed partial class MainWindow
         if(refreshHovered)WrappedTooltip(localization.Get(SourceOn(SourceUse.GarlandDutyLoot) ? "DutyFinder.RefreshTip":"Advanced.SourceOffTip"));
         ImGui.SameLine();
         if(state.Document is { HasRewards:true, HasFights:true, HasCoffers:true })HelpMarker("DutyUi.Source");
-        else HelpMarkerText(localization.Get("DutyUi.Source")+"\n"+localization.Get("DutyUi.Partial"));
+        else{DrawHelpIcon();if(TipHovered())TipText(localization.Get("DutyUi.Source")+"\n"+localization.Get("DutyUi.Partial"));}
         if(DutyDocument(state,true) is not { } document)return;
         if(lumina?.State.Data?.ForDuty(duty.DutyId) is { Count:>0 })ImGui.TextDisabled(localization.Get("DutyFinder.Lumina"));
         var view=DutyFinderViewOf(document);

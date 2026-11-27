@@ -120,8 +120,12 @@ internal sealed partial class MainWindow
                 CraftLogSection(localization.Get("CraftLogUi.SectionTarget"));
                 DrawCraftLogTarget(aimed);
             }
-            CraftLogSection(localization.Get("CraftLogUi.SectionResult"),localization.Format("CraftLogUi.Assumptions",context.StartingQuality.ToString("N0",Numbers))
+            // X-880 (0.1891): the section's help is formatted only while its marker is hovered.
+            CraftLogTitle(localization.Get("CraftLogUi.SectionResult"));
+            ImGui.SameLine();DrawHelpIcon();
+            if(TipHovered())TipText(localization.Format("CraftLogUi.Assumptions",context.StartingQuality.ToString("N0",Numbers))
                 +(context.Recipe?.Simulation?.Collectable==true ? localization.Get("CraftLogUi.CollectableHelp"):localization.Get("CraftLogUi.NoHq"))+"\n"+localization.Get("CraftLogUi.Objective"));
+            ImGui.Separator();
             var state=craftLogSession.State;
             if(state.Result is { } solved)
             {
@@ -225,15 +229,16 @@ internal sealed partial class MainWindow
         }
         finally{ImGui.PopID();}
     }
-    private void CraftLogSection(string title,string? help=null)
+    private void CraftLogSection(string title)
+    {
+        CraftLogTitle(title);
+        ImGui.Separator();
+    }
+    // A section's title alone: a section with a help marker puts it after the title, its help built only on hover (X-880, 0.1891).
+    private static void CraftLogTitle(string title)
     {
         ImGui.Spacing();
         TenshoAssistant.UI.UiComponents.SubTitle(title);
-        if(help is not null)
-        {
-            ImGui.SameLine();HelpMarkerText(help);
-        }
-        ImGui.Separator();
     }
     private void DrawCraftLogTitle(RecipeDefinition recipe)
     {

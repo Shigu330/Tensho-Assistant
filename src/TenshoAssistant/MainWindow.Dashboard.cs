@@ -159,23 +159,24 @@ internal sealed partial class MainWindow
         bool Chosen(string name)=>!allCurves && dashboardCurve==name;
         var memoryTop=UI.GaugeMath.NiceMax(history.Series(sample=>sample.HeapMb).Max() ?? view.MemoryMb ?? 0,500);
         Next();
-        Pick("Memory",Gauge("Memory",localization.Get("Dashboard.GaugeMemory"),view.MemoryMb is { } mb ? Mb(mb):"—",view.MemoryMb,memoryTop,null,null,
-            localization.Format("Dashboard.GaugeMemoryTip",Number(memoryTop,"N0")),Chosen("Memory")));
+        // X-880 (0.1891): a gauge's help is formatted only on hover, after the gauge (its last item is the gauge's button).
+        Pick("Memory",Gauge("Memory",localization.Get("Dashboard.GaugeMemory"),view.MemoryMb is { } mb ? Mb(mb):"—",view.MemoryMb,memoryTop,null,null,Chosen("Memory")));
+        if(TipHovered())TipText(localization.Format("Dashboard.GaugeMemoryTip",Number(memoryTop,"N0")));
         Next();
-        Pick("Page",Gauge("Page",localization.Get("Dashboard.GaugePage"),view.PageMs is { } page ? Ms(page):"—",view.PageMs,HealthHistoryScales.FrameMs,HealthBoard.SlowPageMs,null,
-            view.PageName is { } slowest ? localization.Format("Dashboard.GaugePageTip",slowest):localization.Get("Dashboard.GaugePageTipDesktop"),Chosen("Page")));
+        Pick("Page",Gauge("Page",localization.Get("Dashboard.GaugePage"),view.PageMs is { } page ? Ms(page):"—",view.PageMs,HealthHistoryScales.FrameMs,HealthBoard.SlowPageMs,null,Chosen("Page")));
+        if(TipHovered())TipText(view.PageName is { } slowest ? localization.Format("Dashboard.GaugePageTip",slowest):localization.Get("Dashboard.GaugePageTipDesktop"));
         if(view.FrameAvgMs is { } frame)
         {
             Next();
-            Pick("Frame",Gauge("Frame",localization.Get("Dashboard.GaugeFrame"),Ms(frame),frame,HealthHistoryScales.FrameMs,null,null,
-                localization.Format("Dashboard.GaugeFrameTip",view.FrameP95Ms is { } bound ? "≤ "+Number(bound,"0.##"):"> 100"),Chosen("Frame")));
+            Pick("Frame",Gauge("Frame",localization.Get("Dashboard.GaugeFrame"),Ms(frame),frame,HealthHistoryScales.FrameMs,null,null,Chosen("Frame")));
+            if(TipHovered())TipText(localization.Format("Dashboard.GaugeFrameTip",view.FrameP95Ms is { } bound ? "≤ "+Number(bound,"0.##"):"> 100"));
         }
         var rate=history.LastPerMinute(sample=>sample.Requests);
         var rates=history.PerMinute(sample=>sample.Requests);
         var rateTop=UI.GaugeMath.NiceMax(rates.Max() ?? rate ?? 0,10);
         Next();
-        Pick("Requests",Gauge("Requests",localization.Get("Dashboard.GaugeRequests"),rate is { } perMinute ? Number(perMinute,"0.#"):"—",rate,rateTop,null,null,
-            localization.Format("Dashboard.GaugeRequestsTip",view.RequestsTotal),Chosen("Requests")));
+        Pick("Requests",Gauge("Requests",localization.Get("Dashboard.GaugeRequests"),rate is { } perMinute ? Number(perMinute,"0.#"):"—",rate,rateTop,null,null,Chosen("Requests")));
+        if(TipHovered())TipText(localization.Format("Dashboard.GaugeRequestsTip",view.RequestsTotal));
         // The counters on their own line, under the gauges.
         onLine=0;
         Next();StatTile(localization.Get("Dashboard.TileWrites"),view.WritesFailed.ToString("N0",Numbers),view.WritesFailed>0 ? HealthLevel.Problem:HealthLevel.Ok,localization.Get("Dashboard.TileWritesTip"));
