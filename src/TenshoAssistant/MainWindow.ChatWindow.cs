@@ -1312,15 +1312,23 @@ internal sealed partial class MainWindow
 
     /// <summary>X-564 (0.1633): the methods the chat's first frame compiled, named in the log 2 s later (the runtime's events come late), then
     /// the listener let go; off the game's thread.</summary>
+    /// <remarks>X-897 (review of 0.1916 M2): the listener is owned by the window meanwhile (<see cref="chatFrameNames"/>): the window's
+    /// Dispose lets it go at once when the plugin unloads within the 2 s, and the later work then names nothing (it used to run after the
+    /// unload, with nobody owning it).</remarks>
     private void LogChatFrameJit(Diagnostics.JitNames names,long thread)
     {
+        var held=new Diagnostics.Held<Diagnostics.JitNames>(names);
+        chatFrameNames=held;
         _=Task.Delay(2000).ContinueWith(_=>
         {
-            try{log.Information("Chat window: methods compiled on the game's thread in its first frame with lines (X-564){0}: {1}.",names.Heard(thread) ? "":" (window not heard whole)",string.Join(", ",names.Names(thread)) is { Length:>0 } list ? list:"none");}
+            if(held.Take() is not { } taken)return;
+            try{log.Information("Chat window: methods compiled on the game's thread in its first frame with lines (X-564){0}: {1}.",taken.Heard(thread) ? "":" (window not heard whole)",string.Join(", ",taken.Names(thread)) is { Length:>0 } list ? list:"none");}
             catch(Exception error){log.Warning("Chat window: the first frame's compilations could not be named: {0}",error.Message);}
-            finally{names.Dispose();}
+            finally{taken.Dispose();}
         },TaskScheduler.Default);
     }
+    // X-897: the chat's listener waiting for its later naming, let go by the window's Dispose when still there.
+    private Diagnostics.Held<Diagnostics.JitNames>? chatFrameNames;
 
     // X-558 (0.1775): the next tab not shown to take its messages (ChatLoading.RefreshOrder), the frames of the first minute after the load,
     // and this frame's refresh time for them.

@@ -70,7 +70,9 @@ internal static class ChatFrameJit1633Tests
         {
             var chat=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.ChatWindow.cs"));
             Check(chat.Contains("var names=developerMode ? Diagnostics.JitNames.Open():null;",StringComparison.Ordinal),"developer mode only");
-            Check(chat.Contains("_=Task.Delay(2000).ContinueWith(",StringComparison.Ordinal) && chat.Contains("finally{names.Dispose();}",StringComparison.Ordinal),"later, then let go");
+            // X-897 (review of 0.1916 M2): owned by the window meanwhile, let go once (by the later work or by the window's Dispose).
+            Check(chat.Contains("_=Task.Delay(2000).ContinueWith(",StringComparison.Ordinal) && chat.Contains("if(held.Take() is not { } taken)return;",StringComparison.Ordinal)
+                && chat.Contains("finally{taken.Dispose();}",StringComparison.Ordinal),"later, then let go");
         }),
     ];
 }
