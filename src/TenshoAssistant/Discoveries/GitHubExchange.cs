@@ -94,7 +94,12 @@ public sealed class GitHubExchange : IDisposable
     // The secrets are written under their own gate (never after a Disconnect removed them); a write that failed is tried again (the pair stays in
     // memory). A renewal runs under a lock file shared by every client of this profile, not tied to the plugin's stop.
     private int generation,workGeneration;private bool secretsUnsaved;private Task? refreshing;
+    // X-883 (0.1904): the work running (connect, exchange, report), which Dispose waits for a little: its last writes (github.json,
+    // github-merged.json after an upload the unload stopped) used to land after Dispose returned, while the folder could be going away.
+    private Task? running;
     private readonly object secretsGate=new();
+    /// <summary>X-883: the longest time Dispose waits for the work running (a renewal in flight first) before it closes the client.</summary>
+    internal static readonly TimeSpan UnloadWait=TimeSpan.FromSeconds(5);
     /// <summary>X-181: the longest wait for the other client's renewal (beyond the renewal's own deadline).</summary>
     internal TimeSpan LockWait { get; init; }=TimeSpan.FromSeconds(45);
     internal static readonly TimeSpan RefreshDeadline=TimeSpan.FromSeconds(30);
@@ -165,7 +170,7 @@ public sealed class GitHubExchange : IDisposable
             busy=true;workGeneration=generation;
             if(report)reportMessage=null;else{message=null;tried=clock();if(exchange)meta.Tried=tried;}
         }
-        _=Task.Run(async()=>
+        var task=Task.Run(async()=>
         {
             ExchangeMessage result;
             try{result=await work().ConfigureAwait(false);}
@@ -183,6 +188,7 @@ public sealed class GitHubExchange : IDisposable
             }
             lock(gate){if(report)reportMessage=result;else message=result;busy=false;userCode=null;}
         });
+        lock(gate)running=task;
         return true;
     }
 
@@ -245,8 +251,9 @@ public sealed class GitHubExchange : IDisposable
         var until=DateTime.UtcNow+LockWait;
         while(true)
         {
+            // X-883 (0.1904): the wait ends at the plugin's stop (no renewal asked yet: nothing to keep), so Dispose is not held by it.
             try{return new FileStream(LockPath,FileMode.OpenOrCreate,FileAccess.ReadWrite,FileShare.None);}
-            catch(IOException) when(DateTime.UtcNow<until){await Task.Delay(50).ConfigureAwait(false);}
+            catch(IOException) when(DateTime.UtcNow<until){await Task.Delay(50,stop.Token).ConfigureAwait(false);}
         }
     }
 
@@ -677,8 +684,9 @@ public sealed class GitHubExchange : IDisposable
         var until=DateTime.UtcNow+LockWait;
         while(true)
         {
+            // X-883 (0.1904): the wait ends at the plugin's stop (nothing of the rotation done yet), so Dispose is not held by it.
             try{return new FileStream(RotationLockPath,FileMode.OpenOrCreate,FileAccess.ReadWrite,FileShare.None);}
-            catch(IOException) when(DateTime.UtcNow<until){await Task.Delay(50).ConfigureAwait(false);}
+            catch(IOException) when(DateTime.UtcNow<until){await Task.Delay(50,stop.Token).ConfigureAwait(false);}
         }
     }
 
@@ -842,12 +850,22 @@ public sealed class GitHubExchange : IDisposable
     }
 
     /// <summary>X-181 (0.1171, night review N8): a renewal in flight is given a few seconds to finish and be kept before the client closes.</summary>
+    /// <remarks>X-883 (0.1904, review of 0.1903 M1): then the work running is given the rest of those seconds to end (stopped, it ends at once
+    /// and writes what it notes before Dispose returns, never after). A renewed pair the files still refuse (written once more after a short
+    /// wait) is said in the log: GitHub ended the old refresh token, so at the next start the player is asked to connect again.</remarks>
     public void Dispose()
     {
         stop.Cancel();
-        Task? pending;lock(gate)pending=refreshing;
-        try{pending?.Wait(TimeSpan.FromSeconds(5));}catch(AggregateException){}
-        WriteSecrets();
+        var waited=System.Diagnostics.Stopwatch.StartNew();
+        Task? pending,work;lock(gate){pending=refreshing;work=running;}
+        try{pending?.Wait(UnloadWait);}catch(AggregateException){}
+        var left=UnloadWait-waited.Elapsed;
+        if(left>TimeSpan.Zero)try{work?.Wait(left);}catch(AggregateException){}
+        if(!WriteSecrets())
+        {
+            Thread.Sleep(250);
+            if(!WriteSecrets())Log?.Invoke("Discoveries: the renewed GitHub sign-in could not be written before the plugin closed; the old one has ended, so the Discoveries page will ask to connect again.");
+        }
         client.Dispose();
     }
 }
