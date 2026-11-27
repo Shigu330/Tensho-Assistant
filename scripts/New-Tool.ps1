@@ -6,7 +6,8 @@
     the Page enum, the list of pages (MainWindow.Pages.cs; with -Parent, a tab of that family with its Tab and About), a stop of the guide's
     visit (Guide/GuideFlow.cs), the desktop application's kind « AsIs » (DesktopPages.cs), the help of its « ? » and the tests. The Home
     page's list of tools is produced from the list of pages and its help. The skeleton passes the tests as it is (NewTool1615Tests runs it
-    on a copy). It changes no version and commits nothing. Review the result, then follow "Adding a page" in CONTRIBUTING.md.
+    on a copy). Its folder gets a row in the module map of docs/project/ARCHITECTURE.md, in both halves (X-872: a code folder without a
+    row fails the tests). It changes no version and commits nothing. Review the result, then follow "Adding a page" in CONTRIBUTING.md.
 .EXAMPLE
     .\scripts\New-Tool.ps1 -Name RetainerNotes -Category Objects -LabelEn "Retainer notes" -LabelFr "Notes de servants" -DryRun
 .EXAMPLE
@@ -29,6 +30,8 @@ $src=Join-Path $root 'src/TenshoAssistant'
 $tests=Join-Path $root 'tests/TenshoAssistant.Tests'
 if($Name -cnotmatch '^[A-Z][A-Za-z0-9]{2,39}$'){throw "The name must be in PascalCase, 3 to 40 letters or digits: '$Name'."}
 foreach($label in $LabelEn,$LabelFr){if([string]::IsNullOrWhiteSpace($label) -or $label.Length -gt 40){throw "A label must have 1 to 40 characters: '$label'."}}
+# The labels go into a table row of ARCHITECTURE.md: no column separator, no code mark.
+foreach($label in $LabelEn,$LabelFr){if($label.Contains('|') -or $label.Contains('`')){throw "A label must not contain '|' nor a backtick: '$label'."}}
 
 function Read-Text([string]$path){
     $text=[IO.File]::ReadAllText($path)
@@ -70,6 +73,21 @@ $desktopPath=Join-Path $root 'src/TenshoAssistant.Desktop/DesktopPages.cs'
 $desktop=Read-Text $desktopPath
 $desktopAnchor="`n    ];`n`n    /// <summary>The page's kind, or null for a page that is not classified yet.</summary>"
 if(-not $desktop.Text.Contains($desktopAnchor)){throw 'Anchor not found in DesktopPages.cs (the end of the AsIs list).'}
+# X-872 (0.1880): every code folder of the plugin is a row of the module map of ARCHITECTURE.md, in both halves (ArchitectureMap1879Tests).
+# The new folder's row goes before the row of UI/ in each half. A copy without the document (NewTool1615Tests) is left as it is.
+$architecturePath=Join-Path $root 'docs/project/ARCHITECTURE.md'
+$architecture=if(Test-Path $architecturePath){Read-Text $architecturePath}else{$null}
+$mapAnchor="`n"+'| `UI/` |'
+if($architecture){
+    $half=$architecture.Text.IndexOf("`n---`n",[StringComparison]::Ordinal)
+    if($half -lt 0){throw 'ARCHITECTURE.md has no French half (the line ---).'}
+    $architectureHalves=@($architecture.Text.Substring(0,$half),$architecture.Text.Substring($half))
+    foreach($part in $architectureHalves){
+        $first=$part.IndexOf($mapAnchor,[StringComparison]::Ordinal)
+        if($first -lt 0 -or $part.IndexOf($mapAnchor,$first+1,[StringComparison]::Ordinal) -ge 0){throw 'ARCHITECTURE.md: the row of UI/ must be in each half once (the module map).'}
+        if($part.Contains("`n| ``$Name/`` |")){throw "ARCHITECTURE.md already has a row for $Name/."}
+    }
+}
 
 $changes=@(
     "create  src/TenshoAssistant/MainWindow.$Name.cs",
@@ -80,6 +98,7 @@ $changes=@(
     "change  src/TenshoAssistant/Guide/GuideFlow.cs (a stop of the guide's visit, for every player)",
     "change  src/TenshoAssistant.Desktop/DesktopPages.cs (kind AsIs: drawn from the plugin's services alone)",
     "change  src/TenshoAssistant/Localization/Languages/en.json and fr.json (Navigation.$Name, ${Name}Ui, PageHelp)",
+    "change  docs/project/ARCHITECTURE.md (a row of the module map for $Name/, in both halves: describe the folder)",
     "change  tests/TenshoAssistant.Tests/TenshoAssistant.Tests.csproj (the test class is found by itself: Program.cs unchanged)"
 )
 $changes | ForEach-Object {Write-Host $_}
@@ -153,6 +172,13 @@ Write-Text (Join-Path $src 'MainWindow.Pages.cs') $pagesText $list.Crlf
 Write-Text $guidePath (Replace-Once $guide.Text $guideAnchor "new(`"$Name`"), $guideAnchor" 'GuideFlow.cs') $guide.Crlf
 # Desktop application: AsIs (the skeleton reads nothing from the game); NeedsLink when the page calls a game-link class, InGame when it stays in the game.
 Write-Text $desktopPath (Replace-Once $desktop.Text $desktopAnchor "`n        `"$Name`",$desktopAnchor" 'DesktopPages.cs') $desktop.Crlf
+# Module map of ARCHITECTURE.md: one row for the folder in each half, to be described by the contributor.
+if($architecture){
+    $rowEn="`n| ``$Name/`` | ${LabelEn}: the page ``MainWindow.$Name.cs`` and its pure model (``${Name}Model``); say here what it does and what it reads |"
+    $rowFr="`n| ``$Name/`` | ${LabelFr} : la page ``MainWindow.$Name.cs`` et son modèle pur (``${Name}Model``) ; dites ici ce qu'elle fait et ce qu'elle lit |"
+    $mapped=(Replace-Once $architectureHalves[0] $mapAnchor "$rowEn$mapAnchor" 'ARCHITECTURE.md (English)')+(Replace-Once $architectureHalves[1] $mapAnchor "$rowFr$mapAnchor" 'ARCHITECTURE.md (French)')
+    Write-Text $architecturePath $mapped $architecture.Crlf
+}
 # Texts
 $texts=@{
     en=@{Label=$LabelEn;Title=$LabelEn;Help='Describe this tool in one sentence.';Count='{0} rows';Start='Say how to start.';Empty='Say what to do if it stays empty.'}

@@ -141,7 +141,9 @@ Discuss the idea first with the « Tool proposal » issue form. Then, from the r
   `MainWindow.Pages.cs`; with `-Parent <Page>`, the page is a tab of that family (its `Tab` and `About`, no title of its own);
 - a stop of the guide's visit for every player (`Guide/GuideFlow.cs`) and the kind `AsIs` in the desktop application
   (`DesktopPages.cs`): review both. The Home page's list of tools takes the page from the list of pages and its help; README's table
-  of pages is produced by `tools/docgen.py write --blocks`, which the script runs when Python is there.
+  of pages is produced by `tools/docgen.py write --blocks`, which the script runs when Python is there;
+- a row for its folder `<Name>/` in the module map of `docs/project/ARCHITECTURE.md`, in both halves (the tests refuse a code folder
+  without one): replace its text with what the folder holds.
 
 It changes no version and commits nothing. The skeleton passes the tests as it is (`NewTool1615Tests` runs the script on a copy). Then
 follow the list below: the tests refuse a page that misses one of its places.
@@ -405,7 +407,9 @@ Discutez d'abord de l'idée avec le formulaire de ticket « Tool proposal ». Pu
   `MainWindow.Pages.cs` ; avec `-Parent <Page>`, la page est un onglet de cette famille (son `Tab` et son `About`, sans titre à elle) ;
 - un arrêt de la visite du guide pour tous les joueurs (`Guide/GuideFlow.cs`) et le genre `AsIs` dans l'application de bureau
   (`DesktopPages.cs`) : à revoir tous les deux. La liste des outils de l'accueil prend la page dans la liste des pages et son aide ; le
-  tableau des pages du README est produit par `tools/docgen.py write --blocks`, que le script lance quand Python est là.
+  tableau des pages du README est produit par `tools/docgen.py write --blocks`, que le script lance quand Python est là ;
+- une ligne pour son dossier `<Name>/` dans la carte des modules de `docs/project/ARCHITECTURE.md`, dans les deux moitiés (les tests
+  refusent un dossier de code sans la sienne) : remplacez son texte par ce que contient le dossier.
 
 Il ne change aucune version et ne commite rien. Le squelette passe les tests tel quel (`NewTool1615Tests` lance le script sur une copie).
 Suivez ensuite la liste ci-dessous : les tests refusent une page à qui manque l'une de ses places.
