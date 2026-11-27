@@ -41,7 +41,7 @@ internal static class GearFamily1888Tests
             Check(!Regex.IsMatch(plugin, @"new Gear\.(GearLoader|GameGearsetReader|GraceWatcher)\("), "Plugin.cs creates none of them");
             var call = plugin.IndexOf("var (gear,gameGearsets,graceWatcher)=RegisterGear(configuration,data,framework,client,player,objects,chat,()=>SaveTimed(\"grace\"));", StringComparison.Ordinal);
             Check(call > 0 && Count(plugin, @"RegisterGear\(") == 1, "Plugin.cs calls the family once");
-            Check(call > plugin.IndexOf("RegisterVoyages(", StringComparison.Ordinal) && call < plugin.IndexOf("registrations.Register(()=>sharedFates=new Fields.SharedFateReader(", StringComparison.Ordinal),
+            Check(call > plugin.IndexOf("RegisterVoyages(", StringComparison.Ordinal) && call < plugin.IndexOf("RegisterSharedFates(configuration,framework,client,player,gameGui,", StringComparison.Ordinal),
                 "where the services were made: after the voyages, before the shared FATEs");
             Check(plugin.Contains("mainWindow.GraceSource=()=>graceWatcher?.Shown;", StringComparison.Ordinal) && plugin.Contains("mainWindow.EquippedGear=()=>gear?.Equipped ?? [];", StringComparison.Ordinal)
                 && plugin.Contains("if(gameGearsets is not null)gameGearsets.Copied=read=>", StringComparison.Ordinal), "the plugin's later wiring reads the three handed back");

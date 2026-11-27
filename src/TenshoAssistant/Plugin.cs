@@ -635,10 +635,8 @@ public sealed partial class Plugin : IDalamudPlugin
             RegisterVoyages(pluginInterface,configuration,data,framework,client,tenshoData,()=>SaveTimed("voyages"));
             // X-153 (0.1888): the gear family (gear loader, the game's gear sets and job levels, the manuals' Grace) in Plugin.Gear.cs.
             var (gear,gameGearsets,graceWatcher)=RegisterGear(configuration,data,framework,client,player,objects,chat,()=>SaveTimed("grace"));
-            // X-213 (0.1781, the user's request of 12/11, K-23): the shared FATE ranks, read when the player opens the game's Shared FATE window, per character.
-            Fields.SharedFateReader? sharedFates=null;
-            registrations.Register(()=>sharedFates=new Fields.SharedFateReader(framework,client,player,gameGui,log,()=>configuration.SharedFates??=[],()=>SaveTimed("shared FATEs")),()=>sharedFates?.Dispose());
-            mainWindow.SharedFatesNow=()=>sharedFates?.Shown;
+            // X-153 (0.1895): the field content family (shared FATE ranks, Occult Crescent) in Plugin.Fields.cs.
+            RegisterSharedFates(configuration,framework,client,player,gameGui,()=>SaveTimed("shared FATEs"));
             mainWindow.GraceSource=()=>graceWatcher?.Shown;
             // X-197 (0.1761): an item's desynthesis (Item sheet) and your desynthesis levels (PlayerState, read on the framework thread).
             mainWindow.ItemDesynthOf=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Item>().GetRowOrDefault(id) is { } desynthItem
@@ -983,11 +981,7 @@ public sealed partial class Plugin : IDalamudPlugin
             // X-92 (0.972): what is new in the game's sheets since the last load (log and self-check).
             var gameDataCheck=Diagnostics.GameDataWatch.Start(data,Path.Combine(pluginInterface.GetPluginConfigDirectory(),"GameDataSnapshot.json"),log,gameDataCancel.Token);
             mainWindow.GameDataCheck=()=>gameDataCheck;
-            // X-188 (0.1176): the Occult Crescent's state, read on the island (the field content page shows the phantom jobs).
-            Fields.OccultCrescentReader? occultReader=null;
-            registrations.Register(()=>occultReader=new Fields.OccultCrescentReader(framework,log),()=>occultReader?.Dispose());
-            mainWindow.OccultStateRead=()=>occultReader?.State;
-            mainWindow.OccultOnIsland=()=>occultReader?.OnIsland==true;
+            RegisterOccultCrescent(framework);
             // W-11 (0.714): the Grand Companies, read when the page opens and on the player's click.
             mainWindow.GcFeminine=()=>framework.RunOnFrameworkThread(GrandCompanies.GcReader.Feminine);
             mainWindow.ReadGc=rows=>framework.RunOnFrameworkThread(()=>

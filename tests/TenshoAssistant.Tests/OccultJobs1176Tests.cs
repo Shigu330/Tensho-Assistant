@@ -48,7 +48,8 @@ internal static class OccultJobs1176Tests
                 && loader.Contains("new(Label(16607),Label(16611),Label(16608),Label(16618))", StringComparison.Ordinal), "sheets and Addon words");
             var page = Read("src/TenshoAssistant/MainWindow.FieldContent.cs");
             Check(page.Contains("tabs.Add((\"Occult\",island.Name,()=>DrawFieldOccult(catalog.OccultJobs,labels)));", StringComparison.Ordinal), "the tab under the island's name");
-            Check(Read("src/TenshoAssistant/Plugin.cs").Contains("mainWindow.OccultStateRead=()=>occultReader?.State;", StringComparison.Ordinal), "the state given to the page");
+            // X-153 (0.1895): given by the field content family.
+            Check(Read("src/TenshoAssistant/Plugin.Fields.cs").Contains("mainWindow.OccultStateRead=()=>occultReader?.State;", StringComparison.Ordinal), "the state given to the page");
             Check(File.Exists(Path.GetFullPath("docs/evidence/0.1176-occult-jobs.md")), "evidence");
         }),
     ];

@@ -83,7 +83,9 @@ internal static class SharedFate1781Tests
                 && reader.Contains("if(handle.IsNull || !handle.IsReady || !handle.IsVisible){stamped=false;return;}", StringComparison.Ordinal), "the window open, or nothing read");
             Check(reader.Contains("seen.Add(new(zone.TerritoryTypeId,zone.CurrentRank,zone.MaxRank,zone.FateProgress,zone.NeededFates));", StringComparison.Ordinal), "the agent's fields, read only");
             Check(reader.Contains("all[character]=merged;", StringComparison.Ordinal) && reader.Contains("save();", StringComparison.Ordinal) && reader.Contains("CompetitiveGate.Add(framework,OnUpdate);", StringComparison.Ordinal), "per character, saved, cut in competitive content");
-            Check(Read("src/TenshoAssistant/Plugin.cs").Contains("new Fields.SharedFateReader(framework,client,player,gameGui,log,()=>configuration.SharedFates??=[],()=>SaveTimed(\"shared FATEs\"))", StringComparison.Ordinal), "wired");
+            // X-153 (0.1895): made by the field content family, its save passed in by the plugin's constructor.
+            Check(Read("src/TenshoAssistant/Plugin.Fields.cs").Contains("new Fields.SharedFateReader(framework,client,player,gameGui,log,()=>configuration.SharedFates??=[],save)", StringComparison.Ordinal)
+                && Read("src/TenshoAssistant/Plugin.cs").Contains("RegisterSharedFates(configuration,framework,client,player,gameGui,()=>SaveTimed(\"shared FATEs\"));", StringComparison.Ordinal), "wired");
             Check(Read("src/TenshoAssistant/Configuration.cs").Contains("\"SharedFates\",", StringComparison.Ordinal), "the player's data, kept by « reset all »");
             Check(Read("src/TenshoAssistant/MainWindow.Fates.cs").Contains("DrawSharedFates();", StringComparison.Ordinal)
                 && Read("src/TenshoAssistant/MainWindow.SheetLoaders.cs").Contains("SharedFatesLoad=()=>Read(\"Shared FATE sheets\",()=>Fields.SharedFateLoader.Read(data));", StringComparison.Ordinal), "the section on the FATE page, the sheets on both sides");

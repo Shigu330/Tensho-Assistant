@@ -50,7 +50,8 @@ internal static class OccultPanel1178Tests
             Check(Read("src/TenshoAssistant/MainWindow.TrackerWindow.cs").Contains("new(this,OccultPanelDefinition)", StringComparison.Ordinal), "the panel is a PanelWindow");
             Check(Read("src/TenshoAssistant/Fields/FieldBoard.Dalamud.cs").Contains("GetExcelSheet<MKDData>()", StringComparison.Ordinal), "coins from MKDData");
             Check(new TenshoAssistant.Configuration().OccultPanel, "on by default");
-            Check(Read("src/TenshoAssistant/Plugin.cs").Contains("mainWindow.OccultOnIsland=()=>occultReader?.OnIsland==true;", StringComparison.Ordinal), "the reader gives the page whether the island is there");
+            // X-153 (0.1895): given by the field content family.
+            Check(Read("src/TenshoAssistant/Plugin.Fields.cs").Contains("mainWindow.OccultOnIsland=()=>occultReader?.OnIsland==true;", StringComparison.Ordinal), "the reader gives the page whether the island is there");
             Check(File.Exists(Path.GetFullPath("docs/evidence/0.1178-occult-panel.md")), "evidence");
         }),
     ];
