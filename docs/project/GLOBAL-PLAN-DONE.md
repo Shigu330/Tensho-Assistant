@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (897 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (898 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -965,12 +965,13 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-872 | CI red since 0.1879 (4fda210a, 16ac189b; job « New tool skeleton passes Verify… | Done in 0.1880.0 |
 | X-873 | Review of block 0.1877 to 0.1879 (review 0.1879, 27/11), I1: finding in… | Done in 0.1880.0 |
 | X-874 | Review of block 0.1877 to 0.1879 (review 0.1879, 27/11), pre-existing before… | Done in 0.1881.0 |
+| X-875 | Review of block 0.1880 to 0.1881 (review 0.1881, 27/11), pre-existing before… | Done in 0.1882.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (897 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (898 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1933,3 +1934,4 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-872 | CI rouge depuis 0.1879 (4fda210a, 16ac189b ; job « New tool skeleton passes… | Fait en 0.1880.0 |
 | X-873 | Relecture du bloc 0.1877 à 0.1879 (relecture 0.1879, 27/11), I1 : Le nouveau… | Fait en 0.1880.0 |
 | X-874 | Relecture du bloc 0.1877 à 0.1879 (relecture 0.1879, 27/11), déjà là avant le… | Fait en 0.1881.0 |
+| X-875 | Relecture du bloc 0.1880 à 0.1881 (relecture 0.1881, 27/11), déjà là avant le… | Fait en 0.1882.0 |

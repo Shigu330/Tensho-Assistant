@@ -369,7 +369,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [x119-desktop-app.md](x119-desktop-app.md) | `src/TenshoAssistant.Desktop/Program.cs`, `src/TenshoAssistant.Desktop/TenshoAssistant.Desktop.csproj`, `tools/README.md` | `docs/evidence/x118-desktop-probe.md`, `docs/evidence/x120-plugin-ui-test.md` |
 | [x119-desktop-link.md](x119-desktop-link.md) | `src/TenshoAssistant/Link/LocalLink.cs`, `src/TenshoAssistant/Plugin.Desktop.cs` | `SECURITY.md` |
 | [x119-desktop-weather.png](x119-desktop-weather.png) | — | `docs/evidence/x119-desktop-app.md` |
-| [x120-plugin-ui-test.md](x120-plugin-ui-test.md) | `tests/TenshoAssistant.Tests/PinnedHost1876Tests.cs`, `tests/TenshoAssistant.Tests/PluginUiTest1032Tests.cs`, `tools/README.md` | `CHANGELOG.md` |
+| [x120-plugin-ui-test.md](x120-plugin-ui-test.md) | `tests/TenshoAssistant.Tests/PinnedHost1876Tests.cs`, `tests/TenshoAssistant.Tests/PluginUiTest1032Tests.cs`, `tools/README.md` | `docs/changelog/CHANGELOG-0.1800-0.1899.md` |
 | [x121-desktop-update.md](x121-desktop-update.md) | `src/TenshoAssistant.Desktop/DesktopUpdate.cs` | — |
 | [x126-desktop-install.md](x126-desktop-install.md) | `src/TenshoAssistant/Plugin.Desktop.cs` | — |
 | [x158-highbridge-window.md](x158-highbridge-window.md) | `src/TenshoAssistant/Maps/VistaWindow.cs`, `tests/TenshoAssistant.Tests/VistaWindow1128Tests.cs` | — |

@@ -51,7 +51,13 @@ repris dans la ligne « Tests » de chaque entrée du [CHANGELOG](../../CHANGELO
 Contrôles de base à refaire après un changement de cycle de vie : rechargement/déchargement répété sans double callback ni commande
 orpheline ; préférence « ouvrir au chargement » respectée ; la carte du jeu (touche M) revient normale une fois le plugin déchargé.
 
-### Essais en jeu à faire (liste au 2026-11-02, DLL 0.315.0.0)
+### Essais en jeu (liste produite le 2026-11-27, version 0.1882.0)
+
+<!-- q:public -->
+_In English: this page is the author's in-game test list, in French only. Produced on 2026-11-27 for version 0.1882.0: 506 tests done, 592 open, 8 could not be tried, 2 failed; the boxes of these tests follow that count. 183 other ticked boxes come from before the list was kept as data and are not counted._
+
+Compte de la source des essais le 2026-11-27 (version 0.1882.0) : 506 faits, 592 ouverts, 8 pas pu, 2 en échec ; les cases de ces essais suivent ce compte. 183 autres cases cochées viennent d'avant la source (essais rapportés avant qu'elle existe, gardés tels quels) : elles ne comptent pas.
+<!-- /q:public -->
 
 Parcours de la campagne de la phase 6, les mêmes essais rangés par activité : [TESTING-ROUTE.md](TESTING-ROUTE.md) (2026-11-09).
 
@@ -1403,10 +1409,10 @@ Une étape impossible (pas de compagnie, pas de sous-marin…) se rapporte « no
 
 - [ ] (0.1161) Découvertes › échange GitHub : un joueur déjà connecté voit « Tensho se connecte maintenant à GitHub par son application GitHub… » et se reconnecte ; la page d'autorisation de GitHub nomme l'application de Tensho et ne demande que les tickets du dépôt et les gists ; un envoi crée le gist secret et le ticket « Discoveries: <login> »
 
-- [x] (0.1163) Où : Gold Saucer, le Dédale bestial ; dans Tensho : CONTENUS › Dresseur › onglet « Équipe ». Faire : 1) finissez un plateau du Dédale bestial ; 2) laissez la fenêtre de résultat du jeu ouverte quelques secondes (Tensho la lit à ce moment) ; 3) ouvrez /tensho › Dresseur › Équipe ; 4) cliquez la ligne « Dernier plateau… » pour la déplier. Regarder : « Dernier plateau (date) : score… · bonus… · total… » avec les mêmes chiffres que la fenêtre du jeu ; dépliée, une ligne par bête « Nom : rang A (x/100) → rang B (y/100) », et « +N rang(s) » en vert si elle monte.
+- [ ] (0.1163) Où : Gold Saucer, le Dédale bestial ; dans Tensho : CONTENUS › Dresseur › onglet « Équipe ». Faire : 1) finissez un plateau du Dédale bestial ; 2) laissez la fenêtre de résultat du jeu ouverte quelques secondes (Tensho la lit à ce moment) ; 3) ouvrez /tensho › Dresseur › Équipe ; 4) cliquez la ligne « Dernier plateau… » pour la déplier. Regarder : « Dernier plateau (date) : score… · bonus… · total… » avec les mêmes chiffres que la fenêtre du jeu ; dépliée, une ligne par bête « Nom : rang A (x/100) → rang B (y/100) », et « +N rang(s) » en vert si elle monte.
 
 
-- [x] (0.1164) Où : Tensho › Paramètres. Faire : 1) cochez puis décochez deux ou trois cases (par exemple dans l'onglet Carte) ; 2) déplacez une fenêtre de Tensho ; 3) cliquez « C'est fait ». Regarder : le jeu ne fige pas au clic ; l'agent vérifie dans le journal de Dalamud qu'aucun enregistrement des réglages n'a été lent.
+- [ ] (0.1164) Où : Tensho › Paramètres. Faire : 1) cochez puis décochez deux ou trois cases (par exemple dans l'onglet Carte) ; 2) déplacez une fenêtre de Tensho ; 3) cliquez « C'est fait ». Regarder : le jeu ne fige pas au clic ; l'agent vérifie dans le journal de Dalamud qu'aucun enregistrement des réglages n'a été lent.
 
 
 - [x] (0.1165) Jardin avec plusieurs emplacements notés : clic droit sur une plante (menu « Potager N, emplacement M »), Entretenir : dans Jardinage, seul cet emplacement passe à « entretenu » (heure d'entretien suivante repoussée), les autres et l'onglet Alarmes suivent ; en mode développeur, dalamud.log a « Garden menu read: window …, patch N, bed M. »
