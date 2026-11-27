@@ -78,7 +78,7 @@ internal static class Pending1865Tests
                 var inline=Regex.Match(source[end..],@"^\s*"+NewlineSearch);
                 if(inline.Success)
                 {
-                    if(!Handled(Statement(source,end),inline.Groups["m"].Value))found.Add(reader+": "+Line(source,end));
+                    if(!Handled(Statement(source,end),inline.Groups["m"].Value,Rest(source,end+inline.Index)))found.Add(reader+": "+Line(source,end));
                     continue;
                 }
                 var assigned=Regex.Match(source[..use.Index],@"\b(?:var|string)\s+(\w+)\s*=\s*$");
@@ -92,7 +92,8 @@ internal static class Pending1865Tests
                     var search=Regex.Match(lines[i],@"\b"+Regex.Escape(name)+VariableChain+NewlineSearch);
                     if(!search.Success)continue;
                     var statement=lines[i]+(i+1<lines.Length ? lines[i+1]:"");
-                    if(!Handled(statement,search.Groups["m"].Value))found.Add(name+": "+lines[i].Trim());
+                    var from=lines[i][search.Index..]+(i+1<lines.Length ? "\n"+lines[i+1]:"");
+                    if(!Handled(statement,search.Groups["m"].Value,from))found.Add(name+": "+lines[i].Trim());
                 }
             }
         }
@@ -113,16 +114,37 @@ internal static class Pending1865Tests
     private const string NewlineSearch=@"\s*\.\s*(?:(?<m>Contains|IndexOf|LastIndexOf|EndsWith|Replace)\s*\(\s*""(?:[^""\\]|\\.)*(?:[^""\\]|\\.)\\n"
         +@"|(?<m>StartsWith|Split)\s*\(\s*(?:""(?:[^""\\]|\\.)*\\n|'\\n'))";
 
-    // The statement (the line of the search and the next) takes the « \r » into account. A search for a snippet: its « \r\n » form
-    // too. A split: a « \r » among the separators or trimmed after (« TrimEnd('\r') »), or each piece trimmed (Trim(), TrimEnd(),
-    // StringSplitOptions.TrimEntries).
-    private static bool Handled(string statement,string method)=>method=="Split"
-        ? statement.Contains(@"\r",StringComparison.Ordinal) || Regex.IsMatch(statement,@"\.\s*Trim(?:End)?\s*\(\s*\)|\bTrimEntries\b")
+    // The search takes the « \r » into account. A search for a snippet: its « \r\n » form too, anywhere in the statement (the line of
+    // the search and the next). A split (X-867, review 0.1871 M1): from the split itself to the end of its statement (the first « ; »
+    // of the code, on its line or the next), a « \r » among the separators or trimmed after (« TrimEnd('\r') »), or each piece
+    // trimmed (Trim(), TrimEnd(), StringSplitOptions.TrimEntries); a « \r » or a Trim before the split, or in another statement, no
+    // longer lets it pass. Not covered, on purpose: a Trim or a « \r » after the split in the same statement but on another
+    // expression (« s.Split('\n')[0]==name.Trim() »): telling which expression a call works on needs a C# parser, and in the tests of
+    // today what follows a split in its statement works on its pieces.
+    private static bool Handled(string statement,string method,string split)=>method=="Split"
+        ? SplitStatement(split) is var cut
+            && (cut.Contains(@"\r",StringComparison.Ordinal) || Regex.IsMatch(cut,@"\.\s*Trim(?:End)?\s*\(\s*\)|\bTrimEntries\b"))
         : statement.Contains(@"\r\n",StringComparison.Ordinal);
+
+    // X-867: the text from <paramref name="at"/> to the end of the next line.
+    private static string Rest(string source,int at)
+    {
+        var stop=source.IndexOf('\n',at);
+        if(stop>=0){var after=source.IndexOf('\n',stop+1);stop=after<0 ? source.Length:after;}
+        return source[at..(stop<0 ? source.Length:stop)];
+    }
+
+    // X-867: a split up to the first « ; » of its code (a « ; » in a literal or a comment does not count).
+    private static string SplitStatement(string split)
+    {
+        var stop=CodeOnly(split).IndexOf(';');
+        return stop<0 ? split:split[..stop];
+    }
 
     /// <summary>X-866: <paramref name="source"/> with its comments and the contents of its string and character literals blanked
     /// (same length, line breaks kept), so a word written in them (« class », « File.ReadAllText(») is not taken for code. Regular,
-    /// verbatim, interpolated and raw (« """ ») literals; an interpolation hole is blanked with its literal.</summary>
+    /// verbatim, interpolated and raw (« """ ») literals; an interpolation hole is blanked with its literal. X-867 (review 0.1871 M3):
+    /// a verbatim interpolated literal is verbatim in both spellings, « $@"…" » and « @$"…" » (a « \" » ends it).</summary>
     internal static string CodeOnly(string source)
     {
         var code=source.ToCharArray();
@@ -152,16 +174,16 @@ internal static class Pending1865Tests
                 stop=stop<0 ? source.Length:stop+quotes;
                 Blank(i+quotes,stop-quotes);i=stop;
             }
-            else if(c=='@' && next=='"')
+            else if(c=='@' && VerbatimQuote(source,i) is var quote && quote>0)
             {
-                var k=i+2;
+                var k=quote+1;
                 for(;k<source.Length;k++)
                 {
                     if(source[k]!='"')continue;
                     if(k+1<source.Length && source[k+1]=='"'){k++;continue;}
                     break;
                 }
-                Blank(i+2,k);i=k+1;
+                Blank(quote+1,k);i=k+1;
             }
             else if(c=='"' || c=='\'')
             {
@@ -172,6 +194,14 @@ internal static class Pending1865Tests
             else i++;
         }
         return new string(code);
+    }
+
+    // X-867: the opening quote of a verbatim literal whose « @ » is at <paramref name="at"/> (« @"…" », « @$"…" », « @$$"…" »), or -1.
+    private static int VerbatimQuote(string source,int at)
+    {
+        var quote=at+1;
+        while(quote<source.Length && source[quote]=='$')quote++;
+        return quote<source.Length && source[quote]=='"' ? quote:-1;
     }
 
     // A class, struct, record (« record class », « record struct ») or interface declaration and its name.
