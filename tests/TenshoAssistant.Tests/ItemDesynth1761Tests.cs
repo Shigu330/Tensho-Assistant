@@ -49,7 +49,7 @@ internal static class ItemDesynth1761Tests
             var levels = Read("src/TenshoAssistant/Items/DesynthesisLevels.Dalamud.cs");
             Check(levels.Contains("TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);", StringComparison.Ordinal) && levels.Contains("!state->IsLoaded", StringComparison.Ordinal)
                 && levels.Contains("ItemDesynth.Level(state->GetDesynthesisLevel(job))", StringComparison.Ordinal), "read on the framework thread, the player loaded, checked");
-            var plugin = Read("src/TenshoAssistant/Plugin.cs");
+            var plugin = Read("src/TenshoAssistant/Plugin.Items.cs");
             Check(plugin.Contains("Items.ItemDesynth.Of(desynthItem.Desynth,desynthItem.ClassJobRepair.RowId,desynthItem.LevelItem.RowId)", StringComparison.Ordinal) && plugin.Contains("()=>desynthLevels?.Dispose()", StringComparison.Ordinal), "the Item sheet; disposed");
             foreach (var language in new[] { "en", "fr" })
             {

@@ -601,12 +601,8 @@ public sealed partial class Plugin : IDalamudPlugin
             // X-153 (0.1895): the field content family (shared FATE ranks, Occult Crescent) in Plugin.Fields.cs.
             RegisterSharedFates(configuration,framework,client,player,gameGui,()=>SaveTimed("shared FATEs"));
             mainWindow.GraceSource=()=>graceWatcher?.Shown;
-            // X-197 (0.1761): an item's desynthesis (Item sheet) and your desynthesis levels (PlayerState, read on the framework thread).
-            mainWindow.ItemDesynthOf=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Item>().GetRowOrDefault(id) is { } desynthItem
-                ? Items.ItemDesynth.Of(desynthItem.Desynth,desynthItem.ClassJobRepair.RowId,desynthItem.LevelItem.RowId):null;
-            Items.DesynthesisLevels? desynthLevels=null;
-            registrations.Register(()=>desynthLevels=new Items.DesynthesisLevels(framework,client,log),()=>desynthLevels?.Dispose());
-            mainWindow.DesynthLevelOf=job=>desynthLevels?.Of(job);
+            // X-153 (0.1928): the desynthesis of an item and the player's desynthesis levels in Plugin.Items.cs.
+            RegisterDesynthesis(data,framework,client);
             // X-223 (0.1233): the region of the home world's data centre (WorldRegionGroup row), for the Jumbo Cactpot's draw time.
             mainWindow.HomeRegion=()=>player.HomeWorld.ValueNullable?.DataCenter.ValueNullable?.Region.RowId ?? 0;
             // X-153 (0.1896): the hunting family (S rank kills, hunting log) in Plugin.Hunting.cs.
@@ -723,22 +719,8 @@ public sealed partial class Plugin : IDalamudPlugin
             // the server bar family (X-153, 0.1240: Plugin.ServerBar.cs), in the order they were created before.
             RegisterServerBar(dtrBar,framework,gameGui,player,client,inventory,configuration,localization,()=>currencies?.State,()=>gilWatcher?.State?.Entries,()=>gear?.Equipped ?? []);
             mainWindow.StackSizeOf=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Item>().GetRowOrDefault(id)?.StackSize ?? 0;
-            // 0.347 (g, I-08): at an NPC shop, the bags' items labelled « to sell » and « important » (chat; sound if turned on).
-            Items.ItemNoteShopReminder? shopReminder=null;
-            registrations.Register(()=>shopReminder=new Items.ItemNoteShopReminder(framework,gameGui,configuration,()=>inventoryService.Current,()=>player.IsLoaded ? player.ContentId:0,
-                (toSell,important)=>
-                {
-                    var items=data.GetExcelSheet<Lumina.Excel.Sheets.Item>();
-                    string Names(IReadOnlyList<(uint Item,long Quantity)> list)=>string.Join(", ",list.Take(10).Select(entry=>$"{items.GetRowOrDefault(entry.Item)?.Name.ExtractText() ?? $"#{entry.Item}"} ×{entry.Quantity}"))
-                        +(list.Count>10 ? " …":"");
-                    if(toSell.Count>0)chat.Print("[Tensho] "+localization.Format("ItemNotes.ShopToSell",Names(toSell)));
-                    if(important.Count>0)
-                    {
-                        var message=localization.Format("ItemNotes.ShopImportant",Names(important));
-                        chat.Print("[Tensho] "+message);
-                        if(configuration.ItemNoteImportantSound){Alarms.AlarmService.PlaySound((configuration.AlarmOptions ?? new()).Sound,log);linkNotices.Add(message);}
-                    }
-                },log),()=>shopReminder?.Dispose());
+            // X-153 (0.1928): the shop reminder of the items labelled « to sell » and « important » in Plugin.Items.cs.
+            RegisterShopReminder(configuration,data,framework,gameGui,player,chat);
             // 0.346 (g, I-07): lowest offer minus 1 copied to the clipboard when the player opens an item's offers (off by default).
             RegisterUndercut(configuration,marketBoardEvents,framework,chat,data);
             mainWindow.WorldName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.World>().GetRowOrDefault(id)?.Name.ExtractText();
@@ -1166,22 +1148,13 @@ public sealed partial class Plugin : IDalamudPlugin
             mainWindow.EurekaChanceFor=job=>data.GetExcelSheet<Lumina.Excel.Sheets.Trait>().GetRowOrDefault(job==16 ? 242u:243u) is { } row && (row.Quest.RowId==0 ? player.GetClassJobLevel(row.ClassJob.Value)>=row.Level:unlocks.IsTraitUnlocked(row)) ? Gathering.GpScenario.EurekaChance:0m;
             // X-153 (0.1927): the Mini Cactpot and Triple Triad readers in Plugin.MiniGames.cs.
             RegisterMiniGameReaders(framework,player,client,gameGui,targets,data);
-            ItemCatalogLoader? catalogLoader = null;
-            ItemUseCatalogLoader? usageLoader=null;
-            registrations.Register(()=>usageLoader=new ItemUseCatalogLoader(itemUses,data,framework,log),()=>usageLoader?.Dispose());
-            // 0.469 (user request, in-game campaign): today's Grand Company request, read from the game's supply missions window.
-            mainWindow.GcSupply.Restore(configuration.GcSupplySeen);
+            // X-153 (0.1928): the items' uses and today's Grand Company request restored, in Plugin.Items.cs.
+            RegisterItemUses(configuration,data,framework);
             // 0.787 (X-28): what the workshop already received, from its delivery window.
             FreeCompany.WorkshopDeliveryReader? workshopDeliveryReader=null;
             registrations.Register(()=>workshopDeliveryReader=new FreeCompany.WorkshopDeliveryReader(framework,gameGui,log,mainWindow.WorkshopDeliverySeen),()=>workshopDeliveryReader?.Dispose());
-            Items.GcSupplyReader? gcSupplyReader=null;
-            registrations.Register(()=>gcSupplyReader=new Items.GcSupplyReader(framework,gameGui,client,player,data,log,()=>itemUses.State.Catalog,mainWindow.GcSupply,seen=>
-            {
-                configuration.GcSupplySeen=seen;
-                try{saver.Save();}catch(Exception error){log.Warning(error,"Today's Grand Company request could not be saved.");}
-            },developer:()=>configuration.DeveloperMode),()=>gcSupplyReader?.Dispose());
-            registrations.Register(() => catalogLoader = new ItemCatalogLoader(itemCatalog, data, framework, log, dataCache),
-                () => catalogLoader?.Dispose());
+            // X-153 (0.1928): the Grand Company supply reader and the items' catalogue in Plugin.Items.cs.
+            RegisterItemCatalog(configuration,data,framework,gameGui,client,player,saver);
             RecipeCatalogLoader? recipeLoader = null;
             registrations.Register(() => recipeLoader = new RecipeCatalogLoader(recipeCatalog, data, framework, log, dataCache),
                 () => recipeLoader?.Dispose());

@@ -48,7 +48,7 @@ internal static class MiniGamesFamily1927Tests
             var readers = At("RegisterMiniGameReaders(framework,player,client,gameGui,targets,data);");
             Check(Count(plugin, @"RegisterTriadNpcs\(") == 1 && Count(plugin, @"RegisterMiniGameReaders\(") == 1, "each called once");
             Check(At("RegisterDutyFinder(configuration,framework,gameGui);") < npcs && npcs < At("RegisterBeastCatalog("), "the NPCs: after the Duty Finder, before the Beastmaster's catalogue, as before");
-            Check(At("mainWindow.EurekaChanceFor=") < readers && readers < At("ItemUseCatalogLoader? usageLoader=null;"), "the readers: after the gathering helpers, before the item uses' loader, as before");
+            Check(At("mainWindow.EurekaChanceFor=") < readers && readers < At("RegisterItemUses(configuration,data,framework);"), "the readers: after the gathering helpers, before the item uses' loader, as before");
         }),
         ("Mini-games family 1927: each service's install and its release are given to one same registration of Plugin.MiniGames.cs (its own release, never another's)", () =>
             FamilyRegistrations.Paired("Mini-games family 1927", PluginFiles().Single(file => file.Name == "Plugin.MiniGames.cs").Text, Paths.Select(path => (path.Service, path.Install, path.Release)))),
