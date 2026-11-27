@@ -45,7 +45,9 @@ internal static class BeastHeld1555Tests
             // Written (as MainWindow.SaveBeastPlans), then read again by a new start: nothing lost.
             var writer = new BackgroundWriter((error, message) => throw new Exception(message, error));
             BeastTeams.SaveLater(writer, file, memory);
-            Check(writer.Flush(TimeSpan.FromSeconds(5)), "written");
+            // X-886 (0.1908): Flush returns as soon as the file is written; the bound only ends a failing run (5 s ran out once under the
+            // whole suite's load, the writer's thread not scheduled).
+            Check(writer.Flush(TimeSpan.FromSeconds(60)), "written");
             var again = new BeastPlansFile().Load(file, null, At).Plans;
             Check(again.Ranks![7] == 2 && again.Ranks[3] == 12 && again.Result!.Score == 900 && again.Keys[1] == "key", "read again after a restart: all kept");
         })),

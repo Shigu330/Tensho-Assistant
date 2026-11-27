@@ -10,7 +10,9 @@ internal static class LocalLink1081Tests
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
     private static string Read(string file) => File.ReadAllText(Path.GetFullPath(file));
 
-    private static bool Wait(Func<bool> condition,int milliseconds=8000)
+    // X-886 (0.1908): returns as soon as the condition holds; the bound only ends a failing run. 8 s ran out twice in ten runs of the whole
+    // suite under load: the client tries every 3 s (a 1 s connect, then 2 s), so 8 s left it under three tries; 30 s leaves it ten.
+    private static bool Wait(Func<bool> condition,int milliseconds=30_000)
     {
         var until=Environment.TickCount64+milliseconds;
         while(Environment.TickCount64<until){if(condition())return true;Thread.Sleep(50);}

@@ -630,6 +630,9 @@ public sealed class JitWarmup : IDisposable
 
     /// <summary>For the desktop application's headless run: true once finished within the time.</summary>
     public bool Wait(TimeSpan limit)=>!disposed && done.Wait(limit);
+    /// <summary>X-886 (0.1908): true once the worker has ended (finished, or stopped by Dispose), within <paramref name="limit"/>; for the tests,
+    /// which read a stop against the worker, not the clock.</summary>
+    internal bool Ended(TimeSpan limit)=>done.Wait(limit);
 
     public void Dispose()
     {

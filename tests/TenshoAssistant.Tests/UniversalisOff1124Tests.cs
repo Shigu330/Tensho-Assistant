@@ -28,11 +28,13 @@ internal static class UniversalisOff1124Tests
             // 0.1202: the board's pause at 1.5 s instead of 3 (the same wait, half the time; the 3 s is checked by VerifySpeed1202Tests).
             using var board=new MarketBoardService(new HttpClient(server)){Enabled=()=>Volatile.Read(ref on),RequestPause=TimeSpan.FromSeconds(1.5)};
             board.Request("Chaos",5057);
-            Check(SpinWait.SpinUntil(()=>Volatile.Read(ref server.Sent)==1 && !board.State.Loading,5000),"the first request leaves: "+server.Sent);
+            // X-886 (0.1908): SpinUntil returns as soon as the state is there; its bound only ends a failing run (6 s ran out once under the
+            // whole suite's load, the board's worker not scheduled after its 1.5 s pause): 30 s.
+            Check(SpinWait.SpinUntil(()=>Volatile.Read(ref server.Sent)==1 && !board.State.Loading,30_000),"the first request leaves: "+server.Sent);
             board.Request("Chaos",5058);
             Check(SpinWait.SpinUntil(()=>board.State is { ItemId: 5058, Cooldown: true },2000),"the second waits for its slot");
             Volatile.Write(ref on,false);
-            Check(SpinWait.SpinUntil(()=>board.State is { ItemId: 5058, Loading: false },6000),"the wait ends: "+board.State);
+            Check(SpinWait.SpinUntil(()=>board.State is { ItemId: 5058, Loading: false },30_000),"the wait ends: "+board.State);
             Check(Volatile.Read(ref server.Sent)==1,"turned off during the wait: nothing sent (the old code sent it), sent "+server.Sent);
             Check(board.State.Error is not null,"the board says why (source off): "+board.State.Error);
         }),

@@ -14,10 +14,17 @@ internal static class TwoClients1216Tests
         if(SeenPriceStore.Read(path) is { } saved)store.Load(saved);
         return store;
     }
+    // X-886 (0.1908): a save that finds the lock busy past its 10 s wait fails and is kept to save again (SeenPrices.Write, X-587), as the
+    // plugin's saver does: once in ten runs of the whole suite under load the other client's turn outlasted the wait. Tried again here, at
+    // most five times; what is checked is the join (nothing lost), not the wait.
     private static void Save(SeenPriceStore store,string path)
     {
-        var entries=store.SnapshotToSave(out var stamp);
-        SeenPriceStore.Write(path,entries);store.MarkSaved(stamp);
+        for(var attempt=1;;attempt++)
+        {
+            var entries=store.SnapshotToSave(out var stamp);
+            try{SeenPriceStore.Write(path,entries);store.MarkSaved(stamp);return;}
+            catch(IOException) when(attempt<5){}
+        }
     }
     private static void InTemp(Action<string> run)
     {

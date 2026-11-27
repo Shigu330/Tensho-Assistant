@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using TenshoAssistant;
 using TenshoAssistant.Market;
 
@@ -45,10 +44,11 @@ internal static class ReviewFixes1758Tests
             var underWay = Task.Run(() => file.Save(value));
             Check(Waiting(file), "the write waits for the other client's lock (its waiting mark)");
             Check(!underWay.IsCompleted, "the write under way");
-            var watch = Stopwatch.StartNew();
+            // X-886 (0.1908): read against the write, not the clock (Close measured 2144 ms once under the whole suite's load, a thread not
+            // scheduled): Close returned while the write still waits for the lock the other client holds (before 0.1758 it took the gate that
+            // write holds, so it could only return once the write had given up).
             file.Close();
-            var closeMs = watch.ElapsedMilliseconds;
-            Check(closeMs < 500 && !underWay.IsCompleted, "Close did not wait for the write under way: " + closeMs + " ms");
+            Check(!underWay.IsCompleted && Waiting(file), "Close did not wait for the write under way (still waiting for the other client's lock)");
             other.Dispose();
             Check(underWay.Wait(TimeSpan.FromSeconds(10)) && underWay.Result, "the write under way ends, written");
             Check(file.ClosingSave is null, "it began before the unload: not the unload's save");
@@ -68,14 +68,14 @@ internal static class ReviewFixes1758Tests
             saver.Save();
             Check(Waiting(file), "the worker waits for the other client's lock (its waiting mark)");
             value.HidePanelsBehindGame = !value.HidePanelsBehindGame;
-            var release = Task.Run(() => { Thread.Sleep(2_000); other.Dispose(); });
-            var watch = Stopwatch.StartNew();
+            // X-886 (0.1908): read against the worker, not the clock: the other client lets go only once Flush has returned, so Close and a
+            // Flush that kept its bound return while the worker still waits for that lock (its waiting mark); one that waited for the worker
+            // would only return once the worker had given up.
             file.Close();
-            Check(watch.ElapsedMilliseconds < 500, "Close: at once, " + watch.ElapsedMilliseconds + " ms");
             Check(!saver.Flush(TimeSpan.FromMilliseconds(500)), "the worker still waits: Flush says so");
-            Check(watch.ElapsedMilliseconds < 1_700, "Flush kept its bound (the other client lets go at 2 s): " + watch.ElapsedMilliseconds + " ms");
+            Check(Waiting(file), "Close and Flush kept their bound: the worker still waits for the other client's lock");
+            other.Dispose();
             Check(saver.Settle(TimeSpan.FromSeconds(15)), "settled once the other client let go");
-            release.Wait();
             Check(file.ClosingSave == true, "the live settings written by the unload's save");
             var again = Settings(root).Load(out _);
             Check(again.DeveloperMode == value.DeveloperMode && again.HidePanelsBehindGame == value.HidePanelsBehindGame, "the last settings on disk");

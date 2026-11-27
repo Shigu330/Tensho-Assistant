@@ -44,9 +44,10 @@ internal static class JitWarmup1050Tests
             }
             Check(told==1,"finished told once");
             var stopped=JitWarmup.Start(()=>[typeof(Sample)],TimeSpan.FromMinutes(5),_=>Interlocked.Increment(ref told));
-            var watch=System.Diagnostics.Stopwatch.StartNew();
             stopped.Dispose();
-            Check(watch.Elapsed<TimeSpan.FromSeconds(3) && !stopped.Completed && told==1,"a warm-up still waiting stops at once, without compiling or telling");
+            // X-886 (0.1908): read against the worker, not the clock (Dispose's join of 2 s ran out once under the whole suite's load, the
+            // worker not scheduled): it ends long before its 5-minute delay, without compiling anything or telling.
+            Check(stopped.Ended(TimeSpan.FromSeconds(60)) && !stopped.Completed && stopped.Prepared==0 && told==1,"a warm-up still waiting stops at once, without compiling or telling");
             stopped.Dispose();
         }),
         ("JIT warm-up 1050: the window starts it on its own type and disposes it with itself",() =>

@@ -14,9 +14,23 @@ public sealed record WikiItemAcquisition(uint ItemId,string Title,IReadOnlyList<
 
 public static class WikiItemAcquisitionParser
 {
-    private static readonly TimeSpan Limit=TimeSpan.FromSeconds(1);
+    // X-886 (0.1908): the linear engine (as GardenJournal since X-428): its time is bounded by the input's length (itself bounded by
+    // GarlandClient.MaximumBytes), never by going back over it, so it needs no timeout. The 1 s timeout ran out once on a page of a few lines,
+    // a thread not scheduled under the whole suite's load: on a busy PC a page could fail to read for the same reason. Same matches and groups.
+    private const RegexOptions Linear=RegexOptions.CultureInvariant|RegexOptions.NonBacktracking;
+    private static readonly TimeSpan Limit=Regex.InfiniteMatchTimeout;
     private static readonly Regex Generator=new(@"^[*#:\s]*\{\{\s*(vendor list|contained in|quest list|deployed from|desynthesis list|retrieval list|achievement list|item list|recipe list|gathering list|drop list)\s*(\||\}\})",
-        RegexOptions.IgnoreCase|RegexOptions.CultureInvariant,TimeSpan.FromSeconds(1));
+        RegexOptions.IgnoreCase|Linear,Limit);
+    private static readonly Regex OnlineStore=new(@"^\|\s*online-store-id\s*=\s*\d+",RegexOptions.Multiline|Linear,Limit);
+    private static readonly Regex Section=new(@"^==\s*([^=].*?)\s*==$",Linear,Limit);
+    private static readonly Regex SubSection=new(@"^===+\s*(.*?)\s*===+$",Linear,Limit);
+    private static readonly Regex NamedLink=new(@"\[https?://[^\s\]]+\s+([^\]]+)\]",Linear,Limit);
+    private static readonly Regex BareLink=new(@"\[https?://[^\]]+\]",Linear,Limit);
+    private static readonly Regex WikiLink=new(@"\[\[(?:[^\]|]*\|)?([^\]]*)\]\]",Linear,Limit);
+    private static readonly Regex Template=new(@"\{\{([^{}]*)\}\}",Linear,Limit);
+    private static readonly Regex Markup=new(@"<[^>]+>",Linear,Limit);
+    private static readonly Regex Layout=new(@"^\s*(clear|-)\s*$",RegexOptions.IgnoreCase|Linear,Limit);
+    private static readonly Regex Spaces=new(@"\s+",Linear,Limit);
     public static string Url(string title)=>"https://ffxiv.consolegameswiki.com/mediawiki/index.php?title="+Uri.EscapeDataString(title.Replace(' ','_'))+"&action=raw";
     public static WikiItemAcquisition Parse(string wikitext,uint itemId,string title,DateTimeOffset fetchedAt)
     {
@@ -24,13 +38,13 @@ public static class WikiItemAcquisitionParser
         if(wikitext.Length>GarlandClient.MaximumBytes)throw new InvalidDataException("Wiki response too large.");
         var lines=new List<WikiAcquisitionLine>();var inside=false;var heading="";
         // Infobox « online-store-id » (0.148: Bennu Horn, Lunar Whale Identification Key) = sold on the online store.
-        if(Regex.IsMatch(wikitext,@"^\|\s*online-store-id\s*=\s*\d+",RegexOptions.Multiline,Limit))lines.Add(new("","Online Store"));
+        if(OnlineStore.IsMatch(wikitext))lines.Add(new("","Online Store"));
         foreach(var raw in wikitext.Split('\n'))
         {
             var line=raw.TrimEnd('\r').Trim();
-            if(Regex.Match(line,@"^==\s*([^=].*?)\s*==$",RegexOptions.None,Limit) is { Success:true } section){inside=section.Groups[1].Value.Equals("Acquisition",StringComparison.OrdinalIgnoreCase);heading="";continue;}
+            if(Section.Match(line) is { Success:true } section){inside=section.Groups[1].Value.Equals("Acquisition",StringComparison.OrdinalIgnoreCase);heading="";continue;}
             if(!inside)continue;
-            if(Regex.Match(line,@"^===+\s*(.*?)\s*===+$",RegexOptions.None,Limit) is { Success:true } sub){heading=Clean(sub.Groups[1].Value);continue;}
+            if(SubSection.Match(line) is { Success:true } sub){heading=Clean(sub.Groups[1].Value);continue;}
             // Bullets, and plain lines such as « {{onlinestore|24}} » (0.148); tables, files and categories are skipped.
             if(line.Length==0 || line.StartsWith('{') && !line.StartsWith("{{",StringComparison.Ordinal) || line.StartsWith('|') || line.StartsWith('!') || line.StartsWith("[[File:",StringComparison.OrdinalIgnoreCase) || line.StartsWith("[[Category:",StringComparison.OrdinalIgnoreCase))continue;
             // List generators filled by the wiki at display time (capture 2026-10-31, Alsvid Whistle: « vendor list y », « contained in »,
@@ -55,18 +69,18 @@ public static class WikiItemAcquisitionParser
     // [[a|b]] → b, [https://… text] → text, {{template|x|y}} → known wording or « template x y », markup and HTML removed.
     private static string Clean(string text)
     {
-        text=Regex.Replace(text,@"\[https?://[^\s\]]+\s+([^\]]+)\]","$1",RegexOptions.None,Limit);
-        text=Regex.Replace(text,@"\[https?://[^\]]+\]","",RegexOptions.None,Limit);
-        text=Regex.Replace(text,@"\[\[(?:[^\]|]*\|)?([^\]]*)\]\]","$1",RegexOptions.None,Limit);
-        text=Regex.Replace(text,@"\{\{([^{}]*)\}\}",match=>
+        text=NamedLink.Replace(text,"$1");
+        text=BareLink.Replace(text,"");
+        text=WikiLink.Replace(text,"$1");
+        text=Template.Replace(text,match=>
         {
             var parts=match.Groups[1].Value.Split('|').Select(part=>part.Trim()).ToArray();
             return Templates.TryGetValue(parts[0],out var wording) ? wording(parts)
                 :string.Join(" ",parts.Select(part=>part.Contains('=') ? part[(part.IndexOf('=')+1)..]:part).Where(part=>part.Length>0));
-        },RegexOptions.None,Limit);
-        text=Regex.Replace(text,@"<[^>]+>"," ",RegexOptions.None,Limit).Replace("'''","").Replace("''","");
-        text=Regex.Replace(text,@"^\s*(clear|-)\s*$","",RegexOptions.IgnoreCase,Limit);
-        return Regex.Replace(text,@"\s+"," ",RegexOptions.None,Limit).Trim();
+        });
+        text=Markup.Replace(text," ").Replace("'''","").Replace("''","");
+        text=Layout.Replace(text,"");
+        return Spaces.Replace(text," ").Trim();
     }
 }
 
