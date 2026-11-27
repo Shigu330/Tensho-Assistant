@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (918 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (920 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -977,12 +977,14 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-881 | Review  (review 0.1891, 27/11), pre-existing before the block M1: M1 in… | Done in 0.1892.0 |
 | X-882 | Flaky test (relay 215, 27/11): « Fair lock 1309: behaviour: a client taking the… | Done in 0.1905.0 |
 | X-883 | Flaky test (relay 215, 27/11): « GitHub token 1171: a renewal GitHub accepted… | Done in 0.1904.0 |
+| X-884 | Idea I-060 chosen by the user on the test page (27/11): when the plan tool… | Done in 0.1916.0 |
 | X-885 | Review of block 0.1892 to 0.1903 (review 0.1903, 27/11), minor M1, M2: M1 in… | Done in 0.1906.0 |
 | X-886 | Flaky tests under load (relay 216, 27/11, sweeps of 10 full-suite runs beside… | Done in 0.1908.0 |
 | X-887 | Review of block 0.1904 to 0.1906 (review 0.1906, 27/11), minor M1: M1 in… | Done in 0.1909.0 |
 | X-888 | Review of block 0.1904 to 0.1906 (review 0.1906, 27/11), pre-existing before… | Done in 0.1907.0 |
 | X-889 | Review of block 0.1907 to 0.1909 (review 0.1909, 27/11), minor M1, M3, M4: M1… | Done in 0.1911.0 |
 | X-890 | Review of block 0.1907 to 0.1909 (review 0.1909, 27/11), pre-existing before… | Done in 0.1910.0 |
+| X-891 | Whole test process frozen under load (sweep of 27/11 on 0.1911, run 1 of 10)… | Done in 0.1916.0 |
 | X-892 | Review of block 0.1910 to 0.1912 (review 0.1912, 27/11), minor M1, M2, M3, M4… | Done in 0.1913.0 |
 | X-893 | Known limit of the discoveries' GitHub sign-in (user's decision of 27/11… | Done in 0.1914.0 |
 | X-894 | Review  (review 0.1913, 27/11), pre-existing before the block M1: M1 in… | Done in 0.1915.0 |
@@ -991,7 +993,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (918 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (920 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1966,12 +1968,14 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-881 | Relecture  (relecture 0.1891, 27/11), déjà là avant le bloc M1 : M1 : Un site… | Fait en 0.1892.0 |
 | X-882 | Test fragile (relais 215, 27/11) : « Fair lock 1309: behaviour: a client taking… | Fait en 0.1905.0 |
 | X-883 | Test fragile (relais 215, 27/11) : « GitHub token 1171: a renewal GitHub… | Fait en 0.1904.0 |
+| X-884 | Idée I-060 choisie par l'utilisateur sur la page des essais (27/11) : l'outil… | Fait en 0.1916.0 |
 | X-885 | Relecture du bloc 0.1892 à 0.1903 (relecture 0.1903, 27/11), mineurs M1, M2… | Fait en 0.1906.0 |
 | X-886 | Tests fragiles sous charge (relais 216, 27/11, balayages de 10 passes de la… | Fait en 0.1908.0 |
 | X-887 | Relecture du bloc 0.1904 à 0.1906 (relecture 0.1906, 27/11), mineurs M1 : M1… | Fait en 0.1909.0 |
 | X-888 | Relecture du bloc 0.1904 à 0.1906 (relecture 0.1906, 27/11), déjà là avant le… | Fait en 0.1907.0 |
 | X-889 | Relecture du bloc 0.1907 à 0.1909 (relecture 0.1909, 27/11), mineurs M1, M3, M4… | Fait en 0.1911.0 |
 | X-890 | Relecture du bloc 0.1907 à 0.1909 (relecture 0.1909, 27/11), déjà là avant le… | Fait en 0.1910.0 |
+| X-891 | Gel complet du processus de tests sous charge (balayage du 27/11 sur 0.1911… | Fait en 0.1916.0 |
 | X-892 | Relecture du bloc 0.1910 à 0.1912 (relecture 0.1912, 27/11), mineurs M1, M2… | Fait en 0.1913.0 |
 | X-893 | Limite connue de la connexion GitHub des découvertes (décision de l'utilisateur… | Fait en 0.1914.0 |
 | X-894 | Relecture  (relecture 0.1913, 27/11), déjà là avant le bloc M1 : M1 : Quand le… | Fait en 0.1915.0 |
