@@ -934,7 +934,10 @@ var groups = TestRegistry.Groups(tests, typeof(TestRegistry).Assembly);
 // 0.1202 (measure 8: targeted tests while working): « --only TEXT » runs the tests whose name holds TEXT (case ignored); a full run
 // (Verify.ps1, publish.sh, the CI) never passes it.
 groups = GroupFilter.Only(groups, args);
+// X-889 M4 (review of 0.1909): what stops the process during the run, measured (StallMeter, TestRunner.cs), said after the slowest tests.
+var stalls = StallMeter.Start();
 var run = ParallelTests.Run(groups, Environment.ProcessorCount, Quarantine.Entries, DateOnly.FromDateTime(DateTime.Now), GroupFilter.Full(args));
+stalls.Dispose();
 foreach (var result in run.Results)
 {
     if (result.Passed) Console.WriteLine($"PASS {result.Name}");
@@ -945,6 +948,7 @@ foreach (var note in run.Results.Select(result => result.Note).OfType<string>().
 Console.WriteLine(ParallelTests.Line(run, groups));
 // Measure 7 (0.1201): the slowest tests are said in one line, before the count (which stays the last line: the scripts read it there).
 Console.WriteLine(SlowestTests.Line(run.Times, run.Whole));
+Console.WriteLine(stalls.Record.Line());
 Console.WriteLine(ParallelTests.CountLine(run));
 // X-671: a test left behind, still running, might keep the process alive (a thread of its own not in the background): ended here.
 if (run.Hung) { Console.Out.Flush(); Console.Error.Flush(); Environment.Exit(1); }

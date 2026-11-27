@@ -162,9 +162,12 @@ public sealed class GitHubExchange : IDisposable
         var disk=ReadDisk();
         if(disk.Pair is { } found){Adopt(found);Seen(found.Token,found.Refresh);}
         // X-888 (0.1907): a pair kept aside at the last unload (its files refused it) is taken back, then written to its files.
+        // X-889 M1 (review of 0.1909): a spare is removed only when it was read and found older than the two files, under the profile's lock
+        // and read again there (DropOldSpare); never when it could not be read now (it may hold the only copy of a renewed pair) nor when it
+        // is damaged (removed once a pair is written to the files).
         var spared=disk.Spare==SpareState.Newer;
         if(spared)secretsUnsaved=true;
-        else if(File.Exists(SparePath))try{File.Delete(SparePath);}catch(Exception error) when(error is IOException or UnauthorizedAccessException){}
+        else if(disk.Spare==SpareState.Older)DropOldSpare();
         // X-175: a token of the other sign-in (the OAuth app's, once the GitHub App is in place) is forgotten: the player connects again, to the App.
         if(token is not null && !this.signIn.Owns(meta.ClientId)){Disconnect();message=new("ExchangeSignInChanged");}
         else if(spared && SaveSecrets(SecretsLockWait) is SecretsWrite.Files or SecretsWrite.Taken)SaveMeta();
@@ -241,8 +244,11 @@ public sealed class GitHubExchange : IDisposable
     private void ForgetIfStill(string? usedRefresh)
     {
         string? used;lock(gate)used=usedRefresh is null ? token:usedRefresh;
-        var disk=ReadDisk().Pair;
-        if(disk is { } found && (usedRefresh is null ? found.Token!=used:found.Refresh!=used)){Adopt(found);Seen(found.Token,found.Refresh);return;}
+        var disk=ReadDisk();
+        if(disk.Pair is { } found && (usedRefresh is null ? found.Token!=used:found.Refresh!=used)){Adopt(found);Seen(found.Token,found.Refresh);return;}
+        // X-889 M1 (review of 0.1909): a part of the disk not readable now (a spare held by a scanner, OneDrive, another client) may hold a
+        // newer pair: nothing is removed; the exchange says the sign-in expired and the next one reads again.
+        if(disk.Unknown)return;
         Disconnect();
     }
 
@@ -428,6 +434,14 @@ public sealed class GitHubExchange : IDisposable
             }
             catch(Exception error) when(error is IOException or UnauthorizedAccessException or System.ComponentModel.Win32Exception or System.Security.Cryptography.CryptographicException){return SecretsWrite.Refused;}
         }
+    }
+    /// <summary>X-889 M1 (review of 0.1909): the spare removed at the start only when, read again under the profile's lock, it is still older
+    /// than the two files (another client may have kept a newer pair aside meanwhile); left as it is when the lock is not had.</summary>
+    private void DropOldSpare()
+    {
+        using var held=TryHoldLock(SecretsLockWait);
+        if(held is null || ReadDisk().Spare!=SpareState.Older)return;
+        try{File.Delete(SparePath);}catch(Exception error) when(error is IOException or UnauthorizedAccessException){}
     }
     /// <summary>X-890: the pair in memory not written yet, settled under the profile's lock taken without an async work (the start, the unload);
     /// Refused when the lock is not had within <paramref name="wait"/> (the pair stays in memory).</summary>

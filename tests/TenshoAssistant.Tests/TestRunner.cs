@@ -281,3 +281,108 @@ internal static class ParallelTests
             + $"alone after: {(serial.Length == 0 ? "none" : string.Join(", ", serial))}; longest class: {byGroup.Name} {Number(byGroup.Seconds)} s";
     }
 }
+
+/// <summary>
+/// X-889 M4 (review of 0.1909): what stops the test process during a run, measured instead of guessed. On 0.1908 one run of ten under load
+/// failed six tests at once (bounds of 10 to 30 s passed); one of them waited 10 s for a raw thread (not one of the pool) to end a body of
+/// two lines, and the tests' summed time was about 760 s above the other runs (about 24 s on each of the 32 threads): a stop of every
+/// thread, not a pool kept busy. A thread of its own (above normal priority, so a busy processor alone does not delay it) wakes every
+/// <see cref="Tick"/>: a late wake is a stop of the whole process or of the PC, with the garbage collector's pauses inside it
+/// (GC.GetTotalPauseDuration). A work item put on the pool each <see cref="ProbeEvery"/> says how long the pool keeps a work waiting (the
+/// pool starved by tests that block its threads). Said in one line after the slowest tests (« STALLS … »), kept with each run of a sweep under load.
+/// </summary>
+internal sealed class StallMeter : IDisposable
+{
+    public static readonly TimeSpan Tick = TimeSpan.FromMilliseconds(200), ProbeEvery = TimeSpan.FromSeconds(1);
+    private readonly Stopwatch clock = Stopwatch.StartNew();
+    private readonly Thread thread;
+    private volatile bool stop;
+    private int probing;
+    public StallRecord Record { get; } = new();
+
+    private StallMeter()
+    {
+        thread = new Thread(Watch) { IsBackground = true, Name = "stall meter", Priority = ThreadPriority.AboveNormal };
+        thread.Start();
+    }
+    public static StallMeter Start() => new();
+
+    private void Watch()
+    {
+        try
+        {
+            var last = clock.Elapsed;
+            var paused = GC.GetTotalPauseDuration();
+            var probe = TimeSpan.Zero;
+            while (!stop)
+            {
+                Thread.Sleep(Tick);
+                var now = clock.Elapsed;
+                var pause = GC.GetTotalPauseDuration();
+                Record.Wake(now - last - Tick, pause - paused, now, ThreadPool.PendingWorkItemCount, ThreadPool.ThreadCount);
+                (last, paused) = (now, pause);
+                if (now < probe || Interlocked.CompareExchange(ref probing, 1, 0) != 0) continue;
+                probe = now + ProbeEvery;
+                var waiting = ThreadPool.PendingWorkItemCount;
+                ThreadPool.UnsafeQueueUserWorkItem(_ =>
+                {
+                    Record.Pool(clock.Elapsed - now, now, waiting);
+                    Volatile.Write(ref probing, 0);
+                }, null);
+            }
+        }
+        catch (Exception failure) { Record.Failed(failure.GetType().Name); }
+    }
+
+    public void Dispose()
+    {
+        stop = true;
+        thread.Join(TimeSpan.FromSeconds(2));
+    }
+}
+
+/// <summary>X-889 M4: the longest late wake of the stall meter (with the collector's pauses inside it and the pool then) and the longest wait
+/// of a work on the pool, each with its moment in the run.</summary>
+internal sealed class StallRecord
+{
+    private readonly object gate = new();
+    private TimeSpan late, lateAt, lateCollected, wait, waitAt;
+    private long lateQueued, waitQueued;
+    private int lateThreads, wakes, probes;
+    private string? failure;
+
+    public TimeSpan Late { get { lock (gate) return late; } }
+    public TimeSpan PoolWait { get { lock (gate) return wait; } }
+    public int Wakes { get { lock (gate) return wakes; } }
+    public int Probes { get { lock (gate) return probes; } }
+
+    public void Wake(TimeSpan behind, TimeSpan collected, TimeSpan at, long queued, int threads)
+    {
+        lock (gate)
+        {
+            wakes++;
+            if (behind <= late) return;
+            (late, lateAt, lateCollected, lateQueued, lateThreads) = (behind, at, collected, queued, threads);
+        }
+    }
+    public void Pool(TimeSpan waited, TimeSpan at, long queued)
+    {
+        lock (gate)
+        {
+            probes++;
+            if (waited <= wait) return;
+            (wait, waitAt, waitQueued) = (waited, at, queued);
+        }
+    }
+    public void Failed(string name) { lock (gate) failure = name; }
+
+    public string Line()
+    {
+        static string Seconds(TimeSpan time) => time.TotalSeconds.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture);
+        lock (gate)
+            return $"STALLS the watch thread woke at most {Seconds(late)} s late (at {Seconds(lateAt)} s of the run; garbage collection pauses in it "
+                + $"{Seconds(lateCollected)} s; the pool then: {lateQueued} work(s) waiting, {lateThreads} thread(s)); a work on the pool waited at most "
+                + $"{Seconds(wait)} s (at {Seconds(waitAt)} s; {waitQueued} waiting before it); {wakes} wakes, {probes} probes"
+                + (failure is null ? "." : $"; the meter stopped on {failure}.");
+    }
+}
