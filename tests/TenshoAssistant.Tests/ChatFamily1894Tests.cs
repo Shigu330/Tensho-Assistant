@@ -48,7 +48,7 @@ internal static class ChatFamily1894Tests
             var game = At("RegisterGameChat(configuration,framework,gameGui);");
             var players = At("RegisterChatPlayers(configuration,interop,framework,client,objects,targets,partyList,data,chatSenders,gameConfig,seStrings,contextMenus);");
             Check(Count(plugin, @"RegisterGameChat\(") == 1 && Count(plugin, @"RegisterChatPlayers\(") == 1, "each called once");
-            Check(At("RegisterBeastBoard(configuration,data,framework,gameGui,objects);") < game && game < At("registrations.Register(()=>selfCheck=new Diagnostics.SelfCheckRunner("),
+            Check(At("RegisterBeastBoard(configuration,data,framework,gameGui,objects);") < game && game < At("RegisterSelfCheck(pluginInterface,configuration,data,framework,client,player);"),
                 "the game chat after the beast board, before the self-check, as before");
             Check(At("RegisterChat(configuration,client,addonLifecycle,framework,player,") < players && players < At("FreeCompany.AetherialWheelReader? wheelReader=null;"),
                 "the player actions right after the chat reader, before the aetherial wheels, as before");

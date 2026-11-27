@@ -559,10 +559,8 @@ public sealed partial class Plugin : IDalamudPlugin
             // X-153 (0.1894): the game chat's layout probe and its hider, in the chat family (Plugin.Chat.cs).
             RegisterGameChat(configuration,framework,gameGui);
             // 0.494 (user request): the self-check, on its own in developer mode, on request otherwise.
-            registrations.Register(()=>selfCheck=new Diagnostics.SelfCheckRunner(framework,client,player,log,()=>configuration.DeveloperMode,mainWindow.SelfCheckReady,mainWindow.PrepareSelfCheck,mainWindow.SelfCheckProbes,mainWindow.SelfCheckWindows,
-                Path.Combine(pluginInterface.GetPluginConfigDirectory(),"SelfCheckSeen.json"),string.Join(";",data.GameData.Repositories.Values.OrderBy(repository=>repository.Name).Select(repository=>$"{repository.Name}:{repository.Version}")),
-                Path.Combine(pluginInterface.GetPluginConfigDirectory(),Diagnostics.LaunchProof.FileName),pluginInterface.AssemblyLocation.FullName),()=>selfCheck?.Dispose());
-            mainWindow.SelfCheck=selfCheck;
+            // X-153 (0.1901): the diagnostics family (self-check, reading capture) in Plugin.Diagnostics.cs.
+            RegisterSelfCheck(pluginInterface,configuration,data,framework,client,player);
             mainWindow.ConfigureMarketBoard(marketBoard);
             // X-153 (0.1898): the currency watcher and its alerts, in the inventory family (Plugin.Inventory.cs); the server bar reads it.
             var currencies=RegisterCurrencies(configuration,framework,client,player,data,condition,chat,objects,discord);
@@ -631,8 +629,7 @@ public sealed partial class Plugin : IDalamudPlugin
                 characterJobsWriter.Enqueue("The job levels and gear sets of the character could not be saved.",()=>{if(characterJobs.Save(jobs))mainWindow.CharacterJobsChanged();});
             };
             // 0.650 (phase 5): the in-game readings, in developer mode only. Temporary.
-            Diagnostics.ReadingCapture? readingCapture=null;
-            registrations.Register(()=>readingCapture=new Diagnostics.ReadingCapture(framework,objects,condition,gameGui,chat,()=>configuration.DeveloperMode,log),()=>readingCapture?.Dispose());
+            RegisterReadingCapture(configuration,framework,objects,condition,gameGui,chat);
             // g, X-06 (0.391): gatherer GP regeneration tick (on-screen bar, off by default).
             Gathering.RegenTickReader? regenTick=null;
             // g, R-08 (0.403): GP alert at the threshold (chat line and sound with the alarm options), once per rise.

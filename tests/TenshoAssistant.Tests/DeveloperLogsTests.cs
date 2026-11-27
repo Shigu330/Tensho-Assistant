@@ -65,7 +65,7 @@ internal static class DeveloperLogsTests
             Check(code.Contains("CompetitiveGate.Cut") && code.Contains("ChatMessageUnhandled-=OnMessage"),"the chat too, with its cleanup");
             Check(code.Contains("if(disposed || !enabled())return;"),"nothing outside developer mode");
             Check(code.Contains("if(count>=limit)return;"),"a limit on the lines");
-            Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs")).Contains("()=>configuration.DeveloperMode,log)"),"wired to the setting");
+            Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Diagnostics.cs")).Contains("()=>configuration.DeveloperMode,log)"),"wired to the setting (X-153, 0.1901: the diagnostics family)");
         }),
     ];
 }

@@ -74,7 +74,7 @@ internal static class Island671Tests
         }),
         ("Island: nothing is asked of the game or scheduled in it, and the read is a click",() =>
         {
-            foreach(var file in new[]{"Island/IslandReader.Dalamud.cs","MainWindow.IslandSanctuary.cs","Diagnostics/ReadingCapture.Dalamud.cs","Plugin.cs"})
+            foreach(var file in new[]{"Island/IslandReader.Dalamud.cs","MainWindow.IslandSanctuary.cs","Diagnostics/ReadingCapture.Dalamud.cs","Plugin.cs","Plugin.Diagnostics.cs"})
                 foreach(var call in new[]{"RequestDemandFull","ScheduleCraft","SetDisplayedCycle","RequestFavorData"})
                     Check(!Read(file).Contains(call,StringComparison.Ordinal),$"{file}: {call}");
             Check(Read("MainWindow.IslandSanctuary.cs").Split("ReadIsland!(catalog)").Length==2 && Read("MainWindow.IslandSanctuary.cs").Contains("if(ImGui.Button(localization.Get(\"Island.Read\")))islandRead=ReadIsland!(catalog);"),"on a click");

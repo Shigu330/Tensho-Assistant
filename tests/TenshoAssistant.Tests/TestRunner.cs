@@ -59,7 +59,14 @@ internal static class TestRegistry
 /// runs and stays in the count; a failure is said (QUARANTINE) without failing the run. After its day, or naming no test, the entry fails.</summary>
 internal static class Quarantine
 {
-    public static readonly (string Test, DateOnly Until, string Reason)[] Entries = [];
+    public static readonly (string Test, DateOnly Until, string Reason)[] Entries =
+    [
+        // 0.1901 (relay 215): failed once in a full parallel run of the tests (the waiting client took the lock past 1.5 s), green 8 times alone
+        // beside CPU burners, and once in a full run on 22/11. A timing bound that the whole suite's load can push past; to fix at
+        // its cause (a bound measured against the greedy client's own turns, not the wall clock): plan X-882.
+        ("Fair lock 1309: behaviour: a client taking the lock again in a tight loop lets a waiting client in, well before its limit (it was starved); queued at each release, the greedy client goes first in turn (fair, not a hand-over)",
+            new DateOnly(2026, 12, 4), "timing bound pushed past by the full suite's load (failed 27/11 and 22/11 in full runs, green alone under stress); plan X-882"),
+    ];
 }
 
 /// <summary>« --only TEXT » (0.1202) applied to each group; the groups left empty are dropped. A full run keeps them all.</summary>
