@@ -14,6 +14,9 @@ internal static class GitHubUnload1904Tests
     private static readonly DateTimeOffset At = new(2026, 11, 12, 12, 0, 0, TimeSpan.Zero);
     private const string TestAppId = "Iv23liTestOnly000000";
     private static readonly GitHubSignIn App = GitHubSignIn.For(TestAppId);
+    // 0.1905: Dispose's wait made long in these tests, so that the result is read from the work, not the clock (under the whole suite's load,
+    // with its pool of threads saturated, the stopped work ended past the 5 s of the plugin twice in ten runs).
+    private static readonly TimeSpan Patient = TimeSpan.FromSeconds(60);
     private const string RefreshAddress = "https://github.com/login/oauth/access_token";
     private const string Renewed = "{\"access_token\":\"ghu_new\",\"expires_in\":28800,\"refresh_token\":\"ghr_new\",\"refresh_token_expires_in\":15897600,\"token_type\":\"bearer\",\"scope\":\"\"}";
 
@@ -76,7 +79,7 @@ internal static class GitHubUnload1904Tests
         {
             var github = new GitHub { HoldUpload = true };
             Connected(root, Meta(At.AddHours(8)));
-            var exchange = new GitHubExchange(root, github, App, () => At);
+            var exchange = new GitHubExchange(root, github, App, () => At) { UnloadWait = Patient };
             Check(exchange.Exchange(Sightings(), true) && github.UploadAsked.Task.Wait(TimeSpan.FromSeconds(20)), "the upload asked");
             exchange.Dispose();
             Check(!exchange.Busy && exchange.Message is { Key: "ExchangeStopped" }, "the work ended before Dispose returned: " + (exchange.Busy ? "still busy" : exchange.Message?.Key));
@@ -108,13 +111,13 @@ internal static class GitHubUnload1904Tests
             var github = new GitHub();
             Connected(root, Meta(At.AddMinutes(-1)));
             using var other = new FileStream(Path.Combine(root, "github.lock"), FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
-            var exchange = new GitHubExchange(root, github, App, () => At);
+            var exchange = new GitHubExchange(root, github, App, () => At) { UnloadWait = Patient };
             Check(exchange.Exchange(Sightings(), true), "started");
             Thread.Sleep(500);
             Check(exchange.Busy, "waiting for the other client's lock");
             var timer = Stopwatch.StartNew();
             exchange.Dispose();
-            Check(timer.Elapsed < TimeSpan.FromSeconds(3), "Dispose not held by the lock's wait: " + timer.Elapsed);
+            Check(timer.Elapsed < TimeSpan.FromSeconds(20), "Dispose not held by the lock's wait (45 s): " + timer.Elapsed);
             Check(!exchange.Busy && exchange.Message is { Key: "ExchangeStopped" } && github.Refreshes == 0, "stopped, no renewal asked: " + exchange.Message?.Key);
         })),
     ];

@@ -123,7 +123,8 @@ internal static class GitHubToken1171Tests
         {
             using var github = new GitHub { Hold = new(TaskCreationOptions.RunContinuationsAsynchronously) }; github.Answer = OneRenewal();
             Connected(root, Due(), "ghu_old", "ghr_old");
-            var exchange = new GitHubExchange(root, github, App, () => At);
+            // 0.1905 (X-883): Dispose's wait made long, so the work has ended (and written) before the folder is removed, under any load.
+            var exchange = new GitHubExchange(root, github, App, () => At) { UnloadWait = TimeSpan.FromSeconds(60) };
             Check(exchange.Exchange(Sightings(), true) && github.Asked.Task.Wait(TimeSpan.FromSeconds(10)), "the renewal asked");
             _ = Task.Delay(300).ContinueWith(_ => github.Hold!.SetResult());
             exchange.Dispose();

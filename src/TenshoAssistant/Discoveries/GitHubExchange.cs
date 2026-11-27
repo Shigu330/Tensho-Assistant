@@ -98,8 +98,9 @@ public sealed class GitHubExchange : IDisposable
     // github-merged.json after an upload the unload stopped) used to land after Dispose returned, while the folder could be going away.
     private Task? running;
     private readonly object secretsGate=new();
-    /// <summary>X-883: the longest time Dispose waits for the work running (a renewal in flight first) before it closes the client.</summary>
-    internal static readonly TimeSpan UnloadWait=TimeSpan.FromSeconds(5);
+    /// <summary>X-883: the longest time Dispose waits for the work running (a renewal in flight first) before it closes the client. 0.1905: the
+    /// behaviour tests wait longer (a pool of threads saturated by the whole suite under load let the stopped work end past 5 s).</summary>
+    internal TimeSpan UnloadWait { get; init; }=TimeSpan.FromSeconds(5);
     /// <summary>X-181: the longest wait for the other client's renewal (beyond the renewal's own deadline).</summary>
     internal TimeSpan LockWait { get; init; }=TimeSpan.FromSeconds(45);
     internal static readonly TimeSpan RefreshDeadline=TimeSpan.FromSeconds(30);

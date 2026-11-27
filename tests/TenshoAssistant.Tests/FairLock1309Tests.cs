@@ -20,6 +20,9 @@ internal static class FairLock1309Tests
     }
 
     private static string[] Marks(string root) => Directory.GetFiles(root,"*.wait-*");
+    // X-882 (0.1905): the waiting client's wait in the first test, and the most turns the greedy client may take while it waits.
+    private const int Wait = 10_000;
+    private const int MostTurns = 3;
 
     // X-708 (0.1699): a live waiting mark, its owner still holding it. A mark closed by its owner (delete on close) stays listed while another
     // handle is open on it (another client reading its creation time, an antivirus scan): « delete pending », it cannot be opened any more.
@@ -79,7 +82,11 @@ internal static class FairLock1309Tests
         // X-668 (relay 145): fair, not a hand-over, checked at each turn. In 0.1625 a wait of 2 s after the five turns let the greedy client take
         // the lock once the waiting client had stopped asking: a lock that starved the greedy client during every turn passed. Now each turn
         // of the waiting client lasts until the greedy client is queued (its waiting mark: load cannot hide it any more), and the next turn
-        // must find that the greedy client went first, unless that turn waited past half its wait (1 s), when the lock lets it try anyway.
+        // must find that the greedy client went first, unless that turn waited past half its wait, when the lock lets it try anyway.
+        // X-882 (0.1905): « well before its limit » is counted in the greedy client's turns, not on the clock: a fair lock lets the greedy
+        // client hold it at most once or twice while this client waits (the hold under way, one that came before this client's mark); a lock
+        // that starves it lets the greedy client in again and again (dozens of turns in a second). The clock bound (1.5 s of a 2 s wait)
+        // failed under the full suite's load (22/11, 27/11) with a fair lock: the wait is now 10 s, past which the test fails as « starved ».
         ("Fair lock 1309: behaviour: a client taking the lock again in a tight loop lets a waiting client in, well before its limit (it was starved); queued at each release, the greedy client goes first in turn (fair, not a hand-over)",() => InTemp(root =>
         {
             var path = Path.Combine(root,"Profile.lock");
@@ -94,22 +101,24 @@ internal static class FairLock1309Tests
             for (var round = 0; round < 5; round++)
             {
                 var watch = System.Diagnostics.Stopwatch.StartNew();
-                using (FairFileLock.Hold(path,2_000,error => new TimeoutException("starved: " + error.Message)))
+                var before = Volatile.Read(ref held.Value);
+                using (FairFileLock.Hold(path,Wait,error => new TimeoutException("starved: " + error.Message)))
                 {
                     var took = watch.ElapsedMilliseconds;
                     var atHold = Volatile.Read(ref held.Value);
-                    rounds.Add(took + " ms, greedy " + (released < 0 ? "-" : "+" + (atHold - released)));
-                    Check(took < 1_500,"the waiting client got the lock in " + took + " ms (round " + round + ")");
+                    rounds.Add(took + " ms, greedy " + (released < 0 ? "-" : "+" + (atHold - released)) + " (" + (atHold - before) + " while waiting)");
+                    Check(atHold - before <= MostTurns,"the waiting client got the lock after " + (atHold - before) + " turns of the greedy client (round " + round + ": "
+                        + string.Join("; ",rounds) + ")");
                     if (released >= 0)
                     {
                         if (atHold > released) wentFirst++;
-                        else Check(took >= 1_000,"fair, not a hand-over: the greedy client, queued at the release of round " + (round - 1)
+                        else Check(took >= Wait / 2,"fair, not a hand-over: the greedy client, queued at the release of round " + (round - 1)
                             + ", went first (" + string.Join("; ",rounds) + ")");
                     }
                     // This client's own mark is closed once it holds the lock: a live mark now is the greedy client's, waiting behind this turn.
                     // X-708: live only; the closed mark of this client can stay listed a moment (a ghost, see Live) while the greedy client is
                     // not queued yet, and the next turn then finds nobody in line.
-                    Check(Until(() => LiveMarks(root) > 0,5_000),"the greedy client queued during round " + round + " (" + string.Join("; ",rounds) + ")");
+                    Check(Until(() => LiveMarks(root) > 0,Wait),"the greedy client queued during round " + round + " (" + string.Join("; ",rounds) + ")");
                     released = Volatile.Read(ref held.Value);
                 }
             }
