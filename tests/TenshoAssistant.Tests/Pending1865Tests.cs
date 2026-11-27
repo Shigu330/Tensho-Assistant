@@ -105,6 +105,10 @@ internal static class Pending1865Tests
     // before it), so it is not refused. X-866 (review 0.1870 M1): StartsWith and Split, any « \n », string or character: a CRLF text
     // never starts with « \n », and a split on « \n » leaves a « \r » at the end of each piece, so a comparison or an absence check
     // made on the pieces fails or always passes. Replace (X-866): a « …x\n… » snippet is never found, the text stays as it was.
+    // X-868 (review 0.1871 M2): a split's « \n » is found at any place among its separators, written in the call: several separators
+    // (« Split('\r','\n') »), an array (« Split(new[]{'\n'}) », « new char[]{…} », « new string[]{…} ») or a collection expression
+    // (« Split(['\n']) »). Not covered, on purpose: separators held in a variable or a field (« Split(Separators) »): their value is
+    // written elsewhere, and no test of today splits a raw read that way.
     // Not covered, on purpose: Regex calls (a pattern's « \n » may be the text « \\n » of a JSON file, and « \s » or « \r? » before
     // it takes the « \r »: the source alone cannot tell; Clarity1363Tests holds such a pattern), « == » or Equals against a whole read
     // (none in the tests), and reads other than File.ReadAllText (ReadAllTextAsync, StreamReader.ReadToEnd, Encoding.GetString:
@@ -112,7 +116,8 @@ internal static class Pending1865Tests
     // (its « \n » is the text « \n », and a line break written in it has the line ending of the test file's own checkout, the same as
     // the file it searches).
     private const string NewlineSearch=@"\s*\.\s*(?:(?<m>Contains|IndexOf|LastIndexOf|EndsWith|Replace)\s*\(\s*""(?:[^""\\]|\\.)*(?:[^""\\]|\\.)\\n"
-        +@"|(?<m>StartsWith|Split)\s*\(\s*(?:""(?:[^""\\]|\\.)*\\n|'\\n'))";
+        +@"|(?<m>StartsWith)\s*\(\s*(?:""(?:[^""\\]|\\.)*\\n|'\\n')"
+        +@"|(?<m>Split)\s*\(\s*(?:new\s*\w*\s*\[\s*\]\s*\{\s*|\[\s*)?(?:(?:""(?:[^""\\]|\\.)*""|'(?:[^'\\]|\\.)+')\s*,\s*)*(?:""(?:[^""\\]|\\.)*\\n|'\\n'))";
 
     // The search takes the « \r » into account. A search for a snippet: its « \r\n » form too, anywhere in the statement (the line of
     // the search and the next). A split (X-867, review 0.1871 M1): from the split itself to the end of its statement (the first « ; »

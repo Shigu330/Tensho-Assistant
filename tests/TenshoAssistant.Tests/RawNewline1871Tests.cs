@@ -1,10 +1,13 @@
 // 0.1871 (X-866, review 0.1870 M1 and M2): the ratchet of the raw newline searches (Pending1865Tests). M1: the exemption « a « \n » that
 // starts the snippet is also in « \r\n » » holds for Contains, IndexOf, LastIndexOf and EndsWith only; StartsWith and Split are found
-// with any « \n » (string or character), and a split passes only when it takes the « \r » into account. M2: the class of a raw helper
+// with any « \n » (string or character; for a split, since 0.1872, X-868, any of the separators written in the call: several, an
+// array or a collection expression), and a split passes only when it takes the « \r » into account (since 0.1872, X-867, from the
+// split to the end of its statement: see RawNewline1872Tests and RawNewline1873Tests). M2: the class of a raw helper
 // is the type whose body holds it, found in the code only (a « class » in a comment or a string no longer names it), records and
 // structs included. Neighbour cases written here so the next review finds them settled: Replace, the character forms, a read written in
-// a comment or a string, verbatim and raw literals. Not covered on purpose (reasons in Pending1865Tests: NewlineSearch and RawHelpers):
-// Regex calls, « == » or Equals against a whole read, reads other than File.ReadAllText, a nested helper called by its short name.
+// a comment or a string, verbatim and raw literals. Not covered on purpose (reasons in Pending1865Tests: NewlineSearch, Handled and
+// RawHelpers): Regex calls, « == » or Equals against a whole read, reads other than File.ReadAllText, a nested helper called by its
+// short name, split separators held in a variable or a field, a Trim or a « \r » on another expression of the split's statement.
 internal static class RawNewline1871Tests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
