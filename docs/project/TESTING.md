@@ -51,12 +51,12 @@ repris dans la ligne « Tests » de chaque entrée du [CHANGELOG](../../CHANGELO
 Contrôles de base à refaire après un changement de cycle de vie : rechargement/déchargement répété sans double callback ni commande
 orpheline ; préférence « ouvrir au chargement » respectée ; la carte du jeu (touche M) revient normale une fois le plugin déchargé.
 
-### Essais en jeu (liste produite le 2026-11-27, version 0.1889.0)
+### Essais en jeu (liste produite le 2026-11-27, version 0.1890.0)
 
 <!-- q:public -->
-_In English: this page is the author's in-game test list, in French only. Produced on 2026-11-27 for version 0.1889.0. It has 1258 boxes: 660 ticked, 598 empty. 1075 boxes follow the test source: 477 done (ticked), 589 open, 7 could not be tried, 2 failed (empty). The 183 other ticked boxes come from before the source existed (reported before it, kept as they are). Apart: 38 tests of the source have no box on this page (29 done, 8 open, 1 could not be tried, 0 failed)._
+_In English: this page is the author's in-game test list, in French only. Produced on 2026-11-27 for version 0.1890.0. It has 1259 boxes: 660 ticked, 599 empty. 1076 boxes follow the test source: 477 done (ticked), 590 open, 7 could not be tried, 2 failed (empty). The 183 other ticked boxes come from before the source existed (reported before it, kept as they are). Apart: 38 tests of the source have no box on this page (29 done, 8 open, 1 could not be tried, 0 failed)._
 
-Liste produite le 2026-11-27 (version 0.1889.0) : 1258 cases, 660 cochées, 598 vides. 1075 cases suivent la source des essais : 477 faits (cochées), 589 ouverts, 7 pas pu, 2 en échec (vides). Les 183 autres cases cochées viennent d'avant la source (essais rapportés avant qu'elle existe, gardés tels quels). À part : 38 essais de la source n'ont pas de case sur cette page (29 faits, 8 ouverts, 1 pas pu, 0 en échec).
+Liste produite le 2026-11-27 (version 0.1890.0) : 1259 cases, 660 cochées, 599 vides. 1076 cases suivent la source des essais : 477 faits (cochées), 590 ouverts, 7 pas pu, 2 en échec (vides). Les 183 autres cases cochées viennent d'avant la source (essais rapportés avant qu'elle existe, gardés tels quels). À part : 38 essais de la source n'ont pas de case sur cette page (29 faits, 8 ouverts, 1 pas pu, 0 en échec).
 <!-- /q:public -->
 
 Parcours de la campagne de la phase 6, les mêmes essais rangés par activité : [TESTING-ROUTE.md](TESTING-ROUTE.md) (2026-11-09).
@@ -2819,6 +2819,8 @@ Une étape impossible (pas de compagnie, pas de sous-marin…) se rapporte « no
 - [ ] (0.1888) Démarrage et arrêt après le déplacement de la famille de l'équipement : recharger le plugin, se déconnecter puis se reconnecter, et quitter le jeu : aucune erreur dans le journal ; puis la page Équipement montre ce qui est porté et les ensembles du jeu, et la Grâce d'un manuel s'affiche comme avant.
 
 - [ ] (0.1889) Infobulles après X-878 : sur quelques pages à listes (liste de récolte avec ses points à heures, Marché, Pêche, Jardin, Chat), passer la souris sur les éléments qui avaient une infobulle et sur un élément grisé : la même infobulle s'affiche, rien ne manque, aucune erreur dans le journal.
+
+- [ ] (0.1890) Jardin après X-879 : sur la vue d'un jardin, passer la souris sur la petite icône grise d'une parcelle sans croisement ou au voisin inconnu : la phrase s'affiche comme avant (avec le numéro de la parcelle voisine quand elle la nomme), aucune erreur dans le journal.
 
 **0.535 : interfaces** — à voir en jouant
 
