@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (899 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (903 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -676,6 +676,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-566 | Audit of 17/11 (master's report, part A, items 1 to 3): three places of the… | Done in 0.1538.0 |
 | X-567 | Audit of 17/11 (master's report, part B): four errors players see: FAQ « the… | Done in 0.1538 |
 | X-568 | Audit of 17/11 (master's report, part B, internal and generators)… | Done in 0.1879.0 |
+| X-569 | Audit of 17/11 (master's report, part C): dead code: 11 dead lines in the… | Done in 0.1884.0 |
 | X-570 | Audit of 17/11 (master's report, part A, items 4 to 10): cleanup and robustness… | Done in 0.1539 |
 | X-571 | Flaky test « Fair lock 1309 » (two bank stores on one file, 2 s lock wait)… | Done in 0.1541 |
 | X-572 | Review of block 0.1535 to 0.1539 (review 0.1539, 17/11), I1: finding in… | Done in 0.1540 |
@@ -909,6 +910,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-813 | Review of block 0.1807 to 0.1812 (review 0.1812, 22/11), I1: finding in… | Done in 0.1852.0 |
 | X-814 | Review of block 0.1807 to 0.1812 (review 0.1812, 22/11), minor M1, M2, M3: M1… | Done in 0.1848.0 |
 | X-815 | Bug seen by the user on 11/22 around 17:15 (capture read: Free company › Best… | Done in 0.1847.0 |
+| X-816 | Dead code found by the user's analysis (local AI specialised in Dalamud, 11/22… | Done in 0.1883.0 |
 | X-817 | Tool: the version publishing tool (and Verify.ps1) do not run the merge tool's… | Done in 0.1868.0 |
 | X-819 | Review of block 0.1813 to 0.1819 (review 0.1819, 22/11), I1: finding in… | Done in 0.1820.0 |
 | X-820 | Review of block 0.1813 to 0.1819 (review 0.1819, 22/11), minor M1, M2, M3: M1… | Done in 0.1822.0 |
@@ -960,19 +962,21 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-866 | Review of block 0.1869 to 0.1870 (review 0.1870, 27/11), minor M1, M2: M1 in… | Done in 0.1871.0 |
 | X-867 | Review  (review 0.1871, 27/11), minor M1, M3: M1 in… | Done in 0.1872.0 |
 | X-868 | Review  (review 0.1871, 27/11), pre-existing before the block M2: M2 in… | Done in 0.1873.0 |
+| X-869 | Relay 204: the command guard refuses the allowed PluginUiTest push written with… | Done in 0.1882.0 |
 | X-870 | Review  (review 0.1874, 27/11), minor M1: M1 in… | Done in 0.1875.0 |
 | X-871 | Review  (review 0.1874, 27/11), pre-existing before the block M2: M2 in… | Done in 0.1876.0 |
 | X-872 | CI red since 0.1879 (4fda210a, 16ac189b; job « New tool skeleton passes Verify… | Done in 0.1880.0 |
 | X-873 | Review of block 0.1877 to 0.1879 (review 0.1879, 27/11), I1: finding in… | Done in 0.1880.0 |
 | X-874 | Review of block 0.1877 to 0.1879 (review 0.1879, 27/11), pre-existing before… | Done in 0.1881.0 |
 | X-875 | Review of block 0.1880 to 0.1881 (review 0.1881, 27/11), pre-existing before… | Done in 0.1882.0 |
+| X-876 | Review  (review 0.1882, 27/11), I1: finding in docs/project/TESTING.md:57 et… | Done in 0.1882.0 |
 | X-877 | Review  (review 0.1882, 27/11), minor M1: M1 in 10-REDDIT.md:3-4 (agent file)… | Done in 0.1882.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (899 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (903 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1646,6 +1650,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-566 | Audit du 17/11 (rapport de la maître, partie A, points 1 à 3) : trois endroits… | Fait en 0.1538.0 |
 | X-567 | Audit du 17/11 (rapport de la maître, partie B) : quatre erreurs que voient les… | Fait en 0.1538 |
 | X-568 | Audit du 17/11 (rapport de la maître, partie B, internes et générateurs)… | Fait en 0.1879.0 |
+| X-569 | Audit du 17/11 (rapport de la maître, partie C) : code mort : 11 lignes mortes… | Fait en 0.1884.0 |
 | X-570 | Audit du 17/11 (rapport de la maître, partie A, points 4 à 10) : nettoyage et… | Fait en 0.1539 |
 | X-571 | Test fragile « Fair lock 1309 » (deux magasins de banque sur un fichier… | Fait en 0.1541 |
 | X-572 | Relecture du bloc 0.1535 à 0.1539 (relecture 0.1539, 17/11), I1 : Le rejeu peut… | Fait en 0.1540 |
@@ -1879,6 +1884,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-813 | Relecture du bloc 0.1807 à 0.1812 (relecture 0.1812, 22/11), I1 : X-809 : la… | Fait en 0.1852.0 |
 | X-814 | Relecture du bloc 0.1807 à 0.1812 (relecture 0.1812, 22/11), mineurs M1, M2, M3… | Fait en 0.1848.0 |
 | X-815 | Bug vu par l'utilisateur le 22/11 vers 17 h 15 (capture lue : Compagnie libre ›… | Fait en 0.1847.0 |
+| X-816 | Code mort relevé par l'analyse de l'utilisateur (IA locale spécialisée Dalamud… | Fait en 0.1883.0 |
 | X-817 | Outil : l'outil de publication des versions (et Verify.ps1) ne lance pas… | Fait en 0.1868.0 |
 | X-819 | Relecture du bloc 0.1813 à 0.1819 (relecture 0.1819, 22/11), I1 : Un gist créé… | Fait en 0.1820.0 |
 | X-820 | Relecture du bloc 0.1813 à 0.1819 (relecture 0.1819, 22/11), mineurs M1, M2, M3… | Fait en 0.1822.0 |
@@ -1930,10 +1936,12 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-866 | Relecture du bloc 0.1869 à 0.1870 (relecture 0.1870, 27/11), mineurs M1, M2… | Fait en 0.1871.0 |
 | X-867 | Relecture  (relecture 0.1871, 27/11), mineurs M1, M3 : M1 : Handled laisse… | Fait en 0.1872.0 |
 | X-868 | Relecture  (relecture 0.1871, 27/11), déjà là avant le bloc M2 : M2 : Un… | Fait en 0.1873.0 |
+| X-869 | Relais 204 : le garde-fou des commandes refuse la poussée permise vers… | Fait en 0.1882.0 |
 | X-870 | Relecture  (relecture 0.1874, 27/11), mineurs M1 : M1 : La copie reçoit le… | Fait en 0.1875.0 |
 | X-871 | Relecture  (relecture 0.1874, 27/11), déjà là avant le bloc M2 : M2 : Le… | Fait en 0.1876.0 |
 | X-872 | CI rouge depuis 0.1879 (4fda210a, 16ac189b ; job « New tool skeleton passes… | Fait en 0.1880.0 |
 | X-873 | Relecture du bloc 0.1877 à 0.1879 (relecture 0.1879, 27/11), I1 : Le nouveau… | Fait en 0.1880.0 |
 | X-874 | Relecture du bloc 0.1877 à 0.1879 (relecture 0.1879, 27/11), déjà là avant le… | Fait en 0.1881.0 |
 | X-875 | Relecture du bloc 0.1880 à 0.1881 (relecture 0.1881, 27/11), déjà là avant le… | Fait en 0.1882.0 |
+| X-876 | Relecture  (relecture 0.1882, 27/11), I1 : La page publique dit « 506 tests… | Fait en 0.1882.0 |
 | X-877 | Relecture  (relecture 0.1882, 27/11), mineurs M1 : M1 : L'en-tête du brouillon… | Fait en 0.1882.0 |
