@@ -9,8 +9,10 @@
 > 2026-10-27 to 2026-10-29 (the « History of the domains and versions » archive) were removed from this file on 2026-11-08: their names,
 > counters and states belonged to their date. They stay readable in git (this file in commit `2da535d`, 0.865.0).
 
-One plugin project (`src/TenshoAssistant`, .NET 10, Dalamud.NET.Sdk 15, a single DLL, plus the native library of the optional Raphael
-solver next to it) and a test program without native dependency (`tests/TenshoAssistant.Tests`) that compiles the pure C# files of the
+One plugin project (`src/TenshoAssistant`, .NET 10, Dalamud.NET.Sdk 15: the DLL `TenshoAssistant.dll`, with the libraries of its NuGet
+packages next to it in the package: the optional Raphael solver, `Raphael.Net.dll` and its native `raphael_bindings.dll`; SQLite for
+`TenshoData.db` and `Discoveries/Discoveries.db`, `Microsoft.Data.Sqlite.dll`, `SQLitePCLRaw.batteries_v2.dll`, `SQLitePCLRaw.core.dll`,
+`SQLitePCLRaw.provider.e_sqlite3.dll` and the native `e_sqlite3.dll`) and a test program without native dependency (`tests/TenshoAssistant.Tests`) that compiles the pure C# files of the
 plugin by link and reads the embedded data files from the sources. A third project, the desktop application
 (`src/TenshoAssistant.Desktop`), draws the plugin's own pages in a window of Windows, game closed (see « Desktop application » below).
 
@@ -337,9 +339,13 @@ Known gaps:
 > 2026-10-27 au 2026-10-29 (l'archive « Historique des domaines et des versions ») ont été retirées de ce fichier le 2026-11-08 : leurs
 > noms, compteurs et états étaient ceux de leur date. Elles restent lisibles dans git (ce fichier au commit `2da535d`, 0.865.0).
 
-Un projet plugin (`src/TenshoAssistant`, .NET 10, Dalamud.NET.Sdk 15, une seule DLL, plus à côté la bibliothèque native du solveur
-Raphael facultatif) et un programme de tests sans dépendance native (`tests/TenshoAssistant.Tests`) qui compile par lien les fichiers C#
-purs du plugin et lit les fichiers de données embarqués depuis les sources.
+Un projet plugin (`src/TenshoAssistant`, .NET 10, Dalamud.NET.Sdk 15 : la DLL `TenshoAssistant.dll`, avec à côté d'elle dans le paquet
+les bibliothèques de ses paquets NuGet : le solveur Raphael facultatif, `Raphael.Net.dll` et sa bibliothèque native `raphael_bindings.dll` ;
+SQLite pour `TenshoData.db` et `Discoveries/Discoveries.db`, `Microsoft.Data.Sqlite.dll`, `SQLitePCLRaw.batteries_v2.dll`,
+`SQLitePCLRaw.core.dll`, `SQLitePCLRaw.provider.e_sqlite3.dll` et la bibliothèque native `e_sqlite3.dll`) et un programme de tests sans
+dépendance native (`tests/TenshoAssistant.Tests`) qui compile par lien les fichiers C# purs du plugin et lit les fichiers de données
+embarqués depuis les sources. Un troisième projet, l'application de bureau (`src/TenshoAssistant.Desktop`), dessine les pages du plugin
+dans une fenêtre de Windows, jeu fermé (voir « Application de bureau » plus bas).
 
 | Fichiers | Rôle |
 |---|---|
