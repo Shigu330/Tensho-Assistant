@@ -130,7 +130,7 @@ internal sealed partial class MainWindow
                     {
                         ImGui.SameLine();
                         ImGui.TextColored(Muted,seenPoints is { } seen ? localization.Format("OceanVoyage.FishPoints",LevelRange(seen.LevelMin,seen.LevelMax)):"");
-                        if(earned.Points>0)TipText(localization.Format("OceanVoyage.FishEarned",earned.Nq+earned.Hq,earned.Points.ToString("N0",Numbers)));
+                        if(earned.Points>0){if(TipHovered())TipText(localization.Format("OceanVoyage.FishEarned",earned.Nq+earned.Hq,earned.Points.ToString("N0",Numbers)));}
                         else TipText(localization.Get("OceanVoyage.FishPointsTip"));
                     }
                     // X-85 V5 (0.963): a fish that needs Fisher's Intuition (GatherBuddy predators): an eye, the fish to catch first in its tooltip.
@@ -141,7 +141,7 @@ internal sealed partial class MainWindow
                         try{ImGui.TextColored(Warning,Dalamud.Interface.FontAwesomeExtensions.ToIconString(Dalamud.Interface.FontAwesomeIcon.Eye));}
                         finally{ImGui.PopFont();}
                         var predators=localization.Format("FishingPanel.Predators",string.Join(", ",needs.Predators.Select(pair=>$"{items?.Find(pair.Fish)?.Name ?? pair.Fish.ToString()} ×{pair.Count}")));
-                        TipText(needs.Intuition is { } seconds ? predators+"\n"+localization.Format("FishingPanel.Intuition",seconds):predators);
+                        if(TipHovered())TipText(needs.Intuition is { } seconds ? predators+"\n"+localization.Format("FishingPanel.Intuition",seconds):predators);
                     }
                     // X-85 V3 (0.961, user request): a mark on the fish that count for a mission not done yet, the missions in its tooltip.
                     if(countsFor?.Invoke(fishId,row.Bite) is { Count:>0 } wanted)
@@ -150,7 +150,7 @@ internal sealed partial class MainWindow
                         ImGui.PushFont(Dalamud.Interface.UiBuilder.IconFont);
                         try{ImGui.TextColored(Accent,Dalamud.Interface.FontAwesomeExtensions.ToIconString(Dalamud.Interface.FontAwesomeIcon.Bullseye));}
                         finally{ImGui.PopFont();}
-                        TipText(localization.Format("OceanVoyage.ForMission",string.Join("\n",wanted)));
+                        if(TipHovered())TipText(localization.Format("OceanVoyage.ForMission",string.Join("\n",wanted)));
                     }
                     ImGui.TableNextColumn();
                     for(var step=0;step<row.Route.Count;step++)
@@ -161,7 +161,7 @@ internal sealed partial class MainWindow
                         if(step==0 && inHand==row.Route[0])
                             ImGui.GetWindowDrawList().AddRect(ImGui.GetItemRectMin()-new Vector2(1),ImGui.GetItemRectMax()+new Vector2(1),ImGui.GetColorU32(Success),3,ImDrawFlags.None,2);
                         // X-684 (0.1669): the bait's icon carries the common item tooltip; only what it does not say is added under it.
-                        if((bait is null || step>0))TipText(()=>bait is null ? row.Route[step]+(step==0 ? "":"\n"+localization.Get("FishingSources.Mooch")):localization.Get("FishingSources.Mooch"));
+                        if((bait is null || step>0))if(TipHovered())TipText(bait is null ? row.Route[step]+(step==0 ? "":"\n"+localization.Get("FishingSources.Mooch")):localization.Get("FishingSources.Mooch"));
                     }
                     if(row.Route.Count==0)ImGui.TextDisabled("?");
                     ImGui.TableNextColumn();
@@ -170,7 +170,7 @@ internal sealed partial class MainWindow
                     {
                         var colour=bite switch{"Weak"=>Success,"Strong"=>Warning,"Legendary"=>Error,_=>Muted};
                         ImGui.TextColored(colour,(bite switch{"Weak"=>"!","Strong"=>"!!","Legendary"=>"!!!",_=>"?"})+(hook is not null ? " "+localization.Get("FishingPanel.HookShort"+hook):""));
-                        TipText(localization.Get(bite is not null ? "FishingPanel.Bite"+bite:"FishingPanel.BiteUnknown")+(hook is not null ? " · "+localization.Get("FishingPanel.Hook"+hook):""));
+                        if(TipHovered())TipText(localization.Get(bite is not null ? "FishingPanel.Bite"+bite:"FishingPanel.BiteUnknown")+(hook is not null ? " · "+localization.Get("FishingPanel.Hook"+hook):""));
                     }
                     else ImGui.TextDisabled("?");
                     ImGui.TableNextColumn();

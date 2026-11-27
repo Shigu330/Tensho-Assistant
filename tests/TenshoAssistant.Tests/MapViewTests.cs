@@ -112,7 +112,7 @@ internal static class MapViewTests
             var panel=Read2("MainWindow.CollectablePanel.cs");
             Check(panel.Contains("if(same)ImGui.BeginDisabled();") && panel.Contains("if(same)ImGui.EndDisabled();") && panel.Contains("if(balancedOff && risk==50)risk=CollectableRisk.Safe;"),"disabled, shown as Safe");
             // X-607 (0.1885): TipText shows its text on a disabled item too (ImGuiHoveredFlags.AllowWhenDisabled, UI/Components/Tooltip.cs).
-            Check(panel.Contains("TipText(()=>localization.Get($\"CollectablePanel.Cap{cap}\")"),"its tooltip still says why");
+            Check(panel.Contains("if(TipHovered())TipText(localization.Get($\"CollectablePanel.Cap{cap}\")"),"its tooltip still says why");
         }),
     ];
 }

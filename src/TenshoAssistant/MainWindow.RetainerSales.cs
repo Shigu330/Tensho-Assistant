@@ -85,8 +85,8 @@ internal sealed partial class MainWindow
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(listing.Quantity.ToString());
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(listing.UnitPrice?.ToString("N0",Numbers) ?? "?");
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(verdict.Lowest?.ToString("N0",Numbers) ?? "—");
-                if (verdict.Competitor is { Length: > 0 } seller) TipText(()=>localization.Format("RetainerSales.Seller", seller, offers?.DataAt?.ToLocalTime().ToString("g") ?? "?"));
-                else if (verdict.Lowest is not null && offers?.Offers.FirstOrDefault()?.Seen == true) TipText(()=>localization.Format("RetainerSales.SeenAt", offers.DataAt?.ToLocalTime().ToString("g") ?? "?"));
+                if (verdict.Competitor is { Length: > 0 } seller) {if(TipHovered())TipText(localization.Format("RetainerSales.Seller", seller, offers?.DataAt?.ToLocalTime().ToString("g") ?? "?"));}
+                else if (verdict.Lowest is not null && offers?.Offers.FirstOrDefault()?.Seen == true) if(TipHovered())TipText(localization.Format("RetainerSales.SeenAt", offers.DataAt?.ToLocalTime().ToString("g") ?? "?"));
                 ImGui.TableNextColumn();
                 var (key, color) = verdict.Kind switch
                 {

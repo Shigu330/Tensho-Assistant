@@ -76,11 +76,11 @@ internal sealed partial class MainWindow
                 ImGui.TableNextColumn();ImGui.TextUnformatted(name);
                 if(ImGui.IsItemHovered())DrawItemInfoTooltip(piece.Item);
                 ImGui.TableNextColumn();ImGui.TextUnformatted(piece.Places.Count<=3 ? string.Join(", ",piece.Places):string.Join(", ",piece.Places.Take(3))+" …");
-                if(piece.Places.Count>3)TipText(()=>string.Join(", ",piece.Places));
+                if(piece.Places.Count>3)if(TipHovered())TipText(string.Join(", ",piece.Places));
                 ImGui.TableNextColumn();
                 if(piece.SameLook.Count==0){ImGui.TextDisabled("—");continue;}
                 ImGui.TextColored(Warning,localization.Format("GlamourCollection.SameLookCount",piece.SameLook.Count));
-                TipText(()=>string.Join("\n",piece.SameLook.Select(other=>items?.Find(other)?.Name ?? $"#{other}")));
+                if(TipHovered())TipText(string.Join("\n",piece.SameLook.Select(other=>items?.Find(other)?.Name ?? $"#{other}")));
             }
         }
         finally{ImGui.EndTable();}

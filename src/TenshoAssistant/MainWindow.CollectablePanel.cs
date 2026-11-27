@@ -87,7 +87,7 @@ internal sealed partial class MainWindow
             try{clicked=ImGui.Button(icon.ToIconString()+$"###CollectableRisk{cap}");}
             finally{ImGui.PopFont();if(chosen)ImGui.PopStyleColor();if(same)ImGui.EndDisabled();}
             if(clicked && !chosen){configuration.CollectableRiskTolerance=cap;risk=cap;SaveReminders();}
-            TipText(()=>localization.Get($"CollectablePanel.Cap{cap}")+Environment.NewLine+localization.Get(same ? "CollectablePanel.BalancedSame":$"CollectablePanel.Cap{cap}Tip"));
+            if(TipHovered())TipText(localization.Get($"CollectablePanel.Cap{cap}")+Environment.NewLine+localization.Get(same ? "CollectablePanel.BalancedSame":$"CollectablePanel.Cap{cap}Tip"));
         }
         ImGui.PushTextWrapPos(0);
         // 0.531 (user report: the description did not follow the change): with a plan in hand, what this step gives on this node, in figures.

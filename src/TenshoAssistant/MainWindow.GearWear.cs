@@ -41,7 +41,7 @@ internal sealed partial class MainWindow
                 {
                     // X-191 (0.1177): the whole percent as the game shows it; the exact value in the tip.
                     ImGui.TextColored(percent>=settings.Spiritbond ? Accent:Muted,TenshoAssistant.Localization.TenshoCulture.Percent(GearWear.ShownSpiritbond(percent)));
-                    TipText(TenshoAssistant.Localization.TenshoCulture.Percent(percent,"0.00"));
+                    if(TipHovered())TipText(TenshoAssistant.Localization.TenshoCulture.Percent(percent,"0.00"));
                 }
                 else ImGui.TextDisabled("—");
             }

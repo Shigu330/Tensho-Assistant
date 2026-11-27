@@ -55,7 +55,7 @@ internal sealed partial class MainWindow
         if(grace.Left is { } left)
         {
             ImGui.TextUnformatted(localization.Format("GameGearsets.GraceLeft",left.ToString("N0",Numbers)));
-            TipText(()=>localization.Format("GameGearsets.GraceTip",grace.Param.ToString(Numbers),(grace.Cap ?? 0).ToString("N0",Numbers)));
+            if(TipHovered())TipText(localization.Format("GameGearsets.GraceTip",grace.Param.ToString(Numbers),(grace.Cap ?? 0).ToString("N0",Numbers)));
         }
         else
         {

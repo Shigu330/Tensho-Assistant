@@ -112,7 +112,7 @@ internal sealed partial class MainWindow
             DrawSmallGameIcon(item.Position.Data);
             if(ImGui.Selectable($"{localization.Format("MapLocal.Level",item.Quest.Level)}  {item.Quest.Name}  {status}##Quest{item.Quest.Id}"))FlagAt(map,world);
             QuestMenu($"QuestTool{item.Quest.Id}",item.Quest.Id,item.Quest.Name);
-            TipText(()=>CoordinateText(map,world)+"\n"+localization.Get("MapLocal.ClickFlag"));
+            if(TipHovered())TipText(CoordinateText(map,world)+"\n"+localization.Get("MapLocal.ClickFlag"));
         });
     }
 

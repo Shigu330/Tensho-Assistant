@@ -25,13 +25,15 @@ internal sealed partial class MainWindow
     }
 
     // Tooltip of the last drawn item from a ready text (also when disabled).
-    private static void TipText(string text)=>TipText(()=>text);
-
-    // X-545 (0.1517): the same from a text built only when the item is hovered (a tooltip made of several lines, per row of a long list).
-    private static void TipText(Func<string> text)
+    // X-878 (0.1889): no closure. A text that is computed (formatted, joined, made of several parts) is built only on hover, by
+    // « if(TipHovered())TipText(…) »: nothing is allocated per row and per frame while the mouse is elsewhere (UiRatchets1885Tests).
+    private static void TipText(string text)
     {
-        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(text());
+        if(TipHovered())WrappedTooltip(text);
     }
+
+    // True when the last drawn item is hovered, also when disabled: the guard of a tooltip whose text is computed.
+    private static bool TipHovered()=>ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled);
 
     // A muted « info » icon on the line, its help text on hover.
     private void HelpMarker(string key)

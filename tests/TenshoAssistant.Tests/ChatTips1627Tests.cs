@@ -21,7 +21,7 @@ internal static class ChatTips1627Tests
         ("Chat tips 1627: wiring: on hover only, never in capture mode, read from the party or nearby, nothing kept; the item's icon and description",()=>
         {
             var chat=Read("src/TenshoAssistant/MainWindow.ChatWindow.cs");
-            Check(chat.Contains("if(!chatLinesBlocked && run.Role==ChatRole.Sender && !options.CaptureNames && ChatChannels.Spoken(record.Channel))TipText(()=>ChatSenderTip(record));"),"the name's tooltip");
+            Check(chat.Contains("if(!chatLinesBlocked && run.Role==ChatRole.Sender && !options.CaptureNames && ChatChannels.Spoken(record.Channel))if(TipHovered())TipText(ChatSenderTip(record));"),"the name's tooltip");
             Check(chat.Contains("DrawGameIcon(item.IconId,") && chat.Contains("if(ChatPlayers?.Description(item.Id) is { Length:>0 } description)"),"the item's");
             var actions=Read("src/TenshoAssistant/Chat/ChatPlayerActions.Dalamud.cs");
             Check(actions.Contains("public (string Job,int Level)? Seen(ChatSource source)") && actions.Contains("foreach(var member in party)") && actions.Contains("InRange(source) is { } character"),"party, then nearby");

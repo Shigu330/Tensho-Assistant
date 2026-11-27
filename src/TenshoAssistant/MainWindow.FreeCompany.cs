@@ -137,14 +137,14 @@ internal sealed partial class MainWindow
         try{ImGui.TextColored(Accent,(vessel.Kind==VesselKind.Submarine ? FontAwesomeIcon.Water:FontAwesomeIcon.Plane).ToIconString());}
         finally{ImGui.PopFont();}
         ImGui.SameLine();ImGui.TextUnformatted(vessel.Name.Length>0 ? vessel.Name:$"#{vessel.Slot}");
-        if(vessel.RegisteredAt is { } registered)TipText(()=>localization.Format("FreeCompany.Registered",registered.ToLocalTime().ToString("g")));
+        if(vessel.RegisteredAt is { } registered)if(TipHovered())TipText(localization.Format("FreeCompany.Registered",registered.ToLocalTime().ToString("g")));
         // Rank and a bar of the experience to the next rank.
         ImGui.TableNextColumn();
         ImGui.TextUnformatted(localization.Format("FreeCompany.Rank",vessel.Rank));
         ImGui.SameLine();
         var progress=(float)Voyages.ExpProgress(vessel);
         ImGui.ProgressBar(progress,new Vector2(-1,ImGui.GetTextLineHeight()),TenshoAssistant.Localization.TenshoCulture.Percent(progress*100));
-        TipText(()=>localization.Format("FreeCompany.Exp",vessel.Exp.ToString("N0",Numbers),vessel.NextExp.ToString("N0",Numbers)));
+        if(TipHovered())TipText(localization.Format("FreeCompany.Exp",vessel.Exp.ToString("N0",Numbers),vessel.NextExp.ToString("N0",Numbers)));
         ImGui.TableNextColumn();
         if(vessel.Route.Count>0)ImGui.TextWrapped(string.Join(" › ",vessel.Route));
         // T26 (0.919): an airship's last voyage, rebuilt from the game's voyage log.

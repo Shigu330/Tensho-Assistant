@@ -108,7 +108,7 @@ internal sealed partial class MainWindow
         else
         {
             ImGui.TextUnformatted(localization.Format("Fates.SharedNext",read.Progress,read.Needed));
-            TipText(localization.Format("Fates.SharedNextTip",read.Rank+1));
+            if(TipHovered())TipText(localization.Format("Fates.SharedNextTip",read.Rank+1));
         }
         ImGui.TableNextColumn();
         if(!zone.TraderKnown){ImGui.TextDisabled(localization.Get("Fates.SharedRewardsNoTrader"));Tip("Fates.SharedRewardsNoTraderTip");return;}

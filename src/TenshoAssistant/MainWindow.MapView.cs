@@ -479,7 +479,7 @@ internal sealed partial class MainWindow
         ImGui.PushFont(UiBuilder.IconFont);
         try{ImGui.TextColored(flight.Complete ? Accent:Muted,FontAwesomeIcon.Feather.ToIconString());}
         finally{ImGui.PopFont();}
-        TipText(()=>flight.Complete ? localization.Get("MapView.FlightYes"):localization.Format("MapView.FlightPartial",flight.Unlocked,flight.Total));
+        if(TipHovered())TipText(flight.Complete ? localization.Get("MapView.FlightYes"):localization.Format("MapView.FlightPartial",flight.Unlocked,flight.Total));
     }
 
     // Vertical tool column like the game map buttons.
@@ -1131,7 +1131,7 @@ internal sealed partial class MainWindow
                     changed=true;
                 }
                 if(layer)Tip("MapView.IconsLayerFixed");
-                else TipText(()=>localization.Get(ownMenu ? "MapView.IconsOwnMenuOn":"MapView.IconsOwnMenuOff")+"\n"+localization.Get("MapView.IconsOwnMenu"));
+                else if(TipHovered())TipText(localization.Get(ownMenu ? "MapView.IconsOwnMenuOn":"MapView.IconsOwnMenuOff")+"\n"+localization.Get("MapView.IconsOwnMenu"));
                 ImGui.SameLine();
                 ImGui.TextUnformatted(iconName);
                 if(TenshoGlyph(icon) is not null)Tip("MapView.TenshoIconHelp");

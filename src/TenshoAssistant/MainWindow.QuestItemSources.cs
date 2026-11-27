@@ -91,7 +91,7 @@ internal sealed partial class MainWindow
                         if(row.IsRepeatable && row.Progress==QuestProgress.Complete)Tip("QuestSources.Repeatable");
                         ImGui.TableNextColumn();ImGui.TextUnformatted(source.Category);
                         ImGui.TableNextColumn();ImGui.TextDisabled(source.Variants.Count==1 ? localization.Get("QuestSourceCounts.VariantOne"):localization.Format("QuestSourceCounts.Variants",source.Variants.Count));
-                        TipText(()=>string.Join('\n',source.Variants.Take(12).Select(line=>
+                        if(TipHovered())TipText(string.Join('\n',source.Variants.Take(12).Select(line=>
                             $"{QuestRewardConditionLabel(line)} · {(line.Quantity is { } count ? "× "+count:localization.Get("QuestSources.Quantity"))}{(line.HighQuality==true ? " HQ":"")}"))
                             +(source.Variants.Count>12 ? localization.Get("QuestSources.More"):""));
                     }

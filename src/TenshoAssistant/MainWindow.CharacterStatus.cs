@@ -78,7 +78,7 @@ internal sealed partial class MainWindow
                     else
                     {
                         ImGui.TextUnformatted(localization.Format("CharacterStatus.BingoState",status.BingoStickers ?? 0));
-                        if(status.BingoExpires is { } expires)TipText(()=>localization.Format("CharacterStatus.BingoExpires",expires.ToLocalTime().ToString("g")));
+                        if(status.BingoExpires is { } expires)if(TipHovered())TipText(localization.Format("CharacterStatus.BingoExpires",expires.ToLocalTime().ToString("g")));
                     }
                     ImGui.TableNextColumn();
                     if(status.HuntBills is { } bills)ImGui.TextUnformatted(bills.ToString(Numbers));
@@ -138,7 +138,7 @@ internal sealed partial class MainWindow
                     else ImGui.TextDisabled(localization.Get("CharacterStatus.Unknown"));
                     ImGui.TableNextColumn();TenshoAssistant.UI.UiComponents.NumberCell(retainer.Gil.ToString("N0",Numbers));
                     ImGui.TableNextColumn();TenshoAssistant.UI.UiComponents.NumberCell(retainer.Items.ToString(Numbers));
-                    TipText(retainer.Stacks is { } stacks ? localization.Format("CharacterStatus.RetainerStock",stacks,retainer.HqStacks ?? 0,retainer.Crystals ?? 0)
+                    if(TipHovered())TipText(retainer.Stacks is { } stacks ? localization.Format("CharacterStatus.RetainerStock",stacks,retainer.HqStacks ?? 0,retainer.Crystals ?? 0)
                         :localization.Get("CharacterStatus.RetainerStockUnknown"));
                     ImGui.TableNextColumn();DrawRetainerSale(retainer,now);
                     ImGui.TableNextColumn();
@@ -210,7 +210,7 @@ internal sealed partial class MainWindow
             if(done is { } end)detail.Add(localization.Format(key,end<=now ? localization.Get("CharacterStatus.OtherDone"):end.ToLocalTime().ToString("g")));
         if(parts.Count==0 && detail.Count==0){ImGui.TextDisabled(localization.Get("CharacterStatus.Unknown"));return;}
         ImGui.TextUnformatted(parts.Count>0 ? string.Join(" · ",parts):localization.Get("CharacterStatus.OtherMore"));
-        if(detail.Count>0)TipText(string.Join("\n",detail));
+        if(detail.Count>0)if(TipHovered())TipText(string.Join("\n",detail));
     }
 
     // Reminders « done » boxes: the logged-in character's (0.374, M-04), or the shared ones when no character is logged in.

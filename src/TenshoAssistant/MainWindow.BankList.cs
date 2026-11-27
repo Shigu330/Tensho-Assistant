@@ -96,7 +96,7 @@ internal sealed partial class MainWindow
                             ImGui.TableNextColumn();ImGui.TextUnformatted(row.Hq.ToString("N0",Numbers));
                             ImGui.TableNextColumn();ImGui.TextUnformatted(row.Total.ToString("N0",Numbers));
                             ImGui.TableNextColumn();ImGui.TextDisabled(string.Join(", ",row.Storages));
-                            TipText(()=>string.Join("\n",row.Storages));
+                            if(TipHovered())TipText(string.Join("\n",row.Storages));
                         }
                         finally{ImGui.PopID();}
                     }

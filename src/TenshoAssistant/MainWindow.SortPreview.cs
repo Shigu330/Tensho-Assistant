@@ -206,7 +206,7 @@ internal sealed partial class MainWindow
                                         DrawItemInfoTooltip(stack.Item.Id.Value,hq:stack.Item.IsHighQuality);
                                         WrappedTooltip($"{(stack.Item.IsHighQuality ? "HQ":"NQ")} : {stack.Quantity:N0}\n"+localization.Format("SortUi.Slot",target+1,reserved.Name,reserved.Preserve ? localization.Get("SortUi.Protected"):""));
                                     }
-                                    else TipText(()=>localization.Format("SortUi.EmptySlot",target+1,reserved.Name,reserved.Preserve ? localization.Get("SortUi.Protected"):""));
+                                    else if(TipHovered())TipText(localization.Format("SortUi.EmptySlot",target+1,reserved.Name,reserved.Preserve ? localization.Get("SortUi.Protected"):""));
                                 }
                             }
                             finally { ImGui.PopID(); }

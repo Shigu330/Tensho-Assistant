@@ -313,7 +313,7 @@ internal sealed partial class MainWindow
                     foreach(var (item,needed) in group.Lines)
                     {
                         DrawListPanelLine(key,item,needed,GetRecipeHoldings(item));
-                        if(group.Timed)TipText(()=>string.Join(", ",ListPanelZones(item)));
+                        if(group.Timed)if(TipHovered())TipText(string.Join(", ",ListPanelZones(item)));
                         // 0.761 (X-14, user request): open or closed now, and for how long.
                         // 0.827 (X-59, user request): the timer alone, green while open, red while closed; the words on hover.
                         if(group.Timed && ListPanelTimedState(item) is { } state)
@@ -334,7 +334,7 @@ internal sealed partial class MainWindow
     {
         var size=new Vector2(ImGui.GetTextLineHeight());
         ImGui.SameLine();DrawGameIcon(TeleportIcon,size);
-        TipText(()=>localization.Format("ListPanels.ZoneCost",gil.ToString("N0",Numbers)));
+        if(TipHovered())TipText(localization.Format("ListPanels.ZoneCost",gil.ToString("N0",Numbers)));
         ImGui.SameLine();DrawItemIcon(itemCatalog.State.Catalog?.Find(1) ?? new Items.ItemDefinition(1,"",false,65002),size);
         ImGui.SameLine();ImGui.TextUnformatted(gil.ToString("N0",Numbers));
     }
@@ -549,7 +549,7 @@ internal sealed partial class MainWindow
             ImGui.PushFont(Dalamud.Interface.UiBuilder.IconFont);
             try{ImGui.TextColored(UI.FfxivTheme.Warning,Dalamud.Interface.FontAwesomeIcon.Warehouse.ToIconString());}
             finally{ImGui.PopFont();}
-            TipText(()=>localization.Format("ListPanels.Elsewhere",elsewhere));
+            if(TipHovered())TipText(localization.Format("ListPanels.Elsewhere",elsewhere));
         }
         // 0.795 (X-35, user request): a monster nearby drops it.
         if(nearbyDroppedItems.TryGetValue(itemId,out var droppers))
@@ -558,7 +558,7 @@ internal sealed partial class MainWindow
             ImGui.PushFont(Dalamud.Interface.UiBuilder.IconFont);
             try{ImGui.TextColored(new Vector4(0.98f,0.55f,0.35f,1),Dalamud.Interface.FontAwesomeIcon.Paw.ToIconString());}
             finally{ImGui.PopFont();}
-            TipText(()=>localization.Format("ListPanels.MonsterNearby",string.Join(", ",droppers)));
+            if(TipHovered())TipText(localization.Format("ListPanels.MonsterNearby",string.Join(", ",droppers)));
         }
     }
 }

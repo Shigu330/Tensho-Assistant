@@ -90,7 +90,7 @@ internal sealed partial class MainWindow
                         var key = price.Source == SaleSource.Board ? "RetainerSales.SaleListBoard" : "RetainerSales.SaleListUniversalis";
                         var seen = price.At?.ToLocalTime();
                         ImGui.TextDisabled(localization.Format(key, seen is { } local ? RetainerSaleList.Short(local, DateTimeOffset.Now) : "?"));
-                        if (seen is { } whole) TipText(localization.Format(key, whole.ToString("g")));
+                        if (seen is { } whole) if(TipHovered())TipText(localization.Format(key, whole.ToString("g")));
                     }
                     else ImGui.TextDisabled("—");
                     ImGui.TableNextColumn();

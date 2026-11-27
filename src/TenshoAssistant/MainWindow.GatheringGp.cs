@@ -188,7 +188,7 @@ internal sealed partial class MainWindow
         }
         ImGui.TextColored(Accent,localization.Format("GpUi.BountifulEstimate",bonus));
         var next=BountifulEstimate.NextStep(rating,valueBase);
-        TipText(()=>localization.Format("GpUi.BountifulEstimateHelp",rating,valueBase,(int)Math.Floor(valueBase*0.9),(int)Math.Floor(valueBase*1.1))
+        if(TipHovered())TipText(localization.Format("GpUi.BountifulEstimateHelp",rating,valueBase,(int)Math.Floor(valueBase*0.9),(int)Math.Floor(valueBase*1.1))
             +(next is { } step ? "\n"+localization.Format("GpUi.BountifulNext",step-rating):""));
         // X-156 (0.1266): the bonus comes from a community rule, not from the game: flagged as an estimate, as everywhere.
         OriginMark(UI.UiOrigin.Estimated,localization.Get("GpUi.BountifulRule"));

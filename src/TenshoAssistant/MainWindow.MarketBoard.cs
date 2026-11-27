@@ -105,7 +105,7 @@ internal sealed partial class MainWindow
             ImGui.BeginDisabled(name is null);
             try{if(ImGui.RadioButton(localization.Format("MarketBoard.Scope"+scope,name ?? "…")+$"##Scope{scope}",MarketScopeShown==scope))ChooseMarketScope(scope);}
             finally{ImGui.EndDisabled();}
-            if(name is null && scope==MarketScope.Region)TipText(()=>localization.Get(configuration.CommunityUniversalis ? "MarketBoard.RegionUnknown":"Advanced.SourceOffTip"));
+            if(name is null && scope==MarketScope.Region){if(TipHovered())TipText(localization.Get(configuration.CommunityUniversalis ? "MarketBoard.RegionUnknown":"Advanced.SourceOffTip"));}
             else Tip("MarketBoard.ScopeTip");
             ImGui.SameLine();
         }
@@ -212,7 +212,7 @@ internal sealed partial class MainWindow
                 DrawGilIcon();
                 ImGui.SameLine(0,6);
                 ImGui.TextColored(Accent,localization.Format("MarketBoard.PlanCost",plan.Offers.Count,plan.Bought));
-                TipText(()=>localization.Format("MarketBoard.PlanHelp",(plan.Cost/(double)plan.Bought).ToString("N0",Numbers)));
+                if(TipHovered())TipText(localization.Format("MarketBoard.PlanHelp",(plan.Cost/(double)plan.Bought).ToString("N0",Numbers)));
             }
             else ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("MarketBoard.PlanNone"));
         }
@@ -224,7 +224,7 @@ internal sealed partial class MainWindow
         if(Undercut.Price(board.Offers.Where(offer=>(offer.Seen ? offer.Own==false:!ownRetainers.Contains(offer.Retainer)) && (offer.Seen || !board.NamesDropped) && offer.UnitPrice is >0 and <=uint.MaxValue).Select(offer=>new UndercutListing((uint)offer.UnitPrice,offer.Hq,0)),new HashSet<ulong>()) is { } lowest)
         {
             CopyButton(localization.Format("MarketBoard.CopyUndercut",lowest.Paste.ToString("N0")),()=>lowest.Paste.ToString(System.Globalization.CultureInfo.InvariantCulture));
-            TipText(()=>localization.Format("MarketBoard.CopyUndercutTip",lowest.Lowest.ToString("N0",Numbers),board.FetchedAt.ToLocalTime().ToString("g")));
+            if(TipHovered())TipText(localization.Format("MarketBoard.CopyUndercutTip",lowest.Lowest.ToString("N0",Numbers),board.FetchedAt.ToLocalTime().ToString("g")));
         }
         ImGui.TextDisabled(localization.Format("MarketBoard.Count",marketShown.Length,board.Offers.Count));
         if(marketShown.Length==0){ImGui.TextDisabled(localization.Get("MarketBoard.Empty"));return;}
@@ -246,7 +246,7 @@ internal sealed partial class MainWindow
                 ImGui.TableNextColumn();ImGui.TextUnformatted(offer.UnitPrice.ToString("N0",Numbers));
                 ImGui.TableNextColumn();ImGui.TextUnformatted(offer.Quantity.ToString("N0",Numbers));
                 ImGui.TableNextColumn();ImGui.TextUnformatted(offer.Cost.ToString("N0",Numbers));
-                TipText(()=>localization.Format("MarketBoard.TotalHelp",offer.Total.ToString("N0",Numbers),offer.Tax.ToString("N0",Numbers)));
+                if(TipHovered())TipText(localization.Format("MarketBoard.TotalHelp",offer.Total.ToString("N0",Numbers),offer.Tax.ToString("N0",Numbers)));
                 ImGui.TableNextColumn();ImGui.TextUnformatted(offer.Hq ? "HQ":"NQ");
                 ImGui.TableNextColumn();ImGui.TextUnformatted(offer.World);
                 ImGui.TableNextColumn();

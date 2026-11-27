@@ -124,7 +124,7 @@ internal sealed partial class MainWindow
         {
             ImGui.SameLine();
             ImGui.Checkbox(localization.Format("QuestsBrowser.OtherCities", questOtherCity.Count) + "###QuestOtherCities", ref questShowOtherCities);
-            TipText(()=>localization.Format("QuestsBrowser.OtherCitiesHelp", questPlayerCity ?? localization.Get("QuestsBrowser.CityUnknown")));
+            if(TipHovered())TipText(localization.Format("QuestsBrowser.OtherCitiesHelp", questPlayerCity ?? localization.Get("QuestsBrowser.CityUnknown")));
         }
         // 0.550 (T3).
         var levelFrom = configuration.QuestList.LevelFrom; var levelTo = configuration.QuestList.LevelTo;

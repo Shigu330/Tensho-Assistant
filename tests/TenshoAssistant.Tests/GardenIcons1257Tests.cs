@@ -36,7 +36,7 @@ internal static class GardenIcons1257Tests
             Check(cell.Contains("DrawItemIconOrText(item,new Vector2(side),bed.Seed,GardenColor(state),out asIcon)"),"the seed: icon or name");
             Check(cell.Contains("if(hovered)DrawGardenBedTooltip(bed,item,state,now);") && cell.Contains("ItemLinksMenu(UniqueMenuId($\"Garden{bed.Id}\"),item);")
                 && cell.Contains("if(clicked && item is not null)SelectItem(item.Id);"),"tooltip, right-click menu, click = item in context");
-            Check(cell.Contains("ImGui.InvisibleButton($\"##GardenEmpty{number}\",new Vector2(side));\n            TipText(localization.Format(\"Garden.EmptyBed\",number));"),"an empty bed is an element with its tooltip");
+            Check(cell.Contains("ImGui.InvisibleButton($\"##GardenEmpty{number}\",new Vector2(side));\n            if(TipHovered())TipText(localization.Format(\"Garden.EmptyBed\",number));"),"an empty bed is an element with its tooltip");
             Check(cell.Contains("if(!asIcon && badge==GardenBadge.Due)ImGui.TextColored(Warning,localization.Get(\"Garden.StateToTend\"));"),"without the icon, the word says a tending is due");
             Check(cell.Contains("ImGui.TextColored(Success,localization.Get(\"Garden.Ripe\"))"),"ripe in a word");
             var buttons=Between(view,"private void DrawGardenIconButtons(","\n    }");

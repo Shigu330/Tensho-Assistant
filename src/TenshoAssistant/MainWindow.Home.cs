@@ -118,7 +118,7 @@ internal sealed partial class MainWindow
                     var room=MathF.Max(0,max.X-left-ImGui.GetStyle().ItemSpacing.X/2);
                     static float Measure(string text)=>ImGui.CalcTextSize(text).X;
                     var shownName=UI.TextFit.Fit(name,room,Measure);var shownLine=UI.TextFit.Fit(line,room,Measure);
-                    if(UI.TextFit.Shortened(name,shownName) || UI.TextFit.Shortened(line,shownLine))TipText(name+"\n"+line);
+                    if(UI.TextFit.Shortened(name,shownName) || UI.TextFit.Shortened(line,shownLine))if(TipHovered())TipText(name+"\n"+line);
                     draw.PushClipRect(min,max,true);
                     try
                     {

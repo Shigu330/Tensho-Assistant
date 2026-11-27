@@ -30,7 +30,7 @@ internal static class UiRatchets1885Tests
             Check(hand.Length == 0, "ImGui.TreeNode( written by hand: use UI.UiComponents.TreeNode(label): " + string.Join(", ", hand));
             Check(Count(@"UiComponents\.TreeNode\(") >= 23, "the tree nodes go through the component");
         }),
-        ("UI ratchets 1885: no « if hovered, tooltip » written by hand: TipText(text) or TipText(()=>text)", () =>
+        ("UI ratchets 1885: no « if hovered, tooltip » written by hand: TipText(text) or if(TipHovered())TipText(text)", () =>
         {
             var hand = Pages().Where(page => Regex.IsMatch(page.Text, @"IsItemHovered\((?:ImGuiHoveredFlags\.AllowWhenDisabled)?\)\s*\)\s*WrappedTooltip\("))
                 .Select(page => page.Name).ToArray();
@@ -54,7 +54,7 @@ internal static class UiRatchets1885Tests
             var components = File.ReadAllText(Path.Combine(Root, "UI/UiComponents.cs"));
             Check(components.Contains("public static bool TreeNode(string label)", StringComparison.Ordinal) && components.Contains("public static bool Header(string label", StringComparison.Ordinal), "TreeNode and Header");
             var tooltip = File.ReadAllText(Path.Combine(Root, "UI/Components/Tooltip.cs"));
-            Check(tooltip.Contains("private static void TipText(Func<string> text)", StringComparison.Ordinal), "TipText built on hover");
+            Check(tooltip.Contains("private static bool TipHovered()", StringComparison.Ordinal) && !tooltip.Contains("Func<string>", StringComparison.Ordinal), "TipText and its hover guard, without a closure (X-878, TipText1889Tests)");
             var contributing = File.ReadAllText(Path.GetFullPath("CONTRIBUTING.md"));
             foreach (var name in new[] { "UiComponents.Header", "UiComponents.TreeNode", "TipText(", "GlyphButton" })
                 Check(contributing.Split(name).Length >= 3, "named in both halves of CONTRIBUTING: " + name);

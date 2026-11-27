@@ -214,7 +214,7 @@ internal sealed partial class MainWindow
                 if(row.Worth(balance,days) is { } worth)
                 {
                     ImGui.TextColored(worth>0 ? Success:Muted,worth.ToString("N0",Numbers));
-                    TipText(()=>localization.Format("CurrencyValue.WorthTip",(row.Sellable(balance,days) ?? 0).ToString("N0",Numbers),days));
+                    if(TipHovered())TipText(localization.Format("CurrencyValue.WorthTip",(row.Sellable(balance,days) ?? 0).ToString("N0",Numbers),days));
                 }
                 else ImGui.TextDisabled("—");
                 ImGui.TableNextColumn();

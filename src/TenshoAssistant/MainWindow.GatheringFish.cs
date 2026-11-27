@@ -66,7 +66,7 @@ internal sealed partial class MainWindow
             if(biteTimes?.Get(place.PointId) is { Times:{ } times } && times.GetValueOrDefault(fishId) is { } biteAt)
             {
                 ImGui.TextUnformatted(localization.Format("GatheringFish.BiteAt",localization.Format("FishingPanel.BiteTime",biteAt.Minimum,biteAt.Maximum,biteAt.Usual),place.Place));
-                TipText(()=>localization.Format("FishingPanel.BiteTimeHelp",biteAt.Reports));
+                if(TipHovered())TipText(localization.Format("FishingPanel.BiteTimeHelp",biteAt.Reports));
             }
         if(spot is not null)
         {

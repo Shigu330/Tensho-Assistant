@@ -458,7 +458,7 @@ internal sealed partial class MainWindow
                     var lines=new List<string>();
                     if(bonus>0)lines.Add(localization.Format("Gear.MealBonus",bonus.ToString("N0",Numbers)));
                     if(eatenOut>0)lines.Add(localization.Format("Gear.MealEatenStat",eatenOut.ToString("N0",Numbers)));
-                    TipText(string.Join("\n",lines));
+                    if(TipHovered())TipText(string.Join("\n",lines));
                 }
                 else ImGui.TextUnformatted(later.ToString("N0",Numbers));
             }
@@ -605,7 +605,7 @@ internal sealed partial class MainWindow
                         try{ImGui.TextColored(Warning,FontAwesomeIcon.ExclamationTriangle.ToIconString());}
                         finally{ImGui.PopFont();}
                         ImGui.SameLine();ImGui.TextColored(Warning,localization.Format("Gear.OverCap",lost));
-                        TipText(()=>localization.Format("Gear.OverCapTip",lost,localization.Get("Gear.Param"+kind.Param),item.Caps?.GetValueOrDefault(kind.Param) ?? 0));
+                        if(TipHovered())TipText(localization.Format("Gear.OverCapTip",lost,localization.Get("Gear.Param"+kind.Param),item.Caps?.GetValueOrDefault(kind.Param) ?? 0));
                     }
                 }
             }

@@ -100,7 +100,7 @@ internal sealed partial class MainWindow
                 else
                 {
                     DrawGameIcon(matched.Icon,new Vector2(24));
-                    TipText(()=>localization.Format("FishingWeather.Source",name));
+                    if(TipHovered())TipText(localization.Format("FishingWeather.Source",name));
                     ImGui.SameLine();ImGui.TextUnformatted(matched.Name);
                 }
             }

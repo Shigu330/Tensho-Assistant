@@ -118,7 +118,7 @@ internal sealed partial class MainWindow
         if(data.Unmatched.Count>0)
         {
             ImGui.TextDisabled(localization.Format("Garden.CrossesUnmatched",data.Unmatched.Count));
-            TipText(()=>string.Join(", ",data.Unmatched));
+            if(TipHovered())TipText(string.Join(", ",data.Unmatched));
         }
     }
 
@@ -137,7 +137,7 @@ internal sealed partial class MainWindow
                     var others=pair.Outcomes.Where(seed=>seed!=gardenCrossSeed).Select(name).ToArray();
                     var label=name(pair.First)+" + "+name(pair.Second)+"  · "+(others.Length==0 ? localization.Get("Garden.PairOnly"):localization.Format("Garden.PairOthers",others.Length));
                     if(ImGui.Selectable(label+$"##GardenPair{pair.First}/{pair.Second}",gardenPair==pair))gardenPair=pair;
-                    if(others.Length>0)TipText(()=>string.Join(", ",others));
+                    if(others.Length>0)if(TipHovered())TipText(string.Join(", ",others));
                 }
         }
         finally{ImGui.EndChild();}

@@ -81,14 +81,14 @@ internal sealed partial class MainWindow
         if(credit.Url.Length>0)
         {
             CopyButton(localization.Get("Credits.CopyLink"),()=>credit.Url);
-            TipText(()=>localization.Format("Credits.CopyLinkTip",credit.Url));
+            if(TipHovered())TipText(localization.Format("Credits.CopyLinkTip",credit.Url));
         }
         ImGui.TableNextColumn();
         ImGui.TextWrapped(CreditLicense(credit));
         if(credit.LicenseUrl.Length>0)
         {
             CopyButton(localization.Get("Credits.CopyLicense"),()=>credit.LicenseUrl);
-            TipText(()=>localization.Format("Credits.CopyLinkTip",credit.LicenseUrl));
+            if(TipHovered())TipText(localization.Format("Credits.CopyLinkTip",credit.LicenseUrl));
         }
         ImGui.TableNextColumn();
         ImGui.TextWrapped(localization.Get("Credits.Items."+credit.Id));
@@ -108,7 +108,7 @@ internal sealed partial class MainWindow
             if(credit.Files.Count>0)
             {
                 ImGui.TextDisabled(localization.Format("Credits.Files",credit.Files.Count));
-                TipText(()=>string.Join("\n",credit.Files));
+                if(TipHovered())TipText(string.Join("\n",credit.Files));
             }
         }
         finally{ImGui.PopTextWrapPos();}

@@ -923,7 +923,7 @@ internal sealed partial class MainWindow
             {
                 if(shown)filters.Add(row.Id);else filters.Remove(row.Id);
                 ChatTabChanged(tab);
-            },row=>{TipText(()=>ChatHelpText(Chat.ChatHelp.FilterTip(row,localization.Get)));});
+            },row=>{if(TipHovered())TipText(ChatHelpText(Chat.ChatHelp.FilterTip(row,localization.Get)));});
         }
         finally{ImGui.TreePop();}
     }
@@ -942,7 +942,7 @@ internal sealed partial class MainWindow
             filters.RemoveAll(chosen=>rows.Any(row=>row.Id==chosen));
             if(all)filters.AddRange(rows.Select(row=>row.Id));
             ChatTabChanged(tab);
-        },genre=>{TipText(()=>ChatGenreTip(genre.Rows.Count(row=>filters.Contains(row.Id)),genre.Rows.Count));});
+        },genre=>{if(TipHovered())TipText(ChatGenreTip(genre.Rows.Count(row=>filters.Contains(row.Id)),genre.Rows.Count));});
     }
 
     private string ChatGenreTip(int on,int count)=>localization.Format("ChatWindow.GenreTip",on,count);
@@ -1021,7 +1021,7 @@ internal sealed partial class MainWindow
                 SetHiddenPlayers(options,hidden);
         }
         finally{ImGui.EndDisabled();}
-        if(hideFull)TipText(()=>localization.Format("ChatWindow.ListFull",ChatTextFilter.ListMaximum));
+        if(hideFull)if(TipHovered())TipText(localization.Format("ChatWindow.ListFull",ChatTextFilter.ListMaximum));
         if(ChatTextFilter.IsPlayer(said.Sender,ChatTextFilter.Words(options.HighlightedPlayers)))
         {
             if(ImGui.Selectable(localization.Format("ChatWindow.MenuUnhighlightPlayer",shown))){options.HighlightedPlayers=ChatTextFilter.RemovePlayer(options.HighlightedPlayers,said.Sender);chatSettingsPending=true;}
@@ -1038,7 +1038,7 @@ internal sealed partial class MainWindow
                 }
             }
             finally{ImGui.EndDisabled();}
-            if(forwardFull)TipText(()=>localization.Format("ChatWindow.ListFull",ChatTextFilter.ListMaximum));
+            if(forwardFull)if(TipHovered())TipText(localization.Format("ChatWindow.ListFull",ChatTextFilter.ListMaximum));
         }
         // X-447 B10 (0.1654): the conversation with this player, opened (or the one open) and shown; a player's own lines open none.
         if(options.Conversations && ChatSpoken(said) && ImGui.Selectable(localization.Format("ChatWindow.MenuConversation",shown))
@@ -1122,7 +1122,7 @@ internal sealed partial class MainWindow
         {
             if(shown)tab.Channels.Add(channel);else tab.Channels.Remove(channel);
             ChatMessages.Restart(tab);chatSettingsPending=true;
-        },channel=>{TipText(()=>ChatHelpText(Chat.ChatHelp.ChannelTip(channel)));});
+        },channel=>{if(TipHovered())TipText(ChatHelpText(Chat.ChatHelp.ChannelTip(channel)));});
     }
 
     /// <summary>
@@ -1557,7 +1557,7 @@ internal sealed partial class MainWindow
                 var text=ChatFormat.Plain(record,options,ChatChannelShort,ChatLinkName).ReplaceLineEndings(" ");
                 ImGui.TextColored(ChatColor(options.ColorOf(record.Channel)),ChatLook.Shorten(text,ImGui.GetContentRegionAvail().X,line=>ImGui.CalcTextSize(line).X));
                 if(ImGui.IsItemHovered())ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-                TipText(()=>localization.Format("ChatWindow.PinnedTip",text));
+                if(TipHovered())TipText(localization.Format("ChatWindow.PinnedTip",text));
                 if(ImGui.IsItemClicked(ImGuiMouseButton.Left))chatScrollTo=record.Id;
             }
             finally{ImGui.PopID();}
@@ -2050,7 +2050,7 @@ internal sealed partial class MainWindow
                     if(options.TextOutline)ChatOutline(run.Text);
                     ImGui.TextColored(ChatRunColour(run,record,color,options),run.Text);
                     // X-473 (0.1627): a player's name: their world, and their job and level when the game shows them (never in capture mode).
-                    if(!chatLinesBlocked && run.Role==ChatRole.Sender && !options.CaptureNames && ChatChannels.Spoken(record.Channel))TipText(()=>ChatSenderTip(record));
+                    if(!chatLinesBlocked && run.Role==ChatRole.Sender && !options.CaptureNames && ChatChannels.Spoken(record.Channel))if(TipHovered())TipText(ChatSenderTip(record));
                     if(!chatLinesBlocked && run.Link is { Kind:ChatSegmentKind.DalamudLink })TipText(localization.Get("ChatWindow.DalamudLinkGameTip"));
                     // X-473 (0.1715): a status the game linked: its icon, name and description, as the game's tooltip.
                     // X-733 (0.1734): a meal's or a medicine's: the bonuses of what was eaten or drunk, as the game's status tooltip.
@@ -2071,7 +2071,7 @@ internal sealed partial class MainWindow
             {
                 ImGui.SameLine(0,0);
                 ImGui.TextColored(Muted,localization.Format("ChatWindow.Repeats",repeats+1));
-                TipText(()=>ChatRepeatsTip(repeats+1));
+                if(TipHovered())TipText(ChatRepeatsTip(repeats+1));
             }
         }
     }
@@ -2263,7 +2263,7 @@ internal sealed partial class MainWindow
         if(link.Kind==ChatSegmentKind.DalamudLink)
         {
             if(ImGui.IsItemHovered())ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-            TipText(()=>DalamudLinkFailed==link.Plugin ? localization.Format("ChatWindow.DalamudLinkFailedTip",link.Plugin):localization.Format("ChatWindow.DalamudLinkTip",link.Plugin));
+            if(TipHovered())TipText(DalamudLinkFailed==link.Plugin ? localization.Format("ChatWindow.DalamudLinkFailedTip",link.Plugin):localization.Format("ChatWindow.DalamudLinkTip",link.Plugin));
             if(ChatLinkClicked(id))
             {
                 DalamudLinkFailed=null;

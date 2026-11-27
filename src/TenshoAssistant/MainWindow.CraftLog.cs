@@ -330,7 +330,7 @@ internal sealed partial class MainWindow
             first=false;
             var quality=Gathering.Collectables.QualityFor(threshold,maximum);
             if(ImGui.SmallButton(localization.Format(labelKey,threshold)+"###CraftLog"+labelKey))SetCraftLogTarget(recipe,quality);
-            TipText(()=>localization.Format("CraftSearch.CollectTip",threshold,quality));
+            if(TipHovered())TipText(localization.Format("CraftSearch.CollectTip",threshold,quality));
         }
     }
     // 0.468 (user request, in-game campaign): the suggestion kept as the recipe's best sequence; from then on, while it reaches the target, the panel shows it and computes nothing.

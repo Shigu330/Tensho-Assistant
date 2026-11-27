@@ -347,7 +347,7 @@ internal sealed partial class MainWindow
                     }
                     ImGui.TableNextColumn();
                     ImGui.TextUnformatted(item.Sources.Length == 1 ? DutySourceLabel(item.Sources[0]) : $"{item.Sources.Length} sources");
-                    TipText(()=>string.Join('\n',item.Sources.Select(DutySourceLabel)));
+                    if(TipHovered())TipText(string.Join('\n',item.Sources.Select(DutySourceLabel)));
                 }
             }
             finally { clipper.End(); clipper.Destroy(); }

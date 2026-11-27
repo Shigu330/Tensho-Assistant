@@ -75,7 +75,7 @@ internal sealed partial class MainWindow
             requestedChain=(macroChain.State.CharacterId,pages.Select(page=>page.Text).ToArray());writtenChain=null;macroChainApplied=null;
             macroWriter.Request(pages.Select(page=>page.Lines).ToArray(),copy);
         }
-        TipText(()=>where+"\n"+localization.Get(copy.OverwriteAny ? "CraftMacro.ToGameAny":"CraftMacro.ToGameSafe"));
+        if(TipHovered())TipText(where+"\n"+localization.Get(copy.OverwriteAny ? "CraftMacro.ToGameAny":"CraftMacro.ToGameSafe"));
         // 0.194: prediction before the click, same rule as the copy, from the slot states copied each second.
         ApplyWrittenChain();
         // 0.330: only under the very pages of the last chained copy, for the character it wrote to, while the saved plan is still the one
@@ -346,7 +346,7 @@ internal sealed partial class MainWindow
                     {
                         DrawGameIcon(metadata?.Icon ?? 0,new Vector2(24)); ImGui.SameLine();
                         ImGui.TextWrapped($"{i+1}. {metadata?.Name ?? kind.ToString()}");
-                        if(step is not null)TipText(()=>localization.Format("SimulationHelp.Effects",step.After.Veneration,step.After.Innovation,step.After.GreatStrides,step.After.WasteNot,step.After.Manipulation,step.After.MuscleMemory,localization.Get(step.After.TrainedPerfection ? "SimulationHelp.Protected":step.After.UsedTrainedPerfection ? "SimulationHelp.Used":"SimulationHelp.Available")));
+                        if(step is not null)if(TipHovered())TipText(localization.Format("SimulationHelp.Effects",step.After.Veneration,step.After.Innovation,step.After.GreatStrides,step.After.WasteNot,step.After.Manipulation,step.After.MuscleMemory,localization.Get(step.After.TrainedPerfection ? "SimulationHelp.Protected":step.After.UsedTrainedPerfection ? "SimulationHelp.Used":"SimulationHelp.Available")));
                         if(ImGui.SmallButton(localization.Get("CraftPresets.Remove"))) { simulationActions.RemoveAt(i); simulationResult=null; break; }
                         if(i>0) { ImGui.SameLine(); if(ImGui.SmallButton(localization.Get("CraftSequence.Up"))) { (simulationActions[i-1],simulationActions[i])=(simulationActions[i],simulationActions[i-1]); simulationResult=null; break; } }
                         if(i+1<simulationActions.Count) { ImGui.SameLine(); if(ImGui.SmallButton(localization.Get("CraftSequence.Down"))) { (simulationActions[i+1],simulationActions[i])=(simulationActions[i],simulationActions[i+1]); simulationResult=null; break; } }

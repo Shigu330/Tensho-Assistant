@@ -92,7 +92,7 @@ internal sealed partial class MainWindow
                 {
                     var hint=fashionHintMatches[index]; ImGui.TableNextRow(); ImGui.TableNextColumn();
                     if(ImGui.Selectable($"{hint.Name}##FashionHint{hint.Id}",fashionHintId==hint.Id)) { fashionHintId=hint.Id; fashionShowItems=true; fashionItemQuery=""; }
-                    if(developerMode) TipText(()=>$"ID: {hint.Id}");
+                    if(developerMode) if(TipHovered())TipText($"ID: {hint.Id}");
                     ImGui.TableNextColumn(); ImGui.TextUnformatted(dataset is null ? localization.Get("FashionUi.NotFetched") : dataset.ForHint(hint.Id).Count.ToString(CultureInfo.InvariantCulture));
                 }
             }
@@ -154,7 +154,7 @@ internal sealed partial class MainWindow
                     if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled) && item is not null) DrawItemInfoTooltip(id);
                     ItemLinksMenu($"FashionLinks{id}",item);
                     // X-684 (0.1695): under the common item tooltip, the slots only (the name was written twice); an item not found keeps its name line.
-                    TipText(()=>(item is null ? localization.Format("UiFragments.Equipment",localization.Get("FashionUi.Unresolved"),localization.Get("UiFragments.Unknown"))
+                    if(TipHovered())TipText((item is null ? localization.Format("UiFragments.Equipment",localization.Get("FashionUi.Unresolved"),localization.Get("UiFragments.Unknown"))
                         :localization.Format("FashionUi.ItemSlots",FashionSlotNames(item.Equipment)))+(developerMode ? $"\nID {id}":""));
                     ImGui.TableNextColumn(); ImGui.TextUnformatted(entry.Match.Reports.ToString("N0",Numbers));
                     ImGui.TableNextColumn();

@@ -54,7 +54,7 @@ internal sealed partial class MainWindow
         try{ImGui.TextColored(origin==UiOrigin.Old ? Warning:Muted,icon.ToIconString());}
         finally{ImGui.PopFont();}
         var word=localization.Get(UiOrigins.Key(origin));
-        TipText(string.IsNullOrWhiteSpace(detail) ? word:word+" · "+detail);
+        if(TipHovered())TipText(string.IsNullOrWhiteSpace(detail) ? word:word+" · "+detail);
     }
 
     // One drawing for the state and origin lines: the glyph and the short word in the colour, then the page's sentence (muted, wrapped).

@@ -124,7 +124,7 @@ internal sealed partial class MainWindow
         try{if(ImGui.Selectable(localization.Get("ChatWindow.Detach")))DetachChatTab(tab);}
         finally{ImGui.EndDisabled();}
         if(free)Tip("ChatWindow.DetachTip");
-        else TipText(()=>localization.Format("ChatWindow.DetachNoneTip",ChatWindows.Maximum));
+        else if(TipHovered())TipText(localization.Format("ChatWindow.DetachNoneTip",ChatWindows.Maximum));
         if(!any)return;
         if(ImGui.Selectable(localization.Get("ChatWindow.HideAll")))chatAllHidden=true;
         Tip("ChatWindow.HideAllTip");

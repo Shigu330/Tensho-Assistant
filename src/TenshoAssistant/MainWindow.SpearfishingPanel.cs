@@ -77,7 +77,7 @@ internal sealed partial class MainWindow
                 ImGui.SameLine(ImGui.GetFontSize()*1.4f);
                 if(frame.Slots.FirstOrDefault(slot=>slot.Index==index && slot.Available) is not { } slot){ImGui.TextDisabled("—");continue;}
                 ImGui.TextColored(Accent,Gathering.Spearfishing.ShortShadow(slot.Size,slot.Speed));
-                TipText(()=>SpearShadowText(slot.Size,slot.Speed));
+                if(TipHovered())TipText(SpearShadowText(slot.Size,slot.Speed));
                 if(slot.Large)
                 {
                     ImGui.SameLine();

@@ -21,7 +21,7 @@ internal static class SaleListCopy1726Tests
         {
             var page = Read("MainWindow.RetainerSaleList.cs");
             Check(page.Contains("var paste = RetainerSaleList.Paste(unit.Unit);", StringComparison.Ordinal) && page.Contains("() => paste.ToString());", StringComparison.Ordinal) && !page.Contains("() => unit.Unit.ToString()", StringComparison.Ordinal), "the price to paste");
-            Check(page.Contains("column == titles.Length - 1 ? ImGuiTableColumnFlags.WidthFixed", StringComparison.Ordinal) && page.Contains("if (seen is { } whole) TipText(localization.Format(key, whole.ToString(\"g\")));", StringComparison.Ordinal), "the width");
+            Check(page.Contains("column == titles.Length - 1 ? ImGuiTableColumnFlags.WidthFixed", StringComparison.Ordinal) && page.Contains("if (seen is { } whole) if(TipHovered())TipText(localization.Format(key, whole.ToString(\"g\")));", StringComparison.Ordinal), "the width");
             Check(Read("Localization/Languages/fr.json").Contains("Copie l'offre la plus basse vue moins 1 gil (jamais sous 1)", StringComparison.Ordinal)
                 && Read("Localization/Languages/en.json").Contains("Copies the lowest offer seen minus 1 gil (never under 1)", StringComparison.Ordinal), "the tooltip in en and fr");
         }),

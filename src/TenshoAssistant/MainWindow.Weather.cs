@@ -69,7 +69,7 @@ internal sealed partial class MainWindow
                     ImGui.TableNextColumn();
                     if(entry.Weather is not { } value){ImGui.TextDisabled("?");continue;}
                     DrawGameIcon(value.Icon,new Vector2(24));
-                    TipText(()=>$"{value.Name}\n{entry.StartsAt.ToLocalTime():g} · {entry.EtHours} ET");
+                    if(TipHovered())TipText($"{value.Name}\n{entry.StartsAt.ToLocalTime():g} · {entry.EtHours} ET");
                 }
             }
         }

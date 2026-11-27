@@ -150,7 +150,7 @@ internal sealed partial class MainWindow
                     ImGui.TableNextRow();ImGui.TableNextColumn();
                     DrawGameIcon(leve.TypeIcon,size);ImGui.SameLine();
                     ImGui.TextUnformatted(leve.Name);
-                    TipText(()=>LeveTooltip(leve));
+                    if(TipHovered())TipText(LeveTooltip(leve));
                     DrawLeveMenu(leve);
                     ImGui.TableNextColumn();ImGui.TextUnformatted(leve.Level.ToString());
                     ImGui.TableNextColumn();ImGui.TextUnformatted(leve.Type);

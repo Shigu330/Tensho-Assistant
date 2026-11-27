@@ -96,8 +96,8 @@ internal static class ChatHelp1517Tests
         ("Chat help 1517: the settings use the channel's and the filter's own tooltip, not a shared sentence", () =>
         {
             var code = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.ChatWindow.cs"));
-            Check(code.Contains("TipText(()=>ChatHelpText(Chat.ChatHelp.ChannelTip(channel)));")
-                  && code.Contains("TipText(()=>ChatHelpText(Chat.ChatHelp.FilterTip(row,localization.Get)));"), "the chat settings' boxes use ChatHelp");
+            Check(code.Contains("if(TipHovered())TipText(ChatHelpText(Chat.ChatHelp.ChannelTip(channel)));")
+                  && code.Contains("if(TipHovered())TipText(ChatHelpText(Chat.ChatHelp.FilterTip(row,localization.Get)));"), "the chat settings' boxes use ChatHelp");
             Check(!code.Contains("Tip(\"ChatWindow.ChannelBoxTip\")") && !code.Contains("Tip(\"ChatWindow.FilterTip\")"), "a shared tooltip is still drawn");
         }),
     ];

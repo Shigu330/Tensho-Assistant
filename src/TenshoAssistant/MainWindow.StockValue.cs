@@ -98,7 +98,7 @@ internal sealed partial class MainWindow
                 if(ImGui.IsItemHovered())DrawItemInfoTooltip(line.ItemId);
                 ImGui.TableNextColumn();TenshoAssistant.UI.UiComponents.NumberCell(line.Quantity.ToString("N0",Numbers));
                 ImGui.TableNextColumn();ImGui.TextUnformatted(line.Places.Count<=3 ? string.Join(", ",line.Places):string.Join(", ",line.Places.Take(3))+" …");
-                if(line.Places.Count>3)TipText(()=>string.Join(", ",line.Places));
+                if(line.Places.Count>3)if(TipHovered())TipText(string.Join(", ",line.Places));
                 ImGui.TableNextColumn();TenshoAssistant.UI.UiComponents.NumberCell(line.Sold.ToString("N0",Numbers));
                 ImGui.TableNextColumn();TenshoAssistant.UI.UiComponents.NumberCell(line.PerDay.ToString(line.PerDay>=10 ? "N0":"0.#",Numbers));
                 ImGui.TableNextColumn();TenshoAssistant.UI.UiComponents.NumberCell(line.PerDayGil.ToString("N0",Numbers));
@@ -117,7 +117,7 @@ internal sealed partial class MainWindow
                     if(Inventory.StockValue.NpcBuyGap(buy,line.Sold,line.Hq) is > 0 and var less)
                     {
                         ImGui.TextColored(Success,buy.ToString("N0",Numbers));
-                        TipText(localization.Format("HoverUi.NpcBuyCheaper",less.ToString("N0",Numbers)));
+                        if(TipHovered())TipText(localization.Format("HoverUi.NpcBuyCheaper",less.ToString("N0",Numbers)));
                     }
                     else TenshoAssistant.UI.UiComponents.NumberCell(buy.ToString("N0",Numbers));
                 }
@@ -186,7 +186,7 @@ internal sealed partial class MainWindow
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();ImGui.TextUnformatted(line.Place);
                 ImGui.TableNextColumn();TenshoAssistant.UI.UiComponents.NumberCell(line.Value.ToString("N0",Numbers));
-                TipText(()=>localization.Format("StockValue.ValueTip",line.Priced,line.NotSold));
+                if(TipHovered())TipText(localization.Format("StockValue.ValueTip",line.Priced,line.NotSold));
                 ImGui.TableNextColumn();
                 if(line.Unpriced>0){ImGui.TextColored(Warning,localization.Format("StockValue.Unpriced",line.Unpriced));Tip("StockValue.UnpricedTip");}
                 else ImGui.TextDisabled("—");

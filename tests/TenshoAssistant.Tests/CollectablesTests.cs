@@ -333,7 +333,7 @@ internal static class CollectablesTests
                 Check(plan.Worst<=plan.Expected && plan.Expected>=20 && plan.Worst>=7,$"real run at {risk} %: {plan}");
             }
             var panel=Read("MainWindow.CollectablePanel.cs");
-            Check(panel.Contains("CollectableRisk.Snap(configuration.CollectableRiskTolerance)") && panel.Contains("FontAwesomeIcon.HandHolding:cap==50 ? FontAwesomeIcon.BalanceScale:FontAwesomeIcon.Dice") && panel.Contains("TipText(()=>localization.Get($\"CollectablePanel.Cap{cap}\")"),"three steps");
+            Check(panel.Contains("CollectableRisk.Snap(configuration.CollectableRiskTolerance)") && panel.Contains("FontAwesomeIcon.HandHolding:cap==50 ? FontAwesomeIcon.BalanceScale:FontAwesomeIcon.Dice") && panel.Contains("if(TipHovered())TipText(localization.Get($\"CollectablePanel.Cap{cap}\")"),"three steps");
             Check(new TenshoAssistant.Configuration().CollectableRiskTolerance==50,"default");
         }),
         ("Collectables: thresholds by item and by the name shown, tiers, empty rows left out",() =>

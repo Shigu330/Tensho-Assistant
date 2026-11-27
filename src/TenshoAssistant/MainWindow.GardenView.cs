@@ -57,7 +57,7 @@ internal sealed partial class MainWindow
         {
             // An empty bed: an outlined square (the theme's border does not show in the dark theme), reached by the keyboard and the gamepad.
             ImGui.InvisibleButton($"##GardenEmpty{number}",new Vector2(side));
-            TipText(localization.Format("Garden.EmptyBed",number));
+            if(TipHovered())TipText(localization.Format("Garden.EmptyBed",number));
             ImGui.GetWindowDrawList().AddRect(ImGui.GetItemRectMin(),ImGui.GetItemRectMax(),ImGui.GetColorU32(Muted with{W=Muted.W*0.5f}));
             return;
         }
@@ -87,7 +87,7 @@ internal sealed partial class MainWindow
             {
                 if(GardenView.Left(bed,now) is { } left)ImGui.TextUnformatted(GardenLeftText(left));
                 // X-581 (0.1572): never « Ripe » when the game said otherwise: « Unknown », and why under the mouse.
-                else if(state==GardenState.Unknown){ImGui.TextColored(Muted,localization.Get("Garden.StateUnknown"));TipText(GardenUnknownText(bed));}
+                else if(state==GardenState.Unknown){ImGui.TextColored(Muted,localization.Get("Garden.StateUnknown"));if(TipHovered())TipText(GardenUnknownText(bed));}
                 // X-720 (0.1723): past the calculated time without the game's word: « Ripe? », and why under the mouse.
                 else if(state==GardenState.Expected){ImGui.TextColored(Accent,localization.Get("Garden.StateExpectedShort"));TipText(localization.Get("Garden.ExpectedWhy"));}
                 else ImGui.TextColored(Success,localization.Get("Garden.Ripe"));
@@ -222,7 +222,7 @@ internal sealed partial class MainWindow
                     ImGui.SameLine();
                     ImGui.AlignTextToFramePadding();
                     ImGui.TextDisabled("+"+(forecast.Outcomes.Count-shown).ToString(Numbers));
-                    TipText(string.Join(", ",forecast.Outcomes.Skip(shown).Select(Name)));
+                    if(TipHovered())TipText(string.Join(", ",forecast.Outcomes.Skip(shown).Select(Name)));
                 }
                 break;
             case GardenForecastKind.NoPartner:DrawGardenCrossNote(FontAwesomeIcon.Ban,localization.Get("Garden.ForecastNone"));break;

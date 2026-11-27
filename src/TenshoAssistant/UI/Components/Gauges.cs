@@ -89,7 +89,7 @@ internal sealed partial class MainWindow
         var label=ImGui.CalcTextSize(text(top)).X+ImGui.GetStyle().ItemSpacing.X;
         ImGui.Dummy(new Vector2(width,height+line*1.5f));
         var known=values.Where(value=>value is not null).Select(value=>value!.Value).ToArray();
-        if(known.Length>0)TipText(localization.Format("Dashboard.CurveSummary",text(known.Min()),text(known.Max()),text(known[^1])));
+        if(known.Length>0)if(TipHovered())TipText(localization.Format("Dashboard.CurveSummary",text(known.Min()),text(known.Max()),text(known[^1])));
         var draw=ImGui.GetWindowDrawList();
         var min=origin+new Vector2(label,line*0.5f);var max=origin+new Vector2(width-2,height);
         var border=FfxivTheme.Border;var grid=ImGui.GetColorU32(border with{W=border.W*0.6f});var muted=ImGui.GetColorU32(Muted);

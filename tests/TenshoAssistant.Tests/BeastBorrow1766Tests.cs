@@ -74,7 +74,7 @@ internal static class BeastBorrow1766Tests
             var page = Read("src/TenshoAssistant/MainWindow.Beastmaster.cs");
             Check(page.Contains("ImGui.TableNextColumn(); ImGui.TextUnformatted(beast.Family);\n                DrawBeastBorrowIcon(catalog, beast);", StringComparison.Ordinal), "after each beast's family");
             Check(page.Contains("DrawBeastBorrowLine(catalog, borrow);", StringComparison.Ordinal) && page.Contains("$\"{family} · {borrowed.Name}##{family}\"", StringComparison.Ordinal), "under the filter and in its list");
-            Check(page.Contains("TipText(() => localization.Format(\"BeastUi.BorrowTip\", BorrowLabel(catalog), borrow.Name, borrow.Effect));", StringComparison.Ordinal), "named on hover with its effect");
+            Check(page.Contains("if(TipHovered())TipText(localization.Format(\"BeastUi.BorrowTip\", BorrowLabel(catalog), borrow.Name, borrow.Effect));", StringComparison.Ordinal), "named on hover with its effect");
             foreach (var language in new[] { "en", "fr" })
             {
                 var text = Read($"src/TenshoAssistant/Localization/Languages/{language}.json");

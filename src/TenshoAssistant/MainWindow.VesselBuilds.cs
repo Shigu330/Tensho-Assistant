@@ -153,7 +153,7 @@ internal sealed partial class MainWindow
         if(readStats is { } shown && current is not null && current.Stats!=shown)
         {
             ImGui.TextColored(Warning,localization.Get("VesselBuilds.Mismatch"));
-            TipText(()=>localization.Format("VesselBuilds.MismatchTip",
+            if(TipHovered())TipText(localization.Format("VesselBuilds.MismatchTip",
                 string.Join(" / ",Enumerable.Range(0,5).Select(index=>shown[index])),string.Join(" / ",Enumerable.Range(0,5).Select(index=>current.Stats[index]))));
         }
 
@@ -220,7 +220,7 @@ internal sealed partial class MainWindow
                     ImGui.CloseCurrentPopup();
                 }
                 if(locked)ImGui.PopStyleColor();
-                TipText(()=>string.Join("\n",Enumerable.Range(0,5).Select(index=>$"{(index<names.Count ? names[index]:"")} : {option.Stats[index]}"))
+                if(TipHovered())TipText(string.Join("\n",Enumerable.Range(0,5).Select(index=>$"{(index<names.Count ? names[index]:"")} : {option.Stats[index]}"))
                         +"\n"+localization.Format("VesselBuilds.PartLine",option.Rank,option.Components,option.Repair));
                 ImGui.SameLine();
                 ImGui.TextDisabled(localization.Format("VesselBuilds.PartLine",option.Rank,option.Components,option.Repair));
@@ -343,7 +343,7 @@ internal sealed partial class MainWindow
                 row++;
                 ImGui.TableNextRow();ImGui.TableNextColumn();
                 ImGui.TextUnformatted(VesselBuilds.Identifier(catalog,candidate.Build));
-                TipText(()=>string.Join("\n",Enumerable.Range(0,4).Select(slot=>$"{localization.Get($"VesselBuilds.SlotSubmarine{slot}")} : {catalog.Find(VesselKind.Submarine,candidate.Build[slot])?.Name}"))
+                if(TipHovered())TipText(string.Join("\n",Enumerable.Range(0,4).Select(slot=>$"{localization.Get($"VesselBuilds.SlotSubmarine{slot}")} : {catalog.Find(VesselKind.Submarine,candidate.Build[slot])?.Name}"))
                     +"\n"+localization.Format("VesselBuilds.CandidateCost",candidate.Summary.Cost,candidate.Summary.Capacity)
                     +(VesselBuilds.VoyagesUntilRepair(candidate.DamagePerVoyage) is { } voyages ? "\n"+localization.Format("VesselBuilds.Wear",voyages,candidate.DamagePerVoyage):""));
                 for(var index=0;index<5;index++){ImGui.TableNextColumn();ImGui.TextUnformatted(candidate.Summary.Stats[index].ToString());}

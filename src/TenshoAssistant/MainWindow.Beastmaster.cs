@@ -131,7 +131,7 @@ internal sealed partial class MainWindow
                 var known = obtained?.Contains(beast.Id);
                 DrawStateMark(known); ImGui.SameLine();
                 ImGui.TextColored(known == true ? Success : known == false ? Muted : Accent, beast.Name);
-                TipText(()=>localization.Format("BeastUi.Tooltip", beast.Id, beast.Assault, beast.Volley));
+                if(TipHovered())TipText(localization.Format("BeastUi.Tooltip", beast.Id, beast.Assault, beast.Volley));
                 // X-135 (0.1163): the beast's rank when read (team window or board result).
                 if (BeastRanks?.TryGetValue(beast.Id, out var rankKnown) == true) { ImGui.SameLine(); ImGui.TextDisabled(localization.Format("BeastUi.KnownRank", rankKnown)); }
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(beast.Family);
@@ -322,7 +322,7 @@ internal sealed partial class MainWindow
             {
                 DrawSmallGameIcon(reward.Icon); ImGui.SameLine();
                 ImGui.TextUnformatted(localization.Format("BeastUi.ResultReward", itemCatalog.State.Catalog?.Find(reward.Item)?.Name ?? $"#{reward.Item}", reward.Count));
-                TipText(() => localization.Get("BeastUi.ResultRewardTip"));
+                if(TipHovered())TipText(localization.Get("BeastUi.ResultRewardTip"));
             }
         }
         else ImGui.TextDisabled(localization.Get("BeastUi.ResultRewardsUnread"));
@@ -692,7 +692,7 @@ internal sealed partial class MainWindow
         if (catalog.BorrowOf(beast) is not { } borrow) return;
         ImGui.SameLine();
         DrawGameIcon(borrow.Icon, new Vector2(ImGui.GetTextLineHeight()));
-        TipText(() => localization.Format("BeastUi.BorrowTip", BorrowLabel(catalog), borrow.Name, borrow.Effect));
+        if(TipHovered())TipText(localization.Format("BeastUi.BorrowTip", BorrowLabel(catalog), borrow.Name, borrow.Effect));
     }
 
     // X-746 (0.1766): under the filter, the action Borrow gives with the family chosen.
@@ -833,7 +833,7 @@ internal sealed partial class MainWindow
             var beasts = team is { Count: > 0 } ? team.Select(member => member.Beast).ToArray() : plan.Team.Select(pick => pick.Beast).ToArray();
             if (beasts.Length == 0) return;
             TenshoAssistant.UI.UiComponents.SubTitle(localization.Get("BeastUi.FeedTeam"));
-            TipText(() => localization.Get("BeastUi.FeedTeamTip"));
+            if(TipHovered())TipText(localization.Get("BeastUi.FeedTeamTip"));
             var satiety = catalog.SatietyLabel.Length > 0 ? catalog.SatietyLabel : localization.Get("BeastUi.Satiety");
             foreach (var id in BeastTeams.BookOrder(beasts))
             {
@@ -860,7 +860,7 @@ internal sealed partial class MainWindow
         {
             var knife = catalog.Items.FirstOrDefault(item => item.Row == BeastSpaces.ThiefKnife)?.Name is { Length: > 0 } name ? name : localization.Get("BeastUi.ThiefKnife");
             ImGui.TextDisabled(kind == BeastSpaces.Shop ? localization.Get("BeastUi.ShopAdvice") : localization.Format("BeastUi.TreasureAdvice", knife));
-            if (catalog.Rules.FirstOrDefault(rule => rule.Key == (kind == BeastSpaces.Shop ? "Shop" : "Treasure")) is { } rule) TipText(() => rule.Text);
+            if (catalog.Rules.FirstOrDefault(rule => rule.Key == (kind == BeastSpaces.Shop ? "Shop" : "Treasure")) is { } rule) if(TipHovered())TipText(rule.Text);
         }
         finally { ImGui.Unindent(); }
     }

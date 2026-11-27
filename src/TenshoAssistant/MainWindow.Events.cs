@@ -142,7 +142,7 @@ internal sealed partial class MainWindow
                     var definition=items?.Find(reward.ItemId);
                     // X-684 (0.1669): the icon carries the common item tooltip; its name is no longer written again under it.
                     ImGui.SameLine();DrawItemIcon(definition,new Vector2(ImGui.GetTextLineHeight()));
-                    if(definition is null)TipText(()=>$"#{reward.ItemId}");
+                    if(definition is null)if(TipHovered())TipText($"#{reward.ItemId}");
                 }
             }
             ImGui.SameLine();
