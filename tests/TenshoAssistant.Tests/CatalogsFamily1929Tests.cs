@@ -54,7 +54,7 @@ internal static class CatalogsFamily1929Tests
             foreach (var name in new[] { "RegisterNpcVendors", "RegisterMapCatalog", "RegisterWeatherAndGpCatalogs", "RegisterRecipeAndGatheringCatalogs" })
                 Check(Count(plugin, name + @"\(") == 1, name + ": called once");
             Check(At("mainWindow.PlayerGrandCompany =") < npcs && npcs < At("itemContextMenu=new ItemContextMenuBridge("), "the NPC vendors: after the Grand Company, before the context menu");
-            Check(At("hoverReader?.Dispose()") < maps && maps < At("RegisterDutyCatalog(") && At("statsReader?.Dispose()") < weather && weather < At("RegisterCraftReaders("), "the maps, then the weather and GP, around the duty catalogue and the character stats");
+            Check(At("hoverReader?.Dispose()") < maps && maps < At("RegisterDutyCatalog(") && At("RegisterCharacterStats(") < weather && weather < At("RegisterCraftReaders("), "the maps, then the weather and GP, around the duty catalogue and the character stats");
             Check(At("RegisterItemCatalog(") < recipes && recipes < At("inventoryReader = new DalamudInventoryReader("), "the recipes and gathering points: after the items' catalogue, before the inventory's reader, as before");
         }),
         ("Catalogs family 1929: each service's install and its release are given to one same registration of Plugin.Catalogs.cs (its own release, never another's)", () =>

@@ -16,6 +16,8 @@ internal static class FamilyRegistrations
             for (var i = at + head.Length - 1; i < text.Length && end < 0; i++)
             {
                 var c = text[i];
+                // 0.1930 (X-153, the character's family): a line comment is skipped, so an apostrophe in it (« the retainers' job ») opens no character.
+                if (c == '/' && i + 1 < text.Length && text[i + 1] == '/') { var line = text.IndexOf('\n', i); i = line < 0 ? text.Length : line; continue; }
                 if (c is '"' or '\'')
                 {
                     var verbatim = c == '"' && i > 0 && (text[i - 1] == '@' || (text[i - 1] == '$' && i > 1 && text[i - 2] == '@'));

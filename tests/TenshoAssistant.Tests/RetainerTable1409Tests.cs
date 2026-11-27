@@ -66,7 +66,7 @@ internal static class RetainerTable1409Tests
             Check(reader.Contains("var copy=finder?.FirstOrDefault(row=>row.RetainerId==id);", StringComparison.Ordinal) && typeof(RetainerState).GetProperties().All(property => !property.Name.Contains("Id", StringComparison.Ordinal)), "joined by id, the id not kept");
             var watcher = Read("Character/CharacterStatusWatcher.Dalamud.cs");
             Check(watcher.Contains("Retainers=ReadRetainers(),", StringComparison.Ordinal) && watcher.Contains("try{return RetainerReader.Read(jobName,townName);}", StringComparison.Ordinal), "guarded on its own");
-            var plugin = Read("Plugin.cs");
+            var plugin = Read("Plugin.Character.cs");
             Check(plugin.Contains("GetExcelSheet<Lumina.Excel.Sheets.ClassJob>().GetRowOrDefault(job)?.Abbreviation.ExtractText()", StringComparison.Ordinal)
                 && plugin.Contains("GetExcelSheet<Lumina.Excel.Sheets.Town>().GetRowOrDefault(town)?.Name.ExtractText()", StringComparison.Ordinal), "job and town named from the sheets");
         }),

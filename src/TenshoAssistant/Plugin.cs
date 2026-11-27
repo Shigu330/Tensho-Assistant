@@ -756,16 +756,8 @@ public sealed partial class Plugin : IDalamudPlugin
             // g, M-11 (0.382): challenge log entries (ContentsNote rows with a name; docs/evidence/0.382-counters.md).
             var challengeRows=LoadSheet("ContentsNote",()=>data.GetExcelSheet<Lumina.Excel.Sheets.ContentsNote>().Where(row=>!row.Name.IsEmpty && row.RowId<=int.MaxValue).Select(row=>(int)row.RowId).ToArray(),[]);
             mainWindow.ChallengeRows=()=>challengeRows;
-            // g, M-04 (0.374): one status file per character (Characters/<local character id>.json): ventures, counters, « done » boxes.
-            Character.CharacterStatusWatcher? characterStatus=null;
-            registrations.Register(()=>characterStatus=new Character.CharacterStatusWatcher(framework,player,log,
-                ()=>dailyRoulettes,Path.Combine(pluginInterface.GetPluginConfigDirectory(),"Characters"),
-                // X-196 (0.1409): the retainers' job and market town, named from the sheets (ClassJob abbreviation; Town, whose rows are RetainerTown's values).
-                job=>data.GetExcelSheet<Lumina.Excel.Sheets.ClassJob>().GetRowOrDefault(job)?.Abbreviation.ExtractText() ?? "",
-                town=>data.GetExcelSheet<Lumina.Excel.Sheets.Town>().GetRowOrDefault(town)?.Name.ExtractText() ?? "",
-                // X-469 (0.1762, D-174): the open retainer's items on sale, as the sale list reader copies them.
-                sales:()=>retainerSales?.State),()=>characterStatus?.Dispose());
-            mainWindow.CharacterStatusSource=characterStatus;
+            // X-153 (0.1930): the character's status file (ventures, counters, retainers) in Plugin.Character.cs.
+            RegisterCharacterStatus(pluginInterface,data,framework,player,dailyRoulettes,retainerSales);
             // g, C-03 (0.357): items the armoire takes, for the storage report.
             IReadOnlySet<uint>? cabinetItems=null;
             // g, C-14 (0.363): guildleves (Leve sheet, copied once) and the character's progress, read while the page shows them.
@@ -1018,8 +1010,8 @@ public sealed partial class Plugin : IDalamudPlugin
             // X-153 (0.1929): the maps' catalogue in Plugin.Catalogs.cs.
             RegisterMapCatalog(data,framework);
             RegisterDutyCatalog(pluginInterface,data,framework,client,unlocks,player);
-            CharacterStatsReader? statsReader = null;
-            registrations.Register(() => statsReader = new CharacterStatsReader(characterStats, framework, player, client, log,objects,data,gameGui), () => statsReader?.Dispose());
+            // X-153 (0.1930): the character's attributes in Plugin.Character.cs.
+            RegisterCharacterStats(data,framework,player,client,objects,gameGui);
             // X-153 (0.1929): the weather and GP actions' catalogues in Plugin.Catalogs.cs.
             RegisterWeatherAndGpCatalogs(data,framework);
             // X-153 (0.1924): the crafting family (actions' loader, live reader, food and medicine, meals, detection, recipe log) in Plugin.Craft.cs.

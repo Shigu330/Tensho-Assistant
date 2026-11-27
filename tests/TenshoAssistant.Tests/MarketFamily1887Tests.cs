@@ -46,7 +46,7 @@ internal static class MarketFamily1887Tests
             Check(call > 0 && Count(plugin, @"RegisterRetainerMarket\(") == 1, "Plugin.cs calls the family once");
             Check(call > plugin.IndexOf("SettingsNotice(\"Plugin.SettingsBackupKeptAside\",backupAside);", StringComparison.Ordinal)
                 && call < plugin.IndexOf("registrations.Register(()=>mainWindow.CommunityHelp=communityHelp=new Help.CommunityHelpIndex()", StringComparison.Ordinal), "where the services were made");
-            Check(call < plugin.IndexOf("sales:()=>retainerSales?.State", StringComparison.Ordinal), "the character status reads the reader handed back");
+            Check(call < plugin.IndexOf("RegisterCharacterStatus(pluginInterface,data,framework,player,dailyRoulettes,retainerSales);", StringComparison.Ordinal), "the character status reads the reader handed back (X-153, 0.1930: given to its family)");
             Check(home.Contains("return retainerSales;", StringComparison.Ordinal), "the sale list's reader handed back");
         }),
         ("Market family 1887: behaviour: what a family hands back is the service its install made, released once at unload", () =>

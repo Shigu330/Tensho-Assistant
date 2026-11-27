@@ -77,7 +77,7 @@ internal static class RetainerListing1762Tests
             Check(watcher.Contains("if(sales() is not { Status:TenshoAssistant.Market.RetainerSalesStatus.Ready,RetainerId:not 0 } open){lastListing=null;return;}", StringComparison.Ordinal)
                 && watcher.Contains("RetainerReader.NameOf(open.RetainerId)", StringComparison.Ordinal) && watcher.Contains("RetainerStates.WithListing(retainers,name,listed,now)", StringComparison.Ordinal)
                 && watcher.Contains("ReadListing(now);\n        if(now<nextRead)return;", StringComparison.Ordinal), "the watcher");
-            Check(Read("src/TenshoAssistant/Plugin.cs").Contains("sales:()=>retainerSales?.State),()=>characterStatus?.Dispose());", StringComparison.Ordinal), "wired");
+            Check(Read("src/TenshoAssistant/Plugin.Character.cs").Contains("sales:()=>retainerSales?.State),()=>characterStatus?.Dispose());", StringComparison.Ordinal), "wired");
             Check(Read("src/TenshoAssistant/Character/CharacterStatus.cs").Contains("Retainers=RetainerStates.KeepListings(old.Retainers,fresh.Retainers,fresh.SeenAt) ?? old.Retainers,", StringComparison.Ordinal), "merged");
             var page = Read("src/TenshoAssistant/MainWindow.CharacterStatus.cs");
             Check(page.Contains("DrawRetainerListing(retainer);\n                }", StringComparison.Ordinal) && page.Contains("localization.Get(\"CharacterStatus.ListedNever\")", StringComparison.Ordinal), "under the retainer's row");
