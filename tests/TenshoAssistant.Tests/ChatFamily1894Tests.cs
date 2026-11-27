@@ -50,7 +50,7 @@ internal static class ChatFamily1894Tests
             Check(Count(plugin, @"RegisterGameChat\(") == 1 && Count(plugin, @"RegisterChatPlayers\(") == 1, "each called once");
             Check(At("RegisterBeastBoard(configuration,data,framework,gameGui,objects);") < game && game < At("RegisterSelfCheck(pluginInterface,configuration,data,framework,client,player);"),
                 "the game chat after the beast board, before the self-check, as before");
-            Check(At("RegisterChat(configuration,client,addonLifecycle,framework,player,") < players && players < At("FreeCompany.AetherialWheelReader? wheelReader=null;"),
+            Check(At("RegisterChat(configuration,client,addonLifecycle,framework,player,") < players && players < At("RegisterAetherialWheels(configuration,"),
                 "the player actions right after the chat reader, before the aetherial wheels, as before");
         }),
         // X-885 M2 (0.1906): this case replaced « behaviour », the same RegistrationScope test copied in each family test, which touched nothing

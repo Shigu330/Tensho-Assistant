@@ -56,7 +56,7 @@ internal static class ItemsFamily1928Tests
                 Check(Count(plugin, name + @"\(") == 1, name + ": called once");
             Check(At("mainWindow.GraceSource=") < desynth && desynth < At("mainWindow.HomeRegion=()=>"), "the desynthesis: after the grace, before the home region");
             Check(At("mainWindow.StackSizeOf=") < shop && shop < At("RegisterUndercut("), "the shop reminder: after the stack sizes, before the undercut");
-            Check(At("RegisterMiniGameReaders(") < uses && uses < At("workshopDeliveryReader=new FreeCompany.WorkshopDeliveryReader(") && At("workshopDeliveryReader?.Dispose()") < catalog
+            Check(At("RegisterMiniGameReaders(") < uses && uses < At("RegisterWorkshopDeliveries(framework,gameGui);") && At("RegisterWorkshopDeliveries(framework,gameGui);") < catalog
                 && catalog < At("RegisterRecipeAndGatheringCatalogs(data,framework);"), "the uses and the catalogue: around the workshop's deliveries, before the recipes' catalogue, as before");
         }),
         ("Items family 1928: each service's install and its release are given to one same registration of Plugin.Items.cs (its own release, never another's)", () =>

@@ -106,7 +106,8 @@ internal static class AetherialWheels1719Tests
             Check(Read("MainWindow.Reminders.cs").Contains("Row(\"AetherialWheels\",FontAwesomeIcon.Cog,", StringComparison.Ordinal), "the Reminders row");
             var configuration = Read("Configuration.cs");
             Check(configuration.Contains("public List<TenshoAssistant.FreeCompany.AetherialWheelSlot>? AetherialWheels { get; set; }", StringComparison.Ordinal) && configuration.Contains("\"AetherialWheels\",", StringComparison.Ordinal), "saved, kept as player data");
-            Check(Read("Plugin.cs").Contains("new FreeCompany.AetherialWheelReader(framework,gameGui,data,log,configuration,()=>SaveTimed(\"aetherial wheels\"),()=>configuration.DeveloperMode),()=>wheelReader?.Dispose());", StringComparison.Ordinal), "owned by the plugin");
+            Check(Read("Plugin.FreeCompany.cs").Contains("new FreeCompany.AetherialWheelReader(framework,gameGui,data,log,configuration,save,()=>configuration.DeveloperMode),()=>wheelReader?.Dispose());", StringComparison.Ordinal)
+                && Read("Plugin.cs").Contains("RegisterAetherialWheels(configuration,data,framework,gameGui,()=>SaveTimed(\"aetherial wheels\"));", StringComparison.Ordinal), "owned by the plugin (X-153, 0.1931: in its family, its save given in)");
             var fr = Read("Localization/Languages/fr.json");
             Check(fr.Contains("\"AetherialWheels\": \"Tours éthéréens\"", StringComparison.Ordinal) && fr.Contains("base de tour éthéréen", StringComparison.Ordinal) && fr.Contains(": chargé\"", StringComparison.Ordinal)
                 && !fr.Contains("tours éthérées", StringComparison.Ordinal) && !fr.Contains("roue éthérée", StringComparison.Ordinal), "the game's own words (Addon 8458, 8630, 8640)");

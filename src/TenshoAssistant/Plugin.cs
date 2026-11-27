@@ -791,9 +791,8 @@ public sealed partial class Plugin : IDalamudPlugin
             registrations.Register(()=>mainWindow.ChatMessages.Renumbered+=chatSenders.Renumber,()=>mainWindow.ChatMessages.Renumbered-=chatSenders.Renumber);
             RegisterChat(configuration,client,addonLifecycle,framework,player,pluginInterface.GetPluginConfigDirectory(),chatSenders);
             RegisterChatPlayers(configuration,interop,framework,client,objects,targets,partyList,data,chatSenders,gameConfig,seStrings,contextMenus);
-            // X-225 (0.1719): the aetherial wheels of the company's stand, read in its window (the Reminders page and the automatic alarms follow).
-            FreeCompany.AetherialWheelReader? wheelReader=null;
-            registrations.Register(()=>wheelReader=new FreeCompany.AetherialWheelReader(framework,gameGui,data,log,configuration,()=>SaveTimed("aetherial wheels"),()=>configuration.DeveloperMode),()=>wheelReader?.Dispose());
+            // X-153 (0.1931): the aetherial wheels' reader in Plugin.FreeCompany.cs.
+            RegisterAetherialWheels(configuration,data,framework,gameGui,()=>SaveTimed("aetherial wheels"));
             Alarms.AutoAlarmWatcher? autoAlarms=null;
             registrations.Register(()=>autoAlarms=new Alarms.AutoAlarmWatcher(framework,client,log,configuration,()=>SaveTimed("automatic alarms"),localization.Get),
                 ()=>autoAlarms?.Dispose());
@@ -1138,9 +1137,8 @@ public sealed partial class Plugin : IDalamudPlugin
             RegisterMiniGameReaders(framework,player,client,gameGui,targets,data);
             // X-153 (0.1928): the items' uses and today's Grand Company request restored, in Plugin.Items.cs.
             RegisterItemUses(configuration,data,framework);
-            // 0.787 (X-28): what the workshop already received, from its delivery window.
-            FreeCompany.WorkshopDeliveryReader? workshopDeliveryReader=null;
-            registrations.Register(()=>workshopDeliveryReader=new FreeCompany.WorkshopDeliveryReader(framework,gameGui,log,mainWindow.WorkshopDeliverySeen),()=>workshopDeliveryReader?.Dispose());
+            // X-153 (0.1931): the workshop deliveries' reader in Plugin.FreeCompany.cs.
+            RegisterWorkshopDeliveries(framework,gameGui);
             // X-153 (0.1928): the Grand Company supply reader and the items' catalogue in Plugin.Items.cs.
             RegisterItemCatalog(configuration,data,framework,gameGui,client,player,saver);
             // X-153 (0.1929): the recipes' and gathering points' catalogues in Plugin.Catalogs.cs.

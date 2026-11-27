@@ -47,7 +47,7 @@ internal static class WorkshopDelivered787Tests
         ("Workshop delivered: read once a second while shown, kept, and used by the panel and the page",() =>
         {
             string Read(string file)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+file));
-            Check(Read("Plugin.cs").Contains("new FreeCompany.WorkshopDeliveryReader(framework,gameGui,log,mainWindow.WorkshopDeliverySeen)"),"wired");
+            Check(Read("Plugin.FreeCompany.cs").Contains("new FreeCompany.WorkshopDeliveryReader(framework,gameGui,log,mainWindow.WorkshopDeliverySeen)"),"wired");
             Check(Read("MainWindow.ListPanels.cs").Contains("WorkshopStock.Totals(workshopPanelShown,WorkshopDelivered)"),"panel");
             var page=Read("MainWindow.WorkshopProjects.cs");
             Check(page.Contains("WorkshopStock.Remaining(selected,delivered)") && page.Contains("WorkshopStock.Totals(shown,WorkshopDelivered)") && page.Contains("if(all.TryGetValue(result,out var known) && known.SameAs(delivery))return;"),"page, saved on change only");
