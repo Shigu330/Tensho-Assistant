@@ -340,11 +340,14 @@ internal sealed class StallMeter : IDisposable
         catch (Exception failure) { Record.Failed(failure.GetType().Name); }
     }
 
-    public void Dispose()
+    /// <summary>X-892 M3 (review of 0.1912): the meter asked to stop; true once its thread has ended within <paramref name="wait"/> (it records
+    /// nothing more then), false when it still runs (a process stopped under load past the wait).</summary>
+    public bool Stop(TimeSpan wait)
     {
         stop = true;
-        thread.Join(TimeSpan.FromSeconds(2));
+        return thread.Join(wait);
     }
+    public void Dispose() => Stop(TimeSpan.FromSeconds(2));
 }
 
 /// <summary>X-889 M4: the longest late wake of the stall meter (with the collector's pauses inside it and the pool then) and the longest wait
@@ -400,14 +403,40 @@ internal sealed class TestTrace : IDisposable
     private readonly object gate = new();
     private readonly StreamWriter writer;
     private readonly Stopwatch clock = Stopwatch.StartNew();
-    public TestTrace(string path)
+    private string? failure;
+    public TestTrace(string path) : this(new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.ReadWrite)) { }
+    /// <summary>X-892 M4: the trace on any stream (the behaviour test gives one whose writes fail).</summary>
+    internal TestTrace(Stream stream)
     {
-        writer = new StreamWriter(new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.ReadWrite), new System.Text.UTF8Encoding(false)) { AutoFlush = true, NewLine = "\n" };
+        writer = new StreamWriter(stream, new System.Text.UTF8Encoding(false)) { AutoFlush = true, NewLine = "\n" };
     }
+    /// <summary>X-892 M4 (review of 0.1912): why the trace stopped writing (the exception's type), null while it writes.</summary>
+    public string? Failure { get { lock (gate) return failure; } }
+    /// <summary>
+    /// X-892 M4 (review of 0.1912): a write that fails (a full disk, a locked file) or comes after the end of the run (a test thread left
+    /// behind) stops the trace, said once on the error output, and never throws: it was called outside the try that catches the tests'
+    /// failures, so the raw test thread died of it and the whole process fell, without its results, in the very sweep the trace is for.
+    /// </summary>
     public void Line(string what, string test)
     {
         var line = string.Create(System.Globalization.CultureInfo.InvariantCulture, $"{clock.Elapsed.TotalSeconds:0.000} {Environment.CurrentManagedThreadId} {what} {test}");
-        lock (gate) writer.WriteLine(line);
+        lock (gate)
+        {
+            if (failure is not null) return;
+            try { writer.WriteLine(line); }
+            catch (Exception error) when (error is IOException or ObjectDisposedException or UnauthorizedAccessException)
+            {
+                failure = error.GetType().Name;
+                Console.Error.WriteLine($"TRACE stopped: {failure} ({error.Message}); the tests go on without it.");
+            }
+        }
     }
-    public void Dispose() { lock (gate) writer.Dispose(); }
+    public void Dispose()
+    {
+        lock (gate)
+        {
+            failure ??= "closed";
+            try { writer.Dispose(); } catch (Exception error) when (error is IOException or ObjectDisposedException or UnauthorizedAccessException) { }
+        }
+    }
 }

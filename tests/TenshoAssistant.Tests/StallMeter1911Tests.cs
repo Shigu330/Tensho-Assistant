@@ -28,7 +28,9 @@ internal static class StallMeter1911Tests
             var meter = StallMeter.Start();
             var waited = System.Diagnostics.Stopwatch.StartNew();
             while ((meter.Record.Wakes < 3 || meter.Record.Probes < 1) && waited.Elapsed < S(60)) Thread.Sleep(50);
-            meter.Dispose();
+            // X-892 M3 (review of 0.1912): the thread's end is checked (Dispose joins it 2 s only; past that under load, it woke once more
+            // during the sleep below and « stopped » failed).
+            Check(meter.Stop(S(60)), "the meter's thread ended");
             Check(meter.Record.Wakes >= 3 && meter.Record.Probes >= 1, "woke and probed: " + meter.Record.Line());
             var wakes = meter.Record.Wakes;
             Thread.Sleep(600);
