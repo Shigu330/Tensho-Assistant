@@ -21,3 +21,10 @@ charset = utf-8-bom
 
 [*.{bat,cmd}]
 end_of_line = crlf
+
+# X-816 (0.1883): a private member never used or never read (IDE0051, IDE0052) and an unused parameter (IDE0060) stop the Release
+# build of the plugin and the tests (EnforceCodeStyleInBuild in their csproj); a signature imposed by its caller names the parameter _ .
+[{src/TenshoAssistant,tests/TenshoAssistant.Tests}/**.cs]
+dotnet_diagnostic.IDE0051.severity = error
+dotnet_diagnostic.IDE0052.severity = error
+dotnet_diagnostic.IDE0060.severity = error

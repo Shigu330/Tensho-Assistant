@@ -69,7 +69,7 @@ internal static class GistRotation1817Tests
         return store;
     }
     private static string MinedHash(DiscoveryStore store,uint subject)
-        =>GistRotation.Hash(CommunityDiscoveries.Mine(store.Snapshot(DateTimeOffset.UtcNow,false)).Facts.Single(fact=>fact.Subject==subject));
+        =>GistRotation.Hash(CommunityDiscoveries.Mine(store.Snapshot(DateTimeOffset.UtcNow)).Facts.Single(fact=>fact.Subject==subject));
     private static string KeyOf(uint subject)=>Fact(subject).Key;
 
     /// <summary>The profile: connected as « tester », gist g1, issue 7; the last upload (g1, revision r1) held A (subject 1).</summary>

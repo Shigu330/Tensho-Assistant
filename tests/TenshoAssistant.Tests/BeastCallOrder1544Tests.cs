@@ -10,8 +10,6 @@ internal static class BeastCallOrder1544Tests
 {
     private static void Check(bool value, string message) { if (!value) throw new Exception(message); }
 
-    private static int Hits(BoardBattle fight, Beast beast) => BeastTeams.Hits(fight, beast).Count == 0 ? 0 : fight.Enemies.Count(enemy => enemy.WeaknessRow == beast.AutoRow);
-
     private static Beast With(uint id, string name, uint auto, int strength, int intelligence)
         => new(id, name, 0, "", "x", "", "", Enumerable.Range(1, 10).Select(_ => new BeastStats(strength, intelligence, 100, 100, 500)).ToArray(), "", auto);
 

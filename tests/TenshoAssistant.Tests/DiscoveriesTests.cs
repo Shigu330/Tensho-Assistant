@@ -40,7 +40,7 @@ internal static class DiscoveriesTests
             try
             {
                 var store=new DiscoveryStore();store.SeeMonster(10,20,130,11,new Vector3(101,0,-5),12,At);
-                DiscoveryFiles.Write(Path.Combine(folder,"Import","a.json"),store.Snapshot(At,false));
+                DiscoveryFiles.Write(Path.Combine(folder,"Import","a.json"),store.Snapshot(At));
                 File.WriteAllText(Path.Combine(folder,"Import","b.json"),"{not json");
                 Check(store.Dirty,"an export does not mark the base saved");
                 var other=new DiscoveryStore();

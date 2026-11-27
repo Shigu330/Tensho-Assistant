@@ -41,7 +41,7 @@ internal static class ExchangeHour1842Tests
                 store.SeeSource(DiscoveryKind.VistaSeen,7,2,minute,at);
                 store.SeeSource(DiscoveryKind.Venture,9,1,minute,at);
             }
-            var set=ExchangeV3.Build(CommunityDiscoveries.Mine(store.Snapshot(day.AddDays(1),false)));
+            var set=ExchangeV3.Build(CommunityDiscoveries.Mine(store.Snapshot(day.AddDays(1))));
             foreach(var kind in new[]{DiscoveryKind.FishCondition,DiscoveryKind.FishTransition,DiscoveryKind.VistaSeen})
             {
                 Check(set.Files.TryGetValue(ExchangeV3.FileName(kind),out var bytes),$"{kind}: its file built");

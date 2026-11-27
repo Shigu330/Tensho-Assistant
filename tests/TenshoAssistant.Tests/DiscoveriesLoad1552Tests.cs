@@ -60,12 +60,12 @@ internal static class DiscoveriesLoad1552Tests
             store.SeeSource(DiscoveryKind.Venture,5,7,2,At);
             store.UseSharedSource(kind=>kind==DiscoveryKind.Venture ? Shared(Venture(6)):throw new IOException("damaged"),[DiscoveryKind.Venture,DiscoveryKind.FishCatch]);
             var missing=store.ReadAllShared();
-            var exported=store.Snapshot(At,false);
+            var exported=store.Snapshot(At);
             Check(missing.SequenceEqual([DiscoveryKind.FishCatch]),"the kind that cannot be read is named: "+string.Join(",",missing));
             Check(exported.Facts.Count==2 && exported.Facts.Any(fact=>fact.Subject==6),"the shared kind read in time is in the export: "+exported.Facts.Count);
             var page=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Discoveries.cs"));
             Check(page.IndexOf("var missing=store.ReadAllShared();",StringComparison.Ordinal) is var first && first>0
-                && first<page.IndexOf("DiscoveryFiles.Write(path,store.Snapshot(DateTimeOffset.UtcNow,false));",StringComparison.Ordinal)
+                && first<page.IndexOf("DiscoveryFiles.Write(path,store.Snapshot(DateTimeOffset.UtcNow));",StringComparison.Ordinal)
                 && page.Contains("\"DiscoveriesUi.ExportPartial\"",StringComparison.Ordinal),"the export reads first and says what is missing");
         }),
         ("Discoveries load 1552: A19, the summary is worked out again only when the base changed",() =>

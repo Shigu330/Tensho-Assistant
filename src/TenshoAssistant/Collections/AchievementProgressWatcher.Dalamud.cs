@@ -38,7 +38,7 @@ public sealed unsafe class AchievementProgressWatcher : IDisposable
         this.framework=framework;this.client=client;this.player=player;this.log=log;this.data=data;this.tracked=tracked;this.completed=completed;
         writer=new((error,what)=>log.Warning(error,"{0}",what));
         // 0.997 (review): a file that does not read (another shape, damaged) is kept as is: nothing is written over it (saveBlocked).
-        loading=data is null ? null:Task.Run(()=>data.Load(DateTimeOffset.UtcNow));
+        loading=data is null ? null:Task.Run(()=>data.Load());
         TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 

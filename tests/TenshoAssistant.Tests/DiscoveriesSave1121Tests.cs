@@ -42,7 +42,7 @@ internal static class DiscoveriesSave1121Tests
             Check(!store.Dirty && DiscoveryFiles.Read(good)!.Facts.Count==2,"the next save holds both and clears it");
             store.MarkSaved(stamp-1);
             Check(!store.Dirty,"an older stamp changes nothing");
-            store.Snapshot(At,false);store.SeeSource(DiscoveryKind.FestivalSeen,3,1,6,At);store.Snapshot(At);
+            store.Snapshot(At);store.SeeSource(DiscoveryKind.FestivalSeen,3,1,6,At);store.Snapshot(At);
             Check(store.Dirty,"an export or a check never marks it written");
         })),
         ("Discoveries 1121: the seen prices too: a failed write keeps them to save, a written one clears them unless they changed meanwhile",() => InTemp(root =>

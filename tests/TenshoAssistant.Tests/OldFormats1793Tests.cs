@@ -115,9 +115,9 @@ internal static class OldFormats1793Tests
         {
             Today(root);
             var bank = Text(Bank(root, Data(root)).Load());
-            var gil = new GilJournalStore(Path.Combine(root, "GilJournal"), Data(root)).Load(Journal, At);
-            var achievements = new AchievementProgressData(Path.Combine(root, "AchievementProgress.json"), Data(root)).Load(At);
-            var voyages = new VoyageHistoryData(Path.Combine(root, "VoyageHistory.json"), Data(root)).Load(At);
+            var gil = new GilJournalStore(Path.Combine(root, "GilJournal"), Data(root)).Load(Journal);
+            var achievements = new AchievementProgressData(Path.Combine(root, "AchievementProgress.json"), Data(root)).Load();
+            var voyages = new VoyageHistoryData(Path.Combine(root, "VoyageHistory.json"), Data(root)).Load();
             var discoveryPath = Path.Combine(root, "Discoveries", DiscoveryDatabase.FileName);
             var facts = Facts(new DiscoveryDatabase(discoveryPath));
             Check(bank.Length > 0 && gil.Count == 4 && Same(achievements, Progress(1)) && voyages.Count == 2 && facts.Split('\n').Length == 3, "today's data read");
@@ -128,12 +128,12 @@ internal static class OldFormats1793Tests
             var store = Bank(root, data);
             store.Save(store.Load());
             var journal = new GilJournalStore(Path.Combine(root, "GilJournal"), data);
-            journal.Save(Journal, journal.Load(Journal, At));
+            journal.Save(Journal, journal.Load(Journal));
             var progress = new AchievementProgressData(Path.Combine(root, "AchievementProgress.json"), data);
-            var all = progress.Load(At);
+            var all = progress.Load();
             foreach (var (character, seen) in all) progress.Save(character, seen, all);
             var history = new VoyageHistoryData(Path.Combine(root, "VoyageHistory.json"), data);
-            history.Save(history.Load(At), null, DateTimeOffset.UtcNow);
+            history.Save(history.Load(), null, DateTimeOffset.UtcNow);
             var discoveries = new DiscoveryDatabase(discoveryPath);
             var memory = new DiscoveryStore();
             memory.Load(discoveries.ReadMine());
@@ -143,9 +143,9 @@ internal static class OldFormats1793Tests
 
             // The next plugin load, fresh instances.
             Check(Text(Bank(root, Data(root)).Load()) == bank, "the bank identical");
-            Check(new GilJournalStore(Path.Combine(root, "GilJournal"), Data(root)).Load(Journal, At).SequenceEqual(gil), "the gil journal identical (an id above long.MaxValue)");
-            Check(Same(new AchievementProgressData(Path.Combine(root, "AchievementProgress.json"), Data(root)).Load(At), achievements), "the achievement progress identical");
-            Check(Same(new VoyageHistoryData(Path.Combine(root, "VoyageHistory.json"), Data(root)).Load(At), voyages), "the voyage history identical");
+            Check(new GilJournalStore(Path.Combine(root, "GilJournal"), Data(root)).Load(Journal).SequenceEqual(gil), "the gil journal identical (an id above long.MaxValue)");
+            Check(Same(new AchievementProgressData(Path.Combine(root, "AchievementProgress.json"), Data(root)).Load(), achievements), "the achievement progress identical");
+            Check(Same(new VoyageHistoryData(Path.Combine(root, "VoyageHistory.json"), Data(root)).Load(), voyages), "the voyage history identical");
             Check(Facts(new DiscoveryDatabase(discoveryPath)) == facts, "the discoveries identical (yours, shared, provenance)");
             using var open = new TenshoDataDatabase(Path.Combine(root, TenshoDataDatabase.FileName)).Open();
             Check(Convert.ToInt64(TenshoDataDatabase.Scalar(open, "SELECT COUNT(*) FROM converted;")) == 0 && Convert.ToInt64(TenshoDataDatabase.Scalar(open, "SELECT COUNT(*) FROM gil_converted;")) == 0,
@@ -224,9 +224,9 @@ internal static class OldFormats1793Tests
                 for (var twice = 0; twice < 2; twice++)
                 {
                     Check(Text(store.Load()) == bankShown, $"load {load}: the bank is the database's");
-                    Check(new GilJournalStore(Path.Combine(root, "GilJournal"), data).Load(Journal, At).SequenceEqual(gilShown), $"load {load}: the gil journal is the database's");
-                    Check(Same(new AchievementProgressData(Path.Combine(root, "AchievementProgress.json"), data).Load(At), progressShown), $"load {load}: the achievements are the database's");
-                    Check(Same(new VoyageHistoryData(Path.Combine(root, "VoyageHistory.json"), data).Load(At), voyagesShown), $"load {load}: the voyages are the database's");
+                    Check(new GilJournalStore(Path.Combine(root, "GilJournal"), data).Load(Journal).SequenceEqual(gilShown), $"load {load}: the gil journal is the database's");
+                    Check(Same(new AchievementProgressData(Path.Combine(root, "AchievementProgress.json"), data).Load(), progressShown), $"load {load}: the achievements are the database's");
+                    Check(Same(new VoyageHistoryData(Path.Combine(root, "VoyageHistory.json"), data).Load(), voyagesShown), $"load {load}: the voyages are the database's");
                 }
                 // Saves of this load: the database written, the files of before never.
                 store.Save(store.Load());
@@ -255,9 +255,9 @@ internal static class OldFormats1793Tests
             var saved = Bank(root, Data(root)).Load();
             Check(Text(saved) == bankShown && saved.Length == 4
                 && saved.Single(entry => entry.Key == new BankKey(Second, BankStorageKind.Bags, 0)).Snapshot.Containers.Values.Sum(container => container.Stacks.Sum(stack => stack.Quantity)) == 2, "the bank's last change saved");
-            Check(new GilJournalStore(Path.Combine(root, "GilJournal"), Data(root)).Load(Journal, At).SequenceEqual(gilShown), "the gil journal saved");
-            Check(Same(new AchievementProgressData(Path.Combine(root, "AchievementProgress.json"), Data(root)).Load(At), progressShown), "the achievements saved");
-            Check(Same(new VoyageHistoryData(Path.Combine(root, "VoyageHistory.json"), Data(root)).Load(At), voyagesShown), "the voyages saved by key");
+            Check(new GilJournalStore(Path.Combine(root, "GilJournal"), Data(root)).Load(Journal).SequenceEqual(gilShown), "the gil journal saved");
+            Check(Same(new AchievementProgressData(Path.Combine(root, "AchievementProgress.json"), Data(root)).Load(), progressShown), "the achievements saved");
+            Check(Same(new VoyageHistoryData(Path.Combine(root, "VoyageHistory.json"), Data(root)).Load(), voyagesShown), "the voyages saved by key");
         })),
         ("Old formats 1793: behaviour: the JSON mode (no data file can be made) still reads and writes the bank, gil journal, voyage and achievement files; only the former shared bank file is left aside", () => InTemp(root =>
         {
@@ -283,9 +283,9 @@ internal static class OldFormats1793Tests
             // The next load reads those files as before.
             var next = new TenshoDataFile(Path.Combine(root, TenshoDataDatabase.FileName), (_, _) => { });
             Check(Text(Bank(root, next).Load()) == Text(entries), "the bank read back");
-            Check(new GilJournalStore(Path.Combine(root, "GilJournal"), next).Load(Journal, At).SequenceEqual(Gil(3, 100)), "the gil journal read back");
-            Check(Same(new AchievementProgressData(Path.Combine(root, "AchievementProgress.json"), next).Load(At), Progress(4)), "the achievements read back");
-            Check(Same(new VoyageHistoryData(Path.Combine(root, "VoyageHistory.json"), next).Load(At), [Voyage(17, 0, 0, (1, 1)), Voyage(18, 1, 1, (2, 2))]), "the voyages read back");
+            Check(new GilJournalStore(Path.Combine(root, "GilJournal"), next).Load(Journal).SequenceEqual(Gil(3, 100)), "the gil journal read back");
+            Check(Same(new AchievementProgressData(Path.Combine(root, "AchievementProgress.json"), next).Load(), Progress(4)), "the achievements read back");
+            Check(Same(new VoyageHistoryData(Path.Combine(root, "VoyageHistory.json"), next).Load(), [Voyage(17, 0, 0, (1, 1)), Voyage(18, 1, 1, (2, 2))]), "the voyages read back");
             Check(File.ReadAllBytes(Path.Combine(root, "InventoryBank.json")).SequenceEqual(former) && !File.Exists(Path.Combine(root, "InventoryBank.json.migrated")), "the former shared file left as it is");
             Check(said.SequenceEqual(["Bank: a file of an old format (InventoryBank.json) was left aside, not read (X-574)."]), "only the former shared file said, once: " + string.Join(" | ", said));
         })),

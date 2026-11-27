@@ -46,8 +46,8 @@ internal static class DiscoveriesFormat916Tests
                 Check(DiscoveryFiles.Read(path) is null,"an older one refused");
             }
             finally{try{Directory.Delete(folder,true);}catch(Exception){}}
-            Check(typeof(CommunityDiscoveries).GetMethod("Decode") is null && ThroughGist(CommunityDiscoveries.Mine(store.Snapshot(At,false))) is [{ Seen:4 }],"shared as a v3 set (no v1/v2 gist reader left)");
-            Check(CommunityDiscoveries.Mine(store.Snapshot(At,false)).Version==2,"shared as version 2");
+            Check(typeof(CommunityDiscoveries).GetMethod("Decode") is null && ThroughGist(CommunityDiscoveries.Mine(store.Snapshot(At))) is [{ Seen:4 }],"shared as a v3 set (no v1/v2 gist reader left)");
+            Check(CommunityDiscoveries.Mine(store.Snapshot(At)).Version==2,"shared as version 2");
         }),
         ("Discoveries format: every sighting counts its value (5, 5, 7 gives 5:2 7:1) and its HQ; the Key is the same seven parts",() =>
         {
@@ -109,7 +109,7 @@ internal static class DiscoveriesFormat916Tests
                 && Histogram(bigger.ImportedValues)=="1:5,4:1","the largest per value");
             var fresh=new DiscoveryStore();fresh.Merge([Fact(1,new(){[2]=4},120)]);
             Check(fresh.Find(DiscoveryKind.MonsterDrop,_=>true,4) is [{ Seen:0, Imported:1, Hq:0, Values:null, ImportedHq:1 } added] && Histogram(added.ImportedValues)=="2:4","a new import is imported only");
-            var mine=CommunityDiscoveries.Mine(store.Snapshot(At,false));
+            var mine=CommunityDiscoveries.Mine(store.Snapshot(At));
             Check(mine.Facts is [{ Hq:1, ImportedHq:0, ImportedValues:null, Imported:0 } sent] && Histogram(sent.Values)=="1:1","only yours shared");
             var back=ThroughGist(mine);
             Check(back.Count==1 && back[0].Hq==1 && Histogram(back[0].Values)=="1:1","the gist keeps them");
@@ -118,10 +118,10 @@ internal static class DiscoveriesFormat916Tests
         {
             var store=new DiscoveryStore();
             store.Merge([new DiscoveryFact{Kind=DiscoveryKind.Venture,Subject=6,Detail=7,LevelMin=1,LevelMax=1,Imported=1,First=At,Last=At}]);
-            var empty=JsonSerializer.Serialize(store.Snapshot(At,false));
+            var empty=JsonSerializer.Serialize(store.Snapshot(At));
             Check(empty.StartsWith("{\"Version\":2,",StringComparison.Ordinal) && !empty.Contains("Hq") && !empty.Contains("Values"),"left out: "+empty);
             store.SeeSource(DiscoveryKind.Venture,5,7,5,At,hq:true);store.SeeSource(DiscoveryKind.Venture,5,7,5,At);store.SeeSource(DiscoveryKind.Venture,5,7,7,At);
-            var json=JsonSerializer.Serialize(CommunityDiscoveries.Mine(store.Snapshot(At,false)));
+            var json=JsonSerializer.Serialize(CommunityDiscoveries.Mine(store.Snapshot(At)));
             Check(json.Contains("\"Hq\":1,\"Values\":{\"5\":2,\"7\":1}") && !json.Contains("Imported\":0,\"ImportedHq") && !json.Contains("ImportedValues"),"written: "+json);
             Check(json.Contains("\"Key\":\"5:5:7:0:0:0:0\""),"the Key as before");
         }),

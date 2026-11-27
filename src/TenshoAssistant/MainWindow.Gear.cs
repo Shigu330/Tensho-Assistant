@@ -84,7 +84,7 @@ internal sealed partial class MainWindow
         ImGui.TextColored(Accent,localization.Format("CharacterDates.Summary",state.Name,state.Job,state.Level));
         ImGui.SameLine();
         ImGui.TextDisabled(localization.Format("Gear.ItemLevels",model.WornLevel.ToString("0.0",Numbers),model.PlannedLevel.ToString("0.0",Numbers)));
-        DrawGearToolbar(catalog,state,plan,plannedPieces,wornPieces);
+        DrawGearToolbar(catalog,state,plan,plannedPieces);
         if(!ImGui.BeginTable("GearPlanner",3,ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerV))return;
         try
         {
@@ -101,7 +101,7 @@ internal sealed partial class MainWindow
             foreach(var slot in GearRight)DrawGearSlot(catalog,state,slot,wornPieces,plannedPieces,plan);
         }
         finally{ImGui.EndTable();}
-        DrawGearToObtain(catalog,plannedPieces);
+        DrawGearToObtain(plannedPieces);
         ImGui.TextDisabled(localization.Get("Gear.Notes"));
     }
 
@@ -172,7 +172,7 @@ internal sealed partial class MainWindow
     }
 
     private void DrawGearToolbar(GearCatalog catalog,CharacterStatsState state,Dictionary<GearSlot,uint> plan,
-        Dictionary<GearSlot,(GearItem Item,bool Hq,IReadOnlyList<(int,int)> Materia)> planned,Dictionary<GearSlot,(GearItem Item,bool Hq,IReadOnlyList<(int,int)> Materia)> worn)
+        Dictionary<GearSlot,(GearItem Item,bool Hq,IReadOnlyList<(int,int)> Materia)> planned)
     {
         ImGui.BeginDisabled(TryOnItem is null || planned.Count==0);
         try
@@ -698,7 +698,7 @@ internal sealed partial class MainWindow
     }
 
     // Pieces of the plan the character does not own yet, each with its sources (the item menu's groups: vendors, crafting, duties…).
-    private void DrawGearToObtain(GearCatalog catalog,Dictionary<GearSlot,(GearItem Item,bool Hq,IReadOnlyList<(int,int)> Materia)> planned)
+    private void DrawGearToObtain(Dictionary<GearSlot,(GearItem Item,bool Hq,IReadOnlyList<(int,int)> Materia)> planned)
     {
         var pieces=planned.Select(pair=>(Slot:pair.Key,Item:gearLooks.GetValueOrDefault(pair.Key) ?? pair.Value.Item))
             .Concat(gearLooks.Where(pair=>!planned.ContainsKey(pair.Key)).Select(pair=>(Slot:pair.Key,Item:pair.Value)))

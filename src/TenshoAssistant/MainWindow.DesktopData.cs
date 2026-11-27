@@ -201,7 +201,7 @@ internal sealed partial class MainWindow
             IReadOnlyDictionary<uint,Collections.AchievementProgress>? seen=null;
             try
             {
-                var all=progress.Load(DateTimeOffset.UtcNow);
+                var all=progress.Load();
                 if(Collections.AchievementProgressData.Latest(all) is { } character)seen=all[character];
             }
             catch(Exception error){warn(error,"The achievement progress could not be read from the copy of the Tensho data file.");return;}
@@ -302,7 +302,7 @@ internal sealed partial class MainWindow
                 var now=DateTimeOffset.UtcNow;
                 if(journal.Latest() is { } character)
                 {
-                    var entries=Inventory.GilJournal.Prune(journal.Load(character,now),now);
+                    var entries=Inventory.GilJournal.Prune(journal.Load(character),now);
                     var (gil,retainers,company)=Inventory.GilJournal.LastBalances(entries);
                     state=new Inventory.GilJournalState(character,entries.ToArray(),gil,retainers,company,false);
                 }

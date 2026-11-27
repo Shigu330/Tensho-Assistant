@@ -43,14 +43,14 @@ internal static class GilJournalSqlite1139Tests
             var said=new List<string>();
             var store=Store(folder,database,said:said);
             Check(store.Mode=="sqlite","SQLite in use: "+store.Mode);
-            Check(store.Load(Character,At).Count==0,"nothing read from the file of before");
+            Check(store.Load(Character).Count==0,"nothing read from the file of before");
             Check(File.ReadAllBytes(json).SequenceEqual(bytes) && Aside(folder) is null,"the file of before in place, unchanged, nothing set aside");
             Check(said.Count==1 && said[0].StartsWith("Gil journal: a file of an old format (GilJournal",StringComparison.Ordinal)
                 && said[0].EndsWith(") was left aside, not read (X-574).",StringComparison.Ordinal) && !said[0].Contains(Character.ToString(),StringComparison.Ordinal),"said once, without the character's id: "+string.Join(" | ",said));
             var newer=Entries(5,2000);store.Save(Character,newer);
-            store.Load(Character,At);
+            store.Load(Character);
             Check(said.Count==1,"once per data file");
-            Check(Same(Store(folder,database).Load(Character,At),newer),"after a restart: the same entries, none twice");
+            Check(Same(Store(folder,database).Load(Character),newer),"after a restart: the same entries, none twice");
             Check(File.ReadAllBytes(json).SequenceEqual(bytes),"the file of before never written");
         })),
         ("Gil SQLite 1139: an old file found again never brings the old entries back over newer ones",() => InTemp((_,folder,database) =>
@@ -60,7 +60,7 @@ internal static class GilJournalSqlite1139Tests
             var newer=Entries(6,5000);store.Save(Character,newer);
             GilJournal.Write(json,Entries(3));var bytes=File.ReadAllBytes(json);
             var restarted=Store(folder,database);
-            Check(Same(restarted.Load(Character,At),newer),"the newer journal is kept; the old file is not read");
+            Check(Same(restarted.Load(Character),newer),"the newer journal is kept; the old file is not read");
             Check(File.ReadAllBytes(json).SequenceEqual(bytes) && Aside(folder) is null,"the old file left where it is, unchanged");
         })),
         ("Gil SQLite 1139: a stop inside a save leaves the last save whole; a file of before stays as it is, never read",() => InTemp((_,folder,database) =>
@@ -69,10 +69,10 @@ internal static class GilJournalSqlite1139Tests
             var first=Entries(4);store.Save(1,first);
             store.DuringSave=()=>throw new IOException("simulated stop inside the transaction");
             Check(Throws<IOException>(()=>store.Save(1,Entries(9,7000))),"the save fails");
-            Check(Same(Store(folder,database).Load(1,At),first),"the save of before is whole");
+            Check(Same(Store(folder,database).Load(1),first),"the save of before is whole");
             var json=Path.Combine(folder,GilJournalStore.FileName(2));
             var old=Entries(2);GilJournal.Write(json,old);var bytes=File.ReadAllBytes(json);
-            Check(Store(folder,database).Load(2,At).Count==0,"not read");
+            Check(Store(folder,database).Load(2).Count==0,"not read");
             Check(File.Exists(json) && File.ReadAllBytes(json).SequenceEqual(bytes) && Aside(folder) is null,"the old file stays where it was, unchanged");
         })),
         ("Gil SQLite 1139: an unreadable file of before is left in place and never written over; the journal is saved",() => InTemp((_,folder,database) =>
@@ -80,9 +80,9 @@ internal static class GilJournalSqlite1139Tests
             var json=Path.Combine(folder,GilJournalStore.FileName(Character));
             File.WriteAllText(json,"{ not a journal");
             var store=Store(folder,database);
-            Check(store.Load(Character,At).Count==0,"not read: the load works (the watcher then saves)");
+            Check(store.Load(Character).Count==0,"not read: the load works (the watcher then saves)");
             store.Save(Character,Entries(2));
-            Check(Same(Store(folder,database).Load(Character,At),Entries(2)),"saved in the data file");
+            Check(Same(Store(folder,database).Load(Character),Entries(2)),"saved in the data file");
             Check(File.ReadAllText(json)=="{ not a journal" && Aside(folder) is null,"the file is untouched, in place");
         })),
         ("Gil SQLite 1139: a damaged data file and one of a newer layout are refused and never written over",() => InTemp((root,folder,database) =>
@@ -91,7 +91,7 @@ internal static class GilJournalSqlite1139Tests
             var json=Path.Combine(folder,GilJournalStore.FileName(Character));GilJournal.Write(json,Entries(2));var jsonBytes=File.ReadAllBytes(json);
             var warnings=new List<string>();var store=Store(folder,database,warnings);
             Check(store.Mode=="blocked","damaged: blocked, " +store.Mode);
-            Check(Throws<IOException>(()=>store.Load(Character,At)) && Throws<IOException>(()=>store.Save(Character,Entries(3))),"no load, no save");
+            Check(Throws<IOException>(()=>store.Load(Character)) && Throws<IOException>(()=>store.Save(Character,Entries(3))),"no load, no save");
             Check(File.ReadAllBytes(database).SequenceEqual(junk),"the damaged file is unchanged");
             Check(File.ReadAllBytes(json).SequenceEqual(jsonBytes),"the old journal file is unchanged");
             Check(warnings.Any(warning=>warning.Contains("not written this session",StringComparison.Ordinal)),"said in the log");
@@ -116,7 +116,7 @@ internal static class GilJournalSqlite1139Tests
             Check(store.Mode=="json","JSON as before: "+store.Mode);
             var entries=Entries(3);store.Save(Character,entries);
             Check(File.Exists(Path.Combine(folder,GilJournalStore.FileName(Character))),"written as a JSON file");
-            Check(Same(Store(folder,database).Load(Character,At),entries),"read back");
+            Check(Same(Store(folder,database).Load(Character),entries),"read back");
         })),
         ("Gil SQLite 1139: two writers on one file (two game clients) and a reader while they write: every journal read is one save, whole",() => InTemp((_,folder,database) =>
         {
@@ -132,12 +132,12 @@ internal static class GilJournalSqlite1139Tests
             while(!writers.All(task=>task.IsCompleted))
                 foreach(var id in new ulong[]{1,2})
                 {
-                    var read=reader.Load(id,At);
+                    var read=reader.Load(id);
                     if(!Same(read,small) && !Same(read,large))errors.Enqueue($"journal {id} read half written: {read.Count} entries");
                 }
             Task.WaitAll(writers);
             Check(errors.IsEmpty,string.Join("; ",errors.Take(3)));
-            foreach(var id in new ulong[]{1,2}){var last=reader.Load(id,At);Check(Same(last,small) || Same(last,large),"journal "+id+" is one whole save");}
+            foreach(var id in new ulong[]{1,2}){var last=reader.Load(id);Check(Same(last,small) || Same(last,large),"journal "+id+" is one whole save");}
         })),
         ("Gil SQLite 1139: wiring (the plugin passes TenshoData.db to the watcher, saves and loads through the store, folds the journal in at unload)",() =>
         {

@@ -45,7 +45,7 @@ internal static class ConcurrentData1169Tests
             first.Observe([Vessel(100, 0, At, 21)]); Check(first.Flush(TimeSpan.FromSeconds(10)), "first saved");
             second.Observe([Vessel(200, 0, At.AddHours(1), 22)]); Check(second.Flush(TimeSpan.FromSeconds(10)), "second saved");
             first.Observe([Vessel(100, 1, At.AddHours(2), 23)]); Check(first.Flush(TimeSpan.FromSeconds(10)), "first saved again");
-            var all = new VoyageHistoryData(file, Data(root)).Load(DateTimeOffset.UtcNow);
+            var all = new VoyageHistoryData(file, Data(root)).Load();
             Check(all.Select(Key).SequenceEqual([Key(Record(100, 0, At, 21)), Key(Record(200, 0, At.AddHours(1), 22)), Key(Record(100, 1, At.AddHours(2), 23))]),
                 "a third load sees the three voyages: " + string.Join(", ", all.Select(Key)));
         })),
@@ -57,23 +57,23 @@ internal static class ConcurrentData1169Tests
             var second = new VoyageHistoryStore(file, (_, _) => { }, Data(root));
             second.Observe([Vessel(100, 0, At, 21) with { Loot = [new VoyageLoot(21, 1), new VoyageLoot(30, 2)] }]); second.Flush(TimeSpan.FromSeconds(10));
             first.Observe([Vessel(100, 1, At.AddHours(1), 24)]); first.Flush(TimeSpan.FromSeconds(10));
-            var all = new VoyageHistoryData(file, Data(root)).Load(DateTimeOffset.UtcNow);
+            var all = new VoyageHistoryData(file, Data(root)).Load();
             Check(all.Count == 2 && all[0].Loot.Count == 2, "the other client's newer reading kept: " + all.Count);
             var data = new VoyageHistoryData(file, Data(root));
             data.Save([Record(300, 0, DateTimeOffset.UtcNow.AddDays(-200), 1)], null, DateTimeOffset.UtcNow);
-            Check(new VoyageHistoryData(file, Data(root)).Load(DateTimeOffset.UtcNow).All(record => record.HouseId != 300), "older than 180 days: removed by the purge");
+            Check(new VoyageHistoryData(file, Data(root)).Load().All(record => record.HouseId != 300), "older than 180 days: removed by the purge");
         })),
         ("Concurrent data 1169: an older reading of an achievement never takes back a newer one saved by the other client (N9)", () => InTemp(root =>
         {
             var file = Path.Combine(root, "AchievementProgress.json");
             var a = new AchievementProgressData(file, Data(root)); var b = new AchievementProgressData(file, Data(root));
-            a.Load(At); b.Load(At);
+            a.Load(); b.Load();
             b.Save(7, new Dictionary<uint, AchievementProgress> { [1] = new(7, 10, At.AddHours(2)), [2] = new(1, 5, At.AddHours(2)) }, []);
             a.Save(7, new Dictionary<uint, AchievementProgress> { [1] = new(5, 10, At.AddHours(1)), [3] = new(2, 3, At.AddHours(1)) }, []);
-            var seen = new AchievementProgressData(file, Data(root)).Load(At)[7];
+            var seen = new AchievementProgressData(file, Data(root)).Load()[7];
             Check(seen.Count == 3 && seen[1].Current == 7 && seen[2].Current == 1 && seen[3].Current == 2, "a1 7/10, a2 and a3 all kept: " + string.Join(", ", seen.Select(pair => $"{pair.Key}={pair.Value.Current}")));
             a.Save(7, new Dictionary<uint, AchievementProgress> { [1] = new(9, 10, At.AddHours(3)) }, []);
-            Check(new AchievementProgressData(file, Data(root)).Load(At)[7][1].Current == 9, "a newer reading still replaces");
+            Check(new AchievementProgressData(file, Data(root)).Load()[7][1].Current == 9, "a newer reading still replaces");
         })),
         ("Concurrent data 1169: a file of before written again (an older version still running) is never read nor moved: the data file's rows win (X-574)", () => InTemp(root =>
         {
@@ -82,14 +82,14 @@ internal static class ConcurrentData1169Tests
             new VoyageHistoryData(voyages, Data(root)).Save([Record(100, 0, At, 21)]);
             VoyageHistory.Write(voyages, [Record(100, 1, At.AddHours(1), 22)]);   // an older version still running, its own session only
             var voyageBytes = File.ReadAllBytes(voyages);
-            var kept = new VoyageHistoryData(voyages, Data(root)).Load(At);
+            var kept = new VoyageHistoryData(voyages, Data(root)).Load();
             Check(kept.Select(Key).SequenceEqual([Key(Record(100, 0, At, 21))]) && File.ReadAllBytes(voyages).SequenceEqual(voyageBytes), "voyages: the data file's only, the file left as it is");
             // Achievements.
             var achievements = Path.Combine(root, "AchievementProgress.json");
             new AchievementProgressData(achievements, Data(root)).Save(7, new Dictionary<uint, AchievementProgress> { [1] = new(1, 10, At) }, []);
             File.WriteAllText(achievements, AchievementProgressStore.Write(new() { [7] = new() { [2] = new(4, 10, At.AddHours(1)) }, [8] = new() { [1] = new(2, 10, At) } }));
             var achievementBytes = File.ReadAllBytes(achievements);
-            var progress = new AchievementProgressData(achievements, Data(root)).Load(At);
+            var progress = new AchievementProgressData(achievements, Data(root)).Load();
             Check(progress.Count == 1 && progress[7].Count == 1 && File.ReadAllBytes(achievements).SequenceEqual(achievementBytes), "achievements: the data file's only");
             // Gil journal.
             var folder = Path.Combine(root, "GilJournal"); Directory.CreateDirectory(folder);
@@ -98,7 +98,7 @@ internal static class ConcurrentData1169Tests
             new GilJournalStore(folder, Data(root)).Save(7, [one]);
             GilJournal.Write(gil, [two]);
             var gilBytes = File.ReadAllBytes(gil);
-            var journal = new GilJournalStore(folder, Data(root)).Load(7, At);
+            var journal = new GilJournalStore(folder, Data(root)).Load(7);
             Check(journal.SequenceEqual([one]) && File.ReadAllBytes(gil).SequenceEqual(gilBytes), "gils: the data file's entry only, the file left as it is");
             Check(Aside(root).Length == 0 && Directory.GetDirectories(folder, "before-sqlite-*").Length == 0, "nothing set aside");
         })),
@@ -112,7 +112,7 @@ internal static class ConcurrentData1169Tests
             Task<List<VoyageRecord>>? other = null;
             var first = new VoyageHistoryData(file, Data(root));
             first.Save(three.Take(1).ToList());
-            first.DuringSave = () => other ??= Task.Run(() => new VoyageHistoryData(file, Data(root)).Load(At));
+            first.DuringSave = () => other ??= Task.Run(() => new VoyageHistoryData(file, Data(root)).Load());
             first.Save(three);
             Check(other is not null && other.Wait(TimeSpan.FromSeconds(20)) && other.Result.Count is 1 or 3, "the second client: one save whole, never half: " + other?.Result.Count);
             using var open = new TenshoDataDatabase(Path.Combine(root, TenshoDataDatabase.FileName)).Open();

@@ -430,7 +430,7 @@ internal sealed partial class MainWindow
                     // X-588 (external audit A18 of 18/11): the shared kinds still being read are read first; one that cannot be is named.
                     var missing=store.ReadAllShared();
                     var path=Path.Combine(folder,"Export",DiscoveryFiles.ExportName(DateTimeOffset.UtcNow));
-                    DiscoveryFiles.Write(path,store.Snapshot(DateTimeOffset.UtcNow,false));
+                    DiscoveryFiles.Write(path,store.Snapshot(DateTimeOffset.UtcNow));
                     return missing.Count==0 ? localization.Format("DiscoveriesUi.ExportDone",path)
                         :localization.Format("DiscoveriesUi.ExportPartial",path,missing.Count);
                 });

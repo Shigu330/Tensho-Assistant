@@ -32,7 +32,7 @@ internal static class HeldCopy1306Tests
             var aside=Path.Combine(top,"before-sqlite-20261101-120000");Directory.CreateDirectory(aside);
             var kept=Path.Combine(aside,"VoyageHistory.json");VoyageHistory.Write(kept,[Voyage(2)]);
             using(new FileStream(kept,FileMode.Open,FileAccess.ReadWrite,FileShare.None))
-                Check(new VoyageHistoryData(file,new TenshoDataFile(Path.Combine(top,TenshoDataDatabase.FileName),(_,_)=>{})).Load(Converted).Select(record=>record.Slot).SequenceEqual([1]),"the copy held: no throw, the data file's voyage only");
+                Check(new VoyageHistoryData(file,new TenshoDataFile(Path.Combine(top,TenshoDataDatabase.FileName),(_,_)=>{})).Load().Select(record=>record.Slot).SequenceEqual([1]),"the copy held: no throw, the data file's voyage only");
             Check(VoyageHistory.Read(kept).Single().Slot==2,"the copy left as it was");
         })),
         ("Held copy 1306: the file itself held: no throw, still said as left aside; the file gone: nothing said",() => InTemp(top =>
@@ -41,10 +41,10 @@ internal static class HeldCopy1306Tests
             VoyageHistory.Write(file,[Voyage(3)]);
             var said=new List<string>();
             using(new FileStream(file,FileMode.Open,FileAccess.ReadWrite,FileShare.None))
-                Check(new VoyageHistoryData(file,new TenshoDataFile(Path.Combine(top,TenshoDataDatabase.FileName),(_,_)=>{},said.Add)).Load(Converted).Count==0 && said.Count(line=>line.Contains("old format",StringComparison.Ordinal))==1,"held whole: no throw, said once");
+                Check(new VoyageHistoryData(file,new TenshoDataFile(Path.Combine(top,TenshoDataDatabase.FileName),(_,_)=>{},said.Add)).Load().Count==0 && said.Count(line=>line.Contains("old format",StringComparison.Ordinal))==1,"held whole: no throw, said once");
             File.Delete(file);
             said.Clear();
-            Check(new VoyageHistoryData(file,new TenshoDataFile(Path.Combine(top,TenshoDataDatabase.FileName),(_,_)=>{},said.Add)).Load(Converted).Count==0 && said.All(line=>!line.Contains("old format",StringComparison.Ordinal)),"gone: nothing said");
+            Check(new VoyageHistoryData(file,new TenshoDataFile(Path.Combine(top,TenshoDataDatabase.FileName),(_,_)=>{},said.Add)).Load().Count==0 && said.All(line=>!line.Contains("old format",StringComparison.Ordinal)),"gone: nothing said");
         })),
     ];
 }

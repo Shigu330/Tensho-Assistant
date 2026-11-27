@@ -60,7 +60,7 @@ internal static class KeptOpenFixes1798Tests
             second.Close();
             first.Close();
             var reloaded = new GilJournalStore(Path.Combine(root,"GilJournal"),new TenshoDataFile(file,(error,message) => throw new Exception(message,error)));
-            Check(reloaded.Load(4,At).Count == saved.Count,"the save whole after both unloads");
+            Check(reloaded.Load(4).Count == saved.Count,"the save whole after both unloads");
             lines.Clear();
             var third = new TenshoDataFile(file,(error,message) => throw new Exception(message,error),line => { lock (lines) lines.Add(line); });
             third.KeepOpen();

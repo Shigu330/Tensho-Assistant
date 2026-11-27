@@ -65,7 +65,7 @@ internal static class KeptOpen1794Tests
             data.Close();
             var again = new TenshoDataFile(file, (error, message) => throw new Exception(message, error));
             var reloaded = new GilJournalStore(Path.Combine(root, "GilJournal"), again);
-            Check(Same(reloaded.Load(7, At), first) && Same(reloaded.Load(8, At), second), "both journals whole after the reload");
+            Check(Same(reloaded.Load(7), first) && Same(reloaded.Load(8), second), "both journals whole after the reload");
             using var open = again.Database()!.Open();
             Check(Convert.ToInt64(TenshoDataDatabase.Scalar(open, "SELECT COUNT(*) FROM save_probe;")) == 1, "the timing wrote one probe row, nothing else");
         })),
@@ -80,7 +80,7 @@ internal static class KeptOpen1794Tests
             new GilJournalStore(Path.Combine(root, "GilJournal"), data).Save(3, Gil(3, 300));
             data.Close();
             Check(Journal(file) == 0, "a save after the close folds the journal in at its own close, as before");
-            Check(Same(new GilJournalStore(Path.Combine(root, "GilJournal"), new TenshoDataFile(file, (error, message) => throw new Exception(message, error))).Load(3, At), Gil(3, 300)),
+            Check(Same(new GilJournalStore(Path.Combine(root, "GilJournal"), new TenshoDataFile(file, (error, message) => throw new Exception(message, error))).Load(3), Gil(3, 300)),
                 "the later save read back");
             // Closed before it was ever kept (an unload during the start): never kept afterwards.
             var early = new TenshoDataFile(Path.Combine(root, "early.db"), (error, message) => throw new Exception(message, error));

@@ -31,7 +31,7 @@ public sealed class GilJournalStore
     public string Mode=>data.Mode;
 
     /// <summary>A character's journal, oldest first (throws when it cannot be read: the caller then never writes over it).</summary>
-    public List<GilEntry> Load(ulong character,DateTimeOffset now)
+    public List<GilEntry> Load(ulong character)
     {
         var json=Path.Combine(folder,FileName(character));
         // X-842 M5 (0.1843): a file read from its .bak is said, as the other kept stores do.

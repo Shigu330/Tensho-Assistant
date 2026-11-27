@@ -790,7 +790,7 @@ public sealed class DiscoveryStore
     /// A copy of the base (an export, a check: nothing is marked). X-93 part 2 (0.1040): copied by slices (<see cref="Slice"/>), the lock let go
     /// between them. X-142 (0.1121): a save takes SnapshotToSave and marks it written only after the write (MarkSaved).
     /// </summary>
-    public DiscoveryFile Snapshot(DateTimeOffset at,bool saving=false)=>Copy(at,out _);
+    public DiscoveryFile Snapshot(DateTimeOffset at)=>Copy(at,out _);
 
     /// <summary>X-142 (0.1121): the copy to write and the change stamp it holds (taken before the copy, so a change meanwhile goes in the next save).</summary>
     public DiscoveryFile SnapshotToSave(DateTimeOffset at,out long stamp)=>Copy(at,out stamp);

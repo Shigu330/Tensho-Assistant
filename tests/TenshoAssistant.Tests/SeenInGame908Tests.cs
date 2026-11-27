@@ -46,7 +46,7 @@ internal static class SeenInGame908Tests
             Check(store.MostSeenSpearShadow(100)==(2,150),"yours first while ahead");
             var other=new DiscoveryStore();
             other.SeeSource(DiscoveryKind.SpearShadow,100,3,200,at,1,1,place);
-            var shared=other.Snapshot(at,saving:false).Facts;
+            var shared=other.Snapshot(at).Facts;
             store.Merge(shared);store.Merge(shared);
             Check(store.MostSeenSpearShadow(100)==(3,200),"imported sightings count");
             Check(store.Find(DiscoveryKind.SpearShadow,subject=>subject==100,8).Select(DiscoveryFact.TimesOf).SequenceEqual([3,2]),"times: seen and imported");

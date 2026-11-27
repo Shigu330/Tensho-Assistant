@@ -38,7 +38,7 @@ internal static class MapSearch597Tests
             var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.MapSearch.cs"));
             Check(view.Contains("mapFindTask=Task.Run(") && view.Contains("markers?.Read(group.Key)"),"built off the frame, without the frame's marker cache");
             Check(view.Contains("OpenMapView(hit.MapId);") && !view.Contains("PlaceFlagFromMapView"),"opens the Tensho map, no flag");
-            Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Maps.cs")).Contains("DrawMapFind(catalog);"),"in the plugin's Maps section");
+            Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Maps.cs")).Contains("DrawMapFind();"),"in the plugin's Maps section");
             Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Lifetime.cs")).Contains("mapFindCancel"),"stopped with the window");
             Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Maps/MapMarkerSource.Dalamud.cs")).Contains("public IReadOnlyList<MapIconMarker> Read(uint range)"),"a read that touches no shared state");
         }),

@@ -45,16 +45,16 @@ internal static class AchievementSqlite1140Tests
             var said=new List<string>();
             var store=new AchievementProgressData(file,Data(database,said:said));
             Check(store.Mode=="sqlite","SQLite in use: "+store.Mode);
-            Check(store.Load(At).Count==0,"nothing read from the file of before");
+            Check(store.Load().Count==0,"nothing read from the file of before");
             Check(File.ReadAllBytes(file).SequenceEqual(bytes) && Aside(root).Length==0,"the file of before in place, unchanged, nothing set aside");
             Check(said.Count(line=>line=="Achievement progress: a file of an old format (AchievementProgress.json) was left aside, not read (X-574).")==1,"said once: "+string.Join(" | ",said));
-            store.Load(At);
+            store.Load();
             Check(said.Count==1,"once per data file");
             store.Save(First,Sample()[First],Sample());store.Save(Second,Sample()[Second],Sample());
-            Check(Same(new AchievementProgressData(file,Data(database)).Load(At),Sample()),"saved in the data file, the same after a restart");
+            Check(Same(new AchievementProgressData(file,Data(database)).Load(),Sample()),"saved in the data file, the same after a restart");
             var all=Sample();all[First][3811]=new(1,1,At.AddMinutes(5));
             store.Save(First,all[First],all);
-            Check(Same(new AchievementProgressData(file,Data(database)).Load(At),all),"a save replaces that character's rows; the other character untouched");
+            Check(Same(new AchievementProgressData(file,Data(database)).Load(),all),"a save replaces that character's rows; the other character untouched");
             Check(File.ReadAllBytes(file).SequenceEqual(bytes),"the file of before never written");
         })),
         ("Achievements SQLite 1140: an old file found again never brings the old progress back over newer",() => InTemp((root,file,database) =>
@@ -62,7 +62,7 @@ internal static class AchievementSqlite1140Tests
             var store=new AchievementProgressData(file,Data(database));
             var all=Sample();all[Second][42]=new(10,10,At.AddHours(1));store.Save(First,all[First],all);store.Save(Second,all[Second],all);
             File.WriteAllText(file,AchievementProgressStore.Write(Sample()));var bytes=File.ReadAllBytes(file);
-            Check(Same(new AchievementProgressData(file,Data(database)).Load(At),all),"newer progress kept");
+            Check(Same(new AchievementProgressData(file,Data(database)).Load(),all),"newer progress kept");
             Check(File.ReadAllBytes(file).SequenceEqual(bytes) && Aside(root).Length==0,"the old file left where it is, unchanged");
         })),
         ("Achievements SQLite 1140: a stop inside a save leaves the last save whole; the file of before stays as it is",() => InTemp((root,file,database) =>
@@ -74,7 +74,7 @@ internal static class AchievementSqlite1140Tests
             store.DuringSave=()=>throw new IOException("simulated stop");
             var changed=Sample();changed[First][3811]=new(1,1,At.AddDays(1));
             Check(Throws<IOException>(()=>store.Save(First,changed[First],changed)),"the save fails");
-            Check(Same(new AchievementProgressData(file,Data(database)).Load(At),Sample()),"the save of before whole");
+            Check(Same(new AchievementProgressData(file,Data(database)).Load(),Sample()),"the save of before whole");
             Check(File.ReadAllBytes(file).SequenceEqual(bytes) && Aside(root).Length==0,"the old file in place, unchanged");
         })),
         // D-145 (0.1205, relay 37): an unreadable file of before used to block every save of the family. X-574 (0.1793): it is not read at all.
@@ -82,9 +82,9 @@ internal static class AchievementSqlite1140Tests
         {
             File.WriteAllText(file,"{bad");
             var store=new AchievementProgressData(file,Data(database));
-            Check(store.Load(At).Count==0,"nothing read from it, no error");
+            Check(store.Load().Count==0,"nothing read from it, no error");
             store.Save(First,Sample()[First],Sample());
-            Check(Same(new AchievementProgressData(file,Data(database)).Load(At),new(){[First]=Sample()[First]}),"saved");
+            Check(Same(new AchievementProgressData(file,Data(database)).Load(),new(){[First]=Sample()[First]}),"saved");
             Check(File.ReadAllText(file)=="{bad" && Aside(root).Length==0,"left byte for byte, never moved nor removed");
         })),
         ("Achievements SQLite 1140: one damaged data file blocks every family and is never written over; a file that cannot be created keeps JSON",() => InTemp((root,file,database) =>
@@ -94,7 +94,7 @@ internal static class AchievementSqlite1140Tests
             var warnings=new List<string>();var data=Data(database,warnings);
             var achievements=new AchievementProgressData(file,data);var gil=new GilJournalStore(Path.Combine(root,"GilJournal"),data);
             Check(achievements.Mode=="blocked" && gil.Mode=="blocked","both blocked");
-            Check(Throws<IOException>(()=>achievements.Load(At)) && Throws<IOException>(()=>achievements.Save(First,Sample()[First],Sample()))
+            Check(Throws<IOException>(()=>achievements.Load()) && Throws<IOException>(()=>achievements.Save(First,Sample()[First],Sample()))
                 && Throws<IOException>(()=>gil.Save(1,[])),"nothing read nor written");
             Check(File.ReadAllBytes(database).SequenceEqual(junk) && File.ReadAllBytes(file).SequenceEqual(bytes),"both files unchanged");
             Check(warnings.Count==1,"said once: "+warnings.Count);
@@ -117,12 +117,12 @@ internal static class AchievementSqlite1140Tests
                     +$"INSERT INTO gil_entries VALUES(5,0,{At.UtcTicks},-100,900,0,4);INSERT INTO gil_entries VALUES(5,1,{At.AddMinutes(1).UtcTicks},50,950,0,2);PRAGMA user_version=1;");
             }
             var data=Data(database);
-            var gil=new GilJournalStore(Path.Combine(root,"GilJournal"),data).Load(5,At);
+            var gil=new GilJournalStore(Path.Combine(root,"GilJournal"),data).Load(5);
             Check(gil.Count==2 && gil[0].Delta==-100 && gil[1].Balance==950,"gil rows of 0.1139 kept");
             var store=new AchievementProgressData(file,data);
-            Check(store.Load(At).Count==0,"no achievements yet");
+            Check(store.Load().Count==0,"no achievements yet");
             store.Save(First,Sample()[First],Sample());
-            Check(new AchievementProgressData(file,Data(database)).Load(At)[First].Count==2,"saved beside the gil journal");
+            Check(new AchievementProgressData(file,Data(database)).Load()[First].Count==2,"saved beside the gil journal");
             using var check=data.Database()!.Open();
             Check(Convert.ToInt64(TenshoDataDatabase.Scalar(check,"PRAGMA user_version;"))==TenshoDataDatabase.Schema && TenshoDataDatabase.Schema==1,"layout 1: 0.1139 still opens the file");
         })),
@@ -133,7 +133,7 @@ internal static class AchievementSqlite1140Tests
                 // 0.1444 (X-153): the collections family moved to Plugin.Collections.cs.
                 && File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Collections.cs")).Contains("new Collections.AchievementProgressData(Path.Combine(pluginInterface.GetPluginConfigDirectory(),\"AchievementProgress.json\"),tenshoData)",StringComparison.Ordinal),"plugin");
             var watcher=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Collections/AchievementProgressWatcher.Dalamud.cs"));
-            Check(watcher.Contains("loading=data is null ? null:Task.Run(()=>data.Load(DateTimeOffset.UtcNow));",StringComparison.Ordinal)
+            Check(watcher.Contains("loading=data is null ? null:Task.Run(()=>data.Load());",StringComparison.Ordinal)
                 && watcher.Contains("if(!read.IsCompleted)return;",StringComparison.Ordinal) && watcher.Contains("if(data is { } store && !saveBlocked && character!=0)",StringComparison.Ordinal)
                 && !watcher.Contains("File.ReadAllText",StringComparison.Ordinal),"watcher");
             var security=File.ReadAllText(Path.GetFullPath("SECURITY.md")).ReplaceLineEndings("\n").Split("\n---",2);

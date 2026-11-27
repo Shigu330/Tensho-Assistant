@@ -55,7 +55,7 @@ internal static class Link1207Tests
                 SqliteConnection.ClearAllPools();
                 Check(!File.ReadAllBytes(database).SequenceEqual(written), "a real write changes the .db itself: its notice is not lost");
                 var before = File.ReadAllBytes(database);
-                Check(store.Load(7, DateTimeOffset.UtcNow).Count == 2, "read back");
+                Check(store.Load(7).Count == 2, "read back");
                 SqliteConnection.ClearAllPools();
                 Check(File.ReadAllBytes(database).SequenceEqual(before), "a read leaves the .db as it was: no notice, no copy");
             }

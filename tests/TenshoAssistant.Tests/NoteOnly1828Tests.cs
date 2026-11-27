@@ -119,7 +119,7 @@ print("new:",read[0]["new"],"changed:",",".join(changed))
                 var store=new DiscoveryStore();store.Load(new DiscoveryFile{Facts=[Fact(1)]});
                 File.WriteAllText(Path.Combine(profile,"github.json"),JsonSerializer.Serialize(new GitHubExchangeMeta{Login="tester",GistId=Gist,Issue=7,ClientId=GitHubSignIn.Current.ClientId,UploadHash="old"}));
                 File.WriteAllBytes(Path.Combine(profile,"github.token"),UserSecret.Protect(Encoding.UTF8.GetBytes("token")));
-                var hash=GistRotation.Hash(CommunityDiscoveries.Mine(store.Snapshot(DateTimeOffset.UtcNow,false)).Facts.Single());
+                var hash=GistRotation.Hash(CommunityDiscoveries.Mine(store.Snapshot(DateTimeOffset.UtcNow)).Facts.Single());
                 GistRotation.Write(Path.Combine(profile,GistRotation.FileName),new GistRotationState{Issue=7,SentGist=Gist,SentRevision=Revision,Sent=new(){[Fact(1).Key]=hash}});
                 ExchangeMessage Exchange(GitHubExchange exchange)
                 {

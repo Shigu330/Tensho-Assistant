@@ -38,14 +38,13 @@ public static class TriadMatchSimulator
             while (!position.IsTerminal)
             {
                 var moves = position.LegalMoves();
-                var offset = position.Turn == TriadPlayer.Blue ? 0 : 5;
                 if (forced != TriadForcedCards.None)
                 {
                     var hand = moves.Select(move => move.CardIndex).Distinct().OrderBy(index => index).ToArray();
                     var card = forced == TriadForcedCards.Order ? hand[0] : hand[random.Next(hand.Length)];
                     moves = moves.Where(move => move.CardIndex == card).ToArray();
                 }
-                position = position.Play(Choose(position, moves, depth, random, offset));
+                position = position.Play(Choose(position, moves, depth, random));
             }
             var difference = position.BlueScore - position.RedScore;
             if (difference > 0) wins++; else if (difference == 0) draws++; else losses++;
@@ -53,7 +52,7 @@ public static class TriadMatchSimulator
         return new(games, wins, draws, losses);
     }
 
-    private static TriadMove Choose(TriadPosition position, IReadOnlyList<TriadMove> moves, int depth, Random random, int offset)
+    private static TriadMove Choose(TriadPosition position, IReadOnlyList<TriadMove> moves, int depth, Random random)
     {
         var maximize = position.Turn == TriadPlayer.Blue;
         var best = int.MinValue; var choices = new List<TriadMove>();

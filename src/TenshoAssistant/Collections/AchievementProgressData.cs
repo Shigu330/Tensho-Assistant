@@ -24,7 +24,7 @@ public sealed class AchievementProgressData
     public string Mode=>data.Mode;
 
     /// <summary>Everything seen, per character (throws when it cannot be read: the caller then never writes over it).</summary>
-    public Dictionary<ulong,Dictionary<uint,AchievementProgress>> Load(DateTimeOffset now)
+    public Dictionary<ulong,Dictionary<uint,AchievementProgress>> Load()
     {
         if(data.Database() is not { } opened)return ReadFile();
         // X-574 (0.1793): a file of before still there is left aside, never read (the progress is the data file's).

@@ -11,7 +11,7 @@ internal static class Cells855Tests
         {
             var store=new DiscoveryStore();
             store.Load(new DiscoveryFile{Facts=[Old(12,2,7),Old(31,1,6),Old(71,1,7)]});
-            var all=store.Snapshot(DateTimeOffset.UtcNow,saving:false).Facts;
+            var all=store.Snapshot(DateTimeOffset.UtcNow).Facts;
             Check(all.Count==2,"12 and 31 share the 0-50 cell; 71 in the next");
             var joined=all.Single(fact=>fact.CellX==0);
             Check(joined.Seen==3 && joined.X==31 && joined.First.Day==6 && joined.Last.Day==7,"sightings added, first place kept");

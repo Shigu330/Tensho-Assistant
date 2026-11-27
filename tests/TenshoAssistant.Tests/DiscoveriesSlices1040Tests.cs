@@ -60,7 +60,7 @@ internal static class DiscoveriesSlices1040Tests
             Check(!store.Dirty,"marked written once saved");
             file.Facts[0].Seen=99;
             Check(store.Find(DiscoveryKind.FestivalSeen,file.Facts[0].Subject,5).Single().Seen!=99,"a copy, not the base's fact");
-            store.Snapshot(At.AddDays(2),false);
+            store.Snapshot(At.AddDays(2));
             store.SeeSource(DiscoveryKind.FestivalSeen,DiscoveryStore.Slice*3,1,6,At.AddDays(1));
             Check(store.Dirty,"an export leaves the mark; a new sighting sets it");
         }),

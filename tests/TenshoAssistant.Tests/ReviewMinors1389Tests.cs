@@ -42,12 +42,12 @@ internal static class ReviewMinors1389Tests
             var hold = Hold(file);
             try
             {
-                var held = new AchievementProgressData(file, Data(root)).Load(At);
+                var held = new AchievementProgressData(file, Data(root)).Load();
                 Check(held[7].Count == 1 && !held[7].ContainsKey(2), "held: its reading not read");
             }
             finally { hold.Dispose(); }
             Check(File.ReadAllBytes(file).SequenceEqual(bytes), "held while read: left in place, unchanged");
-            var all = new AchievementProgressData(file, Data(root)).Load(At);
+            var all = new AchievementProgressData(file, Data(root)).Load();
             Check(all[7].Count == 1 && all[7][1].Current == 1, "free: still not read nor merged: " + all[7].Count);
             Check(File.ReadAllBytes(file).SequenceEqual(bytes) && Directory.GetDirectories(root, "before-sqlite-*").Length == 0, "never set aside");
         })),
@@ -63,12 +63,12 @@ internal static class ReviewMinors1389Tests
             var hold = Hold(file);
             try
             {
-                var held = new GilJournalStore(folder, Data(root)).Load(7, At);
+                var held = new GilJournalStore(folder, Data(root)).Load(7);
                 Check(held.SequenceEqual([one]), "held: its entry not read");
             }
             finally { hold.Dispose(); }
             Check(File.ReadAllBytes(file).SequenceEqual(bytes), "held while read: left in place, unchanged");
-            var journal = new GilJournalStore(folder, Data(root)).Load(7, At);
+            var journal = new GilJournalStore(folder, Data(root)).Load(7);
             Check(journal.SequenceEqual([one]) && File.ReadAllBytes(file).SequenceEqual(bytes) && Directory.GetDirectories(folder, "before-sqlite-*").Length == 0, "free: still not read, never set aside");
         })),
         ("Review minors 1389 M4: one way to write a time left in the server bar (no TenshoCulture.Days)", () =>

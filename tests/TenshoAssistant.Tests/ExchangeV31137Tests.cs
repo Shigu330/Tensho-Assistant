@@ -109,9 +109,9 @@ internal static class ExchangeV31137Tests
             store.Merge([Fish(4869)]);
             store.SeeSource(DiscoveryKind.FishCatch,4869,1,3,At,135,16,new Vector3(130,0,-20));
             store.SeeSource(DiscoveryKind.Venture,5,7,2,At);
-            var mine=CommunityDiscoveries.Mine(store.Snapshot(At,false));
+            var mine=CommunityDiscoveries.Mine(store.Snapshot(At));
             var set=ExchangeV3.Build(mine);
-            Check(set.Index==ExchangeV3.Build(CommunityDiscoveries.Mine(store.Snapshot(At.AddHours(3),false))).Index,"same facts, same index (each file's hash in it)");
+            Check(set.Index==ExchangeV3.Build(CommunityDiscoveries.Mine(store.Snapshot(At.AddHours(3)))).Index,"same facts, same index (each file's hash in it)");
             var index=ExchangeV3.ParseIndex(set.Index)!;
             Check(index.Files.Select(entry=>entry.Name).SequenceEqual(["kind-05.jsonl.gz","kind-10.jsonl.gz"]),"one file per kind, in kind order");
             var read=0;
@@ -210,11 +210,11 @@ internal static class ExchangeV31137Tests
             old.Files[V2]=Encoding.UTF8.GetBytes(JsonSerializer.Serialize(Common(Fish(9))));
             using var v2=new GitHubExchange(Path.Combine(root,"c"),old);var third=new DiscoveryStore();
             third.Merge([Venture(4),Fish(8)],common:true);Saved(third);
-            var before=JsonSerializer.Serialize(third.Snapshot(At,false));
+            var before=JsonSerializer.Serialize(third.Snapshot(At));
             Check(Run(v2,third,false).Args[2]=="CommonUnreachable" && third.Find(DiscoveryKind.FishCatch,9u,5).Count==0,"no v3 set (404): nothing taken, said unreachable or not published yet (X-367)");
             Check(old.Asked.SequenceEqual([CommunityDiscoveries.AddressV3+ExchangeV3.IndexName]),"only the v3 index asked, never the v2 file");
             Saved(third);
-            Check(JsonSerializer.Serialize(third.Snapshot(At,false))==before && third.Find(DiscoveryKind.FishCatch,8u,5).Count==1 && third.Find(DiscoveryKind.Venture,4u,5).Count==1,
+            Check(JsonSerializer.Serialize(third.Snapshot(At))==before && third.Find(DiscoveryKind.FishCatch,8u,5).Count==1 && third.Find(DiscoveryKind.Venture,4u,5).Count==1,
                 "the local base untouched: the facts it held are all there, nothing added");
             Check(!File.Exists(Path.Combine(root,"c","community-v3.json")) && !File.Exists(Path.Combine(root,"c","community.sha256")),"no hash noted");
             old.Files[CommunityDiscoveries.AddressV3+ExchangeV3.IndexName]=Encoding.UTF8.GetBytes("{\"Format\":\"tensho-discoveries\",\"Version\":4,\"Files\":[]}");

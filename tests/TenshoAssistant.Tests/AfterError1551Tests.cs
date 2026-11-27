@@ -131,12 +131,12 @@ internal static class AfterError1551Tests
             store.DuringSave=()=>throw new IOException("disk full");
             writer.Enqueue("save",saves.Done(1,copy,saves.Stamp,()=>store.Save(1,copy)));
             Check(writer.Flush(Guard) && saves.Due && saves.Failed(1)==copy,"failed: still to save, its copy kept");
-            Check(store.Load(1,DateTimeOffset.UtcNow).Count==1,"the data file keeps its last whole save");
+            Check(store.Load(1).Count==1,"the data file keeps its last whole save");
             // The character changes before any new gil change: the old code had marked the journal clean, the entry was lost.
             store.DuringSave=null;
             saves.Switch();
             foreach(var (id,kept) in saves.Again(2,false))writer.Enqueue("again",saves.Done(id,kept,null,()=>store.Save(id,kept)));
-            Check(writer.Flush(Guard) && saves.FailedCount==0 && store.Load(1,DateTimeOffset.UtcNow).Count==2,"written again after the change of character");
+            Check(writer.Flush(Guard) && saves.FailedCount==0 && store.Load(1).Count==2,"written again after the change of character");
         })),
         ("After error 1551: A14, acknowledged only once written; a change during the write stays to save; the failed copy is the journal given back",() =>
         {
@@ -180,7 +180,7 @@ internal static class AfterError1551Tests
             var copy=TenshoDataDatabase.CopyForDesktop(source,target);
             Check(copy.Copied==0 && copy.Problems.Count==1 && copy.Problems[0].Contains("damaged",StringComparison.Ordinal),"refused, said: "+string.Join("; ",copy.Problems));
             SqliteConnection.ClearAllPools();
-            Check(File.Exists(target) && new GilJournalStore(Path.Combine(root,"mirror","GilJournal"),new TenshoDataFile(target,Warn)).Load(1,DateTimeOffset.UtcNow).Count==1,"the last readable copy kept whole");
+            Check(File.Exists(target) && new GilJournalStore(Path.Combine(root,"mirror","GilJournal"),new TenshoDataFile(target,Warn)).Load(1).Count==1,"the last readable copy kept whole");
         })),
         ("After error 1551: A15, a file at the size bound is written within it and read back; one over it is set aside, never written over",() => InTemp(root =>
         {

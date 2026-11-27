@@ -133,7 +133,7 @@ internal static class GistRefused1597Tests
             var seen=new DiscoveryStore();
             seen.SeeSource(DiscoveryKind.Venture,5,7,2,at);
             seen.SeeSource(DiscoveryKind.Desynthesis,9,7,2,at);
-            var mine=CommunityDiscoveries.Mine(seen.Snapshot(at,false));
+            var mine=CommunityDiscoveries.Mine(seen.Snapshot(at));
             var files=ExchangeV3.GistFiles(ExchangeV3.Build(mine));
             var index=ExchangeV3.ParseIndex(files[ExchangeV3.IndexName])!;
             Check(index.Files.Count==2,"two kind files");

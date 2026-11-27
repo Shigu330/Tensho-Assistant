@@ -80,7 +80,7 @@ internal sealed partial class MainWindow
             patchRecheckFor=reports;
             _=Task.Run(()=>
             {
-                try{patchRecheck=PatchRecheck.Find(reports,discoveries.Snapshot(DateTimeOffset.UtcNow,saving:false).Facts);}
+                try{patchRecheck=PatchRecheck.Find(reports,discoveries.Snapshot(DateTimeOffset.UtcNow).Facts);}
                 catch(Exception error){log.Warning(error,"The discoveries to recheck after the game patch could not be counted.");}
                 finally{Volatile.Write(ref patchRecheckRunning,0);}
             });

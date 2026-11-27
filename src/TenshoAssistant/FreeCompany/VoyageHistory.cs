@@ -109,7 +109,7 @@ public sealed class VoyageHistoryData(string file,TenshoDataFile? data)
     public string Mode=>data?.Mode ?? "json";
 
     /// <summary>The history, as saved (throws when it cannot be read: the caller then never writes over it).</summary>
-    public List<VoyageRecord> Load(DateTimeOffset now)
+    public List<VoyageRecord> Load()
     {
         // X-842 M5 (0.1843): a file read from its .bak is said, as the other kept stores do (through the data file's log; none without a data file).
         if(data?.Database() is not { } opened)return VoyageHistory.Read(file,data?.Recovered("The voyage history"));
@@ -225,7 +225,7 @@ public sealed class VoyageHistoryStore(string path,Action<Exception,string> warn
     private void Load()
     {
         if(records is not null)return;
-        try{var now=DateTimeOffset.UtcNow;records=VoyageHistory.Prune(source.Load(now),now);written=records.ToDictionary(Key);}
+        try{var now=DateTimeOffset.UtcNow;records=VoyageHistory.Prune(source.Load(),now);written=records.ToDictionary(Key);}
         catch(Exception error){records=[];failed=true;warn(error,"Voyage history could not be read; it is not written over.");}
     }
 }

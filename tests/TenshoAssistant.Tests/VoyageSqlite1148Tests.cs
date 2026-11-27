@@ -47,14 +47,14 @@ internal static class VoyageSqlite1148Tests
             var said=new List<string>();
             var data=new VoyageHistoryData(file,Data(database,said:said));
             Check(data.Mode=="sqlite","SQLite in use: "+data.Mode);
-            Check(data.Load(At).Count==0,"nothing read from the file of before");
+            Check(data.Load().Count==0,"nothing read from the file of before");
             Check(File.ReadAllBytes(file).SequenceEqual(bytes) && Aside(root).Length==0,"the file of before in place, unchanged, nothing set aside");
             Check(said.SequenceEqual(["Voyage history: a file of an old format (VoyageHistory.json) was left aside, not read (X-574)."]),"said once: "+string.Join(" | ",said));
             data.Save(Sample());
-            Check(Same(new VoyageHistoryData(file,Data(database)).Load(At),Sample()),"saved (ids above long.MaxValue, no return time, quotes in names), the same after a restart");
+            Check(Same(new VoyageHistoryData(file,Data(database)).Load(),Sample()),"saved (ids above long.MaxValue, no return time, quotes in names), the same after a restart");
             var added=Voyage(17,3,At.AddHours(3),At.AddHours(30),(5,5));
             data.Save(Sample().Skip(1).Append(added).ToList());
-            Check(Same(new VoyageHistoryData(file,Data(database)).Load(At),Sample().Append(added).ToList()),"a save writes its voyages by key, the others kept (X-182)");
+            Check(Same(new VoyageHistoryData(file,Data(database)).Load(),Sample().Append(added).ToList()),"a save writes its voyages by key, the others kept (X-182)");
             Check(said.Count==1 && File.ReadAllBytes(file).SequenceEqual(bytes),"said once; the file of before never written");
             using var open=new TenshoDataDatabase(database).Open();
             Check(Convert.ToInt64(TenshoDataDatabase.Scalar(open,"SELECT COUNT(*) FROM converted;"))==0,"no « converted » mark written");
@@ -66,7 +66,7 @@ internal static class VoyageSqlite1148Tests
             var data=new VoyageHistoryData(file,Data(database)){DuringSave=()=>throw new IOException("stop inside the transaction")};
             var changed=Sample();changed[1]=changed[1] with {Loot=[new VoyageLoot(8,8)]};
             Check(Throws<IOException>(()=>data.Save(changed)),"the stop is seen");
-            Check(Same(new VoyageHistoryData(file,Data(database)).Load(At),Sample()),"the save of before whole");
+            Check(Same(new VoyageHistoryData(file,Data(database)).Load(),Sample()),"the save of before whole");
             Check(File.ReadAllBytes(file).SequenceEqual(bytes) && Aside(root).Length==0,"the file of before stays, unchanged");
         })),
         ("Voyages SQLite 1148: an old file found again never brings the old history back over newer",() => InTemp((root,file,database) =>
@@ -74,7 +74,7 @@ internal static class VoyageSqlite1148Tests
             var data=new VoyageHistoryData(file,Data(database));
             var newer=Sample();newer[0]=newer[0] with {Loot=[new VoyageLoot(7,7)]};data.Save(newer);
             VoyageHistory.Write(file,Sample());var bytes=File.ReadAllBytes(file);
-            Check(Same(new VoyageHistoryData(file,Data(database)).Load(At),newer),"newer history kept");
+            Check(Same(new VoyageHistoryData(file,Data(database)).Load(),newer),"newer history kept");
             Check(File.ReadAllBytes(file).SequenceEqual(bytes) && Aside(root).Length==0,"the old file left where it is, unchanged");
         })),
         ("Voyages SQLite 1148: an unreadable file of before, a blocked data file, no data file: never written over",() => InTemp((root,file,database) =>
@@ -103,9 +103,9 @@ internal static class VoyageSqlite1148Tests
         {
             var first=Sample();var second=Sample().Skip(1).Append(Voyage(99,4,At.AddHours(4),null,(1,1))).ToList();
             var a=new VoyageHistoryData(file,Data(database));var b=new VoyageHistoryData(file,Data(database));
-            a.Load(At);
+            a.Load();
             Parallel.For(0,40,index=>{if(index%2==0)a.Save(first);else b.Save(second);});
-            var saved=new VoyageHistoryData(file,Data(database)).Load(At);
+            var saved=new VoyageHistoryData(file,Data(database)).Load();
             Check(Same(saved,Sample().Append(second[^1]).ToList()),"neither erases the other's voyages (X-182): "+saved.Count);
             var mirror=Path.Combine(root,"mirror");
             var copy=TenshoDataDatabase.CopyForDesktop(database,Path.Combine(mirror,TenshoDataDatabase.FileName));

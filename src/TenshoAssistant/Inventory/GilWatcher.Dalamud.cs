@@ -215,7 +215,7 @@ public sealed unsafe class GilWatcher : IDisposable
         Saves.Switch();
         // X-587 (external audit A14 of 18/11): a journal of this character whose write failed is newer than the data file's: the one used.
         if(id!=0 && Saves.Failed(id) is { } kept)loading=Task.FromResult(GilJournal.Prune(kept,now));
-        else loading=id==0 ? null:Task.Run(()=>GilJournal.Prune(store.Load(id,now),now));
+        else loading=id==0 ? null:Task.Run(()=>GilJournal.Prune(store.Load(id),now));
         Volatile.Write(ref state,null);
     }
 

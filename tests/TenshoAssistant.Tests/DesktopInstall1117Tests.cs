@@ -30,7 +30,7 @@ internal static class DesktopInstall1117Tests
     }
 
     /// <summary>A package as Verify.ps1 makes it (exe, app DLL, plugin\TenshoAssistant.dll of one version); extra: more entries added.</summary>
-    private static (byte[] Zip,Version Version) Package(string temp,Action<ZipArchive>? extra=null)
+    private static (byte[] Zip,Version Version) Package(Action<ZipArchive>? extra=null)
     {
         var assembly=typeof(DesktopInstall1117Tests).Assembly.Location;
         var version=DesktopUpdate.Three(AssemblyName.GetAssemblyName(assembly).Version!);
@@ -73,7 +73,7 @@ internal static class DesktopInstall1117Tests
     [
         ("Desktop install 1117: a foreign folder named like the version is refused and left intact, from the plugin's button and from the app's update",() => InTemp(temp =>
         {
-            var (zip,version)=Package(temp);var three=DesktopVersionCheck.Three(version);var tag=DesktopUpdate.Tag(version);
+            var (zip,version)=Package();var three=DesktopVersionCheck.Three(version);var tag=DesktopUpdate.Tag(version);
             var chosen=Path.Combine(temp,"My documents");
             var foreign=Path.Combine(chosen,three);
             Directory.CreateDirectory(Path.Combine(foreign,"photos"));
@@ -99,7 +99,7 @@ internal static class DesktopInstall1117Tests
         })),
         ("Desktop install 1117: Tensho's own copy is kept when valid, replaced when damaged and unused, never replaced when it is Current, Previous or running",() => InTemp(temp =>
         {
-            var (zip,version)=Package(temp);var three=DesktopVersionCheck.Three(version);var tag=DesktopUpdate.Tag(version);
+            var (zip,version)=Package();var three=DesktopVersionCheck.Three(version);var tag=DesktopUpdate.Tag(version);
             var own=Path.Combine(temp,"own");var folder=Path.Combine(temp,"apps");var target=Path.Combine(folder,three);
             var (first,_)=Install(own,folder,new FakeSource(tag,zip),version);
             Check(first is not null && DesktopUpdate.SameFolder(first.Folder,target) && File.Exists(Path.Combine(target,DesktopInstall.Marker)),"installed and marked as Tensho's");
@@ -123,15 +123,15 @@ internal static class DesktopInstall1117Tests
         })),
         ("Desktop install 1117: a broken download and a refused zip leave nothing; the zip is bounded (entries, unpacked bytes, entries outside)",() => InTemp(temp =>
         {
-            var (zip,version)=Package(temp);var tag=DesktopUpdate.Tag(version);
+            var (zip,version)=Package();var tag=DesktopUpdate.Tag(version);
             var own=Path.Combine(temp,"own");var folder=Path.Combine(temp,"apps");
             try{Install(own,folder,new FakeSource(tag,zip,throwAfter:1000),version);Check(false,"the broken download throws");}
             catch(IOException){}
             Check(NoLeftovers(own,folder),"a broken download leaves no partial file");
-            var (many,_)=Package(temp,archive=>{for(var i=0;i<DesktopInstall.MaxEntries;i++)archive.CreateEntry($"extra/{i}.txt");});
+            var (many,_)=Package(archive=>{for(var i=0;i<DesktopInstall.MaxEntries;i++)archive.CreateEntry($"extra/{i}.txt");});
             var (tooMany,steps)=Install(own,folder,new FakeSource(tag,many),version);
             Check(tooMany is null && steps.Contains(InstallStep.ErrorPackage) && NoLeftovers(own,folder) && !Directory.Exists(Path.Combine(folder,DesktopVersionCheck.Three(version))),"too many entries: refused, nothing left");
-            var (outside,_)=Package(temp,archive=>{using var w=new StreamWriter(archive.CreateEntry("../escaped.txt").Open());w.Write("x");});
+            var (outside,_)=Package(archive=>{using var w=new StreamWriter(archive.CreateEntry("../escaped.txt").Open());w.Write("x");});
             var (escaped,steps2)=Install(own,folder,new FakeSource(tag,outside),version);
             Check(escaped is null && steps2.Contains(InstallStep.ErrorPackage) && !File.Exists(Path.Combine(folder,"escaped.txt")) && NoLeftovers(own,folder),"an entry outside the folder: refused, nothing written outside");
             // The unpacked-bytes cap counts what is written, whatever the entries announce.
@@ -148,7 +148,7 @@ internal static class DesktopInstall1117Tests
         })),
         ("Desktop install 1117: two installs at once in the same folders, and two writers of update.json at once, lose nothing",() => InTemp(temp =>
         {
-            var (zip,version)=Package(temp);var three=DesktopVersionCheck.Three(version);var tag=DesktopUpdate.Tag(version);
+            var (zip,version)=Package();var three=DesktopVersionCheck.Three(version);var tag=DesktopUpdate.Tag(version);
             var own=Path.Combine(temp,"own");var folder=Path.Combine(temp,"apps");
             var both=Enumerable.Range(0,2).Select(_=>Task.Run(()=>Install(own,folder,new FakeSource(tag,zip),version))).ToArray();
             Task.WaitAll(both,TimeSpan.FromSeconds(60));
@@ -210,7 +210,7 @@ internal static class DesktopInstall1117Tests
         // marker names the package just checked (its SHA-256), else replaced. Behaviour test (R28): real folders, a real package and install.
         ("Desktop install 1209: behaviour: a free copy of the version whose marker names another package (a file missing the check does not see) is replaced; one in use is kept",() => InTemp(temp =>
         {
-            var (zip,version)=Package(temp);var three=DesktopVersionCheck.Three(version);var tag=DesktopUpdate.Tag(version);
+            var (zip,version)=Package();var three=DesktopVersionCheck.Three(version);var tag=DesktopUpdate.Tag(version);
             var own=Path.Combine(temp,"own");var folder=Path.Combine(temp,"apps");var target=Path.Combine(folder,three);
             var (first,_)=Install(own,folder,new FakeSource(tag,zip),version);
             var marker=Path.Combine(target,DesktopInstall.Marker);var good=File.ReadAllText(marker);

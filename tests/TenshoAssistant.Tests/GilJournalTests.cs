@@ -74,7 +74,7 @@ internal static class GilJournalTests
         {
             var watcher=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Inventory/GilWatcher.Dalamud.cs"));
             // 0.1139 (X-173): read through GilJournalStore (TenshoData.db, the file of before converted once).
-            Check(watcher.Contains("loading=id==0 ? null:Task.Run(()=>GilJournal.Prune(store.Load(id,now),now));"),"task");
+            Check(watcher.Contains("loading=id==0 ? null:Task.Run(()=>GilJournal.Prune(store.Load(id),now));"),"task");
             Check(watcher.Contains("if(!read.IsCompleted)return;") && watcher.Contains("else{loadFailed=true;"),"waited, failure kept");
         }),
         // From GilMail903Tests: 0.903 (X-84): gil taken from or attached to a letter are filed under « Mail » in the gil journal.

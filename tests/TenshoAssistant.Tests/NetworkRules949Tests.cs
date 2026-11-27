@@ -17,7 +17,7 @@ internal static class NetworkRules949Tests
             CommunitySources.ApplyGameDataOnly(c,false);Check(c.CommunityPaissa,"given back");
             var store=new DiscoveryStore();var at=new DateTimeOffset(2026,11,8,21,37,12,TimeSpan.Zero);
             store.SeeSource(DiscoveryKind.FishCatch,5,1,1,at,1,1,new Vector3(1,0,1));
-            var mine=CommunityDiscoveries.Mine(store.Snapshot(at,false)).Facts.Single();
+            var mine=CommunityDiscoveries.Mine(store.Snapshot(at)).Facts.Single();
             Check(mine.First==new DateTimeOffset(2026,11,8,0,0,0,TimeSpan.Zero) && mine.Last==mine.First,"day only");
             Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Discoveries.cs")).Contains("localization.Get(\"DiscoveriesUi.PublicWarning\")"),"warning");
             Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/TenshoAssistant.json")).Contains("equipping a gear set"),"manifest");

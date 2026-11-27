@@ -77,12 +77,12 @@ internal static class AsideGist1561Tests
         var seen=new DiscoveryStore();
         seen.SeeSource(DiscoveryKind.Venture,5,7,2,At);
         for(var n=0;n<3;n++)seen.SeeSource(DiscoveryKind.Venture,6,7,2,At.AddHours(n));
-        var facts=seen.Snapshot(At,false).Facts;
+        var facts=seen.Snapshot(At).Facts;
         var a=facts.Single(fact=>fact.Subject==5).Key;var b=facts.Single(fact=>fact.Subject==6);
         Check(b.Seen>=1,"B seen");
         var database=new DiscoveryDatabase(Path.Combine(root,DiscoveryDatabase.FileName));
         database.Write(facts,[],false);
-        var gist=ExchangeV3.GistFiles(ExchangeV3.Build(CommunityDiscoveries.Mine(seen.Snapshot(At,false))));
+        var gist=ExchangeV3.GistFiles(ExchangeV3.Build(CommunityDiscoveries.Mine(seen.Snapshot(At))));
         using(var open=new SqliteConnection($"Data Source={database.Path};Pooling=false"))
         {
             open.Open();

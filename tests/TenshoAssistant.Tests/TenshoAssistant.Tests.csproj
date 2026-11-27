@@ -5,6 +5,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!-- X-816 (0.1883): the code style rules .editorconfig sets to error (dead private members, unused parameters) run in the Release build. -->
+    <EnforceCodeStyleInBuild Condition="'$(Configuration)'=='Release'">true</EnforceCodeStyleInBuild>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="../../src/TenshoAssistant/TenshoJson.cs" Link="TenshoJson.cs" />

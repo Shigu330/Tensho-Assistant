@@ -21,6 +21,7 @@ internal sealed class Reader1199G { public int Calls; public void OnUpdate(int t
 internal sealed class Reader1199Cold
 {
     private int total;
+    public int Total => total;
     [MethodImpl(MethodImplOptions.NoInlining)] public void OnUpdate(int tick) { total += First(tick) + Second(tick); Action<int> later = value => total += Third(value); later(tick); }
     [MethodImpl(MethodImplOptions.NoInlining)] private int First(int value) => value + 1;
     [MethodImpl(MethodImplOptions.NoInlining)] private int Second(int value) => value * 2;
@@ -29,6 +30,7 @@ internal sealed class Reader1199Cold
 internal sealed class Reader1199Ahead
 {
     private int total;
+    public int Total => total;
     [MethodImpl(MethodImplOptions.NoInlining)] public void OnUpdate(int tick) { total += First(tick) + Second(tick); Action<int> later = value => total += Third(value); later(tick); }
     [MethodImpl(MethodImplOptions.NoInlining)] private int First(int value) => value + 1;
     [MethodImpl(MethodImplOptions.NoInlining)] private int Second(int value) => value * 2;
@@ -37,6 +39,7 @@ internal sealed class Reader1199Ahead
 internal sealed class Reader1199Shared
 {
     private int total;
+    public int Total => total;
     [MethodImpl(MethodImplOptions.NoInlining)] public void OnUpdate(int tick) { total += First(tick) + Second(tick); Action<int> later = value => total += Third(value); later(tick); }
     [MethodImpl(MethodImplOptions.NoInlining)] private int First(int value) => value + 1;
     [MethodImpl(MethodImplOptions.NoInlining)] private int Second(int value) => value * 2;

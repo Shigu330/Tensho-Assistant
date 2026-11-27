@@ -39,8 +39,8 @@ internal static class DesktopData1147Tests
                 Check(Hash(source)==before.Item1 && (Hash(wal)==before.Item2 || new FileInfo(wal).Length==0),"the plugin's file unchanged by the copy, its journal unchanged or empty: "+before+" -> "+(Hash(source),Hash(wal)));
                 var app=new GilJournalStore(Path.Combine(mirror,"GilJournal"),new TenshoDataFile(target,Warn));
                 Check(app.Latest()==2UL,"the newest character is the one shown");
-                Check(app.Load(1,now).Count==2 && app.Load(2,now).Count==2,"every row copied");
-                var (gil,retainers,company)=GilJournal.LastBalances(app.Load(2,now));
+                Check(app.Load(1).Count==2 && app.Load(2).Count==2,"every row copied");
+                var (gil,retainers,company)=GilJournal.LastBalances(app.Load(2));
                 Check(gil==510 && retainers==90_000 && company is null,"last balances per source, none guessed for the company chest");
 
                 // A save half done in the plugin (its transaction open): the copy holds the last whole save, never half of the next one.
@@ -51,7 +51,7 @@ internal static class DesktopData1147Tests
                     using(var command=writing.CreateCommand()){command.Transaction=transaction;command.CommandText="DELETE FROM gil_entries WHERE character=1;";command.ExecuteNonQuery();}
                     copy=TenshoDataDatabase.CopyForDesktop(source,target);
                     Check(copy.Copied==1,"copied while the game writes: "+string.Join("; ",copy.Problems));
-                    Check(app.Load(1,now).Count==2,"the half-done save is not in the copy");
+                    Check(app.Load(1).Count==2,"the half-done save is not in the copy");
                     transaction.Rollback();
                 }
                 // A newer save, copied while the application reads its copy (an open read on the copy).
@@ -68,10 +68,10 @@ internal static class DesktopData1147Tests
                     transaction.Commit();
                 }
                 // A read of the copy under way: the backup waits, then gives up (SQLite busy) and the copy stays the last whole one; the next notice copies.
-                Check(copy.Copied==1 || copy.Problems.Count==1 && copy.Problems[0].Contains("SQLite error 5",StringComparison.Ordinal) && app.Latest()==2UL && app.Load(1,now).Count==2,"while the app reads: copied, or refused with the copy whole: "+string.Join("; ",copy.Problems));
+                Check(copy.Copied==1 || copy.Problems.Count==1 && copy.Problems[0].Contains("SQLite error 5",StringComparison.Ordinal) && app.Latest()==2UL && app.Load(1).Count==2,"while the app reads: copied, or refused with the copy whole: "+string.Join("; ",copy.Problems));
                 copy=TenshoDataDatabase.CopyForDesktop(source,target);
                 Check(copy.Copied==1,"copied once the read is over: "+string.Join("; ",copy.Problems));
-                Check(app.Latest()==3UL && app.Load(3,now).Count==1,"the copy follows the plugin's file");
+                Check(app.Latest()==3UL && app.Load(3).Count==1,"the copy follows the plugin's file");
 
                 // The game closed: the plugin's journal folded in, no connection left: still copied, read-only.
                 new TenshoDataFile(source,Warn).Checkpoint();

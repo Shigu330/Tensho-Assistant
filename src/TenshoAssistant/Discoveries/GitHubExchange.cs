@@ -404,7 +404,7 @@ public sealed class GitHubExchange : IDisposable
         else if(upload && Connected && store.Aside is not null && !(aside=await KeepAside(store).ConfigureAwait(false)).Go)sent=aside.Said;
         else if(upload && Connected)
         {
-            var mine=CommunityDiscoveries.Mine(store.Snapshot(DateTimeOffset.UtcNow,false));
+            var mine=CommunityDiscoveries.Mine(store.Snapshot(DateTimeOffset.UtcNow));
             if(mine.Facts.Count==0)sent="ShareEmpty";
             // X-822: after a write of github.json that failed, written again first, or nothing made (a send whose gist and issue cannot be
             // noted would make new ones at each exchange). Not written when the last write held: another client of this profile may have

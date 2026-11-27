@@ -56,7 +56,7 @@ internal sealed partial class MainWindow
     private void DrawMapsPicker(MapCatalog catalog)
     {
         // P10 (0.597): search everything on every map, from here rather than from the map.
-        DrawMapFind(catalog);
+        DrawMapFind();
         ImGui.SetNextItemWidth(-1);
         ImGui.InputTextWithHint("##MapSearch", localization.Get("MapsUi.Search"), ref mapQuery, 128);
         Tip("MapsUi.SearchTip");

@@ -41,14 +41,14 @@ internal static class AchievementDesktop1150Tests
         {
             var database = Path.Combine(root,TenshoDataDatabase.FileName);
             var plugin = new AchievementProgressData(Path.Combine(root,"AchievementProgress.json"),Data(database));
-            plugin.Load(At);
+            plugin.Load();
             var first = Seen((100,2,10,1));var second = Seen((100,9,10,3),(200,1,1,2));
             plugin.Save(11,first,new() { [11] = first });
             plugin.Save(22,second,new() { [11] = first,[22] = second });
             var mirror = Path.Combine(root,"mirror");var copy = Path.Combine(mirror,TenshoDataDatabase.FileName);
             Check(TenshoDataDatabase.CopyForDesktop(database,copy).Copied == 1,"copied");
             var app = new AchievementProgressData(Path.Combine(mirror,"AchievementProgress.json"),Data(copy));
-            var all = app.Load(DateTimeOffset.UtcNow);
+            var all = app.Load();
             Check(AchievementProgressData.Latest(all) == 22 && all[22].Count == 2 && all[22][100] == second[100] && all[22][200] == second[200],"character 22's progress as saved");
             Check(!Directory.GetDirectories(mirror,"before-sqlite-*").Any() && !File.Exists(Path.Combine(mirror,"AchievementProgress.json")),"nothing converted or made in the copy's folder");
         })),
@@ -62,7 +62,7 @@ internal static class AchievementDesktop1150Tests
             SqliteConnection.ClearAllPools();
             var mirror = Path.Combine(root,"mirror");var copy = Path.Combine(mirror,TenshoDataDatabase.FileName);
             Check(TenshoDataDatabase.CopyForDesktop(database,copy).Copied == 1,"copied");
-            var all = new AchievementProgressData(Path.Combine(mirror,"AchievementProgress.json"),Data(copy)).Load(DateTimeOffset.UtcNow);
+            var all = new AchievementProgressData(Path.Combine(mirror,"AchievementProgress.json"),Data(copy)).Load();
             Check(AchievementProgressData.Latest(all) is null,"nothing to show yet");
             Check(File.ReadAllBytes(json).SequenceEqual(bytes) && !Directory.GetDirectories(root,"before-sqlite-*").Any(),"the plugin's file of before untouched");
         })),

@@ -18,7 +18,7 @@ internal static class EorzeaHour1831Tests
                 store.SeeSource(DiscoveryKind.VistaSeen,7,2,minute,at);
                 store.SeeSource(DiscoveryKind.Venture,9,1,minute,at);
             }
-            var snapshot=store.Snapshot(day.AddDays(1),false);
+            var snapshot=store.Snapshot(day.AddDays(1));
             Check(snapshot.Facts.Single(fact=>fact.Kind==DiscoveryKind.FishCondition) is { LevelMin:1023, LevelMax:1079 } local && local.Values!.Count==3,"the local base keeps the minute");
             var mine=CommunityDiscoveries.Mine(snapshot);
             foreach(var kind in new[]{DiscoveryKind.FishCondition,DiscoveryKind.FishTransition,DiscoveryKind.VistaSeen})
@@ -40,7 +40,7 @@ internal static class EorzeaHour1831Tests
             var store=new DiscoveryStore();
             store.Merge([new DiscoveryFact{Kind=DiscoveryKind.VistaSeen,Subject=7,Detail=2,LevelMin=300,LevelMax=300,Imported=1,First=day,Last=day,Values=new(){[300]=1}}]);
             store.SeeSource(DiscoveryKind.VistaSeen,7,2,1439,day.AddHours(3));
-            var fact=CommunityDiscoveries.Mine(store.Snapshot(day.AddDays(1),false)).Facts.Single();
+            var fact=CommunityDiscoveries.Mine(store.Snapshot(day.AddDays(1))).Facts.Single();
             Check(fact.LevelMin==1380 && fact.LevelMax==1380 && fact.Values is { Count:1 } values && values.ContainsKey(1380),$"own minute 1439 sent as 1380 ({fact.LevelMin}, {string.Join(",",fact.Values?.Keys.ToArray() ?? [])})");
         }),
         ("X-829: the warning says the Eorzea hour; the merge tool keeps a share's hour (its selftest)",() =>

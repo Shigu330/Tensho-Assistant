@@ -32,7 +32,7 @@ internal static class GitHubApp1138Tests
     }
 
     /// <summary>GitHub's usual answers: the device code, a token (given by <paramref name="token"/>), the user, a new gist g1, an issue 5.</summary>
-    private static (HttpStatusCode,string)? Usual(string method,string address,string body,string token,HttpStatusCode issue=HttpStatusCode.Created)
+    private static (HttpStatusCode,string)? Usual(string method,string address,string token,HttpStatusCode issue=HttpStatusCode.Created)
     {
         if(address=="https://github.com/login/device/code")
             return (HttpStatusCode.OK,"{\"device_code\":\"dev\",\"user_code\":\"ABCD-1234\",\"verification_uri\":\"https://github.com/login/device\",\"interval\":0,\"expires_in\":900}");
@@ -91,7 +91,7 @@ internal static class GitHubApp1138Tests
         {
             const string oauthToken="gho_oauth_secret_value";
             using var first=new GitHub();
-            first.Answer=(method,address,body)=>Usual(method,address,body,$"{{\"access_token\":\"{oauthToken}\",\"token_type\":\"bearer\",\"scope\":\"gist,public_repo\"}}");
+            first.Answer=(method,address,body)=>Usual(method,address,$"{{\"access_token\":\"{oauthToken}\",\"token_type\":\"bearer\",\"scope\":\"gist,public_repo\"}}");
             var a=Path.Combine(root,"a");
             using(var exchange=new GitHubExchange(a,first,GitHubSignIn.For(""),()=>At){PollFloor=TimeSpan.Zero})
             {
@@ -107,7 +107,7 @@ internal static class GitHubApp1138Tests
 
             const string access="ghu_app_access_value",renewal="ghr_app_refresh_value";
             using var second=new GitHub();
-            second.Answer=(method,address,body)=>Usual(method,address,body,
+            second.Answer=(method,address,body)=>Usual(method,address,
                 $"{{\"access_token\":\"{access}\",\"expires_in\":28800,\"refresh_token\":\"{renewal}\",\"refresh_token_expires_in\":15897600,\"token_type\":\"bearer\",\"scope\":\"\"}}");
             var b=Path.Combine(root,"b");
             using(var exchange=new GitHubExchange(b,second,App,()=>At){PollFloor=TimeSpan.Zero})
@@ -126,7 +126,7 @@ internal static class GitHubApp1138Tests
         ("GitHub App 1138: an expired App token is renewed before the upload, the new pair kept protected; a fresh one is not; the gist is created secret",() => InTemp(root =>
         {
             using var github=new GitHub();
-            github.Answer=(method,address,body)=>Usual(method,address,body,
+            github.Answer=(method,address,body)=>Usual(method,address,
                 "{\"access_token\":\"ghu_new\",\"expires_in\":28800,\"refresh_token\":\"ghr_new\",\"refresh_token_expires_in\":15897600,\"token_type\":\"bearer\",\"scope\":\"\"}");
             Connected(root,new(){Login="tester",ClientId=TestAppId,TokenExpires=At.AddMinutes(-1),RefreshExpires=At.AddDays(100)},"ghu_old","ghr_old");
             using(var exchange=new GitHubExchange(root,github,App,()=>At))
@@ -160,7 +160,7 @@ internal static class GitHubApp1138Tests
             {
                 var folder=Path.Combine(root,name.Replace(' ','-'));
                 using var github=new GitHub();
-                github.Answer=(method,address,body)=>address=="https://github.com/login/oauth/access_token" ? (status,json):Usual(method,address,body,"{}");
+                github.Answer=(method,address,body)=>address=="https://github.com/login/oauth/access_token" ? (status,json):Usual(method,address,"{}");
                 Connected(folder,new(){Login="tester",ClientId=TestAppId,GistId="g1",Issue=7,TokenExpires=At.AddHours(-2),RefreshExpires=At.AddDays(30)},"ghu_old","ghr_old");
                 using var exchange=new GitHubExchange(folder,github,App,()=>At);
                 Check(exchange.Exchange(Sightings(),true) && Wait(exchange) is { Key:"ExchangeExpired" },$"{name}: « connect again »");
@@ -170,12 +170,12 @@ internal static class GitHubApp1138Tests
                 Check(Meta(folder) is { ClientId:"", TokenExpires:null, RefreshExpires:null, GistId:"g1", Issue:7 },$"{name}: the sign-in forgotten, the gist and issue kept");
             }
             var ended=Path.Combine(root,"ended");
-            using var none=new GitHub();none.Answer=(method,address,body)=>Usual(method,address,body,"{}");
+            using var none=new GitHub();none.Answer=(method,address,body)=>Usual(method,address,"{}");
             Connected(ended,new(){Login="tester",ClientId=TestAppId,TokenExpires=At.AddDays(-200),RefreshExpires=At.AddDays(-1)},"ghu_old","ghr_old");
             using(var exchange=new GitHubExchange(ended,none,App,()=>At))
                 Check(exchange.Exchange(Sightings(),true) && Wait(exchange) is { Key:"ExchangeExpired" } && !exchange.Connected && none.Sent.Count==0,"a refresh token past its end: disconnected without asking GitHub");
             var lost=Path.Combine(root,"lost");
-            using var lostServer=new GitHub();lostServer.Answer=(method,address,body)=>Usual(method,address,body,"{}");
+            using var lostServer=new GitHub();lostServer.Answer=(method,address,body)=>Usual(method,address,"{}");
             Connected(lost,new(){Login="tester",ClientId=TestAppId,TokenExpires=At.AddHours(-1)},"ghu_old",null);
             using(var exchange=new GitHubExchange(lost,lostServer,App,()=>At))
                 Check(exchange.Exchange(Sightings(),true) && Wait(exchange) is { Key:"ExchangeExpired" } && !exchange.Connected && lostServer.Sent.Count==0,"an expired token without refresh token: disconnected");
@@ -186,7 +186,7 @@ internal static class GitHubApp1138Tests
             {
                 var folder=Path.Combine(root,((int)status).ToString());
                 using var github=new GitHub();
-                github.Answer=(method,address,body)=>Usual(method,address,body,"{}",status);
+                github.Answer=(method,address,body)=>Usual(method,address,"{}",status);
                 Connected(folder,new(){Login="tester",ClientId=TestAppId,TokenExpires=At.AddHours(8),RefreshExpires=At.AddDays(30)},"ghu_live","ghr_live");
                 using var exchange=new GitHubExchange(folder,github,App,()=>At);
                 Check(exchange.Exchange(Sightings(),true) && Wait(exchange) is { Key:"ExchangeAppMissing" },$"{(int)status}: « the App is not installed »");
@@ -198,7 +198,7 @@ internal static class GitHubApp1138Tests
             // The OAuth app as before: a refused issue is a failed exchange, not « App missing ».
             var oauth=Path.Combine(root,"oauth");
             using var before=new GitHub();
-            before.Answer=(method,address,body)=>Usual(method,address,body,"{}",HttpStatusCode.Forbidden);
+            before.Answer=(method,address,body)=>Usual(method,address,"{}",HttpStatusCode.Forbidden);
             Connected(oauth,new(){Login="tester"},"gho_live",null);
             using(var exchange=new GitHubExchange(oauth,before,GitHubSignIn.For(""),()=>At))
                 Check(exchange.Exchange(Sightings(),true) && Wait(exchange) is { Key:"ExchangeFailed" } && exchange.Connected,"OAuth: failed as before, still connected");

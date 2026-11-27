@@ -46,9 +46,9 @@ internal static class ReviewMinors1380Tests
             VoyageHistory.Write(file, [Record(100, 1, at.AddHours(1), 24)]);
             var bytes = File.ReadAllBytes(file);
             using (new FileStream(file, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
-                Check(new VoyageHistoryData(file, Data(root)).Load(DateTimeOffset.UtcNow).Select(record => record.Loot[0].ItemId).SequenceEqual([21u]), "held: the load goes on, the data file's voyage only");
+                Check(new VoyageHistoryData(file, Data(root)).Load().Select(record => record.Loot[0].ItemId).SequenceEqual([21u]), "held: the load goes on, the data file's voyage only");
             Check(File.ReadAllBytes(file).SequenceEqual(bytes) && Directory.GetDirectories(root, "before-sqlite-*").Length == 0, "left in place, not set aside");
-            var all = new VoyageHistoryData(file, Data(root)).Load(DateTimeOffset.UtcNow);
+            var all = new VoyageHistoryData(file, Data(root)).Load();
             Check(all.Count == 1 && all[0].Loot[0].ItemId == 21, "free: still not read nor merged: " + all.Count);
             Check(File.ReadAllBytes(file).SequenceEqual(bytes), "never moved");
         })),

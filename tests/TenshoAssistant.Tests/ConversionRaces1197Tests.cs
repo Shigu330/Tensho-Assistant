@@ -37,7 +37,6 @@ internal static class ConversionRaces1197Tests
     }
     private static (long Mine, long Shared) Count(string root) => new DiscoveryDatabase(Path.Combine(root, DiscoveryDatabase.FileName)).Count();
     private static string[] Temporaries(string root) => Directory.GetFiles(root, DiscoveryDatabase.FileName + ".converting*");
-    private static string[] Aside(string root) => Directory.GetDirectories(root, "before-sqlite-*").SelectMany(Directory.GetFiles).ToArray();
     private static string Kind(string main) => DiscoveryFiles.SharedPath(DiscoveryFiles.SharedFolder(main), DiscoveryKind.FishCatch);
     // The start of the discoveries as the plugin does it (Plugin.Discoveries.cs): the database opened (made when missing), the files of before named.
     private static (DiscoveryDatabase Database, string[] Old) Start(string root)

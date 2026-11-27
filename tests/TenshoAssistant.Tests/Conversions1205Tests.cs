@@ -49,11 +49,11 @@ internal static class Conversions1205Tests
             var seen = new Dictionary<uint, AchievementProgress> { [42] = new(9, 10, At) };
             using (Hold(file))
             {
-                Check(store.Load(At).Count == 0, "held at the load: nothing read, no error");
+                Check(store.Load().Count == 0, "held at the load: nothing read, no error");
                 Check(!Refused(() => store.Save(Character, seen, [])), "held at the save: saved all the same");
             }
             store.Save(Character, seen, []);
-            var all = new AchievementProgressData(file, Data(root)).Load(At)[Character];
+            var all = new AchievementProgressData(file, Data(root)).Load()[Character];
             Check(all.Count == 1 && all[42] == new AchievementProgress(9, 10, At), "the session's progress only: " + all.Count);
             Check(File.ReadAllBytes(file).SequenceEqual(bytes) && Aside(root) == 0 && ConvertedMarks(root) == 0, "the file left as it is; nothing set aside nor marked");
         })),
@@ -66,10 +66,10 @@ internal static class Conversions1205Tests
             var mine = Voyage(4, At);
             using (Hold(file))
             {
-                Check(store.Load(At).Count == 0, "held at the load: nothing read");
+                Check(store.Load().Count == 0, "held at the load: nothing read");
                 Check(!Refused(() => store.Save([mine], [mine], At)), "held at the save: saved all the same");
             }
-            var history = new VoyageHistoryData(file, Data(root)).Load(At);
+            var history = new VoyageHistoryData(file, Data(root)).Load();
             Check(history.Select(voyage => voyage.Slot).SequenceEqual([4]), "the session's voyage only: " + string.Join(",", history.Select(voyage => voyage.Slot)));
             Check(File.ReadAllBytes(file).SequenceEqual(bytes) && Aside(root) == 0 && ConvertedMarks(root) == 0, "the file left as it is; nothing set aside nor marked");
         })),
@@ -83,12 +83,12 @@ internal static class Conversions1205Tests
             var session = new List<GilEntry>();
             using (Hold(json))
             {
-                session.AddRange(store.Load(Character, At));
+                session.AddRange(store.Load(Character));
                 Check(session.Count == 0, "held at the load: nothing read");
                 session.Add(new(At, 10, 1060, GilSource.Character, GilCategory.Other));
                 Check(!Refused(() => store.Save(Character, session)), "held at the save: saved all the same");
             }
-            var journal = new GilJournalStore(folder, Data(root)).Load(Character, At);
+            var journal = new GilJournalStore(folder, Data(root)).Load(Character);
             Check(journal.SequenceEqual(session), "the session's entries only: " + journal.Count);
             Check(File.ReadAllBytes(json).SequenceEqual(bytes) && Aside(folder) == 0 && ConvertedMarks(root) == 0, "the file left as it is; nothing set aside nor marked");
         })),
@@ -99,7 +99,7 @@ internal static class Conversions1205Tests
             Check(!Refused(() => new GilJournalStore(folder, Data(root)).Save(Character, [new(At, 1, 1, GilSource.Character, GilCategory.Other)])) && File.ReadAllText(json) == "{ not a journal", "gil journal");
             var file = Path.Combine(root, "VoyageHistory.json"); File.WriteAllText(file, "{ not a history");
             Check(!Refused(() => new VoyageHistoryData(file, Data(root)).Save([], [], At)) && File.ReadAllText(file) == "{ not a history", "voyage history");
-            Check(new GilJournalStore(folder, Data(root)).Load(Character, At).Count == 1, "the journal saved in the data file");
+            Check(new GilJournalStore(folder, Data(root)).Load(Character).Count == 1, "the journal saved in the data file");
         })),
     ];
 }

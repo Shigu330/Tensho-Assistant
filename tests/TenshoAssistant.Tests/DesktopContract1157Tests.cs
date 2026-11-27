@@ -15,11 +15,11 @@ internal static class DesktopContract1157Tests
     // Stand-ins of the plugin's types, to see the resolver at work on real reflection (the plugin's DLL is not loaded by the tests).
     private sealed class Window
     {
-#pragma warning disable CS0169, CS0414, IDE0051
+#pragma warning disable CS0169, CS0414, IDE0051, IDE0060
         private int jitWarmup;
         private IReadOnlyDictionary<string,Delegate> DesktopSurfaceMap()=>new Dictionary<string,Delegate>();
         internal static void Copy(string a,string b){}
-#pragma warning restore CS0169, CS0414, IDE0051
+#pragma warning restore CS0169, CS0414, IDE0051, IDE0060
     }
 
     public static IEnumerable<(string Name,Action Run)> Cases =>

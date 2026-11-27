@@ -10,7 +10,6 @@ internal static class ChatLinks1441Tests
     private static readonly ChatLink Limsa = new(ChatSegmentKind.MapLink,129,12,9.5f,11.2f,"Limsa Lominsa Lower Decks");
     private static readonly ChatLink Potion = new(ChatSegmentKind.ItemLink,ItemId:4552,Hq:true);
     private static float Measure(string text) => text.Length;
-    private static string Text(IReadOnlyList<ChatRun> line) => string.Concat(line.Select(run => run.Text));
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [

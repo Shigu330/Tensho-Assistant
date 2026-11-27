@@ -13,8 +13,6 @@ namespace TenshoAssistant.Maps;
 public sealed class ChatMapLinkWatcher : IDisposable
 {
     private readonly RegistrationScope registrations=new();
-    private readonly IChatGui chat;
-    private readonly IClientState client;
     private readonly IPluginLog log;
     private readonly Func<bool> enabled;
     private bool disposed,warned;
@@ -22,7 +20,8 @@ public sealed class ChatMapLinkWatcher : IDisposable
 
     public ChatMapLinkWatcher(IChatGui chat,IClientState client,IPluginLog log,Func<bool> enabled)
     {
-        this.chat=chat;this.client=client;this.log=log;this.enabled=enabled;
+        // X-816 (0.1883): the game's chat and client are used only by the subscriptions below (their parameters), never kept.
+        this.log=log;this.enabled=enabled;
         // X-76 H10 (0.924): subscriptions owned by one RegistrationScope: a failure part-way undoes the ones already made; Dispose releases them in reverse order.
         try
         {

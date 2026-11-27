@@ -46,7 +46,7 @@ internal static class PatchRecheck1048Tests
         ("Patch recheck 1048: counted off the frame once per report list, with its text in English and French",() =>
         {
             var code=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Caching.cs"));
-            Check(code.Contains("DrawPatchRecheck(reports);") && code.Contains("_=Task.Run(()=>") && code.Contains("PatchRecheck.Find(reports,discoveries.Snapshot(DateTimeOffset.UtcNow,saving:false).Facts)"),"wiring off the frame");
+            Check(code.Contains("DrawPatchRecheck(reports);") && code.Contains("_=Task.Run(()=>") && code.Contains("PatchRecheck.Find(reports,discoveries.Snapshot(DateTimeOffset.UtcNow).Facts)"),"wiring off the frame");
             Check(code.Contains("ReferenceEquals(reports,patchRecheckFor)") && code.Contains("Tip(\"CacheUi.PatchRecheckTip\")"),"once per list, with its tip");
             foreach (var language in new[]{"en","fr"})
             {

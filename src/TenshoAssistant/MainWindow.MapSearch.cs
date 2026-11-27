@@ -67,7 +67,7 @@ internal sealed partial class MainWindow
         },token);
     }
 
-    private void DrawMapFind(MapCatalog catalog)
+    private void DrawMapFind()
     {
         ImGui.SetNextItemWidth(-1);
         ImGui.InputTextWithHint("###MapFind",localization.Get("MapsUi.FindHint"),ref mapFindQuery,80);
