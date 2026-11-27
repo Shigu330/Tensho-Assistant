@@ -1115,50 +1115,15 @@ public sealed partial class Plugin : IDalamudPlugin
             RegisterQuests(configuration,data,framework,player,client,unlocks,tenshoData);
             TriadObservationReader? triadReader = null;
             MiniCactpotObservationReader? cactpotReader=null;
-            GatheringObservationReader? gatheringReader=null;
-            mainWindow.GatheringSlotRects=()=>gatheringReader?.SlotRects ?? [];
-            mainWindow.GatheringAutoGather=()=>gatheringReader?.AutoGather;
-            registrations.Register(()=>gatheringReader=new GatheringObservationReader(gatheringObservation,framework,player,client,gameGui,objects,log),()=>gatheringReader?.Dispose());
-            CollectableReader? collectableReader=null;
-            SpearfishingReader? spearfishingReader=null;
-            registrations.Register(()=>mainWindow.Spearfishing=spearfishingReader=new SpearfishingReader(framework,gameGui,client,log,
-                // 0.894 (user capture: node 32076 found, list of the zone shown): several points share one GatheringPointBase (32074–32076 → 465) and the catalogue
-                // keeps one point per base, so the node is given as its base.
-                ()=>(targets.Target is { ObjectKind:Dalamud.Game.ClientState.Objects.Enums.ObjectKind.GatheringPoint } node ? node.BaseId
-                    // 0.892: no node targeted: the nearest targetable gathering point within 12 yalms.
-                    :objects.LocalPlayer is { } me ? objects.Where(item=>item.ObjectKind==Dalamud.Game.ClientState.Objects.Enums.ObjectKind.GatheringPoint && item.IsTargetable
-                        && System.Numerics.Vector3.Distance(item.Position,me.Position)<=12).OrderBy(item=>System.Numerics.Vector3.Distance(item.Position,me.Position))
-                        .Select(item=>item.BaseId).FirstOrDefault():0u) is var found and not 0
-                    && data.GetExcelSheet<Lumina.Excel.Sheets.GatheringPoint>().GetRowOrDefault(found) is { } pointRow ? pointRow.GatheringPointBase.RowId:0u),()=>spearfishingReader?.Dispose());
-            registrations.Register(()=>mainWindow.Collectables=collectableReader=new CollectableReader(framework,gameGui,client,data,log),()=>collectableReader?.Dispose());
-            mainWindow.CollectableActionInfo=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Action>().GetRowOrDefault(id) is { } row ? (row.Name.ExtractText(),(uint)row.Icon,(int)row.PrimaryCostValue):null;
-            // 0.480: status 757, Scrutiny (Status sheet, docs/evidence/0.479-collectable-window-values.md).
-            mainWindow.CollectableActionStatus=id=>Gathering.CollectableActionState.Status(id);
-            mainWindow.GatheringRecastLeft=id=>Gathering.CollectableActionState.RecastLeft(id);
-            Gathering.ActionBarLocator? barLocator=null;
-            registrations.Register(()=>mainWindow.BarLocator=barLocator=new Gathering.ActionBarLocator(framework,gameGui,log),()=>{mainWindow.BarLocator=null;barLocator?.Dispose();});
-            // 0.517 (user report): IsActionUnlocked is false for a row without an unlock link, and 22 of the 24 gathering actions have none: they come with the level, which the plan checks (docs/evidence/0.517-gp-action-unlocks.md).
-            var gatheringActionRows=new Dictionary<uint,(string,uint,string)?>();
-            mainWindow.GatheringActionRow=id=>
-            {
-                if(gatheringActionRows.TryGetValue(id,out var known))return known;
-                (string,uint,string)? found=null;
-                try
-                {
-                    if(data.GetExcelSheet<Lumina.Excel.Sheets.Action>().GetRowOrDefault(id) is { } row)
-                        found=(row.Name.ExtractText(),row.Icon,data.GetExcelSheet<Lumina.Excel.Sheets.ActionTransient>().GetRowOrDefault(id)?.Description.ExtractText() ?? "");
-                }
-                catch(Exception error){log.Warning(error,"Gathering action {Id} unavailable (perhaps after a game update).",id);}
-                gatheringActionRows[id]=found;
-                return found;
-            };
+            // X-153 (0.1926): the gathering readers (gathering window, spearfishing, collectables, action bar, gathering actions) in Plugin.GatheringReaders.cs.
+            RegisterGatheringReaders(data,framework,player,client,gameGui,objects,targets);
             UI.GameWindowsReader? gameWindows=null;
             registrations.Register(()=>{gameWindows=new UI.GameWindowsReader(framework,client,gameGui,log,()=>mainWindow.DeveloperMode);mainWindow.GameWindowSource=()=>gameWindows.Windows;},()=>{mainWindow.GameWindowSource=null;gameWindows?.Dispose();});
             mainWindow.ItemLinkToChat=id=>chatGui.Print(new Dalamud.Game.Text.SeStringHandling.SeStringBuilder().AddItemLink(id,false).BuiltString);
             UI.GameWindowFollower? gameWindowFollower=null;
             registrations.Register(()=>{gameWindowFollower=new UI.GameWindowFollower(framework,gameGui,log);mainWindow.GameWindowFollow=gameWindowFollower.At;bankOverlay.Follow=gameWindowFollower.At;},()=>{mainWindow.GameWindowFollow=null;bankOverlay.Follow=null;gameWindowFollower?.Dispose();});
-            Gathering.GatherKnowledgeReader? gatherKnowledge=null;
-            registrations.Register(()=>{gatherKnowledge=new Gathering.GatherKnowledgeReader(data,framework,client,player,log);mainWindow.GatherAccess=gatherKnowledge.Access;mainWindow.GatherKind=gatherKnowledge.Kind;},()=>{mainWindow.GatherAccess=null;mainWindow.GatherKind=null;gatherKnowledge?.Dispose();});
+            // X-153 (0.1926): what the player may gather, read from the game, in Plugin.GatheringReaders.cs.
+            RegisterGatherKnowledge(data,framework,client,player);
             // X-76 P4 (0.927): the game's own unlock state of an item (null when it teaches nothing, when nobody is logged in, or in PvP).
             mainWindow.ItemUnlockState=id=>
             {

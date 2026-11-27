@@ -38,7 +38,7 @@ internal static class GatherPointAccess518Tests
             Check(map.Contains("ImGui.GetColorU32(TimedPointColor(timedPoint))"),"nor a green clock");
             var reader=Read("Gathering/GatherKnowledgeReader.Dalamud.cs");
             Check(reader.Contains("TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update);") && reader.Contains("TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,Update)") && reader.Contains("failed=true;known=null;"),"owned, fails to unknown");
-            Check(Read("Plugin.cs").Contains("gatherKnowledge?.Dispose()"),"cleaned up");
+            Check(Read("Plugin.GatheringReaders.cs").Contains("gatherKnowledge?.Dispose()"),"cleaned up");
         }),
     ];
 }
