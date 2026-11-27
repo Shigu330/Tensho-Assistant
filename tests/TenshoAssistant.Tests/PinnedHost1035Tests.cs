@@ -20,7 +20,8 @@ internal static class PinnedHost1035Tests
             foreach (var gone in new[]{"src/PluginUiTest/Program.cs","samples/SamplePlugin/Plugin.cs","docs/github-actions-example.yml"})
                 Check(!File.Exists(Path.GetFullPath(Root+gone)),"moved to the PluginUiTest repository: "+gone);
             var files = Directory.EnumerateFiles(Path.GetFullPath(Root+"src/PluginUiTest.Host"),"*.cs").Select(Path.GetFileName).Order().ToArray();
-            Check(files.SequenceEqual(["CallGraph.cs","DalamudPaths.cs","DalamudRuntime.cs","HostWindows.cs","ImGuiHeadless.cs","Rewrite.cs","StandIns.cs","Win32Gl.cs"]),"the eight files of the library: "+string.Join(", ",files));
+            // X-309 (0.1874): HostClock.cs, out of Rewrite.cs upstream (its tests link it alone), is the ninth file.
+            Check(files.SequenceEqual(["CallGraph.cs","DalamudPaths.cs","DalamudRuntime.cs","HostClock.cs","HostWindows.cs","ImGuiHeadless.cs","Rewrite.cs","StandIns.cs","Win32Gl.cs"]),"the nine files of the library: "+string.Join(", ",files));
             var project = Read(Root+"src/PluginUiTest.Host/PluginUiTest.Host.csproj");
             Check(project.Contains("Pinned copy",StringComparison.Ordinal) && project.Contains("Shigu330/PluginUiTest",StringComparison.Ordinal),"the project says it is a pinned copy and where the source is");
             Check(Read("src/TenshoAssistant.Desktop/TenshoAssistant.Desktop.csproj").Contains("pinned copy",StringComparison.Ordinal),"the desktop app's reference says pinned copy");

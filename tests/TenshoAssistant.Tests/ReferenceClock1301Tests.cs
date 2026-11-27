@@ -10,7 +10,8 @@ internal static class ReferenceClock1301Tests
     [
         ("Reference clock 1301: the plugin copy's reads of the computer's clock go to HostClock (every way of reading it)", () =>
         {
-            var rewrite = Read("tools/PluginUiTest/src/PluginUiTest.Host/Rewrite.cs");
+            // X-309 (0.1874): HostClock is in its own file upstream (Shigu330/PluginUiTest), read with Rewrite.cs.
+            var rewrite = Read("tools/PluginUiTest/src/PluginUiTest.Host/Rewrite.cs") + Read("tools/PluginUiTest/src/PluginUiTest.Host/HostClock.cs");
             foreach (var read in new[] { "System.DateTime::get_Now", "System.DateTime::get_UtcNow", "System.DateTime::get_Today",
                          "System.DateTimeOffset::get_Now", "System.DateTimeOffset::get_UtcNow", "System.TimeProvider::get_System" })
                 Check(rewrite.Contains($"[\"{read}\"]=Clock(", StringComparison.Ordinal), read);
