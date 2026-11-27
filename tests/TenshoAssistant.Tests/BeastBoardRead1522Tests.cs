@@ -77,7 +77,7 @@ internal static class BeastBoardRead1522Tests
             Check(page.Contains("BeastTeams.MergeRanks(plans.Ranks, plans.Floors, ranks, limit)") && page.Contains("\"BeastUi.TeamRanksAssumed\", unknown, board.RankLimit"), "ranks merged as floors; the team's unknown ranks said");
             var reader = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Beastmaster/BeastBoardReader.Dalamud.cs"));
             Check(reader.Contains("AgentXBMStageDetailList.Instance()") && reader.Contains("stage->ContentId") && reader.Contains("team->ContentId"), "the reader reads the agents' board");
-            var plugin = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"));
+            var plugin = (File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"))+File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Beastmaster.cs")));
             Check(plugin.Contains("mainWindow.BeastBoardContent=()=>boardReader?.State.Content ?? 0;"), "wired");
         }),
     ];

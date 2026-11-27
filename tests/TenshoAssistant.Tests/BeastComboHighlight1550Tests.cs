@@ -37,7 +37,7 @@ internal static class BeastComboHighlight1550Tests
             Check(reader.Contains("gui.GetAddonByName(\"XBMActivePet\")") && reader.Contains("BeastInstinct.FromWindow(trick, name, known)"), "the window read");
             var locator = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Gathering/ActionBarLocator.Dalamud.cs"));
             Check(!locator.Contains("UseAction") && !locator.Contains("Hook") && !reader.Contains("UseAction"), "nothing sent to the game (R03.3)");
-            var plugin = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"));
+            var plugin = (File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"))+File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Beastmaster.cs")));
             Check(plugin.Contains("(\"BeastCombo\",mainWindow.DrawBeastComboHighlight)") && plugin.Contains("()=>boardReader?.ActiveBeast ?? 0),()=>familiarReader?.Dispose());"), "drawn each frame, wired");
             foreach (var language in new[] { "en", "fr" })
             {

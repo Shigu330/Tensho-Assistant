@@ -62,7 +62,7 @@ internal static class BeastFightNow1529Tests
             var page = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Beastmaster.cs"));
             Check(page.Contains("var now = BeastTeams.FightsShown(board, BeastFightsShown?.Invoke());") && page.Contains("foreach (var index in now) DrawBeastFightNow(board, index, plan, taken, catalog);"), "the fights shown first");
             Check(page.Contains("UiComponents.TreeNode(localization.Get(\"BeastUi.WholeBoard\") + \"###BeastWholeBoard\")"), "the whole board folded under its own node");
-            var plugin = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"));
+            var plugin = (File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"))+File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Beastmaster.cs")));
             Check(plugin.Contains("mainWindow.BeastFightsShown=()=>boardReader?.State.Shown;"), "wired");
         }),
     ];

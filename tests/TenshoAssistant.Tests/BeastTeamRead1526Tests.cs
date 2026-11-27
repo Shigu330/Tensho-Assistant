@@ -58,7 +58,7 @@ internal static class BeastTeamRead1526Tests
             var drawn = none < 0 ? -1 : page.IndexOf("DrawBeastTeamRead(board, plan, team, catalog);", none, StringComparison.Ordinal);
             var best = current < 0 ? -1 : page.IndexOf("new(\"Best\"", current, StringComparison.Ordinal);
             Check(page.Contains("var team = BeastTeamRead?.Invoke();") && current > 0 && none > current && drawn > none && best > drawn && page.Contains("BeastTeams.FromTeam(board, plan, team, catalog.Beasts)"), "the team read drawn in its own tab, the « Current » one (X-800: the user asked for tabs)");
-            Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs")).Contains("mainWindow.BeastTeamRead=()=>boardReader?.State.Team;"), "wired");
+            Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Beastmaster.cs")).Contains("mainWindow.BeastTeamRead=()=>boardReader?.State.Team;"), "wired");
         }),
     ];
 }

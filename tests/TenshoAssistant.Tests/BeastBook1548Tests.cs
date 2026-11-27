@@ -75,7 +75,7 @@ internal static class BeastBook1548Tests
         {
             var reader = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Beastmaster/BeastBoardReader.Dalamud.cs"));
             Check(reader.Contains("gui.GetAddonByName(\"XBMMonsterBookDetail\")") && reader.Contains("BeastTeams.ParseBook(texts, known)") && reader.Contains("ReadBook();"), "reader");
-            Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs")).Contains("mainWindow.BeastResultRead,mainWindow.BeastBookRead)"), "plugin wiring");
+            Check((File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"))+File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Beastmaster.cs"))).Contains("mainWindow.BeastResultRead,mainWindow.BeastBookRead)"), "plugin wiring");
             Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Beastmaster.cs")).Contains("BeastTeams.WithBook(LoadBeastPlans(), read)"), "window merge");
             foreach (var language in new[] { "en", "fr" })
             {

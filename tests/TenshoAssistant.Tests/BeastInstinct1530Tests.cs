@@ -46,7 +46,7 @@ internal static class BeastInstinct1530Tests
             Check(page.Contains("DrawBeastCombo(id);") && page.Contains("BeastInstinct.Combos(beast)"), "each beast of the fight shown");
             var probe = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Beastmaster/BeastWindowProbe.Dalamud.cs"));
             Check(probe.Contains("\"XBMActivePet\""), "the window of the beast called, in the developer probe");
-            var plugin = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"));
+            var plugin = (File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"))+File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Beastmaster.cs")));
             Check(plugin.Contains("mainWindow.BeastActionName="), "the actions' names from the game");
         }),
     ];

@@ -511,11 +511,8 @@ public sealed partial class Plugin : IDalamudPlugin
             TriadNpcLoader? triadNpcLoader=null;
             registrations.Register(()=>triadNpcLoader=new TriadNpcLoader(triadNpcs,data,framework,client,player,unlocks,log),()=>triadNpcLoader?.Dispose());
             mainWindow.ConfigureTriadNpcs(triadNpcs);
-            // 0.500 (user request): the Beastmaster page.
-            var beasts=new Beastmaster.BeastService();
-            Beastmaster.BeastCatalogLoader? beastLoader=null;
-            registrations.Register(()=>beastLoader=new Beastmaster.BeastCatalogLoader(beasts,data,framework,client,player,log),()=>beastLoader?.Dispose());
-            mainWindow.Beasts=beasts;
+            // 0.500 (user request): the Beastmaster page; X-153 (0.1886): its family in Plugin.Beastmaster.cs.
+            var beasts=RegisterBeastCatalog(data,framework,client,player);
             // X-73.9 (0.863): spells learned and beasts tamed, put down to their monster, for the discoveries base.
             if(itemWatcher is not null){itemWatcher.Beasts=()=>beasts.State.Obtained;itemWatcher.WatchUnlocks(unlocks);itemWatcher.Vistas=()=>mapLive?.State?.Sightseen;
                 var blueActions=data.GetExcelSheet<Lumina.Excel.Sheets.AozAction>().Where(row=>row.Action.RowId!=0).GroupBy(row=>row.Action.RowId).ToDictionary(group=>group.Key,group=>group.First().RowId);
@@ -577,28 +574,7 @@ public sealed partial class Plugin : IDalamudPlugin
             // X-747 (0.1772): the furniture placed in a house and its event objects, in the log (developer mode only), before any code.
             Maps.HousingFurnitureProbe? housingProbe=null;
             registrations.Register(()=>housingProbe=new Maps.HousingFurnitureProbe(framework,client,objects,log,()=>configuration.DeveloperMode),()=>housingProbe?.Dispose());
-            registrations.Register(()=>boardReader=new Beastmaster.BeastBoardReader(framework,gameGui,log,()=>mainWindow.Beasts?.State.Catalog?.Beasts,mainWindow.BeastRanksRead,mainWindow.BeastResultRead,mainWindow.BeastBookRead)
-                {ItemIcon=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Item>().GetRowOrDefault(id)?.Icon ?? 0u},()=>boardReader?.Dispose());
-            registrations.Register(()=>{boardWindow=new BeastBoardWindow(mainWindow){Windows=()=>boardReader?.State ?? default};boardWindows.AddWindow(boardWindow);},()=>{if(boardWindow is not null)boardWindows.RemoveWindow(boardWindow);});
-            showBoardPanel=()=>configuration.ShowBeastBoardPanel;
-            // X-549 (0.1522): the board the game's board or team window is about, for the panel and the page.
-            mainWindow.BeastBoardContent=()=>boardReader?.State.Content ?? 0;
-            // X-550 (0.1526): the team the game's team window shows.
-            mainWindow.BeastTeamRead=()=>boardReader?.State.Team;
-            // X-486 (0.1529): the fights the game's board window shows.
-            mainWindow.BeastFightsShown=()=>boardReader?.State.Shown;
-            // X-136 (0.1550): the beast called and the hotbars for the combo highlight (off by default). X-655 (0.1599): the beast read on the
-            // field first (the player's familiar), the battlehorns window only when none is found (the window is closed during the fights).
-            Beastmaster.BeastFamiliarReader? familiarReader=null;
-            registrations.Register(()=>familiarReader=new Beastmaster.BeastFamiliarReader(framework,objects,log,()=>configuration.HighlightBeastCombos,()=>mainWindow.Beasts?.State.Catalog?.Beasts,()=>boardReader?.ActiveBeast ?? 0),()=>familiarReader?.Dispose());
-            mainWindow.BeastCalledNow=()=>familiarReader?.Called ?? Beastmaster.BeastCalledRead.None;
-            Gathering.ActionBarLocator? beastBarLocator=null;
-            registrations.Register(()=>mainWindow.BeastBarLocator=beastBarLocator=new Gathering.ActionBarLocator(framework,gameGui,log),()=>{mainWindow.BeastBarLocator=null;beastBarLocator?.Dispose();});
-            // X-136 (0.1530): the names of the beasts' Tricks and of the beastmaster's skills, from the game's Action sheet.
-            mainWindow.BeastActionName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Action>().GetRowOrDefault(id)?.Name.ExtractText() ?? "";
-            mainWindow.BeastBoardOfTerritory=territory=>mainWindow.Beasts?.State.Catalog?.Boards.FirstOrDefault(board=>data.GetExcelSheet<Lumina.Excel.Sheets.ContentFinderCondition>().GetRowOrDefault(board.Content)?.TerritoryType.RowId==territory)?.Id ?? 0;
-            Beastmaster.BeastWindowProbe? beastProbe=null;
-            registrations.Register(()=>beastProbe=new Beastmaster.BeastWindowProbe(framework,gameGui,log,()=>configuration.DeveloperMode),()=>beastProbe?.Dispose());
+            RegisterBeastBoard(configuration,data,framework,gameGui,objects);
             // X-467 (0.1502): where the game's chat puts its typing box and its message panels, in developer mode (read-only).
             Chat.ChatLogLayoutProbe? chatLayoutProbe=null;
             registrations.Register(()=>chatLayoutProbe=new Chat.ChatLogLayoutProbe(framework,gameGui,log,()=>configuration.DeveloperMode),()=>chatLayoutProbe?.Dispose());

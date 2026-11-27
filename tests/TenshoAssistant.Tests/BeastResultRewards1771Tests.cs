@@ -62,7 +62,7 @@ internal static class BeastResultRewards1771Tests
         {
             var reader = Read("src/TenshoAssistant/Beastmaster/BeastBoardReader.Dalamud.cs");
             Check(reader.Contains("BeastResults.Parse(values, known, now, ItemIcon)", StringComparison.Ordinal) && reader.Contains("Beastmaster board result, rewards:", StringComparison.Ordinal), "read with the icons, said in the log");
-            Check(Read("src/TenshoAssistant/Plugin.cs").Contains("{ItemIcon=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Item>().GetRowOrDefault(id)?.Icon ?? 0u}", StringComparison.Ordinal), "the Item sheet's icon");
+            Check((Read("src/TenshoAssistant/Plugin.cs")+Read("src/TenshoAssistant/Plugin.Beastmaster.cs")).Contains("{ItemIcon=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Item>().GetRowOrDefault(id)?.Icon ?? 0u}", StringComparison.Ordinal), "the Item sheet's icon");
             var page = Read("src/TenshoAssistant/MainWindow.Beastmaster.cs");
             Check(page.Contains("if (result.Rewards is { } rewards)", StringComparison.Ordinal) && page.Contains("localization.Get(\"BeastUi.ResultRewardsUnread\")", StringComparison.Ordinal), "the line, or « not read »");
             foreach (var language in new[] { "en", "fr" })

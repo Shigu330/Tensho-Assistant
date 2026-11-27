@@ -64,7 +64,7 @@ internal static class BeastCalled1599Tests
                 "the player's own battle NPCs, cut in PvP, nothing sent (R03.3)");
             var locator = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Gathering/ActionBarLocator.Dalamud.cs"));
             Check(locator.Contains("Hotbar slots read for the beast combo") && locator.Contains("!first && second,name,index+1)"), "the slots said, bar and slot kept");
-            var plugin = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"));
+            var plugin = (File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"))+File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Beastmaster.cs")));
             Check(plugin.Contains("mainWindow.BeastCalledNow=()=>familiarReader?.Called ?? Beastmaster.BeastCalledRead.None;"), "wired");
         }),
     ];
