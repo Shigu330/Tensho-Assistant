@@ -23,7 +23,7 @@ internal static class Map328Tests
         {
             var replacer = Read("Maps/NativeMapReplacer.Dalamud.cs");
             Check(replacer.Contains("keepGameMap=!options.ReplaceGameMap || bypass || !canShow() || !canMove;",StringComparison.Ordinal),"decided with canShow");
-            Check(Read("Plugin.cs").Contains("()=>mainWindow.MapViewVisible()",StringComparison.Ordinal),"canShow is the map's own visibility (catalogue, combat, duty)");
+            Check(Read("Plugin.Maps.cs").Contains("()=>mainWindow.MapViewVisible()",StringComparison.Ordinal),"canShow is the map's own visibility (catalogue, combat, duty; X-153, 0.1900: the map family)");
         }),
         ("Live map reads: vectors bounded, each secondary read isolated so position and flag survive",() =>
         {

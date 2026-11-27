@@ -17,7 +17,8 @@ internal static class HousingProbe1772Tests
             Check(probe.Contains("if (count is < 0 or > 5000) { said = null; return; }", StringComparison.Ordinal) && probe.Contains("if (text == said) return;", StringComparison.Ordinal), "a bounded count; said only when it changes");
             Check(probe.Contains("thing.ObjectKind == ObjectKind.EventObj", StringComparison.Ordinal) && !probe.Contains("ObjectKind.Player", StringComparison.Ordinal), "event objects only, never players");
             Check(probe.Contains("failed = true;", StringComparison.Ordinal) && probe.Contains("CompetitiveGate.Remove(framework, OnUpdate)", StringComparison.Ordinal), "stopped on a failure, removed on dispose");
-            Check(Read("src/TenshoAssistant/Plugin.cs").Contains("housingProbe=new Maps.HousingFurnitureProbe(framework,client,objects,log,()=>configuration.DeveloperMode),()=>housingProbe?.Dispose());", StringComparison.Ordinal), "registered with its cleanup, developer mode");
+            // X-153 (0.1900): registered by the map family.
+            Check(Read("src/TenshoAssistant/Plugin.Maps.cs").Contains("housingProbe=new Maps.HousingFurnitureProbe(framework,client,objects,log,()=>configuration.DeveloperMode),()=>housingProbe?.Dispose());", StringComparison.Ordinal), "registered with its cleanup, developer mode");
             var evidence = Read("docs/evidence/0.1772-housing-furniture.md");
             Check(evidence.Contains("FurnitureVector", StringComparison.Ordinal) && evidence.Contains("\n---\n", StringComparison.Ordinal), "the evidence, both halves");
         }),

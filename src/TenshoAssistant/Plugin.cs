@@ -427,9 +427,8 @@ public sealed partial class Plugin : IDalamudPlugin
             var islandAnimalBook=new Island.IslandAnimalSource(()=>configuration.Cache.Duration(CacheArea.Sources),dataCache){Enabled=()=>CommunitySources.Allowed(configuration,SourceUse.WikiIslandAnimals)};
             registrations.Register(()=>{},islandAnimalBook.Dispose);
             mainWindow.IslandAnimalBookSource=islandAnimalBook;
-            Maps.NativeMapReplacer? mapReplacer=null;
-            registrations.Register(()=>mapReplacer=new Maps.NativeMapReplacer(framework,gameGui,client,condition,()=>configuration.MapView,mainWindow.ShowMapFromGame,()=>mainWindow.MapViewOpen,()=>mainWindow.MapViewVisible(),mainWindow.CloseMapFromGame,log),()=>mapReplacer?.Dispose());
-            mainWindow.ConfigureGameMapOpener(()=>mapReplacer?.OpenGameMap());
+            // X-153 (0.1900): the rest of the map family (game map replacement, housing probe, treasure map) in Plugin.Maps.cs.
+            RegisterGameMap(configuration,framework,gameGui,client,condition);
             Macros.MacroWriter? macroWriter=null;
             registrations.Register(()=>macroWriter=new Macros.MacroWriter(framework,log,outcome=>
             {
@@ -555,9 +554,7 @@ public sealed partial class Plugin : IDalamudPlugin
             var retainerSales=RegisterRetainerMarket(configuration,framework,gameGui,client,player,marketBoardEvents);
             Help.CommunityHelpIndex? communityHelp=null;
             registrations.Register(()=>mainWindow.CommunityHelp=communityHelp=new Help.CommunityHelpIndex(),()=>communityHelp?.Dispose());
-            // X-747 (0.1772): the furniture placed in a house and its event objects, in the log (developer mode only), before any code.
-            Maps.HousingFurnitureProbe? housingProbe=null;
-            registrations.Register(()=>housingProbe=new Maps.HousingFurnitureProbe(framework,client,objects,log,()=>configuration.DeveloperMode),()=>housingProbe?.Dispose());
+            RegisterHousingProbe(configuration,framework,client,objects);
             RegisterBeastBoard(configuration,data,framework,gameGui,objects);
             // X-153 (0.1894): the game chat's layout probe and its hider, in the chat family (Plugin.Chat.cs).
             RegisterGameChat(configuration,framework,gameGui);
@@ -814,10 +811,7 @@ public sealed partial class Plugin : IDalamudPlugin
             registrations.Register(()=>leveReader=new Leves.LeveProgressReader(framework,client,player,unlocks,data,log,LeveList),()=>leveReader?.Dispose());
             mainWindow.LeveDefinitions=LeveList;
             // g, M-01 (0.371): automatic alarms at the ventures' end and the vessels' return (on by default, Alarms settings).
-            // g, M-14 (0.384): the deciphered treasure map's spot (game functions checked, TreasureSpot → Level).
-            Maps.TreasureMapReader? treasureMap=null;
-            registrations.Register(()=>treasureMap=new Maps.TreasureMapReader(framework,client,data,log),()=>treasureMap?.Dispose());
-            mainWindow.TreasureMap=()=>treasureMap?.Spot;
+            var treasureMap=RegisterTreasureMap(framework,client,data);
             // X-159 (0.1174): the map a treasure hunt's chest is put down to (its item, TreasureHuntRank.ItemName).
             if(itemWatcher is not null)itemWatcher.TreasureMapItem=()=>treasureMap?.Spot is { } held && data.GetExcelSheet<Lumina.Excel.Sheets.TreasureHuntRank>().GetRowOrDefault(held.Rank) is { } rank ? rank.ItemName.RowId:0u;
             // X-153 (0.1443): the chat family (the Tensho chat window's reader, the chat's map links, the link under the mouse) is wired in Plugin.Chat.cs.

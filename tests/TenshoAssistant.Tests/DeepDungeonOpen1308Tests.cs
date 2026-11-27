@@ -30,7 +30,8 @@ internal static class DeepDungeonOpen1308Tests
             var map=Read("src/TenshoAssistant/MainWindow.MapView.cs");
             Check(map.Contains("if(InOwnMapInstance?.Invoke()==true)return false;",StringComparison.Ordinal),"MapViewVisible: hidden, so the replacer keeps the game's map (canShow)");
             Check(Read("src/TenshoAssistant/Plugin.cs").Contains("mainWindow.InOwnMapInstance=()=>Competitive.CompetitiveGate.HasOwnMap(client.TerritoryType);",StringComparison.Ordinal)
-                && Read("src/TenshoAssistant/Plugin.cs").Contains("()=>mainWindow.MapViewVisible(),mainWindow.CloseMapFromGame",StringComparison.Ordinal),"plugin");
+                // X-153 (0.1900): the game map's replacement is registered by the map family.
+                && Read("src/TenshoAssistant/Plugin.Maps.cs").Contains("()=>mainWindow.MapViewVisible(),mainWindow.CloseMapFromGame",StringComparison.Ordinal),"plugin");
             var decisions=Read("docs/project/DECISIONS.md");
             Check(decisions.Contains("deep dungeons (Palace of the Dead, Heaven-on-High, Eureka Orthos, Pilgrim's Traverse, content type 21) are no longer cut",StringComparison.Ordinal)
                 && decisions.Contains("les donjons profonds (Palais des morts, Pilier des cieux, Eurêka Orthos, Sanctuaire des pèlerins, type de contenu 21) ne sont plus coupés",StringComparison.Ordinal),"DEC-038, both halves");

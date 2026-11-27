@@ -33,7 +33,9 @@ internal static class MapsFamily1404Tests
                 Check(at > last,part + ": created in the order of before");
                 last = at;
             }
-            Check(Count(home,@"registrations\.Register\(") == 2,"through the plugin's registrations");
+            // 0.1900: the rest of the family follows RegisterMaps in the same file (MapsFamily1900Tests); these two are its own.
+            var own = home[..home.IndexOf("private void RegisterGameMap(",StringComparison.Ordinal)];
+            Check(Count(own,@"registrations\.Register\(") == 2,"through the plugin's registrations");
             foreach (var made in new[] { @"new Maps\.MapMarkerSource\(", @"new Maps\.MapLocalIndexService\(", @"mainWindow\.ConfigureMapView\(" })
                 Check(files.Sum(file => Count(file.Text,made)) == 1 && Count(home,made) == 1,made + ": once, in the family");
             Check(files.Sum(file => Count(file.Text,@"private Maps\.MapLiveReader\? mapLive;")) == 1 && home.Contains("private Maps.MapLiveReader? mapLive;"),"the live reader is the family's field");

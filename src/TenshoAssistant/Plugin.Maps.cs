@@ -28,4 +28,31 @@ public sealed partial class Plugin
             catch(OperationCanceledException){}
         });
     }
+
+    // X-153 (0.1900): the rest of the map family, each block moved as it was and called where it stood (MapsFamily1900Tests).
+
+    /// <summary>The game's own map replaced by Tensho's when the player asks it (map settings), and opened again on request.</summary>
+    private void RegisterGameMap(Configuration configuration,IFramework framework,IGameGui gameGui,IClientState client,ICondition condition)
+    {
+        Maps.NativeMapReplacer? mapReplacer=null;
+        registrations.Register(()=>mapReplacer=new Maps.NativeMapReplacer(framework,gameGui,client,condition,()=>configuration.MapView,mainWindow.ShowMapFromGame,()=>mainWindow.MapViewOpen,()=>mainWindow.MapViewVisible(),mainWindow.CloseMapFromGame,log),()=>mapReplacer?.Dispose());
+        mainWindow.ConfigureGameMapOpener(()=>mapReplacer?.OpenGameMap());
+    }
+
+    /// <summary>X-747 (0.1772): the furniture placed in a house and its event objects, in the log (developer mode only), before any code.</summary>
+    private void RegisterHousingProbe(Configuration configuration,IFramework framework,IClientState client,IObjectTable objects)
+    {
+        Maps.HousingFurnitureProbe? housingProbe=null;
+        registrations.Register(()=>housingProbe=new Maps.HousingFurnitureProbe(framework,client,objects,log,()=>configuration.DeveloperMode),()=>housingProbe?.Dispose());
+    }
+
+    /// <summary>g, M-14 (0.384): the deciphered treasure map's spot (game functions checked, TreasureSpot → Level). Returns the reader,
+    /// which the discoveries' item watcher reads.</summary>
+    private Maps.TreasureMapReader? RegisterTreasureMap(IFramework framework,IClientState client,IDataManager data)
+    {
+        Maps.TreasureMapReader? treasureMap=null;
+        registrations.Register(()=>treasureMap=new Maps.TreasureMapReader(framework,client,data,log),()=>treasureMap?.Dispose());
+        mainWindow.TreasureMap=()=>treasureMap?.Spot;
+        return treasureMap;
+    }
 }
