@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (927 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (928 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -993,6 +993,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-897 | Review  (review 0.1916, 27/11), pre-existing before the block M2: M2 in… | Done in 0.1919.0 |
 | X-898 | Review of block 0.1917 to 0.1919 (review 0.1919, 27/11), minor M1: M1 in… | Done in 0.1920.0 |
 | X-899 | Review of block 0.1917 to 0.1919 (review 0.1919, 27/11), pre-existing before… | Done in 0.1921.0 |
+| X-900 | The test runner's trace stops with « There is not enough space on the disk »… | Done in 0.1923.0 |
 | X-901 | Review of block 0.1920 to 0.1921 (review 0.1921, 27/11), minor M1: M1 in… | Done in 0.1922.0 |
 | X-902 | Review of block 0.1920 to 0.1921 (review 0.1921, 27/11), pre-existing before… | Done in 0.1922.0 |
 
@@ -1000,7 +1001,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (927 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (928 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1991,5 +1992,6 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-897 | Relecture  (relecture 0.1916, 27/11), déjà là avant le bloc M2 : M2 : Le verrou… | Fait en 0.1919.0 |
 | X-898 | Relecture du bloc 0.1917 à 0.1919 (relecture 0.1919, 27/11), mineurs M1 : M1… | Fait en 0.1920.0 |
 | X-899 | Relecture du bloc 0.1917 à 0.1919 (relecture 0.1919, 27/11), déjà là avant le… | Fait en 0.1921.0 |
+| X-900 | La trace du lanceur de tests s'arrête avec « There is not enough space on the… | Fait en 0.1923.0 |
 | X-901 | Relecture du bloc 0.1920 à 0.1921 (relecture 0.1921, 27/11), mineurs M1 : M1… | Fait en 0.1922.0 |
 | X-902 | Relecture du bloc 0.1920 à 0.1921 (relecture 0.1921, 27/11), déjà là avant le… | Fait en 0.1922.0 |
