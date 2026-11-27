@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (905 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (906 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -973,12 +973,13 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-877 | Review  (review 0.1882, 27/11), minor M1: M1 in 10-REDDIT.md:3-4 (agent file)… | Done in 0.1882.0 |
 | X-878 | Review of block 0.1883 to 0.1888 (review 0.1888, 27/11), minor M1, M2: M1 in… | Done in 0.1889.0 |
 | X-879 | Review  (review 0.1889, 27/11), minor M1: M1 in… | Done in 0.1890.0 |
+| X-880 | Review  (review 0.1890, 27/11), pre-existing before the block M1: M1 in… | Done in 0.1891.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (905 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (906 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1949,3 +1950,4 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-877 | Relecture  (relecture 0.1882, 27/11), mineurs M1 : M1 : L'en-tête du brouillon… | Fait en 0.1882.0 |
 | X-878 | Relecture du bloc 0.1883 à 0.1888 (relecture 0.1888, 27/11), mineurs M1, M2… | Fait en 0.1889.0 |
 | X-879 | Relecture  (relecture 0.1889, 27/11), mineurs M1 : M1 : Le cliquet « un texte… | Fait en 0.1890.0 |
+| X-880 | Relecture  (relecture 0.1890, 27/11), déjà là avant le bloc M1 : M1 : La limite… | Fait en 0.1891.0 |
