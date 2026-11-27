@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (913 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (915 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -981,12 +981,14 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-886 | Flaky tests under load (relay 216, 27/11, sweeps of 10 full-suite runs beside… | Done in 0.1908.0 |
 | X-887 | Review of block 0.1904 to 0.1906 (review 0.1906, 27/11), minor M1: M1 in… | Done in 0.1909.0 |
 | X-888 | Review of block 0.1904 to 0.1906 (review 0.1906, 27/11), pre-existing before… | Done in 0.1907.0 |
+| X-889 | Review of block 0.1907 to 0.1909 (review 0.1909, 27/11), minor M1, M3, M4: M1… | Done in 0.1911.0 |
+| X-890 | Review of block 0.1907 to 0.1909 (review 0.1909, 27/11), pre-existing before… | Done in 0.1910.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (913 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (915 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1965,3 +1967,5 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-886 | Tests fragiles sous charge (relais 216, 27/11, balayages de 10 passes de la… | Fait en 0.1908.0 |
 | X-887 | Relecture du bloc 0.1904 à 0.1906 (relecture 0.1906, 27/11), mineurs M1 : M1… | Fait en 0.1909.0 |
 | X-888 | Relecture du bloc 0.1904 à 0.1906 (relecture 0.1906, 27/11), déjà là avant le… | Fait en 0.1907.0 |
+| X-889 | Relecture du bloc 0.1907 à 0.1909 (relecture 0.1909, 27/11), mineurs M1, M3, M4… | Fait en 0.1911.0 |
+| X-890 | Relecture du bloc 0.1907 à 0.1909 (relecture 0.1909, 27/11), déjà là avant le… | Fait en 0.1910.0 |
