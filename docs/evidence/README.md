@@ -161,7 +161,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1846-memory-measure.md](0.1846-memory-measure.md) | `src/TenshoAssistant/MainWindow.MapView.cs`, `tests/TenshoAssistant.Tests/ReviewMinors1851Tests.cs` | `docs/changelog/CHANGELOG-0.1800-0.1899.md` |
 | [0.1847-universalis-400.md](0.1847-universalis-400.md) | `src/TenshoAssistant/Market/MarketService.cs` | `docs/changelog/CHANGELOG-0.1800-0.1899.md` |
 | [0.1858-chat-load-measures.md](0.1858-chat-load-measures.md) | — | `docs/changelog/CHANGELOG-0.1800-0.1899.md` |
-| [0.1916-event-listener-deadlock.md](0.1916-event-listener-deadlock.md) | `src/TenshoAssistant/Diagnostics/RuntimeListeners.cs`, `tests/TenshoAssistant.Tests/EventListenerGate1916Tests.cs` | `CHANGELOG.md` |
+| [0.1916-event-listener-deadlock.md](0.1916-event-listener-deadlock.md) | `src/TenshoAssistant/Diagnostics/RuntimeListeners.cs`, `tests/TenshoAssistant.Tests/EventListenerGate1916Tests.cs` | `docs/changelog/CHANGELOG-0.1900-0.1999.md` |
 | [0.199-adenium-shop.md](0.199-adenium-shop.md) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.201-agent-alarm.md](0.201-agent-alarm.md) | — | `docs/changelog/CHANGELOG-0.200-0.299.md` |
 | [0.203-gathering-jobs.md](0.203-gathering-jobs.md) | `src/TenshoAssistant/Alarms/TenshoAlarm.cs` | `docs/changelog/CHANGELOG-0.200-0.299.md` |

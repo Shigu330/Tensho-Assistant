@@ -545,7 +545,7 @@ Liés aux horaires du jeu : à faire quand le moment arrive (réinitialisations,
 
 *Il faut : webhook Discord*
 
-- [ ] **0.598** Paramètres › Alerte, partie Discord : cochez « Un salon par catégorie » et mettez une au… (TESTING l. 637)
+- [x] **0.598** Paramètres › Alerte, partie Discord : cochez « Un salon par catégorie » et mettez une au… (TESTING l. 637)
 
 ## Étape 10 : Missions et instances (28)
 
@@ -563,10 +563,10 @@ Outil de mission, roulettes, donjons, Eurêka, Bozja, donjons profonds, Carnaval
 - [ ] **0.718** (0.718) Missions › Donjons sans fond : dans l'onglet « Objets », lisez le « Texte du jeu… (TESTING l. 823)
 - [ ] **0.723** Masked Carnivale : épreuves faites (TESTING l. 831)
 - [x] **0.876** Coffre de mission ouvert : fiche « Coffre (vu par vous) » (TESTING l. 1036)
-- [ ] **0.975** Page Eurêka et Bozja : Croissant occulte, ALÉA placés (TESTING l. 1158)
-- [ ] **0.990** (0.990) Ouvrir Monde › Butin des missions, se déconnecter, puis rouvrir la page : les ét… (TESTING l. 1178)
-- [ ] **0.994** (0.994) Monde › Butin des missions › un donjon › « Mécaniques et stratégie (wiki) » › «… (TESTING l. 1183)
-- [ ] **0.995** (0.995) Monde › Butin des missions › choisir un raid › « Vos notes et schéma d'arène » :… (TESTING l. 1185)
+- [x] **0.975** Page Eurêka et Bozja : Croissant occulte, ALÉA placés (TESTING l. 1158)
+- [x] **0.990** (0.990) Ouvrir Monde › Butin des missions, se déconnecter, puis rouvrir la page : les ét… (TESTING l. 1178)
+- [x] **0.994** (0.994) Monde › Butin des missions › un donjon › « Mécaniques et stratégie (wiki) » › «… (TESTING l. 1183)
+- [x] **0.995** (0.995) Monde › Butin des missions › choisir un raid › « Vos notes et schéma d'arène » :… (TESTING l. 1185)
 
 *Il faut : mode développeur*
 

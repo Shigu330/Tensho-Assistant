@@ -51,12 +51,12 @@ repris dans la ligne « Tests » de chaque entrée du [CHANGELOG](../../CHANGELO
 Contrôles de base à refaire après un changement de cycle de vie : rechargement/déchargement répété sans double callback ni commande
 orpheline ; préférence « ouvrir au chargement » respectée ; la carte du jeu (touche M) revient normale une fois le plugin déchargé.
 
-### Essais en jeu (liste produite le 2026-11-27, version 0.1919.0)
+### Essais en jeu (liste produite le 2026-11-27, version 0.1921.0)
 
 <!-- q:public -->
-_In English: this page is the author's in-game test list, in French only. Produced on 2026-11-27 for version 0.1919.0. It has 1273 boxes: 660 ticked, 613 empty. 1090 boxes follow the test source: 477 done (ticked), 604 open, 7 could not be tried, 2 failed (empty). The 183 other ticked boxes come from before the source existed (reported before it, kept as they are). Apart: 38 tests of the source have no box on this page (29 done, 8 open, 1 could not be tried, 0 failed)._
+_In English: this page is the author's in-game test list, in French only. Produced on 2026-11-27 for version 0.1921.0. It has 1273 boxes: 672 ticked, 601 empty. 1090 boxes follow the test source: 489 done (ticked), 592 open, 7 could not be tried, 2 failed (empty). The 183 other ticked boxes come from before the source existed (reported before it, kept as they are). Apart: 38 tests of the source have no box on this page (29 done, 8 open, 1 could not be tried, 0 failed)._
 
-Liste produite le 2026-11-27 (version 0.1919.0) : 1273 cases, 660 cochées, 613 vides. 1090 cases suivent la source des essais : 477 faits (cochées), 604 ouverts, 7 pas pu, 2 en échec (vides). Les 183 autres cases cochées viennent d'avant la source (essais rapportés avant qu'elle existe, gardés tels quels). À part : 38 essais de la source n'ont pas de case sur cette page (29 faits, 8 ouverts, 1 pas pu, 0 en échec).
+Liste produite le 2026-11-27 (version 0.1921.0) : 1273 cases, 672 cochées, 601 vides. 1090 cases suivent la source des essais : 489 faits (cochées), 592 ouverts, 7 pas pu, 2 en échec (vides). Les 183 autres cases cochées viennent d'avant la source (essais rapportés avant qu'elle existe, gardés tels quels). À part : 38 essais de la source n'ont pas de case sur cette page (29 faits, 8 ouverts, 1 pas pu, 0 en échec).
 <!-- /q:public -->
 
 Parcours de la campagne de la phase 6, les mêmes essais rangés par activité : [TESTING-ROUTE.md](TESTING-ROUTE.md) (2026-11-09).
@@ -634,7 +634,7 @@ Une étape impossible (pas de compagnie, pas de sous-marin…) se rapporte « no
 
 - [x] (0.597) Section Carte : chercher un lieu, une éthérite, un vendeur, un PNJ de Triple Triad, une quête et une ressource, cliquer chacun et vérifier le centre de la carte.
 
-- [ ] (0.598) Paramètres › Alerte, partie Discord : cochez « Un salon par catégorie » et mettez une autre adresse de salon pour une catégorie. Faites sonner une alarme de cette catégorie et une alarme d'une autre catégorie : chacune arrive dans son salon Discord.
+- [x] (0.598) Paramètres › Alerte, partie Discord : cochez « Un salon par catégorie » et mettez une autre adresse de salon pour une catégorie. Faites sonner une alarme de cette catégorie et une alarme d'une autre catégorie : chacune arrive dans son salon Discord.
 
 - [x] (0.599) Accueil : vérifier chaque ligne d'« Aujourd'hui » contre Rappels, Compagnie, Quêtes et Alarmes, cliquer chacune, masquer une ligne et une tuile dans « Personnaliser ».
 
@@ -1155,7 +1155,7 @@ Une étape impossible (pas de compagnie, pas de sous-marin…) se rapporte « no
 
 
 
-- [ ] (0.975) Page Eurêka et Bozja : onglets ou zones du Croissant occulte présents, avec des ALÉA et des affrontements placés.
+- [x] (0.975) Page Eurêka et Bozja : onglets ou zones du Croissant occulte présents, avec des ALÉA et des affrontements placés.
 
 
 - [x] (0.977) Cibler un lieu d'une autre zone, se téléporter dans la zone, ouvrir la carte Tensho sans ouvrir celle du jeu : les marqueurs rouges des quêtes pas encore acceptées sont là.
@@ -1175,14 +1175,14 @@ Une étape impossible (pas de compagnie, pas de sous-marin…) se rapporte « no
 
 - [ ] (0.989) Collections › Tenues : déplier une tenue incomplète, « Pièces manquantes → souhaits » : elles sont dans Souhaits ; « Fabricables → … » : dans la liste d'artisanat.
 
-- [ ] (0.990) (0.990) Ouvrir Monde › Butin des missions, se déconnecter, puis rouvrir la page : les états sont toujours affichés, avec la ligne « État enregistré de votre dernier personnage (lu le …) ».
+- [x] (0.990) (0.990) Ouvrir Monde › Butin des missions, se déconnecter, puis rouvrir la page : les états sont toujours affichés, avec la ligne « État enregistré de votre dernier personnage (lu le …) ».
 
 
 
 
-- [ ] (0.994) (0.994) Monde › Butin des missions › un donjon › « Mécaniques et stratégie (wiki) » › « Lire sur le wiki » : on voit les sections du wiki (Objectives, boss…). En combat, le bloc dit « Masqué pendant un combat. »
+- [x] (0.994) (0.994) Monde › Butin des missions › un donjon › « Mécaniques et stratégie (wiki) » › « Lire sur le wiki » : on voit les sections du wiki (Objectives, boss…). En combat, le bloc dit « Masqué pendant un combat. »
 
-- [ ] (0.995) (0.995) Monde › Butin des missions › choisir un raid › « Vos notes et schéma d'arène » : écrire une note, ajouter T1 et A, les glisser, copier le code, puis le coller dans une autre mission.
+- [x] (0.995) (0.995) Monde › Butin des missions › choisir un raid › « Vos notes et schéma d'arène » : écrire une note, ajouter T1 et A, les glisser, copier le code, puis le coller dans une autre mission.
 
 
 
@@ -1206,7 +1206,7 @@ Une étape impossible (pas de compagnie, pas de sous-marin…) se rapporte « no
 - [x] (0.1014) Accueil, « Tous les outils » : chaque page a sa ligne (Champs de Bozja et Eurêka, Lexique, Île, Jardin, etc.), « Ouvrir » mène à la page, « Détails » montre son but ; les anciennes lignes (Craftimizer, Banque, Item Use) ouvrent toujours leur onglet
 
 
-- [ ] (0.1015) Aide, « Questions fréquentes » : 31 questions en français (puis en anglais après un changement de langue) ; taper « dépôt » ou « langue » dans la recherche de l'Aide ne garde que les questions qui en parlent ; « Comment changer la langue ? » montre un bouton « Ouvrir cette page » qui mène aux Paramètres ; une recherche sans réponse dit « Aucune question pour cette recherche. »
+- [x] (0.1015) Aide, « Questions fréquentes » : 31 questions en français (puis en anglais après un changement de langue) ; taper « dépôt » ou « langue » dans la recherche de l'Aide ne garde que les questions qui en parlent ; « Comment changer la langue ? » montre un bouton « Ouvrir cette page » qui mène aux Paramètres ; une recherche sans réponse dit « Aucune question pour cette recherche. »
 
 - [ ] (0.1031) Application de bureau, jeu fermé : décompresser TenshoAssistant.Desktop.zip (ou ouvrir src/TenshoAssistant.Desktop/bin/package) et lancer TenshoAssistant.Desktop.exe par un double-clic, sans rien installer : la fenêtre s'ouvre sans console, les catalogues se chargent (« Lecture des données du jeu : N catalogues prêts sur 12 »)
 
@@ -1471,11 +1471,11 @@ Une étape impossible (pas de compagnie, pas de sous-marin…) se rapporte « no
 
 - [x] (0.1183) Aide › FAQ : « M ouvre une autre carte : comment retrouver celle du jeu ? » ouvre les Paramètres ; « Tensho joue-t-il à ma place ? » cite la carte sur M et le titre selon le job
 
-- [ ] (0.1184) Mode développeur : après deux ou trois rechargements de Tensho, dalamud.log, lignes « Load created » et « Load 10 s later » : « heap … MB, Tensho load contexts N of M, previous instance … » ; si N grandit à chaque rechargement ou si l'instance d'avant reste « still alive », une fuite est vue (à rapporter)
+- [x] (0.1184) Mode développeur : après deux ou trois rechargements de Tensho, dalamud.log, lignes « Load created » et « Load 10 s later » : « heap … MB, Tensho load contexts N of M, previous instance … » ; si N grandit à chaque rechargement ou si l'instance d'avant reste « still alive », une fuite est vue (à rapporter)
 
 - [x] (0.1186) Après un rechargement de Tensho, carte ouverte : les vendeurs (et ceux des fêtes en cours) apparaissent sur la carte comme avant ; page Événements : les PNJ des fêtes se chargent toujours
 
-- [ ] (0.1187) Mode développeur : après trois rechargements de Tensho ou plus, dalamud.log, lignes « Earlier instance … » dix secondes après un chargement : pour les instances de deux chargements ou plus en arrière, « 0 of N parts alive » (le contexte peut rester « alive ») ; si des parties restent vivantes, rapporter leurs noms. Aucune ligne « framework subscriptions were still registered at unload »
+- [x] (0.1187) Mode développeur : après trois rechargements de Tensho ou plus, dalamud.log, lignes « Earlier instance … » dix secondes après un chargement : pour les instances de deux chargements ou plus en arrière, « 0 of N parts alive » (le contexte peut rester « alive ») ; si des parties restent vivantes, rapporter leurs noms. Aucune ligne « framework subscriptions were still registered at unload »
 
 - [x] (0.1188) Mode développeur : après un rechargement de Tensho, carte ouverte, dalamud.log : la première image de la carte (« Slow frame … map canvas ») n'a plus « canvas vendors » ni « icon list » en tête ; lignes « Earlier instance … » : parties collectées, état du déchargement, champs statiques
 
@@ -1635,7 +1635,7 @@ Une étape impossible (pas de compagnie, pas de sous-marin…) se rapporte « no
 
 - [ ] (0.1260) Fenêtre de Tensho étroite : les trois blocs du bandeau s'empilent, rien de coupé
 
-- [ ] (0.1261) Accueil › Aujourd'hui : première ligne « Prochaine échéance : …, dans … » (alarme, retour de vaisseau ou jardin, la plus proche) ; un clic ouvre l'outil ; sous une heure le temps avance à la seconde ; « Personnaliser » permet de la masquer
+- [x] (0.1261) Accueil › Aujourd'hui : première ligne « Prochaine échéance : …, dans … » (alarme, retour de vaisseau ou jardin, la plus proche) ; un clic ouvre l'outil ; sous une heure le temps avance à la seconde ; « Personnaliser » permet de la masquer
 
 - [x] (0.1261) Accueil : chaque tuile réagit d'un seul bloc au survol et au clic (icône, nom et ligne ensemble) ; au clavier ou à la manette, un seul arrêt par tuile
 
@@ -2568,7 +2568,7 @@ Une étape impossible (pas de compagnie, pas de sous-marin…) se rapporte « no
 
 - [ ] (0.1719) Quand un tour est chargé : la ligne dit « chargé » (ou « chargé depuis … au plus tard »), l'alarme a sonné ; retirer un tour de la base (fenêtre ouverte) : il quitte la ligne et son alarme à venir disparaît
 
-- [ ] (0.1720) Fenêtre de chat Tensho, onglet de combat : se téléporter, utiliser une compétence de votre job (et laisser un allié en utiliser une), puis survoler le nom de l'action dans la ligne « Vous utilisez … » ou « … utilise … » : l'info-bulle montre son icône, son nom et sa description ; survoler aussi le nom d'un effet (« Vous bénéficiez de l'effet … ») : son info-bulle ; le nom d'une action d'ennemi qui porte le nom d'une action de joueur n'a pas d'info-bulle
+- [x] (0.1720) Fenêtre de chat Tensho, onglet de combat : se téléporter, utiliser une compétence de votre job (et laisser un allié en utiliser une), puis survoler le nom de l'action dans la ligne « Vous utilisez … » ou « … utilise … » : l'info-bulle montre son icône, son nom et sa description ; survoler aussi le nom d'un effet (« Vous bénéficiez de l'effet … ») : son info-bulle ; le nom d'une action d'ennemi qui porte le nom d'une action de joueur n'a pas d'info-bulle
 
 - [x] (0.1722) Mode développeur, atelier de la compagnie, panneau de contrôle aérien : liste des aéronefs, puis le détail de l'aéronef (ses pièces) : le journal a des lignes « Workshop vessel read: Airship 1: rank …, speed …, range … » ; dire si vitesse, distance et pièces sont à 0 avant le détail et lues après
 
@@ -2846,9 +2846,9 @@ Une étape impossible (pas de compagnie, pas de sous-marin…) se rapporte « no
 
 - [ ] (0.1902) Mandats après X-153 : recharger Tensho, ouvrir la page des mandats (mandats acceptés et terminés lus) ; puis se déconnecter et quitter le jeu : aucune erreur dans le journal à la fermeture.
 
-- [ ] (0.1903) Mode après X-153 : recharger Tensho ; ouvrir le Fashion Report au Gold Saucer (la page de la mode lit le thème et les indices) ; faire juger une tenue si la base des découvertes le permet ; puis se déconnecter et quitter le jeu : aucune erreur dans le journal à la fermeture.
+- [x] (0.1903) Mode après X-153 : recharger Tensho ; ouvrir le Fashion Report au Gold Saucer (la page de la mode lit le thème et les indices) ; faire juger une tenue si la base des découvertes le permet ; puis se déconnecter et quitter le jeu : aucune erreur dans le journal à la fermeture.
 
-- [ ] (0.1904) Découvertes avec GitHub connecté : lancer un échange (Monde › Découvertes) puis désactiver Tensho aussitôt dans /xlplugins : aucune erreur dans le journal ; réactiver Tensho : toujours connecté à GitHub, l'échange suivant se fait.
+- [x] (0.1904) Découvertes avec GitHub connecté : lancer un échange (Monde › Découvertes) puis désactiver Tensho aussitôt dans /xlplugins : aucune erreur dans le journal ; réactiver Tensho : toujours connecté à GitHub, l'échange suivant se fait.
 
 **0.535 : interfaces** — à voir en jouant
 
