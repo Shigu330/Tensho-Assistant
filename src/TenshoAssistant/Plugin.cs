@@ -563,12 +563,8 @@ public sealed partial class Plugin : IDalamudPlugin
             Maps.HousingFurnitureProbe? housingProbe=null;
             registrations.Register(()=>housingProbe=new Maps.HousingFurnitureProbe(framework,client,objects,log,()=>configuration.DeveloperMode),()=>housingProbe?.Dispose());
             RegisterBeastBoard(configuration,data,framework,gameGui,objects);
-            // X-467 (0.1502): where the game's chat puts its typing box and its message panels, in developer mode (read-only).
-            Chat.ChatLogLayoutProbe? chatLayoutProbe=null;
-            registrations.Register(()=>chatLayoutProbe=new Chat.ChatLogLayoutProbe(framework,gameGui,log,()=>configuration.DeveloperMode),()=>chatLayoutProbe?.Dispose());
-            // X-467 (0.1504, D-181): the game chat's messages hidden while the option asks it, given back otherwise and on unload.
-            Chat.GameChatHider? chatHider=null;
-            registrations.Register(()=>{chatHider=new Chat.GameChatHider(framework,gameGui,log,mainWindow.ChatGameMessagesWant){DeveloperMode=()=>configuration.DeveloperMode,OptionWanted=mainWindow.ChatGameMessagesOption};mainWindow.ChatGamePlace=()=>chatHider?.Place;mainWindow.ChatGameChannelMenu=()=>chatHider?.ChannelMenuOpen==true;},()=>{mainWindow.ChatGamePlace=null;mainWindow.ChatGameChannelMenu=null;chatHider?.Dispose();});
+            // X-153 (0.1894): the game chat's layout probe and its hider, in the chat family (Plugin.Chat.cs).
+            RegisterGameChat(configuration,framework,gameGui);
             // 0.494 (user request): the self-check, on its own in developer mode, on request otherwise.
             registrations.Register(()=>selfCheck=new Diagnostics.SelfCheckRunner(framework,client,player,log,()=>configuration.DeveloperMode,mainWindow.SelfCheckReady,mainWindow.PrepareSelfCheck,mainWindow.SelfCheckProbes,mainWindow.SelfCheckWindows,
                 Path.Combine(pluginInterface.GetPluginConfigDirectory(),"SelfCheckSeen.json"),string.Join(";",data.GameData.Repositories.Values.OrderBy(repository=>repository.Name).Select(repository=>$"{repository.Name}:{repository.Version}")),
@@ -883,12 +879,7 @@ public sealed partial class Plugin : IDalamudPlugin
             // X-679 (0.1658): the senders follow their lines when the chat history put back numbers them again.
             registrations.Register(()=>mainWindow.ChatMessages.Renumbered+=chatSenders.Renumber,()=>mainWindow.ChatMessages.Renumbered-=chatSenders.Renumber);
             RegisterChat(configuration,client,addonLifecycle,framework,player,pluginInterface.GetPluginConfigDirectory(),chatSenders);
-            Chat.ChatPlayerActions? chatPlayers=null;
-            registrations.Register(()=>mainWindow.ChatPlayers=chatPlayers=new Chat.ChatPlayerActions(interop,framework,client,objects,targets,partyList,data,log,chatSenders,gameConfig,seStrings),
-                ()=>{mainWindow.ChatPlayers=null;chatPlayers?.Dispose();chatSenders.Clear();});
-            // X-715 (0.1718, D-202 b): developer mode, what the game's chat sends on a click on a player's name, read only.
-            Chat.ChatLinkWatch? chatLinkWatch=null;
-            registrations.Register(()=>chatLinkWatch=new Chat.ChatLinkWatch(interop,framework,contextMenus,log,()=>configuration.DeveloperMode),()=>chatLinkWatch?.Dispose());
+            RegisterChatPlayers(configuration,interop,framework,client,objects,targets,partyList,data,chatSenders,gameConfig,seStrings,contextMenus);
             // X-225 (0.1719): the aetherial wheels of the company's stand, read in its window (the Reminders page and the automatic alarms follow).
             FreeCompany.AetherialWheelReader? wheelReader=null;
             registrations.Register(()=>wheelReader=new FreeCompany.AetherialWheelReader(framework,gameGui,data,log,configuration,()=>SaveTimed("aetherial wheels"),()=>configuration.DeveloperMode),()=>wheelReader?.Dispose());

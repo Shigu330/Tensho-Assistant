@@ -48,7 +48,8 @@ internal static class ChatLinkProbe1718Tests
             Check(detour.Contains("developerMode() && !TenshoAssistant.Competitive.CompetitiveGate.Cut", StringComparison.Ordinal) && !detour.Contains("link->Payload[", StringComparison.Ordinal) && !detour.Contains("link->IntValue1=", StringComparison.Ordinal), "read only, developer mode, never during a cut");
             Check(watch.Contains("var want=!failed && hook is not null && developerMode() && !probe.Full;", StringComparison.Ordinal), "the hook on in developer mode only");
             Check(watch.Contains("addon.StartsWith(\"ChatLog\",StringComparison.Ordinal)", StringComparison.Ordinal) && !watch.Contains("AddMenuItem", StringComparison.Ordinal), "the chat's menus read, nothing added");
-            Check(Read("Plugin.cs").Contains("new Chat.ChatLinkWatch(interop,framework,contextMenus,log,()=>configuration.DeveloperMode),()=>chatLinkWatch?.Dispose());", StringComparison.Ordinal), "owned and disposed by the plugin");
+            // X-153 (0.1894): owned by the chat family.
+            Check(Read("Plugin.Chat.cs").Contains("new Chat.ChatLinkWatch(interop,framework,contextMenus,log,()=>configuration.DeveloperMode),()=>chatLinkWatch?.Dispose());", StringComparison.Ordinal), "owned and disposed by the plugin");
         }),
     ];
 }

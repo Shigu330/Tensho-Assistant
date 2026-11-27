@@ -50,7 +50,7 @@ internal static class BeastFamily1886Tests
             Check(At("registrations.Register(()=>triadNpcLoader=new TriadNpcLoader(") < catalog && catalog < At("itemWatcher.Beasts=()=>beasts.State.Obtained;"),
                 "the catalogue after the Triple Triad NPCs, before the discoveries read the beasts tamed");
             var board = At("RegisterBeastBoard(configuration,data,framework,gameGui,objects);");
-            Check(At("registrations.Register(()=>housingProbe=new Maps.HousingFurnitureProbe(") < board && board < At("registrations.Register(()=>chatLayoutProbe=new Chat.ChatLogLayoutProbe("),
+            Check(At("registrations.Register(()=>housingProbe=new Maps.HousingFurnitureProbe(") < board && board < At("RegisterGameChat(configuration,framework,gameGui);"),
                 "the board's services after the housing probe, before the chat layout probe");
             Check(catalog < board, "the catalogue first (the board reads it)");
             var home = PluginFiles().Single(file => file.Name == "Plugin.Beastmaster.cs").Text;

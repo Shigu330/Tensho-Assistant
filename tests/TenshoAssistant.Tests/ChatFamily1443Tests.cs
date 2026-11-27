@@ -34,7 +34,9 @@ internal static class ChatFamily1443Tests
                 Check(at > last,part + ": created in the order of before");
                 last = at;
             }
-            Check(Count(home,@"registrations\.Register\(") == 3,"through the plugin's registrations");
+            // 0.1894: the rest of the family follows RegisterChat in the same file (ChatFamily1894Tests); these three are its own.
+            var own = home[..home.IndexOf("private void RegisterGameChat(",StringComparison.Ordinal)];
+            Check(Count(own,@"registrations\.Register\(") == 3,"through the plugin's registrations");
             Check(home.Contains("mainWindow.ChatLinkHistory=chatLinks?.History;") && home.Contains("mainWindow.ChatLinkHover=chatLinkHover?.Hover;"),"the main window still reads them");
             var plugin = files.Single(file => file.Name == "Plugin.cs").Text;
             var treasure = plugin.IndexOf("if(itemWatcher is not null)itemWatcher.TreasureMapItem=",StringComparison.Ordinal);

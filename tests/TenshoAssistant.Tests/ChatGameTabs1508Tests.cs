@@ -58,7 +58,8 @@ internal static class ChatGameTabs1508Tests
             Check(!hider.Contains("TextInput->",StringComparison.Ordinal) && !hider.Contains("ChannelSelectDropDown->SelectItem",StringComparison.Ordinal),"the typing box and the menu are never written");
             var window=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.ChatWindow.cs"));
             Check(window.Contains("if(ChatFollow.StepsAside(ChatHidesGameMessages(),ChatGameChannelMenu?.Invoke()==true))return false;",StringComparison.Ordinal),"the window steps aside");
-            var plugin=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"));
+            // X-153 (0.1894): wired by the chat family.
+            var plugin=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Chat.cs"));
             Check(plugin.Contains("mainWindow.ChatGameChannelMenu=()=>chatHider?.ChannelMenuOpen==true;",StringComparison.Ordinal) && plugin.Contains("mainWindow.ChatGameChannelMenu=null;",StringComparison.Ordinal),"wired and cleared");
             var en=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Localization/Languages/en.json"));
             var fr=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Localization/Languages/fr.json"));

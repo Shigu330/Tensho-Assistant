@@ -27,7 +27,8 @@ internal static class ChatLogLayout1502Tests
             foreach(var forbidden in new[]{"SetPosition","SetSize","Hide(","Show(","SetFocusNode","Focus()","NodeText","GetText","ProcessChatBox","SendMessage","SetAlpha","->SetVisibility","ToggleVisibility"})
                 Check(!probe.Contains(forbidden,StringComparison.Ordinal),$"the probe does not use {forbidden}");
             Check(probe.Contains("!developerMode()",StringComparison.Ordinal) && probe.Contains("CompetitiveGate.Add(framework,OnUpdate)",StringComparison.Ordinal),"developer mode, off in competitive content");
-            var plugin=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"));
+            // X-153 (0.1894): registered by the chat family.
+            var plugin=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Chat.cs"));
             Check(plugin.Contains("new Chat.ChatLogLayoutProbe(framework,gameGui,log,()=>configuration.DeveloperMode),()=>chatLayoutProbe?.Dispose()",StringComparison.Ordinal),"registered and disposed");
         }),
     ];

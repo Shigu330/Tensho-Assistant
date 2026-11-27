@@ -107,8 +107,11 @@ internal static class ChatSenders1660Tests
         }),
         ("Chat senders 1660: the hook is set when Tensho loads, not later; its first call is measured in the log",()=>
         {
+            // X-153 (0.1894): registered by the chat family, which the plugin's constructor calls.
             var plugin=Read("src/TenshoAssistant/Plugin.cs");
-            var hooked=plugin.IndexOf("registrations.Register(()=>mainWindow.ChatPlayers=chatPlayers=new Chat.ChatPlayerActions(",StringComparison.Ordinal);
+            var family=Read("src/TenshoAssistant/Plugin.Chat.cs");
+            var hooked=plugin.IndexOf("RegisterChatPlayers(configuration,interop,",StringComparison.Ordinal);
+            Check(family.Contains("registrations.Register(()=>mainWindow.ChatPlayers=chatPlayers=new Chat.ChatPlayerActions(",StringComparison.Ordinal),"registered by the chat family");
             Check(hooked>0 && plugin.IndexOf("public Plugin(",StringComparison.Ordinal) is var ctor && ctor>0 && ctor<hooked,"registered in the plugin's constructor");
             var actions=Read("src/TenshoAssistant/Chat/ChatPlayerActions.Dalamud.cs");
             var made=actions.IndexOf("public ChatPlayerActions(",StringComparison.Ordinal);

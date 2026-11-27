@@ -34,7 +34,8 @@ internal static class ChatPlaceOption1512Tests
             Check(hider.Contains("if(ChatHideWants.OptionReadsPlace(OptionWanted(),TenshoAssistant.Competitive.CompetitiveGate.Cut))",StringComparison.Ordinal)
                 && hider.Contains("public Func<bool> OptionWanted{get;init;}=()=>false;",StringComparison.Ordinal),"read only while wanted; nothing when unset");
             Check(hider.Split("Read(boxes)").Length==2,"one reading of the place");
-            var plugin=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"));
+            // X-153 (0.1894): the hider is made by the chat family.
+            var plugin=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Chat.cs"));
             Check(plugin.Contains("OptionWanted=mainWindow.ChatGameMessagesOption}",StringComparison.Ordinal),"the plugin passes the option");
         }),
     ];

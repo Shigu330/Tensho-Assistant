@@ -66,7 +66,8 @@ internal static class ChatGameHide1504Tests
                 && window.Contains("=>!inDesktopApp && !windowDisposed && ChatPanelOpen && !chatWindowFailed && ChatOptions.WindowOpen && ChatOptions.HideGameMessages && !ChatOptions.BothChats;",StringComparison.Ordinal),"wanted only with the window open and working (X-527: shown or not is ChatHideWants' choice)");
             var tracker=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Dashboard.cs"));
             Check(tracker.Contains("if(name==\"Chat\")chatWindowFailed=true;",StringComparison.Ordinal),"a failed chat window gives the messages back");
-            var plugin=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"));
+            // X-153 (0.1894): registered by the chat family.
+            var plugin=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Chat.cs"));
             Check(plugin.Contains("new Chat.GameChatHider(framework,gameGui,log,mainWindow.ChatGameMessagesWant)",StringComparison.Ordinal) && plugin.Contains("chatHider?.Dispose()",StringComparison.Ordinal),"registered and disposed");
         }),
     ];
