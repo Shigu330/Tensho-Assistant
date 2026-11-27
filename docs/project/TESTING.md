@@ -54,9 +54,9 @@ orpheline ; préférence « ouvrir au chargement » respectée ; la carte du jeu
 ### Essais en jeu (liste produite le 2026-11-27, version 0.1882.0)
 
 <!-- q:public -->
-_In English: this page is the author's in-game test list, in French only. Produced on 2026-11-27 for version 0.1882.0: 506 tests done, 592 open, 8 could not be tried, 2 failed; the boxes of these tests follow that count. 183 other ticked boxes come from before the list was kept as data and are not counted._
+_In English: this page is the author's in-game test list, in French only. Produced on 2026-11-27 for version 0.1882.0. It has 1253 boxes: 660 ticked, 593 empty. 1070 boxes follow the test source: 477 done (ticked), 584 open, 7 could not be tried, 2 failed (empty). The 183 other ticked boxes come from before the source existed (reported before it, kept as they are). Apart: 38 tests of the source have no box on this page (29 done, 8 open, 1 could not be tried, 0 failed)._
 
-Compte de la source des essais le 2026-11-27 (version 0.1882.0) : 506 faits, 592 ouverts, 8 pas pu, 2 en échec ; les cases de ces essais suivent ce compte. 183 autres cases cochées viennent d'avant la source (essais rapportés avant qu'elle existe, gardés tels quels) : elles ne comptent pas.
+Liste produite le 2026-11-27 (version 0.1882.0) : 1253 cases, 660 cochées, 593 vides. 1070 cases suivent la source des essais : 477 faits (cochées), 584 ouverts, 7 pas pu, 2 en échec (vides). Les 183 autres cases cochées viennent d'avant la source (essais rapportés avant qu'elle existe, gardés tels quels). À part : 38 essais de la source n'ont pas de case sur cette page (29 faits, 8 ouverts, 1 pas pu, 0 en échec).
 <!-- /q:public -->
 
 Parcours de la campagne de la phase 6, les mêmes essais rangés par activité : [TESTING-ROUTE.md](TESTING-ROUTE.md) (2026-11-09).
