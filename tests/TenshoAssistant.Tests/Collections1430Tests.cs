@@ -41,7 +41,7 @@ internal static class Collections1430Tests
         }),
         ("Collections 1430: a listener in this process sees forced collections end, then lets go; the plugin says the summary", () =>
         {
-            var listener = new RuntimeSuspensionListener(_ => { });
+            var listener = RuntimeSuspensionListener.Open(_ => { });
             try
             {
                 var waited = System.Diagnostics.Stopwatch.StartNew();

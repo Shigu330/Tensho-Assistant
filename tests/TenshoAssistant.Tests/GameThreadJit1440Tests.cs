@@ -37,7 +37,7 @@ internal static class GameThreadJit1440Tests
         }),
         ("Game thread JIT 1440: the listener keeps the game thread's compilations only, is the current tracker while alive, and lets go at its end",() =>
         {
-            var listener = new RuntimeSuspensionListener(_ => { });
+            var listener = RuntimeSuspensionListener.Open(_ => { });
             try
             {
                 Check(ReferenceEquals(GameThreadJit.Current,listener.Jit),"the current tracker");

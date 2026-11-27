@@ -1383,7 +1383,7 @@ public sealed partial class Plugin : IDalamudPlugin
             // collection pauses are not all of them), to name what the readers wait on about 25 s after a load.
             if(configuration.DeveloperMode)
             {
-                var suspensions=new Diagnostics.RuntimeSuspensionListener(note=>log.Information(note));
+                var suspensions=Diagnostics.RuntimeSuspensionListener.Open(note=>log.Information(note));
                 registrations.Register(()=>{},()=>suspensions.Dispose());
                 // X-433 (0.1433): the gaps between the game's frames meanwhile (the interface's Draw, once a frame; not a framework
                 // subscription, which would wait for the readers' compiler), whatever ran meanwhile: a stop of every managed thread by a

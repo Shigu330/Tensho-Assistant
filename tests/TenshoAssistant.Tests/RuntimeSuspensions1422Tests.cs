@@ -33,7 +33,7 @@ internal static class RuntimeSuspensions1422Tests
         ("Runtime suspensions 1422: a listener in this process sees the suspension of a forced collection, then lets go", () =>
         {
             var notes = new List<string>();
-            var listener = new RuntimeSuspensionListener(note => { lock (notes) notes.Add(note); });
+            var listener = RuntimeSuspensionListener.Open(note => { lock (notes) notes.Add(note); });
             try
             {
                 var waited = System.Diagnostics.Stopwatch.StartNew();
@@ -53,7 +53,7 @@ internal static class RuntimeSuspensions1422Tests
         ("Runtime suspensions 1422: the plugin listens in developer mode only, two minutes, released at the unload; the right source and keywords", () =>
         {
             var plugin = Read("src/TenshoAssistant/Plugin.cs");
-            var start = plugin.IndexOf("if(configuration.DeveloperMode)\n            {\n                var suspensions=new Diagnostics.RuntimeSuspensionListener(note=>log.Information(note));", StringComparison.Ordinal);
+            var start = plugin.IndexOf("if(configuration.DeveloperMode)\n            {\n                var suspensions=Diagnostics.RuntimeSuspensionListener.Open(note=>log.Information(note));", StringComparison.Ordinal);
             Check(start > 0 && start > plugin.IndexOf("mainWindow.LoadMilliseconds=", StringComparison.Ordinal), "developer mode, after the load line");
             Check(plugin.Contains("registrations.Register(()=>{},()=>suspensions.Dispose());", StringComparison.Ordinal), "released with the plugin's registrations");
             Check(plugin.Contains("Task.Delay(Diagnostics.RuntimeSuspensionWatch.Length)", StringComparison.Ordinal) && RuntimeSuspensionWatch.Length == TimeSpan.FromMinutes(2), "two minutes");

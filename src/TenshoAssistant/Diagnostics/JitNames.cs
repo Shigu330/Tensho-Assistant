@@ -26,6 +26,18 @@ public sealed class JitNames : EventListener
     private int dropped;
     private readonly string startMark="TenshoJitStart"+Guid.NewGuid().ToString("N"),stopMark="TenshoJitStop"+Guid.NewGuid().ToString("N");
 
+    /// <summary>X-891 (0.1916): made under <see cref="RuntimeListeners.Gate"/> only (two listeners made or disposed at once can freeze the
+    /// process).</summary>
+    public static JitNames Open()=>RuntimeListeners.Open(()=>new JitNames());
+
+    private JitNames(){}
+
+    /// <summary>X-891 (0.1916): disposed under the gate, never beside another listener made or disposed.</summary>
+    public override void Dispose()
+    {
+        lock(RuntimeListeners.Gate)base.Dispose();
+    }
+
     protected override void OnEventSourceCreated(EventSource source)
     {
         if(source.Name==RuntimeSource)EnableEvents(source,EventLevel.Verbose,(EventKeywords)JitKeyword);

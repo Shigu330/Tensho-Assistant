@@ -39,7 +39,7 @@ internal static class LargeAllocations1431Tests
         }),
         ("Large allocations 1431: a listener in this process sees a large allocation on this thread; the warm-up names its thread; the plugin says the summary", () =>
         {
-            var listener = new RuntimeSuspensionListener(_ => { });
+            var listener = RuntimeSuspensionListener.Open(_ => { });
             var kept = new List<byte[]>();
             try
             {

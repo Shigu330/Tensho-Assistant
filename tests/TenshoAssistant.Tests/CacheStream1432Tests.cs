@@ -5,6 +5,7 @@
 // more (the runtime's allocation ticks); the item catalogue is built sized once and sorted in place, in the same order.
 using System.Diagnostics.Tracing;
 using System.Reflection;
+using TenshoAssistant.Diagnostics;
 using TenshoAssistant.Caching;
 using TenshoAssistant.Items;
 
@@ -19,6 +20,10 @@ internal static class CacheStream1432Tests
     private sealed class LargeBytes : EventListener
     {
         public readonly List<(DateTime At, long Size)> Seen = [];
+        // X-891 (0.1916): made and disposed under the gate of the runtime's listeners, as the plugin's own.
+        public static LargeBytes Open() => RuntimeListeners.Open(() => new LargeBytes());
+        private LargeBytes() { }
+        public override void Dispose() { lock (RuntimeListeners.Gate) base.Dispose(); }
         protected override void OnEventSourceCreated(EventSource source)
         {
             if (source.Name == "Microsoft-Windows-DotNETRuntime") EnableEvents(source, EventLevel.Verbose, (EventKeywords)0x1);
@@ -48,7 +53,7 @@ internal static class CacheStream1432Tests
                 }
                 var file = Directory.GetFiles(root, "*.json", SearchOption.AllDirectories).Single(path => new FileInfo(path).Length > 3_000_000);
                 Check(new FileInfo(file).Length > 3_000_000, "a large entry: " + new FileInfo(file).Length);
-                using var listener = new LargeBytes();
+                using var listener = LargeBytes.Open();
                 // The listener works: a 2 MB marker is seen before the read.
                 var marker = new byte[2 * 1024 * 1024];
                 var waited = System.Diagnostics.Stopwatch.StartNew();

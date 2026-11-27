@@ -27,7 +27,7 @@ internal static class FrameGaps1433Tests
         ("Frame gaps 1433: the plugin counts the game's frames in developer mode, two minutes, and lets go at the end and at the unload", () =>
         {
             var plugin = Read("src/TenshoAssistant/Plugin.cs");
-            var start = plugin.IndexOf("var suspensions=new Diagnostics.RuntimeSuspensionListener(note=>log.Information(note));", StringComparison.Ordinal);
+            var start = plugin.IndexOf("var suspensions=Diagnostics.RuntimeSuspensionListener.Open(note=>log.Information(note));", StringComparison.Ordinal);
             var subscribe = plugin.IndexOf("pluginInterface.UiBuilder.Draw+=Gap;", StringComparison.Ordinal);
             Check(start > 0 && subscribe > start && plugin.IndexOf("if(configuration.DeveloperMode)", start - 200, StringComparison.Ordinal) > 0, "with the other measures, developer mode");
             Check(plugin.Contains("registrations.Register(()=>{},()=>{pluginInterface.UiBuilder.Draw-=Gap;pluginInterface.UiBuilder.HideUi-=GapHidden;});", StringComparison.Ordinal), "let go at the unload (0.1437: HideUi too)");

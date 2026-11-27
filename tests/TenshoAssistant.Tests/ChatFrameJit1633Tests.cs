@@ -48,7 +48,7 @@ internal static class ChatFrameJit1633Tests
             // stood still, every thread waiting). Both waits are now conditions: the window opens once the listener has heard this thread,
             // and the marks are waited for up to Patience (the runner says a test hung after 5 min), polled every 10 ms without spinning;
             // a failure says what was heard (JitNames.State).
-            using var names=new JitNames();
+            using var names=JitNames.Open();
             var thread=ThreadClock.SystemId();
             var ready=System.Diagnostics.Stopwatch.StartNew();
             while(!names.Hears(thread) && ready.Elapsed<Patience){Probe();Thread.Sleep(10);}
@@ -69,7 +69,7 @@ internal static class ChatFrameJit1633Tests
         ("Chat frame jit 1633: wiring: developer mode only, the names logged off the game's thread, the listener let go",()=>
         {
             var chat=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.ChatWindow.cs"));
-            Check(chat.Contains("var names=developerMode ? new Diagnostics.JitNames():null;",StringComparison.Ordinal),"developer mode only");
+            Check(chat.Contains("var names=developerMode ? Diagnostics.JitNames.Open():null;",StringComparison.Ordinal),"developer mode only");
             Check(chat.Contains("_=Task.Delay(2000).ContinueWith(",StringComparison.Ordinal) && chat.Contains("finally{names.Dispose();}",StringComparison.Ordinal),"later, then let go");
         }),
     ];

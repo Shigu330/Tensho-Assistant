@@ -308,7 +308,11 @@ public sealed class RuntimeSuspensionListener : EventListener
     // X-433 (0.1448): the thread the runtime's events are given on (its own allocations are the measure's cost).
     private long listenerThread;
 
-    public RuntimeSuspensionListener(Action<string> say)
+    /// <summary>X-891 (0.1916): made under <see cref="RuntimeListeners.Gate"/> only (two listeners made or disposed at once can freeze the
+    /// process).</summary>
+    public static RuntimeSuspensionListener Open(Action<string> say)=>RuntimeListeners.Open(()=>new RuntimeSuspensionListener(say));
+
+    private RuntimeSuspensionListener(Action<string> say)
     {
         this.say=say;
         GameThreadJit.Begin(jit);
@@ -405,6 +409,7 @@ public sealed class RuntimeSuspensionListener : EventListener
         say=null;
         // X-433 (0.1440): the slow passes' lines stop with the listener (nothing kept past the watch or the unload).
         GameThreadJit.End(jit);
-        base.Dispose();
+        // X-891 (0.1916): disposed under the gate, never beside another listener made or disposed.
+        lock(RuntimeListeners.Gate)base.Dispose();
     }
 }

@@ -1293,7 +1293,7 @@ internal sealed partial class MainWindow
             log.Information(FormattableString.Invariant($"Chat window: lines first drawn {WarmupSinceMade:F0} ms after the load (X-564), the panels' gate {(PanelsOpen ? "open":"still closed")}."));
             // X-564 (0.1632): that frame's time, and how much of it the game's thread spent compiling (34 ms of chat on 20/11 17:50).
             // X-564 (0.1633): in developer mode, the names of the methods compiled meanwhile on this thread (the runtime's JIT events).
-            var names=developerMode ? new Diagnostics.JitNames():null;
+            var names=developerMode ? Diagnostics.JitNames.Open():null;
             names?.Start();
             var jitBefore=System.Runtime.JitInfo.GetCompilationTime(true);
             var methodsBefore=System.Runtime.JitInfo.GetCompiledMethodCount(true);
