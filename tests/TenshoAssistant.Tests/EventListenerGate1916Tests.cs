@@ -16,6 +16,17 @@ internal static class EventListenerGate1916Tests
 
     /// <summary>The listeners of the runtime's events in the plugin and the tests, each made and disposed under the gate.</summary>
     private static readonly string[] Gated = ["RuntimeSuspensionListener", "JitNames", "LargeBytes"];
+    /// <summary>X-896 (review of 0.1916 M1): each listener of the runtime's events as « file|class », the desktop app's included.</summary>
+    private static readonly string[] GatedFiles =
+    [
+        "src/TenshoAssistant/Diagnostics/RuntimeSuspensions.cs|RuntimeSuspensionListener",
+        "src/TenshoAssistant/Diagnostics/JitNames.cs|JitNames",
+        "tests/TenshoAssistant.Tests/CacheStream1432Tests.cs|LargeBytes",
+        "src/TenshoAssistant.Desktop/Headless.cs|JitNames",
+    ];
+    /// <summary>X-896 (review of 0.1916 M1): a class deriving from EventListener, a primary constructor (« class X(int a) : EventListener »)
+    /// and type parameters included.</summary>
+    internal static readonly Regex Listener = new(@"\bclass\s+(\w+)\s*(?:<[^>]*>)?\s*(?:\((?:[^()]|\([^()]*\))*\))?\s*:\s*(?:global::)?(?:System\.Diagnostics\.Tracing\.)?EventListener\b");
 
     public static IEnumerable<(string Name, Action Run)> Cases =>
     [
@@ -60,26 +71,44 @@ internal static class EventListenerGate1916Tests
                 Check(type.GetMethod("Open", BindingFlags.Public | BindingFlags.Static) is not null, type.Name + ": Open");
                 Check(type.GetMethod("Dispose", BindingFlags.Public | BindingFlags.Instance, Type.EmptyTypes)?.DeclaringType == type, type.Name + ": its own Dispose");
             }
-            foreach (var file in new[] { "src/TenshoAssistant/Diagnostics/RuntimeSuspensions.cs", "src/TenshoAssistant/Diagnostics/JitNames.cs", "tests/TenshoAssistant.Tests/CacheStream1432Tests.cs" })
+            foreach (var file in GatedFiles.Select(entry => entry.Split('|')[0]).Distinct())
             {
                 var text = File.ReadAllText(Path.GetFullPath(file)).Replace("\r\n", "\n");
-                Check(Regex.IsMatch(text, @"lock ?\(RuntimeListeners\.Gate\) ?base\.Dispose\(\);"), file + ": base.Dispose under the gate");
+                Check(Regex.IsMatch(text, @"lock ?\((?:TenshoAssistant\.Diagnostics\.)?RuntimeListeners\.Gate\) ?base\.Dispose\(\);"), file + ": base.Dispose under the gate");
                 Check(text.Contains("RuntimeListeners.Open(", StringComparison.Ordinal), file + ": made under the gate");
             }
         }),
         ("Event listener gate 1916: every listener of the runtime's events in the plugin and the tests is a gated one", () =>
         {
+            // X-896 (review of 0.1916 M1): the desktop app's sources too, and a class with a primary constructor.
             var found = new List<string>();
-            foreach (var root in new[] { "src/TenshoAssistant", "tests/TenshoAssistant.Tests" })
+            var here = Path.GetFullPath(".");
+            foreach (var root in new[] { "src/TenshoAssistant", "src/TenshoAssistant.Desktop", "tests/TenshoAssistant.Tests" })
                 foreach (var file in Directory.EnumerateFiles(Path.GetFullPath(root), "*.cs", SearchOption.AllDirectories))
                 {
                     if (file.Contains(Path.DirectorySeparatorChar + "bin" + Path.DirectorySeparatorChar) || file.Contains(Path.DirectorySeparatorChar + "obj" + Path.DirectorySeparatorChar)) continue;
                     if (file.EndsWith("EventListenerGate1916Tests.cs", StringComparison.Ordinal)) continue;
-                    foreach (Match match in Regex.Matches(File.ReadAllText(file), @"class (\w+)\s*:\s*(?:System\.Diagnostics\.Tracing\.)?EventListener\b"))
-                        found.Add(match.Groups[1].Value);
+                    foreach (Match match in Listener.Matches(File.ReadAllText(file)))
+                        found.Add(Path.GetRelativePath(here, file).Replace('\\', '/') + "|" + match.Groups[1].Value);
                 }
-            Check(found.Count > 0 && found.All(name => Gated.Contains(name)), "listeners found: " + string.Join(", ", found));
-            Check(Gated.All(found.Contains), "the gated ones still exist: " + string.Join(", ", found));
+            Check(found.Count > 0 && found.All(GatedFiles.Contains), "listeners found: " + string.Join(", ", found));
+            Check(GatedFiles.All(found.Contains), "the gated ones still exist: " + string.Join(", ", found));
+            // The listeners compiled into the tests (the plugin's Diagnostics sources are linked there), indirect ones included.
+            var compiled = typeof(EventListenerGate1916Tests).Assembly.GetTypes().Where(type => type.IsSubclassOf(typeof(EventListener))).Select(type => type.Name).ToList();
+            Check(compiled.Count > 0 && compiled.All(Gated.Contains), "listeners compiled into the tests: " + string.Join(", ", compiled));
+        }),
+        ("Event listener gate 1916: the listeners' pattern finds a class with a primary constructor, type parameters or the full base name, and nothing else (X-896)", () =>
+        {
+            string[] listeners =
+            [
+                "private sealed class A : EventListener",
+                "internal sealed class SuspensionWatch(Action<string> say) : EventListener",
+                "sealed class B<T>(Func<int> make, int count = (1)) : System.Diagnostics.Tracing.EventListener, IDisposable",
+                "class C:global::System.Diagnostics.Tracing.EventListener",
+            ];
+            foreach (var line in listeners) Check(Listener.IsMatch(line), "found: " + line);
+            string[] others = ["class D : EventListenerGate", "class E(int a) : EventSource", "class F : IEventListener", "class G : Base, IObserver<EventListener>"];
+            foreach (var line in others) Check(!Listener.IsMatch(line), "not a listener: " + line);
         }),
     ];
 }

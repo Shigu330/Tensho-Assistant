@@ -37,5 +37,7 @@
     <!-- X-119 step 2 (0.1081): the local link's one source (protocol, the plugin's server, this app's client), shared with the plugin. -->
     <Compile Include="..\TenshoAssistant\TenshoJson.cs" Link="TenshoJson.cs" />
     <Compile Include="..\TenshoAssistant\Link\LocalLink.cs" Link="Link\LocalLink.cs" />
+    <!-- X-896 (review of 0.1916 M1): the gate of the runtime's event listeners, shared with the plugin this app loads in its process. -->
+    <Compile Include="..\TenshoAssistant\Diagnostics\RuntimeListeners.cs" Link="Diagnostics\RuntimeListeners.cs" />
   </ItemGroup>
 </Project>

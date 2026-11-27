@@ -169,7 +169,7 @@ internal static class Headless
         var failed=0;
         // --jit-names: the methods compiled during each page's first frame, counted by declaring type (runtime JIT events, this thread):
         // what the warm-up does not cover yet. Diagnostic only, off by default.
-        using var jitNames=args.Contains("--jit-names") ? new JitNames() : null;
+        using var jitNames=args.Contains("--jit-names") ? JitNames.Open() : null;
         foreach(var page in host.Pages)
         {
             lock(AbsentProxy.Reached)AbsentProxy.Reached.Clear();
@@ -534,10 +534,15 @@ internal static class Headless
     internal static string Short(string text)=>(text.Length>140 ? text[..140]+"…" : text).Replace("|","/").Replace("\n"," ");
 
     /// <summary>Runtime JIT events (MethodJittingStarted) between Begin and End (the frame; other threads' few compilations included), as "namespace.type" of each compiled method.</summary>
+    /// <remarks>X-896 (review of 0.1916 M1): made and disposed under the gate of the runtime's listeners, as the plugin's own (the plugin
+    /// runs in this process too; two listeners made or disposed at once can freeze it, X-891).</remarks>
     private sealed class JitNames : System.Diagnostics.Tracing.EventListener
     {
         private readonly List<string> names=[];
         private int thread=-1;
+        public static JitNames Open()=>TenshoAssistant.Diagnostics.RuntimeListeners.Open(()=>new JitNames());
+        private JitNames(){}
+        public override void Dispose(){lock(TenshoAssistant.Diagnostics.RuntimeListeners.Gate)base.Dispose();}
         public void Begin(){lock(names){names.Clear();thread=Environment.CurrentManagedThreadId;}}
         // The runtime's events reach the listener a little later, on its own thread: the window is closed after a short wait.
         public List<string> End(){Thread.Sleep(300);lock(names){thread=-1;return [..names];}}
