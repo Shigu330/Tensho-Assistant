@@ -57,7 +57,7 @@ internal static class ItemsFamily1928Tests
             Check(At("mainWindow.GraceSource=") < desynth && desynth < At("mainWindow.HomeRegion=()=>"), "the desynthesis: after the grace, before the home region");
             Check(At("mainWindow.StackSizeOf=") < shop && shop < At("RegisterUndercut("), "the shop reminder: after the stack sizes, before the undercut");
             Check(At("RegisterMiniGameReaders(") < uses && uses < At("workshopDeliveryReader=new FreeCompany.WorkshopDeliveryReader(") && At("workshopDeliveryReader?.Dispose()") < catalog
-                && catalog < At("recipeLoader = new RecipeCatalogLoader("), "the uses and the catalogue: around the workshop's deliveries, before the recipes' catalogue, as before");
+                && catalog < At("RegisterRecipeAndGatheringCatalogs(data,framework);"), "the uses and the catalogue: around the workshop's deliveries, before the recipes' catalogue, as before");
         }),
         ("Items family 1928: each service's install and its release are given to one same registration of Plugin.Items.cs (its own release, never another's)", () =>
             FamilyRegistrations.Paired("Items family 1928", PluginFiles().Single(file => file.Name == "Plugin.Items.cs").Text, Paths.Select(path => (path.Service, path.Install, path.Release)))),

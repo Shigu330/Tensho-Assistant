@@ -50,7 +50,7 @@ internal static class CraftFamily1924Tests
             var readers = At("RegisterCraftReaders(data,framework,player,client,gameGui,objects);");
             var log = At("RegisterCraftLog(pluginInterface,configuration,data,framework,player,client,gameGui,unlocks,interop);");
             Check(Count(plugin, @"RegisterCraftReaders\(") == 1 && Count(plugin, @"RegisterCraftLog\(") == 1, "each called once");
-            Check(At("gpLoader=new GpCatalogLoader(") < readers && readers < At("var macroChainCheckedAt="), "the readers: after the GP actions' loader, before Macro Chain, as before");
+            Check(At("RegisterWeatherAndGpCatalogs(data,framework);") < readers && readers < At("var macroChainCheckedAt="), "the readers: after the GP actions' loader, before Macro Chain, as before");
             Check(At("toolGallery=new TenshoAssistant.MyTools.ToolGallery(") < log && log < At("RegisterFashion(configuration,data,framework,gameGui);"), "the log: after the tools' gallery, before the fashion family, as before");
         }),
         ("Craft family 1924: each service's install and its release are given to one same registration of Plugin.Craft.cs (its own release, never another's)", () =>

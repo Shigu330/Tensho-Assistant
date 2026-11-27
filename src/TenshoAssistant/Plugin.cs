@@ -1000,10 +1000,8 @@ public sealed partial class Plugin : IDalamudPlugin
                 return opened;
             };
             mainWindow.PlayerGrandCompany = () => player.IsLoaded ? player.GrandCompany.RowId : 0;
-            var npcVendors=new Npcs.NpcVendorService();
-            Npcs.NpcVendorLoader? npcLoader=null;
-            registrations.Register(()=>npcLoader=new Npcs.NpcVendorLoader(npcVendors,data,framework,log,dataCache),()=>npcLoader?.Dispose());
-            mainWindow.ConfigureNpcVendors(npcVendors);
+            // X-153 (0.1929): the NPC vendors' catalogue in Plugin.Catalogs.cs.
+            RegisterNpcVendors(data,framework);
             itemContextMenu=new ItemContextMenuBridge(configuration,contextMenus,player,client,itemCatalog,log,localization,gameGui){Relevant=mainWindow.RelevantRoutes,Title=mainWindow.RouteTitle,Sources=mainWindow.SourceMenu,
                 // 0.826 (X-58): the crafting lists first, then the item's pages.
                 Links=id=>[..mainWindow.CraftListAdds(id),..(mainWindow.ExternalLinksFor(id) ?? [])]};
@@ -1017,15 +1015,13 @@ public sealed partial class Plugin : IDalamudPlugin
             ItemHoverReader? hoverReader = null;
             registrations.Register(() => hoverReader = new ItemHoverReader(configuration, market, itemHover, itemCatalog, gameGui, player, client, framework, log) { InDuty = () => mapLive?.State is { InDuty: true }, Keys = keyState, Developer=()=>configuration.DeveloperMode, },
                 () => hoverReader?.Dispose());
-            MapCatalogLoader? mapLoader = null;
-            registrations.Register(() => mapLoader = new MapCatalogLoader(maps, data, framework, log), () => mapLoader?.Dispose());
+            // X-153 (0.1929): the maps' catalogue in Plugin.Catalogs.cs.
+            RegisterMapCatalog(data,framework);
             RegisterDutyCatalog(pluginInterface,data,framework,client,unlocks,player);
             CharacterStatsReader? statsReader = null;
             registrations.Register(() => statsReader = new CharacterStatsReader(characterStats, framework, player, client, log,objects,data,gameGui), () => statsReader?.Dispose());
-            GpCatalogLoader? gpLoader=null;
-            WeatherCatalogLoader? weatherLoader=null;
-            registrations.Register(()=>weatherLoader=new WeatherCatalogLoader(weather,data,framework,log),()=>weatherLoader?.Dispose());
-            registrations.Register(()=>gpLoader=new GpCatalogLoader(gpActions,data,framework,log),()=>gpLoader?.Dispose());
+            // X-153 (0.1929): the weather and GP actions' catalogues in Plugin.Catalogs.cs.
+            RegisterWeatherAndGpCatalogs(data,framework);
             // X-153 (0.1924): the crafting family (actions' loader, live reader, food and medicine, meals, detection, recipe log) in Plugin.Craft.cs.
             RegisterCraftReaders(data,framework,player,client,gameGui,objects);
             // A-10 (0.422): Macro Chain (Caraxi, InternalName « MacroChain ») loaded: exported pages use its /nextmacro.
@@ -1155,12 +1151,8 @@ public sealed partial class Plugin : IDalamudPlugin
             registrations.Register(()=>workshopDeliveryReader=new FreeCompany.WorkshopDeliveryReader(framework,gameGui,log,mainWindow.WorkshopDeliverySeen),()=>workshopDeliveryReader?.Dispose());
             // X-153 (0.1928): the Grand Company supply reader and the items' catalogue in Plugin.Items.cs.
             RegisterItemCatalog(configuration,data,framework,gameGui,client,player,saver);
-            RecipeCatalogLoader? recipeLoader = null;
-            registrations.Register(() => recipeLoader = new RecipeCatalogLoader(recipeCatalog, data, framework, log, dataCache),
-                () => recipeLoader?.Dispose());
-            GatheringCatalogLoader? gatheringLoader = null;
-            registrations.Register(() => gatheringLoader = new GatheringCatalogLoader(gatheringCatalog, data, framework, log, dataCache),
-                () => gatheringLoader?.Dispose());
+            // X-153 (0.1929): the recipes' and gathering points' catalogues in Plugin.Catalogs.cs.
+            RegisterRecipeAndGatheringCatalogs(data,framework);
             DalamudInventoryReader? inventoryReader = null;
             registrations.Register(() => inventoryReader = new DalamudInventoryReader(inventoryService, inventory, player, client, framework, log),
                 () => inventoryReader?.Dispose());
