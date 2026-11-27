@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (920 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (923 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -988,12 +988,15 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-892 | Review of block 0.1910 to 0.1912 (review 0.1912, 27/11), minor M1, M2, M3, M4… | Done in 0.1913.0 |
 | X-893 | Known limit of the discoveries' GitHub sign-in (user's decision of 27/11… | Done in 0.1914.0 |
 | X-894 | Review  (review 0.1913, 27/11), pre-existing before the block M1: M1 in… | Done in 0.1915.0 |
+| X-895 | Review of block 0.1914 to 0.1915 (review 0.1915, 27/11), minor M1, M2: M1 in… | Done in 0.1917.0 |
+| X-896 | Review  (review 0.1916, 27/11), minor M1: M1 in… | Done in 0.1918.0 |
+| X-897 | Review  (review 0.1916, 27/11), pre-existing before the block M2: M2 in… | Done in 0.1919.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (920 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (923 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1979,3 +1982,6 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-892 | Relecture du bloc 0.1910 à 0.1912 (relecture 0.1912, 27/11), mineurs M1, M2… | Fait en 0.1913.0 |
 | X-893 | Limite connue de la connexion GitHub des découvertes (décision de l'utilisateur… | Fait en 0.1914.0 |
 | X-894 | Relecture  (relecture 0.1913, 27/11), déjà là avant le bloc M1 : M1 : Quand le… | Fait en 0.1915.0 |
+| X-895 | Relecture du bloc 0.1914 à 0.1915 (relecture 0.1915, 27/11), mineurs M1, M2… | Fait en 0.1917.0 |
+| X-896 | Relecture  (relecture 0.1916, 27/11), mineurs M1 : M1 : Le cliquet « tout… | Fait en 0.1918.0 |
+| X-897 | Relecture  (relecture 0.1916, 27/11), déjà là avant le bloc M2 : M2 : Le verrou… | Fait en 0.1919.0 |
