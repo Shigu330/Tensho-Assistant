@@ -20,7 +20,7 @@ internal static class LevesTests
             var reader = Read("Leves/LeveProgressReader.Dalamud.cs");
             Check(reader.Contains("unlocks.IsLeveCompleted(row)",StringComparison.Ordinal) && reader.Contains("quests->LeveQuests",StringComparison.Ordinal)
                 && reader.Contains("TimeSpan.FromMilliseconds(2)",StringComparison.Ordinal),"Dalamud completion, accepted leves from memory, 2 ms budget");
-            Check(Read("Plugin.cs").Contains("()=>leveReader?.Dispose()",StringComparison.Ordinal),"reader disposed");
+            Check(Read("Plugin.Leves.cs").Contains("()=>leveReader?.Dispose()",StringComparison.Ordinal),"reader disposed (X-153, 0.1902: by the leves family)");
         }),
         // From Leves968Tests: X-87 (0.968): an accepted leve's marker is dropped once that leve is under way (and any marker the game does not draw); leve targets get the leve icon.
         ("Leves 968: ShouldRender and active objective filter, active leve read, targets drawn with its icon",() =>

@@ -804,8 +804,8 @@ public sealed partial class Plugin : IDalamudPlugin
                 var labels=Leves.LeveCatalog.ClientLabels(leves.Select(leve=>leve.Client));
                 return labels.Count==0 ? leves:leves.Select(leve=>leve with{Client=Leves.LeveCatalog.WithoutClientLabel(leve.Client,labels)}).ToArray();
             }
-            Leves.LeveProgressReader? leveReader=null;
-            registrations.Register(()=>leveReader=new Leves.LeveProgressReader(framework,client,player,unlocks,data,log,LeveList),()=>leveReader?.Dispose());
+            // X-153 (0.1902): the leves family (leve progress) in Plugin.Leves.cs; the Leves page reads the reader handed back.
+            var leveReader=RegisterLeveProgress(framework,client,player,unlocks,data,LeveList);
             mainWindow.LeveDefinitions=LeveList;
             // g, M-01 (0.371): automatic alarms at the ventures' end and the vessels' return (on by default, Alarms settings).
             var treasureMap=RegisterTreasureMap(framework,client,data);
