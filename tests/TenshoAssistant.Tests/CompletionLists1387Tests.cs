@@ -64,7 +64,7 @@ internal static class CompletionLists1387Tests
             var reader = Read("Collections/CollectionReader.Dalamud.cs");
             var completion = Read("Collections/CollectionReader.Completion.Dalamud.cs");
             var page = Read("MainWindow.Collections.cs");
-            var plugin = Read("Plugin.cs");
+            var plugin = Read("Plugin.Quests.cs");
             Check(reader.Contains("listsLoad=owner==0 ? null:Task.Run(()=>lists.Load(who));") && reader.Contains("if(character!=0)KeepCompleteReadings(character,"), "the reader loads in the background and keeps complete readings");
             Check(completion.Contains("CompletionListsData.Apply(entry,savedTitles,") && completion.Contains("CompletionListsData.Apply(entry,savedAchievements,")
                 && completion.Contains("try{lists.Save(list);}"), "applied while the list is not sent, saved in the background");
