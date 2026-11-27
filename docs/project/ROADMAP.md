@@ -85,9 +85,9 @@ Nothing open.
 
 ## In-game tests
 
-The current list: the boxes of [TESTING.md](TESTING.md). The guided in-game campaign of the whole plugin is phase 6 of the
-[global plan](GLOBAL-PLAN.md). Records still asked for (data unknown): marker type of an accepted leve; quest icon
-variants 71141 / 71151 (see « To decide », D-88).
+The current list: the boxes of [TESTING.md](TESTING.md). The in-game tests of the whole plugin are phase 6 of the
+[global plan](GLOBAL-PLAN.md), in small batches at the end of each block of work. No record is still asked for: the marker of an
+accepted leve was read, and the quest icon variants 71141 / 71151 stay « variant n » (their meaning is not in the game data).
 
 ## Complementary domain
 
@@ -182,9 +182,9 @@ Aucune en attente.
 
 ## Tests en jeu
 
-La liste à jour : les cases de [TESTING.md](TESTING.md). La campagne guidée en jeu de tout le plugin est la phase 6 du
-[plan global](GLOBAL-PLAN.md). Relevés encore demandés (données inconnues) : type de marqueur d'un mandat accepté ;
-variantes d'icônes de quête 71141 / 71151 (voir « À décider », D-88).
+La liste à jour : les cases de [TESTING.md](TESTING.md). Les essais en jeu de tout le plugin sont la phase 6 du
+[plan global](GLOBAL-PLAN.md), par petits lots à la fin de chaque bloc de travail. Aucun relevé n'est encore demandé : le marqueur d'un
+mandat accepté a été relevé, et les variantes d'icônes de quête 71141 / 71151 restent « variante n » (leur sens n'est pas dans les données du jeu).
 
 ## Domaine complémentaire
 

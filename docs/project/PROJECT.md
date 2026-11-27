@@ -23,8 +23,10 @@ Source: the master prompt given on 2026-10-27, kept in the maintainer's notes (o
 references give technical facts, never an old roadmap.
 
 Out of scope (2026-10-31): ACT/IINACT and combat parsers ([DEC-009](DECISIONS.md)); any game automation or any advantage in combat or PvP
-(Dalamud rules, see [CONTRIBUTING](../../CONTRIBUTING.md#publication-dalamud)). Exception of 2026-11-04: Beastmaster, information only,
-PvE only ([DEC-032](DECISIONS.md)); game advice in PvE only ([DEC-033](DECISIONS.md)). The whole plugin stops in PvP and ranked content
+(Dalamud rules, see [CONTRIBUTING](../../CONTRIBUTING.md#publication-dalamud)). Beastmaster: PvE only, game information
+([DEC-032](DECISIONS.md)) and a team calculated out of combat ([DEC-046](DECISIONS.md)); the Crucible of the Unbroken is not switched
+off, Tensho helps there fully, combat included (addition of 2026-11-11 to [DEC-038](DECISIONS.md)); the highlight of the combo skills is
+an option, off by default, display only. Game advice in PvE only ([DEC-033](DECISIONS.md)). The whole plugin stops in PvP and ranked content
 ([DEC-038](DECISIONS.md)). No submission to the official Dalamud repository, but its rules are kept ([DEC-039](DECISIONS.md),
 [PUBLISHING](PUBLISHING.md)).
 
@@ -67,8 +69,10 @@ Source : prompt maître fourni le 2026-10-27, conservé dans les notes du mainte
 références héritées fournissent des faits techniques, jamais une ancienne feuille de route.
 
 Hors périmètre (2026-10-31) : ACT/IINACT et parsers de combat ([DEC-009](DECISIONS.md)) ; toute automatisation de jeu ou tout avantage en
-combat/JcJ (règles Dalamud, voir [CONTRIBUTING](../../CONTRIBUTING.md#publication-dalamud)). Exception du 2026-11-04 : dresseur,
-informations seulement, JcE seulement ([DEC-032](DECISIONS.md)) ; conseils de jeu en JcE seulement ([DEC-033](DECISIONS.md)). Le plugin
+combat/JcJ (règles Dalamud, voir [CONTRIBUTING](../../CONTRIBUTING.md#publication-dalamud)). Dresseur : JcE seulement, informations du
+jeu ([DEC-032](DECISIONS.md)) et équipe calculée hors combat ([DEC-046](DECISIONS.md)) ; le Dédale bestial n'est pas coupé, Tensho y aide
+entièrement, combat compris (ajout du 2026-11-11 à [DEC-038](DECISIONS.md)) ; le surlignage des techniques de combo est une option, coupée
+par défaut, affichage seulement. Conseils de jeu en JcE seulement ([DEC-033](DECISIONS.md)). Le plugin
 entier s'arrête en JcJ et en contenu classé ([DEC-038](DECISIONS.md)). Pas de soumission au dépôt officiel Dalamud, mais ses règles sont
 tenues ([DEC-039](DECISIONS.md), [PUBLISHING](PUBLISHING.md)).
 

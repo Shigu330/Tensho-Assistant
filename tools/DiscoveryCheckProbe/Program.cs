@@ -5,17 +5,32 @@ using Lumina;
 using Lumina.Data;
 using Lumina.Data.Files;
 using Lumina.Excel.Sheets;
+using Microsoft.Data.Sqlite;
 
-// Read-only: the facts the plugin's parsers recorded in game (Discoveries.json) and the market prices seen (MarketSeen.json), checked against the game's own
-// sheets. Arguments: the sqpack directory, then the Discoveries folder. Nothing is written: the report goes to the console. Deterministic: « now » is the base's
-// own Written date (the market file: its last write), facts are read in file order and every list is sorted.
+// Read-only: the facts the plugin's parsers recorded in game (Discoveries.db, the player's own rows, X-172) and the market prices seen (MarketSeen.json), checked
+// against the game's own sheets. Arguments: the sqpack directory, then the Discoveries folder. Nothing is written: the base is opened read-only, the report goes to
+// the console. Deterministic: « now » is the base's last write (its WAL file's when newer; the market file: its last write), facts are read in key order and every
+// list is sorted. X-568 (0.1878): read Discoveries.json before, gone since the base moved to SQLite.
 // IMPOSSIBLE = contradicts a sheet or the plugin's own rules; SUSPECT = possible but unlikely, to look at; NOTE = not checkable from the sheets, or a confirmation.
 if(args.Length<2){Console.Error.WriteLine("Arguments: <sqpack folder> <Discoveries folder>");return 2;}
 Console.OutputEncoding=new UTF8Encoding(false);CultureInfo.DefaultThreadCurrentCulture=CultureInfo.InvariantCulture;CultureInfo.CurrentCulture=CultureInfo.InvariantCulture;
 using var game=new GameData(args[0],new LuminaOptions{DefaultExcelLanguage=Language.French,CacheFileResources=false});
 var json=new JsonSerializerOptions{PropertyNameCaseInsensitive=true};
-var basePath=Path.Combine(args[1],"Discoveries.json");var marketPath=Path.Combine(args[1],"MarketSeen.json");
-var file=JsonSerializer.Deserialize<FactFile>(File.ReadAllText(basePath),json) ?? throw new InvalidDataException("Discoveries.json unreadable");
+var basePath=Path.Combine(args[1],"Discoveries.db");var marketPath=Path.Combine(args[1],"MarketSeen.json");
+if(!File.Exists(basePath)){Console.Error.WriteLine($"{basePath} not found");return 2;}
+var file=new FactFile{Written=new[]{basePath,basePath+"-wal"}.Where(File.Exists).Select(path=>new DateTimeOffset(File.GetLastWriteTimeUtc(path),TimeSpan.Zero)).Max()};
+using(var connection=new SqliteConnection(new SqliteConnectionStringBuilder{DataSource=basePath,Mode=SqliteOpenMode.ReadOnly,Pooling=false}.ToString()))
+{
+    connection.Open();
+    using var read=connection.CreateCommand();
+    read.CommandText="SELECT key,fact FROM facts WHERE shared=0 ORDER BY key;";
+    using var rows=read.ExecuteReader();
+    while(rows.Read())
+    {
+        try{if(JsonSerializer.Deserialize<Fact>(rows.GetString(1),json) is { } fact)file.Facts.Add(fact);}
+        catch(JsonException error){file.Unreadable.Add($"{rows.GetString(0)}: {error.Message}");}
+    }
+}
 var now=file.Written;
 
 var items=game.GetExcelSheet<Item>()!;var bnpcNames=game.GetExcelSheet<BNpcName>()!;var bnpcBases=game.GetExcelSheet<BNpcBase>()!;var fates=game.GetExcelSheet<Fate>()!;
@@ -394,7 +409,8 @@ var fashionSlots=facts.Where(fact=>fact.Kind==12 && fact.Detail!=0).GroupBy(fact
 
 var output=new StringBuilder();
 output.AppendLine($"DiscoveryCheckProbe — {basePath}");
-output.AppendLine($"File Version {file.Version}, Producer « {file.Producer} », Written {file.Written:O} (taken as « now »), {facts.Count} facts.");
+output.AppendLine($"Last write {file.Written:O} (taken as « now »), {facts.Count} facts of your own, {file.Unreadable.Count} rows unreadable.");
+foreach(var row in file.Unreadable)output.AppendLine($"  IMPOSSIBLE unreadable row {row}");
 output.AppendLine();
 output.AppendLine("SUMMARY (kind: checked / ok / with anomalies)");
 foreach(var (kind,kindReport) in report)output.AppendLine($"  {kind,2} {kindNames.GetValueOrDefault(kind,"?"),-18} {kindReport.Checked,5} / {kindReport.Ok,5} / {kindReport.Anomalies.Count,5}");
@@ -507,10 +523,9 @@ sealed class Fact
 }
 sealed class FactFile
 {
-    public int Version { get; set; }
-    public string? Producer { get; set; }
     public DateTimeOffset Written { get; set; }
     public List<Fact> Facts { get; set; }=[];
+    public List<string> Unreadable { get; }=[];
 }
 sealed class KindReport
 {

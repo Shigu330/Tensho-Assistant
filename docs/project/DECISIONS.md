@@ -383,7 +383,7 @@ Options: Information only; no advice; calculated team.
 Decision: Information panel for the "Dédale bestial" (PvE): enemies, actions, weaknesses once confirmed, what the team covers, bonuses. Nothing in PvP. No calculated "best team" without a new decision. Limited exception to DEC-009: neither ACT nor combat measurement.
 Reason: User's choice, with the recommended choice for the form. PvE does not remove the rules: the one on combat also applies in PvE, and rankings may count as competitive content.
 Consequences: Contact the Dalamud approval team before 1.0.0 (issue #31), and remove the panel if it refuses.
-References: docs/evidence/0.500-xbm-columns.md, issue #34
+References: docs/evidence/0.500-xbm-columns.md, issue #34; « no calculated team » part replaced by DEC-046; Crucible panel replaced by DEC-038 (addition of 2026-11-11: the Crucible of the Unbroken is no longer switched off, full help, combat included)
 
 ID: DEC-033
 Timestamp: 2026-11-04 Europe/Brussels
@@ -523,7 +523,7 @@ Options: Weakness coverage only; calculated team out of combat; nothing more.
 Decision: Calculated team allowed, prepared out of combat: from the Tensho page, before entering, based on the weaknesses of the enemies met (readings) and the beasts owned; result in the disk cache. Nothing during a fight, nothing inside the Dédale (DEC-038 turns Tensho off in ranked content), no automated action, PvE only. Completes DEC-032 and DEC-041.
 Reason: User decision, Dalamud rule recalled beforehand (custom repository, DEC-039).
 Consequences: Point X-109 of the plan; the calculation stays a preparation aid, shown as such.
-References: DEC-032, DEC-038, DEC-039, DEC-041, issue #34
+References: DEC-032, DEC-038, DEC-039, DEC-041, issue #34; « nothing inside the Crucible » part replaced by DEC-038 (addition of 2026-11-11)
 
 ID: DEC-047
 Timestamp: 2026-11-09 Europe/Brussels
@@ -533,7 +533,7 @@ Options: Cut at entry, everything prepared beforehand; cut at the start of each 
 Decision: Limited exception to DEC-038 for the "Dédale bestial": in its territories, all of Tensho stays off except the Beastmaster team panel and the minimal reading it requires, active only in front of the board, between fights; turned off from the start of each fight and during any fight. No automated action, nothing that reads the fight. The rest of ranked content is unchanged.
 Reason: User decision, Dalamud rule recalled beforehand (custom repository, DEC-039).
 Consequences: X-109: the moment a fight starts has to be proven in game (development reading allowed by this exception) before enabling the panel; when in doubt, off.
-References: DEC-032, DEC-038, DEC-039, DEC-041, DEC-046
+References: DEC-032, DEC-038, DEC-039, DEC-041, DEC-046; replaced by DEC-038 (addition of 2026-11-11, X-137: the Crucible of the Unbroken is no longer switched off, so this limited exception no longer applies)
 
 ID: DEC-048
 Timestamp: 2026-11-10 Europe/Brussels
@@ -1012,7 +1012,7 @@ Options: Informations seulement ; pas de conseil ; équipe calculée.
 Decision: Panneau d'informations pour le Dédale bestial (JcE) : ennemis, actions, faiblesses une fois confirmées, ce que l'équipe couvre, bonus. Rien en JcJ. Pas de « meilleure équipe » calculée sans nouvelle décision. Exception limitée à DEC-009 : ni ACT ni mesure de combat.
 Reason: Choix de l'utilisateur, avec le choix recommandé pour la forme. Le JcE n'écarte pas les règles : celle sur le combat vaut aussi en JcE, et les classements peuvent compter comme contenu compétitif.
 Consequences: Contacter l'équipe d'approbation de Dalamud avant la 1.0.0 (issue #31), et retirer le panneau si elle refuse.
-References: docs/evidence/0.500-xbm-columns.md, issue #34
+References: docs/evidence/0.500-xbm-columns.md, issue #34 ; partie « pas d'équipe calculée » remplacée par DEC-046 ; panneau du Dédale remplacé par DEC-038 (ajout du 2026-11-11 : le Dédale bestial n'est plus coupé, aide entière, combat compris)
 
 DEC-ID: DEC-033
 Timestamp: 2026-11-04 Europe/Brussels
@@ -1152,7 +1152,7 @@ Options: Couverture des faiblesses seulement ; équipe calculée hors combat ; r
 Decision: Équipe calculée permise, préparée hors combat : depuis la page Tensho, avant d'entrer, d'après les faiblesses des ennemis rencontrés (relevés) et les bêtes possédées ; résultat en cache disque. Rien pendant un combat, rien à l'intérieur du Dédale (DEC-038 coupe Tensho en contenu classé), aucune action automatisée, JcE seulement. Complète DEC-032 et DEC-041.
 Reason: Décision de l'utilisateur, règle Dalamud rappelée avant (dépôt personnalisé, DEC-039).
 Consequences: Point X-109 du plan ; le calcul reste une aide de préparation, affichée comme telle.
-References: DEC-032, DEC-038, DEC-039, DEC-041, issue #34
+References: DEC-032, DEC-038, DEC-039, DEC-041, issue #34 ; partie « rien dans le Dédale » remplacée par DEC-038 (ajout du 2026-11-11)
 
 DEC-ID: DEC-047
 Timestamp: 2026-11-09 Europe/Brussels
@@ -1162,7 +1162,7 @@ Options: Coupure à l'entrée, tout préparé avant ; coupure au début de chaqu
 Decision: Exception limitée à DEC-038 pour le Dédale bestial : dans ses territoires, tout Tensho reste coupé sauf le panneau d'équipe du dresseur et la lecture minimale qu'il demande, actifs seulement devant le plateau, entre les combats ; coupés dès le début de chaque combat et pendant tout combat. Aucune action automatisée, rien qui lise le combat. Le reste du contenu classé est inchangé.
 Reason: Décision de l'utilisateur, règle Dalamud rappelée avant (dépôt personnalisé, DEC-039).
 Consequences: X-109 : le moment du début de combat est à prouver en jeu (relevé de développement autorisé par cette exception) avant d'activer le panneau ; en doute, coupé.
-References: DEC-032, DEC-038, DEC-039, DEC-041, DEC-046
+References: DEC-032, DEC-038, DEC-039, DEC-041, DEC-046 ; remplacée par DEC-038 (ajout du 2026-11-11, X-137 : le Dédale bestial n'est plus coupé, cette exception limitée ne s'applique plus)
 
 DEC-ID: DEC-048
 Timestamp: 2026-11-10 Europe/Brussels

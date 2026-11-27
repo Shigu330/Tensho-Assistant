@@ -18,7 +18,7 @@ the older documents cite them) and no new one is created.
 | Family | Where | Meaning |
 |---|---|---|
 | `R-01` to `R-14` | [ROADMAP](ROADMAP.md), [PROJECT](PROJECT.md) | the user's first requests (R-14: resistance to game updates) |
-| `D-NN` | [ROADMAP](ROADMAP.md) | decisions postponed to the end; settled ones point to their DEC |
+| `D-NN` | [ROADMAP](ROADMAP.md) | working decisions, shown in the « To decide » block of ROADMAP while open; settled ones point to their DEC |
 | `A-`, `R-`, `I-`, `C-`, `M-`, `N-`, `X-` (01 to 15) | [GAPS](GAPS.md) | gaps by domain: A crafting, R gathering, I items, C collections, M map and character, N domains without a module, X cross-check additions |
 | `C0` to `C36` (with `K` and `G`) | [CRAFT-GATHER-PROPOSALS](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/CRAFT-GATHER-PROPOSALS.md) | crafting and gathering proposals |
 | `I0` to `I22` | [ITEMS-PROPOSALS](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/ITEMS-PROPOSALS.md) | items, bank, sorting and market proposals |
@@ -39,7 +39,7 @@ The same identifier names two things in these cases; cite it with its document's
 | `X-01` to `X-14` | plan point (GLOBAL-PLAN) and cross-check gap (GAPS) | "X-03" for the plan point, "GAPS X-03" for the gap |
 | `C-01` to `C-15`, `C0` to `C36` | collection gap (GAPS) and crafting proposal | "GAPS C-05", "C5" |
 | `P1` to `P10` | map proposal and X-76 parser | "P1" for the map, "parser P1" for the parser |
-| `D-NN`, `D1` to `D5` | postponed decision (ROADMAP) and question of the switch-off plan | "D-83", "switch-off D1" |
+| `D-NN`, `D1` to `D5` | working decision (« To decide » block of ROADMAP) and question of the switch-off plan | "D-83", "switch-off D1" |
 
 ---
 
@@ -61,7 +61,7 @@ quels (le CHANGELOG et les anciens documents les citent) et aucun nouveau n'est 
 | Famille | Où | Sens |
 |---|---|---|
 | `R-01` à `R-14` | [ROADMAP](ROADMAP.md), [PROJECT](PROJECT.md) | les premières demandes de l'utilisateur (R-14 : résistance aux mises à jour du jeu) |
-| `D-NN` | [ROADMAP](ROADMAP.md) | décisions reportées à la fin ; celles tranchées renvoient à leur DEC |
+| `D-NN` | [ROADMAP](ROADMAP.md) | décisions de travail, montrées dans le bloc « À décider » de ROADMAP tant qu'elles sont ouvertes ; celles tranchées renvoient à leur DEC |
 | `A-`, `R-`, `I-`, `C-`, `M-`, `N-`, `X-` (01 à 15) | [GAPS](GAPS.md) | manques par domaine : A artisanat, R récolte, I objets, C collections, M carte et personnage, N domaines sans module, X ajouts du recoupement |
 | `C0` à `C36` (avec `K` et `G`) | [CRAFT-GATHER-PROPOSALS](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/CRAFT-GATHER-PROPOSALS.md) | propositions d'artisanat et de récolte |
 | `I0` à `I22` | [ITEMS-PROPOSALS](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/ITEMS-PROPOSALS.md) | propositions objets, banque, tri et marché |
@@ -82,4 +82,4 @@ Le même identifiant nomme deux choses dans ces cas ; le citer avec le nom de so
 | `X-01` à `X-14` | point du plan (GLOBAL-PLAN) et manque du recoupement (GAPS) | « X-03 » pour le point du plan, « GAPS X-03 » pour le manque |
 | `C-01` à `C-15`, `C0` à `C36` | manque des collections (GAPS) et proposition d'artisanat | « GAPS C-05 », « C5 » |
 | `P1` à `P10` | proposition de la carte et parseur de X-76 | « P1 » pour la carte, « parseur P1 » pour le parseur |
-| `D-NN`, `D1` à `D5` | décision reportée (ROADMAP) et question du plan de coupure | « D-83 », « coupure D1 » |
+| `D-NN`, `D1` à `D5` | décision de travail (bloc « À décider » de ROADMAP) et question du plan de coupure | « D-83 », « coupure D1 » |

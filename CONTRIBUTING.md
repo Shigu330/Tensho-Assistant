@@ -120,7 +120,8 @@ Development builds in game:
   `src/TenshoAssistant/FreeCompany/Data/submarine-breakpoints.csv`). References under AGPL (Mappy, SortaKinda…) or without a licence
   (xivgear.app…) are read to understand them, **never copied**.
 - Out of scope: ACT/IINACT, parsers, anything that provides an advantage in combat or PvP. Game advice is for PvE only; Beastmaster content
-  shows information only (DEC-032, DEC-033).
+  shows game information and a team calculated out of combat (DEC-032, DEC-033, DEC-046); the Crucible of the Unbroken is not switched
+  off, Tensho helps there fully, combat included (DEC-038, addition of 2026-11-11); the combo highlight is an option, off by default.
 
 ## Adding a tool
 
@@ -381,7 +382,9 @@ Arborescence du dépôt : le bloc de la partie anglaise ci-dessus.
   fichier (exemple : `src/TenshoAssistant/FreeCompany/Data/submarine-breakpoints.csv`). Les références sous AGPL (Mappy, SortaKinda…) ou
   sans licence (xivgear.app…) sont lues pour les comprendre, **jamais copiées**.
 - Hors périmètre : ACT/IINACT, parsers, tout ce qui donne un avantage en combat ou en JcJ. Les conseils de jeu sont pour le JcE
-  seulement ; le contenu du dresseur ne montre que des informations (DEC-032, DEC-033).
+  seulement ; le contenu du dresseur montre des informations du jeu et une équipe calculée hors combat (DEC-032, DEC-033, DEC-046) ; le
+  Dédale bestial n'est pas coupé, Tensho y aide entièrement, combat compris (DEC-038, ajout du 2026-11-11) ; le surlignage des combos est une
+  option, coupée par défaut.
 
 ## Ajouter un outil
 
