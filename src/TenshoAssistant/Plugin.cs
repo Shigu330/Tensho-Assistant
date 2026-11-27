@@ -1175,22 +1175,8 @@ public sealed partial class Plugin : IDalamudPlugin
                 return unlocked;
             };
             registrations.Register(()=>craftLogReader=new CraftLogReader(mainWindow.CraftLog,recipeCatalog,configuration,framework,player,client,gameGui,log),()=>craftLogReader?.Dispose());
-            FashionHintLoader? fashionLoader=null;
-            registrations.Register(()=>fashionLoader=new FashionHintLoader(fashionHints,data,framework,log),()=>fashionLoader?.Dispose());
-            var fashionCheck=new Fashion.FashionCheckService();
-            Fashion.FashionCheckReader? fashionCheckReader=null;
-            registrations.Register(()=>fashionCheckReader=new Fashion.FashionCheckReader(fashionCheck,framework,gameGui,log,()=>mainWindow.DeveloperMode)
-            {
-                // X-73.4 (0.861): the outfit judged, for the discoveries base.
-                Judged=(theme,slots)=>
-                {
-                    if(!configuration.Discovery.Enabled || !configuration.Discovery.FashionReport || mainWindow.DiscoveryStore is not { } store)return;
-                    var at=DateTimeOffset.UtcNow;
-                    foreach(var slot in slots)store.SeeSource(Discoveries.DiscoveryKind.FashionEvaluation,slot.Item,slot.Category,slot.Evaluation,at,theme);
-                },
-            },()=>fashionCheckReader?.Dispose());
-            mainWindow.ConfigureFashionStains(id=>data.GetExcelSheet<Lumina.Excel.Sheets.Stain>().TryGetRow(id,out var stain) ? (stain.Name.ExtractText(),stain.Color):null);
-            mainWindow.ConfigureFashionCheck(fashionCheck,row=>data.GetExcelSheet<Lumina.Excel.Sheets.FashionCheckWeeklyTheme>().TryGetRow(row,out var theme) ? theme.Name.ExtractText():null);
+            // X-153 (0.1903): the fashion family (hints' loader, Fashion Report reader, its stains and themes) in Plugin.Fashion.cs.
+            RegisterFashion(configuration,data,framework,gameGui);
             QuestReader? questReader = null;
             registrations.Register(() => questReader = new QuestReader(quests, data, framework, player, client, unlocks, log,()=>configuration.Cache.Duration(CacheArea.Quests),dataCache),
                 () => questReader?.Dispose());

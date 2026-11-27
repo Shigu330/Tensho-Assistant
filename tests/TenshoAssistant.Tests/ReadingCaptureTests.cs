@@ -59,7 +59,8 @@ internal static class ReadingCaptureTests
             Check(page.Contains("if(settings.HuntMarks)") && page.Contains("store.SeeHuntMark(") && page.Contains("if(settings.Fates)") && page.Contains("store.SeeFate("),"marks and FATEs behind settings");
             var reader=Read("Market/SeenPriceReader.Dalamud.cs");
             Check(reader.Contains("board.HistoryReceived+=OnHistory;") && reader.Contains("board.HistoryReceived-=OnHistory;"),"history subscribed and released");
-            var plugin=Read("Plugin.cs");
+            // X-153 (0.1903): the Fashion Report reader is registered by the fashion family.
+            var plugin=Read("Plugin.Fashion.cs");
             Check(plugin.Contains("if(!configuration.Discovery.Enabled || !configuration.Discovery.FashionReport || mainWindow.DiscoveryStore is not { } store)return;"),"outfit behind its setting");
         }),
         // From Probes881Tests: 0.881 (X-75.7): new developer-mode probes, numbers only.
