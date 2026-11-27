@@ -53,9 +53,5 @@ internal static class WikiMonsterTests
         try{WikiMonsterParser.Parse(redirected,44106,"Other item",DateTimeOffset.UtcNow);throw new Exception("Foreign redirect accepted");}catch(InvalidDataException){}
         var missing=WikiMonsterParser.Parse("{\"error\":{\"code\":\"missingtitle\",\"info\":\"The page you specified doesn't exist.\"}}",42,"Nothing Here",DateTimeOffset.UtcNow);
         Check(missing.Monsters.Count==0 && missing.ItemId==42 && missing.Revision==0);
-        var drop=new TenshoAssistant.Items.ItemDefinition(44106,"Épaule",false,UiCategoryId:45,EnglishName:"Rroneek Chuck");
-        Check(MonsterDropCandidates.Eligible(drop,false,false) && !MonsterDropCandidates.Eligible(drop,true,false) && !MonsterDropCandidates.Eligible(drop,false,true)
-            && !MonsterDropCandidates.Eligible(drop with{UiCategoryId=46},false,false) && !MonsterDropCandidates.Eligible(drop with{EnglishName=""},false,false)
-            && !MonsterDropCandidates.Eligible(drop with{Equipment=TenshoAssistant.Items.EquipmentSlots.Head},false,false) && !MonsterDropCandidates.Eligible(null,false,false));
     }
 }

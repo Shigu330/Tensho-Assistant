@@ -52,15 +52,6 @@ public static class WikiMonsterParser
     }
 }
 
-/// <summary>Item categories that can hold monster drops (ItemUICategory, verified against the local catalogue copy on 2026-10-30).</summary>
-public static class MonsterDropCandidates
-{
-    // 45 ingredient, 48 stone, 49 metal, 50 lumber, 51 cloth, 52 leather, 53 bone, 54 reagent.
-    public static readonly IReadOnlySet<uint> Categories=new HashSet<uint>{45,48,49,50,51,52,53,54};
-    public static bool Eligible(Items.ItemDefinition? item,bool craftable,bool gathered)
-        =>item is { Equipment:Items.EquipmentSlots.None } && item.EnglishName.Length>0 && Categories.Contains(item.UiCategoryId) && !craftable && !gathered;
-}
-
 /// <summary>
 /// Primary monster source: Console Games Wiki drop tables, titled by the game's own English item name (no Garland lookup).
 /// One shared cadence, memory and disk copy for the window and the hover.

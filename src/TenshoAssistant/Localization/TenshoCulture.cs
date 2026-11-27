@@ -34,10 +34,6 @@ internal static class TenshoCulture
     /// <summary>The colon after a label: « : » in English, « : » after a no-break space in French.</summary>
     public static string Colon => IsFrench ? " :" : ":";
 
-    /// <summary>Hours and minutes: « 3h 05m » in English, « 3 h 05 » in French.</summary>
-    public static string Hours(int hours, int minutes)
-        => IsFrench ? $"{hours} h {minutes:00}" : $"{hours}h {minutes:00}m";
-
     private static CultureInfo BuildEnglish()
     {
         // The invariant culture, with « 12.5% » instead of its « 12.50 % » for the P format.

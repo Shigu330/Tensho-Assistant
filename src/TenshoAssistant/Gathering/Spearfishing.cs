@@ -9,7 +9,6 @@ namespace TenshoAssistant.Gathering;
 /// candidates are the GatherBuddy fish with that size and speed, those gathered in the current zone first.
 /// </summary>
 public sealed record SpearfishSlot(int Index,bool Available,int Size,int Speed,bool Large,bool Reverse);
-public sealed record SpearfishCandidates(IReadOnlyList<uint> InZone,IReadOnlyList<uint> Elsewhere);
 
 public static class Spearfishing
 {
@@ -50,13 +49,6 @@ public static class Spearfishing
     {
         yield return (slot.Size,slot.Speed);
         if(slot.Speed>0 && slot.Speed%2==0)yield return (slot.Size,slot.Speed/2);
-    }
-
-    public static SpearfishCandidates Candidates(IEnumerable<GatherBuddyFish> fish,SpearfishSlot slot,Func<uint,bool> inZone)
-    {
-        if(!slot.Available || slot.Size is < 1 or > 3 || slot.Speed<=0)return new([],[]);
-        var matches=fish.Where(entry=>entry.SpearSize==slot.Size && entry.SpearSpeed==slot.Speed).Select(entry=>entry.FishId).Distinct().Order().ToArray();
-        return new(matches.Where(inZone).ToArray(),matches.Where(id=>!inZone(id)).ToArray());
     }
 }
 

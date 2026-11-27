@@ -31,8 +31,6 @@ public static class GardenView
         return TenshoAssistant.UI.TimeLeft.Split(left);
     }
 
-    /// <summary>The text of a time left: its key (Common.LeftDays « {0} d {1} h », LeftHours « {0} h {1:00} », LeftMinutes « {0} min ») and its two numbers.</summary>
-    public static (string Key,int First,int Second) LeftText((int Days,int Hours,int Minutes) left)=>TenshoAssistant.UI.TimeLeft.Text(left);
 
     public static GardenBadge Badge(GardenBed bed,DateTimeOffset now)
     {

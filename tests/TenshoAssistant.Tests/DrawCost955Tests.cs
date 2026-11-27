@@ -35,7 +35,6 @@ internal static class DrawCost955Tests
             }
             Check(catalog.ShopsOf(1).Select(shop=>shop[0].ShopId).SequenceEqual(new uint[]{10,20}),"shops in the order of their first sale; a shop with no sale left out");
             Check(catalog.ShopsOf(3).Count==0 && catalog.ShopsOf(99).Count==0,"nothing sold, unknown NPC: empty (the page says « no shop »)");
-            Check(catalog.SalesOfShop(40).Select(sale=>sale.ItemId).SequenceEqual(new uint[]{400}) && catalog.SalesOfShop(77).Count==0,"sales by shop, also a shop no vendor opens");
             var page = Read("MainWindow.NpcVendors.cs");
             Check(page.Contains("if(npcVendorFocus!=0 && catalog.Vendor(npcVendorFocus) is { } focused){DrawNpcVendorSheet(catalog,focused);return;}",StringComparison.Ordinal)
                 && page.Contains("var sales=catalog.ShopsOf(vendor.NpcId);",StringComparison.Ordinal),"the page reads the indexes");

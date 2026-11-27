@@ -10,8 +10,6 @@ public sealed record DutyLootDocument(uint InstanceId, DateTimeOffset FetchedAt,
     bool HasFights, bool HasCoffers, IReadOnlyList<DutyLootEntry> Entries)
 {
     public bool HasUnparsedFightDrops { get; init; }
-    // Presence of all categories still does not establish an exhaustive drop table.
-    public bool IsExhaustive => false;
 }
 
 public static class DutyLootParser

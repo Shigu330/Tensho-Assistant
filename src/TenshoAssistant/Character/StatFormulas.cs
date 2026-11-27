@@ -126,12 +126,4 @@ public static class StatFormulas
     }
     private static long FloorDiv(long a, long b) => a / b - (a % b != 0 && (a < 0) != (b < 0) ? 1 : 0);
     private static long CeilDiv(long a, long b) => -FloorDiv(-a, b);
-
-    /// <summary>Attributes useful to the job's category: combat, gathering (32) or crafting (33).</summary>
-    public static IReadOnlyList<string> Useful(int category) => category switch
-    {
-        32 => ["Gathering", "Perception", "GatheringPoints"],
-        33 => ["Craftsmanship", "Control", "CraftingPoints"],
-        _ => [],
-    };
 }

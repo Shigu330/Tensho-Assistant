@@ -5,8 +5,6 @@ namespace TenshoAssistant.Help;
 
 public enum ProblemKind { Bug, Idea, Translation }
 public sealed record ProblemDraft(ProblemKind Kind, string Title, string What, string Expected, string Report, string Version, string Client);
-/// <summary>ReportLeftOut: the address would be too long with the report, which then goes to the clipboard.</summary>
-public sealed record ProblemLink(string Url, bool ReportLeftOut);
 
 /// <summary>
 /// 0.1125 (X-143 part 3, audit A08): what leaves, exactly. Fields are the form's fields as they are in the address (cleaned, in the address's
@@ -102,12 +100,6 @@ public static partial class ProblemReport
 
     public static string SearchAddress(string words)
         => $"{Repository}/issues?q={Uri.EscapeDataString("is:issue " + Clean(words).Trim())}";
-
-    public static ProblemLink Link(ProblemDraft draft)
-    {
-        var send = Prepare(draft);
-        return new(send.Url, send.ReportLeftOut);
-    }
 
     /// <summary>The address, the fields as they are in it and the clipboard text, all cleaned the same way (one place: what is previewed is what leaves).</summary>
     /// <summary>The form of each kind, its fields by id (cleaned, empty ones left out, in the form's order) and the title with its prefix.</summary>

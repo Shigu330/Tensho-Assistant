@@ -73,8 +73,6 @@ public sealed class QuestLinks
     }
     public QuestEntry? Find(uint id) => entries.GetValueOrDefault(id);
     public IReadOnlyList<QuestEntry> Following(uint id) => next.GetValueOrDefault(id) ?? Array.Empty<QuestEntry>();
-    public static string JoinLabel(byte mode) => mode switch
-    { 1 => "All linked quests", 2 => "At least one of the linked quests", _ => $"Condition not interpreted (mode {mode})" };
     public bool CompletionEvidence(QuestEntry entry) => entry.PreviousQuestIds.Count > 0 && entry.PreviousQuestJoin switch
     {
         1 => entry.PreviousQuestIds.All(id => Find(id)?.Progress == QuestProgress.Complete),

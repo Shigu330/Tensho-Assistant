@@ -9,7 +9,6 @@ public sealed record DutyLootState(DutyDefinition? Duty, DutyLootDocument? Docum
 public sealed class DutyLootService : IDisposable
 {
     public const int CacheCapacity = 32;
-    public static readonly TimeSpan FreshFor = TimeSpan.FromMinutes(30);
     public static readonly TimeSpan RequestInterval = GarlandClient.RequestInterval;
     private readonly object gate = new();
     private readonly GarlandClient transport;

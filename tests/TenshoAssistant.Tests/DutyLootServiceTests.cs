@@ -57,7 +57,7 @@ internal static class DutyLootServiceTests
             Run(service.RequestAsync()); Check(calls == 1,"fresh cache reused");
             Run(service.RequestAsync(true)); Check(calls == 1 && service.State.Error is not null,"force still throttled");
             clock.Advance(TimeSpan.FromSeconds(3)); Run(service.RequestAsync(true)); Check(calls == 2,"explicit refresh after interval");
-            clock.Advance(DutyLootService.FreshFor); Run(service.RequestAsync()); Check(calls == 3,"stale cache re-fetched only on request");
+            clock.Advance(service.CacheLifetime); Run(service.RequestAsync()); Check(calls == 3,"stale cache re-fetched only on request");
         }),
         ("Duty selection cancellation rejects late replies and prevents foreign cache entries", () =>
         {

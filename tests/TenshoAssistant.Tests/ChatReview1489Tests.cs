@@ -18,7 +18,7 @@ internal static class ChatReview1489Tests
         ("Chat review 1489: faded to 30 %, the four copies of the outline together are no darker than 30 % of the outline at full (M1)", () =>
         {
             var full = Overlap(ChatLook.Outline(1f));
-            Check(ChatLook.Outline(1f) == ChatLook.OutlineColor, "at full opacity, as before");
+            // X-569 (0.1884): the same check is kept once, in ChatOutline1485Tests.
             foreach (var alpha in new[] { 0.3f, ChatCover.FadedAlpha, 0.5f, 0.8f })
             {
                 var together = Overlap(ChatLook.Outline(alpha));

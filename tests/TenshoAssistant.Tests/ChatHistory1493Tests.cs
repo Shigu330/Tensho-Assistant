@@ -86,7 +86,7 @@ internal static class ChatHistory1493Tests
                 }
                 Check(read.Records[0].Body.Any(piece => piece.Link is { Kind: ChatSegmentKind.MapLink, TerritoryId: 130 }), "a place stays a link (it runs no command)");
                 // Trimmed and written again, the file no longer holds the old link at all.
-                ChatHistory.Rewrite(path, Ann, read.Records);
+                ChatHistory.Trim(path, Ann, Now, 2000, 7);
                 Check(!File.ReadAllText(path).Contains("SomePlugin", StringComparison.Ordinal), "written again: gone from the disk");
                 // This session's line keeps its link (the command is valid now).
                 Check(record.Body[1].Link is { Kind: ChatSegmentKind.DalamudLink, CommandId: 7 }, "the session's own message unchanged");

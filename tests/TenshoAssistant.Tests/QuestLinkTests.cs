@@ -47,7 +47,7 @@ internal static class QuestLinkTests
             var links = new QuestLinks([Q(1,QuestProgress.Complete)]);
             Check(!links.CompletionEvidence(Q(2,join:99,previous:[1])), "unknown join preserved");
             Check(!links.CompletionEvidence(Q(2)) && !links.CompletionEvidence(Q(2,previous:[999])), "no vacuous success");
-            Check(QuestLinks.JoinLabel(99).Contains("99") && links.Find(999) is null, "raw mode and unresolved identity retained");
+            Check(links.Find(999) is null, "unresolved identity retained");
         }),
         ("Quest publication snapshots nested links and logout removes character progression", () =>
         {

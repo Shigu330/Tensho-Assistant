@@ -22,8 +22,6 @@ public sealed class GatherBuddyFishData
     public int Count => fish.Count;
     public GatherBuddyFishData(Dictionary<uint, GatherBuddyFish> fish) { this.fish = fish; }
     public GatherBuddyFish? Find(uint fishId) => fish.GetValueOrDefault(fishId);
-    /// <summary>R-15 (0.417): every fish with a known spearfishing size and speed.</summary>
-    public IEnumerable<GatherBuddyFish> Spearfish => fish.Values.Where(entry => entry.SpearSize is not null && entry.SpearSpeed is not null);
 
     /// <summary>
     /// Bait route before the fish: its bait, or its mooch chain. GatherBuddy writes a mooch either as the whole chain (« Mooch(data, bait,

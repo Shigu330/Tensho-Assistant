@@ -27,9 +27,6 @@ public sealed record CurrencyBuy(uint ItemId,uint Quantity,uint Cost,bool Hq,dec
 /// </summary>
 public static class CurrencyValue
 {
-    public static IReadOnlyList<CurrencyBuy> Rank(IEnumerable<CurrencyBuy> buys)
-        =>buys.OrderBy(buy=>buy.GilPerUnit is null).ThenByDescending(buy=>buy.GilPerUnit ?? 0).ThenBy(buy=>buy.Cost).ThenBy(buy=>buy.ItemId).ToArray();
-
     /// <summary>
     /// 0.794 (X-33, user report: a single odd sale put an item first): most gil in that many days of sales first, unknown last; at equal gil, the gil per unit.
     /// </summary>

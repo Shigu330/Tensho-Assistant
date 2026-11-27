@@ -50,7 +50,7 @@ internal static class ChatLinks1441Tests
             // 0.1468 (X-479): each payload told apart by the reader (ChatPayload), the pieces made by ChatPayloads (ChatLinkPieces1468Tests).
             Check(reader.Contains("MapLinkPayload map=>new(ChatPayloadKind.Map,\"MapLink\",Link:MapLink(map)),") && reader.Contains("RawPayload raw when raw.Equals(RawPayload.LinkTerminator)=>new(ChatPayloadKind.LinkEnd,\"LinkEnd\"),")
                 && reader.Contains("ItemPayload item=>new(ChatPayloadKind.Item,\"Item\",Link:new ChatLink(ChatSegmentKind.ItemLink,ItemId:item.ItemId,Hq:item.IsHQ)),"),"map, item and end read");
-            Check(reader.Contains("if(TenshoAssistant.Competitive.CompetitiveGate.Cut)return;"),"still not read during a cut");
+            // X-569 (0.1884): the same check is kept once, in ChatWindow1434Tests.
             var window = Read("MainWindow.ChatWindow.cs");
             Check(window.Contains("if(run.Link is { } link && ChatLinkActive(link))DrawChatLink(run,link,$\"{record.Id}_{line}_{index}\",record);"),"links drawn as links (X-474: a link of a plugin without a handler stays plain text)");
             Check(window.Contains("if(ChatLinkClicked(id))OpenMapPointFromPage(map,link.X,link.Y);"),"map: left click (X-636: on release, without a drag), flag and map");

@@ -200,8 +200,6 @@ public sealed class NpcVendorCatalog
     }
     private readonly FrozenDictionary<uint,NpcVendor> vendorByNpc;
     private readonly FrozenDictionary<uint,IReadOnlyList<IReadOnlyList<NpcShopSale>>> shopsByNpc;
-    /// <summary>Every sale of one shop, in the order of Sales; empty when the shop sells nothing.</summary>
-    public IReadOnlyList<NpcShopSale> SalesOfShop(uint shopId)=>salesByShop.GetValueOrDefault(shopId) ?? [];
     /// <summary>The vendor of this NPC id (the first one kept by Build), or null.</summary>
     public NpcVendor? Vendor(uint npcId)=>vendorByNpc.GetValueOrDefault(npcId);
     /// <summary>The shops of this NPC's vendor that sell something, each one's sales (never empty), shops in the order of their first sale in Sales.</summary>

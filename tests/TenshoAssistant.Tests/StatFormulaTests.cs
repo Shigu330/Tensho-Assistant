@@ -21,7 +21,6 @@ internal static class StatFormulaTests
             Check(StatFormulas.Combat(new Dictionary<string,int>{["CriticalHit"]=3000},30,2,Level100).First(row=>row.Key=="CritRate").Value.StartsWith("23"),"crit 3000: 23.5 %");
             Check(StatFormulas.Combat(base100,31,4,Level100).Any(row=>row.Key=="Piety"),"healer: piety");
             Check(StatFormulas.Combat(base100,30,1,Level100 with { Main=0 }).All(row=>row.Key!="Determination"),"unknown main: no determination");
-            Check(StatFormulas.Useful(32).SequenceEqual(["Gathering","Perception","GatheringPoints"]) && StatFormulas.Useful(30).Count==0,"gatherer stats only");
             Check(StatFormulas.MainOf(100)==440 && StatFormulas.MainOf(71)==296 && StatFormulas.MainOf(1)==20 && StatFormulas.MainOf(101) is null,"main table, levels 1 to 100");
         }),
     ];

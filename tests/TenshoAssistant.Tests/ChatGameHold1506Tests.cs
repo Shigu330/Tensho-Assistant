@@ -47,7 +47,7 @@ internal static class ChatGameHold1506Tests
                 && ChatHideWants.InFrame(ChatHideWant.Hide,false,false)==ChatHideWant.Hold,"the game's chat not shown: held");
             Check(hider.Contains("place=ChatHideWants.ReadsPlace(now) ? Read(boxes) : null;",StringComparison.Ordinal) && window.Contains("var follow=ChatHidesGameMessages() ? ChatGamePlace?.Invoke():null;",StringComparison.Ordinal),
                 "a place read while the chat is shown (0.1509, X-534 M1), used by the window only while hidden");
-            Check(ChatHideWants.InFrame(ChatHideWant.Hide,true,false)==ChatHideWant.Hold,"a competitive cut never gives back over a hidden chat");
+            // X-569 (0.1884): the same check is kept once, in ChatGameResume1510Tests.
         }),
     ];
 }

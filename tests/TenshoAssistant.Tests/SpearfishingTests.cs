@@ -20,17 +20,11 @@ internal static class SpearfishingTests
             ]);
             Check(data.Find(43803) is { SpearSize:1, SpearSpeed:150 } && data.Find(43810) is { SpearSize:3, SpearSpeed:400 },"size and speed");
             Check(data.Find(43811) is { SpearSize:null, SpearSpeed:null } && data.Find(43664) is { SpearSize:null, Baits.Count:1 },"unknown and rod fish");
-            Check(data.Spearfish.Select(fish=>fish.FishId).Order().SequenceEqual([43803u,43810u]),"spearfish only");
             Check(Spearfishing.Speed("LynFast")==600 && Spearfishing.Speed("SuperSlow")==100 && Spearfishing.Speed("Unknown") is null && Spearfishing.SpeedName(350)=="Fast" && Spearfishing.SpeedName(123) is null,"speed names");
         }),
-        ("Spearfishing: candidates by size and speed, the zone's first; nothing for an empty slot",() =>
+        // X-569 (0.1884): Spearfishing.Candidates, never called by the plugin, removed with its checks; the reader's checks stay.
+        ("Spearfishing: the spearfishing window is read only, on the framework thread",() =>
         {
-            GatherBuddyFish Fish(uint id,int size,int speed)=>new(id,[],[],null,null,null,null,[],[],null,[],false,size,speed);
-            var fish=new[]{Fish(1,2,300),Fish(2,2,300),Fish(3,2,350),Fish(4,3,300)};
-            var result=Spearfishing.Candidates(fish,new SpearfishSlot(0,true,2,300,false,false),id=>id==2);
-            Check(result.InZone.SequenceEqual([2u]) && result.Elsewhere.SequenceEqual([1u]),"match and zone");
-            Check(Spearfishing.Candidates(fish,new SpearfishSlot(1,false,2,300,false,false),_=>true).InZone.Count==0
-                && Spearfishing.Candidates(fish,new SpearfishSlot(1,true,-1,300,false,false),_=>true).Elsewhere.Count==0,"empty or unknown slot");
             var reader=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Gathering/SpearfishingReader.Dalamud.cs"));
             Check(reader.Contains("GetAddonByName(\"SpearFishing\")") && reader.Contains("framework.IsInFrameworkUpdateThread") && !reader.Contains("FireCallback"),"read only, framework thread");
         }),

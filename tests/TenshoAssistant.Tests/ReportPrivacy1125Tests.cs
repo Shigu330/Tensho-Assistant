@@ -78,7 +78,7 @@ internal static class ReportPrivacy1125Tests
             NothingPrivate(longer.Clipboard!,"clipboard");
             Check(longer.Preview().EndsWith(longer.Clipboard!,StringComparison.Ordinal),"the preview shows the clipboard text too");
             Check(Query(longer.Url).SequenceEqual(longer.Fields),"shorter address, same rule");
-            var link=ProblemReport.Link(draft);
+            var link=ProblemReport.Prepare(draft);
             Check(!link.ReportLeftOut && link.Url.Contains("template=bug_report.yml"),"Link stays the same address");
         }),
         ("Report privacy: the browser opens from the preview only, and the diagnosis is built from fields",() =>

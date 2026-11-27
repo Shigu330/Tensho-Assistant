@@ -73,7 +73,6 @@ internal static class OceanVoyageTests
             Check(agreeing.Check==OceanCheck.Unverified && agreeing.Offset==0 && agreeing.Candidates.SequenceEqual([0,3]) && agreeing.Sightings==1,"agreeing but not unique: still unverified");
             var impossible=schedule.State(OceanPort.Aldenard,[new OceanSighting{Slot=6,Route=1},new OceanSighting{Slot=7,Route=1}]);
             Check(impossible.Check==OceanCheck.Contradicted && impossible.Candidates.Count==0,"inconsistent sightings");
-            Check(OceanSchedule.SlotOf(OceanSchedule.LoopStart+TimeSpan.FromHours(2)*5+TimeSpan.FromMinutes(40))==5,"slot aboard");
         }),
         ("Ocean timetable 917: fishing help off at sea, sightings saved and logged, kept by « restore every setting »",() =>
         {

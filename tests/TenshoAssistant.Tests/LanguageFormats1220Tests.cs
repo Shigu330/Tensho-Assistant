@@ -54,13 +54,13 @@ internal static class LanguageFormats1220Tests
                 var loc = Manager();
                 loc.SetLanguage("en");
                 Check(loc.Format("Home.Catalogues",1234567,2500) == "1,234,567 items · 2,500 recipes loaded","English Tensho on a German Windows: " + loc.Format("Home.Catalogues",1234567,2500));
-                Check(TenshoCulture.Percent(12.5,"0.0") == "12.5%" && TenshoCulture.Hours(3,5) == "3h 05m" && TenshoCulture.Colon == ":","English percent, hours and colon");
+                Check(TenshoCulture.Percent(12.5,"0.0") == "12.5%" && TenshoCulture.Colon == ":","English percent and colon");
                 Check(1234.ToString("N0",TenshoCulture.Current) == "1,234","English group separator");
                 var stats = StatFormulas.Combat(new Dictionary<string,int>{["CriticalHit"]=3000},30,2,new LevelModifiers(440,420,2780));
                 Check(stats.First(row => row.Key == "CritRate").Value == "23.5%","stats in English: " + stats.First(row => row.Key == "CritRate").Value);
                 loc.SetLanguage("fr");
                 Check(loc.Format("Home.Catalogues",1234567,2500).StartsWith("1 234 567 ",StringComparison.Ordinal),"French Tensho: no-break spaces: " + loc.Format("Home.Catalogues",1234567,2500));
-                Check(TenshoCulture.Percent(12.5,"0.0") == "12,5 %" && TenshoCulture.Hours(3,5) == "3 h 05" && TenshoCulture.Colon == " :","French percent, hours and colon");
+                Check(TenshoCulture.Percent(12.5,"0.0") == "12,5 %" && TenshoCulture.Colon == " :","French percent and colon");
                 Check(StatFormulas.Combat(new Dictionary<string,int>{["CriticalHit"]=3000},30,2,new LevelModifiers(440,420,2780)).First(row => row.Key == "CritRate").Value == "23,5 %","stats in French");
                 loc.SetLanguage("en");
             });

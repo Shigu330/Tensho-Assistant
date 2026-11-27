@@ -45,8 +45,7 @@ internal static class ZoneBagOrder1322Tests
             var slots=InventorySortRules.Build(Snapshot(20).Containers.Values,Bags,profile,Describe).Slots!;
             Check(Enumerable.Range(35,10).All(index=>slots[index] is not null) && slots[45] is null,"the zone's ten positions in a row");
             Check(slots[35]!.Stack.Item.Id.Value<slots[44]!.Stack.Item.Id.Value,"from its start");
-            var saddle=InventorySortScope.FromStorage(new BankKey(7,BankStorageKind.Saddlebag,0));
-            Check(InventorySortRules.FillOrder(saddle).SequenceEqual(Enumerable.Range(0,saddle.Capacity)),"the saddlebag: position after position, zones too");
+            // X-569 (0.1884): the same check is kept once, in BagOrder1172Tests.
         }),
     ];
 }

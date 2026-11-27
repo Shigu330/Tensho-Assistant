@@ -28,7 +28,7 @@ internal static class GardenView1256Tests
             Check(GardenView.Left(bed,Now.AddMinutes(1))==(0,0,59),"59 min");
             Check(GardenView.Left(bed,Now.AddMinutes(1).AddSeconds(30))==(0,0,58),"58 min 30 s: rounded down, never ripe too early");
             Check(GardenView.Left(bed,Now.AddHours(1)) is null && GardenView.Left(bed,Now.AddHours(5)) is null,"ripe: no time left");
-            Check(GardenView.LeftText((2,7,0))==("Common.LeftDays",2,7) && GardenView.LeftText((0,5,12))==("Common.LeftHours",5,12) && GardenView.LeftText((0,0,59))==("Common.LeftMinutes",59,0),"days, hours, minutes");
+            Check(TenshoAssistant.UI.TimeLeft.Text((2,7,0))==("Common.LeftDays",2,7) && TenshoAssistant.UI.TimeLeft.Text((0,5,12))==("Common.LeftHours",5,12) && TenshoAssistant.UI.TimeLeft.Text((0,0,59))==("Common.LeftMinutes",59,0),"days, hours, minutes");
             foreach(var file in new[]{"en","fr"})
             {
                 var text=Read($"src/TenshoAssistant/Localization/Languages/{file}.json");

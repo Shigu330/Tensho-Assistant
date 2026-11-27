@@ -9,22 +9,22 @@ internal static class DutyLootTests
         ("Duty name-only direct fight drops remain explicitly outside parsed chest coverage", () =>
         {
             var parsed = DutyLootParser.Parse("""{"instance":{"id":4,"fights":[{"drops":[{"name":"Unresolved boss drop"}]}]}}""",4,DateTimeOffset.UtcNow);
-            Check(parsed.HasUnparsedFightDrops && parsed.HasFights && parsed.Entries.Count == 0 && !parsed.IsExhaustive);
+            Check(parsed.HasUnparsedFightDrops && parsed.HasFights && parsed.Entries.Count == 0);
         }),
         ("Duty loot parser separates categories and preserves multi-source item provenance", () =>
         {
             var parsed = DutyLootParser.Parse("""{"instance":{"id":4,"rewards":[1608,1608],"fights":[{"name":"Boss","coffer":{"items":[1608,2684]}},{"coffer":{"items":[2684]}}],"coffers":[{"items":[3781,1608]}]},"partials":[{"id":999}]}""",4,DateTimeOffset.UtcNow);
             Check(parsed.Entries.Count == 6 && parsed.Entries.Count(e => e.ItemId == 1608) == 3);
-            Check(parsed.HasRewards && parsed.HasFights && parsed.HasCoffers && !parsed.IsExhaustive);
+            Check(parsed.HasRewards && parsed.HasFights && parsed.HasCoffers);
             Check(parsed.Entries.Single(e => e.ItemId == 3781).Kind == DutyLootSourceKind.ZoneCoffer);
         }),
         ("Duty loot parser preserves missing categories and unknown item identities without invented empty coverage", () =>
         {
             var parsed = DutyLootParser.Parse("""{"instance":{"id":4,"coffers":[{"items":[4000000000]}]}}""",4,DateTimeOffset.Now);
-            Check(!parsed.HasRewards && !parsed.HasFights && parsed.HasCoffers && !parsed.IsExhaustive);
+            Check(!parsed.HasRewards && !parsed.HasFights && parsed.HasCoffers);
             Check(parsed.Entries.Single().ItemId == 4000000000 && parsed.FetchedAt.Offset == TimeSpan.Zero);
             var absent = DutyLootParser.Parse("""{"instance":{"id":4}}""",4,DateTimeOffset.UtcNow);
-            Check(absent.Entries.Count == 0 && !absent.HasCoffers && !absent.IsExhaustive);
+            Check(absent.Entries.Count == 0 && !absent.HasCoffers);
         }),
         ("Duty loot parser rejects identity mismatch malformed categories IDs and oversized responses", () =>
         {

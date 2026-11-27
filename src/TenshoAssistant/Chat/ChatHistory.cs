@@ -459,14 +459,6 @@ public static class ChatHistory
             if(line.Length>0)yield return Decode(line,0);
     }
 
-    /// <summary>Writes the file again with these messages only, through a temporary file (a failure leaves the old file whole).</summary>
-    public static void Rewrite(string path,ulong character,IReadOnlyList<ChatRecord> records)
-    {
-        var text=new StringBuilder(Header(character)).Append('\n');
-        foreach(var record in records)text.Append(Encode(record)).Append('\n');
-        AtomicFile.Write(path,Utf8.GetBytes(text.ToString()));
-    }
-
     /// <summary>Adds lines at the end of a character's file (made with its first line when there is none). A line cut short by an earlier
     /// failed write is closed first, so it stays alone (skipped when read) and never spoils the next one. A file that is not this
     /// character's history throws InvalidDataException and is not touched. Returns the file's length before (0: made by this write), for
