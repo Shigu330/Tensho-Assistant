@@ -116,8 +116,9 @@ runs the tests, publishes the zip (nothing of Dalamud in it, checked), runs the 
 checks the outcomes and the schema. First run, measured (run 42893995549, Dalamud.dll 15.0.3.9, ImGui's default font: no Dalamud
 assets in CI): tests 4/4; `constructor -> created`, `Fine window -> drawn`, `Throwing window -> threw`, `Memory reader -> skipped`;
 exit 1 as expected; the JSON report matches its schema. Rulesets: `main` (no deletion, no force push) and `v*` tags (no deletion, update
-or force push), as Tensho's. In this repository only `tools/PluginUiTest/src/PluginUiTest.Host` stays, as a pinned copy (its `.cs` files
-the same as at `28f3160`), referenced by the desktop application; the commands below name paths that are now in the other repository.
+or force push), as Tensho's. In this repository only `tools/PluginUiTest/src/PluginUiTest.Host` stays, as a pinned copy referenced by the
+desktop application (its `.cs` files were those of `28f3160` at the move; the copy follows upstream since, and the exact version and commit
+it is the same as are written in `tools/PluginUiTest/README.md`: on 2026-11-27, v0.2.0 plus commit `602838a`); the commands below name paths that are now in the other repository.
 
 ## What remained before a separate repository (done in X-124, except the wider measures)
 
