@@ -46,7 +46,7 @@ Settings: %APPDATA%\XIVLauncher\pluginConfigs\TenshoAssistant\Settings.json (an 
 
 ## Does Tensho play for me?
 
-No. It reads and shows. What acts on the game, such as teleporting, sorting or writing a macro, only happens when you click. Two settings act without a click: the M key opens Tensho's map instead of the game's (on by default), and the title you chose for a job is worn when you change job (off by default).
+No. It reads and shows. What acts on the game, such as teleporting, sorting or writing a macro, only happens when you click. Three settings act without a click: the M key opens Tensho's map instead of the game's (on by default), the title you chose for a job is worn when you change job (off by default), and « Hide the game chat's messages » hides the game chat's messages and tabs while Tensho's chat window is open in their place (off by default).
 
 ## M opens another map: how do I get the game's back?
 
@@ -176,7 +176,7 @@ Réglages : %APPDATA%\XIVLauncher\pluginConfigs\TenshoAssistant\Settings.json (u
 
 ## Tensho joue-t-il à ma place ?
 
-Non. Il lit et il affiche. Ce qui agit sur le jeu, comme se téléporter, trier ou écrire une macro, ne se fait que sur votre clic. Deux réglages agissent sans clic : la touche M ouvre la carte de Tensho au lieu de celle du jeu (activé par défaut), et le titre choisi pour un job se porte quand vous changez de job (désactivé par défaut).
+Non. Il lit et il affiche. Ce qui agit sur le jeu, comme se téléporter, trier ou écrire une macro, ne se fait que sur votre clic. Trois réglages agissent sans clic : la touche M ouvre la carte de Tensho au lieu de celle du jeu (activé par défaut), le titre choisi pour un job se porte quand vous changez de job (désactivé par défaut), et « Cacher les messages du chat du jeu » cache les messages et les onglets du chat du jeu pendant que la fenêtre de chat de Tensho est ouverte à leur place (désactivé par défaut).
 
 ## M ouvre une autre carte : comment retrouver celle du jeu ?
 

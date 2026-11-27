@@ -55,9 +55,7 @@ orpheline ; préférence « ouvrir au chargement » respectée ; la carte du jeu
 
 Parcours de la campagne de la phase 6, les mêmes essais rangés par activité : [TESTING-ROUTE.md](TESTING-ROUTE.md) (2026-11-09).
 
-Non validé en jeu au 2026-11-02 : 0.232–0.302, 0.307–0.309, 0.315. Dans cette plage, déjà rapporté OK par
-l'utilisateur le 2026-11-02 (ne pas refaire) : 0.265–0.271, 0.276–0.279, 0.283–0.289, 0.290–0.292 (légèreté seulement), 0.293–0.299 ;
-hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagnie, pas de sous-marin…) se rapporte « non essayé », pas « OK ».
+Une étape impossible (pas de compagnie, pas de sous-marin…) se rapporte « non essayé », pas « OK ».
 0.234 ne change que l'outil de release : rien à essayer en jeu.
 
 **Pêche (0.232–0.233, 0.252–0.254)**

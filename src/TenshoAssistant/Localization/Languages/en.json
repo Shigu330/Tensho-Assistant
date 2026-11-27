@@ -679,7 +679,7 @@
     "QuestionSaved": "What does Tensho keep on my PC?",
     "AnswerSaved": "What the game has shown it (storages, collections, progress), your settings, notes, lists and alarms, a gil journal (90 days), the voyage history (180 days) and the discoveries base. These files stay on this PC; your discoveries leave it only through the GitHub exchange, after you connect GitHub (or as a file you export and share yourself), and alarms only through the Discord webhook, if you set one.",
     "QuestionActions": "Does Tensho play for me?",
-    "AnswerActions": "No. It reads and shows. What acts on the game, such as teleporting, sorting or writing a macro, only happens when you click. Two settings act without a click: the M key opens Tensho's map instead of the game's (on by default), and the title you chose for a job is worn when you change job (off by default).",
+    "AnswerActions": "No. It reads and shows. What acts on the game, such as teleporting, sorting or writing a macro, only happens when you click. Three settings act without a click: the M key opens Tensho's map instead of the game's (on by default), the title you chose for a job is worn when you change job (off by default), and « Hide the game chat's messages » hides the game chat's messages and tabs while Tensho's chat window is open in their place (off by default).",
     "QuestionGardenText": "The garden is shown as icons: how do I get the text back?",
     "AnswerGardenText": "Timers › Gardening › Garden tab › « Detailed view » shows each bed as text again (seed, dates, crossbreeds). The icons say the same: hover a seed for its dates; the round mark shows the tending state (drop: later, « ! »: due, check: ripe).",
     "QuestionOldPrice": "Hover prices still say « old » after Ctrl+Alt: why?",
