@@ -51,12 +51,12 @@ repris dans la ligne « Tests » de chaque entrée du [CHANGELOG](../../CHANGELO
 Contrôles de base à refaire après un changement de cycle de vie : rechargement/déchargement répété sans double callback ni commande
 orpheline ; préférence « ouvrir au chargement » respectée ; la carte du jeu (touche M) revient normale une fois le plugin déchargé.
 
-### Essais en jeu (liste produite le 2026-11-27, version 0.1891.0)
+### Essais en jeu (liste produite le 2026-11-27, version 0.1903.0)
 
 <!-- q:public -->
-_In English: this page is the author's in-game test list, in French only. Produced on 2026-11-27 for version 0.1891.0. It has 1260 boxes: 660 ticked, 600 empty. 1077 boxes follow the test source: 477 done (ticked), 591 open, 7 could not be tried, 2 failed (empty). The 183 other ticked boxes come from before the source existed (reported before it, kept as they are). Apart: 38 tests of the source have no box on this page (29 done, 8 open, 1 could not be tried, 0 failed)._
+_In English: this page is the author's in-game test list, in French only. Produced on 2026-11-27 for version 0.1903.0. It has 1272 boxes: 660 ticked, 612 empty. 1089 boxes follow the test source: 477 done (ticked), 603 open, 7 could not be tried, 2 failed (empty). The 183 other ticked boxes come from before the source existed (reported before it, kept as they are). Apart: 38 tests of the source have no box on this page (29 done, 8 open, 1 could not be tried, 0 failed)._
 
-Liste produite le 2026-11-27 (version 0.1891.0) : 1260 cases, 660 cochées, 600 vides. 1077 cases suivent la source des essais : 477 faits (cochées), 591 ouverts, 7 pas pu, 2 en échec (vides). Les 183 autres cases cochées viennent d'avant la source (essais rapportés avant qu'elle existe, gardés tels quels). À part : 38 essais de la source n'ont pas de case sur cette page (29 faits, 8 ouverts, 1 pas pu, 0 en échec).
+Liste produite le 2026-11-27 (version 0.1903.0) : 1272 cases, 660 cochées, 612 vides. 1089 cases suivent la source des essais : 477 faits (cochées), 603 ouverts, 7 pas pu, 2 en échec (vides). Les 183 autres cases cochées viennent d'avant la source (essais rapportés avant qu'elle existe, gardés tels quels). À part : 38 essais de la source n'ont pas de case sur cette page (29 faits, 8 ouverts, 1 pas pu, 0 en échec).
 <!-- /q:public -->
 
 Parcours de la campagne de la phase 6, les mêmes essais rangés par activité : [TESTING-ROUTE.md](TESTING-ROUTE.md) (2026-11-09).
@@ -2823,6 +2823,30 @@ Une étape impossible (pas de compagnie, pas de sous-marin…) se rapporte « no
 - [ ] (0.1890) Jardin après X-879 : sur la vue d'un jardin, passer la souris sur la petite icône grise d'une parcelle sans croisement ou au voisin inconnu : la phrase s'affiche comme avant (avec le numéro de la parcelle voisine quand elle la nomme), aucune erreur dans le journal.
 
 - [ ] (0.1891) Tableau de bord et aides après X-880 : passer la souris sur chacune des quatre jauges du tableau de bord (mémoire, page, image, requêtes), sur l'icône d'aide du résultat dans le journal d'artisanat, et sur l'icône d'aide de la source dans le Duty Finder quand la source est partielle : chaque aide s'affiche comme avant, aucune erreur dans le journal.
+
+- [ ] (0.1892) Cloches d'alarme après X-881 : passer la souris sur une cloche de la météo (prévisions et recherche), du bandeau météo, d'une fenêtre de pêche, d'un créneau de récolte, des rappels et des sous-marins : l'aide dit ce qui sera créé puis le délai, comme avant ; un clic crée l'alarme ; aucune erreur dans le journal.
+
+- [ ] (0.1893) Marché après X-153 (famille du marché) : recharger Tensho, ouvrir les offres d'un objet au tableau des ventes (prix vus enregistrés si l'option est active ; sous-cotation copiée si elle est active), puis se déconnecter et quitter le jeu : aucune erreur dans le journal à la fermeture.
+
+- [ ] (0.1894) Chat après X-153 (famille du chat) : recharger Tensho avec la fenêtre de chat de Tensho et l'option qui masque les messages du chat du jeu ; clic droit sur un nom de joueur dans la fenêtre de chat de Tensho (menu, message privé) ; puis se déconnecter et quitter le jeu : messages du chat du jeu rendus, aucune erreur dans le journal à la fermeture.
+
+- [ ] (0.1895) Contenus de terrain après X-153 : recharger Tensho, ouvrir la fenêtre des FATE partagés du jeu puis la page des FATE (rangs à jour) ; au Croissant occulte, la page des contenus de terrain montre les métiers fantômes ; puis se déconnecter et quitter le jeu : aucune erreur dans le journal à la fermeture.
+
+- [ ] (0.1896) Chasse après X-153 : recharger Tensho, ouvrir la page de la chasse (carnet de chasse lu : rangs et monstres) ; là où un rang S se compte en monstres vaincus, en vaincre un (le compte monte) ; puis se déconnecter et quitter le jeu : aucune erreur dans le journal à la fermeture.
+
+- [ ] (0.1897) Inventaire après X-153 (première tranche) : recharger Tensho ; ouvrir l'inventaire du jeu (bouton de tri au-dessus s'il est activé), une fenêtre de rangement avec une liste qui demande des objets (cases surlignées), et le rapport de stockage (ensembles d'équipement lus) ; puis se déconnecter et quitter le jeu : aucune erreur dans le journal à la fermeture.
+
+- [ ] (0.1898) Monnaies et gils après X-153 : recharger Tensho ; la barre du serveur montre les monnaies et les gils (infobulles comme avant) ; gagner ou dépenser des gils (le journal des gils note la ligne) ; une alerte de seuil de monnaie, si elle est réglée, sonne et écrit sa ligne ; puis se déconnecter et quitter le jeu : aucune erreur dans le journal à la fermeture.
+
+- [ ] (0.1899) Missions après X-153 : recharger Tensho ; ouvrir le Duty Finder du jeu (la fiche de la mission choisie et son butin s'affichent) et la page du butin des missions (missions débloquées et terminées lues) ; puis se déconnecter et quitter le jeu : aucune erreur dans le journal à la fermeture.
+
+- [ ] (0.1900) Carte après X-153 : recharger Tensho ; avec le remplacement de la carte activé, ouvrir la carte du jeu (la carte de Tensho s'ouvre, le bouton rouvre celle du jeu) ; déchiffrer une carte au trésor (l'endroit s'affiche dans Tensho) ; puis se déconnecter et quitter le jeu : aucune erreur dans le journal à la fermeture.
+
+- [ ] (0.1901) Diagnostic après X-153 : recharger Tensho en mode développeur (l'auto-contrôle passe seul : ligne « Selftest done » dans le journal) ; lancer l'auto-contrôle par la commande ; puis se déconnecter et quitter le jeu : aucune erreur dans le journal à la fermeture.
+
+- [ ] (0.1902) Mandats après X-153 : recharger Tensho, ouvrir la page des mandats (mandats acceptés et terminés lus) ; puis se déconnecter et quitter le jeu : aucune erreur dans le journal à la fermeture.
+
+- [ ] (0.1903) Mode après X-153 : recharger Tensho ; ouvrir le Fashion Report au Gold Saucer (la page de la mode lit le thème et les indices) ; faire juger une tenue si la base des découvertes le permet ; puis se déconnecter et quitter le jeu : aucune erreur dans le journal à la fermeture.
 
 **0.535 : interfaces** — à voir en jouant
 
