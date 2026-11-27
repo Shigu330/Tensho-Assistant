@@ -24,10 +24,13 @@ internal static class EventListenerGate1916Tests
         "tests/TenshoAssistant.Tests/CacheStream1432Tests.cs|LargeBytes",
         "src/TenshoAssistant.Desktop/Headless.cs|JitNames",
     ];
-    /// <summary>X-896 (review of 0.1916 M1): a class deriving from EventListener, a primary constructor (« class X(int a) : EventListener »)
-    /// and type parameters included.</summary>
-    internal static readonly Regex Listener = new(@"\bclass\s+(\w+)\s*(?:<[^>]*>)?\s*(?:\((?:[^()]|\([^()]*\))*\))?\s*:\s*(?:global::)?(?:System\.Diagnostics\.Tracing\.)?EventListener\b");
-    /// <summary>X-899 (review of 0.1919 M2): a class and its first base, by its last name (« class X(int a) : A.B.MyBase&lt;T&gt;, I » gives X and MyBase).</summary>
+    /// <summary>X-899 (review of 0.1919 M2): a class and its first base, by its last name (« class X(int a) : A.B.MyBase&lt;T&gt;, I » gives X and MyBase).
+    /// A primary constructor with one level of inner parentheses and type parameters are read (X-896).</summary>
+    // Not covered, on purpose (X-902, review of 0.1921 M2, as D-233 for the raw newlines' ratchet): a base named through a using alias
+    // (« using L = System.Diagnostics.Tracing.EventListener; class Y : L »), a primary constructor with two levels of inner parentheses
+    // (« class V(int a = (1 + (2))) : EventListener ») or an attribute with typeof in it (« class X([Foo(typeof(int))] int a) : EventListener »).
+    // No source of the plugin, the desktop app or the tests writes these forms, and the listeners compiled into the tests are still checked
+    // by their type (IsSubclassOf), whatever the form. A later review finding more forms of this kind sets them aside here with its reason.
     internal static readonly Regex Declared = new(@"\bclass\s+(\w+)\s*(?:<[^>]*>)?\s*(?:\((?:[^()]|\([^()]*\))*\))?\s*:\s*(?:global::)?(?:\w+\.)*(\w+)\b");
 
     /// <summary>X-899 (review of 0.1919 M2): the listeners of the runtime's events in the sources, as « file|class »: a class whose first base
@@ -111,8 +114,9 @@ internal static class EventListenerGate1916Tests
             var compiled = typeof(EventListenerGate1916Tests).Assembly.GetTypes().Where(type => type.IsSubclassOf(typeof(EventListener))).Select(type => type.Name).ToList();
             Check(compiled.Count > 0 && compiled.All(Gated.Contains), "listeners compiled into the tests: " + string.Join(", ", compiled));
         }),
-        ("Event listener gate 1916: the listeners' pattern finds a class with a primary constructor, type parameters or the full base name, and nothing else (X-896)", () =>
+        ("Event listener gate 1916: the ratchet finds a class with a primary constructor, type parameters or the full base name, and nothing else (X-896, X-901)", () =>
         {
+            // X-901 (review of 0.1921 M1): through Listeners, the pattern the ratchet really uses (Declared), one sample per file.
             string[] listeners =
             [
                 "private sealed class A : EventListener",
@@ -120,9 +124,12 @@ internal static class EventListenerGate1916Tests
                 "sealed class B<T>(Func<int> make, int count = (1)) : System.Diagnostics.Tracing.EventListener, IDisposable",
                 "class C:global::System.Diagnostics.Tracing.EventListener",
             ];
-            foreach (var line in listeners) Check(Listener.IsMatch(line), "found: " + line);
             string[] others = ["class D : EventListenerGate", "class E(int a) : EventSource", "class F : IEventListener", "class G : Base, IObserver<EventListener>"];
-            foreach (var line in others) Check(!Listener.IsMatch(line), "not a listener: " + line);
+            foreach (var line in listeners)
+                Check(Listeners([("x.cs", line + " { }")]) is [var one] && one == "x.cs|" + Declared.Match(line).Groups[1].Value, "found: " + line);
+            foreach (var line in others) Check(Listeners([("x.cs", line + " { }")]).Count == 0, "not a listener: " + line);
+            var names = Listeners(listeners.Concat(others).Select((line, index) => (index + ".cs", line + " { }"))).Order(StringComparer.Ordinal);
+            Check(string.Join(", ", names) == "0.cs|A, 1.cs|SuspensionWatch, 2.cs|B, 3.cs|C", "all at once: " + string.Join(", ", names));
         }),
         ("Event listener gate 1916: the ratchet finds a listener deriving through base classes of its own, across files, and nothing else (X-899)", () =>
         {
