@@ -500,10 +500,8 @@ public sealed partial class Plugin : IDalamudPlugin
             mainWindow.ConfigureLumina(lumina);
             // X-153 (0.1899): the duties family (Duty Finder, duty catalogue, duty progress) in Plugin.Duties.cs.
             RegisterDutyFinder(configuration,framework,gameGui);
-            var triadNpcs=new TriadNpcService();
-            TriadNpcLoader? triadNpcLoader=null;
-            registrations.Register(()=>triadNpcLoader=new TriadNpcLoader(triadNpcs,data,framework,client,player,unlocks,log),()=>triadNpcLoader?.Dispose());
-            mainWindow.ConfigureTriadNpcs(triadNpcs);
+            // X-153 (0.1927): the Triple Triad NPCs' loader in Plugin.MiniGames.cs.
+            RegisterTriadNpcs(data,framework,client,player,unlocks);
             // 0.500 (user request): the Beastmaster page; X-153 (0.1886): its family in Plugin.Beastmaster.cs.
             var beasts=RegisterBeastCatalog(data,framework,client,player);
             // X-73.9 (0.863): spells learned and beasts tamed, put down to their monster, for the discoveries base.
@@ -1113,8 +1111,6 @@ public sealed partial class Plugin : IDalamudPlugin
             RegisterFashion(configuration,data,framework,gameGui);
             // X-153 (0.1925): the quests' and collections' readers in Plugin.Quests.cs.
             RegisterQuests(configuration,data,framework,player,client,unlocks,tenshoData);
-            TriadObservationReader? triadReader = null;
-            MiniCactpotObservationReader? cactpotReader=null;
             // X-153 (0.1926): the gathering readers (gathering window, spearfishing, collectables, action bar, gathering actions) in Plugin.GatheringReaders.cs.
             RegisterGatheringReaders(data,framework,player,client,gameGui,objects,targets);
             UI.GameWindowsReader? gameWindows=null;
@@ -1168,9 +1164,8 @@ public sealed partial class Plugin : IDalamudPlugin
             // 0.520: Enhanced Solid Reason and Enhanced Ageless Words, Eureka Moment (docs/evidence/0.410-gp-actions.md).
             mainWindow.EurekaReady=()=>objects.LocalPlayer is { } local && local.StatusList.Any(status=>status.StatusId==2765);
             mainWindow.EurekaChanceFor=job=>data.GetExcelSheet<Lumina.Excel.Sheets.Trait>().GetRowOrDefault(job==16 ? 242u:243u) is { } row && (row.Quest.RowId==0 ? player.GetClassJobLevel(row.ClassJob.Value)>=row.Level:unlocks.IsTraitUnlocked(row)) ? Gathering.GpScenario.EurekaChance:0m;
-            registrations.Register(()=>cactpotReader=new MiniCactpotObservationReader(cactpotObservation,framework,player,client,gameGui,log),()=>cactpotReader?.Dispose());
-            registrations.Register(() => triadReader = new TriadObservationReader(triadObservation, framework, player, client, gameGui, log, () => targets.Target?.BaseId ?? 0, data, () => mainWindow.DeveloperMode),
-                () => triadReader?.Dispose());
+            // X-153 (0.1927): the Mini Cactpot and Triple Triad readers in Plugin.MiniGames.cs.
+            RegisterMiniGameReaders(framework,player,client,gameGui,targets,data);
             ItemCatalogLoader? catalogLoader = null;
             ItemUseCatalogLoader? usageLoader=null;
             registrations.Register(()=>usageLoader=new ItemUseCatalogLoader(itemUses,data,framework,log),()=>usageLoader?.Dispose());

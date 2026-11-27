@@ -47,7 +47,7 @@ internal static class BeastFamily1886Tests
             var plugin = PluginFiles().Single(file => file.Name == "Plugin.cs").Text;
             int At(string piece) { var at = plugin.IndexOf(piece, StringComparison.Ordinal); Check(at >= 0, "not found: " + piece); return at; }
             var catalog = At("var beasts=RegisterBeastCatalog(data,framework,client,player);");
-            Check(At("registrations.Register(()=>triadNpcLoader=new TriadNpcLoader(") < catalog && catalog < At("itemWatcher.Beasts=()=>beasts.State.Obtained;"),
+            Check(At("RegisterTriadNpcs(data,framework,client,player,unlocks);") < catalog && catalog < At("itemWatcher.Beasts=()=>beasts.State.Obtained;"),
                 "the catalogue after the Triple Triad NPCs, before the discoveries read the beasts tamed");
             var board = At("RegisterBeastBoard(configuration,data,framework,gameGui,objects);");
             Check(At("RegisterHousingProbe(configuration,framework,client,objects);") < board && board < At("RegisterGameChat(configuration,framework,gameGui);"),

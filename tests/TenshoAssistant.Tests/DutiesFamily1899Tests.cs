@@ -52,7 +52,7 @@ internal static class DutiesFamily1899Tests
             var finder = At("RegisterDutyFinder(configuration,framework,gameGui);");
             var catalog = At("RegisterDutyCatalog(pluginInterface,data,framework,client,unlocks,player);");
             Check(Count(plugin, @"RegisterDutyFinder\(") == 1 && Count(plugin, @"RegisterDutyCatalog\(") == 1, "each called once");
-            Check(At("mainWindow.ConfigureLumina(lumina);") < finder && finder < At("var triadNpcs=new TriadNpcService();"), "the Duty Finder after Lumina, before the Triple Triad NPCs, as before");
+            Check(At("mainWindow.ConfigureLumina(lumina);") < finder && finder < At("RegisterTriadNpcs(data,framework,client,player,unlocks);"), "the Duty Finder after Lumina, before the Triple Triad NPCs, as before");
             Check(At("mapLoader = new MapCatalogLoader(") < catalog && catalog < At("CharacterStatsReader? statsReader = null;"), "the duty catalogue after the map catalogue, before the character stats, as before");
         }),
         // X-885 M2 (0.1906): this case replaced « behaviour », the same RegistrationScope test copied in each family test, which touched nothing
