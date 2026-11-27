@@ -4,6 +4,9 @@ using System.Text.RegularExpressions;
 // call and per frame, hovered or not (one per row of a long list), and TipText(string) wrapped its text in one more; a computed text
 // (formatted, joined, concatenated) passed to TipText was built at each frame too. Now TipText takes a string only, and a computed text
 // sits behind its hover guard: if(TipHovered())TipText(…). A ready text (a name, a field, localization.Get of a fixed key) goes as is.
+// X-879 (0.1890, review of 0.1889, M1): the ratchet reads the argument written inside the TipText call only. Its limit: any name
+// passes as a ready text, so a text formatted in a local variable or a parameter just before the call is not seen (DrawGardenCrossNote
+// took a formatted text as a parameter until 0.1890). Such a text is the author's and the reviewer's to guard; the case titles say so.
 internal static class TipText1889Tests
 {
     private static void Check(bool value, string message) { if (!value) throw new Exception(message); }
@@ -49,13 +52,13 @@ internal static class TipText1889Tests
             var lambdas = Sources().Where(source => Regex.IsMatch(source.Text, @"(?<![\w.])TipText\(\s*\(\s*\)\s*=>")).Select(source => source.Name).ToArray();
             Check(lambdas.Length == 0, "TipText(()=>…): if(TipHovered())TipText(…): " + string.Join(", ", lambdas));
         }),
-        ("TipText 1889: a computed tooltip text is built only behind its hover guard", () =>
+        ("TipText 1889: a text computed inside the TipText call (formatted, joined, concatenated, a call) has its hover guard on that line", () =>
         {
             var unguarded = Sources().SelectMany(source => Unguarded(source.Name, source.Text)).ToArray();
             Check(unguarded.Length == 0, "a tooltip text built at each frame: if(TipHovered())TipText(…): " + string.Join(", ", unguarded));
             Check(Sources().Sum(source => Regex.Matches(source.Text, @"if\(TipHovered\(\)\)TipText\(").Count) >= 100, "the computed tooltips keep their guard");
         }),
-        ("TipText 1889: the ratchet itself: a ready text passes, a computed one needs the guard on its line", () =>
+        ("TipText 1889: the ratchet itself: a ready text passes, a computed one needs the guard on its line; a name passes as ready (its limit)", () =>
         {
             Check(Unguarded("a", "        TipText(row.Description);\n        TipText(localization.Get(\"A.B\"));\n        TipText(names[index]);").Count == 0, "ready texts");
             Check(Unguarded("a", "        TipText(localization.Format(\"A.B\",x));").Count == 1, "a formatted text");
@@ -64,6 +67,14 @@ internal static class TipText1889Tests
             Check(Unguarded("a", "        TipText(Build(row));").Count == 1, "a method call");
             Check(Unguarded("a", "        if(open)if(TipHovered())TipText(localization.Format(\"A.B\",x));").Count == 0, "guarded");
             Check(Unguarded("a", "        if(open){if(TipHovered())TipText(Build(row));}\n        else TipText(row.Name);").Count == 0, "guarded in braces before an else");
+            Check(Unguarded("a", "        var text=localization.Format(\"A.B\",x);\n        TipText(text);").Count == 0, "the limit, written: a name passes, even one formatted just before");
+        }),
+        ("TipText 1890: the garden cross note builds its formatted tooltip only on hover (X-879)", () =>
+        {
+            var garden = File.ReadAllText(Path.Combine(Root, "MainWindow.GardenView.cs")).Replace("\r\n", "\n");
+            Check(!garden.Contains("DrawGardenCrossNote(FontAwesomeIcon.Question,localization.Format(", StringComparison.Ordinal), "the formatted note text is passed built");
+            Check(garden.Contains("DrawGardenCrossNote(FontAwesomeIcon.Question,null);\n                if(TipHovered())TipText(localization.Format(\"Garden.ForecastUnknownNeighbour\",", StringComparison.Ordinal), "the neighbour sentence is built behind the guard");
+            Check(garden.Contains("if(key is not null&&TipHovered())TipText(localization.Get(key));", StringComparison.Ordinal), "the fixed sentences on hover too");
         }),
     ];
 }

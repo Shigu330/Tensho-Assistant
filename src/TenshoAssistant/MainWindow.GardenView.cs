@@ -225,20 +225,22 @@ internal sealed partial class MainWindow
                     if(TipHovered())TipText(string.Join(", ",forecast.Outcomes.Skip(shown).Select(Name)));
                 }
                 break;
-            case GardenForecastKind.NoPartner:DrawGardenCrossNote(FontAwesomeIcon.Ban,localization.Get("Garden.ForecastNone"));break;
-            case GardenForecastKind.UnknownSeed:DrawGardenCrossNote(FontAwesomeIcon.Question,localization.Get("Garden.ForecastUnknownSeed"));break;
-            case GardenForecastKind.NotKept:DrawGardenCrossNote(FontAwesomeIcon.Question,localization.Get("Garden.ForecastNotKept"));break;
+            case GardenForecastKind.NoPartner:DrawGardenCrossNote(FontAwesomeIcon.Ban,"Garden.ForecastNone");break;
+            case GardenForecastKind.UnknownSeed:DrawGardenCrossNote(FontAwesomeIcon.Question,"Garden.ForecastUnknownSeed");break;
+            case GardenForecastKind.NotKept:DrawGardenCrossNote(FontAwesomeIcon.Question,"Garden.ForecastNotKept");break;
             case GardenForecastKind.UnknownNeighbour:
-                DrawGardenCrossNote(FontAwesomeIcon.Question,localization.Format("Garden.ForecastUnknownNeighbour",forecast.Partner ?? 0,BedSeed(forecast.Partner)));
+                DrawGardenCrossNote(FontAwesomeIcon.Question,null);
+                if(TipHovered())TipText(localization.Format("Garden.ForecastUnknownNeighbour",forecast.Partner ?? 0,BedSeed(forecast.Partner)));
                 break;
         }
     }
 
-    /// <summary>« No crossbreed » or « unknown »: a muted glyph the keyboard and the gamepad reach, the sentence in its tooltip.</summary>
-    private void DrawGardenCrossNote(FontAwesomeIcon icon,string text)
+    /// <summary>« No crossbreed » or « unknown »: a muted glyph the keyboard and the gamepad reach, the sentence in its tooltip,
+    /// built only on hover (X-879). A null key leaves the tooltip to the caller, behind its own guard (the sentence that names the bed).</summary>
+    private void DrawGardenCrossNote(FontAwesomeIcon icon,string? key)
     {
         ImGui.InvisibleButton("##GardenCrossNote",new Vector2(ImGui.GetFrameHeight()));
-        TipText(text);
+        if(key is not null&&TipHovered())TipText(localization.Get(key));
         DrawGlyphIn(icon,ImGui.GetItemRectMin(),ImGui.GetItemRectMax(),Muted,ImGui.GetFontSize()*0.85f);
     }
 

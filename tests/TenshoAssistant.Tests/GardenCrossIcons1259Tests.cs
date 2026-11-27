@@ -24,10 +24,10 @@ internal static class GardenCrossIcons1259Tests
                 && cross.Contains("if(clicked)SelectItem(seed);") && cross.Contains("if(hovered)DrawGardenCrossTooltip("),"icon, menu, click, tooltip");
             Check(cross.Contains("GardenView.Mark(wished,holdings.HasObservation,holdings.Total)") && cross.Contains("RefreshRecipeHoldingsCache();"),"the mark comes from the wishlist and the inventories read");
             Check(view.Contains("private const int GardenCrossIconsShown=4;") && cross.Contains("forecast.Outcomes.Skip(shown).Select(Name)"),"four icons, the others counted and named in the tooltip");
-            Check(cross.Contains("DrawGardenCrossNote(FontAwesomeIcon.Ban,localization.Get(\"Garden.ForecastNone\"))") && cross.Contains("DrawGardenCrossNote(FontAwesomeIcon.Question,localization.Get(\"Garden.ForecastUnknownSeed\"))")
+            Check(cross.Contains("DrawGardenCrossNote(FontAwesomeIcon.Ban,\"Garden.ForecastNone\")") && cross.Contains("DrawGardenCrossNote(FontAwesomeIcon.Question,\"Garden.ForecastUnknownSeed\")")
                 && cross.Contains("localization.Format(\"Garden.ForecastUnknownNeighbour\",forecast.Partner ?? 0,BedSeed(forecast.Partner))"),"no crossbreed and unknown: a glyph with the sentence of before");
             var note=Between(view,"private void DrawGardenCrossNote(","\n    }");
-            Check(note.Contains("ImGui.InvisibleButton(\"##GardenCrossNote\"") && note.Contains("TipText(text);"),"the glyph is an element with its tooltip");
+            Check(note.Contains("ImGui.InvisibleButton(\"##GardenCrossNote\"") && note.Contains("if(key is not null&&TipHovered())TipText(localization.Get(key));"),"the glyph is an element with its tooltip");
             var tooltip=Between(view,"private void DrawGardenCrossTooltip(","\n    }");
             Check(tooltip.Contains("if(!observed)ImGui.TextDisabled(localization.Get(\"Garden.CrossUnknown\"));") && tooltip.Contains("else ImGui.TextColored(Warning,localization.Get(\"Garden.CrossNotOwned\"));"),"never « not owned » without a reading");
             Check(tooltip.Contains("\"Garden.CrossWith\"") && tooltip.Contains("\"Garden.CrossWished\"") && tooltip.Contains("\"Garden.CrossOwned\"") && tooltip.Contains("\"Garden.CrossForecast\""),"partner, wish, count, and « a forecast »");
