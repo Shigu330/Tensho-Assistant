@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (910 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (913 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -978,12 +978,15 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-882 | Flaky test (relay 215, 27/11): « Fair lock 1309: behaviour: a client taking the… | Done in 0.1905.0 |
 | X-883 | Flaky test (relay 215, 27/11): « GitHub token 1171: a renewal GitHub accepted… | Done in 0.1904.0 |
 | X-885 | Review of block 0.1892 to 0.1903 (review 0.1903, 27/11), minor M1, M2: M1 in… | Done in 0.1906.0 |
+| X-886 | Flaky tests under load (relay 216, 27/11, sweeps of 10 full-suite runs beside… | Done in 0.1908.0 |
+| X-887 | Review of block 0.1904 to 0.1906 (review 0.1906, 27/11), minor M1: M1 in… | Done in 0.1909.0 |
+| X-888 | Review of block 0.1904 to 0.1906 (review 0.1906, 27/11), pre-existing before… | Done in 0.1907.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (910 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (913 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1959,3 +1962,6 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-882 | Test fragile (relais 215, 27/11) : « Fair lock 1309: behaviour: a client taking… | Fait en 0.1905.0 |
 | X-883 | Test fragile (relais 215, 27/11) : « GitHub token 1171: a renewal GitHub… | Fait en 0.1904.0 |
 | X-885 | Relecture du bloc 0.1892 à 0.1903 (relecture 0.1903, 27/11), mineurs M1, M2… | Fait en 0.1906.0 |
+| X-886 | Tests fragiles sous charge (relais 216, 27/11, balayages de 10 passes de la… | Fait en 0.1908.0 |
+| X-887 | Relecture du bloc 0.1904 à 0.1906 (relecture 0.1906, 27/11), mineurs M1 : M1… | Fait en 0.1909.0 |
+| X-888 | Relecture du bloc 0.1904 à 0.1906 (relecture 0.1906, 27/11), déjà là avant le… | Fait en 0.1907.0 |
