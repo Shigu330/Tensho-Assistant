@@ -27,6 +27,19 @@ internal static class EventListenerGate1916Tests
     /// <summary>X-896 (review of 0.1916 M1): a class deriving from EventListener, a primary constructor (« class X(int a) : EventListener »)
     /// and type parameters included.</summary>
     internal static readonly Regex Listener = new(@"\bclass\s+(\w+)\s*(?:<[^>]*>)?\s*(?:\((?:[^()]|\([^()]*\))*\))?\s*:\s*(?:global::)?(?:System\.Diagnostics\.Tracing\.)?EventListener\b");
+    /// <summary>X-899 (review of 0.1919 M2): a class and its first base, by its last name (« class X(int a) : A.B.MyBase&lt;T&gt;, I » gives X and MyBase).</summary>
+    internal static readonly Regex Declared = new(@"\bclass\s+(\w+)\s*(?:<[^>]*>)?\s*(?:\((?:[^()]|\([^()]*\))*\))?\s*:\s*(?:global::)?(?:\w+\.)*(\w+)\b");
+
+    /// <summary>X-899 (review of 0.1919 M2): the listeners of the runtime's events in the sources, as « file|class »: a class whose first base
+    /// is EventListener, or a class found a listener here (a base class of the plugin's own, in any file, any number of steps away).</summary>
+    internal static List<string> Listeners(IEnumerable<(string File, string Text)> sources)
+    {
+        var classes = sources.SelectMany(source => Declared.Matches(source.Text).Select(match => (source.File, Name: match.Groups[1].Value, Base: match.Groups[2].Value))).ToList();
+        var names = new HashSet<string>(StringComparer.Ordinal) { "EventListener" };
+        while (classes.Where(type => names.Contains(type.Base) && !names.Contains(type.Name)).Select(type => type.Name).ToList() is { Count: > 0 } more)
+            names.UnionWith(more);
+        return classes.Where(type => names.Contains(type.Base)).Select(type => type.File + "|" + type.Name).Distinct().ToList();
+    }
 
     public static IEnumerable<(string Name, Action Run)> Cases =>
     [
@@ -81,16 +94,17 @@ internal static class EventListenerGate1916Tests
         ("Event listener gate 1916: every listener of the runtime's events in the plugin and the tests is a gated one", () =>
         {
             // X-896 (review of 0.1916 M1): the desktop app's sources too, and a class with a primary constructor.
-            var found = new List<string>();
+            // X-899 (review of 0.1919 M2): a listener through a base class of its own too, in every source read (Listeners).
+            var sources = new List<(string File, string Text)>();
             var here = Path.GetFullPath(".");
             foreach (var root in new[] { "src/TenshoAssistant", "src/TenshoAssistant.Desktop", "tests/TenshoAssistant.Tests" })
                 foreach (var file in Directory.EnumerateFiles(Path.GetFullPath(root), "*.cs", SearchOption.AllDirectories))
                 {
                     if (file.Contains(Path.DirectorySeparatorChar + "bin" + Path.DirectorySeparatorChar) || file.Contains(Path.DirectorySeparatorChar + "obj" + Path.DirectorySeparatorChar)) continue;
                     if (file.EndsWith("EventListenerGate1916Tests.cs", StringComparison.Ordinal)) continue;
-                    foreach (Match match in Listener.Matches(File.ReadAllText(file)))
-                        found.Add(Path.GetRelativePath(here, file).Replace('\\', '/') + "|" + match.Groups[1].Value);
+                    sources.Add((Path.GetRelativePath(here, file).Replace('\\', '/'), File.ReadAllText(file)));
                 }
+            var found = Listeners(sources);
             Check(found.Count > 0 && found.All(GatedFiles.Contains), "listeners found: " + string.Join(", ", found));
             Check(GatedFiles.All(found.Contains), "the gated ones still exist: " + string.Join(", ", found));
             // The listeners compiled into the tests (the plugin's Diagnostics sources are linked there), indirect ones included.
@@ -109,6 +123,17 @@ internal static class EventListenerGate1916Tests
             foreach (var line in listeners) Check(Listener.IsMatch(line), "found: " + line);
             string[] others = ["class D : EventListenerGate", "class E(int a) : EventSource", "class F : IEventListener", "class G : Base, IObserver<EventListener>"];
             foreach (var line in others) Check(!Listener.IsMatch(line), "not a listener: " + line);
+        }),
+        ("Event listener gate 1916: the ratchet finds a listener deriving through base classes of its own, across files, and nothing else (X-899)", () =>
+        {
+            (string File, string Text)[] sources =
+            [
+                ("a.cs", "internal sealed class Mine : MyBase { }\nclass Plain : Other { }"),
+                ("b.cs", "internal abstract class MyBase(int a) : global::System.Diagnostics.Tracing.EventListener, IDisposable { }"),
+                ("c.cs", "sealed class Far<T> : Space.Mine { }\nclass Direct : EventListener { }\nclass G : Base, IObserver<EventListener> { }\nclass D : EventListenerGate { }"),
+            ];
+            var found = Listeners(sources).Order(StringComparer.Ordinal).ToList();
+            Check(string.Join(", ", found) == "a.cs|Mine, b.cs|MyBase, c.cs|Direct, c.cs|Far", "found: " + string.Join(", ", found));
         }),
     ];
 }

@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1921.0
+- Plan global, X-899 : Tests du verrou des écouteurs du runtime (relecture 0.1919, M2) : le cliquet de EventListenerGate1916Tests voit aussi un écouteur qui hérite d'EventListener par une classe de base à soi (« class X : MaBase »), dans toutes les sources lues (plugin, application de bureau, tests), pas seulement dans le code compilé dans les tests : la première base de chaque classe est lue, et une classe dont la base est un écouteur en est un aussi, de proche en proche d'un fichier à l'autre. Cas nouveau sur exemples (héritage indirect sur deux niveaux, à travers trois fichiers).
+- Tests : EventListenerGate1916Tests. Verify.ps1 (agent) : 4254/4254, 0 avertissement, 0 erreur ; DLL 0.1921.0.0. Rien à essayer en jeu.
+### English
+- Tests of the runtime listeners' gate (review of 0.1919, M2): the ratchet of EventListenerGate1916Tests also sees a listener deriving from EventListener through a base class of its own (« class X : MyBase »), in every source read (plugin, desktop app, tests), not only in the code compiled into the tests: each class's first base is read, and a class whose base is a listener is one too, step by step across files. New case on samples (indirect inheritance over two steps, across three files).
+
 ## 0.1920.0
 - Plan global, X-898 : Tests du verrou des écouteurs du runtime (relecture 0.1919, M1) : le cas des 6 fils de RuntimeGate1919Tests vérifie d'abord que les deux chargements ont le même verrou, et échoue tout de suite sinon, avant de créer un écouteur ; un verrou par chargement revenu ne fige plus tout le processus de tests (le rapport sort).
 - Tests : RuntimeGate1919Tests. Verify.ps1 (agent) : 4253/4253, 0 avertissement, 0 erreur ; DLL 0.1920.0.0. Rien à essayer en jeu.
