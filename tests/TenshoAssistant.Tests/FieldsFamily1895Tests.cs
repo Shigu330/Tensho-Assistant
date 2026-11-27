@@ -1,7 +1,7 @@
 // 0.1895 (X-153, GPT review of 11/11, accepted by the user): the field content family out of Plugin.cs. The shared FATE ranks and the
 // Occult Crescent's state have exactly one install path and one release path across every Plugin*.cs file, both in Plugin.Fields.cs,
 // inside the plugin's registrations; Plugin.cs calls each where its block stood and creates none; the main window still reads them.
-// Behaviour: the save handed to a family is the caller's own, called by the service, not at install.
+// Pairing (X-885 M2, 0.1906): each service's install and its release given to one same registration.
 using System.Text.RegularExpressions;
 using TenshoAssistant;
 
@@ -47,19 +47,9 @@ internal static class FieldsFamily1895Tests
             Check(At("var (gear,gameGearsets,graceWatcher)=RegisterGear(") < fates && fates < At("mainWindow.GraceSource=()=>graceWatcher?.Shown;"), "the shared FATEs after the gear, as before");
             Check(At("mainWindow.GameDataCheck=()=>gameDataCheck;") < occult && occult < At("mainWindow.GcFeminine=()=>framework.RunOnFrameworkThread("), "the Occult Crescent after the game data check, before the Grand Companies, as before");
         }),
-        ("Fields family 1895: behaviour: the save handed to a family is the caller's, called by the service only", () =>
-        {
-            var saved = new List<string>();
-            void SaveTimed(string what) => saved.Add(what);
-            Action? kept = null;
-            var scope = new RegistrationScope();
-            void Family(Action save) => scope.Register(() => kept = save, () => kept = null);
-            Family(() => SaveTimed("shared FATEs"));
-            Check(saved.Count == 0 && kept is not null, "nothing saved at install");
-            kept!();
-            Check(saved.SequenceEqual(["shared FATEs"]), "the caller's save, with its name");
-            scope.Dispose();
-            Check(kept is null, "released at unload");
-        }),
+        // X-885 M2 (0.1906): this case replaced « behaviour », the same RegistrationScope test copied in each family test, which touched nothing
+        // of the family; each service's install and its release are now checked given to one same registration of Plugin.Fields.cs.
+        ("Fields family 1895: each service's install and its release are given to one same registration of Plugin.Fields.cs (its own release, never another's)", () =>
+            FamilyRegistrations.Paired("Fields family 1895", PluginFiles().Single(file => file.Name == "Plugin.Fields.cs").Text, Paths.Select(path => (path.Service, path.Install, path.Release)))),
     ];
 }

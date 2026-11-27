@@ -1,7 +1,7 @@
 // 0.1898 (X-153, GPT review of 11/11, accepted by the user): the inventory family out of Plugin.cs, second slice. The currency watcher and
 // the gil journal's watcher have exactly one install path and one release path across every Plugin*.cs file, both in Plugin.Inventory.cs,
 // inside the plugin's registrations; Plugin.cs calls each where its block stood, after the Discord notifier and before the server bar,
-// and hands the services back to the server bar. Behaviour: what a family hands back is the service its install made.
+// and hands the services back to the server bar. Pairing (X-885 M2, 0.1906): each service's install and its release given to one same registration.
 using System.Text.RegularExpressions;
 using TenshoAssistant;
 
@@ -48,17 +48,9 @@ internal static class InventoryFamily1898Tests
             Check(At("var discord=new Alarms.DiscordNotifier();") < currencies && currencies < gil && gil < bar, "after the Discord notifier, before the server bar, in the order of before");
             Check(currencies < At("// DEC-038: one chat line on entry, nothing on leaving;") && At("mainWindow.AchievementNameOf=id=>") < gil, "each where its block stood");
         }),
-        ("Inventory family 1898: behaviour: what a family hands back is the service its install made, released once", () =>
-        {
-            var released = 0;
-            var scope = new RegistrationScope();
-            object? watcher = null;
-            object? Family() { scope.Register(() => watcher = new object(), () => released++); return watcher; }
-            var handed = Family();
-            Check(handed is not null && ReferenceEquals(handed, watcher), "the install ran, its service handed back");
-            scope.Dispose();
-            scope.Dispose();
-            Check(released == 1, "released once");
-        }),
+        // X-885 M2 (0.1906): this case replaced « behaviour », the same RegistrationScope test copied in each family test, which touched nothing
+        // of the family; each service's install and its release are now checked given to one same registration of Plugin.Inventory.cs.
+        ("Inventory family 1898: each service's install and its release are given to one same registration of Plugin.Inventory.cs (its own release, never another's)", () =>
+            FamilyRegistrations.Paired("Inventory family 1898", PluginFiles().Single(file => file.Name == "Plugin.Inventory.cs").Text, Paths.Select(path => (path.Service, path.Install, path.Release)))),
     ];
 }

@@ -1,7 +1,7 @@
 // 0.1897 (X-153, GPT review of 11/11, accepted by the user): the inventory family out of Plugin.cs, first slice. The storage windows'
 // highlight, the game's inventory window and the gear sets read on request have exactly one install path and one release path across every
 // Plugin*.cs file, all in Plugin.Inventory.cs, inside the plugin's registrations; Plugin.cs calls each where its block stood and creates
-// none; the main window still reads them. Behaviour: a failing install releases nothing of its own; the unload releases the others once.
+// none; the main window still reads them. Pairing (X-885 M2, 0.1906): each service's install and its release given to one same registration.
 using System.Text.RegularExpressions;
 using TenshoAssistant;
 
@@ -54,19 +54,9 @@ internal static class InventoryFamily1897Tests
             Check(At("RegisterOcean(pluginInterface,configuration,data,framework,client,condition);") < calls[1] && calls[1] < At("Gear.GearWearWatcher? gearWear=null;"), "the inventory window after the ocean fishing, before the gear wear, as before");
             Check(At("mainWindow.Festivals=()=>festivals;") < calls[2] && calls[2] < At("(uint Id,string Name,uint Icon)[]? keyItems=null;"), "the gear sets after the festivals, before the key items, as before");
         }),
-        ("Inventory family 1897: behaviour: a failing install releases nothing of its own; the unload releases the others once, in reverse order", () =>
-        {
-            var released = new List<string>();
-            var scope = new RegistrationScope();
-            scope.Register(() => { }, () => released.Add("highlight"));
-            scope.Register(() => { }, () => released.Add("inventory window"));
-            var failed = false;
-            try { scope.Register(() => throw new InvalidOperationException("install"), () => released.Add("gear sets")); }
-            catch (InvalidOperationException) { failed = true; }
-            Check(failed && released.Count == 0, "the failing install said, nothing released yet");
-            scope.Dispose();
-            scope.Dispose();
-            Check(released.SequenceEqual(["inventory window", "highlight"]), "released once, in reverse order: " + string.Join(",", released));
-        }),
+        // X-885 M2 (0.1906): this case replaced « behaviour », the same RegistrationScope test copied in each family test, which touched nothing
+        // of the family; each service's install and its release are now checked given to one same registration of Plugin.Inventory.cs.
+        ("Inventory family 1897: each service's install and its release are given to one same registration of Plugin.Inventory.cs (its own release, never another's)", () =>
+            FamilyRegistrations.Paired("Inventory family 1897", PluginFiles().Single(file => file.Name == "Plugin.Inventory.cs").Text, Paths.Select(path => (path.Service, path.Install, path.Release)))),
     ];
 }

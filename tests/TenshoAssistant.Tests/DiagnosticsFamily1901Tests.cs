@@ -1,7 +1,7 @@
 // 0.1901 (X-153, GPT review of 11/11, accepted by the user): the diagnostics family out of Plugin.cs. The self-check runner and the reading
 // capture have exactly one install path and one release path across every Plugin*.cs file, both in Plugin.Diagnostics.cs, inside the
 // plugin's registrations; Plugin.cs calls each where its block stood and creates none; the self-check stays a field, which the command
-// and the page sweep read. Behaviour: a failing install releases nothing of its own; the unload releases the others once.
+// and the page sweep read. Pairing (X-885 M2, 0.1906): each service's install and its release given to one same registration.
 using System.Text.RegularExpressions;
 using TenshoAssistant;
 
@@ -46,18 +46,9 @@ internal static class DiagnosticsFamily1901Tests
             Check(At("RegisterGameChat(configuration,framework,gameGui);") < check && check < At("mainWindow.ConfigureMarketBoard(marketBoard);"), "the self-check after the game chat, before the market board, as before");
             Check(At("var currencies=RegisterCurrencies(") < capture && capture < At("Gathering.RegenTickReader? regenTick=null;"), "the reading capture after the currencies, before the GP tick, as before");
         }),
-        ("Diagnostics family 1901: behaviour: a failing install releases nothing of its own; the unload releases the others once", () =>
-        {
-            var released = new List<string>();
-            var scope = new RegistrationScope();
-            scope.Register(() => { }, () => released.Add("self-check"));
-            var failed = false;
-            try { scope.Register(() => throw new InvalidOperationException("install"), () => released.Add("reading capture")); }
-            catch (InvalidOperationException) { failed = true; }
-            Check(failed && released.Count == 0, "the failing install said, nothing released yet");
-            scope.Dispose();
-            scope.Dispose();
-            Check(released.SequenceEqual(["self-check"]), "the one made released once, never the failed one: " + string.Join(",", released));
-        }),
+        // X-885 M2 (0.1906): this case replaced « behaviour », the same RegistrationScope test copied in each family test, which touched nothing
+        // of the family; each service's install and its release are now checked given to one same registration of Plugin.Diagnostics.cs.
+        ("Diagnostics family 1901: each service's install and its release are given to one same registration of Plugin.Diagnostics.cs (its own release, never another's)", () =>
+            FamilyRegistrations.Paired("Diagnostics family 1901", PluginFiles().Single(file => file.Name == "Plugin.Diagnostics.cs").Text, Paths.Select(path => (path.Service, path.Install, path.Release)))),
     ];
 }

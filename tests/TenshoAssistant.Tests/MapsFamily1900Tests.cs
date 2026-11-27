@@ -53,17 +53,9 @@ internal static class MapsFamily1900Tests
             Check(At("communityHelp=new Help.CommunityHelpIndex()") < housing && housing < At("RegisterBeastBoard(configuration,data,framework,gameGui,objects);"), "the housing probe after the community help, before the beast board, as before");
             Check(At("mainWindow.LeveDefinitions=LeveList;") < treasure && treasure < At("if(itemWatcher is not null)itemWatcher.TreasureMapItem=()=>treasureMap?.Spot"), "the treasure map after the leves' list, before the item watcher reads it");
         }),
-        ("Maps family 1900: behaviour: what a family hands back is the service its install made, released once", () =>
-        {
-            var released = 0;
-            var scope = new RegistrationScope();
-            object? reader = null;
-            object? Family() { scope.Register(() => reader = new object(), () => released++); return reader; }
-            var handed = Family();
-            Check(handed is not null && ReferenceEquals(handed, reader), "the install ran, its service handed back");
-            scope.Dispose();
-            scope.Dispose();
-            Check(released == 1, "released once");
-        }),
+        // X-885 M2 (0.1906): this case replaced « behaviour », the same RegistrationScope test copied in each family test, which touched nothing
+        // of the family; each service's install and its release are now checked given to one same registration of Plugin.Maps.cs.
+        ("Maps family 1900: each service's install and its release are given to one same registration of Plugin.Maps.cs (its own release, never another's)", () =>
+            FamilyRegistrations.Paired("Maps family 1900", PluginFiles().Single(file => file.Name == "Plugin.Maps.cs").Text, Paths.Select(path => (path.Service, path.Install, path.Release)))),
     ];
 }

@@ -34,17 +34,9 @@ internal static class LevesFamily1902Tests
             Check(At("IReadOnlyList<Leves.LeveDefinition> LeveList()=>") < call && call < At("mainWindow.LeveDefinitions=LeveList;"), "after the leves' list, where the block stood");
             Check(call < At("mainWindow.LeveProgress=()=>{leveReader?.Want();return leveReader?.State;};"), "before the Leves page reads the reader handed back");
         }),
-        ("Leves family 1902: behaviour: the list handed to the family is asked by the service only, not at install", () =>
-        {
-            var asked = 0;
-            IReadOnlyList<int> List() { asked++; return [1, 2]; }
-            Func<IReadOnlyList<int>>? kept = null;
-            var scope = new RegistrationScope();
-            object? Family(Func<IReadOnlyList<int>> list) { scope.Register(() => kept = list, () => kept = null); return kept; }
-            Check(Family(List) is not null && asked == 0, "nothing asked at install");
-            Check(kept!().Count == 2 && asked == 1, "asked when the service reads it");
-            scope.Dispose();
-            Check(kept is null, "released at unload");
-        }),
+        // X-885 M2 (0.1906): this case replaced « behaviour », the same RegistrationScope test copied in each family test, which touched nothing
+        // of the family; each service's install and its release are now checked given to one same registration of Plugin.Leves.cs.
+        ("Leves family 1902: each service's install and its release are given to one same registration of Plugin.Leves.cs (its own release, never another's)", () =>
+            FamilyRegistrations.Paired("Leves family 1902", PluginFiles().Single(file => file.Name == "Plugin.Leves.cs").Text, [("leve progress reader", @"leveReader=new Leves\.LeveProgressReader\(", @"leveReader\?\.Dispose\(\)")])),
     ];
 }

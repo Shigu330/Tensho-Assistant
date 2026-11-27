@@ -1,7 +1,7 @@
 // 0.1903 (X-153, GPT review of 11/11, accepted by the user): the fashion family out of Plugin.cs. The fashion hints' loader and the Fashion
 // Report reader have exactly one install path and one release path across every Plugin*.cs file, both in Plugin.Fashion.cs, inside the
 // plugin's registrations, with the main window's stains and weekly themes; Plugin.cs calls the family where its block stood and creates none.
-// Behaviour: a failing install releases nothing of its own; the unload releases the others once.
+// Pairing (X-885 M2, 0.1906): each service's install and its release given to one same registration.
 using System.Text.RegularExpressions;
 using TenshoAssistant;
 
@@ -48,18 +48,9 @@ internal static class FashionFamily1903Tests
             Check(Count(plugin, @"RegisterFashion\(") == 1, "called once");
             Check(At("craftLogReader=new CraftLogReader(") < call && call < At("QuestReader? questReader = null;"), "after the craft log reader, before the quests, as before");
         }),
-        ("Fashion family 1903: behaviour: a failing install releases nothing of its own; the unload releases the others once", () =>
-        {
-            var released = new List<string>();
-            var scope = new RegistrationScope();
-            scope.Register(() => { }, () => released.Add("hints"));
-            var failed = false;
-            try { scope.Register(() => throw new InvalidOperationException("install"), () => released.Add("report")); }
-            catch (InvalidOperationException) { failed = true; }
-            Check(failed && released.Count == 0, "the failing install said, nothing released yet");
-            scope.Dispose();
-            scope.Dispose();
-            Check(released.SequenceEqual(["hints"]), "the one made released once, never the failed one: " + string.Join(",", released));
-        }),
+        // X-885 M2 (0.1906): this case replaced « behaviour », the same RegistrationScope test copied in each family test, which touched nothing
+        // of the family; each service's install and its release are now checked given to one same registration of Plugin.Fashion.cs.
+        ("Fashion family 1903: each service's install and its release are given to one same registration of Plugin.Fashion.cs (its own release, never another's)", () =>
+            FamilyRegistrations.Paired("Fashion family 1903", PluginFiles().Single(file => file.Name == "Plugin.Fashion.cs").Text, Paths.Select(path => (path.Service, path.Install, path.Release)))),
     ];
 }

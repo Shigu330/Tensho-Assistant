@@ -1,7 +1,7 @@
 // 0.1896 (X-153, GPT review of 11/11, accepted by the user): the hunting family out of Plugin.cs. The S rank kills watcher and the hunting
 // log reader have exactly one install path and one release path across every Plugin*.cs file, both in Plugin.Hunting.cs, inside the
 // plugin's registrations; Plugin.cs calls each where its block stood and creates none; the main window still reads the hunting log.
-// Behaviour: a failing install releases nothing of its own; the unload releases the others once.
+// Pairing (X-885 M2, 0.1906): each service's install and its release given to one same registration.
 using System.Text.RegularExpressions;
 using TenshoAssistant;
 
@@ -46,18 +46,9 @@ internal static class HuntingFamily1896Tests
             Check(At("mainWindow.HomeRegion=()=>") < kills && kills < At("var characterJobs=new Character.CharacterJobsData(tenshoData);"), "the S rank kills after the home region, before the characters' jobs, as before");
             Check(At("catch(Exception error){log.Warning(error,\"Monster sheets not read ahead") < log && log < At("mainWindow.LeveProgress=()=>"), "the hunting log after the monster sheets, before the leves, as before");
         }),
-        ("Hunting family 1896: behaviour: a failing hunting log install leaves the S rank kills to the unload, released once", () =>
-        {
-            var released = new List<string>();
-            var scope = new RegistrationScope();
-            scope.Register(() => { }, () => released.Add("S rank kills"));
-            var failed = false;
-            try { scope.Register(() => throw new InvalidOperationException("install"), () => released.Add("hunting log")); }
-            catch (InvalidOperationException) { failed = true; }
-            Check(failed && released.Count == 0, "the failing install said, nothing released yet");
-            scope.Dispose();
-            scope.Dispose();
-            Check(released.SequenceEqual(["S rank kills"]), "the one made released once, never the failed one: " + string.Join(",", released));
-        }),
+        // X-885 M2 (0.1906): this case replaced « behaviour », the same RegistrationScope test copied in each family test, which touched nothing
+        // of the family; each service's install and its release are now checked given to one same registration of Plugin.Hunting.cs.
+        ("Hunting family 1896: each service's install and its release are given to one same registration of Plugin.Hunting.cs (its own release, never another's)", () =>
+            FamilyRegistrations.Paired("Hunting family 1896", PluginFiles().Single(file => file.Name == "Plugin.Hunting.cs").Text, Paths.Select(path => (path.Service, path.Install, path.Release)))),
     ];
 }

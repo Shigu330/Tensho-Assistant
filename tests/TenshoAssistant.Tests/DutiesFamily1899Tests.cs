@@ -1,7 +1,7 @@
 // 0.1899 (X-153, GPT review of 11/11, accepted by the user): the duties family out of Plugin.cs. The Duty Finder's reader and loot
 // service, the duty catalogue's loader and the duty progress reader have exactly one install path and one release path across every
 // Plugin*.cs file, all in Plugin.Duties.cs, inside the plugin's registrations; Plugin.cs calls each group where its block stood and creates
-// none. Behaviour: a failing install releases nothing of its own; the unload releases the others once, in reverse order.
+// none. Pairing (X-885 M2, 0.1906): each service's install and its release given to one same registration.
 using System.Text.RegularExpressions;
 using TenshoAssistant;
 
@@ -55,20 +55,9 @@ internal static class DutiesFamily1899Tests
             Check(At("mainWindow.ConfigureLumina(lumina);") < finder && finder < At("var triadNpcs=new TriadNpcService();"), "the Duty Finder after Lumina, before the Triple Triad NPCs, as before");
             Check(At("mapLoader = new MapCatalogLoader(") < catalog && catalog < At("CharacterStatsReader? statsReader = null;"), "the duty catalogue after the map catalogue, before the character stats, as before");
         }),
-        ("Duties family 1899: behaviour: a failing install releases nothing of its own; the unload releases the others once, in reverse order", () =>
-        {
-            var released = new List<string>();
-            var scope = new RegistrationScope();
-            scope.Register(() => { }, () => released.Add("finder reader"));
-            scope.Register(() => { }, () => released.Add("finder loot"));
-            scope.Register(() => { }, () => released.Add("catalogue"));
-            var failed = false;
-            try { scope.Register(() => throw new InvalidOperationException("install"), () => released.Add("progress")); }
-            catch (InvalidOperationException) { failed = true; }
-            Check(failed && released.Count == 0, "the failing install said, nothing released yet");
-            scope.Dispose();
-            scope.Dispose();
-            Check(released.SequenceEqual(["catalogue", "finder loot", "finder reader"]), "released once, in reverse order: " + string.Join(",", released));
-        }),
+        // X-885 M2 (0.1906): this case replaced « behaviour », the same RegistrationScope test copied in each family test, which touched nothing
+        // of the family; each service's install and its release are now checked given to one same registration of Plugin.Duties.cs.
+        ("Duties family 1899: each service's install and its release are given to one same registration of Plugin.Duties.cs (its own release, never another's)", () =>
+            FamilyRegistrations.Paired("Duties family 1899", PluginFiles().Single(file => file.Name == "Plugin.Duties.cs").Text, Paths.Select(path => (path.Service, path.Install, path.Release)))),
     ];
 }

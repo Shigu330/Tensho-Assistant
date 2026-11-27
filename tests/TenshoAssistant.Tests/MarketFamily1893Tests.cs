@@ -1,7 +1,7 @@
 // 0.1893 (X-153, GPT review of 11/11, accepted by the user): the rest of the market family out of Plugin.cs, after its retainer market
 // (0.1887). The world reader, the prices seen reader and the undercut watcher have exactly one install path and one release path across
 // every Plugin*.cs file, all in Plugin.Market.cs, inside the plugin's registrations; Plugin.cs calls each where it stood and creates none.
-// Behaviour: a failing install releases those made before it, never itself, and the unload releases the others in reverse order.
+// Pairing (X-885 M2, 0.1906): each service's install and its release given to one same registration.
 using System.Text.RegularExpressions;
 using TenshoAssistant;
 
@@ -50,19 +50,9 @@ internal static class MarketFamily1893Tests
                 && calls[2] < plugin.IndexOf("RegisterDesktop(pluginInterface,configuration,framework,client,player,inventory,objects);", StringComparison.Ordinal), "the undercut watcher: after the shop reminder, before the desktop");
             Check(plugin.Contains("(\"UndercutClipboard\",()=>undercut?.FlushClipboard())", StringComparison.Ordinal), "the undercut watcher's field still read by the clipboard flush");
         }),
-        ("Market family 1893: behaviour: a failing install releases those made before it, never itself; the unload releases in reverse order", () =>
-        {
-            var released = new List<string>();
-            var scope = new RegistrationScope();
-            scope.Register(() => { }, () => released.Add("world"));
-            scope.Register(() => { }, () => released.Add("seen"));
-            var failed = false;
-            try { scope.Register(() => throw new InvalidOperationException("install"), () => released.Add("undercut")); }
-            catch (InvalidOperationException) { failed = true; }
-            Check(failed, "the failing install is said");
-            Check(!released.Contains("undercut"), "a service whose install failed is not released");
-            scope.Dispose();
-            Check(released.SequenceEqual(["seen", "world"]), "the others released once, in reverse order: " + string.Join(",", released));
-        }),
+        // X-885 M2 (0.1906): this case replaced « behaviour », the same RegistrationScope test copied in each family test, which touched nothing
+        // of the family; each service's install and its release are now checked given to one same registration of Plugin.Market.cs.
+        ("Market family 1893: each service's install and its release are given to one same registration of Plugin.Market.cs (its own release, never another's)", () =>
+            FamilyRegistrations.Paired("Market family 1893", PluginFiles().Single(file => file.Name == "Plugin.Market.cs").Text, Paths.Select(path => (path.Service, path.Install, path.Release)))),
     ];
 }

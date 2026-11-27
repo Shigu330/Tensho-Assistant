@@ -1,7 +1,7 @@
 // 0.1894 (X-153, GPT review of 11/11, accepted by the user): the rest of the chat family out of Plugin.cs, after its chat window reader and
 // map links (0.1443). The game chat's layout probe and hider, the chat window's player actions and the link watch have exactly one install
 // path and one release path across every Plugin*.cs file, all in Plugin.Chat.cs, inside the plugin's registrations; Plugin.cs calls each
-// group where it stood and creates none. Behaviour: the player actions' release clears the senders, after its service, once.
+// group where it stood and creates none. Pairing (X-885 M2, 0.1906): each service's install and its release given to one same registration.
 using System.Text.RegularExpressions;
 using TenshoAssistant;
 
@@ -53,18 +53,9 @@ internal static class ChatFamily1894Tests
             Check(At("RegisterChat(configuration,client,addonLifecycle,framework,player,") < players && players < At("FreeCompany.AetherialWheelReader? wheelReader=null;"),
                 "the player actions right after the chat reader, before the aetherial wheels, as before");
         }),
-        ("Chat family 1894: behaviour: the player actions' release clears the senders after its service, once; a failing install releases nothing of its own", () =>
-        {
-            var steps = new List<string>();
-            var scope = new RegistrationScope();
-            scope.Register(() => { }, () => { steps.Add("actions"); steps.Add("senders cleared"); });
-            var failed = false;
-            try { scope.Register(() => throw new InvalidOperationException("install"), () => steps.Add("link watch")); }
-            catch (InvalidOperationException) { failed = true; }
-            Check(failed && steps.Count == 0, "the failing install said, nothing released yet");
-            scope.Dispose();
-            scope.Dispose();
-            Check(steps.SequenceEqual(["actions", "senders cleared"]), "released once, the senders after the service: " + string.Join(",", steps));
-        }),
+        // X-885 M2 (0.1906): this case replaced « behaviour », the same RegistrationScope test copied in each family test, which touched nothing
+        // of the family; each service's install and its release are now checked given to one same registration of Plugin.Chat.cs.
+        ("Chat family 1894: each service's install and its release are given to one same registration of Plugin.Chat.cs (its own release, never another's)", () =>
+            FamilyRegistrations.Paired("Chat family 1894", PluginFiles().Single(file => file.Name == "Plugin.Chat.cs").Text, Paths.Select(path => (path.Service, path.Install, path.Release)))),
     ];
 }
