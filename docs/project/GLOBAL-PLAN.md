@@ -20,7 +20,7 @@ Plan first written on 2026-11-05 (then at 0.539) from the review done with the u
 | 7 | Just before 1.0.0: tool lists, documents, help |  | No | Mostly done before phase 6, at the user's request; last review just before 1.0.0 |
 | Then | Version 1.0.0, on the custom repository (no submission, DEC-039) |  |  | When the user decides |
 
-Open before 1.0.0: 93 points (925 done), phases 1 to 6, W and X; a count produced by a script from the plan's source.
+Open before 1.0.0: 93 points (927 done), phases 1 to 6, W and X; a count produced by a script from the plan's source.
 <!-- /gen:plan:phases-en -->
 
 **Nothing is planned after 1.0.0 (user's request, 2026-11-09)**: C10, the only point that was there, moved to phase 5. Porting to Dalamud API 16 is not a point of the plan: it is done as soon as Dalamud publishes it, whatever the Tensho version (https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/evidence/0.1009-dalamud-api16-watch.md). The button to show or hide icons on the map already exists (user's report): the request is withdrawn.
@@ -351,7 +351,7 @@ Noted in the order the user made them; to be done after the current task, one ve
 | X-818 | User's request of 11/22 around 17:50: rework the interface of the private test page, « better made and more consistent with our current method » (natures R02.4, alpha announcement R02.2, tests by whole content, no more piloting D-222); with the frontend-design skill the user installed. Done when: (1) a survey of the current page (tabs, sections, what no longer serves: single campaign, steps, « control tower » of 550 tests) shown to the user with the proposal before the code; (2) first screen: the alpha state (announcement check criteria, remaining alpha points), the running relay and the next one, counts by nature (sorted plan view, natures); (3) tests sorted by CONTENT, the content in progress first with all its tests (reopened and never seen together), then the other contents folded; each test: where, what to do, what to look at, ok / ko / could not, note, captures (X-459 merged here); (4) Exchanges, ideas and decisions tabs kept; (5) readable on a phone (the user follows over Remote Control) and in dark as in light; (6) no loss: the page database collections (reponses, idees, echanges, choix, annonce, notes) keep their shape or go through a tested migration, and answers already given are still read by the import; (7) self-test of the page tool, export and publication by the master, validated by the user | Tool: user's request (test page) |
 | X-900 | The test runner's trace stops with « There is not enough space on the disk » during the 0.1919 release (27/11), while drive C has more than 770 GB free: find where the trace writes and why it thinks the disk is full (a size cap, another volume, a wrong message). Done when: the cause stated with proof, the trace reaches the end of a full run, a test of the tool backs it. | To do (tool) |
 
-815 done points of this table: [the done points](GLOBAL-PLAN-DONE.md#requests-of-2026-11-07-while-playing).
+817 done points of this table: [the done points](GLOBAL-PLAN-DONE.md#requests-of-2026-11-07-while-playing).
 <!-- /gen:plan:x-en -->
 
 ## In-game survey reminders, by moment
@@ -504,7 +504,7 @@ Plan écrit d'abord le 2026-11-05 (alors en 0.539), issu de la revue faite avec 
 | 7 | Juste avant la 1.0.0 : listes d'outils, documents, aide |  | Non | Faite en grande partie avant la phase 6, à la demande de l'utilisateur ; dernière relecture juste avant la 1.0.0 |
 | Ensuite | Version 1.0.0, sur le dépôt personnalisé (pas de soumission, DEC-039) |  |  | Quand l'utilisateur le décide |
 
-Ouverts avant la 1.0.0 : 93 points (925 faits), phases 1 à 6, W et X ; compte produit par script depuis la source du plan.
+Ouverts avant la 1.0.0 : 93 points (927 faits), phases 1 à 6, W et X ; compte produit par script depuis la source du plan.
 <!-- /gen:plan:phases -->
 
 **Rien n'est prévu après la 1.0.0 (demande de l'utilisateur, 2026-11-09)** : C10, seul point qui y était, est passé en phase 5. Le portage à l'API 16 de Dalamud n'est pas un point du plan : il se fait dès que Dalamud la publie, quelle que soit la version de Tensho (https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/evidence/0.1009-dalamud-api16-watch.md). Le bouton pour afficher ou cacher des icônes sur la carte existe déjà (rapport de l'utilisateur) : la demande est retirée.
@@ -835,7 +835,7 @@ Notées dans l'ordre où l'utilisateur les a faites ; à faire après la tâche 
 | X-818 | Demande de l'utilisateur du 22/11 vers 17 h 50 : revoir l'interface de la page privée des essais, « mieux faite et plus cohérente avec notre méthodologie actuelle » (natures R02.4, annonce alpha R02.2, essais par contenu entier, plus de pilotage D-222) ; avec le skill frontend-design installé par l'utilisateur. Fait quand : (1) un relevé de la page actuelle (onglets, sections, ce qui ne sert plus : campagne unique, étapes, « tour de contrôle » de 550 essais) montré à l'utilisateur avec la proposition avant le code ; (2) premier écran : l'état de l'alpha (critères du contrôle de l'annonce, points de l'alpha restants), le relais en cours et le suivant, les comptes par nature (vue rangée du plan, natures) ; (3) les essais rangés par CONTENU, le contenu en cours en tête avec tous ses essais (rouverts et jamais vus ensemble), puis les autres contenus repliés ; chaque essai : où, quoi faire, quoi regarder, ok / ko / pas pu, note, captures (X-459 fusionné ici) ; (4) onglets Échanges, idées et décisions gardés ; (5) lisible au téléphone (l'utilisateur suit par Remote Control) et en sombre comme en clair ; (6) aucune perte : les collections de la base de la page (reponses, idees, echanges, choix, annonce, notes) gardent leur forme ou passent par une migration testée, et les réponses déjà données restent lues par l'import ; (7) auto-test de l'outil de la page, export et publication par la maître, validé par l'utilisateur | Outil : demande de l'utilisateur (page des essais) |
 | X-900 | La trace du lanceur de tests s'arrête avec « There is not enough space on the disk » pendant la release de 0.1919 (27/11), alors que le disque C a plus de 770 Go libres : trouver où la trace écrit et pourquoi elle croit le disque plein (limite de taille, autre volume, mauvais message). Fait quand : la cause dite avec la preuve, la trace va au bout d'une passe complète, test de l'outil à l'appui. | À faire (outil) |
 
-815 points faits de ce tableau : [les points faits](GLOBAL-PLAN-DONE.md#demandes-du-2026-11-07-en-jouant).
+817 points faits de ce tableau : [les points faits](GLOBAL-PLAN-DONE.md#demandes-du-2026-11-07-en-jouant).
 <!-- /gen:plan:x -->
 
 ## Rappels de relevés en jeu, par moment
