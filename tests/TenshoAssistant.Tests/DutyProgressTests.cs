@@ -22,7 +22,7 @@ internal static class DutyProgressTests
             Check(reader.Contains("(nint)UIState.MemberFunctionPointers.IsInstanceContentCompleted==0",StringComparison.Ordinal)
                 && reader.Contains("framework.IsInFrameworkUpdateThread",StringComparison.Ordinal)
                 && reader.Contains("TimeSpan.FromMilliseconds(2)",StringComparison.Ordinal),"pointer checked, framework thread, 2 ms budget");
-            Check(Read("Plugin.cs").Contains("() => dutyProgress?.Dispose()",StringComparison.Ordinal),"reader disposed");
+            Check(Read("Plugin.Duties.cs").Contains("() => dutyProgress?.Dispose()",StringComparison.Ordinal),"reader disposed (X-153, 0.1899: by the duties family)");
         }),
         // From DutySaved990Tests: X-106 (0.990): the duties' completion kept per character on disk, shown logged out as « saved ».
         ("Duty saved 990: round trip per character with the last one, broken file read as none",() =>

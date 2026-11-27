@@ -60,7 +60,8 @@ internal static class SourceUses1044Tests
                     Check(json.Contains($"\"Use{use}\": ") && json.Contains($"\"Use{use}Tip\": "),$"{use} has its texts in {language}");
                 }
             }
-            var plugin=File.ReadAllText(Path.GetFullPath(root+"Plugin.cs"));
+            // X-153 (0.1899): every Plugin*.cs file, the families included (the duty finder's loot is wired by the duties family).
+            var plugin=string.Concat(Directory.GetFiles(Path.GetFullPath(root),"Plugin*.cs").Order().Select(File.ReadAllText));
             Check(!plugin.Contains("Enabled=()=>configuration.CommunityWiki") && !plugin.Contains("()=>configuration.CommunityWiki)"),"no wiki service follows the bare source switch");
             Check(plugin.Contains("new DutyLootService(garland){Enabled="),"the duty finder's loot follows its use");
             var client=File.ReadAllText(Path.GetFullPath(root+"Community/GarlandClient.cs"));

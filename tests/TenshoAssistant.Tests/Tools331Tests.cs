@@ -32,7 +32,7 @@ internal static class Tools331Tests
         }),
         ("Duty Finder has its own loot service; restore-all resyncs developer mode",() =>
         {
-            Check(Read("Plugin.cs").Contains("mainWindow.ConfigureDutyFinder(dutyFinder,dutyFinderLoot);",StringComparison.Ordinal),"separate service, same Garland transport");
+            Check(Read("Plugin.Duties.cs").Contains("mainWindow.ConfigureDutyFinder(dutyFinder,dutyFinderLoot);",StringComparison.Ordinal),"separate service, same Garland transport (X-153, 0.1899: the duties family)");
             Check(Read("UI/Components/SettingRow.cs").Contains("developerMode",StringComparison.Ordinal),"developer mode follows « Restore all defaults »");
         }),
     ];

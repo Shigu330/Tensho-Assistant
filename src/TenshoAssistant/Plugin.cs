@@ -499,11 +499,8 @@ public sealed partial class Plugin : IDalamudPlugin
                 id=>data.GetExcelSheet<Lumina.Excel.Sheets.Quest>().TryGetRow(id,out var quest) ? quest.Name.ExtractText():null){Enabled=()=>configuration.CommunityLumina};
             registrations.Register(()=>{},lumina.Dispose);
             mainWindow.ConfigureLumina(lumina);
-            var dutyFinder=new Duties.DutyFinderService();
-            Duties.DutyFinderReader? dutyFinderReader=null;
-            registrations.Register(()=>dutyFinderReader=new Duties.DutyFinderReader(dutyFinder,framework,gameGui,log,()=>mainWindow.DeveloperMode),()=>dutyFinderReader?.Dispose());
-            var dutyFinderLoot=new DutyLootService(garland){Enabled=()=>CommunitySources.Allowed(configuration,SourceUse.GarlandDutyLoot)};registrations.Register(()=>{},dutyFinderLoot.Dispose);
-            mainWindow.ConfigureDutyFinder(dutyFinder,dutyFinderLoot);
+            // X-153 (0.1899): the duties family (Duty Finder, duty catalogue, duty progress) in Plugin.Duties.cs.
+            RegisterDutyFinder(configuration,framework,gameGui);
             var triadNpcs=new TriadNpcService();
             TriadNpcLoader? triadNpcLoader=null;
             registrations.Register(()=>triadNpcLoader=new TriadNpcLoader(triadNpcs,data,framework,client,player,unlocks,log),()=>triadNpcLoader?.Dispose());
@@ -1051,13 +1048,7 @@ public sealed partial class Plugin : IDalamudPlugin
                 () => hoverReader?.Dispose());
             MapCatalogLoader? mapLoader = null;
             registrations.Register(() => mapLoader = new MapCatalogLoader(maps, data, framework, log), () => mapLoader?.Dispose());
-            DutyCatalogLoader? dutyLoader = null;
-            registrations.Register(() => dutyLoader = new DutyCatalogLoader(duties, data, framework, log), () => dutyLoader?.Dispose());
-            // g, C-01 (0.355): unlocked / completed duties, read on the framework thread while the Duty loot page shows them.
-            DutyProgressReader? dutyProgress = null;
-            registrations.Register(() => dutyProgress = new DutyProgressReader(framework, client, unlocks, data, log, () => duties.State.Catalog, player, Path.Combine(pluginInterface.GetPluginConfigDirectory(), "DutyProgress.json")), () => dutyProgress?.Dispose());
-            mainWindow.DutyProgressSource = () => { dutyProgress?.Want(); return dutyProgress?.State; };
-            mainWindow.DutyProgressUnavailable = () => dutyProgress?.Unavailable == true;
+            RegisterDutyCatalog(pluginInterface,data,framework,client,unlocks,player);
             CharacterStatsReader? statsReader = null;
             registrations.Register(() => statsReader = new CharacterStatsReader(characterStats, framework, player, client, log,objects,data,gameGui), () => statsReader?.Dispose());
             GpCatalogLoader? gpLoader=null;
