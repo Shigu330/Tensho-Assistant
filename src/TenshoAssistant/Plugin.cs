@@ -1046,59 +1046,8 @@ public sealed partial class Plugin : IDalamudPlugin
             WeatherCatalogLoader? weatherLoader=null;
             registrations.Register(()=>weatherLoader=new WeatherCatalogLoader(weather,data,framework,log),()=>weatherLoader?.Dispose());
             registrations.Register(()=>gpLoader=new GpCatalogLoader(gpActions,data,framework,log),()=>gpLoader?.Dispose());
-            CraftActionCatalogLoader? craftActionLoader=null;
-            registrations.Register(()=>craftActionLoader=new CraftActionCatalogLoader(craftActions,data,framework,log),()=>craftActionLoader?.Dispose());
-            CraftLiveReader? craftLiveReader=null;
-            registrations.Register(()=>craftLiveReader=new CraftLiveReader(craftLive,recipeCatalog,craftActions,itemCatalog,framework,player,client,gameGui,objects,log),()=>craftLiveReader?.Dispose());
-            CraftLogReader? craftLogReader=null;
-            // A-02 (0.420): crafting food and medicine from the game's sheets (Item › ItemAction › ItemFood), built on first use.
-            var craftConsumables=new Lazy<IReadOnlyList<Craft.CraftConsumable>>(()=>
-            {
-                try
-                {
-                    var foods=data.GetExcelSheet<Lumina.Excel.Sheets.ItemFood>();var list=new List<Craft.CraftConsumable>();
-                    foreach(var item in data.GetExcelSheet<Lumina.Excel.Sheets.Item>().Where(row=>row.ItemAction.RowId!=0 && !row.Name.IsEmpty))
-                    {
-                        if(item.ItemAction.ValueNullable is not { } action || action.Data.Count<2 || (uint)action.Data[0] is not (Craft.CraftConsumables.WellFed or Craft.CraftConsumables.Medicated)
-                           || foods.GetRowOrDefault(action.Data[1]) is not { } food)continue;
-                        var bonuses=food.Params.Where(param=>param.BaseParam.RowId is Craft.CraftConsumables.Craftsmanship or Craft.CraftConsumables.Control or Craft.CraftConsumables.Cp)
-                            .Select(param=>new Craft.CraftBonus(param.BaseParam.RowId,param.IsRelative,param.Value,param.Max,param.ValueHQ,param.MaxHQ)).ToArray();
-                        if(bonuses.Length>0)list.Add(new(item.RowId,item.Name.ExtractText(),(uint)action.Data[0]==Craft.CraftConsumables.Medicated,bonuses,action.Data[1]));
-                    }
-                    return list.OrderByDescending(item=>item.Bonuses.Sum(bonus=>bonus.MaxHq)).ThenBy(item=>item.Name,StringComparer.CurrentCultureIgnoreCase).ToArray();
-                }
-                catch(Exception error){log.Warning(error,"Crafting food and medicine unavailable.");return [];}
-            });
-            mainWindow.CraftConsumableList=()=>craftConsumables.Value;
-            // X-229 (0.1784): every meal (Well Fed, Status 48, with an ItemFood row) and all its bonuses, for the gear planner, built on first use.
-            var gearMeals=new Lazy<IReadOnlyList<Craft.CraftConsumable>>(()=>
-            {
-                try
-                {
-                    var foods=data.GetExcelSheet<Lumina.Excel.Sheets.ItemFood>();var list=new List<Craft.CraftConsumable>();
-                    foreach(var item in data.GetExcelSheet<Lumina.Excel.Sheets.Item>().Where(row=>row.ItemAction.RowId!=0 && !row.Name.IsEmpty))
-                    {
-                        if(item.ItemAction.ValueNullable is not { } action || action.Data.Count<2 || (uint)action.Data[0]!=Craft.CraftConsumables.WellFed
-                           || foods.GetRowOrDefault(action.Data[1]) is not { } food)continue;
-                        var bonuses=food.Params.Where(param=>param.BaseParam.RowId!=0)
-                            .Select(param=>new Craft.CraftBonus(param.BaseParam.RowId,param.IsRelative,param.Value,param.Max,param.ValueHQ,param.MaxHQ)).ToArray();
-                        if(bonuses.Length>0)list.Add(new(item.RowId,item.Name.ExtractText(),false,bonuses,action.Data[1]));
-                    }
-                    return list.OrderBy(item=>item.Name,StringComparer.CurrentCultureIgnoreCase).ToArray();
-                }
-                catch(Exception error){log.Warning(error,"Meals for the gear planner unavailable.");return [];}
-            });
-            mainWindow.GearMealList=()=>gearMeals.Value;
-            // 0.464: food, medicine and specialist read from the game for the simulator; a failure leaves them unknown.
-            var craftDetectionWarned=false;
-            mainWindow.CraftDetectedNow=job=>
-            {
-                try{return Craft.CraftDetectionReader.Read(objects,job);}
-                catch(Exception error){if(!craftDetectionWarned){craftDetectionWarned=true;log.Warning(error,"Crafting food, medicine and specialist could not be read (perhaps after a game update).");}return null;}
-            };
-            // A-11 (0.421): recipes crafted at least once (QuestManager.IsRecipeComplete), read while a crafting view asks.
-            Craft.RecipeLogReader? recipeLog=null;
-            registrations.Register(()=>mainWindow.RecipeLog=recipeLog=new Craft.RecipeLogReader(framework,client,log,()=>recipeCatalog.State.Catalog),()=>recipeLog?.Dispose());
+            // X-153 (0.1924): the crafting family (actions' loader, live reader, food and medicine, meals, detection, recipe log) in Plugin.Craft.cs.
+            RegisterCraftReaders(data,framework,player,client,gameGui,objects);
             // A-10 (0.422): Macro Chain (Caraxi, InternalName « MacroChain ») loaded: exported pages use its /nextmacro.
             var macroChainCheckedAt=DateTimeOffset.MinValue;var macroChainLoaded=false;
             mainWindow.MacroChainLoaded=()=>
@@ -1153,28 +1102,13 @@ public sealed partial class Plugin : IDalamudPlugin
             mainWindow.ChatNotice=text=>chat.Print("[Tensho] "+text);
             // X-13 (0.447): the conductor's call, sent to the chosen channel on click only, on the framework thread.
             mainWindow.SendHuntCall=command=>framework.RunOnFrameworkThread(()=>Maps.HuntAnnouncer.Send(command,log));
-            // A-05 (0.433): crafting lists in a file of their own (like the Bank).
             // TEMPLATES-001 (DEC-029): tools made of data, in a file of their own.
             TenshoAssistant.MyTools.ToolTemplateStore? myTools=null;
             registrations.Register(()=>mainWindow.MyToolsStore=myTools=new TenshoAssistant.MyTools.ToolTemplateStore(Path.Combine(pluginInterface.GetPluginConfigDirectory(),"MyTools.json"),(error,message)=>log.Warning(error,message)),()=>myTools?.Dispose());
             TenshoAssistant.MyTools.ToolGallery? toolGallery=null;
             registrations.Register(()=>mainWindow.MyToolsGallery=toolGallery=new TenshoAssistant.MyTools.ToolGallery(),()=>toolGallery?.Dispose());
-            mainWindow.CraftListStore=new Craft.CraftListStore(Path.Combine(pluginInterface.GetPluginConfigDirectory(),"CraftLists.json"),(error,message)=>log.Warning(error,message));
-            // A-14 (0.436): crafting rotation recorder (read-only hook on UseAction, only while recording).
-            Craft.CraftRecorder? craftRecorder=null;
-            registrations.Register(()=>mainWindow.CraftRecorder=craftRecorder=new Craft.CraftRecorder(interop,log,()=>craftActions.State.Catalog),()=>craftRecorder?.Dispose());
-            // X-11 (0.419): Manipulation learned by the job, from its action row (CraftActionCatalog) and the game's unlock state.
-            // 0.468: said once by job in the log, so a wrong detection can be told from the action's data.
-            var manipulationLogged=new HashSet<uint>();
-            mainWindow.ManipulationLearned=job=>
-            {
-                if(craftActions.State.Catalog?.Find(job,Craft.CraftActionKind.Manipulation) is not { } manipulation
-                    || data.GetExcelSheet<Lumina.Excel.Sheets.Action>().GetRowOrDefault(manipulation.NativeId) is not { } action)return false;
-                var unlocked=unlocks.IsActionUnlocked(action);
-                if(manipulationLogged.Add(job))log.Information("Manipulation for job {Job}: action {Action}, unlock link {Link}, unlocked {Unlocked}",job,manipulation.NativeId,action.UnlockLink.RowId,unlocked);
-                return unlocked;
-            };
-            registrations.Register(()=>craftLogReader=new CraftLogReader(mainWindow.CraftLog,recipeCatalog,configuration,framework,player,client,gameGui,log),()=>craftLogReader?.Dispose());
+            // X-153 (0.1924): the crafting lists, the rotation recorder, Manipulation learned and the craft log reader in Plugin.Craft.cs.
+            RegisterCraftLog(pluginInterface,configuration,data,framework,player,client,gameGui,unlocks,interop);
             // X-153 (0.1903): the fashion family (hints' loader, Fashion Report reader, its stains and themes) in Plugin.Fashion.cs.
             RegisterFashion(configuration,data,framework,gameGui);
             QuestReader? questReader = null;

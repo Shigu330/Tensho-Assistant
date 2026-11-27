@@ -46,7 +46,7 @@ internal static class FashionFamily1903Tests
             int At(string piece) { var at = plugin.IndexOf(piece, StringComparison.Ordinal); Check(at >= 0, "not found: " + piece); return at; }
             var call = At("RegisterFashion(configuration,data,framework,gameGui);");
             Check(Count(plugin, @"RegisterFashion\(") == 1, "called once");
-            Check(At("craftLogReader=new CraftLogReader(") < call && call < At("QuestReader? questReader = null;"), "after the craft log reader, before the quests, as before");
+            Check(At("RegisterCraftLog(pluginInterface,") < call && call < At("QuestReader? questReader = null;"), "after the craft log reader, before the quests, as before");
         }),
         // X-885 M2 (0.1906): this case replaced « behaviour », the same RegistrationScope test copied in each family test, which touched nothing
         // of the family; each service's install and its release are now checked given to one same registration of Plugin.Fashion.cs.

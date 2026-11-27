@@ -23,7 +23,7 @@ internal static class CraftConsumables420Tests
             var simulation=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.CraftSimulation.cs"));
             var solver=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.CraftSolver.cs"));
             Check(simulation.Contains("CraftSimulation.Run(recipe,EffectiveCraftStats(),") && solver.Contains("var effective=EffectiveCraftStats();"),"both");
-            var plugin=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"));
+            var plugin=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Craft.cs"));
             Check(plugin.Contains("(uint)action.Data[0] is not (Craft.CraftConsumables.WellFed or Craft.CraftConsumables.Medicated)"),"food and medicine only");
         }),
     ];

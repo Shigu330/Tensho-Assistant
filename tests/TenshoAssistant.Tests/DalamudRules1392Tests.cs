@@ -55,7 +55,7 @@ internal static class DalamudRules1392Tests
                 ["ProcessChatBoxEntry"] = ["Alarms/AlarmService.Dalamud.cs", "Maps/HuntAnnouncer.Dalamud.cs"],   // rules 1 and 9: player's click only
                 ["SendTitleIdUpdate"] = ["Collections/TitleChanger.Dalamud.cs"],                                    // rule 1: DEC-035
                 ["Teleport("] = ["MainWindow.ChatMapLinks.cs", "MainWindow.MapView.cs", "Maps/MapLiveReader.Dalamud.cs"],   // rule 1: on click
-                ["UseAction"] = ["Craft/CraftRecorder.Dalamud.cs", "Plugin.cs"],                                    // rules 12 and 20: watched only
+                ["UseAction"] = ["Craft/CraftRecorder.Dalamud.cs", "Plugin.Craft.cs"],                                    // rules 12 and 20: watched only
                 ["ReceiveEvent"] = ["Maps/ChatLinkHoverWatcher.Dalamud.cs"],                                         // the chat link's hover, read
             };
             var sources = Sources().Select(path => (Name: Name(path), Text: File.ReadAllText(path))).ToList();

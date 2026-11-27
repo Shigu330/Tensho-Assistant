@@ -19,7 +19,7 @@ internal static class Craft419Tests
         {
             Check(Read("Craft/CraftLogObservation.cs").Contains("return new(recipe,new(stats.Level,cs,control,cp,manipulation,specialist),null,starting);"),"passed through");
             Check(Read("MainWindow.CraftLog.cs").Contains("ManipulationLearned?.Invoke(job)==true"),"unknown = not learned");
-            Check(Read("Plugin.cs").Contains("unlocks.IsActionUnlocked(action)"),"game unlock state");
+            Check(Read("Plugin.Craft.cs").Contains("unlocks.IsActionUnlocked(action)"),"game unlock state");
         }),
         ("X-12: buffs wait their own extra time; unset, as before",() =>
         {

@@ -27,7 +27,7 @@ internal static class CraftRecorder436Tests
             var detour=source[source.IndexOf("private bool OnUseAction(",StringComparison.Ordinal)..];
             Check(detour.IndexOf("hook!.Original(",StringComparison.Ordinal)<detour.IndexOf("try",StringComparison.Ordinal) && detour.Contains("return result;"),"original first, result unchanged");
             Check(source.Contains("hook.Enable();") && source.Contains("hook?.Disable();") && source.Contains("hook?.Dispose();"),"enabled on Start, disabled on Stop, disposed");
-            Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs")).Contains("()=>craftRecorder?.Dispose()"),"disposed with the plugin");
+            Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Craft.cs")).Contains("()=>craftRecorder?.Dispose()"),"disposed with the plugin");
         }),
     ];
 }

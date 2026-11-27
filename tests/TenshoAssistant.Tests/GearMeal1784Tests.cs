@@ -43,7 +43,7 @@ internal static class GearMeal1784Tests
             var gear = Read("src/TenshoAssistant/MainWindow.Gear.cs");
             Check(gear.Contains("model=GearMealModel(model,state);", StringComparison.Ordinal) && gear.Contains("meal is null ? 4:5", StringComparison.Ordinal), "the meal's model and its column");
             Check(Read("src/TenshoAssistant/MainWindow.GearMeal.cs").Contains("ReferenceEquals(cached.Key.Model,model)", StringComparison.Ordinal), "built once per change of the model or the meal");
-            Check(Read("src/TenshoAssistant/Plugin.cs").Contains("(uint)action.Data[0]!=Craft.CraftConsumables.WellFed", StringComparison.Ordinal), "the meals: Well Fed items with an ItemFood row");
+            Check(Read("src/TenshoAssistant/Plugin.Craft.cs").Contains("(uint)action.Data[0]!=Craft.CraftConsumables.WellFed", StringComparison.Ordinal), "the meals: Well Fed items with an ItemFood row");
             Check(Read("src/TenshoAssistant/Configuration.cs").Contains("\"GearMeals\",", StringComparison.Ordinal), "kept by « reset all » (the player's data)");
             foreach (var (language, synced) in new[] { ("en", "At a synced level: unknown"), ("fr", "Au niveau synchronisé : inconnu") })
             {
