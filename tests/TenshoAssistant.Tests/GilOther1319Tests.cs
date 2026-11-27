@@ -52,7 +52,7 @@ internal static class GilOther1319Tests
             var watcher=Read("src/TenshoAssistant/Inventory/GilWatcher.Dalamud.cs");
             Check(watcher.Contains("if(chat is not null)chat.LogMessage+=OnLogMessage;") && watcher.Contains("if(chat is not null)chat.LogMessage-=OnLogMessage;\n        TenshoAssistant.Competitive.CompetitiveGate.Remove"),"subscribed, and removed on dispose");
             Check(watcher.Contains("GilJournal.ForDelta(GilJournal.Classify(seen,now,heard),delta)"),"the messages heard classify (X-658, 0.1604: once per reading)");
-            Check(Read("src/TenshoAssistant/Plugin.cs").Contains("()=>mainWindow.DeveloperMode,chatGui),()=>gilWatcher?.Dispose());"),"the plugin gives the chat");
+            Check(Read("src/TenshoAssistant/Plugin.Inventory.cs").Contains("()=>mainWindow.DeveloperMode,chatGui),()=>gilWatcher?.Dispose());"),"the plugin gives the chat (X-153, 0.1898: its inventory family)");
             Check(Read("docs/evidence/0.1319-gil-other.md").Contains("| 3780 | 57 |"),"evidence");
         }),
     ];

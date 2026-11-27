@@ -36,7 +36,9 @@ internal static class InventoryFamily1897Tests
                 Check(at > last, service + ": in the order of before");
                 last = at;
             }
-            Check(Count(home, @"registrations\.Register\(") == Paths.Length, "every one through the plugin's registrations");
+            // 0.1898: the second slice follows in the same file (InventoryFamily1898Tests); these three come first.
+            var first = home[..home.IndexOf("RegisterCurrencies(", StringComparison.Ordinal)];
+            Check(Count(first, @"registrations\.Register\(") == Paths.Length, "every one through the plugin's registrations");
             Check(home.Contains("mainWindow.InventoryWindow=inventoryWindow;", StringComparison.Ordinal) && home.Contains("mainWindow.Gearsets=()=>gearsets;", StringComparison.Ordinal), "the main window still reads them");
             var plugin = files.Single(file => file.Name == "Plugin.cs").Text;
             Check(!Regex.IsMatch(plugin, @"new Inventory\.(StorageHighlightReader|InventoryWindowReader|GearsetReader)\("), "Plugin.cs creates none of them");

@@ -86,7 +86,8 @@ internal static class LinkNotices1155Tests
         }),
         ("Link notices 1155: wired where the alerts ring, rung with the alarms' options, never the Tensho alarms or the garden twice",() =>
         {
-            var plugin=Read("src/TenshoAssistant/Plugin.cs");
+            // X-153 (0.1898): the currencies' alert rings from the inventory family.
+            var plugin=Read("src/TenshoAssistant/Plugin.cs")+Read("src/TenshoAssistant/Plugin.Inventory.cs");
             Check(plugin.Split("if(options.ChatAllowed(inDuty) || options.SoundAllowed(inDuty))linkNotices.Add(message);").Length==4,"currencies, duty ready, GP");
             Check(plugin.Contains("if(repairText is not null)linkNotices.Add(repairText);") && plugin.Contains("if(extractText is not null)linkNotices.Add(extractText);"),"gear wear");
             Check(plugin.Contains("if(configuration.ItemNoteImportantSound){Alarms.AlarmService.PlaySound((configuration.AlarmOptions ?? new()).Sound,log);linkNotices.Add(message);}"),"important items, when they ring");

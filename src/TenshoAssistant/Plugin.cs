@@ -570,34 +570,8 @@ public sealed partial class Plugin : IDalamudPlugin
                 Path.Combine(pluginInterface.GetPluginConfigDirectory(),Diagnostics.LaunchProof.FileName),pluginInterface.AssemblyLocation.FullName),()=>selfCheck?.Dispose());
             mainWindow.SelfCheck=selfCheck;
             mainWindow.ConfigureMarketBoard(marketBoard);
-            // 0.344 (g, I-02): currency balances and threshold alerts (chat and sound with the alarm options, Discord in its own category),
-            // and their server bar entry. Registered after the Discord notifier, so released before it.
-            Inventory.CurrencyWatcher? currencies=null;
-            // Framework thread. One chat line and one sound for one alert; silence in duties as for the alarms.
-            void CurrencyNotice(string message)
-            {
-                var options=configuration.AlarmOptions ?? new();
-                var inDuty=options.MuteInDuties && condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty];
-                if(options.ChatAllowed(inDuty))chat.Print("[Tensho] "+message);
-                if(options.SoundAllowed(inDuty))Alarms.AlarmService.PlaySound(options.Sound,log);
-                if(options.ChatAllowed(inDuty) || options.SoundAllowed(inDuty))linkNotices.Add(message);
-                var settings=configuration.Discord;
-                if(Alarms.DiscordWebhook.ShouldSend(settings,Alarms.AlarmSource.Currency))
-                    try
-                    {
-                        var character=settings.IncludeCharacter ? objects.LocalPlayer?.Name.TextValue:null;
-                        var content=Alarms.DiscordWebhook.Format(settings,message,message,message,0,DateTimeOffset.Now,character);
-                        discord.Enqueue(new(Alarms.DiscordWebhook.UrlFor(settings,Alarms.AlarmSource.Currency),Alarms.DiscordWebhook.Payload(settings,content)));
-                    }
-                    catch(Exception error){log.Warning("Currency alert could not be queued for Discord ({Error}).",error.GetType().Name);}
-            }
-            registrations.Register(()=>currencies=new Inventory.CurrencyWatcher(framework,client,player,data,configuration,log)
-            {
-                Crossed=crossed=>CurrencyNotice(localization.Format("Currencies.Alert",string.Join(" · ",crossed.Select(Alarms.CurrencyDtrEntry.Line)))),
-                // 0.606: the weekly limit of the limited tomestones reached.
-                WeeklyCapReached=(got,limit)=>CurrencyNotice(localization.Format("Currencies.WeeklyCapAlert",got.ToString("N0",TenshoAssistant.Localization.TenshoCulture.Current),limit.ToString("N0",TenshoAssistant.Localization.TenshoCulture.Current))),
-            },()=>currencies?.Dispose());
-            mainWindow.Currencies=()=>currencies;
+            // X-153 (0.1898): the currency watcher and its alerts, in the inventory family (Plugin.Inventory.cs); the server bar reads it.
+            var currencies=RegisterCurrencies(configuration,framework,client,player,data,condition,chat,objects,discord);
             // DEC-038: one chat line on entry, nothing on leaving; what waits for Discord does not leave during the cut.
             TenshoAssistant.Competitive.CompetitiveGate.Changed+=isCut=>
             {
@@ -755,17 +729,7 @@ public sealed partial class Plugin : IDalamudPlugin
             mainWindow.AchievementNameOf=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Achievement>().GetRowOrDefault(id)?.Name.ExtractText();
             // 0.351 (g, I-04): gil journal per character, kept 90 days; since 0.1139 (X-173) in TenshoData.db; the files of before (GilJournal/<id>.json)
             // left aside, never read (X-574, 0.1793).
-            Inventory.GilWatcher? gilWatcher=null;
-            var gilStore=new Inventory.GilJournalStore(Path.Combine(pluginInterface.GetPluginConfigDirectory(),"GilJournal"),tenshoData);
-            registrations.Register(()=>gilWatcher=new Inventory.GilWatcher(framework,player,gameGui,gilStore,log,
-                ()=>mainWindow.GameWindowSource?.Invoke().Select(window=>window.Name).ToArray() ?? [],()=>mainWindow.DeveloperMode,chatGui),()=>gilWatcher?.Dispose());
-            mainWindow.GilJournalState=()=>gilWatcher?.State;
-            // X-557 (0.1774): a gain in a duty that nothing else explains is the duty's; the character's own names kept out of the « Other » context (R25).
-            if(gilWatcher is not null)
-            {
-                gilWatcher.InDuty=()=>condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty];
-                gilWatcher.OwnNames=()=>[player.CharacterName,player.HomeWorld.ValueNullable?.Name.ExtractText(),player.CurrentWorld.ValueNullable?.Name.ExtractText(),objects.LocalPlayer?.CompanyTag.TextValue];
-            }
+            var gilWatcher=RegisterGilJournal(pluginInterface,framework,player,gameGui,condition,objects,tenshoData);
             // The server bar's entries (alarms, reminders, currencies, gil, X-217's optional entries), once the services they show exist:
             // the server bar family (X-153, 0.1240: Plugin.ServerBar.cs), in the order they were created before.
             RegisterServerBar(dtrBar,framework,gameGui,player,client,inventory,configuration,localization,()=>currencies?.State,()=>gilWatcher?.State?.Entries,()=>gear?.Equipped ?? []);

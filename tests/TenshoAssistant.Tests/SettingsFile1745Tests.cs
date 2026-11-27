@@ -276,14 +276,19 @@ internal static class SettingsFile1745Tests
             // X-775: File.ReadAllText throws UnauthorizedAccessException on Windows while the file is being replaced (as SettingsFile.cs expects).
             var reader = new Thread(() => { try { while (!stop.IsCancellationRequested) { try { SettingsJson.Node(System.IO.File.ReadAllText(path)); } catch (System.Text.Json.JsonException) { Interlocked.Increment(ref broken); } catch (Exception error) when (error is IOException or UnauthorizedAccessException) { } } } catch (Exception error) { Interlocked.CompareExchange(ref unexpected, "reader: " + error, null); } }) { IsBackground = true };
             reader.Start();
-            var a = new Thread(() => { try { for (var i = 1; i <= 25; i++) { one.MapView.IconScale = 1f + i; oneFile.Save(one); } } catch (Exception error) { Interlocked.CompareExchange(ref unexpected, "first client: " + error, null); } });
-            var b = new Thread(() => { try { for (var i = 1; i <= 25; i++) { two.MapView.MapIconPriorities[5] = new() { [9] = i }; twoFile.Save(two); } } catch (Exception error) { Interlocked.CompareExchange(ref unexpected, "second client: " + error, null); } });
+            // R36.2 (0.1898, failed once under Verify's load: « 25, 25 »): a save may fail while the reader holds the file (SettingsFile keeps it
+            // in memory and writes it at the next save, its contract); the saves that failed are counted, and each client saves once more after
+            // the race. A change lost by the merge would stay lost after that save: the check below still catches it.
+            var failed = new int[2];
+            var a = new Thread(() => { try { for (var i = 1; i <= 25; i++) { one.MapView.IconScale = 1f + i; if (!oneFile.Save(one)) Interlocked.Increment(ref failed[0]); } } catch (Exception error) { Interlocked.CompareExchange(ref unexpected, "first client: " + error, null); } });
+            var b = new Thread(() => { try { for (var i = 1; i <= 25; i++) { two.MapView.MapIconPriorities[5] = new() { [9] = i }; if (!twoFile.Save(two)) Interlocked.Increment(ref failed[1]); } } catch (Exception error) { Interlocked.CompareExchange(ref unexpected, "second client: " + error, null); } });
             a.Start(); b.Start();
             Check(a.Join(TimeSpan.FromSeconds(60)) && b.Join(TimeSpan.FromSeconds(60)), "both ended");
             stop.Cancel(); reader.Join();
             Check(unexpected is null, "no exception left in a thread: " + unexpected);
+            Check(oneFile.Save(one) && twoFile.Save(two), "each client's next save written");
             var last = Settings(root).Load(out _);
-            Check(last.MapView.IconScale == 26f && last.MapView.MapIconPriorities.GetValueOrDefault(5u)?.GetValueOrDefault(9u) == 25, $"each one's last value: {last.MapView.IconScale}, {last.MapView.MapIconPriorities.GetValueOrDefault(5u)?.GetValueOrDefault(9u)}");
+            Check(last.MapView.IconScale == 26f && last.MapView.MapIconPriorities.GetValueOrDefault(5u)?.GetValueOrDefault(9u) == 25, $"each one's last value: {last.MapView.IconScale}, {last.MapView.MapIconPriorities.GetValueOrDefault(5u)?.GetValueOrDefault(9u)} (saves failed during the race: {failed[0]}, {failed[1]})");
             Check(last.DeveloperMode == one.DeveloperMode && last.HidePanelsBehindGame == two.HidePanelsBehindGame, "the earlier changes still there");
             Check(broken == 0, "the file read half written " + broken + " time(s)");
         })),

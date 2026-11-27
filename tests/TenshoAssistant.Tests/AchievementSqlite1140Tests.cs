@@ -128,7 +128,8 @@ internal static class AchievementSqlite1140Tests
         })),
         ("Achievements SQLite 1140: wiring (one data file for the plugin, the progress read off the frame, an unreadable one never written over)",() =>
         {
-            var plugin=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"));
+            // X-153 (0.1898): the gil journal's store is made by the inventory family.
+            var plugin=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"))+File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Inventory.cs"));
             Check(plugin.Contains("var (tenshoData,bank,bankBridge)=RegisterPersistence(",StringComparison.Ordinal) && File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Persistence.cs")).Contains("var tenshoData=new TenshoDataFile(",StringComparison.Ordinal) && plugin.Contains("new Inventory.GilJournalStore(Path.Combine(pluginInterface.GetPluginConfigDirectory(),\"GilJournal\"),tenshoData)",StringComparison.Ordinal)
                 // 0.1444 (X-153): the collections family moved to Plugin.Collections.cs.
                 && File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Collections.cs")).Contains("new Collections.AchievementProgressData(Path.Combine(pluginInterface.GetPluginConfigDirectory(),\"AchievementProgress.json\"),tenshoData)",StringComparison.Ordinal),"plugin");

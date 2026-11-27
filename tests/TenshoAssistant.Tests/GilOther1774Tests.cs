@@ -93,7 +93,8 @@ internal static class GilOther1774Tests
             Check(watcher.Contains("if(TenshoAssistant.Competitive.CompetitiveGate.Cut)return;\n        if(disposed || !developerMode())return;", StringComparison.Ordinal) && watcher.Contains("if(own.Count==0)return;", StringComparison.Ordinal), "messages: not cut, developer mode, own names known first");
             Check(watcher.Contains("if(category==GilCategory.Other && developerMode())lock(context)context.Other(at,change);", StringComparison.Ordinal) && watcher.Contains("foreach(var line in due)log.Information(\"{0}\",line);", StringComparison.Ordinal), "the change noted and its line written as a value");
             Check(watcher.Contains("if(chat is not null)chat.ChatMessageUnhandled+=OnChatMessage;", StringComparison.Ordinal) && watcher.Contains("if(chat is not null)chat.ChatMessageUnhandled-=OnChatMessage;", StringComparison.Ordinal), "subscribed and removed");
-            var plugin = Read("src/TenshoAssistant/Plugin.cs");
+            // X-153 (0.1898): wired by the inventory family.
+            var plugin = Read("src/TenshoAssistant/Plugin.Inventory.cs");
             Check(plugin.Contains("gilWatcher.InDuty=()=>condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty];", StringComparison.Ordinal) && plugin.Contains("gilWatcher.OwnNames=()=>[player.CharacterName,", StringComparison.Ordinal), "the plugin's duty and own names");
             Check(Read("src/TenshoAssistant/MainWindow.GilJournal.cs").Contains("GilCategory.Duty=>Dalamud.Interface.FontAwesomeIcon.Dungeon,", StringComparison.Ordinal), "an icon");
             foreach (var language in new[] { "en", "fr" })
