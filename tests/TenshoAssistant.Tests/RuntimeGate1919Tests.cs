@@ -50,6 +50,10 @@ internal static class RuntimeGate1919Tests
             var (context, loaded) = Reloaded();
             try
             {
+                // X-898 (review of 0.1919, M1): one gate per load again (the regression the first case finds) froze the whole test
+                // process here, the first case's report never written: the same gate is checked first, before any listener is made.
+                var otherGate = loaded.GetType("TenshoAssistant.Diagnostics.RuntimeListeners", throwOnError: true)!.GetField("Gate", BindingFlags.Public | BindingFlags.Static)!.GetValue(null);
+                Check(ReferenceEquals(otherGate, RuntimeListeners.Gate), "the same gate for both loads, checked before any listener is made (a gate per load would freeze the process)");
                 var otherOpen = loaded.GetType("TenshoAssistant.Diagnostics.JitNames", throwOnError: true)!.GetMethod("Open", BindingFlags.Public | BindingFlags.Static)!;
                 var failures = new List<string>();
                 var ended = 0;
