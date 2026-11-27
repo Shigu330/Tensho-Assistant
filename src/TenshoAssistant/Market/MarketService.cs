@@ -31,6 +31,12 @@ public sealed class MarketService : IDisposable
     private int generation;
     private bool disposed;
     private long? lastRequest;
+    /// <summary>X-886 (0.1908): the moments a list's requests were given their turn (under the gate), kept only when a test sets it: the
+    /// pause is counted from them, so a test reads it here rather than where a fake server receives the request (a late receipt under load
+    /// made the pause look shorter, UniversalisCeiling1849Tests).</summary>
+    internal List<long>? Turns { get; set; }
+    // X-846, X-886: a list's request given its turn now (under the gate).
+    private void Granted(){lastRequest=Stopwatch.GetTimestamp();Turns?.Add(lastRequest.Value);}
     /// <summary>The pause between two Universalis requests: 3 s (their API's usual courtesy). 0.1202: one place for it, per service; a test may
     /// shorten it to see the same waits in less time (VerifySpeed1202Tests checks the 3 s of every service the plugin makes).</summary>
     public static readonly TimeSpan UsualRequestPause=TimeSpan.FromSeconds(3);
@@ -103,7 +109,7 @@ public sealed class MarketService : IDisposable
                         missing=missing.Except(unsold).ToArray();
                         if(missing.Length==0)return null;
                     }
-                    lastRequest=Stopwatch.GetTimestamp();
+                    Granted();
                     break;
                 }
             }
@@ -183,7 +189,7 @@ public sealed class MarketService : IDisposable
                 var pause=bulk ? SplitPause:RequestPause;
                 var since=lastRequest is { } last ? Stopwatch.GetElapsedTime(last):pause;
                 wait=requestActive ? TimeSpan.FromMilliseconds(250):since<pause ? pause-since:TimeSpan.Zero;
-                if(wait==TimeSpan.Zero){lastRequest=Stopwatch.GetTimestamp();return (true,null);}
+                if(wait==TimeSpan.Zero){Granted();return (true,null);}
             }
             await Task.Delay(wait,token).ConfigureAwait(false);
         }

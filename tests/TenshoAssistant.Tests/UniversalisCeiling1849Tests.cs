@@ -97,10 +97,16 @@ internal static class UniversalisCeiling1849Tests
                 using var http = fake.Client();
                 var pause = TimeSpan.FromMilliseconds(300);
                 using var market = Service(http, bulk ? TimeSpan.Zero : pause, bulk ? pause : TimeSpan.Zero);
+                market.Turns = [];
                 Check(market.FillCacheAsync([2, 3, 4, 5], 7, 97, CancellationToken.None, bulk, new HashSet<uint>()).GetAwaiter().GetResult() is null, "read");
-                Check(fake.Count == 3, "the list, then its two halves: " + fake.Count);
-                for (var index = 1; index < fake.Count; index++)
-                    Check(fake.Gap(index) >= 280, (bulk ? "long" : "short") + " list: request " + index + " came " + fake.Gap(index) + " ms after the one before");
+                Check(fake.Count == 3 && market.Turns.Count == 4, "the list, then its two halves (and the sale speed's turn): " + fake.Count + " asked, " + market.Turns.Count + " turns");
+                // X-886 (0.1908): the pause read between the turns the service gave, where it counts it from (the fake's receipts: once in ten
+                // runs under load, the list's receipt came late and the next one looked 226 ms after it).
+                for (var index = 1; index < market.Turns.Count; index++)
+                {
+                    var gap = Stopwatch.GetElapsedTime(market.Turns[index - 1], market.Turns[index]).TotalMilliseconds;
+                    Check(gap >= 299, (bulk ? "long" : "short") + " list: request " + index + " given its turn " + gap + " ms after the one before");
+                }
             }
         }),
         ("Universalis ceiling 1849: behaviour: a pause asked by Universalis meanwhile stops the halves still to ask", () =>
