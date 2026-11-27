@@ -41,7 +41,8 @@ internal static class DiscoveriesFamily1250Tests
             var plugin = PluginFiles().Single(file => file.Name == "Plugin.cs").Text;
             var store = plugin.IndexOf("var (discoveries,discoveryFolder)=RegisterDiscoveries(pluginInterface);",StringComparison.Ordinal);
             var watcher = plugin.IndexOf("itemWatcher=new Discoveries.ItemDiscoveryWatcher(",StringComparison.Ordinal);
-            var reader = plugin.IndexOf("seenReader=new Market.SeenPriceReader(",StringComparison.Ordinal);
+            // X-153 (0.1893): the seen prices' reader is made by its market family, called at the same place.
+            var reader = plugin.IndexOf("RegisterSeenPrices(configuration,marketBoardEvents,seenPrices,bankBridge);",StringComparison.Ordinal);
             var load = plugin.IndexOf("LoadDiscoveries(discoveryFolder,discoveries,seenPrices,framework,chat);",StringComparison.Ordinal);
             Check(store > 0 && store < watcher && watcher < reader && reader < load,"order of before");
             Check(Count(plugin,@"RegisterDiscoveries\(") == 1 && Count(plugin,@"LoadDiscoveries\(") == 1,"called once each");

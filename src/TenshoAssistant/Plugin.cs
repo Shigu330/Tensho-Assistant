@@ -247,8 +247,8 @@ public sealed partial class Plugin : IDalamudPlugin
                 .GroupBy(row=>row.Name.ExtractText(),StringComparer.OrdinalIgnoreCase).ToDictionary(group=>group.Key,group=>group.First().Region.RowId,StringComparer.OrdinalIgnoreCase);
             fashionData.ConfigureCache(()=>configuration.Cache.Duration(CacheArea.Fashion),dataCache);
             fashionData.Enabled=()=>configuration.CommunityFashion;
-            MarketWorldReader? marketReader = null;
-            registrations.Register(() => marketReader = new MarketWorldReader(market, framework, player, client, log, data), () => marketReader?.Dispose());
+            // X-153 (0.1893): the market family (world reader, prices seen, undercut, retainer market) in Plugin.Market.cs.
+            RegisterMarketWorld(framework,player,client,data);
             // X-173 (0.1140): the player's data file, one for every family moved into it (gil journal, achievement progress, voyage history,
             // bank), with the bank and its bridge to the game's inventory: the persistence family (X-153, 0.1239: Plugin.Persistence.cs).
             var (tenshoData,bank,bankBridge)=RegisterPersistence(pluginInterface,configuration,data,inventory,gameGui,player,client,framework);
@@ -401,9 +401,7 @@ public sealed partial class Plugin : IDalamudPlugin
                 // X-75.5 (0.879): and the region's, from the worlds of the region seen (World → data centre → region, game sheets).
                 return seenPrices.WithRegion(seenPrices.WithDataCenter(quote,market.State.WorldNames?.Keys.ToArray() ?? [],now),RegionWorlds(market.State.WorldId),now);
             };
-            Market.SeenPriceReader? seenReader=null;
-            registrations.Register(()=>seenReader=new Market.SeenPriceReader(marketBoardEvents,seenPrices,()=>market.State.WorldId,()=>configuration.Discovery.Enabled && configuration.Discovery.MarketPrices,log)
-                {OwnRetainers=()=>bankBridge.State.KnownRetainers?.Select(known=>known.Id).ToHashSet()},()=>seenReader?.Dispose());
+            RegisterSeenPrices(configuration,marketBoardEvents,seenPrices,bankBridge);
             // X-153 (0.1250): the prices seen, then the discoveries, read off the frame (Plugin.Discoveries.cs); nothing is written before it is read.
             LoadDiscoveries(discoveryFolder,discoveries,seenPrices,framework,chat);
             // 0.395 (user request): the wiki's spellbook table (one page for every spell) read when the Blue magic page opens, copy first.
@@ -806,9 +804,7 @@ public sealed partial class Plugin : IDalamudPlugin
                     }
                 },log),()=>shopReminder?.Dispose());
             // 0.346 (g, I-07): lowest offer minus 1 copied to the clipboard when the player opens an item's offers (off by default).
-            registrations.Register(()=>undercut=new Market.UndercutWatcher(marketBoardEvents,framework,configuration,(item,lowest,paste,hq)=>
-                chat.Print("[Tensho] "+localization.Format("Undercut.Copied",data.GetExcelSheet<Lumina.Excel.Sheets.Item>().GetRowOrDefault(item)?.Name.ExtractText() ?? $"#{item}",
-                    lowest.ToString("N0",TenshoAssistant.Localization.TenshoCulture.Current),paste.ToString("N0",TenshoAssistant.Localization.TenshoCulture.Current),hq ? " HQ":"")),log),()=>undercut?.Dispose());
+            RegisterUndercut(configuration,marketBoardEvents,framework,chat,data);
             mainWindow.WorldName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.World>().GetRowOrDefault(id)?.Name.ExtractText();
             mainWindow.TerritoryName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.TerritoryType>().GetRowOrDefault(id) is { } territory && territory.PlaceName.RowId!=0
                 ? territory.PlaceName.Value.Name.ExtractText():null;

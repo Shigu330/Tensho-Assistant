@@ -34,7 +34,9 @@ internal static class MarketFamily1887Tests
                 Check(files.Sum(file => Count(file.Text, install)) == 1 && files.Sum(file => Count(file.Text, release)) == 1, service + ": one install and one release path");
                 Check(Count(home, install) == 1 && Count(home, release) == 1, service + ": in its family's file");
             }
-            Check(Count(home, @"registrations\.Register\(") == Paths.Length, "every one through the plugin's registrations");
+            // 0.1893: the rest of the family lives beside it (MarketFamily1893Tests); these four are the retainer market's own.
+            var retainer = home[home.IndexOf("RegisterRetainerMarket(", StringComparison.Ordinal)..];
+            Check(Count(retainer, @"registrations\.Register\(") == Paths.Length, "every one through the plugin's registrations");
             var order = Paths.Select(path => Regex.Match(home, path.Install).Index).ToArray();
             Check(order.SequenceEqual(order.Order()), "in their order of before");
             var plugin = files.Single(file => file.Name == "Plugin.cs").Text;
