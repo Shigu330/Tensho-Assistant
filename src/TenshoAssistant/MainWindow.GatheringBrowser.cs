@@ -99,7 +99,7 @@ internal sealed partial class MainWindow
             {
                 DrawGameIcon(type.IconId,new Vector2(28));
                 if (ImGui.IsItemClicked()) sourceTypeFilter = type.TypeId;
-                if (ImGui.IsItemHovered()) WrappedTooltip(type.TypeName);
+                TipText(type.TypeName);
             }
             finally { ImGui.PopID(); }
         }

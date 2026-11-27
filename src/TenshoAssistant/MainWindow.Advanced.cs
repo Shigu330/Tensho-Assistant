@@ -339,7 +339,7 @@ internal sealed partial class MainWindow
         CopyButton(localization.Get("Contributor.CopyBuild"),()=>@".\scripts\Verify.ps1");
         Tip("Contributor.CopyBuildTip");
         ImGui.TextDisabled(localization.Get("Contributor.License"));
-        if(ImGui.TreeNode(localization.Get("Contributor.DocsTitle")+"###ContribDocs"))
+        if(UI.UiComponents.TreeNode(localization.Get("Contributor.DocsTitle")+"###ContribDocs"))
         {
             try
             {
@@ -352,7 +352,7 @@ internal sealed partial class MainWindow
             }
             finally{ImGui.TreePop();}
         }
-        if(ImGui.TreeNode(localization.Format("Contributor.CodeTitle",page)+"###ContribCode"))
+        if(UI.UiComponents.TreeNode(localization.Format("Contributor.CodeTitle",page)+"###ContribCode"))
         {
             try
             {
@@ -363,7 +363,7 @@ internal sealed partial class MainWindow
             }
             finally{ImGui.TreePop();}
         }
-        if(ImGui.TreeNode(localization.Get("Contributor.SourcesTitle")+"###ContribSources"))
+        if(UI.UiComponents.TreeNode(localization.Get("Contributor.SourcesTitle")+"###ContribSources"))
         {
             try
             {
@@ -381,7 +381,7 @@ internal sealed partial class MainWindow
             }
             finally{ImGui.TreePop();}
         }
-        if(ImGui.TreeNode(localization.Get("Contributor.ProbesTitle")+"###ContribProbes"))
+        if(UI.UiComponents.TreeNode(localization.Get("Contributor.ProbesTitle")+"###ContribProbes"))
         {
             try
             {
@@ -394,7 +394,7 @@ internal sealed partial class MainWindow
             }
             finally{ImGui.TreePop();}
         }
-        if(ImGui.TreeNode(localization.Get("Contributor.LocalizationTitle")+"###ContribLoc"))
+        if(UI.UiComponents.TreeNode(localization.Get("Contributor.LocalizationTitle")+"###ContribLoc"))
         {
             try
             {

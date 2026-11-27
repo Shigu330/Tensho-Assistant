@@ -173,7 +173,7 @@ internal sealed partial class MainWindow
                             WrappedTooltip(localization.Format("CostUi.Quote",quote.WorldId,quote.FetchedAt.ToLocalTime().ToString("G"),quote.UploadedAt?.ToLocalTime().ToString("G") ?? localization.Get("CostUi.Unknown")));
                         ImGui.TableNextColumn(); ImGui.TextUnformatted(line.Cost?.ToString("N0",Numbers) ?? localization.Get("CostUi.Unknown"));
                         ImGui.TableNextColumn(); ImGui.TextUnformatted(PreparationPriceStatus(line));
-                        if(ImGui.IsItemHovered()) WrappedTooltip(PreparationPriceStatus(line));
+                        TipText(()=>PreparationPriceStatus(line));
                     }
                     finally {ImGui.PopID();}
                     }

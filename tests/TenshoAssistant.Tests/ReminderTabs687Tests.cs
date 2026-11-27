@@ -28,7 +28,7 @@ internal static class ReminderTabs687Tests
         ("Leves: the tooltip says what the columns say, for everyone, and the id stays for developers",() =>
         {
             var page=Read("MainWindow.Leves.cs");
-            Check(page.Contains("if(ImGui.IsItemHovered())WrappedTooltip(LeveTooltip(leve));"),"for everyone");
+            Check(page.Contains("TipText(()=>LeveTooltip(leve));"),"for everyone");
             Check(page.Contains("if(developerMode)lines.Add($\"Leve {leve.Id}\");"),"the id");
         }),
         ("0.558: a reminder ticks itself only when the game reads its counter at 0",() =>

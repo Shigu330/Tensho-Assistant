@@ -330,7 +330,7 @@ internal sealed partial class MainWindow
     {
         var id=$"{myToolSelected}:{block}";
         if(ImGui.SmallButton(SafeLabel(link.Label.For(language))+"###Link"))myToolPendingLink=myToolPendingLink==id ? null:id;
-        if(ImGui.IsItemHovered())WrappedTooltip(link.Url);
+        TipText(link.Url);
         if(myToolPendingLink!=id || ToolTemplateFormat.SafeLink(link.Url) is not { } uri)return;
         ImGui.PushTextWrapPos(0);
         try{ImGui.TextColored(UI.FfxivTheme.Warning,localization.Format("MyToolsUi.LinkConfirm",uri.IdnHost,link.Url));}

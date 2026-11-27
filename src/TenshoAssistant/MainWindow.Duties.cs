@@ -168,7 +168,7 @@ internal sealed partial class MainWindow
         if(document.Sections.Count==0){EmptyState("DutyGuide.Empty");return;}
         foreach(var section in document.Sections)
         {
-            if(!ImGui.TreeNode(section.Title+$"###DutyGuide{section.Title}"))continue;
+            if(!UI.UiComponents.TreeNode(section.Title+$"###DutyGuide{section.Title}"))continue;
             try{ImGui.TextWrapped(section.Text);}
             finally{ImGui.TreePop();}
         }
@@ -347,8 +347,7 @@ internal sealed partial class MainWindow
                     }
                     ImGui.TableNextColumn();
                     ImGui.TextUnformatted(item.Sources.Length == 1 ? DutySourceLabel(item.Sources[0]) : $"{item.Sources.Length} sources");
-                    if (ImGui.IsItemHovered())
-                        WrappedTooltip(string.Join('\n',item.Sources.Select(DutySourceLabel)));
+                    TipText(()=>string.Join('\n',item.Sources.Select(DutySourceLabel)));
                 }
             }
             finally { clipper.End(); clipper.Destroy(); }

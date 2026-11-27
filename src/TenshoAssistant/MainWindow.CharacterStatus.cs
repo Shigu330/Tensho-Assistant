@@ -78,7 +78,7 @@ internal sealed partial class MainWindow
                     else
                     {
                         ImGui.TextUnformatted(localization.Format("CharacterStatus.BingoState",status.BingoStickers ?? 0));
-                        if(status.BingoExpires is { } expires && ImGui.IsItemHovered())WrappedTooltip(localization.Format("CharacterStatus.BingoExpires",expires.ToLocalTime().ToString("g")));
+                        if(status.BingoExpires is { } expires)TipText(()=>localization.Format("CharacterStatus.BingoExpires",expires.ToLocalTime().ToString("g")));
                     }
                     ImGui.TableNextColumn();
                     if(status.HuntBills is { } bills)ImGui.TextUnformatted(bills.ToString(Numbers));

@@ -127,7 +127,7 @@ internal sealed partial class MainWindow
                             if(Collectables?.Catalog?.For(row.FishId) is { Count:>0 } collectable && collectable.FirstOrDefault(rule=>rule.Scrips) is { } scrip)
                             {
                                 ImGui.TextColored(Accent,localization.Format("FishingPanel.Collectable",scrip.Low,scrip.Mid,scrip.High));
-                                if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("FishingPanel.CollectableTip",scrip.Low,scrip.RewardLow,scrip.Mid,scrip.RewardMid,scrip.High,scrip.RewardHigh,scrip.Group));
+                                TipText(()=>localization.Format("FishingPanel.CollectableTip",scrip.Low,scrip.RewardLow,scrip.Mid,scrip.RewardMid,scrip.High,scrip.RewardHigh,scrip.Group));
                             }
                             ImGui.TableNextColumn();
                             for(var step=0;step<row.Route.Count;step++)
@@ -139,7 +139,7 @@ internal sealed partial class MainWindow
                                 if(step==0 && inHand==row.Route[0])
                                     ImGui.GetWindowDrawList().AddRect(ImGui.GetItemRectMin()-new Vector2(1),ImGui.GetItemRectMax()+new Vector2(1),ImGui.GetColorU32(Success),3,ImDrawFlags.None,2);
                                 // X-684 (0.1669): the bait's icon carries the common item tooltip; only what it does not say is added under it.
-                                if(ImGui.IsItemHovered())WrappedTooltip((bait is null ? row.Route[step]+"\n":"")+(step==0 ? "":localization.Get("FishingSources.Mooch")+"\n")+localization.Get("FishingPanel.RightClick"));
+                                TipText(()=>(bait is null ? row.Route[step]+"\n":"")+(step==0 ? "":localization.Get("FishingSources.Mooch")+"\n")+localization.Get("FishingPanel.RightClick"));
                             }
                             if(row.Route.Count==0)ImGui.TextDisabled("?");
                             ImGui.TableNextColumn();
@@ -150,7 +150,7 @@ internal sealed partial class MainWindow
                             {
                                 var colour=bite switch{"Weak"=>Success,"Strong"=>Warning,"Legendary"=>Error,_=>Muted};
                                 ImGui.TextColored(colour,(bite switch{"Weak"=>"!","Strong"=>"!!","Legendary"=>"!!!",_=>"?"})+(hook is not null ? " "+localization.Get("FishingPanel.HookShort"+hook):""));
-                                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get(bite is not null ? "FishingPanel.Bite"+bite:"FishingPanel.BiteUnknown")+(hook is not null ? " · "+localization.Get("FishingPanel.Hook"+hook):""));
+                                TipText(()=>localization.Get(bite is not null ? "FishingPanel.Bite"+bite:"FishingPanel.BiteUnknown")+(hook is not null ? " · "+localization.Get("FishingPanel.Hook"+hook):""));
                             }
                             else ImGui.TextDisabled("—");
                             ImGui.TableNextColumn();
@@ -162,7 +162,7 @@ internal sealed partial class MainWindow
                                 if(row.Conditions.Length>0)
                                 {
                                     ImGui.TextUnformatted(row.Conditions);
-                                    if(ImGui.IsItemHovered())WrappedTooltip(row.ConditionsDetail);
+                                    TipText(row.ConditionsDetail);
                                 }
                             }
                         }

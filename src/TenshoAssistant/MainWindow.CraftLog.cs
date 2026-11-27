@@ -217,7 +217,7 @@ internal sealed partial class MainWindow
                 craftSolve.Cancel();IsOpen=true;
             }
             if(canSave)DrawCraftLogSave(craftLogInput.Recipe,macro);
-            if(ImGui.TreeNode(localization.Get("CraftLogUi.Text")))
+            if(UI.UiComponents.TreeNode(localization.Get("CraftLogUi.Text")))
             {
                 try{foreach(var block in macro.Export.Pages)foreach(var line in block.Lines)ImGui.TextUnformatted(line);}
                 finally{ImGui.TreePop();}
@@ -330,7 +330,7 @@ internal sealed partial class MainWindow
             first=false;
             var quality=Gathering.Collectables.QualityFor(threshold,maximum);
             if(ImGui.SmallButton(localization.Format(labelKey,threshold)+"###CraftLog"+labelKey))SetCraftLogTarget(recipe,quality);
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("CraftSearch.CollectTip",threshold,quality));
+            TipText(()=>localization.Format("CraftSearch.CollectTip",threshold,quality));
         }
     }
     // 0.468 (user request, in-game campaign): the suggestion kept as the recipe's best sequence; from then on, while it reaches the target, the panel shows it and computes nothing.

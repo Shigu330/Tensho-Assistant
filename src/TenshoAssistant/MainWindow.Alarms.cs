@@ -120,7 +120,7 @@ internal sealed partial class MainWindow
         bool clicked;
         try{clicked=ImGui.SmallButton(FontAwesomeIcon.Bell.ToIconString()+"##Alarm"+id);}
         finally{ImGui.PopFont();}
-        if(ImGui.IsItemHovered())WrappedTooltip(tooltip+"\n"+localization.Format("Alarms.LeadHint",MinutesText(AlarmSchedule.ClampLead(daily ? AlarmRepeat.EorzeaDaily:AlarmRepeat.Once,DefaultAlarmLead))));
+        TipText(()=>tooltip+"\n"+localization.Format("Alarms.LeadHint",MinutesText(AlarmSchedule.ClampLead(daily ? AlarmRepeat.EorzeaDaily:AlarmRepeat.Once,DefaultAlarmLead))));
         if(clicked)AddAlarms(create());
     }
     // 0.331: a copy in the game keeps ringing there as it was sent; turning the alarm off or changing its lead here does not reach it.
@@ -211,7 +211,7 @@ internal sealed partial class MainWindow
         var starts=alarm.Weathers.Count>0 && vista.MinTime==0 && vista.MaxTime==0 ? new[]{0,480,960}:new[]{alarm.EtMinute};
         if(ImGui.Selectable(localization.Format(weatherNote is null ? "Alarms.VistaAdd":"Alarms.VistaAddWindow",vista.Name)+"##VistaAlarm"))
             AddAlarms(AlarmSchedule.ForWindows(alarm.Label,starts,alarm.LeadMinutes,territory,0,alarm.Weathers).Select(created=>{created.Group=alarm.Group;return created;}).ToArray());
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("Alarms.LeadHint",MinutesText(alarm.LeadMinutes))+(weatherNote is null ? "":"\n"+localization.Get(weatherNote)));
+        TipText(()=>localization.Format("Alarms.LeadHint",MinutesText(alarm.LeadMinutes))+(weatherNote is null ? "":"\n"+localization.Get(weatherNote)));
     }
 
     private string AlarmWhen(TenshoAlarm alarm)=>alarm.Repeat switch
@@ -242,11 +242,11 @@ internal sealed partial class MainWindow
         var size=new Vector2(32);
         if(first.ItemId!=0 && itemCatalog.State.Catalog?.Find(first.ItemId) is { } item)
         {DrawItemIcon(item,size);return;}
-        if(first.IconId!=0){DrawGameIcon(first.IconId,size);if(ImGui.IsItemHovered())WrappedTooltip(title);return;}
+        if(first.IconId!=0){DrawGameIcon(first.IconId,size);TipText(title);return;}
         ImGui.PushFont(UiBuilder.IconFont);
         try{ImGui.Button(FontAwesomeIcon.Bell.ToIconString()+"##GroupIcon",size);}
         finally{ImGui.PopFont();}
-        if(ImGui.IsItemHovered())WrappedTooltip(title);
+        TipText(title);
     }
 
     // Alarms module (0.202): its own page, alarms grouped by item with icon and tooltip, settings and the game's alarms.
@@ -309,7 +309,7 @@ internal sealed partial class MainWindow
             ImGui.SameLine();
             if(ImGui.SmallButton(localization.Get("Alarms.AddDaily")))
                 AddAlarms(AlarmSchedule.ForWindows(alarmManualLabel.Trim().Length>0 ? alarmManualLabel.Trim():localization.Get("Alarms.ManualDefault"),[alarmManualHour*60+alarmManualMinute],DefaultAlarmLead,0,0));
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("Alarms.AddDailyTip",MinutesText(AlarmSchedule.ClampLead(AlarmRepeat.EorzeaDaily,DefaultAlarmLead))));
+            TipText(()=>localization.Format("Alarms.AddDailyTip",MinutesText(AlarmSchedule.ClampLead(AlarmRepeat.EorzeaDaily,DefaultAlarmLead))));
             // 0.386 (g, X-10): the same label at a real local date, once.
             DrawManualDateAlarm();
         }
@@ -421,7 +421,7 @@ internal sealed partial class MainWindow
                         }
                         if(first.ItemId!=0){ImGui.SameLine();if(ImGui.SmallButton(localization.Get("Alarms.OpenItem"))){SelectItem(first.ItemId);OpenItemSheet();}}
                         if(first.TerritoryId!=0){ImGui.SameLine();if(ImGui.SmallButton(localization.Get("Navigation.Weather"))){OpenWeather(first.TerritoryId,maps.State.Catalog?.Entries.FirstOrDefault(map=>map.TerritoryId==first.TerritoryId)?.Zone ?? "");}}
-                        if(ImGui.TreeNode(localization.Format("Alarms.Slots",members.Length)+"###Slots"))
+                        if(UI.UiComponents.TreeNode(localization.Format("Alarms.Slots",members.Length)+"###Slots"))
                         {
                             try
                             {
@@ -450,7 +450,7 @@ internal sealed partial class MainWindow
                                         ImGui.SameLine();
                                         var at=NextAlarm(alarm,now);
                                         ImGui.TextColored(alarm.Enabled ? Success:Muted,AlarmWhen(alarm)+(at is { } when ? " · "+AlarmNextText(when,now):""));
-                                        if(ImGui.IsItemHovered())WrappedTooltip(alarm.Label+"\n"+string.Join("\n",AlarmSchedule.Occurrences(alarm,now,5).Select(time=>time.ToLocalTime().ToString("g"))));
+                                        TipText(()=>alarm.Label+"\n"+string.Join("\n",AlarmSchedule.Occurrences(alarm,now,5).Select(time=>time.ToLocalTime().ToString("g"))));
                                         ImGui.SameLine();ImGui.SetNextItemWidth(90);
                                         var lead=alarm.LeadMinutes;
                                         if(ImGui.InputInt(localization.Get("Alarms.Lead")+"##Lead",ref lead,1)){alarm.LeadMinutes=AlarmSchedule.ClampLead(alarm.Repeat,lead);changed=true;NoteGameCopy([alarm]);}
@@ -461,7 +461,7 @@ internal sealed partial class MainWindow
                                             var gameList=alarmService?.GameAlarms;
                                             var present=gameList?.Any(game=>game.Name==alarm.GameName)==true;
                                             ImGui.TextColored(present ? Success:Accent,localization.Get(present ? "Alarms.InGame":"Alarms.SentNotSeen"));
-                                            if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("Alarms.InGameHelp",alarm.GameName));
+                                            TipText(()=>localization.Format("Alarms.InGameHelp",alarm.GameName));
                                             // 0.331: the copy is not in the game's list as read (deleted there, or the command ignored): on the player's click,
                                             // Tensho rings the alarm again and « Send to the game » comes back (it offers alarms without a game name).
                                             if(gameList is not null && !present)

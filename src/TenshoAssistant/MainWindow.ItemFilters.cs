@@ -24,7 +24,7 @@ internal sealed partial class MainWindow
     private bool DrawItemSearchFilters(ItemCatalog catalog)
     {
         var title=itemSearchFilter.IsEmpty ? localization.Get("ItemFilters.Title"):localization.Get("ItemFilters.Active");
-        if(!ImGui.TreeNode(title+"###ItemFilters"))return false;
+        if(!UI.UiComponents.TreeNode(title+"###ItemFilters"))return false;
         var filter=itemSearchFilter;
         try
         {
@@ -103,7 +103,7 @@ internal sealed partial class MainWindow
     // Key items: names only (no item sheet), searched when the text changes.
     private void DrawKeyItemSearch()
     {
-        if(KeyItemSearch is null || !ImGui.TreeNode(localization.Get("ItemFilters.KeyItems")+"###KeyItems"))return;
+        if(KeyItemSearch is null || !UI.UiComponents.TreeNode(localization.Get("ItemFilters.KeyItems")+"###KeyItems"))return;
         try
         {
             ImGui.SetNextItemWidth(-1);

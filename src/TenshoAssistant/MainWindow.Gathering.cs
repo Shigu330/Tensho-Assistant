@@ -68,7 +68,7 @@ internal sealed partial class MainWindow
             {
                 DrawGameIcon(type.IconId,new Vector2(30));
                 if (ImGui.IsItemClicked()) gatheringTypeFilter = type.TypeId;
-                if (ImGui.IsItemHovered()) WrappedTooltip(type.TypeName);
+                TipText(type.TypeName);
             }
             finally { ImGui.PopID(); }
         }

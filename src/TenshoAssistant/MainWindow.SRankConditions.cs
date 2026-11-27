@@ -46,7 +46,7 @@ internal sealed partial class MainWindow
         }
         foreach(var group in srankShown.GroupBy(row=>row.Mark.Expansion).OrderByDescending(group=>group.Key))
         {
-            if(srankQuery.Length==0 && !ImGui.TreeNode(group.First().Expansion+"###SRank"+group.Key))continue;
+            if(srankQuery.Length==0 && !UI.UiComponents.TreeNode(group.First().Expansion+"###SRank"+group.Key))continue;
             try{foreach(var row in group)DrawSRankRow(row);}
             finally{if(srankQuery.Length==0)ImGui.TreePop();}
         }

@@ -86,7 +86,7 @@ internal sealed partial class MainWindow
                 try
                 {
                     var zone=zones[index];
-                    if(!ImGui.TreeNode(localization.Format("SortUi.ZoneSlots",zone.Name,zone.Start+1,zone.Start+zone.Count)+"###ZoneDetails"))continue;
+                    if(!UI.UiComponents.TreeNode(localization.Format("SortUi.ZoneSlots",zone.Name,zone.Start+1,zone.Start+zone.Count)+"###ZoneDetails"))continue;
                     try
                     {
                         var name=zone.Name;var start=zone.Start+1;var count=zone.Count;var query=zone.Query;var quality=(int)zone.Quality;
@@ -190,7 +190,7 @@ internal sealed partial class MainWindow
                             }
                             Tip("SortUi.JobFilterTip");
                             ImGui.SetNextItemWidth(170);changed|=ImGui.Combo(localization.Get("SortUi.InGearset"),ref inGearset,localization.Get("SortUi.BooleanChoices"));Tip("SortUi.InGearsetTip");
-                            if(ImGui.TreeNode(localization.Get("SortUi.Advanced")+"###Advanced"))
+                            if(UI.UiComponents.TreeNode(localization.Get("SortUi.Advanced")+"###Advanced"))
                             {
                                 try
                                 {

@@ -67,8 +67,7 @@ internal sealed partial class MainWindow
         else if(inside)ImGui.TextColored(Success,text);
         else if(clock is { } passed && FishingStopwatch.Passed(passed.Seconds,time.Maximum,chum))ImGui.TextColored(Error,text);
         else ImGui.TextUnformatted(text);
-        if(ImGui.IsItemHovered())
-            WrappedTooltip(localization.Format("FishingPanel.BiteTime",time.Minimum,time.Maximum,time.Usual)+"\n"+localization.Format("FishingPanel.BiteTimeHelp",time.Reports)
+        TipText(()=>localization.Format("FishingPanel.BiteTime",time.Minimum,time.Maximum,time.Usual)+"\n"+localization.Format("FishingPanel.BiteTimeHelp",time.Reports)
                 +(chum ? "\n"+localization.Get("FishingPanel.BiteTimeChum"):"")+(inside && clock!.Value.Frozen ? "\n"+localization.Get("FishingPanel.BiteTimeHeld"):""));
     }
 }

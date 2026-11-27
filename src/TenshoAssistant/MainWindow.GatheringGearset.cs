@@ -21,6 +21,6 @@ internal sealed partial class MainWindow
         gearsets.Want();
         if(gearsets.State?.Sets is not { } sets || GameGearsets.ForJob(sets,job) is not { } set)return;
         if(ImGui.SmallButton(localization.Format("GatheringDetails.Equip",JobName(job))))gearsets.Equip(set.Number);
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("GatheringDetails.EquipTip",set.Number,set.Name.Length>0 ? set.Name:JobName(job)));
+        TipText(()=>localization.Format("GatheringDetails.EquipTip",set.Number,set.Name.Length>0 ? set.Name:JobName(job)));
     }
 }

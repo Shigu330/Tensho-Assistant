@@ -47,7 +47,7 @@ internal sealed partial class MainWindow
                     // 0.255: the reward name gives the common item tooltip (quality and quantity follow it) and the tools menu.
                     if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled) && item is not null)DrawItemInfoTooltip(item.Id);
                     ItemLinksMenu($"RewardLinks{line.Slot}",item);
-                    if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("QuestRewards.Quality",line.HighQuality is null ? localization.Get("QuestRewards.Unspecified"):line.HighQuality==true ? "HQ":"NQ")+"\n"+localization.Get(line.StainId==0 ? "QuestRewards.NoStain":"QuestRewards.Stain")+"\n"+localization.Get("QuestRewards.Click"));
+                    TipText(()=>localization.Format("QuestRewards.Quality",line.HighQuality is null ? localization.Get("QuestRewards.Unspecified"):line.HighQuality==true ? "HQ":"NQ")+"\n"+localization.Get(line.StainId==0 ? "QuestRewards.NoStain":"QuestRewards.Stain")+"\n"+localization.Get("QuestRewards.Click"));
                     ImGui.SameLine();ImGui.TextDisabled(line.Quantity is { } quantity ? $"× {(quantity).ToString("N0",Numbers)}{(line.HighQuality==true ? " HQ":"")}":localization.Get("QuestRewards.Quantity"));
                     if(clicked && item is not null){SelectItem(item.Id);OpenLink("Item.Stocks");}
                 }

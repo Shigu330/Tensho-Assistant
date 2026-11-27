@@ -111,7 +111,8 @@ internal static class MapViewTests
             Check(Read2("MainWindow.MapView.cs").Contains("(settings.HideTitleBar ? ImGuiWindowFlags.NoTitleBar:0)") && Read2("MainWindow.MapView.cs").Contains("SettingBox(\"MapView.HideTitleBar\""),"setting");
             var panel=Read2("MainWindow.CollectablePanel.cs");
             Check(panel.Contains("if(same)ImGui.BeginDisabled();") && panel.Contains("if(same)ImGui.EndDisabled();") && panel.Contains("if(balancedOff && risk==50)risk=CollectableRisk.Safe;"),"disabled, shown as Safe");
-            Check(panel.Contains("ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled)"),"its tooltip still says why");
+            // X-607 (0.1885): TipText shows its text on a disabled item too (ImGuiHoveredFlags.AllowWhenDisabled, UI/Components/Tooltip.cs).
+            Check(panel.Contains("TipText(()=>localization.Get($\"CollectablePanel.Cap{cap}\")"),"its tooltip still says why");
         }),
     ];
 }

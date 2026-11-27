@@ -131,7 +131,7 @@ internal sealed partial class MainWindow
                 var known = obtained?.Contains(beast.Id);
                 DrawStateMark(known); ImGui.SameLine();
                 ImGui.TextColored(known == true ? Success : known == false ? Muted : Accent, beast.Name);
-                if (ImGui.IsItemHovered()) WrappedTooltip(localization.Format("BeastUi.Tooltip", beast.Id, beast.Assault, beast.Volley));
+                TipText(()=>localization.Format("BeastUi.Tooltip", beast.Id, beast.Assault, beast.Volley));
                 // X-135 (0.1163): the beast's rank when read (team window or board result).
                 if (BeastRanks?.TryGetValue(beast.Id, out var rankKnown) == true) { ImGui.SameLine(); ImGui.TextDisabled(localization.Format("BeastUi.KnownRank", rankKnown)); }
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(beast.Family);

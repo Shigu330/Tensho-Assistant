@@ -106,7 +106,7 @@ internal sealed partial class MainWindow
             ImGui.BeginDisabled(set.All(project=>followed.Contains(project.Id)));
             try{if(ImGui.SmallButton(localization.Format("FreeCompany.WorkshopFollowSet",set.Count)))Follow(set);}
             finally{ImGui.EndDisabled();}
-            if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(string.Join("\n",set.Select(WorkshopName)));
+            TipText(()=>string.Join("\n",set.Select(WorkshopName)));
         }
         var shown=followed.Select(id=>projects.FirstOrDefault(project=>project.Id==id)).OfType<WorkshopProject>().ToArray();
         if(shown.Length==0)return;

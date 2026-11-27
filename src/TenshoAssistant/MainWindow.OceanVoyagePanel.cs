@@ -161,7 +161,7 @@ internal sealed partial class MainWindow
                         if(step==0 && inHand==row.Route[0])
                             ImGui.GetWindowDrawList().AddRect(ImGui.GetItemRectMin()-new Vector2(1),ImGui.GetItemRectMax()+new Vector2(1),ImGui.GetColorU32(Success),3,ImDrawFlags.None,2);
                         // X-684 (0.1669): the bait's icon carries the common item tooltip; only what it does not say is added under it.
-                        if(ImGui.IsItemHovered() && (bait is null || step>0))WrappedTooltip(bait is null ? row.Route[step]+(step==0 ? "":"\n"+localization.Get("FishingSources.Mooch")):localization.Get("FishingSources.Mooch"));
+                        if((bait is null || step>0))TipText(()=>bait is null ? row.Route[step]+(step==0 ? "":"\n"+localization.Get("FishingSources.Mooch")):localization.Get("FishingSources.Mooch"));
                     }
                     if(row.Route.Count==0)ImGui.TextDisabled("?");
                     ImGui.TableNextColumn();
@@ -226,7 +226,7 @@ internal sealed partial class MainWindow
             if(!stop.Spectral && stop.Spot.SpectralSpot!=0 && data.SpotFish.GetValueOrDefault(stop.Spot.SpectralSpot) is { Count:>0 } spectralFish)
             {
                 ImGui.PushStyleColor(ImGuiCol.Text,Success);
-                var open=ImGui.TreeNode(localization.Format("OceanVoyage.SpectralFish",spectralFish.Count)+"##OceanSpectralFish");
+                var open=UI.UiComponents.TreeNode(localization.Format("OceanVoyage.SpectralFish",spectralFish.Count)+"##OceanSpectralFish");
                 ImGui.PopStyleColor();
                 Tip("OceanVoyage.SpectralFishTip");
                 if(open)

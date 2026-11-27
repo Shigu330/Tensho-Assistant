@@ -99,7 +99,7 @@ internal sealed partial class MainWindow
             index++;
             if(ImGui.Selectable(line.Text+$"##SrcLine{index}"))line.Open();
             if(line.Place is { } spot)PlaceMenu($"SrcLinePlace{index}",spot.Map,spot.At,line.Text);
-            if(line.Hint is not null && ImGui.IsItemHovered())WrappedTooltip(line.Hint);
+            if(line.Hint is not null)TipText(line.Hint);
             if(line.Flag is not null && ImGui.Selectable("    "+localization.Get("SourceLinks.Flag")+$"##SrcFlag{index}"))line.Flag();
         }
         foreach(var group in lines.GroupBy(line=>(SourceGroup)line.Group).OrderBy(group=>group.Key))

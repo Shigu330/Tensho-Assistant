@@ -178,7 +178,7 @@ internal sealed partial class MainWindow
                 if(item is not null)ItemLinksMenu($"FashionWeekLinks{hint}/{id}",item);
                 // Report count kept short at the end of the row; the full wording is in the tooltip of the count.
                 ImGui.SameLine();ImGui.TextDisabled($"×{(entry.Match.Reports).ToString("N0",Numbers)}");
-                if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("FashionWeek.Reports",entry.Match.Reports.ToString("N0",Numbers)));
+                TipText(()=>localization.Format("FashionWeek.Reports",entry.Match.Reports.ToString("N0",Numbers)));
                 // 0.581 (T15): this piece for the week's outfit.
                 var weekStart=FashionWeek.Bounds(DateTimeOffset.UtcNow).Start;
                 var inOutfit=TenshoAssistant.Fashion.FashionOutfit.Current(configuration.FashionOutfit,weekStart).GetValueOrDefault(slot)==id;

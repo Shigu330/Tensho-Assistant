@@ -121,7 +121,7 @@ internal sealed partial class MainWindow
                 var color=row.State switch{OutfitState.Stored=>UI.FfxivTheme.TextMuted,OutfitState.InDresser=>UI.FfxivTheme.Success,_=>UI.FfxivTheme.Text};
                 ImGui.PushStyleColor(ImGuiCol.Text,color);
                 bool open;
-                try{open=ImGui.TreeNode($"{set?.Name ?? $"#{row.Outfit.SetItemId}"}  {row.Owned}/{row.Outfit.Pieces.Count}  · {localization.Get("Outfits.State"+row.State)}##Outfit{row.Outfit.SetItemId}");}
+                try{open=UI.UiComponents.TreeNode($"{set?.Name ?? $"#{row.Outfit.SetItemId}"}  {row.Owned}/{row.Outfit.Pieces.Count}  · {localization.Get("Outfits.State"+row.State)}##Outfit{row.Outfit.SetItemId}");}
                 finally{ImGui.PopStyleColor();}
                 // 0.387 (user report): the outfit item's tooltip (how to obtain it), as for a piece.
                 if(ImGui.IsItemHovered())DrawItemInfoTooltip(row.Outfit.SetItemId);

@@ -131,7 +131,7 @@ internal sealed partial class MainWindow
                 :localization.Format("Reminders.VenturesState",ventures.Count,ventures.Count(venture=>venture.Done is { } done && done<=now)),nextVenture,null,()=>
             {
                 // 0.570 (T16): retainer by retainer, with a bell; and one bell for when they are all back.
-                if(ventures is not { Count:>0 } || !ImGui.TreeNode(localization.Get("Reminders.VenturesDetail")+"##VenturesDetail"))return;
+                if(ventures is not { Count:>0 } || !UI.UiComponents.TreeNode(localization.Get("Reminders.VenturesDetail")+"##VenturesDetail"))return;
                 try
                 {
                     foreach(var (name,end) in ventures)
@@ -254,7 +254,7 @@ internal sealed partial class MainWindow
     /// <summary>X-225 (0.1719): the wheels one by one: primed, or when, as far as the reading tells (an estimate says its bounds, R06).</summary>
     private void DrawAetherialWheels(IReadOnlyList<FreeCompany.AetherialWheelSlot>? wheels,DateTimeOffset now)
     {
-        if(wheels is not { Count:>0 } || !ImGui.TreeNode(localization.Get("Reminders.AetherialWheelsDetail")+"##AetherialWheels"))return;
+        if(wheels is not { Count:>0 } || !UI.UiComponents.TreeNode(localization.Get("Reminders.AetherialWheelsDetail")+"##AetherialWheels"))return;
         try
         {
             foreach(var wheel in wheels)

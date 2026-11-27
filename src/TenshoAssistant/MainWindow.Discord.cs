@@ -128,7 +128,7 @@ internal sealed partial class MainWindow
             ImGui.SameLine();
             var line=shown.Pending>0 ? localization.Format("Discord.Pending",shown.Pending):localization.Format("Discord.Status"+shown.Status,shown.Code);
             ImGui.TextColored(shown.Pending>0 || shown.Status is DiscordStatus.Sent or DiscordStatus.Idle ? Success:UI.FfxivTheme.Error,line);
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("Discord.Counts",shown.Sent,shown.Failed,shown.Dropped));
+            TipText(()=>localization.Format("Discord.Counts",shown.Sent,shown.Failed,shown.Dropped));
         }
         if(discordNotifier?.Block is { TotalSeconds:>0 } block)ImGui.TextColored(Accent,localization.Format("Discord.Blocked",Math.Ceiling(block.TotalSeconds)));
         if(settings.Enabled && !DiscordWebhook.IsValidUrl(settings.WebhookUrl) && settings.CategoryUrls is not {Count:>0})ImGui.TextColored(Accent,localization.Get("Discord.NeedsUrl"));

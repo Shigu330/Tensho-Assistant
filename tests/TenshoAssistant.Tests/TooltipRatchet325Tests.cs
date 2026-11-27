@@ -16,7 +16,8 @@ internal static class TooltipRatchet325Tests
     // #28 (review 0.326): another drawn item ends the search too, so a later widget's tooltip never covers the control.
     private static readonly Regex OtherItem = new(@"ImGui\.(Button|SmallButton|ArrowButton|Selectable|ImageButton|InvisibleButton)\(|\bToolButton\(|\bDefaultButton\(|\bSourceButton\(");
     // « Tip( » also matches the page helpers named …Tip( (QuestFilterTip, …).
-    private static readonly Regex Covered = new(@"Tip\(|WrappedTooltip\(|IsItemHovered|SetTooltip\(");
+    // X-607 (0.1885): TipText(text) and TipText(()=>text) are the tooltip of the last item too.
+    private static readonly Regex Covered = new(@"Tip\(|TipText\(|WrappedTooltip\(|IsItemHovered|SetTooltip\(");
     private static readonly Regex Literal = new("\"((?:[^\"\\\\]|\\\\.)*)\"");
 
     private static IEnumerable<(string File,string[] Lines)> Files() =>

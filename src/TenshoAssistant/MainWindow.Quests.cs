@@ -124,7 +124,7 @@ internal sealed partial class MainWindow
         {
             ImGui.SameLine();
             ImGui.Checkbox(localization.Format("QuestsBrowser.OtherCities", questOtherCity.Count) + "###QuestOtherCities", ref questShowOtherCities);
-            if (ImGui.IsItemHovered()) WrappedTooltip(localization.Format("QuestsBrowser.OtherCitiesHelp", questPlayerCity ?? localization.Get("QuestsBrowser.CityUnknown")));
+            TipText(()=>localization.Format("QuestsBrowser.OtherCitiesHelp", questPlayerCity ?? localization.Get("QuestsBrowser.CityUnknown")));
         }
         // 0.550 (T3).
         var levelFrom = configuration.QuestList.LevelFrom; var levelTo = configuration.QuestList.LevelTo;
@@ -203,7 +203,7 @@ internal sealed partial class MainWindow
                 ImGui.TableNextColumn(); if (entry.Level > 0) ImGui.TextUnformatted(entry.Level.ToString(CultureInfo.CurrentCulture)); else ImGui.TextDisabled("?");
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(entry.Zone ?? "");
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(entry.Category);
-                if (entry.Section.Length > 0 && ImGui.IsItemHovered()) WrappedTooltip(entry.Section);
+                if (entry.Section.Length > 0) TipText(entry.Section);
                 ImGui.TableNextColumn();
                 ImGui.TextColored(entry.Progress == QuestProgress.Complete ? Success : Muted,
                     QuestProgressLabel(entry));
@@ -281,7 +281,7 @@ internal sealed partial class MainWindow
         }
         DrawQuestPath(entry);
         var following = questLinks.Following(entry.Id);
-        if (ImGui.TreeNode(localization.Format("QuestDetails.Following",following.Count)+"###QuestFollowing"))
+        if (UI.UiComponents.TreeNode(localization.Format("QuestDetails.Following",following.Count)+"###QuestFollowing"))
         {
             try { foreach (var next in following) DrawQuestLink(next.Id, "next"); }
             finally { ImGui.TreePop(); }

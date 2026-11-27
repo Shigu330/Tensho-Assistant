@@ -97,7 +97,7 @@ internal sealed partial class MainWindow
         foreach (var guide in shown)
         {
             if (ImGui.Selectable($"{guide.Title}{(guide.Author is { } author ? " · " + author : "")}{(guide.ForVersion is { } version ? " · " + version : "")}##{guide.Address}")) guideToOpen = guide;
-            if (ImGui.IsItemHovered()) WrappedTooltip(guide.Address);
+            TipText(guide.Address);
         }
         if (guideToOpen is { } asked && asked.Page == key)
         {
@@ -165,7 +165,7 @@ internal sealed partial class MainWindow
         if (faqView.Count == 0) ImGui.TextDisabled(localization.Get("Help.FaqNoResult"));
         foreach (var topic in faqView)
         {
-            if (!ImGui.TreeNode(topic.Title + $"###HelpQuestion{topic.Key}")) continue;
+            if (!UI.UiComponents.TreeNode(topic.Title + $"###HelpQuestion{topic.Key}")) continue;
             try
             {
                 ImGui.TextWrapped(topic.Purpose);
@@ -195,7 +195,7 @@ internal sealed partial class MainWindow
             if (helpView.Count == 0) ImGui.TextDisabled(localization.Get("Help.NoResult"));
             foreach (var topic in helpView)
             {
-                if (!ImGui.TreeNode(topic.Title + "###HelpTopic" + topic.Key)) continue;
+                if (!UI.UiComponents.TreeNode(topic.Title + "###HelpTopic" + topic.Key)) continue;
                 try
                 {
                     DrawHelpText(topic);

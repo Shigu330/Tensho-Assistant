@@ -58,7 +58,7 @@ internal sealed partial class MainWindow
                         { macroPlan.Add(macro.Slot); macroPlanSaved = false; }
                         ImGui.SameLine(); ImGui.TextUnformatted($"{macro.Slot.Index} · {macro.Slot.Name}");
                         if (macro.ValidationError() is { } validation)
-                        { ImGui.SameLine(); ImGui.TextColored(Accent, localization.Get("MacroUi.Marker")); if (ImGui.IsItemHovered()) WrappedTooltip(validation); }
+                        { ImGui.SameLine(); ImGui.TextColored(Accent, localization.Get("MacroUi.Marker")); TipText(validation); }
                     }
                     finally { ImGui.PopID(); }
                 }

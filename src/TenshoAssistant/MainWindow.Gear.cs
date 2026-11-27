@@ -605,7 +605,7 @@ internal sealed partial class MainWindow
                         try{ImGui.TextColored(Warning,FontAwesomeIcon.ExclamationTriangle.ToIconString());}
                         finally{ImGui.PopFont();}
                         ImGui.SameLine();ImGui.TextColored(Warning,localization.Format("Gear.OverCap",lost));
-                        if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("Gear.OverCapTip",lost,localization.Get("Gear.Param"+kind.Param),item.Caps?.GetValueOrDefault(kind.Param) ?? 0));
+                        TipText(()=>localization.Format("Gear.OverCapTip",lost,localization.Get("Gear.Param"+kind.Param),item.Caps?.GetValueOrDefault(kind.Param) ?? 0));
                     }
                 }
             }
@@ -724,7 +724,7 @@ internal sealed partial class MainWindow
                         foreach(var line in lines)
                         {
                             if(ImGui.Selectable(line.Text+"##"+line.Text))line.Open();
-                            if(line.Hint is { Length:>0 } hint && ImGui.IsItemHovered())WrappedTooltip(hint);
+                            if(line.Hint is { Length:>0 } hint)TipText(hint);
                             if(line.Flag is { } flag){ImGui.SameLine();if(ImGui.SmallButton(localization.Get("Gear.Flag")+"##Flag"+line.Text))flag();}
                         }
                     }

@@ -189,7 +189,7 @@ internal sealed partial class MainWindow
                             var definition = position.Cards[token];
                             var entry = triadCards.FirstOrDefault(entry => entry.Id == definition.Id);
                             DrawGameIcon(definition.IconId,new Vector2(62));
-                            if (ImGui.IsItemHovered()) WrappedTooltip(TriadSimulationTooltip(entry?.Name, definition, token, position));
+                            TipText(()=>TriadSimulationTooltip(entry?.Name, definition, token, position));
                             var blue = position.OwnerAt(square) == TriadPlayer.Blue;
                             ImGui.TextColored(blue ? TriadBlue : TriadRed, $"{(blue ? localization.Get("TriadSim.Blue") : localization.Get("TriadSim.Red"))} · {definition.Label}");
                         }
@@ -228,7 +228,7 @@ internal sealed partial class MainWindow
                     {
                         DrawGameIcon(entry?.IconId ?? 0,new Vector2(44));
                         if (playable && ImGui.IsItemClicked()) triadSelectedToken = token;
-                        if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled)) WrappedTooltip(entry?.Card is { } card
+                        TipText(()=>entry?.Card is { } card
                             ? TriadSimulationTooltip(entry.Name,card,token,triadPosition) + "\n"+localization.Get("TriadDynamic.Click")
                             : localization.Get("TriadSim.Unavailable"));
                         var caption = !editing && triadPosition is { } board && !board.InHand(token)

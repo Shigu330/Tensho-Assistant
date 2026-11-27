@@ -33,7 +33,7 @@ internal sealed partial class MainWindow
                 DrawChainItem(row.ItemId);
                 ImGui.SameLine();
                 ImGui.TextDisabled((row.Note.Important ? localization.Get("ItemNotes.Important")+" · ":"")+(row.Note.ToSell ? localization.Get("ItemNotes.ToSell")+" · ":"")+row.Note.Text.ReplaceLineEndings(" "));
-                if(ImGui.IsItemHovered() && row.Note.Text.Length>0)WrappedTooltip(row.Note.Text);
+                if(row.Note.Text.Length>0)TipText(row.Note.Text);
             }
             finally{ImGui.PopID();}
         });

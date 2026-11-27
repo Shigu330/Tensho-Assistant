@@ -69,7 +69,7 @@ internal sealed partial class MainWindow
             {
                 ImGui.SameLine();
                 if(ImGui.SmallButton(localization.Format(labelKey,threshold)+"###"+labelKey))craftSolveTarget=Gathering.Collectables.QualityFor(threshold,maximum);
-                if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("CraftSearch.CollectTip",threshold,Gathering.Collectables.QualityFor(threshold,maximum)));
+                TipText(()=>localization.Format("CraftSearch.CollectTip",threshold,Gathering.Collectables.QualityFor(threshold,maximum)));
             }
         }
         ImGui.TextDisabled(localization.Get("CraftSearch.TargetHelp"));

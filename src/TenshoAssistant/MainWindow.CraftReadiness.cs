@@ -17,7 +17,7 @@ internal sealed partial class MainWindow
         if(GearsetSource?.State?.Sets is not { } sets){ImGui.NewLine();return;}
         if(GameGearsets.ForJob(sets,job) is not { } set){ImGui.TextDisabled(localization.Format("CraftReadiness.NoSet",JobName(job)));return;}
         if(ImGui.SmallButton(localization.Format("GatheringDetails.Equip",JobName(job))+"###"+id))GearsetSource!.Equip(set.Number);
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("GatheringDetails.EquipTip",set.Number,set.Name.Length>0 ? set.Name:JobName(job)));
+        TipText(()=>localization.Format("GatheringDetails.EquipTip",set.Number,set.Name.Length>0 ? set.Name:JobName(job)));
     }
 
     /// <summary>0.600 (C14): HQ, quick synthesis, master book, specialist, required item and status. Whether the book is read is not known here.</summary>

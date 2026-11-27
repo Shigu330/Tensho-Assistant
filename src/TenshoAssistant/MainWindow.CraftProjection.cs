@@ -60,7 +60,7 @@ internal sealed partial class MainWindow
         ImGui.PushStyleColor(ImGuiCol.Text,found.TargetReached ? Success:Accent);
         try{ImGui.TextWrapped(localization.Format(found.TargetReached ? "CraftProjectionUi.SuggestReached":"CraftProjectionUi.SuggestBelow",Name(found.Move),found.FinalQuality,projectionTarget));}
         finally{ImGui.PopStyleColor();}
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("CraftProjectionUi.SuggestTip")+(found.Then.Count>0 ? "\n"+string.Join(" › ",found.Then.Take(8).Select(Name))+(found.Then.Count>8 ? " …":""):""));
+        TipText(()=>localization.Get("CraftProjectionUi.SuggestTip")+(found.Then.Count>0 ? "\n"+string.Join(" › ",found.Then.Take(8).Select(Name))+(found.Then.Count>8 ? " …":""):""));
     }
     // 0.497 (user report): the state was used in the numbers but never shown: the window now says it, what it does, and which actions it opens.
     private void DrawProjectionCondition(CraftProjectionResult result,string shownName)

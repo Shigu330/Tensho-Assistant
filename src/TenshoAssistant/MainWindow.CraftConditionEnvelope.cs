@@ -50,7 +50,7 @@ internal sealed partial class MainWindow
         ImGui.TextColored(Accent,localization.Format("CraftConditions.Result",result.Quality,simulation.Final.Quality));
         ImGui.TextWrapped(localization.Get("CraftConditions.BoundsHelp"));
         if(simulation.Final.Finish!=CraftFinish.Completed || simulation.Error is not null)ImGui.TextWrapped(localization.Get("CraftConditions.Incomplete"));
-        if(ImGui.TreeNode(localization.Get("CraftConditions.Steps")+"###ConditionSteps"))
+        if(UI.UiComponents.TreeNode(localization.Get("CraftConditions.Steps")+"###ConditionSteps"))
         {
             try {foreach(var band in result.Steps)ImGui.TextUnformatted(localization.Format("CraftConditions.Step",band.Step,band.Quality));}
             finally {ImGui.TreePop();}

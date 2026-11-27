@@ -153,14 +153,14 @@ internal sealed partial class MainWindow
         if(readStats is { } shown && current is not null && current.Stats!=shown)
         {
             ImGui.TextColored(Warning,localization.Get("VesselBuilds.Mismatch"));
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("VesselBuilds.MismatchTip",
+            TipText(()=>localization.Format("VesselBuilds.MismatchTip",
                 string.Join(" / ",Enumerable.Range(0,5).Select(index=>shown[index])),string.Join(" / ",Enumerable.Range(0,5).Select(index=>current.Stats[index]))));
         }
 
         void Row(string label,string now,string later,bool problem,string tip)
         {
             ImGui.TableNextRow();ImGui.TableNextColumn();ImGui.TextUnformatted(label);
-            if(ImGui.IsItemHovered())WrappedTooltip(tip);
+            TipText(tip);
             ImGui.TableNextColumn();ImGui.TextDisabled(now);
             ImGui.TableNextColumn();ImGui.TextColored(problem ? Error:Text,later);
             ImGui.TableNextColumn();
@@ -220,8 +220,7 @@ internal sealed partial class MainWindow
                     ImGui.CloseCurrentPopup();
                 }
                 if(locked)ImGui.PopStyleColor();
-                if(ImGui.IsItemHovered())
-                    WrappedTooltip(string.Join("\n",Enumerable.Range(0,5).Select(index=>$"{(index<names.Count ? names[index]:"")} : {option.Stats[index]}"))
+                TipText(()=>string.Join("\n",Enumerable.Range(0,5).Select(index=>$"{(index<names.Count ? names[index]:"")} : {option.Stats[index]}"))
                         +"\n"+localization.Format("VesselBuilds.PartLine",option.Rank,option.Components,option.Repair));
                 ImGui.SameLine();
                 ImGui.TextDisabled(localization.Format("VesselBuilds.PartLine",option.Rank,option.Components,option.Repair));
@@ -344,7 +343,7 @@ internal sealed partial class MainWindow
                 row++;
                 ImGui.TableNextRow();ImGui.TableNextColumn();
                 ImGui.TextUnformatted(VesselBuilds.Identifier(catalog,candidate.Build));
-                if(ImGui.IsItemHovered())WrappedTooltip(string.Join("\n",Enumerable.Range(0,4).Select(slot=>$"{localization.Get($"VesselBuilds.SlotSubmarine{slot}")} : {catalog.Find(VesselKind.Submarine,candidate.Build[slot])?.Name}"))
+                TipText(()=>string.Join("\n",Enumerable.Range(0,4).Select(slot=>$"{localization.Get($"VesselBuilds.SlotSubmarine{slot}")} : {catalog.Find(VesselKind.Submarine,candidate.Build[slot])?.Name}"))
                     +"\n"+localization.Format("VesselBuilds.CandidateCost",candidate.Summary.Cost,candidate.Summary.Capacity)
                     +(VesselBuilds.VoyagesUntilRepair(candidate.DamagePerVoyage) is { } voyages ? "\n"+localization.Format("VesselBuilds.Wear",voyages,candidate.DamagePerVoyage):""));
                 for(var index=0;index<5;index++){ImGui.TableNextColumn();ImGui.TextUnformatted(candidate.Summary.Stats[index].ToString());}

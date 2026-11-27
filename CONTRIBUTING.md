@@ -157,10 +157,12 @@ follow the list below: the tests refuse a page that misses one of its places.
 2. **Its template.** Blocks of a page go in tabs with `DetailTabs(id, [(key, label, draw), …], ref focus)` (as Storage, Alarms and
    Garden), not in a tab bar written by hand. Tables open with `UiComponents.BeginDataTable` and title their columns with
    `UiComponents.HeadersRow`; numbers right-aligned with `NumberCell`. Empty, waiting and failed states: `EmptyState`, `StateLine`,
-   `DrawDataError`. After each control, its tooltip: `Tip("Section.KeyTip")`. Settings: `BoolSetting`, `IntSetting`, `SliderSetting`,
-   `ComboSetting` (a default, a « Default: » line and a « ↺ » button). Icon buttons `ToolButton`, game icons `DrawGameIcon`, colours from
+   `DrawDataError`. After each control, its tooltip: `Tip("Section.KeyTip")`, or `TipText(text)` for a text already made
+   (`TipText(()=>text)` builds it only on hover). Sections: `UiComponents.Header`, folds inside them: `UiComponents.TreeNode` (both
+   open while the Settings search looks for a setting). Settings: `BoolSetting`, `IntSetting`, `SliderSetting`,
+   `ComboSetting` (a default, a « Default: » line and a « ↺ » button). Icon buttons `ToolButton` or `GlyphButton`, game icons `DrawGameIcon`, colours from
    the theme (`Accent`, `Muted`, `Success`, `Warning`, `Error`). Tests refuse the forms these replace, and the number of tab bars and
-   tables still written by hand can only go down.
+   tables still written by hand can only go down, as can the headers, glyph fonts and tooltips drawn by hand.
 3. **Its texts.** English and French in `Localization/Languages/en.json` and `fr.json` (English is the original; French says « vous »;
    a word of the game is taken from the French client). The help of its « ? »: `PageHelp.<Name>Title`, `Purpose`, `Start` and `Empty`.
    A question players will ask goes in `Help/Faq.cs`. If the page depends on what the game gives, add it to `HelpIndex` so that its help
@@ -424,10 +426,12 @@ Suivez ensuite la liste ci-dessous : les tests refusent une page à qui manque l
    Rangements, Alarmes et Jardin), pas dans une barre d'onglets écrite à la main. Les tableaux s'ouvrent avec
    `UiComponents.BeginDataTable` et titrent leurs colonnes avec `UiComponents.HeadersRow` ; les nombres à droite avec `NumberCell`. États
    vide, en attente et en échec : `EmptyState`, `StateLine`, `DrawDataError`. Après chaque contrôle, son infobulle :
-   `Tip("Section.CléTip")`. Réglages : `BoolSetting`, `IntSetting`, `SliderSetting`, `ComboSetting` (un défaut, une ligne « Par
-   défaut : » et un bouton « ↺ »). Boutons à icône `ToolButton`, icônes du jeu `DrawGameIcon`, couleurs du thème (`Accent`, `Muted`,
+   `Tip("Section.CléTip")`, ou `TipText(texte)` pour un texte déjà fait (`TipText(()=>texte)` ne le construit qu'au survol). Sections :
+   `UiComponents.Header`, replis dedans : `UiComponents.TreeNode` (les deux s'ouvrent pendant que la recherche des Paramètres cherche un
+   réglage). Réglages : `BoolSetting`, `IntSetting`, `SliderSetting`, `ComboSetting` (un défaut, une ligne « Par
+   défaut : » et un bouton « ↺ »). Boutons à icône `ToolButton` ou `GlyphButton`, icônes du jeu `DrawGameIcon`, couleurs du thème (`Accent`, `Muted`,
    `Success`, `Warning`, `Error`). Des tests refusent les formes qu'ils remplacent, et le nombre de barres d'onglets et de tableaux encore
-   écrits à la main ne peut que baisser.
+   écrits à la main ne peut que baisser, comme celui des en-têtes, des polices de glyphes et des infobulles dessinés à la main.
 3. **Ses textes.** Anglais et français dans `Localization/Languages/en.json` et `fr.json` (l'anglais est l'original ; le français dit
    « vous » ; un mot du jeu se prend dans le client français). L'aide de son « ? » : `PageHelp.<Name>Title`, `Purpose`, `Start` et
    `Empty`. Une question que les joueurs poseront va dans `Help/Faq.cs`. Si la page dépend de ce que donne le jeu, l'ajouter à

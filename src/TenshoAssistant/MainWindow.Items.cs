@@ -689,7 +689,7 @@ internal sealed partial class MainWindow
                     if (tool.Reference == "Craftimizer" && simulated is not null) OpenCraftSimulation(simulated);
                     else OpenContextTool(tool.Reference);
                 }
-                if (ImGui.IsItemHovered()) WrappedTooltip(localization.Format("ToolDirectory.OpenContext",ToolText(tool.Name)));
+                TipText(()=>localization.Format("ToolDirectory.OpenContext",ToolText(tool.Name)));
                 ImGui.SameLine();
             }
             finally { ImGui.PopID(); }
@@ -752,7 +752,7 @@ internal sealed partial class MainWindow
         var state = itemCatalog.State;
         ImGui.SetNextItemWidth(-1);
         var changed = ImGui.InputTextWithHint("##ItemQuery", localization.Get("ItemsUi.Query"), ref itemQuery, 128);
-        if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled)) WrappedTooltip(localization.Format("ItemsUi.QueryTip", ItemSearchLimit));
+        TipText(()=>localization.Format("ItemsUi.QueryTip", ItemSearchLimit));
         if (state.Catalog is not { } catalog)
         {
             DrawCatalogStatus();

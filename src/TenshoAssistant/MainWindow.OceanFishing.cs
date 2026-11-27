@@ -99,8 +99,7 @@ internal sealed partial class MainWindow
         if(highlight)ImGui.TextColored(Accent,RouteLabel(route));
         else if(state.Check==OceanCheck.Verified)ImGui.TextUnformatted(RouteLabel(route));
         else ImGui.TextColored(Muted,RouteLabel(route)+" ?");
-        if(ImGui.IsItemHovered())
-            WrappedTooltip(string.Join("\n",route.Stops.Select((stop,stopIndex)=>localization.Format("OceanFishing.Stop",stopIndex+1,stop.Place,localization.Get("OceanFishing.Time"+stop.Time))))
+        TipText(()=>string.Join("\n",route.Stops.Select((stop,stopIndex)=>localization.Format("OceanFishing.Stop",stopIndex+1,stop.Place,localization.Get("OceanFishing.Time"+stop.Time))))
                 +(state.Check==OceanCheck.Verified ? "":"\n"+localization.Get("OceanFishing.UnverifiedTip")));
     }
 }

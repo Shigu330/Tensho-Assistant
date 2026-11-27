@@ -197,7 +197,7 @@ internal sealed partial class MainWindow
                 try { clicked = ImGui.Button(icon.ToIconString(), new Vector2(34, 28)); }
                 finally { ImGui.PopFont(); }
                 if (clicked) open();
-                if (ImGui.IsItemHovered()) WrappedTooltip($"{tooltip} · {item.Name}");
+                TipText(()=>$"{tooltip} · {item.Name}");
             }
             finally { ImGui.PopID(); }
             used += 34 + ImGui.GetStyle().ItemSpacing.X;

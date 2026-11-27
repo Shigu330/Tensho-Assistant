@@ -90,7 +90,7 @@ internal sealed partial class MainWindow
                 if(OccultCrescent.Next(job,level) is { } next)
                 {
                     DrawSmallGameIcon(next.Icon);ImGui.TextUnformatted(localization.Format("FieldContent.OccultNext",next.Name,next.Level));
-                    if(ImGui.IsItemHovered() && next.Description.Length>0)WrappedTooltip(next.Description);
+                    if(next.Description.Length>0)TipText(next.Description);
                 }
                 else if(level>=job.MaxLevel && level>0)ImGui.TextColored(UI.FfxivTheme.Success,labels.Mastered);
                 else ImGui.TextDisabled("—");
@@ -272,7 +272,7 @@ internal sealed partial class MainWindow
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();ImGui.TextUnformatted(row.Number.ToString());
                 ImGui.TableNextColumn();DrawSmallGameIcon(row.Icon);ImGui.TextUnformatted(row.Name);
-                if(ImGui.IsItemHovered() && row.Description.Length>0)WrappedTooltip(row.Description);
+                if(row.Description.Length>0)TipText(row.Description);
                 ImGui.TableNextColumn();ImGui.TextUnformatted(new string('★',Math.Clamp(row.Rarity,0,5)));
                 ImGui.TableNextColumn();ImGui.TextUnformatted(row.Quest);
             }
