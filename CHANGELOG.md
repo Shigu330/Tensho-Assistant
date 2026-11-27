@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1915.0
+- Plan global, X-894 : Connexion GitHub des découvertes (relecture 0.1913, M1) : quand la paire en mémoire est celle gardée de côté dans github.spare (reprise d'un secours plus récent, ou gardée là après un refus des fichiers) et que ce secours ne se lit pas un moment, la paire différente des deux fichiers n'est plus prise pour une paire plus récente renouvelée par un autre client : c'est l'ancienne, dont GitHub a fini le jeton de renouvellement. La paire en mémoire reste utilisée et non écrite ; elle va dans ses fichiers dès que le secours se relit. Avant, l'échange envoyait l'ancien jeton (refusé) et la paire valide ne restait que dans le secours.
+- Tests : GitHubSpare1915Tests. Verify.ps1 (agent) : 4243/4243, 0 avertissement, 0 erreur ; DLL 0.1915.0.0. Rien à essayer en jeu.
+### English
+- GitHub sign-in of the discoveries (review of 0.1913, M1): when the pair in memory is the one kept aside in github.spare (taken back from a newer spare, or kept there after its files refused it) and that spare cannot be read for a moment, the two files' other pair is no longer taken for a newer pair another client renewed: it is the older one, whose refresh token GitHub ended. The pair in memory stays in use and unsaved; it goes to its files as soon as the spare reads again. Before, the exchange sent the old token (refused) and the valid pair was kept by the spare alone.
+
 ## 0.1914.0
 - Plan global, X-893 : FAQ : nouvelle question « Pourquoi Tensho me demande-t-il de connecter GitHub à nouveau ? » (liste Faq.cs, anglais et français, page Découvertes) : quand se reconnecter, et la limite connue décidée le 27/11 (D-239) : si le disque refuse d'écrire la connexion renouvelée au moment même où le jeu plante, la connexion restée sur le PC est l'ancienne et il faut connecter GitHub à nouveau ; rien d'autre n'est perdu. docs/FAQ.md réécrite par tools/faq.py write.
 - Pour les joueurs : la FAQ dit quand connecter GitHub à nouveau, et le seul cas connu où un plantage du jeu le demande.

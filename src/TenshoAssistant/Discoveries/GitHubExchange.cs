@@ -104,6 +104,9 @@ public sealed class GitHubExchange : IDisposable
     // X-890 (review of 0.1909 M2): the pair this client last read on disk or wrote there. The disk holding another pair than this one and than
     // the pair in memory means another client of this profile renewed since: that pair is newer and is taken, never written over.
     private string? seenToken,seenRefresh;
+    // X-894 (review of 0.1913 M1): the pair this client knows to be kept aside in the spare (read from a newer spare, or kept there after
+    // its files refused it). While that spare cannot be read, the files' other pair is the older one under it, never taken for a newer one.
+    private string? sparedToken,sparedRefresh;
     /// <summary>X-890: the longest wait for the profile's lock where a sign-in the player just made is written. X-892 M2 (review of 0.1912):
     /// the start and the unload no longer wait for it (the lock taken only when free at once).</summary>
     internal TimeSpan SecretsLockWait { get; init; }=TimeSpan.FromSeconds(2);
@@ -169,7 +172,7 @@ public sealed class GitHubExchange : IDisposable
         // and read again there (DropOldSpare); never when it could not be read now (it may hold the only copy of a renewed pair) nor when it
         // is damaged (removed once a pair is written to the files).
         var spared=disk.Spare==SpareState.Newer;
-        if(spared)secretsUnsaved=true;
+        if(spared && disk.Pair is { } kept){secretsUnsaved=true;Spared(kept.Token,kept.Refresh);}
         else if(disk.Spare==SpareState.Older)DropOldSpare();
         // X-175: a token of the other sign-in (the OAuth app's, once the GitHub App is in place) is forgotten: the player connects again, to the App.
         if(token is not null && !this.signIn.Owns(meta.ClientId)){Disconnect();message=new("ExchangeSignInChanged");}
@@ -232,7 +235,7 @@ public sealed class GitHubExchange : IDisposable
     {
         lock(secretsGate)
         {
-            lock(gate){generation++;token=null;refresh=null;secretsUnsaved=false;seenToken=seenRefresh=null;meta.Login="";meta.ClientId="";meta.TokenExpires=null;meta.RefreshExpires=null;}
+            lock(gate){generation++;token=null;refresh=null;secretsUnsaved=false;seenToken=seenRefresh=sparedToken=sparedRefresh=null;meta.Login="";meta.ClientId="";meta.TokenExpires=null;meta.RefreshExpires=null;}
             try{File.Delete(TokenPath);}catch(Exception){}
             try{File.Delete(RefreshPath);}catch(Exception){}
             try{File.Delete(SparePath);}catch(Exception){}
@@ -248,7 +251,12 @@ public sealed class GitHubExchange : IDisposable
     {
         string? used;lock(gate)used=usedRefresh is null ? token:usedRefresh;
         var disk=ReadDisk();
-        if(disk.Pair is { } found && (usedRefresh is null ? found.Token!=used:found.Refresh!=used)){Adopt(found);Seen(found.Token,found.Refresh);return;}
+        if(disk.Pair is { } found && (usedRefresh is null ? found.Token!=used:found.Refresh!=used))
+        {
+            Adopt(found);Seen(found.Token,found.Refresh);
+            if(disk.Spare==SpareState.Newer)Spared(found.Token,found.Refresh);
+            return;
+        }
         // X-889 M1 (review of 0.1909): a part of the disk not readable now (a spare held by a scanner, OneDrive, another client) may hold a
         // newer pair: nothing is removed; the exchange says the sign-in expired and the next one reads again.
         if(disk.Unknown)return;
@@ -319,6 +327,7 @@ public sealed class GitHubExchange : IDisposable
         lock(gate){token=found.Token;refresh=found.Refresh;meta.TokenExpires=found.Expires;meta.RefreshExpires=found.RefreshExpires;if(found.ClientId.Length>0)meta.ClientId=found.ClientId;}
     }
     private void Seen(string? access,string? renewal){lock(gate){seenToken=access;seenRefresh=renewal;}}
+    private void Spared(string? access,string? renewal){lock(gate){sparedToken=access;sparedRefresh=renewal;}}
     private static bool Same(Secrets pair,string? access,string? renewal)=>pair.Token==access && pair.Refresh==renewal;
 
     /// <summary>X-890: the profile's lock (<see cref="HoldLock"/>) taken without an async work, waiting at most <paramref name="wait"/>; null when not had.</summary>
@@ -402,23 +411,29 @@ public sealed class GitHubExchange : IDisposable
         var read=signedIn ? null:ReadDisk(quick);
         lock(secretsGate)
         {
-            string? access,renewal,seenAccess,seenRenewal;DateTimeOffset? expires,ends;string clientId;bool unsaved;
+            string? access,renewal,seenAccess,seenRenewal;DateTimeOffset? expires,ends;string clientId;bool unsaved,inSpare;
             lock(gate)
             {
                 if(token is null || generation!=started)return SecretsWrite.Files;
                 access=token;renewal=refresh;expires=meta.TokenExpires;ends=meta.RefreshExpires;clientId=meta.ClientId;unsaved=secretsUnsaved;
-                seenAccess=seenToken;seenRenewal=seenRefresh;
+                seenAccess=seenToken;seenRenewal=seenRefresh;inSpare=sparedToken==access && sparedRefresh==renewal;
             }
             if(read is { } disk)
             {
                 if(disk.Pair is { } found && !Same(found,access,renewal) && !Same(found,seenAccess,seenRenewal))
                 {
+                    // X-894 (review of 0.1913 M1): the pair in memory, not in its files yet, is the one kept aside in the spare, and that
+                    // spare cannot be read now: the files' other pair is the older one the spare replaces (its refresh token ended at the
+                    // renewal), not one another client renewed since. It was taken here, the valid pair left in memory (unsaved cleared)
+                    // and kept by the spare alone. The pair stays in memory, not written yet; the next settle reads the spare again.
+                    if(unsaved && inSpare && disk.Spare==SpareState.Unreadable)return SecretsWrite.Refused;
                     lock(gate)
                     {
                         if(token!=access || refresh!=renewal)return SecretsWrite.Files;
                         token=found.Token;refresh=found.Refresh;meta.TokenExpires=found.Expires;meta.RefreshExpires=found.RefreshExpires;
                         if(found.ClientId.Length>0)meta.ClientId=found.ClientId;
                         secretsUnsaved=false;seenToken=found.Token;seenRefresh=found.Refresh;
+                        if(disk.Spare==SpareState.Newer){sparedToken=found.Token;sparedRefresh=found.Refresh;}
                     }
                     return SecretsWrite.Taken;
                 }
@@ -441,7 +456,7 @@ public sealed class GitHubExchange : IDisposable
             {
                 var spare=new SparePair(DateTime.UtcNow,access,renewal,expires,ends,clientId);
                 AtomicFile.Write(SparePath,UserSecret.Protect(JsonSerializer.SerializeToUtf8Bytes(spare,TenshoJson.Plain)));
-                Seen(access,renewal);
+                Seen(access,renewal);Spared(access,renewal);
                 return SecretsWrite.Spare;
             }
             catch(Exception error) when(error is IOException or UnauthorizedAccessException or System.ComponentModel.Win32Exception or System.Security.Cryptography.CryptographicException){return SecretsWrite.Refused;}
