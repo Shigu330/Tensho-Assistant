@@ -51,12 +51,12 @@ repris dans la ligne « Tests » de chaque entrée du [CHANGELOG](../../CHANGELO
 Contrôles de base à refaire après un changement de cycle de vie : rechargement/déchargement répété sans double callback ni commande
 orpheline ; préférence « ouvrir au chargement » respectée ; la carte du jeu (touche M) revient normale une fois le plugin déchargé.
 
-### Essais en jeu (liste produite le 2026-11-28, version 0.1934.0)
+### Essais en jeu (liste produite le 2026-11-28, version 0.1935.0)
 
 <!-- q:public -->
-_In English: this page is the author's in-game test list, in French only. Produced on 2026-11-28 for version 0.1934.0. It has 1273 boxes: 672 ticked, 601 empty. 1090 boxes follow the test source: 489 done (ticked), 592 open, 7 could not be tried, 2 failed (empty). The 183 other ticked boxes come from before the source existed (reported before it, kept as they are). Apart: 38 tests of the source have no box on this page (29 done, 8 open, 1 could not be tried, 0 failed)._
+_In English: this page is the author's in-game test list, in French only. Produced on 2026-11-28 for version 0.1935.0. It has 1273 boxes: 672 ticked, 601 empty. 1090 boxes follow the test source: 489 done (ticked), 592 open, 7 could not be tried, 2 failed (empty). The 183 other ticked boxes come from before the source existed (reported before it, kept as they are). Apart: 38 tests of the source have no box on this page (29 done, 8 open, 1 could not be tried, 0 failed)._
 
-Liste produite le 2026-11-28 (version 0.1934.0) : 1273 cases, 672 cochées, 601 vides. 1090 cases suivent la source des essais : 489 faits (cochées), 592 ouverts, 7 pas pu, 2 en échec (vides). Les 183 autres cases cochées viennent d'avant la source (essais rapportés avant qu'elle existe, gardés tels quels). À part : 38 essais de la source n'ont pas de case sur cette page (29 faits, 8 ouverts, 1 pas pu, 0 en échec).
+Liste produite le 2026-11-28 (version 0.1935.0) : 1273 cases, 672 cochées, 601 vides. 1090 cases suivent la source des essais : 489 faits (cochées), 592 ouverts, 7 pas pu, 2 en échec (vides). Les 183 autres cases cochées viennent d'avant la source (essais rapportés avant qu'elle existe, gardés tels quels). À part : 38 essais de la source n'ont pas de case sur cette page (29 faits, 8 ouverts, 1 pas pu, 0 en échec).
 <!-- /q:public -->
 
 Parcours de la campagne de la phase 6, les mêmes essais rangés par activité : [TESTING-ROUTE.md](TESTING-ROUTE.md) (2026-11-09).
