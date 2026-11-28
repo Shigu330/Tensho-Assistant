@@ -51,12 +51,12 @@ repris dans la ligne « Tests » de chaque entrée du [CHANGELOG](../../CHANGELO
 Contrôles de base à refaire après un changement de cycle de vie : rechargement/déchargement répété sans double callback ni commande
 orpheline ; préférence « ouvrir au chargement » respectée ; la carte du jeu (touche M) revient normale une fois le plugin déchargé.
 
-### Essais en jeu (liste produite le 2026-11-28, version 0.1949.0)
+### Essais en jeu (liste produite le 2026-11-28, version 0.1950.0)
 
 <!-- q:public -->
-_In English: this page is the author's in-game test list, in French only. Produced on 2026-11-28 for version 0.1949.0. It has 1273 boxes: 682 ticked, 591 empty. 1090 boxes follow the test source: 499 done (ticked), 582 open, 7 could not be tried, 2 failed (empty). The 183 other ticked boxes come from before the source existed (reported before it, kept as they are). Apart: 39 tests of the source have no box on this page (29 done, 9 open, 1 could not be tried, 0 failed)._
+_In English: this page is the author's in-game test list, in French only. Produced on 2026-11-28 for version 0.1950.0. It has 1274 boxes: 682 ticked, 592 empty. 1091 boxes follow the test source: 499 done (ticked), 583 open, 7 could not be tried, 2 failed (empty). The 183 other ticked boxes come from before the source existed (reported before it, kept as they are). Apart: 39 tests of the source have no box on this page (29 done, 9 open, 1 could not be tried, 0 failed)._
 
-Liste produite le 2026-11-28 (version 0.1949.0) : 1273 cases, 682 cochées, 591 vides. 1090 cases suivent la source des essais : 499 faits (cochées), 582 ouverts, 7 pas pu, 2 en échec (vides). Les 183 autres cases cochées viennent d'avant la source (essais rapportés avant qu'elle existe, gardés tels quels). À part : 39 essais de la source n'ont pas de case sur cette page (29 faits, 9 ouverts, 1 pas pu, 0 en échec).
+Liste produite le 2026-11-28 (version 0.1950.0) : 1274 cases, 682 cochées, 592 vides. 1091 cases suivent la source des essais : 499 faits (cochées), 583 ouverts, 7 pas pu, 2 en échec (vides). Les 183 autres cases cochées viennent d'avant la source (essais rapportés avant qu'elle existe, gardés tels quels). À part : 39 essais de la source n'ont pas de case sur cette page (29 faits, 9 ouverts, 1 pas pu, 0 en échec).
 <!-- /q:public -->
 
 Parcours de la campagne de la phase 6, les mêmes essais rangés par activité : [TESTING-ROUTE.md](TESTING-ROUTE.md) (2026-11-09).
@@ -2849,6 +2849,8 @@ Une étape impossible (pas de compagnie, pas de sous-marin…) se rapporte « no
 - [x] (0.1903) Mode après X-153 : recharger Tensho ; ouvrir le Fashion Report au Gold Saucer (la page de la mode lit le thème et les indices) ; faire juger une tenue si la base des découvertes le permet ; puis se déconnecter et quitter le jeu : aucune erreur dans le journal à la fermeture.
 
 - [x] (0.1904) Découvertes avec GitHub connecté : lancer un échange (Monde › Découvertes) puis désactiver Tensho aussitôt dans /xlplugins : aucune erreur dans le journal ; réactiver Tensho : toujours connecté à GitHub, l'échange suivant se fait.
+
+- [ ] (0.1950) Ouvrir deux pages vides (par exemple une liste sans résultat dans Objets, et Alarmes sans alarme) : la ligne « rien ici » est grise atténuée, comme sur les autres pages, et passe à la ligne si la fenêtre est étroite.
 
 **0.535 : interfaces** — à voir en jouant
 
