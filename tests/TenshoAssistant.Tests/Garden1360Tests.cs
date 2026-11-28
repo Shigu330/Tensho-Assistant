@@ -97,8 +97,8 @@ internal static class Garden1360Tests
             Check(en.Contains("\"ForecastNotKept\"") && fr.Contains("\"ForecastNotKept\""),"the sentence in both languages");
             var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.GardenView.cs"));var crosses=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.GardenCrosses.cs"));
             Check(view.Contains("case GardenForecastKind.NotKept:") && crosses.Contains("case GardenForecastKind.NotKept:") && crosses.Contains("entry.Bed.NeighboursAtPlanting?.Select("),"drawn in both views, from the neighbours kept");
-            var plugin=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"));
-            Check(plugin.Contains("itemWatcher?.SourceSeen(Discoveries.GainSource.Garden,"),"the harvest handed to the item sources");
+            var plugin=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Reminders.cs"));
+            Check(plugin.Contains("itemWatcher()?.SourceSeen(Discoveries.GainSource.Garden,"),"the harvest handed to the item sources");
         }),
     ];
 }

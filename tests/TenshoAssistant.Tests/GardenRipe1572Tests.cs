@@ -122,7 +122,7 @@ internal static class GardenRipe1572Tests
             Check(watcher.Contains("Rules()?.Talk?.Read(sender,text)") && watcher.Contains("talkMemory.Said(said,Place(),DateTimeOffset.UtcNow,text);"), "the state line is kept");
             Check(watcher.Contains("talkMemory.Opened(place,now,out var line)") && watcher.Contains("examined?.Invoke(place,slot.Patch,slot.Bed,said,line);"), "the menu that opens takes it");
             Check(watcher.Contains("data.Excel.GetSheet<Lumina.Excel.RawRow>(null,GardenTalk.Sheet)"), "the rules come from the game's sheet");
-            Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs")).Contains("examined:(place,patch,bed,said,line)=>mainWindow.GardenExamined(place,patch,bed,said,line)),()=>gardenWatcher?.Dispose());"), "the plugin tells the page");
+            Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Reminders.cs")).Contains("examined:(place,patch,bed,said,line)=>mainWindow.GardenExamined(place,patch,bed,said,line)),()=>gardenWatcher?.Dispose());"), "the plugin tells the page");
             var page = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.GardenView.cs"));
             Check(page.Contains("else if(state==GardenState.Unknown){ImGui.TextColored(Muted,localization.Get(\"Garden.StateUnknown\"));if(TipHovered())TipText(GardenUnknownText(bed));}"), "« Unknown » with its reason under the mouse");
         }),

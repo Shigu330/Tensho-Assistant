@@ -34,7 +34,7 @@ internal static class GardenMenu1378Tests
             var watcher = Read("src/TenshoAssistant/Reminders/GardenChatWatcher.Dalamud.cs");
             Check(watcher.Contains("GardenChat.GardenItem(message.Message.Payloads.OfType<Dalamud.Game.Text.SeStringHandling.Payloads.ItemPayload>()", StringComparison.Ordinal), "the line's items");
             Check(watcher.Contains("menuMemory.Peek(place,at,GardenMenuMemory.HarvestWindow) is not null,gardenItem)", StringComparison.Ordinal), "given to IsHarvest");
-            var plugin = Read("src/TenshoAssistant/Plugin.cs");
+            var plugin = Read("src/TenshoAssistant/Plugin.Reminders.cs");
             Check(plugin.Contains("isGardenItem:id=>mainWindow.GardenSeedCatalog?.Invoke().Any(row=>row.Item1.SeedId==id || row.Item1.HarvestId==id)==true", StringComparison.Ordinal), "seeds and crops");
         }),
         ("Garden menu 1378: the Duty progress filters are feminine, « l'outil de mission » in lower case", () =>

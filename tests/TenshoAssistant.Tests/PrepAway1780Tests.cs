@@ -118,7 +118,7 @@ internal static class PrepAway1780Tests
                 Check(watcher.Contains($"condition[ConditionFlag.{flag}]", StringComparison.Ordinal), "held: " + flag);
             Check(watcher.Contains("|| settling.Holds(now) || MountAllowed?.Invoke(territory)==false", StringComparison.Ordinal), "held just after a load (X-781: until it is seen back, PrepSettling) and where mounts are not allowed");
             Check(watcher.Contains("if(territory!=lastTerritory){lastTerritory=territory;settling.Loaded(now);}", StringComparison.Ordinal), "a zone change starts the settling time");
-            Check(Read("src/TenshoAssistant/Plugin.cs").Contains("MountAllowed=territory=>territory==0 ? null:data.GetExcelSheet<Lumina.Excel.Sheets.TerritoryType>().GetRowOrDefault(territory)?.Mount}", StringComparison.Ordinal), "TerritoryType.Mount");
+            Check(Read("src/TenshoAssistant/Plugin.Reminders.cs").Contains("MountAllowed=territory=>territory==0 ? null:data.GetExcelSheet<Lumina.Excel.Sheets.TerritoryType>().GetRowOrDefault(territory)?.Mount}", StringComparison.Ordinal), "TerritoryType.Mount");
         }),
     ];
 }

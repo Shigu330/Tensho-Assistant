@@ -83,7 +83,7 @@ internal static class PrepReminder1778Tests
             Check(watcher.Contains("condition[ConditionFlag.InCombat] || condition[ConditionFlag.BoundByDuty] || condition[ConditionFlag.BoundByDuty56] || condition[ConditionFlag.BoundByDuty95]", StringComparison.Ordinal), "busy: a fight or a duty");
             Check(watcher.Contains("CompetitiveGate.Add(framework,OnUpdate);", StringComparison.Ordinal) && watcher.Contains("CompetitiveGate.Remove(framework,OnUpdate);", StringComparison.Ordinal), "cut in PvP and ranked content, removed at the end");
             Check(watcher.Contains("if(status.StatusId==WellFed){left=status.RemainingTime;break;}", StringComparison.Ordinal) && watcher.Contains("info.Companion->EntityId is not (0 or NoEntity)", StringComparison.Ordinal), "the meal and the companion out");
-            var plugin = Read("src/TenshoAssistant/Plugin.cs");
+            var plugin = Read("src/TenshoAssistant/Plugin.Reminders.cs");
             Check(plugin.Contains("new Reminders.PrepReminderWatcher(framework,client,objects,condition,()=>configuration.PrepReminders ?? new(),log)", StringComparison.Ordinal)
                 && plugin.Contains("if(options.ChatAllowed(false))chat.Print(\"[Tensho] \"+text);", StringComparison.Ordinal) && plugin.Contains("()=>prepReminders?.Dispose()", StringComparison.Ordinal), "wired with its end");
             Check(Read("src/TenshoAssistant/MainWindow.Alarms.cs").Contains("DrawPrepReminderSettings();", StringComparison.Ordinal), "with the alarms' settings");
