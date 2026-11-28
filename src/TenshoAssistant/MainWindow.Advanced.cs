@@ -388,8 +388,7 @@ internal sealed partial class MainWindow
                 ImGui.TextWrapped(localization.Get("Contributor.ProbesHelp"));
                 foreach(var probe in new[]{"PROBE_SELLS","PROBE_GTYPE","PROBE_ALARMCMD","PROBE_ACH","PROBE_TALK","PROBE_ZONE","PROBE_MARKERS","PROBE_TRIAD","PROBE_GROW","PROBE_LOCAL"})
                 {ImGui.BulletText(probe);Tip("Contributor.Probe_"+probe);ImGui.SameLine();ImGui.TextDisabled(localization.Get("Contributor.Probe_"+probe));}
-                if(ImGui.SmallButton(localization.Get("Contributor.CopyProbe")))
-                    ImGui.SetClipboardText("$env:PROBE_SELLS='41650'; dotnet run --project tools/ShopCurrencyProbe -c Release -- \"<FFXIV>\\game\\sqpack\"");
+                CopyButton(localization.Get("Contributor.CopyProbe"),()=>"$env:PROBE_SELLS='41650'; dotnet run --project tools/ShopCurrencyProbe -c Release -- \"<FFXIV>\\game\\sqpack\"");
                 Tip("Contributor.CopyProbeTip");
             }
             finally{ImGui.TreePop();}

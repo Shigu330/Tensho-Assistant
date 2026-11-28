@@ -183,7 +183,7 @@ internal sealed partial class MainWindow
             finally {ImGui.EndTable();}
         }
         ImGui.TextWrapped(localization.Get("CostUi.Help"));
-        if(ImGui.SmallButton(localization.Get("CostUi.Copy")))
+        CopyButton(localization.Get("CostUi.Copy"),()=>
         {
             var basis=localization.Get("CostCopy."+estimate.Basis);
             var quality=estimate.Quality switch {PreparationPriceQuality.Nq=>"NQ",PreparationPriceQuality.Hq=>"HQ",_=>localization.Get("CostCopy.Cheapest")};
@@ -200,8 +200,8 @@ internal sealed partial class MainWindow
                     line.Quote?.UploadedAt?.ToLocalTime().ToString("G") ?? localization.Get("CostUi.UnknownLower"))
                     +(line.StockUncertain ? localization.Get("CostCopy.Uncertain"):"")+(line.CachedStock ? localization.Get("CostCopy.Imported"):""));
             text.AppendLine(localization.Format("CostCopy.Summary",localization.Get(estimate.AllCosted ? "CostUi.Total":"CostUi.PartialTotal"),estimate.KnownSubtotal?.ToString() ?? localization.Get("CostCopy.Overflow")));
-            ImGui.SetClipboardText(text.ToString());
-        }
+            return text.ToString();
+        });
     }
     private string PreparationPriceStatus(PreparationCostLine line) => line.Status switch
     {

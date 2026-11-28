@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1945.0
+- Plan global, X-607 : Code plus facile à entretenir (X-607, demande du 18/11) : geste des boutons de copie. Les cinq petits boutons de copie écrits à la main sans message à eux (coût de la préparation, carte et partie observée de Triple Triade, alarmes du jeu en brut, commande de sonde des contributeurs) passent par le composant commun `CopyButton` : même petit bouton, même libellé ; il ajoute la marque « Copié » deux secondes après le clic et rattrape une copie qui échoue. Nouveau test `UiCopy1945Tests` : cliquet sur le presse-papiers écrit à la main hors d'une ligne de menu, forme sur deux lignes refusée, les cinq pages s'en servent.
+- Tests : UiCopy1945Tests. Verify.ps1 (agent) : 4320/4320, 0 avertissement, 0 erreur ; DLL 0.1945.0.0. Rien à essayer en jeu.
+### English
+- Code easier to maintain (X-607, request of 18/11): the gesture of the copy buttons. The five small copy buttons written by hand with no message of their own (preparation cost, Triple Triad card and observed match, raw game alarms, contributors' probe command) go through the shared component `CopyButton`: the same small button, the same label; it adds the « Copied » mark for two seconds after a click and catches a failed copy. New test `UiCopy1945Tests`: a ratchet on the clipboard written by hand outside a menu line, the form over two lines refused, the five pages use it.
+
 ## 0.1944.0
 - Plan global, X-607 : Code plus facile à entretenir (X-607, demande du 18/11) : geste des champs de texte avec indice. Les champs écrits à la main avec un indice traduit (recherches, noms à taper) passent par le nouveau composant `InputWithHint(id, clé de l'indice, texte, taille)` de UI/Components/InputWithHint.cs, le même appel qu'avant : aucune page ne change. Nouveau test `UiInputs1944Tests` : la forme écrite à la main est refusée, le composant garde le même appel, les pages s'en servent et gardent leur info-bulle.
 - Tests : UiInputs1944Tests. Verify.ps1 (agent) : 4317/4317, 0 avertissement, 0 erreur ; DLL 0.1944.0.0. Rien à essayer en jeu.

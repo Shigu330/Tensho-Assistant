@@ -522,8 +522,8 @@ internal sealed partial class MainWindow
                 ImGui.TextUnformatted($"{alarm.Name} · {alarm.Hour:00}:{alarm.Minute:00} {localization.Get("Alarms.Clock"+Math.Clamp(alarm.ClockTime,0,2))}"
                     +(alarm.Repeat ? " · "+localization.Get("Alarms.Repeat"):"")+(alarm.Reminder>0 ? " · "+localization.Format("Alarms.Reminder",MinutesText(alarm.Reminder)):""));
             // Native fields needed before Tensho may write a game alarm (0.202): copy them for the developer.
-            if(game.Count>0 && ImGui.SmallButton(localization.Get("Alarms.CopyRaw")))
-                ImGui.SetClipboardText(string.Join(Environment.NewLine,game.Select(alarm=>$"name={alarm.Name} index={alarm.Index} clock={alarm.ClockTime} {alarm.Hour:00}:{alarm.Minute:00} reminder={alarm.Reminder} sound={alarm.Sound} timestamp={alarm.Timestamp} flags={alarm.Flags} captured={DateTimeOffset.UtcNow.ToUnixTimeSeconds()}")));
+            if(game.Count>0)
+                CopyButton(localization.Get("Alarms.CopyRaw"),()=>string.Join(Environment.NewLine,game.Select(alarm=>$"name={alarm.Name} index={alarm.Index} clock={alarm.ClockTime} {alarm.Hour:00}:{alarm.Minute:00} reminder={alarm.Reminder} sound={alarm.Sound} timestamp={alarm.Timestamp} flags={alarm.Flags} captured={DateTimeOffset.UtcNow.ToUnixTimeSeconds()}")));
         }
     }
 

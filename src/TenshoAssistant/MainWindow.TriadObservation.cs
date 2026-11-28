@@ -54,13 +54,13 @@ internal sealed partial class MainWindow
             DrawObservedTriadGroup(localization.Get("TriadObserved.Red"),frame.RedHand,5);
         }
         ImGui.TextWrapped(localization.Get("TriadObserved.Disclaimer"));
-        if (ImGui.SmallButton(localization.Get("TriadObserved.Copy")))
+        CopyButton(localization.Get("TriadObserved.Copy"),()=>
         {
             var text = new StringBuilder().AppendLine(localization.Format("UiFragments.ObservedCopy",frame.Source,state.ObservedAt?.ToLocalTime().ToString("G") ?? "—",frame.NativePhase));
             foreach (var group in new[] {(localization.Get("TriadObserved.Board"),frame.Board),(localization.Get("TriadObserved.Blue"),frame.BlueHand),(localization.Get("TriadObserved.Red"),frame.RedHand)})
                 for (var index=0;index<group.Item2.Count;index++) text.AppendLine($"{group.Item1} {index+1}: {ObservedTriadDescription(group.Item2[index])}");
-            ImGui.SetClipboardText(text.ToString());
-        }
+            return text.ToString();
+        });
     }
     private void DrawObservedTriadGroup(string label,IReadOnlyList<TriadObservedCard> cards,int columns)
     {

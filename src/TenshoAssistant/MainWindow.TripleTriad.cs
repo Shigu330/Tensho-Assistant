@@ -253,8 +253,7 @@ internal sealed partial class MainWindow
             if (ImGui.Button(localization.Format("CompletionDetails.Item",item.Name)+$"###TriadItem{item.Id}"))
             { SelectItem(item.Id); OpenLink("Item.Stocks"); }
         }
-        if (ImGui.SmallButton(localization.Get("TriadUi.Copy")))
-            ImGui.SetClipboardText(localization.Format("UiFragments.CardCopy",card.Label,entry.Name,card.Stars,TriadCardDefinition.Value(card.Top),TriadCardDefinition.Value(card.Right),TriadCardDefinition.Value(card.Bottom),TriadCardDefinition.Value(card.Left)));
+        CopyButton(localization.Get("TriadUi.Copy"),()=>localization.Format("UiFragments.CardCopy",card.Label,entry.Name,card.Stars,TriadCardDefinition.Value(card.Top),TriadCardDefinition.Value(card.Right),TriadCardDefinition.Value(card.Bottom),TriadCardDefinition.Value(card.Left)));
     }
 
     private static void DrawTriadValues(TriadCardDefinition card)
