@@ -75,7 +75,7 @@ internal static class ChatReview1491Tests
     [
         ("Chat review 1491: the ring sends Dalamud's whole place link, never AddMapLink's bare start; the self-check reads it (X-509)", () =>
         {
-            var plugin = Read("src/TenshoAssistant/Plugin.cs");
+            var plugin = Read("src/TenshoAssistant/Plugin.cs") + Read("src/TenshoAssistant/Plugin.Alarms.cs");
             Check(plugin.Contains("Alarms.AlarmPlaceLink.Build(place.TerritoryId,place.MapId,place.X,place.Y,log) is { } placeLink", StringComparison.Ordinal)
                   && plugin.Contains(".Append(placeLink);", StringComparison.Ordinal) && !plugin.Contains(".AddMapLink(", StringComparison.Ordinal), "the ring: the whole link");
             var link = Read("src/TenshoAssistant/Alarms/AlarmPlaceLink.Dalamud.cs");

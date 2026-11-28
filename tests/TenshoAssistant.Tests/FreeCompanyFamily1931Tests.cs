@@ -46,7 +46,7 @@ internal static class FreeCompanyFamily1931Tests
             var wheels = At("RegisterAetherialWheels(configuration,data,framework,gameGui,()=>SaveTimed(\"aetherial wheels\"));");
             var deliveries = At("RegisterWorkshopDeliveries(framework,gameGui);");
             Check(Count(plugin, @"RegisterAetherialWheels\(") == 1 && Count(plugin, @"RegisterWorkshopDeliveries\(") == 1, "each called once");
-            Check(At("RegisterChatPlayers(") < wheels && wheels < At("autoAlarms=new Alarms.AutoAlarmWatcher("), "the wheels: after the chat's players, before the automatic alarms that follow them, as before");
+            Check(At("RegisterChatPlayers(") < wheels && wheels < At("RegisterAutoAlarms(framework,"), "the wheels: after the chat's players, before the automatic alarms that follow them, as before");
             Check(At("RegisterItemUses(") < deliveries && deliveries < At("RegisterItemCatalog("), "the deliveries: between the items' uses and the items' catalogue, as before");
         }),
         ("Free company family 1931: each service's install and its release are given to one same registration of Plugin.FreeCompany.cs (its own release, never another's)", () =>

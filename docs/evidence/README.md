@@ -322,7 +322,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.803-map-discovery-layout.md](0.803-map-discovery-layout.md) | `src/TenshoAssistant/Maps/MapDiscovery.cs`, `tests/TenshoAssistant.Tests/MapDiscovery803Tests.cs`, `tools/README.md` | — |
 | [0.804-beast-wiki.md](0.804-beast-wiki.md) | `src/TenshoAssistant/Monsters/BeastWikiIndex.cs` | `docs/evidence/0.874-probe-coverage.md` |
 | [0.811-conditional-npcs.md](0.811-conditional-npcs.md) | `src/TenshoAssistant/Npcs/NpcVendorCatalog.cs` | — |
-| [0.812-alarm-link.md](0.812-alarm-link.md) | `src/TenshoAssistant/Plugin.cs` | — |
+| [0.812-alarm-link.md](0.812-alarm-link.md) | `src/TenshoAssistant/Plugin.Alarms.cs` | — |
 | [0.833-zone-entries.md](0.833-zone-entries.md) | `src/TenshoAssistant/Maps/ZoneEntries.cs` | — |
 | [0.834-hidden-gathering-items.md](0.834-hidden-gathering-items.md) | `src/TenshoAssistant/MainWindow.DutyFinder.cs` | — |
 | [0.848-quest-markers-current.md](0.848-quest-markers-current.md) | `src/TenshoAssistant/Maps/MapLabels.cs` | — |

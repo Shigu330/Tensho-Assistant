@@ -8,7 +8,7 @@ internal static class AlarmLinks414Tests
     [
         ("Alarm links: map link when the point is known, item link handlers bounded and removed on unload",() =>
         {
-            var plugin=Read("Plugin.cs");
+            var plugin=Read("Plugin.cs")+Read("Plugin.Alarms.cs");
             // 0.1491 (X-509, review of 0.1490): the whole place link (Dalamud's CreateMapLink: arrow, place and coordinates, end); AddMapLink adds
             // the link's start alone (docs/evidence/0.1491-alarm-place-link.md).
             Check(plugin.Contains("if(mainWindow.AlarmPlace(alarm) is { } place && Alarms.AlarmPlaceLink.Build(place.TerritoryId,place.MapId,place.X,place.Y,log) is { } placeLink)")

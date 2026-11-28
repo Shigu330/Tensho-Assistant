@@ -86,7 +86,7 @@ internal static class DurationText1316Tests
             Check(Read("MainWindow.Home.cs").Contains("TimeLeftText(next.At-DateTimeOffset.UtcNow)"), "Home");
             Check(Read("MainWindow.Weather.cs").Contains("TimeLeftText(entry.StartsAt-now)"), "Weather");
             Check(Read("MainWindow.DesktopData.cs").Contains("TimeLeftUp(item.Occurrence-now)"), "desktop alarm line");
-            Check(Read("Plugin.cs").Contains("UI.TimeLeft.Write(TimeSpan.FromMinutes(Math.Max(0,ringMinutes))"), "the alarm's chat line");
+            Check(Read("Plugin.Alarms.cs").Contains("UI.TimeLeft.Write(TimeSpan.FromMinutes(Math.Max(0,ringMinutes))"), "the alarm's chat line");
         }),
     ];
 }

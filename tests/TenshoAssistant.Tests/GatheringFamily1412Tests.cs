@@ -41,7 +41,7 @@ internal static class GatheringFamily1412Tests
                 && home.Contains("mainWindow.FishingBait=()=>baitReader?.Bait;") && home.Contains("mainWindow.ConfigureNodeEffects(node=>")
                 && home.Contains("mainWindow.ConfigureBountifulBase(item=>") && home.Contains("mainWindow.ConfigureFishingHelp("),"the main window still reads them");
             var plugin = files.Single(file => file.Name == "Plugin.cs").Text;
-            var alarms = plugin.IndexOf("if(alarms is not null)alarms.Gathered=mainWindow.AlarmGathered;",StringComparison.Ordinal);
+            var alarms = plugin.IndexOf("var discord=RegisterAlarms(",StringComparison.Ordinal);
             var call = plugin.IndexOf("RegisterGathering(",StringComparison.Ordinal);
             var jobs = plugin.IndexOf("mainWindow.ConfigureJobNames(job=>",StringComparison.Ordinal);
             Check(alarms > 0 && call > alarms && jobs > call && Count(plugin,@"RegisterGathering\(") == 1,"Plugin.cs calls the family once, where the block stood");

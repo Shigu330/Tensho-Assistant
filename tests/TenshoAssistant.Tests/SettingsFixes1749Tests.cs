@@ -58,17 +58,21 @@ internal static class SettingsFixes1749Tests
             Check(file.Save(value), "first save");
             var before = File.ReadAllBytes(file.FilePath);
             value.DeveloperMode = !value.DeveloperMode;
-            var watch = Stopwatch.StartNew();
             bool saved;
+            long spent;
+            // 0.1932 (failed once under the publication's load: 1736 ms): only the save is timed, not the other client taking its lock first.
             using (FairFileLock.Hold(file.LockPath, 1_000, error => error))
+            {
+                var saving = Stopwatch.StartNew();
                 saved = file.Save(value, onGameThread: true);
-            var spent = watch.ElapsedMilliseconds;
+                spent = saving.ElapsedMilliseconds;
+            }
             Check(!saved && spent < 1_500, $"refused soon on the game's thread while another client holds the lock: {saved}, {spent} ms (was up to 10 s)");
             Check(File.ReadAllBytes(file.FilePath).SequenceEqual(before), "nothing changed");
             Check(said.Count(line => line.StartsWith("The settings could not be written", StringComparison.Ordinal)) == 1, "said once: " + string.Join(" | ", said));
             var other = FairFileLock.Hold(file.LockPath, 1_000, error => error);
             var release = Task.Run(() => { Thread.Sleep(600); other.Dispose(); });
-            watch.Restart();
+            var watch = Stopwatch.StartNew();
             Check(file.Save(value), "off the game's thread, the save waits for the other client");
             Check(watch.ElapsedMilliseconds >= 400, "it waited: " + watch.ElapsedMilliseconds + " ms");
             release.Wait();

@@ -40,7 +40,7 @@ internal static class CollectionsFamily1444Tests
                 && home.Contains("registrations.Register(()=>mainWindow.TitleChangerSource=titleChanger=") && home.Contains("registrations.Register(()=>mainWindow.AchievementProgressSource=achievementProgress=")
                 && home.Contains("mainWindow.ExtraCollections=()=>{extraCollections?.Want();return extraCollections?.State;};"),"the main window still reads them");
             var plugin = files.Single(file => file.Name == "Plugin.cs").Text;
-            var alarms = plugin.IndexOf("()=>autoAlarms?.Dispose());",StringComparison.Ordinal);
+            var alarms = plugin.IndexOf("RegisterAutoAlarms(framework,",StringComparison.Ordinal);
             var call = plugin.IndexOf("RegisterCollections(",StringComparison.Ordinal);
             var hunting = plugin.IndexOf("// g, C-12 (0.364): hunting log",StringComparison.Ordinal);
             Check(alarms > 0 && call > alarms && hunting > call && Count(plugin,@"RegisterCollections\(") == 1,"Plugin.cs calls the family once, where the block stood");

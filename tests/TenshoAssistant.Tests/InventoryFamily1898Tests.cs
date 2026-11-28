@@ -45,7 +45,7 @@ internal static class InventoryFamily1898Tests
             var gil = At("var gilWatcher=RegisterGilJournal(pluginInterface,framework,player,gameGui,condition,objects,tenshoData);");
             var bar = At("RegisterServerBar(dtrBar,framework,gameGui,player,client,inventory,configuration,localization,()=>currencies?.State,()=>gilWatcher?.State?.Entries,");
             Check(Count(plugin, @"RegisterCurrencies\(") == 1 && Count(plugin, @"RegisterGilJournal\(") == 1, "each called once");
-            Check(At("var discord=new Alarms.DiscordNotifier();") < currencies && currencies < gil && gil < bar, "after the Discord notifier, before the server bar, in the order of before");
+            Check(At("var discord=RegisterAlarms(") < currencies && currencies < gil && gil < bar, "after the Discord notifier, before the server bar, in the order of before");
             Check(currencies < At("// DEC-038: one chat line on entry, nothing on leaving;") && At("mainWindow.AchievementNameOf=id=>") < gil, "each where its block stood");
         }),
         // X-885 M2 (0.1906): this case replaced « behaviour », the same RegistrationScope test copied in each family test, which touched nothing

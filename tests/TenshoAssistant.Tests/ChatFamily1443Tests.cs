@@ -41,7 +41,7 @@ internal static class ChatFamily1443Tests
             var plugin = files.Single(file => file.Name == "Plugin.cs").Text;
             var treasure = plugin.IndexOf("if(itemWatcher is not null)itemWatcher.TreasureMapItem=",StringComparison.Ordinal);
             var call = plugin.IndexOf("RegisterChat(",StringComparison.Ordinal);
-            var alarms = plugin.IndexOf("Alarms.AutoAlarmWatcher? autoAlarms=null;",StringComparison.Ordinal);
+            var alarms = plugin.IndexOf("RegisterAutoAlarms(framework,",StringComparison.Ordinal);
             Check(treasure > 0 && call > treasure && alarms > call && Count(plugin,@"RegisterChat\(") == 1,"Plugin.cs calls the family once, where the block stood");
             Check(!Regex.IsMatch(plugin,@"(ChatReader|ChatMapLinkWatcher|ChatLinkHoverWatcher)\b"),"Plugin.cs creates none of them");
         }),
