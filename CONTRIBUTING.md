@@ -161,7 +161,7 @@ follow the list below: the tests refuse a page that misses one of its places.
    (`if(TipHovered())TipText(text)` builds a computed text only on hover). Sub-titles: `UiComponents.SubTitle(text)` (section font, gold). Sections: `UiComponents.Header`, folds inside them: `UiComponents.TreeNode` (both
    open while the Settings search looks for a setting). Settings: `BoolSetting`, `IntSetting`, `SliderSetting`,
    `ComboSetting` (a default, a « Default: » line and a « ↺ » button). A long list's page bar: `Pager`. Icon buttons `ToolButton` or `GlyphButton` (a counter's « + » and « - »: `FontAwesomeIcon.Plus`, `Minus`), game icons `DrawGameIcon`, colours from
-   the theme (`Accent`, `Muted`, `Success`, `Warning`, `Error`). An item's tooltip: `ItemTip(id)`; a text field with a hint:
+   the theme (`Accent`, `Muted`, `Success`, `Warning`, `Error`). An item's tooltip: `ItemTip(id)`; another rich tooltip (action, place, NPC…): `if(RichTipHovered())DrawXTooltip(…)`; a text field with a hint:
    `InputWithHint(id, hintKey, ref text, maximum)`; a text filter whose empty value means « all »: `FilterCombo(id, allKey, ref value,
    choices)`; a copy button: `CopyButton(label, () => text)`; a framed list or pane: `BeginFramed(id, size)` (closed by
    `ImGui.EndChild()`); a control's width: `Widths.Number`, `Widths.Short`, `Widths.Long`… rather than a bare number. Tests refuse the forms these replace, and the number of tab bars and
@@ -433,7 +433,7 @@ Suivez ensuite la liste ci-dessous : les tests refusent une page à qui manque l
    `UiComponents.Header`, replis dedans : `UiComponents.TreeNode` (les deux s'ouvrent pendant que la recherche des Paramètres cherche un
    réglage). Réglages : `BoolSetting`, `IntSetting`, `SliderSetting`, `ComboSetting` (un défaut, une ligne « Par
    défaut : » et un bouton « ↺ »). La barre de pages d'une longue liste : `Pager`. Boutons à icône `ToolButton` ou `GlyphButton` (le « + » et le « - » d'un compteur : `FontAwesomeIcon.Plus`, `Minus`), icônes du jeu `DrawGameIcon`, couleurs du thème (`Accent`, `Muted`,
-   `Success`, `Warning`, `Error`). L'infobulle d'un objet : `ItemTip(id)` ; un champ de texte avec indice :
+   `Success`, `Warning`, `Error`). L'infobulle d'un objet : `ItemTip(id)` ; une autre infobulle riche (action, lieu, PNJ…) : `if(RichTipHovered())DrawXTooltip(…)` ; un champ de texte avec indice :
    `InputWithHint(id, cléIndice, ref texte, maximum)` ; un filtre sur un texte dont la valeur vide veut dire « tous » :
    `FilterCombo(id, cléTous, ref valeur, choix)` ; un bouton de copie : `CopyButton(libellé, () => texte)` ; une liste ou un volet
    encadré : `BeginFramed(id, taille)` (fermé par `ImGui.EndChild()`) ; la largeur d'un contrôle : `Widths.Number`, `Widths.Short`,

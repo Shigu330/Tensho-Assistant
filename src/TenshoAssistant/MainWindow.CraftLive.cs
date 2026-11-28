@@ -79,7 +79,7 @@ internal sealed partial class MainWindow
                 DrawGameIcon(icon,new Vector2(28));ImGui.SameLine();
                 ImGui.TextUnformatted(effect.Metadata.Name+" · "+(effect.Indefinite && effect.Counter is null ? localization.Get("LiveDetails.Present"):effect.Counter?.ToString() ?? localization.Get("LiveDetails.UnknownCounter")));
                 // X-684 (0.1674): the one action and status tooltip (icon of the stack shown, name, the game's description).
-                if(ImGui.IsItemHovered())DrawActionTooltip(icon,effect.Metadata.Name,effect.Metadata.Description);
+                if(RichTipHovered())DrawActionTooltip(icon,effect.Metadata.Name,effect.Metadata.Description);
             }
             foreach(var issue in observation.Issues)DrawCraftIssue(issue);
             ImGui.TextWrapped(localization.Format("LiveDetails.Trained",localization.Get(observation.UsedTrainedPerfection is true ? "LiveDetails.Yes":observation.UsedTrainedPerfection is false ? "LiveDetails.No":"LiveDetails.UnknownTrained")));

@@ -127,7 +127,7 @@ internal sealed partial class MainWindow
             if(ImGui.Selectable($"{FateLabel(fate)}##Fate{fate.Id}"))FlagAt(map,fate.Position);
             PlaceMenu($"FatePlace{fate.Id}",map,CoordinateOf(map,fate.Position),FateLabel(fate));
             // X-684 (0.1676): the one FATE tooltip (its state now), the click's effect under it.
-            if(ImGui.IsItemHovered())DrawFateTooltip(Fields.FateTips.Build(fate.Name,fate.Icon,fate.Level,localization.Get("FieldContent.KindFate"),$"{map.Zone} · {CoordinateText(map,fate.Position)}",
+            if(RichTipHovered())DrawFateTooltip(Fields.FateTips.Build(fate.Name,fate.Icon,fate.Level,localization.Get("FieldContent.KindFate"),$"{map.Zone} · {CoordinateText(map,fate.Position)}",
                 localization.Format("MapLocal.FateTipProgress",fate.Progress)+(fate.SecondsLeft>0 ? localization.Format("MapLocal.FateTime",fate.SecondsLeft/60,(fate.SecondsLeft%60).ToString("00")):"")
                 +(fate.HasBonus ? localization.Get("MapLocal.FateBonus"):""),null,0),localization.Get("MapLocal.ClickFlag"));
         }
@@ -155,14 +155,14 @@ internal sealed partial class MainWindow
                 var world=new Vector3(position.X,0,position.Z);
                 if(ImGui.Selectable($"{label}##Gathering{point.BaseId}"))FlagAt(map,world);
                 GatheringToolMenu($"GatheringTool{point.BaseId}",point.Items,(map,CoordinateOf(map,world)));
-                if(ImGui.IsItemHovered())DrawGatheringTooltip(point);
+                if(RichTipHovered())DrawGatheringTooltip(point);
             }
             else
             {
                 ImGui.TextDisabled(label);
                 GatheringToolMenu($"GatheringTool{point.BaseId}",point.Items);
                 // X-684 (0.1694): the one gathering tooltip (before: the item names alone), saying that the game gives no position.
-                if(ImGui.IsItemHovered())DrawGatheringTooltip(point);
+                if(RichTipHovered())DrawGatheringTooltip(point);
             }
         });
     }
@@ -265,7 +265,7 @@ internal sealed partial class MainWindow
             DrawSmallGameIcon(VendorMarker(vendorMarkers,MapProjection.PixelFromWorld(new Vector3(spot.WorldX,0,spot.WorldZ),map),VendorIconOf(vendor))?.Icon ?? VendorIconOf(vendor));
             if(ImGui.Selectable($"{name}  ({MapProjection.CoordinateText(new(spot.X,spot.Y))})##Vendor{vendor.NpcId}/{spot.X}/{spot.Y}")){PlaceFlagFromMapView(map,spot.X,spot.Y);ImGui.CloseCurrentPopup();}
             NpcMenu($"VendorTool{vendor.NpcId}/{spot.X}/{spot.Y}",name,vendor.NpcId,vendor.Locations);
-            if(ImGui.IsItemHovered())DrawNpcTooltip(VendorTipFacts(vendor),localization.Get("MapLocal.ClickFlag")+"\n"+localization.Get("MapLocal.RightClickTool"));
+            if(RichTipHovered())DrawNpcTooltip(VendorTipFacts(vendor),localization.Get("MapLocal.ClickFlag")+"\n"+localization.Get("MapLocal.RightClickTool"));
         }
     }
 
@@ -291,7 +291,7 @@ internal sealed partial class MainWindow
             try{if(ImGui.Selectable($"{mark}  {npc.Name}  ({MapProjection.CoordinateText(new(npc.X,npc.Y))}){lacking}##LocalTriad{npc.MatchId}")){PlaceFlagFromMapView(map,npc.X,npc.Y);ImGui.CloseCurrentPopup();}}
             finally{ImGui.PopStyleColor();}
             NpcMenu($"TriadTool{npc.MatchId}",npc.Name,0,[new(map.TerritoryId,map.MapId,map.Zone,npc.X,npc.Y,0,0,0)],("MapLocal.OpenTriadTool",()=>OpenLink("Triad.Npcs")));
-            if(ImGui.IsItemHovered())DrawNpcTooltip(TriadTipFacts(npc,beaten,missing.Count,questsDone,id=>entries.TryGetValue(id,out var entry) ? entry.Name:id.ToString()),
+            if(RichTipHovered())DrawNpcTooltip(TriadTipFacts(npc,beaten,missing.Count,questsDone,id=>entries.TryGetValue(id,out var entry) ? entry.Name:id.ToString()),
                 localization.Get("MapLocal.ClickFlag")+"\n"+localization.Get("MapLocal.RightClickTool"));
         }
     }

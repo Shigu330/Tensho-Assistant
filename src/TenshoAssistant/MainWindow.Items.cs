@@ -543,7 +543,7 @@ internal sealed partial class MainWindow
                                         ImGuiSelectableFlags.None, new Vector2(0, 30)) || clickedIcon)
                                     craftBookRecipe = recipe.RecipeId;
                                 // X-684 (0.1692): the one recipe tooltip (before: the crafter and the level only).
-                                if (ImGui.IsItemHovered()) DrawRecipeTooltip(RecipeTipOf(recipe));
+                                if(RichTipHovered())DrawRecipeTooltip(RecipeTipOf(recipe));
                             }
                             finally { ImGui.PopID(); }
                         }

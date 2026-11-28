@@ -12,7 +12,7 @@ internal static class LastTips1695Tests
         ("Last tips 1695: actions: field operations and the racing chocobo's abilities through the one action tooltip", () =>
         {
             var fieldPage = Read("MainWindow.FieldContent.cs");
-            Check(fieldPage.Contains("if(ImGui.IsItemHovered())DrawActionTooltip(row.Icon,row.Name,row.Description,localization.Format(\"FieldContent.ActionTipDetail\",row.Category,row.Most));", StringComparison.Ordinal)
+            Check(fieldPage.Contains("if(RichTipHovered())DrawActionTooltip(row.Icon,row.Name,row.Description,localization.Format(\"FieldContent.ActionTipDetail\",row.Category,row.Most));", StringComparison.Ordinal)
                   && fieldPage.Split("TipText(row.Description)").Length == 2, "field operations (the field records keep their description)");
             var chocobo = Read("MainWindow.ChocoboBarding.cs");
             Check(chocobo.Contains("DrawActionTooltip(0,ability.Name,ability.Description);", StringComparison.Ordinal) && !chocobo.Contains("TipText(ability.Description)", StringComparison.Ordinal), "the racing chocobo");

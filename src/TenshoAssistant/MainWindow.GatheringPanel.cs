@@ -133,7 +133,7 @@ internal sealed partial class MainWindow
                 DrawGameIcon(action.Icon,new Vector2(28));ImGui.SameLine();
                 ImGui.TextColored(Accent,localization.Format(step.Leftover ? "GatheringPanel.NextLeftover":"GatheringPanel.NextAction",action.Name));
                 // X-684 (0.1675): the one action tooltip.
-                if(ImGui.IsItemHovered())DrawGatheringActionTooltip(action);
+                if(RichTipHovered())DrawGatheringActionTooltip(action);
                 // 0.733 (user report): asked from here, inside the panel's own window, which is drawn after the overlays: the frame of 0.728 was cleared before it was looked for.
                 if(configuration.GatheringNextHighlight && BarLocator is { } located)
                 {
@@ -364,7 +364,7 @@ internal sealed partial class MainWindow
             if(spent>=use.Count)ImGui.TextDisabled(label);
             else if(next?.Action?.Spec.Id==use.Action.Spec.Id)ImGui.TextColored(Accent,label);
             else ImGui.TextUnformatted(label);
-            if(ImGui.IsItemHovered())DrawGatheringActionTooltip(use.Action);
+            if(RichTipHovered())DrawGatheringActionTooltip(use.Action);
         }
         if(shown.Actions.Any(use=>use.Action.Spec.Effect==GpEffect.Attempt) && plan.Scenario.Level>=GpScenario.EurekaLevel)
             ImGui.TextDisabled(localization.Get("GpUi.Eureka"));
@@ -388,14 +388,14 @@ internal sealed partial class MainWindow
             if(GatheringActionRow?.Invoke(action.Id) is not { } row)continue;
             DrawGameIcon(row.Icon,new Vector2(22));ImGui.SameLine();
             ImGui.TextUnformatted($"{row.Name} · {action.Cost} {localization.Get("GatheringPanel.CrystalGp")}");
-            if(ImGui.IsItemHovered())DrawGatheringActionTooltip(row.Icon,row.Name,row.Description,action.Level,action.Cost);
+            if(RichTipHovered())DrawGatheringActionTooltip(row.Icon,row.Name,row.Description,action.Level,action.Cost);
         }
         foreach(var (id,left) in cooling)
             if(GatheringActionRow?.Invoke(id) is { } row)
             {
                 DrawGameIcon(row.Icon,new Vector2(22));ImGui.SameLine();
                 ImGui.TextDisabled(localization.Format("GatheringPanel.CrystalWait",row.Name,Math.Ceiling(left ?? 0).ToString("0")));
-                if(ImGui.IsItemHovered())DrawActionTooltip(row.Icon,row.Name,row.Description,after:localization.Format("GatheringPanel.CrystalWait",row.Name,Math.Ceiling(left ?? 0).ToString("0")));
+                if(RichTipHovered())DrawActionTooltip(row.Icon,row.Name,row.Description,after:localization.Format("GatheringPanel.CrystalWait",row.Name,Math.Ceiling(left ?? 0).ToString("0")));
             }
         ImGui.TextDisabled(localization.Get("GatheringPanel.CrystalNote"));
     }

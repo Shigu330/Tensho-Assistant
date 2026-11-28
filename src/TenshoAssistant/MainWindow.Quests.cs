@@ -198,7 +198,7 @@ internal sealed partial class MainWindow
                 ImGui.SameLine();
                 if (ImGui.Selectable($"{entry.Name}##quest{entry.Id}", selectedQuestId == entry.Id)) SelectQuest(entry.Id);
                 // X-89 (0.970): the quest's expansion (game data) in its tooltip. X-684 (0.1670): the one quest tooltip.
-                if (ImGui.IsItemHovered()) DrawQuestTooltip(entry);
+                if(RichTipHovered())DrawQuestTooltip(entry);
                 QuestMenu($"QuestMenu{entry.Id}", entry.Id, entry.Name);
                 ImGui.TableNextColumn(); if (entry.Level > 0) ImGui.TextUnformatted(entry.Level.ToString(CultureInfo.CurrentCulture)); else ImGui.TextDisabled("?");
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(entry.Zone ?? "");

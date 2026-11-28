@@ -126,7 +126,7 @@ internal sealed partial class MainWindow
                             if (ImGui.Selectable($"{(monster.Name.Length == 0 ? localization.Format("MonsterUi.UnnamedMonster",monster.Id) : monster.Name)}##Mob{monster.Id}",state.MonsterId == monster.Id))
                             { monsterLoot.SelectMonster(monster.Id); selectedMonsterMap=0; }
                             // X-684 (0.1673): the one monster tooltip (name, level, zone), the source's number under it in developer mode.
-                            if (ImGui.IsItemHovered()) DrawMonsterTooltip(MonsterTips.Build(monster.Name.Length == 0 ? localization.Format("MonsterUi.UnnamedMonster",monster.Id) : monster.Name,
+                            if(RichTipHovered())DrawMonsterTooltip(MonsterTips.Build(monster.Name.Length == 0 ? localization.Format("MonsterUi.UnnamedMonster",monster.Id) : monster.Name,
                                 monster.Level.Length == 0 ? null : localization.Format("MapView.MonsterTipLevel",monster.Level),MonsterZone(monster.PlaceNameId),[]),
                                 developerMode ? localization.Format("Developer.SourceReference",monster.Id) : null);
                             MonsterMenu($"MonsterMenu{monster.Id}",monster.Id,monster.Name.Length == 0 ? localization.Format("MonsterUi.UnnamedMonster",monster.Id) : monster.Name);

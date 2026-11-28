@@ -35,11 +35,16 @@ internal sealed partial class MainWindow
     // True when the last drawn item is hovered, also when disabled: the guard of a tooltip whose text is computed.
     private static bool TipHovered()=>ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled);
 
+    // X-607 (0.1956): the guard of a rich tooltip (item, action, place, quest, duty, FATE, NPC, recipe, gathering…): the last drawn item
+    // hovered, not when greyed. One form everywhere, « if(RichTipHovered())DrawXTooltip(…) », in place of the hover test on each page
+    // (UiRichTips1956Tests).
+    private static bool RichTipHovered()=>ImGui.IsItemHovered();
+
     // X-607 (0.1943): the item's tooltip (name, kind, level, price, sources) of the last drawn item, on hover, the same guard as before
     // (not when greyed). One form everywhere in place of the hover test and the item tooltip written by hand on each page (UiItemTips1943Tests).
     private void ItemTip(uint id,bool glamourOnly=false,bool? hq=null)
     {
-        if(ImGui.IsItemHovered())DrawItemInfoTooltip(id,glamourOnly,hq);
+        if(RichTipHovered())DrawItemInfoTooltip(id,glamourOnly,hq);
     }
 
     // A muted « info » icon on the line, its help text on hover.

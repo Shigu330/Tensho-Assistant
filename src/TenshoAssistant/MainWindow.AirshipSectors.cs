@@ -82,7 +82,7 @@ internal sealed partial class MainWindow
                 var drops=catalog.Drops.GetValueOrDefault(sector.Id);
                 if(drops is not { Count:>0 }){EmptyState("AirshipSectors.LootNone");continue;}
                 ImGui.TextUnformatted(localization.Format("AirshipSectors.LootCount",drops.Count));
-                if(ImGui.IsItemHovered())DrawAirshipLootTooltip(drops,items);
+                if(RichTipHovered())DrawAirshipLootTooltip(drops,items);
             }
         }
         finally{ImGui.EndTable();}

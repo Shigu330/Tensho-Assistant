@@ -22,7 +22,7 @@ internal static class MonsterTips1673Tests
             Check(map.Contains("if(mapMonsterTip is { } monsterTip && ReferenceEquals(monsterTip.Text,tooltip))DrawMonsterTooltip(monsterTip.Facts,monsterTip.After);\n                else WrappedTooltip(tooltip);"),"the text set last decides");
             Check(!map.Contains("localization.Format(\"MapView.MonsterLabel\",monster.Name,monster.Level)+") && !map.Contains("tooltip=localization.Format(\"MapView.LeveTarget\""),"no hand-written monster tooltip left on the map");
             Check(Read("src/TenshoAssistant/MainWindow.MonsterIcons.cs").Contains("if(tip is not null)DrawMonsterTooltip(tip);"),"the overlay");
-            Check(Read("src/TenshoAssistant/MainWindow.Monsters.cs").Contains("if (ImGui.IsItemHovered()) DrawMonsterTooltip(MonsterTips.Build("),"the Monsters page, for every player now");
+            Check(Read("src/TenshoAssistant/MainWindow.Monsters.cs").Contains("if(RichTipHovered())DrawMonsterTooltip(MonsterTips.Build("),"the Monsters page, for every player now");
         }),
     ];
 }

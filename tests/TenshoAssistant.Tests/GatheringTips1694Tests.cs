@@ -36,7 +36,7 @@ internal static class GatheringTips1694Tests
             Check(map.Contains("if(hit.Point is { } point)DrawGatheringBody(point,GatheringTips.MaxListItems);", StringComparison.Ordinal), "the icons under the cursor");
             Check(!map.Contains("foreach(var id in point.Items.Take(", StringComparison.Ordinal) && !map.Contains("private void DrawGatheringTooltip(", StringComparison.Ordinal), "no copy by hand left in the map");
             var lists = Read("src/TenshoAssistant/MainWindow.MapLocalLists.cs");
-            Check(lists.Split("if(ImGui.IsItemHovered())DrawGatheringTooltip(point);").Length == 3 && !lists.Contains("localization.Get(\"MapLocal.NoPosition\")", StringComparison.Ordinal), "the list, with and without a position");
+            Check(lists.Split("if(RichTipHovered())DrawGatheringTooltip(point);").Length == 3 && !lists.Contains("localization.Get(\"MapLocal.NoPosition\")", StringComparison.Ordinal), "the list, with and without a position");
             var spear = Read("src/TenshoAssistant/MainWindow.SpearfishingPanel.cs");
             Check(spear.Contains("DrawItemInfoTooltip(row.Fish);", StringComparison.Ordinal) && !spear.Contains("WrappedTooltip(name+\" — \"", StringComparison.Ordinal), "the fish's name: the common item tooltip, the name not written again");
         }),

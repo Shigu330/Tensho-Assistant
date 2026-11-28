@@ -17,10 +17,10 @@ internal static class FateTips1676Tests
         }),
         ("FATE tips 1676: the FATEs page, the field operations and the map's list use the one FATE tooltip",()=>
         {
-            Check(Read("src/TenshoAssistant/MainWindow.Fates.cs").Contains("if(ImGui.IsItemHovered())DrawFateTooltip(FateTips.Build(row.Name,0,row.Level,"),"the FATEs page");
+            Check(Read("src/TenshoAssistant/MainWindow.Fates.cs").Contains("if(RichTipHovered())DrawFateTooltip(FateTips.Build(row.Name,0,row.Level,"),"the FATEs page");
             var fieldContent=Read("src/TenshoAssistant/MainWindow.FieldContent.cs");
-            Check(fieldContent.Contains("if(ImGui.IsItemHovered())DrawFateTooltip(FateTips.Build(row.Name,0,row.Level,") && !fieldContent.Contains("WrappedTooltip(FieldEventTip(row))"),"the field operations");
-            Check(Read("src/TenshoAssistant/MainWindow.MapLocalLists.cs").Contains("if(ImGui.IsItemHovered())DrawFateTooltip(Fields.FateTips.Build(fate.Name,fate.Icon,fate.Level,"),"the map's FATEs under way");
+            Check(fieldContent.Contains("if(RichTipHovered())DrawFateTooltip(FateTips.Build(row.Name,0,row.Level,") && !fieldContent.Contains("WrappedTooltip(FieldEventTip(row))"),"the field operations");
+            Check(Read("src/TenshoAssistant/MainWindow.MapLocalLists.cs").Contains("if(RichTipHovered())DrawFateTooltip(Fields.FateTips.Build(fate.Name,fate.Icon,fate.Level,"),"the map's FATEs under way");
         }),
     ];
 }

@@ -24,8 +24,8 @@ internal static class DutyTips1691Tests
             Check(body.Contains("cached.Duty==duty.DutyId && cached.Status==status && cached.Revision==localization.Revision", StringComparison.Ordinal), "built once while hovered");
             Check(body.Contains("developerMode ? DutyTips.Ids(duty):null", StringComparison.Ordinal) && body.Contains("localization.Get(\"DutyUi.UnlockedBy\")", StringComparison.Ordinal), "ids in developer mode only; the unlocking quest");
             var page = Read("src/TenshoAssistant/MainWindow.Duties.cs");
-            Check(page.Contains("if (ImGui.IsItemHovered()) DrawDutyTooltip(DutyTipOf(duty),localization.Get(\"DutyUi.TipClick\"));", StringComparison.Ordinal) && !page.Contains("WrappedTooltip($\"Duty {duty.DutyId}", StringComparison.Ordinal), "the Duties page, for every player");
-            Check(Read("src/TenshoAssistant/MainWindow.DeepDungeons.cs").Contains("if(ImGui.IsItemHovered())DrawDutyTooltip(DutyTipOf(floor),", StringComparison.Ordinal), "the deep dungeons' floors");
+            Check(page.Contains("if(RichTipHovered())DrawDutyTooltip(DutyTipOf(duty),localization.Get(\"DutyUi.TipClick\"));", StringComparison.Ordinal) && !page.Contains("WrappedTooltip($\"Duty {duty.DutyId}", StringComparison.Ordinal), "the Duties page, for every player");
+            Check(Read("src/TenshoAssistant/MainWindow.DeepDungeons.cs").Contains("if(RichTipHovered())DrawDutyTooltip(DutyTipOf(floor),", StringComparison.Ordinal), "the deep dungeons' floors");
             Check(Read("src/TenshoAssistant/MainWindow.Monsters.cs").Contains("if (duty is not null && ImGui.IsItemHovered()) DrawDutyTooltip(DutyTipOf(duty),", StringComparison.Ordinal), "a monster's duty");
             foreach (var code in new[] { "en", "fr" })
             {

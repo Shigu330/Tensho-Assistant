@@ -137,7 +137,7 @@ internal sealed partial class MainWindow
             };
             ImGui.TextWrapped(localization.Format("GpUi.Use",use.Action.Name,use.Count,use.Action.Spec.Cost*use.Count)+when);
             // X-684 (0.1675): the one action tooltip.
-            if(ImGui.IsItemHovered()) DrawGatheringActionTooltip(use.Action);
+            if(RichTipHovered())DrawGatheringActionTooltip(use.Action);
         }
         if(best.Actions.Any(use=>use.Action.Spec.Effect==GpEffect.Attempt) && result.Scenario.Level>=GpScenario.EurekaLevel)
             ImGui.TextWrapped(localization.Get("GpUi.Eureka"));
@@ -165,7 +165,7 @@ internal sealed partial class MainWindow
     {
         var metadata=catalog.Actions.First(action=>action.Spec.JobId==gpJob && action.Spec.Effect==effect);
         DrawGameIcon(metadata.Icon,new Vector2(24));
-        if(ImGui.IsItemHovered())DrawGatheringActionTooltip(metadata);
+        if(RichTipHovered())DrawGatheringActionTooltip(metadata);
         ImGui.SameLine();var toggled=ImGui.Checkbox(label,ref active);
         Tip("GpUi.ActiveEffectTip");
         return toggled;

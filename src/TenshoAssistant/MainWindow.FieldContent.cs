@@ -243,7 +243,7 @@ internal sealed partial class MainWindow
                 ImGui.TableNextColumn();
                 if(ImGui.Selectable($"{row.Name}##FieldEvent{row.Kind}{row.Id}") && map is not null && coordinate is { } target)OpenMapPointFromPage(map,target.X,target.Y);
                 // X-684 (0.1676): the one FATE tooltip (a FATE, a skirmish or a critical engagement).
-                if(ImGui.IsItemHovered())DrawFateTooltip(FateTips.Build(row.Name,0,row.Level,
+                if(RichTipHovered())DrawFateTooltip(FateTips.Build(row.Name,0,row.Level,
                     localization.Get(row.Kind==FieldEventKind.Fate ? (zone.Use==FieldBoard.BozjaUse ? "FieldContent.KindSkirmish":"FieldContent.KindFate"):"FieldContent.KindEngagement"),
                     coordinate is { } eventPlace ? $"{zone.Name} · {MapProjection.CoordinateText(eventPlace)}":zone.Name,null,row.Description.Length>0 ? row.Description:localization.Get("FieldContent.NoDescription"),row.Participants));
                 if(map is not null && coordinate is { } place)PlaceMenu($"FieldPlace{row.Kind}{row.Id}",map,place,row.Name);
@@ -295,7 +295,7 @@ internal sealed partial class MainWindow
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();DrawSmallGameIcon(row.Icon);ImGui.TextUnformatted(row.Name);
                 // X-684 (0.1695): the one action tooltip (icon, name, category and most held, the game's description); before, the description alone.
-                if(ImGui.IsItemHovered())DrawActionTooltip(row.Icon,row.Name,row.Description,localization.Format("FieldContent.ActionTipDetail",row.Category,row.Most));
+                if(RichTipHovered())DrawActionTooltip(row.Icon,row.Name,row.Description,localization.Format("FieldContent.ActionTipDetail",row.Category,row.Most));
                 ImGui.TableNextColumn();ImGui.TextUnformatted(row.Category);
                 ImGui.TableNextColumn();ImGui.TextUnformatted(row.Most.ToString());
             }

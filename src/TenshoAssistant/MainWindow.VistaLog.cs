@@ -76,7 +76,7 @@ internal sealed partial class MainWindow
                 }
                 finally{ImGui.EndPopup();}
             }
-            if(ImGui.IsItemHovered())DrawSightseeingTooltip(vista,done);
+            if(RichTipHovered())DrawSightseeingTooltip(vista,done);
         });
     }
 

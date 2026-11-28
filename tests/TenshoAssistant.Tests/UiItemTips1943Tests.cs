@@ -22,12 +22,12 @@ internal static class UiItemTips1943Tests
             var found=Sources().Where(source=>source.Name!="UI/Components/Tooltip.cs").SelectMany(source=>hand.Matches(source.Text).Select(_=>source.Name)).ToArray();
             Check(found.Length==0,"written by hand: "+string.Join(", ",found));
             var tooltip=File.ReadAllText(Path.Combine(Root,"UI/Components/Tooltip.cs"));
-            Check(hand.Matches(tooltip).Count==1,"only ItemTip itself");
+            Check(hand.Matches(tooltip).Count==0&&tooltip.Split("if(RichTipHovered())DrawItemInfoTooltip(").Length==2,"only ItemTip itself, behind RichTipHovered (0.1956)");
         }),
         ("UI item tips 1943: ItemTip keeps the guard and the tooltip of before (plain hover, the same three arguments)",()=>
         {
             var tooltip=File.ReadAllText(Path.Combine(Root,"UI/Components/Tooltip.cs")).Replace("\r\n","\n");
-            Check(tooltip.Contains("    private void ItemTip(uint id,bool glamourOnly=false,bool? hq=null)\n    {\n        if(ImGui.IsItemHovered())DrawItemInfoTooltip(id,glamourOnly,hq);\n    }"),"same guard, same call");
+            Check(tooltip.Contains("    private void ItemTip(uint id,bool glamourOnly=false,bool? hq=null)\n    {\n        if(RichTipHovered())DrawItemInfoTooltip(id,glamourOnly,hq);\n    }"),"same guard, same call");
             Check(File.ReadAllText(Path.Combine(Root,"MainWindow.MarketHover.cs")).Contains("private void DrawItemInfoTooltip(uint id,bool glamourOnly=false,bool? hq=null,IReadOnlyList<string>? lines=null)"),"the tooltip's order of arguments");
         }),
         ("UI item tips 1943: the pages use it, named arguments kept (glamour only, high quality)",()=>

@@ -41,10 +41,10 @@ internal static class NpcTips1689Tests
             Check(body.Contains("cached.Key==key && cached.Revision==localization.Revision", StringComparison.Ordinal), "built once while hovered, not every frame");
             Check(body.Contains("localization.Format(\"TriadNpcs.BeatenTip\"", StringComparison.Ordinal) && body.Contains("localization.Format(\"MapLocal.TriadMissing\",missing)", StringComparison.Ordinal), "a Triple Triad match: beaten and missing cards too");
             var lists = Read("src/TenshoAssistant/MainWindow.MapLocalLists.cs");
-            Check(lists.Contains("if(ImGui.IsItemHovered())DrawNpcTooltip(VendorTipFacts(vendor),", StringComparison.Ordinal) && lists.Contains("if(ImGui.IsItemHovered())DrawNpcTooltip(TriadTipFacts(npc,beaten,missing.Count,questsDone,", StringComparison.Ordinal), "the map's lists");
-            Check(Read("src/TenshoAssistant/MainWindow.TriadNpcs.cs").Contains("if(ImGui.IsItemHovered())DrawNpcTooltip(TriadTipFacts(npc,beaten,missing.Count,questsDone,Card),", StringComparison.Ordinal), "the Triple Triad page");
-            Check(Read("src/TenshoAssistant/MainWindow.NpcVendors.cs").Contains("if(ImGui.IsItemHovered())DrawNpcTooltip(VendorTipFacts(offer.Vendor));", StringComparison.Ordinal), "the Vendors page");
-            Check(Read("src/TenshoAssistant/MainWindow.SourceLinks.cs").Contains("if(ImGui.IsItemHovered())DrawNpcTooltip(VendorTipFacts(vendor),localization.Get(\"NpcUi.ClickVendor\"));", StringComparison.Ordinal), "an item's sources");
+            Check(lists.Contains("if(RichTipHovered())DrawNpcTooltip(VendorTipFacts(vendor),", StringComparison.Ordinal) && lists.Contains("if(RichTipHovered())DrawNpcTooltip(TriadTipFacts(npc,beaten,missing.Count,questsDone,", StringComparison.Ordinal), "the map's lists");
+            Check(Read("src/TenshoAssistant/MainWindow.TriadNpcs.cs").Contains("if(RichTipHovered())DrawNpcTooltip(TriadTipFacts(npc,beaten,missing.Count,questsDone,Card),", StringComparison.Ordinal), "the Triple Triad page");
+            Check(Read("src/TenshoAssistant/MainWindow.NpcVendors.cs").Contains("if(RichTipHovered())DrawNpcTooltip(VendorTipFacts(offer.Vendor));", StringComparison.Ordinal), "the Vendors page");
+            Check(Read("src/TenshoAssistant/MainWindow.SourceLinks.cs").Contains("if(RichTipHovered())DrawNpcTooltip(VendorTipFacts(vendor),localization.Get(\"NpcUi.ClickVendor\"));", StringComparison.Ordinal), "an item's sources");
             var map = Read("src/TenshoAssistant/MainWindow.MapView.cs");
             Check(map.Contains("private string VendorLabel(Npcs.NpcVendor vendor)=>Npcs.NpcTips.Text(Npcs.NpcTips.Build(NpcName(vendor),0,[],VendorShopLines(vendor,", StringComparison.Ordinal), "the map's labels: the same shop lines as text (X-707)");
             var everywhere = string.Join("\n", Directory.EnumerateFiles(Path.GetFullPath("src/TenshoAssistant"), "MainWindow*.cs").Select(File.ReadAllText));

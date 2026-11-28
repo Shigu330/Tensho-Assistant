@@ -117,7 +117,7 @@ internal sealed partial class MainWindow
                     if (ImGui.Selectable($"{duty.Name}##Duty{duty.DutyId}",dutyLoot.State.Duty?.DutyId == duty.DutyId,ImGuiSelectableFlags.None,new Vector2(0,24)) || clicked)
                     { dutyLoot.Select(duty); showDutyDetails = true; dutyItemQuery = ""; }
                     // X-684 (0.1691): the one duty tooltip (before: the ids only, in developer mode; they are in it then).
-                    if (ImGui.IsItemHovered()) DrawDutyTooltip(DutyTipOf(duty),localization.Get("DutyUi.TipClick"));
+                    if(RichTipHovered())DrawDutyTooltip(DutyTipOf(duty),localization.Get("DutyUi.TipClick"));
                     ImGui.TableNextColumn(); ImGui.TextUnformatted(duty.Category);
                     ImGui.TableNextColumn(); ImGui.TextUnformatted(duty.Level.ToString(CultureInfo.InvariantCulture));
                     ImGui.TableNextColumn(); DrawDutyStatus(progress?.Of(duty.InstanceId));

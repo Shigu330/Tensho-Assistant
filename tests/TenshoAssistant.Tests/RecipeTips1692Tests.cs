@@ -34,9 +34,9 @@ internal static class RecipeTips1692Tests
             Check(body.Contains("cached.Recipe==recipe.RecipeId && cached.Revision==localization.Revision", StringComparison.Ordinal), "built once while hovered");
             Check(body.Contains("lines.Add(RecipeFactsText(p));", StringComparison.Ordinal) && body.Contains("\"RecipeUi.Crafted\":\"RecipeUi.NeverCrafted\"", StringComparison.Ordinal), "facts and crafted before");
             Check(Read("src/TenshoAssistant/MainWindow.CraftReadiness.cs").Contains("ImGui.TextDisabled(RecipeFactsText(p));", StringComparison.Ordinal), "readiness shares the facts line");
-            Check(Read("src/TenshoAssistant/MainWindow.Items.cs").Contains("if (ImGui.IsItemHovered()) DrawRecipeTooltip(RecipeTipOf(recipe));", StringComparison.Ordinal), "the craft book");
-            Check(Read("src/TenshoAssistant/MainWindow.ListPanels.cs").Contains("if(ImGui.IsItemHovered())DrawRecipeTooltip(RecipeTipOf(craft.Recipe),", StringComparison.Ordinal), "a list panel's crafts");
-            Check(Read("src/TenshoAssistant/MainWindow.CraftFromStock.cs").Contains("if(ImGui.IsItemHovered())DrawRecipeTooltip(RecipeTipOf(recipe),localization.Format(\"CraftStock.JobIconTip\"", StringComparison.Ordinal), "the crafts from stock");
+            Check(Read("src/TenshoAssistant/MainWindow.Items.cs").Contains("if(RichTipHovered())DrawRecipeTooltip(RecipeTipOf(recipe));", StringComparison.Ordinal), "the craft book");
+            Check(Read("src/TenshoAssistant/MainWindow.ListPanels.cs").Contains("if(RichTipHovered())DrawRecipeTooltip(RecipeTipOf(craft.Recipe),", StringComparison.Ordinal), "a list panel's crafts");
+            Check(Read("src/TenshoAssistant/MainWindow.CraftFromStock.cs").Contains("if(RichTipHovered())DrawRecipeTooltip(RecipeTipOf(recipe),localization.Format(\"CraftStock.JobIconTip\"", StringComparison.Ordinal), "the crafts from stock");
             foreach (var code in new[] { "en", "fr" })
             {
                 var language = Read($"src/TenshoAssistant/Localization/Languages/{code}.json");

@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1956.0
+- Plan global, X-607 : Code plus simple à entretenir (X-607, demande du 18/11) : les info-bulles riches (objet, action, lieu, quête, mission, ALEA, PNJ, recette, récolte…) s'ouvrent derrière une seule garde, `RichTipHovered()` (`UI/Components/Tooltip.cs`), au lieu du test de survol écrit à la main sur chaque page (31 endroits, et `ItemTip`) : même test qu'avant (pas sur un élément grisé), rien ne change à l'écran. CONTRIBUTING la nomme dans ses deux moitiés. Nouveau test `UiRichTips1956Tests` : le test de survol écrit à la main devant une info-bulle riche est refusé.
+- Tests : UiRichTips1956Tests. Verify.ps1 (agent) : 4349/4349, 0 avertissement, 0 erreur ; DLL 0.1956.0.0. Rien à essayer en jeu.
+### English
+- Simpler code to maintain (X-607, request of 18/11): the rich tooltips (item, action, place, quest, duty, FATE, NPC, recipe, gathering…) open behind one guard, `RichTipHovered()` (`UI/Components/Tooltip.cs`), instead of the hover test written by hand on each page (31 places, and `ItemTip`): the same test as before (not on a greyed item), nothing changes on screen. CONTRIBUTING names it in both halves. New test `UiRichTips1956Tests`: the hover test written by hand in front of a rich tooltip is refused.
+
 ## 0.1955.0
 - Plan global, X-607 : Code plus simple à entretenir (X-607, demande du 18/11) : la barre de pages d'une longue liste (« < Page n / m > »), écrite à la main dans Fabriquer depuis le stock et le Lexique, passe par un seul composant, `Pager` (`UI/Components/Pager.cs`) : mêmes boutons, mêmes identifiants, mêmes info-bulles, même ligne de page ; rien ne change à l'écran. CONTRIBUTING le nomme dans ses deux moitiés. Nouveau test `UiPager1955Tests` : un bouton de page écrit à la main est refusé, le composant garde les bouts grisés et les info-bulles, les deux pages s'en servent.
 - Tests : UiPager1955Tests. Verify.ps1 (agent) : 4347/4347, 0 avertissement, 0 erreur ; DLL 0.1955.0.0. Rien à essayer en jeu.

@@ -84,7 +84,7 @@ internal sealed partial class MainWindow
                         if(ImGui.Selectable($"{npc.Name}##TriadNpc{npc.MatchId}",false,ImGuiSelectableFlags.SpanAllColumns) && npc.MapId!=0
                            && maps.State.Catalog?.Find(npc.MapId) is { } map)PlaceFlagFromMapView(map,npc.X,npc.Y);
                         NpcMenu($"TriadNpcMenu{npc.MatchId}",npc.Name,0,maps.State.Catalog?.Find(npc.MapId) is { } npcMap ? [new(npcMap.TerritoryId,npcMap.MapId,npcMap.Zone,npc.X,npc.Y,0,0,0)]:[]);
-                        if(ImGui.IsItemHovered())DrawNpcTooltip(TriadTipFacts(npc,beaten,missing.Count,questsDone,Card),npc.MapId!=0 ? localization.Get("TriadNpcs.ClickFlag"):null);
+                        if(RichTipHovered())DrawNpcTooltip(TriadTipFacts(npc,beaten,missing.Count,questsDone,Card),npc.MapId!=0 ? localization.Get("TriadNpcs.ClickFlag"):null);
                         ImGui.TableNextColumn();ImGui.TextUnformatted(place);
                         ImGui.TableNextColumn();
                         var available=npc.Available(questsDone);

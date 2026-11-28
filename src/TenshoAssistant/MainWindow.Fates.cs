@@ -140,7 +140,7 @@ internal sealed partial class MainWindow
         ImGui.TableNextColumn();
         if(ImGui.Selectable($"{row.Name}##Fate{zone.Territory}{row.Id}") && map is not null && coordinate is { } target)OpenMapPointFromPage(map,target.X,target.Y);
         // X-684 (0.1676): the one FATE tooltip.
-        if(ImGui.IsItemHovered())DrawFateTooltip(FateTips.Build(row.Name,0,row.Level,localization.Get("FieldContent.KindFate"),
+        if(RichTipHovered())DrawFateTooltip(FateTips.Build(row.Name,0,row.Level,localization.Get("FieldContent.KindFate"),
             coordinate is { } fatePlace ? $"{zone.Name} · {Maps.MapProjection.CoordinateText(fatePlace)}":zone.Name,null,row.Description,row.Participants));
         if(map is not null && coordinate is { } place)PlaceMenu($"FatePlace{zone.Territory}{row.Id}",map,place,row.Name);
         ImGui.TableNextColumn();
