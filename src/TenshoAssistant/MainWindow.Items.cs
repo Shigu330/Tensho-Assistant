@@ -51,7 +51,7 @@ internal sealed partial class MainWindow
 
     private void DrawCrystalsTab()
     {
-        ImGui.TextColored(Accent, localization.Get("ItemsUi.CrystalTitle"));
+        TenshoAssistant.UI.UiComponents.SubTitle(localization.Get("ItemsUi.CrystalTitle"));
         ImGui.TextDisabled(localization.Get("ItemsUi.CrystalHelp"));
         ImGui.Separator();
         var character = bankBridge.State.CharacterId;
@@ -238,7 +238,7 @@ internal sealed partial class MainWindow
         try
         {
             if (!visible) return;
-            ImGui.TextColored(Accent, localization.Get("RecipeUi.Title"));
+            TenshoAssistant.UI.UiComponents.SubTitle(localization.Get("RecipeUi.Title"));
             ImGui.TextDisabled(localization.Get("RecipeUi.Help"));
             ImGui.Separator();
             if (craftHistory.Count > 0 && ImGui.SmallButton(localization.Get("RecipeUi.Back")))

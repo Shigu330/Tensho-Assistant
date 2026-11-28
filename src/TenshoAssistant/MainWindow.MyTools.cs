@@ -212,7 +212,7 @@ internal sealed partial class MainWindow
                 {
                     case HeadingBlock heading:
                         ImGui.Spacing();
-                        using(TenshoAssistant.UI.UiComponents.PushSectionFont())ImGui.TextColored(Accent,heading.Text.For(language));
+                        TenshoAssistant.UI.UiComponents.SubTitle(heading.Text.For(language));
                         ImGui.Separator();
                         break;
                     case NoteBlock note:ImGui.TextWrapped(note.Text.For(language));break;

@@ -338,7 +338,7 @@ internal sealed partial class MainWindow
         if(points.Any(point=>point is not null && point.MapId!=map.MapId))
         {
             ImGui.Spacing();
-            ImGui.TextColored(Accent,localization.Get("MapLocal.FavoritesElsewhere"));
+            TenshoAssistant.UI.UiComponents.SubTitle(localization.Get("MapLocal.FavoritesElsewhere"));
             Rows(false);
         }
         if(remove>=0 && SaveBookmarks(items=>MapBookmarks.RemoveAt(items,remove)))selectedBookmark=Guid.Empty;

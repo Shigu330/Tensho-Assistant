@@ -241,7 +241,7 @@ internal sealed partial class MainWindow
                 var before=OceanSpectralSeen(stop);
                 if(before.Count>0)
                 {
-                    ImGui.TextColored(Accent,localization.Get("OceanVoyage.SpectralSeenTitle"));
+                    TenshoAssistant.UI.UiComponents.SubTitle(localization.Get("OceanVoyage.SpectralSeenTitle"));
                     Tip("OceanVoyage.SpectralSeenTip");
                     var names=itemCatalog.State.Catalog;
                     foreach(var fact in before)

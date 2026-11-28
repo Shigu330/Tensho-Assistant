@@ -513,7 +513,7 @@ internal sealed partial class MainWindow
     private void DrawGameAlarms()
     {
         {
-            ImGui.TextColored(Accent,localization.Get("Alarms.GameTitle"));
+            TenshoAssistant.UI.UiComponents.SubTitle(localization.Get("Alarms.GameTitle"));
             ImGui.TextWrapped(localization.Get("Alarms.GameHelp"));
             if(ImGui.SmallButton(localization.Get("Alarms.OpenGame")))alarmService?.OpenGameWindow();
             if(alarmService?.GameAlarms is not { } game){ImGui.TextDisabled(localization.Get("Alarms.GameUnavailable"));return;}

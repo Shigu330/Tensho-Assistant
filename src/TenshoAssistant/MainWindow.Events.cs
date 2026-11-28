@@ -60,7 +60,7 @@ internal sealed partial class MainWindow
                 if(questsOf is null)ImGui.TextDisabled(localization.Get(reader.QuestsFailed ? "Events.QuestsUnavailable":"Events.Loading"));
                 else if(questsOf.GetValueOrDefault(festival.Id) is { Count:>0 } ids)
                 {
-                    ImGui.TextColored(Accent,localization.Get("Events.Quests"));
+                    TenshoAssistant.UI.UiComponents.SubTitle(localization.Get("Events.Quests"));
                     DrawFestivalQuests(ids);
                 }
                 else ImGui.TextDisabled(localization.Get("Events.NoQuest"));
@@ -88,7 +88,7 @@ internal sealed partial class MainWindow
                 .Where(entry=>entry.Item3.Length>0).ToArray();
         }
         if(vendors.Length==0){ImGui.TextDisabled(localization.Get("Events.NoShop"));return;}
-        ImGui.TextColored(Accent,localization.Get("Events.Shops"));
+        TenshoAssistant.UI.UiComponents.SubTitle(localization.Get("Events.Shops"));
         var items=itemCatalog.State.Catalog;var size=ImGui.GetTextLineHeight();
         foreach(var (vendor,places,sales) in vendors)
         {

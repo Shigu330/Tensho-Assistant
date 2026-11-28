@@ -35,7 +35,7 @@ internal sealed partial class MainWindow
 
     private void DrawHoverComparisons(IReadOnlyList<GearComparison> comparisons)
     {
-        ImGui.TextColored(Accent,localization.Get("HoverUi.Compare"));
+        TenshoAssistant.UI.UiComponents.SubTitle(localization.Get("HoverUi.Compare"));
         foreach(var comparison in comparisons)
         {
             ImGui.TextDisabled(localization.Format("HoverUi.CompareWith",comparison.Worn.Name+(comparison.WornHq ? " HQ":"")));

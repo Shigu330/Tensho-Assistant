@@ -48,7 +48,7 @@ internal sealed partial class MainWindow
     // Triple Triad › Deck: the saved decks, each with its cards; « Show » picks the deck for the editor reminder, « Delete » removes it.
     private void DrawTriadSavedDecks()
     {
-        ImGui.TextColored(Accent,localization.Get("TriadDecks.Title"));
+        TenshoAssistant.UI.UiComponents.SubTitle(localization.Get("TriadDecks.Title"));
         var decks=configuration.TripleTriadDecks ?? [];
         if(decks.Count==0){EmptyState("TriadDecks.Empty");ImGui.Separator();return;}
         string? remove=null;

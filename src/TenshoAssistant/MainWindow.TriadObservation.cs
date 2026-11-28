@@ -12,7 +12,7 @@ internal sealed partial class MainWindow
 {
     private void DrawTriadObservation()
     {
-        ImGui.TextColored(Accent,localization.Get("TriadObserved.Title"));
+        TenshoAssistant.UI.UiComponents.SubTitle(localization.Get("TriadObserved.Title"));
         var state = triadObservation.State;
         DrawToolSettingsLink("TriadObservation","Games");
         ImGui.TextWrapped(localization.Get("TriadObserved.Help"));

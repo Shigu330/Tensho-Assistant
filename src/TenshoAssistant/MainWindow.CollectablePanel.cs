@@ -184,7 +184,7 @@ internal sealed partial class MainWindow
         };
         var info=CollectableActionInfo?.Invoke(action);
         DrawCollectableRisk(advice,rule);
-        ImGui.TextColored(Accent,localization.Get("CollectablePanel.Next"));
+        TenshoAssistant.UI.UiComponents.SubTitle(localization.Get("CollectablePanel.Next"));
         DrawGameIcon(info?.Icon ?? 0,new Vector2(32));
         ImGui.SameLine();
         // 0.528 (user capture): this line was cut at the panel's width.

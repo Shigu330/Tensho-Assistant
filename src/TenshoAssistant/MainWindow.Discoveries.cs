@@ -246,7 +246,7 @@ internal sealed partial class MainWindow
     {
         if(DiscoveryExchange is not { } exchange)return;
         ImGui.Spacing();
-        ImGui.TextColored(Accent,localization.Get("DiscoveriesUi.ExchangeTitle"));
+        TenshoAssistant.UI.UiComponents.SubTitle(localization.Get("DiscoveriesUi.ExchangeTitle"));
         Tip("DiscoveriesUi.ExchangeHelp");
         var working=exchange.Busy;
         if(!exchange.Connected)
@@ -571,7 +571,7 @@ internal sealed partial class MainWindow
     private void DrawDiscoveryDebug(string folder)
     {
         ImGui.Separator();
-        ImGui.TextColored(Accent,localization.Get("DiscoveriesUi.Debug"));
+        TenshoAssistant.UI.UiComponents.SubTitle(localization.Get("DiscoveriesUi.Debug"));
         BoolSetting("DiscoveriesUi.DebugLog","DiscoveriesUi.DebugLogTip",()=>configuration.Discovery.DebugLog,value=>configuration.Discovery.DebugLog=value,c=>c.Discovery.DebugLog);
         ImGui.TextDisabled(folder);
         // X-794 (0.1800): while the copy before emptying runs, only that is said; EndDiscoveryClear empties the base once it ended well.

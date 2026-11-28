@@ -58,7 +58,7 @@ internal sealed partial class MainWindow
     private void DrawHelpBanner()
     {
         if (!HelpBannerShows(page)) return;
-        ImGui.TextColored(Accent, localization.Get("Help.BannerTitle"));
+        TenshoAssistant.UI.UiComponents.SubTitle(localization.Get("Help.BannerTitle"));
         // 0.1222 (X-257, D5): on Home, where to start rather than what the page is.
         ImGui.TextWrapped(localization.Get(page == Page.Home ? "PageHelp.HomeStart" : $"PageHelp.{page}Purpose"));
         void Seen()
@@ -93,7 +93,7 @@ internal sealed partial class MainWindow
         }
         var shown = CommunityHelpIndex.For(guides, key, localization.CurrentCode);
         if (shown.Count == 0) { EmptyState("Help.GuidesNone"); return; }
-        ImGui.TextColored(Accent, localization.Get("Help.GuidesTitle"));
+        TenshoAssistant.UI.UiComponents.SubTitle(localization.Get("Help.GuidesTitle"));
         foreach (var guide in shown)
         {
             if (ImGui.Selectable($"{guide.Title}{(guide.Author is { } author ? " · " + author : "")}{(guide.ForVersion is { } version ? " · " + version : "")}##{guide.Address}")) guideToOpen = guide;
@@ -117,10 +117,10 @@ internal sealed partial class MainWindow
         {
             ImGui.TextUnformatted(topic.Purpose);
             ImGui.Spacing();
-            ImGui.TextColored(Accent, localization.Get("Help.Start"));
+            TenshoAssistant.UI.UiComponents.SubTitle(localization.Get("Help.Start"));
             ImGui.TextUnformatted(topic.Start);
             ImGui.Spacing();
-            ImGui.TextColored(Accent, localization.Get("Help.Empty"));
+            TenshoAssistant.UI.UiComponents.SubTitle(localization.Get("Help.Empty"));
             ImGui.TextUnformatted(topic.Empty);
         }
         finally { ImGui.PopTextWrapPos(); }

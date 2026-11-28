@@ -26,7 +26,7 @@ internal sealed partial class MainWindow
         if(SelectedItem is {OrchestrionId:>0} roll)
         {
             var music=CollectionEntryOf(TenshoAssistant.Collections.CollectionKind.Orchestrion,roll.OrchestrionId);
-            ImGui.TextColored(Accent,localization.Get("ItemUsesUi.Roll"));
+            TenshoAssistant.UI.UiComponents.SubTitle(localization.Get("ItemUsesUi.Roll"));
             ImGui.TextWrapped(music is {ConfirmedUnlocked:true} ? localization.Get("ItemUsesUi.Acquired"):localization.Get("ItemUsesUi.UnknownMusic"));
             ImGui.BeginDisabled(music is null);
             try{if(ImGui.SmallButton(localization.Get("ItemUsesUi.MusicDetails")) && music is not null)OpenOrchestrionFromItem(music);}

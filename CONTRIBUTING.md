@@ -158,7 +158,7 @@ follow the list below: the tests refuse a page that misses one of its places.
    Garden), not in a tab bar written by hand. Tables open with `UiComponents.BeginDataTable` and title their columns with
    `UiComponents.HeadersRow`; numbers right-aligned with `NumberCell`. Empty, waiting and failed states: `EmptyState`, `StateLine`,
    `DrawDataError`. After each control, its tooltip: `Tip("Section.KeyTip")`, or `TipText(text)` for a text already made
-   (`if(TipHovered())TipText(text)` builds a computed text only on hover). Sections: `UiComponents.Header`, folds inside them: `UiComponents.TreeNode` (both
+   (`if(TipHovered())TipText(text)` builds a computed text only on hover). Sub-titles: `UiComponents.SubTitle(text)` (section font, gold). Sections: `UiComponents.Header`, folds inside them: `UiComponents.TreeNode` (both
    open while the Settings search looks for a setting). Settings: `BoolSetting`, `IntSetting`, `SliderSetting`,
    `ComboSetting` (a default, a « Default: » line and a « ↺ » button). Icon buttons `ToolButton` or `GlyphButton`, game icons `DrawGameIcon`, colours from
    the theme (`Accent`, `Muted`, `Success`, `Warning`, `Error`). An item's tooltip: `ItemTip(id)`; a text field with a hint:
@@ -429,7 +429,7 @@ Suivez ensuite la liste ci-dessous : les tests refusent une page à qui manque l
    Rangements, Alarmes et Jardin), pas dans une barre d'onglets écrite à la main. Les tableaux s'ouvrent avec
    `UiComponents.BeginDataTable` et titrent leurs colonnes avec `UiComponents.HeadersRow` ; les nombres à droite avec `NumberCell`. États
    vide, en attente et en échec : `EmptyState`, `StateLine`, `DrawDataError`. Après chaque contrôle, son infobulle :
-   `Tip("Section.CléTip")`, ou `TipText(texte)` pour un texte déjà fait (`if(TipHovered())TipText(texte)` ne construit un texte calculé qu'au survol). Sections :
+   `Tip("Section.CléTip")`, ou `TipText(texte)` pour un texte déjà fait (`if(TipHovered())TipText(texte)` ne construit un texte calculé qu'au survol). Sous-titres : `UiComponents.SubTitle(texte)` (police de section, doré). Sections :
    `UiComponents.Header`, replis dedans : `UiComponents.TreeNode` (les deux s'ouvrent pendant que la recherche des Paramètres cherche un
    réglage). Réglages : `BoolSetting`, `IntSetting`, `SliderSetting`, `ComboSetting` (un défaut, une ligne « Par
    défaut : » et un bouton « ↺ »). Boutons à icône `ToolButton` ou `GlyphButton`, icônes du jeu `DrawGameIcon`, couleurs du thème (`Accent`, `Muted`,

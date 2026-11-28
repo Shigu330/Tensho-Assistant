@@ -19,7 +19,7 @@ internal sealed partial class MainWindow
         var seen=store.Find(Discoveries.DiscoveryKind.BlueSpellCaster,spellId,64).Concat(store.Find(Discoveries.DiscoveryKind.BlueSpellLearned,spellId,16))
             .Where(fact=>fact.Detail!=0).GroupBy(fact=>fact.Detail).Take(8).ToArray();
         if(seen.Length==0)return;
-        ImGui.TextColored(Accent,localization.Get("BlueSpellSources.Seen"));
+        TenshoAssistant.UI.UiComponents.SubTitle(localization.Get("BlueSpellSources.Seen"));
         foreach(var monster in seen)
         {
             var levels=monster.Where(fact=>fact.Kind==Discoveries.DiscoveryKind.BlueSpellCaster).ToArray();
@@ -111,7 +111,7 @@ internal sealed partial class MainWindow
         if(BlueSpellWiki is not { } wiki)return;
         wiki.Select(spellId);
         ImGui.Separator();
-        ImGui.TextColored(Accent,localization.Get("BlueSpellSources.Title"));
+        TenshoAssistant.UI.UiComponents.SubTitle(localization.Get("BlueSpellSources.Title"));
         var view=wiki.State;
         ImGui.BeginDisabled(view.Loading);
         try

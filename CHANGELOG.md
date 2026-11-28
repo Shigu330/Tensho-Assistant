@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1953.0
+- Plan global, X-607 : Pages plus homogènes (X-607, demande du 18/11, accord de l'utilisateur du 28/11) : les sous-titres des pages écrits à la main (texte doré seul sur sa ligne : Diagnostic, Aide, Objets, Événements, info-bulle du marché…) passent par le composant commun `UiComponents.SubTitle` : la police de section du jeu, dorée, la même partout. Quatre lignes dorées restent : des remarques, pas des titres. CONTRIBUTING nomme le composant dans ses deux moitiés. Nouveau test `UiSubTitles1953Tests` : la forme écrite à la main est refusée, le composant reste en police de section dorée, les pages s'en servent.
+- Pour les joueurs : les sous-titres dans les pages ont maintenant tous la police de section du jeu.
+- Tests : UiSubTitles1953Tests. Verify.ps1 (agent) : 4343/4343, 0 avertissement, 0 erreur ; DLL 0.1953.0.0. Non validé en jeu.
+### English
+- More consistent pages (X-607, request of 18/11, the user's approval of 28/11): the sub-titles of the pages written by hand (a gold text alone on its line: Diagnostics, Help, Items, Events, the market tooltip…) go through the shared component `UiComponents.SubTitle`: the game's section font, gold, the same everywhere. Four gold lines stay: remarks, not titles. CONTRIBUTING names the component in both halves. New test `UiSubTitles1953Tests`: the form written by hand is refused, the component stays in the gold section font, the pages use it.
+- For players: The sub-titles inside the pages now all use the game's section font.
+
 ## 0.1952.0
 - Plan global, X-910 : Garde-fou des lignes vides (X-910, relecture de 0.1951, M1) : le contrôle de X-908 voit maintenant les panneaux dont les drapeaux viennent d'une constante (les trois panneaux de listes, `ListPanelFlags`), les fenêtres ouvertes par `Panels?.Show` sans taille ni contrainte de largeur (pêche, voyage en mer, personnage…) et les aides appelées par leur contenu, à toute profondeur ; les menus, info-bulles et fenêtres enfants ouverts dedans sont des fenêtres à part et sont laissés. Un `PushTextWrapPos` n'exempte plus que l'`EmptyState` dessiné après lui et avant son `PopTextWrapPos`. Aucune fenêtre ne change : aucun de ces endroits n'appelait `EmptyState` seul. Test `UiEmptyStateAutoSize1951Tests` élargi (7 cas au lieu de 4).
 - Tests : UiEmptyStateAutoSize1951Tests. Verify.ps1 (agent) : 4340/4340, 0 avertissement, 0 erreur ; DLL 0.1952.0.0. Rien à essayer en jeu.

@@ -98,7 +98,7 @@ internal sealed partial class MainWindow
             hoverHoldingRows=hoverHoldings.Rows.Where(row=>row.Nq+row.Hq>0).OrderByDescending(row=>row.Nq+row.Hq).ToArray();
         }
         var summary=hoverHoldings;
-        ImGui.TextColored(Accent,localization.Get("HoverUi.Stock"));
+        TenshoAssistant.UI.UiComponents.SubTitle(localization.Get("HoverUi.Stock"));
         if(!summary.HasObservation){ImGui.TextDisabled(localization.Get("HoverUi.OwnedUnknown"));return;}
         ImGui.TextUnformatted(localization.Format(summary.HasUnknown ? "HoverUi.OwnedPartial":"HoverUi.Owned",summary.Total.ToString("N0",Numbers),summary.Nq.ToString("N0",Numbers),summary.Hq.ToString("N0",Numbers)));
         var rows=hoverHoldingRows;
@@ -408,7 +408,7 @@ internal sealed partial class MainWindow
         // « How to get it » is the last part: hidden, its Garland / wiki fallback is not asked from the hover either.
         if(hoverPanel && !configuration.HoverShowSources)return;
         // How to obtain the item itself (0.144: the sources follow the unlocking item, not only the collection page).
-        ImGui.TextColored(Accent,localization.Get("HoverUi.HowToGet"));
+        TenshoAssistant.UI.UiComponents.SubTitle(localization.Get("HoverUi.HowToGet"));
         var known=0;
         // X-74 (0.865): what was seen in game first (discoveries base, yours or shared); a source seen there makes the Garland / wiki fallback needless.
         foreach(var seen in DiscoveredSourcesOf(id)){known++;ImGui.TextWrapped(localization.Format("HoverUi.SeenSource",seen));}
@@ -467,7 +467,7 @@ internal sealed partial class MainWindow
     {
         var lines=HoveredUsageLines(id);
         if(lines.Count==0)return;
-        ImGui.TextColored(Accent,localization.Get("HoverUi.Usages"));
+        TenshoAssistant.UI.UiComponents.SubTitle(localization.Get("HoverUi.Usages"));
         foreach(var line in lines)ImGui.TextWrapped(line);
     }
     private List<string> HoveredUsageLines(uint id)
@@ -516,7 +516,7 @@ internal sealed partial class MainWindow
             // 0.343 (I-01): cheapest of the whole region, shown only when cheaper than the data center's.
             if(Cheaper(prices.NqRegion,prices.NqCheapest) || canBeHq && Cheaper(prices.HqRegion,prices.HqCheapest))
             {
-                ImGui.TextColored(Accent,localization.Get("HoverUi.Region"));
+                TenshoAssistant.UI.UiComponents.SubTitle(localization.Get("HoverUi.Region"));
                 if(Cheaper(prices.NqRegion,prices.NqCheapest))DrawCheapest("NQ",prices.NqRegion,state,now);
                 if(canBeHq && Cheaper(prices.HqRegion,prices.HqCheapest))DrawCheapest("HQ",prices.HqRegion,state,now);
             }

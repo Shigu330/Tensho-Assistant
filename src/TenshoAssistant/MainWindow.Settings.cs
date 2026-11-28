@@ -212,7 +212,7 @@ internal sealed partial class MainWindow
         finally{ImGui.EndDisabled();ImGui.Unindent();}
         DrawObservationSetting("Craft", localization.Get("ModuleSettings.ObserveCraft"),craftLive.State.Enabled,craftLive.SetEnabled);
         ImGui.TextWrapped(localization.Get("ModuleSettings.CraftHelp"));
-        ImGui.TextColored(Accent,localization.Get("ModuleSettings.Search"));
+        TenshoAssistant.UI.UiComponents.SubTitle(localization.Get("ModuleSettings.Search"));
         // 0.321 (review 0.316, point 6): saved, with « ↺ »; bounds unchanged.
         var search=CraftSearchOptions;var searchDefaults=DefaultConfiguration.CraftSearch;
         // A-03 (0.465, DEC-028): the optional Raphael solver.

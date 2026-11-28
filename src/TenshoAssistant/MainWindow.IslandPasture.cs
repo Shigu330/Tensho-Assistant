@@ -73,7 +73,7 @@ internal sealed partial class MainWindow
 
     private void DrawIslandAnimalList()
     {
-        ImGui.TextColored(Accent,localization.Get("Island.AnimalListTitle"));
+        TenshoAssistant.UI.UiComponents.SubTitle(localization.Get("Island.AnimalListTitle"));
         if(IslandAnimalBookSource is not { } source)return;
         var state=source.State;
         ImGui.BeginDisabled(state.Loading);

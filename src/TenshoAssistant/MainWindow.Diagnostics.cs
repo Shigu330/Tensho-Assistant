@@ -45,7 +45,7 @@ internal sealed partial class MainWindow
         DrawSelfCheck();
         DrawMacroObservation();
         ImGui.Spacing();
-        ImGui.TextColored(Accent, localization.Get("DiagnosticsUi.Items"));
+        TenshoAssistant.UI.UiComponents.SubTitle(localization.Get("DiagnosticsUi.Items"));
         DrawCatalogStatus();
         if (itemCatalog.State.Catalog is { } catalog)
         {
@@ -54,7 +54,7 @@ internal sealed partial class MainWindow
             ImGui.TextWrapped(localization.Format("DiagnosticsUi.DataVersion",catalog.Metadata.DataVersion));
         }
         ImGui.Spacing();
-        ImGui.TextColored(Accent, localization.Get("DiagnosticsUi.Recipes"));
+        TenshoAssistant.UI.UiComponents.SubTitle(localization.Get("DiagnosticsUi.Recipes"));
         var recipeState = recipeCatalog.State;
         if (recipeState.Catalog is { } recipes)
             ImGui.TextColored(Success, localization.Format("DiagnosticsUi.RecipesReady",recipes.Count.ToString("N0",Numbers),recipes.Source));
@@ -67,7 +67,7 @@ internal sealed partial class MainWindow
         ImGui.Spacing();
         ImGui.Separator();
         var gathering = gatheringCatalog.State;
-        ImGui.TextColored(Accent, localization.Get("DiagnosticsUi.Gathering"));
+        TenshoAssistant.UI.UiComponents.SubTitle(localization.Get("DiagnosticsUi.Gathering"));
         var mapState = maps.State;
         ImGui.TextDisabled(mapState.Catalog is { } mapCatalog ? localization.Format("DiagnosticsUi.Maps",mapCatalog.Entries.Count.ToString("N0"))
             : mapState.Error ?? localization.Format("DiagnosticsUi.MapLoading",mapState.Copied.ToString("N0",Numbers),mapState.Total.ToString("N0",Numbers)));
@@ -78,7 +78,7 @@ internal sealed partial class MainWindow
         }
         else ImGui.TextWrapped(gathering.Error ?? localization.Format("DiagnosticsUi.GatheringLoading",gathering.Copied.ToString("N0",Numbers),gathering.Total.ToString("N0",Numbers)));
         ImGui.Spacing();
-        ImGui.TextColored(Accent, localization.Get("DiagnosticsUi.Services"));
+        TenshoAssistant.UI.UiComponents.SubTitle(localization.Get("DiagnosticsUi.Services"));
         ImGui.TextDisabled(localization.Format("DiagnosticsUi.CollectionState",collections.State.Entries.Count.ToString("N0",Numbers),collections.State.CharacterId,collections.State.Loading));
         if (collections.State.Error is { } collectionError) ImGui.TextWrapped(collectionError);
         var questState = quests.State;
@@ -110,7 +110,7 @@ internal sealed partial class MainWindow
             : localization.Get("DiagnosticsUi.ChainManual"));
         if (chain.Error is { } chainError) ImGui.TextWrapped(chainError);
         ImGui.Spacing();
-        ImGui.TextColored(Accent, localization.Get("DiagnosticsUi.Bank"));
+        TenshoAssistant.UI.UiComponents.SubTitle(localization.Get("DiagnosticsUi.Bank"));
         var bankState = bank.State;
         ImGui.TextWrapped(bankState.Loading ? localization.Get("DiagnosticsUi.FileLoading")
             : bankState.Error ?? localization.Format("DiagnosticsUi.Saved",bankState.Entries.Count));
@@ -121,7 +121,7 @@ internal sealed partial class MainWindow
         if (menus.Message is { } message) ImGui.TextWrapped(message);
         ImGui.Spacing();
         ImGui.Separator();
-        ImGui.TextColored(Accent, localization.Get("DiagnosticsUi.Inventory"));
+        TenshoAssistant.UI.UiComponents.SubTitle(localization.Get("DiagnosticsUi.Inventory"));
         var snapshot = inventory.Current;
         if (snapshot is null)
         {
