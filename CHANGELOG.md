@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1937.0
+- Plan global, X-153 : Branchement des services de Plugin.cs par famille (X-153, revue GPT du 11/11) : famille des événements. Le lecteur des fêtes en cours (leurs quêtes et leurs noms anglais) passe de Plugin.cs au nouveau Plugin.Events.cs : bloc déplacé tel quel, appelé là où il était, l'ordre des branchements gardé ; le lecteur est rendu à la page Événements. Nouveau test `EventsFamily1937Tests` : un seul chemin d'installation et un seul de libération, dans Plugin.Events.cs, donnés au même branchement ; Plugin.cs n'en crée aucun et l'appelle une fois, à sa place d'avant. Rien de visible ne change.
+- Tests : EventsFamily1937Tests. Verify.ps1 (agent) : 4296/4296, 0 avertissement, 0 erreur ; DLL 0.1937.0.0. Rien à essayer en jeu.
+### English
+- Wiring of Plugin.cs's services by family (X-153, GPT review of 11/11): the events' family. The running festivals' reader (their quests and English names) moves from Plugin.cs to the new Plugin.Events.cs: the block moved as it was, called where it stood, the order of the registrations kept; the reader is handed back to the Events page. New test `EventsFamily1937Tests`: one install path and one release path, in Plugin.Events.cs, given to the same registration; Plugin.cs creates none and calls it once, at its place of before. Nothing visible changes.
+
 ## 0.1936.0
 - Plan global, X-153 : Branchement des services de Plugin.cs par famille (X-153, revue GPT du 11/11) : famille des rappels. Le rappel de préparation (repas ou compagnon chocobo bientôt finis, ou finis d'eux-mêmes) et la lecture du potager dans le chat et le menu du parterre passent de Plugin.cs au nouveau Plugin.Reminders.cs : deux blocs déplacés tels quels, appelés là où ils étaient, l'ordre des branchements gardé ; le guetteur d'objets des découvertes est toujours lu au moment où une récolte est vue. Nouveau test `RemindersFamily1936Tests` : un seul chemin d'installation et un seul de libération pour chacun, dans Plugin.Reminders.cs, chacun donné avec sa propre libération ; Plugin.cs n'en crée aucun et appelle chaque bloc une fois, à sa place d'avant. Rien de visible ne change.
 - Tests : RemindersFamily1936Tests. Verify.ps1 (agent) : 4293/4293, 0 avertissement, 0 erreur ; DLL 0.1936.0.0. Rien à essayer en jeu.

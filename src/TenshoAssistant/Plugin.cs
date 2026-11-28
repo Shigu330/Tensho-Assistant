@@ -620,9 +620,8 @@ public sealed partial class Plugin : IDalamudPlugin
             // X-153 (0.1419, tenth slice): the chocobo family (Plugin.Chocobo.cs), at the same place as before.
             RegisterChocobo(data,framework,client,player,unlocks,condition);
             mainWindow.StainName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Stain>().GetRowOrDefault(id)?.Name.ExtractText();
-            // 0.342 (R-09): running festivals (GameMain), their quests (Quest.Festival) and English names (LuminaSupplemental, embedded).
-            Events.FestivalReader? festivals=null;
-            registrations.Register(()=>festivals=new Events.FestivalReader(framework,client,data,log),()=>festivals?.Dispose());
+            // X-153 (0.1937): the festivals' reader in Plugin.Events.cs; the Events page reads the reader handed back.
+            var festivals=RegisterFestivals(framework,client,data);
             mainWindow.Festivals=()=>festivals;
             RegisterGearsets(framework,player);
             // 0.353 (g, I-12): key items (EventItem) by name, from the game data, the list built once.
