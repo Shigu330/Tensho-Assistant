@@ -294,7 +294,8 @@ internal static class DiscordWebhookTests
         ("Discord channels: every sender uses it, the reset keeps them, no report shows them",() =>
         {
             // X-153 (0.1898): the currencies' alert is sent by the inventory family.
-            var plugin=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"))+File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Inventory.cs"))+File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Alarms.cs"));
+            // X-905 (0.1935): every Plugin*.cs file, so a sender on the main address alone cannot come back in another family unseen.
+            var plugin=string.Concat(Directory.GetFiles(Path.GetFullPath("src/TenshoAssistant"), "Plugin*.cs").Order(StringComparer.Ordinal).Select(path => File.ReadAllText(path).Replace("\r\n", "\n")));
             Check(!plugin.Contains("discord.Enqueue(new(settings.WebhookUrl"),"no sender left on the main address alone");
             Check(plugin.Split("DiscordWebhook.UrlFor(settings,").Length==4,"alarms, currencies, duty ready");
             Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/UI/Components/SettingRow.cs")).Contains("configuration.Discord.CategoryUrls=categoryWebhooks;"),"kept by a reset, as the main address");

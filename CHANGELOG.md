@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1935.0
+- Plan global, X-905 : Relecture du bloc 0.1924 à 0.1934 (X-905, M1) : les deux contrôles négatifs (« jamais AddMapLink » du test ChatReview1491, « aucun envoi Discord sur la seule adresse principale » de DiscordWebhookTests) lisent désormais tous les fichiers Plugin*.cs au lieu d'une liste choisie à la main ; un retour du défaut dans une autre famille du câblage fait échouer le test. Le compte des adresses Discord (alarmes, monnaies, mission prête) porte aussi sur tous les fichiers.
+- Tests : ChatReview1491Tests, DiscordWebhookTests. Verify.ps1 (agent) : 4290/4290, 0 avertissement, 0 erreur ; DLL 0.1935.0.0. Rien à essayer en jeu.
+### English
+- Review of block 0.1924 to 0.1934 (X-905, M1): the two negative checks ("never AddMapLink" in ChatReview1491, "no Discord sender on the main address alone" in DiscordWebhookTests) now read every Plugin*.cs file instead of a hand-picked list; the fault coming back in another wiring family fails the test. The Discord address count (alarms, currencies, duty ready) also covers every file.
+
 ## 0.1934.0
 - Plan global, X-153 : Branchement des services de Plugin.cs par famille (X-153, revue GPT du 11/11) : lecteurs de l'interface du jeu. La lecture du thème de l'interface du jeu, celle des fenêtres du jeu et le suivi de leur position (pour les panneaux posés à côté) passent de Plugin.cs au nouveau Plugin.GameUi.cs, avec le lien d'objet mis dans le chat : deux blocs déplacés tels quels, appelés là où ils étaient, l'ordre des branchements gardé. Nouveau test `GameUiFamily1934Tests` : un seul chemin d'installation et un seul de libération pour chacun, dans Plugin.GameUi.cs, chacun donné avec sa propre libération ; Plugin.cs n'en crée aucun et appelle chaque bloc une fois, à sa place d'avant. Rien de visible ne change.
 - Tests : GameUiFamily1934Tests. Verify.ps1 (agent) : 4290/4290, 0 avertissement, 0 erreur ; DLL 0.1934.0.0. Rien à essayer en jeu.
