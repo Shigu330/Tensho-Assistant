@@ -431,6 +431,18 @@ internal static class Headless
         return true;
     }
 
+    /// <summary>X-914 (0.1958): the trial tasks of the « Reminders-tasks » picture on (true) or taken back (false). False when the method cannot be reached.</summary>
+    public static bool TasksTrial(Host host,bool on)
+    {
+        var method=host.Window.GetType().GetMethod("DesktopTasksTrial",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic);
+        var focus=host.Window.GetType().GetField("reminderTabFocus",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic);
+        if(method is null || focus is null)return false;
+        method.Invoke(host.Window,[on]);
+        // The Reminders page opens on its Tasks tab (as the « Reminders-retainers » picture opens Status).
+        if(on)focus.SetValue(host.Window,"Tasks");
+        return true;
+    }
+
     /// <summary>X-606 (0.1710): the trial quests of the « Quests-details » picture on (true) or taken back (false). False when the method cannot be reached.</summary>
     public static bool QuestTrial(Host host,bool on)
     {

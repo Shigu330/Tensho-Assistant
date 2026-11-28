@@ -85,6 +85,7 @@ internal static class DesktopContract
         new(Main,Kind.Method,"OpenLink",false,["System.String"],"the « FreeCompany-routes » picture opens the Best routes tab through the table of links (X-604, X-853)"),
         new(Main,Kind.Method,"DesktopQuestTrial",false,["System.Boolean"],"the trial quests of the « Quests-details » picture (X-606)"),
         new(Main,Kind.Method,"DesktopDiscoveriesTrial",false,["System.Boolean"],"the trial base of the « Discoveries-trial » picture (X-807 M4)"),
+        new(Main,Kind.Method,"DesktopTasksTrial",false,["System.Boolean"],"the trial tasks of the « Reminders-tasks » picture, the counters' icon buttons (X-914)"),
         new("TenshoAssistant.Character.CharacterStatus",Kind.Property,"Retainers",false,null,"the trial retainers' character file (X-430)"),
         new("TenshoAssistant.Character.RetainerState",Kind.Property,"MarketEnds",false,null,"the trial retainers' character file (X-430)"),
         new("TenshoAssistant.Character.RetainerState",Kind.Property,"VentureDone",false,null,"the trial retainers' character file (X-430)"),

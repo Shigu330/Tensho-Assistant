@@ -1,5 +1,6 @@
 using Dalamud.Bindings.ImGui;
 using TenshoAssistant.Inventory;
+using TenshoAssistant.Reminders;
 
 namespace TenshoAssistant;
 
@@ -93,6 +94,27 @@ internal sealed partial class MainWindow
         questNavigation.Clear();
         if(on){quests.Publish(TenshoAssistant.Quests.QuestTrial.Character,TenshoAssistant.Quests.QuestTrial.Entries(),TenshoAssistant.Quests.QuestTrial.ObservedAt);selectedQuestId=TenshoAssistant.Quests.QuestTrial.Shown;questShowDetails=true;}
         else{quests.Clear();selectedQuestId=0;questShowDetails=false;}
+    }
+    // X-914 (0.1958, review of 0.1956 M2, R37): the « Reminders-tasks » picture: Reminders › Tasks with two trial tasks (a counter with its
+    // « - » and « + » icon buttons, a daily task; the application opens the tab), in memory only (nothing is saved unless a button is clicked, and none is in a picture);
+    // the tasks shown before given back after it. Never in the game.
+    internal static readonly Guid DesktopTrialCounter=new("9d1e5a52-0b3c-4b8e-9a51-1a0c00000914"),DesktopTrialDaily=new("9d1e5a52-0b3c-4b8e-9a51-1a0c00000915");
+    private (bool Taken,List<PersonalTask>? Tasks) desktopTasksBefore;
+    private void DesktopTasksTrial(bool on)
+    {
+        if(!inDesktopApp)return;
+        if(on)
+        {
+            if(!desktopTasksBefore.Taken)desktopTasksBefore=(true,configuration.PersonalTasks);
+            configuration.PersonalTasks=
+            [
+                new PersonalTask{Id=DesktopTrialCounter,Name="Trial counter",Period=TaskPeriod.Counter,Target=5,Count=2,OnScreen=false},
+                new PersonalTask{Id=DesktopTrialDaily,Name="Trial daily task",Period=TaskPeriod.Daily,OnScreen=false},
+            ];
+            return;
+        }
+        if(!desktopTasksBefore.Taken)return;
+        configuration.PersonalTasks=desktopTasksBefore.Tasks;desktopTasksBefore=(false,null);
     }
     /// <summary>X-520 (0.1537): the first chat tab's channels are unfolded at the next draw (the desktop application's pictures only).</summary>
     private bool desktopChatChannelsOpen;

@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1958.0
+- Plan global, X-914 : Images de référence : une nouvelle image « Reminders-tasks » montre Rappels › Tâches avec deux tâches d'essai (un compteur avec ses boutons « - » et « + » en icônes, une tâche quotidienne), données en mémoire par l'application de bureau seulement et reprises après l'image, jamais enregistrées : les boutons de compteur en icônes de 0.1954 sont maintenant vus par la comparaison des images (relecture de 0.1956, M2). Les sous-titres de section de 0.1953 restent hors des images : la police de section n'est chargée que dans le jeu (hors du jeu, le sous-titre se dessine dans la police de base, dans la couleur d'avant) ; constat écarté pour cette raison, un essai en jeu les vérifie.
+- Tests : CounterPicture1958Tests. Verify.ps1 (agent) : 4355/4355, 0 avertissement, 0 erreur ; DLL 0.1958.0.0. Non validé en jeu.
+### English
+- Reference pictures: a new picture « Reminders-tasks » shows Reminders › Tasks with two trial tasks (a counter with its « - » and « + » icon buttons, a daily task), given in memory by the desktop application only and taken back after the picture, never saved: the counters' icon buttons of 0.1954 are now seen by the pictures' comparison (review of 0.1956, M2). The section subtitles of 0.1953 stay out of the pictures: the section font is loaded in the game only (out of the game, the subtitle is drawn in the base font, in the colour of before); finding set aside for that reason, an in-game test checks them.
+
 ## 0.1957.0
 - Plan global, X-913 : Les gardes de survol des info-bulles riches écrites à la main avec une autre condition (« x is not null && … », « hovered || … ») ou entre accolades passent aussi par RichTipHovered() (même test), et le cliquet les lit toutes : toute condition « if » qui contient le test de survol simple (non nié) devant une instruction ou un bloc qui dessine un Draw…Tooltip est refusée (relecture de 0.1956, M1). Rien ne change à l'écran.
 - Tests : UiRichTips1957Tests. Verify.ps1 (agent) : 4352/4352, 0 avertissement, 0 erreur ; DLL 0.1957.0.0. Rien à essayer en jeu.

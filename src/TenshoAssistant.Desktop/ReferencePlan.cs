@@ -26,6 +26,8 @@ public static class ReferencePlan
         if(shown.Contains("Diagnostics"))plan.Add(new("Diagnostics-dashboard","Diagnostics",0,1280,860,"dashboard"));
         // X-430 (0.1415): Reminders › Status with two trial characters and four retainers (the table of X-196, every state of a sale).
         if(shown.Contains("Reminders"))plan.Add(new("Reminders-retainers","Reminders",0,1280,860,"retainers"));
+        // X-914 (0.1958, review of 0.1956 M2): Reminders › Tasks with two trial tasks: a counter's « - » and « + » icon buttons (0.1954).
+        if(shown.Contains("Reminders"))plan.Add(new("Reminders-tasks","Reminders",0,1280,860,"tasks-trial"));
         // X-284 M2: the error state of two pages whose sheets cannot be read (as after a game update): one read at once, one off the frame.
         foreach(var page in ErrorPages.Where(shown.Contains))plan.Add(new($"{page}-error",page,0,1280,860,"error"));
         // X-394 (review of 0.1361): the sort preview with a sample inventory: bags 1, 3, 2, 4 and the sort's line once (developer mode).
