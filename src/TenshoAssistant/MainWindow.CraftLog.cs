@@ -199,7 +199,7 @@ internal sealed partial class MainWindow
                 var metadata=catalog.Find(job,steps[index].Action);
                 DrawGameIcon(metadata?.Icon ?? 0,new Vector2(iconSize));
                 // X-684 (0.1674): the one action tooltip, the step's number in its title.
-                if(ImGui.IsItemHovered()){if(metadata is not null)DrawCraftActionTooltip(metadata,$"{index+1}. {metadata.Name}");else WrappedTooltip($"{index+1}. {steps[index].Action}");}
+                if(RichTipHovered()){if(metadata is not null)DrawCraftActionTooltip(metadata,$"{index+1}. {metadata.Name}");else WrappedTooltip($"{index+1}. {steps[index].Action}");}
             }
             if(steps.Count>30)ImGui.TextDisabled(localization.Format("CraftLogUi.More",steps.Count-30));
             ImGui.Spacing();
@@ -295,7 +295,7 @@ internal sealed partial class MainWindow
         var skill=craftActions.State.Catalog?.Find(job,CraftActionKind.Manipulation);
         DrawGameIcon(skill?.Icon ?? 0,new Vector2(28));
         // X-684 (0.1674): the one action tooltip, what was detected under it.
-        if(ImGui.IsItemHovered())
+        if(RichTipHovered())
         {
             var manipulationText=localization.Format("CraftLogUi.ManipulationDetected",CraftYesNo(detected))+"\n"+localization.Get("CraftLogUi.ManipulationTip");
             if(skill is not null)DrawCraftActionTooltip(skill,after:manipulationText);else WrappedTooltip(CraftActionKind.Manipulation+"\n"+manipulationText);

@@ -184,7 +184,7 @@ internal sealed partial class MainWindow
             {
                 var item=catalog?.Find(rows[index].Id);
                 DrawItemIcon(item,new Vector2(24));
-                if(item is not null && ImGui.IsItemHovered())DrawItemInfoTooltip(rows[index].Id);
+                if(item is not null && RichTipHovered())DrawItemInfoTooltip(rows[index].Id);
                 ImGui.SameLine();
                 ImGui.TextUnformatted(item?.Name ?? localization.Format("MyToolsUi.UnknownItem",rows[index].Id));
                 ImGui.SameLine();

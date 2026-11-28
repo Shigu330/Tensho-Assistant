@@ -223,7 +223,7 @@ internal sealed partial class MainWindow
                 try{DrawVistaAlarmEntry(row,map.TerritoryId);ImGui.Separator();PlaceEntries(map,CoordinateOf(map,world),"EntityMenu.Here");}
                 finally{ImGui.EndPopup();}
             }
-            if(ImGui.IsItemHovered())
+            if(RichTipHovered())
             {
                 if(kind==MapLocalKind.Sightseeing)DrawSightseeingTooltip(row,state);
                 else WrappedTooltip(localization.Get("MapLocal.ClickFlag"));
@@ -328,7 +328,7 @@ internal sealed partial class MainWindow
                     }
                     if(known)PlaceMenu("FavoritePlace",here ? map:target!,new(point.X,point.Y),name);
                     // X-684 (0.1672): the one place tooltip, the note under it.
-                    if(ImGui.IsItemHovered()){if(known)DrawPlaceTooltip(here ? map:target!,new Vector2(point.X,point.Y),name,point.Note);else if(point.Note is { } note)WrappedTooltip(note);}
+                    if(RichTipHovered()){if(known)DrawPlaceTooltip(here ? map:target!,new Vector2(point.X,point.Y),name,point.Note);else if(point.Note is { } note)WrappedTooltip(note);}
                 }
                 finally{ImGui.PopID();}
             }

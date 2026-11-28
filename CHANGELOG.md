@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1957.0
+- Plan global, X-913 : Les gardes de survol des info-bulles riches écrites à la main avec une autre condition (« x is not null && … », « hovered || … ») ou entre accolades passent aussi par RichTipHovered() (même test), et le cliquet les lit toutes : toute condition « if » qui contient le test de survol simple (non nié) devant une instruction ou un bloc qui dessine un Draw…Tooltip est refusée (relecture de 0.1956, M1). Rien ne change à l'écran.
+- Tests : UiRichTips1957Tests. Verify.ps1 (agent) : 4352/4352, 0 avertissement, 0 erreur ; DLL 0.1957.0.0. Rien à essayer en jeu.
+### English
+- The hover guards of rich tooltips written by hand with another condition (« x is not null && … », « hovered || … ») or in braces also go through RichTipHovered() (the same test), and the ratchet reads them all: any « if » condition holding the plain hover test (not negated) in front of a statement or block that draws a Draw…Tooltip is refused (review of 0.1956, M1). Nothing changes on screen.
+
 ## 0.1956.0
 - Plan global, X-607 : Code plus simple à entretenir (X-607, demande du 18/11) : les info-bulles riches (objet, action, lieu, quête, mission, ALEA, PNJ, recette, récolte…) s'ouvrent derrière une seule garde, `RichTipHovered()` (`UI/Components/Tooltip.cs`), au lieu du test de survol écrit à la main sur chaque page (31 endroits, et `ItemTip`) : même test qu'avant (pas sur un élément grisé), rien ne change à l'écran. CONTRIBUTING la nomme dans ses deux moitiés. Nouveau test `UiRichTips1956Tests` : le test de survol écrit à la main devant une info-bulle riche est refusé.
 - Tests : UiRichTips1956Tests. Verify.ps1 (agent) : 4349/4349, 0 avertissement, 0 erreur ; DLL 0.1956.0.0. Rien à essayer en jeu.

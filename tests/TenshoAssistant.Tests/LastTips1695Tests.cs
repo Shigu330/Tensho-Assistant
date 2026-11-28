@@ -20,7 +20,7 @@ internal static class LastTips1695Tests
         ("Last tips 1695: items: relic pieces, the garden's seeds, the fashion page", () =>
         {
             var relic = Read("MainWindow.RelicWeapons.cs");
-            Check(relic.Split("if(ImGui.IsItemHovered()){DrawItemInfoTooltip(pieces[0]);WrappedTooltip(").Length == 3, "both stage tables: the common tooltip, then the pieces");
+            Check(relic.Split("if(RichTipHovered()){DrawItemInfoTooltip(pieces[0]);WrappedTooltip(").Length == 3, "both stage tables: the common tooltip, then the pieces");
             var garden = Read("MainWindow.GardenView.cs");
             Check(garden.Split("DrawItemInfoBody(item,item.Id);").Length == 3, "both seed tooltips draw the common body");
             Check(garden.IndexOf("DrawItemInfoBody(item,item.Id);ImGui.TextDisabled(localization.Get(\"Garden.TipClick\"));", StringComparison.Ordinal) > 0, "the click last");

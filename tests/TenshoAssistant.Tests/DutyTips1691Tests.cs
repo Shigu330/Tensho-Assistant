@@ -26,7 +26,7 @@ internal static class DutyTips1691Tests
             var page = Read("src/TenshoAssistant/MainWindow.Duties.cs");
             Check(page.Contains("if(RichTipHovered())DrawDutyTooltip(DutyTipOf(duty),localization.Get(\"DutyUi.TipClick\"));", StringComparison.Ordinal) && !page.Contains("WrappedTooltip($\"Duty {duty.DutyId}", StringComparison.Ordinal), "the Duties page, for every player");
             Check(Read("src/TenshoAssistant/MainWindow.DeepDungeons.cs").Contains("if(RichTipHovered())DrawDutyTooltip(DutyTipOf(floor),", StringComparison.Ordinal), "the deep dungeons' floors");
-            Check(Read("src/TenshoAssistant/MainWindow.Monsters.cs").Contains("if (duty is not null && ImGui.IsItemHovered()) DrawDutyTooltip(DutyTipOf(duty),", StringComparison.Ordinal), "a monster's duty");
+            Check(Read("src/TenshoAssistant/MainWindow.Monsters.cs").Contains("if (duty is not null && RichTipHovered()) DrawDutyTooltip(DutyTipOf(duty),", StringComparison.Ordinal), "a monster's duty");
             foreach (var code in new[] { "en", "fr" })
             {
                 var language = Read($"src/TenshoAssistant/Localization/Languages/{code}.json");

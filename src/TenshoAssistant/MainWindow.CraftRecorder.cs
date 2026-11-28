@@ -34,7 +34,7 @@ internal sealed partial class MainWindow
             var metadata=catalog.Find(job,actions[index]);
             DrawGameIcon(metadata?.Icon ?? 0,new System.Numerics.Vector2(24));
             // X-684 (0.1674): the one action tooltip, the step's number in its title.
-            if(ImGui.IsItemHovered()){if(metadata is not null)DrawCraftActionTooltip(metadata,$"{index+1}. {metadata.Name}");else WrappedTooltip($"{index+1}. {actions[index]}");}
+            if(RichTipHovered()){if(metadata is not null)DrawCraftActionTooltip(metadata,$"{index+1}. {metadata.Name}");else WrappedTooltip($"{index+1}. {actions[index]}");}
         }
         if(ignored>0)ImGui.TextDisabled(localization.Format("CraftRecorder.Ignored",ignored));
         if(ImGui.SmallButton(localization.Get("CraftRecorder.Use"))){simulationActions.Clear();simulationActions.AddRange(actions);simulationResult=null;simulationError=null;}

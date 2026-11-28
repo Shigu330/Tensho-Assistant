@@ -168,7 +168,7 @@ internal sealed partial class MainWindow
             if (duty is not null && ImGui.SmallButton(localization.Format("MonsterUi.Duty",duty.Name)))
             { dutyLoot.Select(duty); showDutyDetails=true; page=Page.DutyLoot; }
             else if (duty is null) ImGui.TextDisabled(localization.Format("MonsterUi.Instance",detail.InstanceId));
-            if (duty is not null && ImGui.IsItemHovered()) DrawDutyTooltip(DutyTipOf(duty),localization.Get("DutyUi.TipClick"));
+            if (duty is not null && RichTipHovered()) DrawDutyTooltip(DutyTipOf(duty),localization.Get("DutyUi.TipClick"));
         }
         if (TenshoAssistant.UI.UiComponents.Header(localization.Format("MonsterUi.OtherItems",detail.DropItemIds.Count)+"##Monster"))
         {

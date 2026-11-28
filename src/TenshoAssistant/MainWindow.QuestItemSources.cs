@@ -84,7 +84,7 @@ internal sealed partial class MainWindow
                         DrawGameIcon(source.Icon,new Vector2(28));var clicked=ImGui.IsItemClicked();ImGui.SameLine();
                         clicked|=ImGui.Selectable(source.Name);
                         // X-684 (0.1670): the one quest tooltip when the quest's entry is known.
-                        if(ImGui.IsItemHovered()){if(quests.State.ById?.GetValueOrDefault(source.QuestId) is { } questEntry)DrawQuestTooltip(questEntry);else WrappedTooltip($"{source.Name}\n{source.Category}"+(developerMode ? $"\nID: {source.QuestId}":""));}
+                        if(RichTipHovered()){if(quests.State.ById?.GetValueOrDefault(source.QuestId) is { } questEntry)DrawQuestTooltip(questEntry);else WrappedTooltip($"{source.Name}\n{source.Category}"+(developerMode ? $"\nID: {source.QuestId}":""));}
                         if(clicked){SelectQuest(source.QuestId);page=Page.Quests;}
                         ImGui.TableNextColumn();
                         ImGui.TextColored(row.Progress==QuestProgress.Complete ? Success:Muted,QuestProgressLabel(row.Progress,row.Sequence));

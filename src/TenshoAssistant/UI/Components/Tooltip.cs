@@ -37,7 +37,8 @@ internal sealed partial class MainWindow
 
     // X-607 (0.1956): the guard of a rich tooltip (item, action, place, quest, duty, FATE, NPC, recipe, gathering…): the last drawn item
     // hovered, not when greyed. One form everywhere, « if(RichTipHovered())DrawXTooltip(…) », in place of the hover test on each page
-    // (UiRichTips1956Tests).
+    // (UiRichTips1956Tests). Also with another condition or braces: « if(x && RichTipHovered()){…DrawXTooltip(…)…} » (X-913, 0.1957,
+    // UiRichTips1957Tests).
     private static bool RichTipHovered()=>ImGui.IsItemHovered();
 
     // X-607 (0.1943): the item's tooltip (name, kind, level, price, sources) of the last drawn item, on hover, the same guard as before

@@ -117,7 +117,7 @@ internal sealed partial class MainWindow
                     DrawItemIcon(item,new Vector2(24));
                     var hovered=ImGui.IsItemHovered();ImGui.SameLine();
                     ImGui.Selectable((item?.Name ?? localization.Format("BankUi.Item",id))+$"##DutyFinderItem{first.Kind}{first.SourceIndex}/{id}",false,ImGuiSelectableFlags.None,new Vector2(0,24));
-                    if(hovered || ImGui.IsItemHovered())DrawItemInfoTooltip(id);
+                    if(hovered || RichTipHovered())DrawItemInfoTooltip(id);
                     ItemLinksMenu($"DutyFinderLinks{first.Kind}{first.SourceIndex}/{id}",item);
                 }
             }

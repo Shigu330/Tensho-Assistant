@@ -70,7 +70,7 @@ internal sealed partial class MainWindow
     /// time; the common item menu with the alarm's gestures first (the Alarm module, turn it off, the map on its point).</summary>
     private void TrackerRowHelp(string id,TrackedAlarm row,Items.ItemDefinition? item,TenshoAlarm? alarm,Maps.MapDefinition? map,(uint TerritoryId,uint MapId,float X,float Y)? place,DateTimeOffset now)
     {
-        if(ImGui.IsItemHovered())
+        if(RichTipHovered())
         {
             var lines=new List<string>{row.Label};
             if(map is not null && place is { } at)lines.Add(localization.Format("Tracker.Place",map.Zone,Maps.MapProjection.CoordinateText(new(at.X,at.Y))));

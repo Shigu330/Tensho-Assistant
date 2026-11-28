@@ -125,7 +125,7 @@ internal sealed partial class MainWindow
                         ImGui.TextUnformatted($"{link.At.ToLocalTime():t} · {place} ({MapProjection.CoordinateNumber(link.X)}, {MapProjection.CoordinateNumber(link.Y)})");
                         if(map is not null && MapCatalog.CoordinatesValid(link.X,link.Y))PlaceMenu($"ChatLinkPlace{link.At.Ticks}",map,new(link.X,link.Y),place);
                         // X-684 (0.1672): the one place tooltip, the channel and who sent it under it.
-                        if(ImGui.IsItemHovered())
+                        if(RichTipHovered())
                         {
                             // X-754 (0.1737, R25): in the chat window's capture mode, the sender's stand-in (the chat window's code), never the name.
                             var line=localization.Format("ChatLinks.Line",ChannelName(link.Channel),link.Sender.Length>0 ? Chat.ChatFormat.LinkSender(link.Sender,ChatOptions.CaptureNames):localization.Get("ChatLinks.NoSender"));

@@ -135,7 +135,7 @@ internal sealed partial class MainWindow
                 ImGui.TableNextColumn();ImGui.TextUnformatted(set.Name);
                 ImGui.TableNextColumn();ImGui.TextUnformatted(Name(pieces[0]));
                 // X-684 (0.1695): the common item tooltip of the piece named here, then every piece of the stage with how many are held (the same tooltip).
-                if(ImGui.IsItemHovered()){DrawItemInfoTooltip(pieces[0]);WrappedTooltip(string.Join("\n",pieces.Select(piece=>Name(piece)+" : "+(Held(piece)?.ToString("N0",Numbers) ?? "?"))));}
+                if(RichTipHovered()){DrawItemInfoTooltip(pieces[0]);WrappedTooltip(string.Join("\n",pieces.Select(piece=>Name(piece)+" : "+(Held(piece)?.ToString("N0",Numbers) ?? "?"))));}
                 ImGui.TableNextColumn();
                 var (held,known)=RelicBoard.PiecesHeld(pieces,Held);
                 if(known==0)ImGui.TextDisabled("?");
@@ -179,7 +179,7 @@ internal sealed partial class MainWindow
                 ImGui.TableNextColumn();ImGui.TextUnformatted((index+1).ToString());
                 ImGui.TableNextColumn();ImGui.TextUnformatted(Name(pieces[0]));
                 // X-684 (0.1695): the common item tooltip of the piece named here, then every piece of the stage with how many are held (the same tooltip).
-                if(ImGui.IsItemHovered()){DrawItemInfoTooltip(pieces[0]);WrappedTooltip(string.Join("\n",pieces.Select(piece=>Name(piece)+" : "+(Held(piece)?.ToString("N0",Numbers) ?? "?"))));}
+                if(RichTipHovered()){DrawItemInfoTooltip(pieces[0]);WrappedTooltip(string.Join("\n",pieces.Select(piece=>Name(piece)+" : "+(Held(piece)?.ToString("N0",Numbers) ?? "?"))));}
                 ImGui.TableNextColumn();
                 var (held,known)=RelicBoard.PiecesHeld(pieces,Held);
                 if(known==0)ImGui.TextDisabled("?");

@@ -228,7 +228,7 @@ internal sealed partial class MainWindow
                 else ImGui.TextUnformatted(entry.Kind==CollectionKind.Portrait && entry.Description.Length>0
                     ? $"{entry.Name} · {localization.Get("ExtraCollections.Portrait"+entry.Description)}":entry.Name);
                 // 0.142: how to obtain it (items, vendors, quests, recipes) for mounts, minions, emotes, cards and rolls.
-                if (ImGui.IsItemHovered())
+                if (RichTipHovered())
                 {
                     if(entry.Kind is CollectionKind.Mount or CollectionKind.Companion or CollectionKind.Emote or CollectionKind.TripleTriad or CollectionKind.Orchestrion)DrawCollectionTooltip(entry);
                     // 0.387 (user report): the 0.365 kinds — the teaching item's full tooltip (how to obtain it) when the game data gives one,

@@ -90,7 +90,7 @@ internal sealed partial class MainWindow
                                 Tip("MapsUi.RemoveTip");
                                 ImGui.SameLine();
                                 ImGui.TextUnformatted((point?.Group is { } group ? $"[{group}] " : "") + (string.IsNullOrWhiteSpace(point?.Name) ? localization.Get("MapsUi.Unnamed") : point.Name));
-                                if (point is not null && ImGui.IsItemHovered())
+                                if (point is not null && RichTipHovered())
                                 {
                                     // X-684 (0.1672): the one place tooltip (zone, region, coordinates, nearest aetheryte, weather), the note under it.
                                     if (valid) DrawPlaceTooltip(map!, new Vector2(point.X, point.Y), string.IsNullOrWhiteSpace(point.Name) ? null : point.Name, point.Note);

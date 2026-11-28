@@ -200,7 +200,7 @@ internal sealed partial class MainWindow
                                     ImGui.GetWindowDrawList().AddRect(min,min+new Vector2(slot),ImGui.GetColorU32(reserved.Preserve ? Success:Accent),4);
                                     // X-684 (0.1669): an item in the slot: the common item tooltip, then the slot and the quantity (the same
                                     // tooltip: the game's ImGui adds a second one of the frame under the first, as the fashion page does).
-                                    if(ImGui.IsItemHovered() && previewStack is { } zoneItem)
+                                    if(RichTipHovered() && previewStack is { } zoneItem)
                                     {
                                         var stack=zoneItem.Stack;
                                         DrawItemInfoTooltip(stack.Item.Id.Value,hq:stack.Item.IsHighQuality);

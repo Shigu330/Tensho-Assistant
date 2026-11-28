@@ -279,7 +279,7 @@ internal sealed partial class MainWindow
                 var item=catalog?.Find(row.Id);var held=GetRecipeHoldings(row.Id);
                 ImGui.TableNextRow();ImGui.TableNextColumn();
                 DrawItemIcon(item,new Vector2(24));
-                if(item is not null && ImGui.IsItemHovered())DrawItemInfoTooltip(row.Id);
+                if(item is not null && RichTipHovered())DrawItemInfoTooltip(row.Id);
                 ImGui.SameLine();
                 if(item is not null)ImGui.TextUnformatted(item.Name);
                 else if(catalog is not null)ImGui.TextColored(UI.FfxivTheme.Warning,localization.Format("MyToolsUi.UnknownItem",row.Id));
