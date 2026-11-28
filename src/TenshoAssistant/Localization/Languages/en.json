@@ -84,6 +84,8 @@
   "MyToolsUi": {
     "ColumnPrice": "Price each",
     "MissingCost": "Cost of what is missing: {0} gil",
+    "CountDownTip": "Takes one off this counter.",
+    "CountUpTip": "Adds one to this counter.",
     "MissingCostUnknown": "Cost of what is missing: at least {0} gil ({1} item(s) without a known price or stock)",
     "AskPrices": "Ask for prices ({0})",
     "AskPricesTip": "Asks Universalis for the prices of your world, at most 32 items per click. The lowest price is shown, NQ or HQ. Nothing is asked without this click.",
@@ -7295,6 +7297,8 @@
     "Panel": "On-screen « to do » panel",
     "PanelTip": "Shows on screen, outside the Tensho window, the tasks marked « On screen » that are not done. Hidden in combat. Closing it turns this setting off.\nDefault: off.",
     "DoneTip": "Marks the task done; it comes back at its next reset.",
+    "CountDownTip": "Takes one off the counter of this task.",
+    "CountUpTip": "Adds one to the counter of this task; it is done once its target is reached, and comes back at its next reset.",
     "Back": "back {0}",
     "OnScreen": "On screen",
     "OnScreenTip": "Shows this task in the « to do » panel while it is not done.",

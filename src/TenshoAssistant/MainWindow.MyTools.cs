@@ -254,14 +254,9 @@ internal sealed partial class MainWindow
     {
         var key=ToolProgress.Key(block);
         var count=tool?.Counts.GetValueOrDefault(key) ?? 0;
-        ImGui.BeginDisabled(tool is null);
-        try
-        {
-            if(ImGui.SmallButton("-") && tool is not null)store.SetCount(tool.Template.Id,key,count-1);
-            ImGui.SameLine();
-            if(ImGui.SmallButton("+") && tool is not null)store.SetCount(tool.Template.Id,key,count+1);
-        }
-        finally{ImGui.EndDisabled();}
+        if(ToolButton(Dalamud.Interface.FontAwesomeIcon.Minus,"MyToolsUi.CountDownTip",tool is not null) && tool is not null)store.SetCount(tool.Template.Id,key,count-1);
+        ImGui.SameLine();
+        if(ToolButton(Dalamud.Interface.FontAwesomeIcon.Plus,"MyToolsUi.CountUpTip",tool is not null) && tool is not null)store.SetCount(tool.Template.Id,key,count+1);
         ImGui.SameLine();
         var line=counter.Target>0 ? $"{counter.Label.For(language)} : {count} / {counter.Target}":$"{counter.Label.For(language)} : {count}";
         if(counter.Target>0 && count>=counter.Target)ImGui.TextColored(Success,line);else ImGui.TextUnformatted(line);

@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1954.0
+- Plan global, X-607 : Pages plus homogènes (X-607, demande du 18/11, accord de l'utilisateur du 28/11) : les boutons « + » et « - » des compteurs, écrits à la main en texte, passent par le bouton à icône commun de Tensho (`ToolButton`, icônes Plus et Moins, centrées, avec leur info-bulle) : compteur d'un outil de Mes outils (grisé dans l'aperçu), compteur d'une tâche perso et son « + » dans la liste des tâches à faire. Info-bulles nouvelles en anglais et en français. CONTRIBUTING le dit dans ses deux moitiés. Nouveau test `UiCounterButtons1954Tests` : un bouton « + » ou « - » en texte est refusé, les compteurs passent par les icônes, les info-bulles existent dans les deux langues.
+- Pour les joueurs : les boutons « + » et « - » des compteurs (Mes outils, tâches perso) sont maintenant des icônes avec une info-bulle.
+- Tests : UiCounterButtons1954Tests. Verify.ps1 (agent) : 4345/4345, 0 avertissement, 0 erreur ; DLL 0.1954.0.0. Non validé en jeu.
+### English
+- More consistent pages (X-607, request of 18/11, the user's approval of 28/11): the « + » and « - » buttons of the counters, written by hand as text, go through Tensho's shared icon button (`ToolButton`, Plus and Minus icons, centred, with their tooltip): a tool's counter in My tools (greyed in the preview), a personal task's counter and its « + » in the list of tasks to do. New tooltips in English and French. CONTRIBUTING says so in both halves. New test `UiCounterButtons1954Tests`: a « + » or « - » button as text is refused, the counters go through the icons, the tooltips exist in both languages.
+- For players: The « + » and « - » buttons of the counters (My tools, personal tasks) are now icons with a tooltip.
+
 ## 0.1953.0
 - Plan global, X-607 : Pages plus homogènes (X-607, demande du 18/11, accord de l'utilisateur du 28/11) : les sous-titres des pages écrits à la main (texte doré seul sur sa ligne : Diagnostic, Aide, Objets, Événements, info-bulle du marché…) passent par le composant commun `UiComponents.SubTitle` : la police de section du jeu, dorée, la même partout. Quatre lignes dorées restent : des remarques, pas des titres. CONTRIBUTING nomme le composant dans ses deux moitiés. Nouveau test `UiSubTitles1953Tests` : la forme écrite à la main est refusée, le composant reste en police de section dorée, les pages s'en servent.
 - Pour les joueurs : les sous-titres dans les pages ont maintenant tous la police de section du jeu.

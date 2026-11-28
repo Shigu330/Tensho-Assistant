@@ -84,6 +84,8 @@
   "MyToolsUi": {
     "ColumnPrice": "Prix à l'unité",
     "MissingCost": "Coût de ce qui manque : {0} gils",
+    "CountDownTip": "Retire un à ce compteur.",
+    "CountUpTip": "Ajoute un à ce compteur.",
     "MissingCostUnknown": "Coût de ce qui manque : au moins {0} gils ({1} objet(s) sans prix ou sans stock connu)",
     "AskPrices": "Demander les prix ({0})",
     "AskPricesTip": "Demande à Universalis les prix de votre monde, 32 objets au plus par clic. Le prix le plus bas est affiché, NQ ou HQ. Rien n'est demandé sans ce clic.",
@@ -7295,6 +7297,8 @@
     "Panel": "Panneau « à faire » à l'écran",
     "PanelTip": "Montre à l'écran, hors de la fenêtre Tensho, les tâches cochées « À l'écran » qui ne sont pas faites. Caché en combat. Le fermer décoche ce réglage.\nPar défaut : désactivé.",
     "DoneTip": "Marque la tâche faite ; elle revient à sa prochaine remise à zéro.",
+    "CountDownTip": "Retire un au compteur de cette tâche.",
+    "CountUpTip": "Ajoute un au compteur de cette tâche ; elle est faite une fois son objectif atteint, et revient à sa prochaine remise à zéro.",
     "Back": "revient {0}",
     "OnScreen": "À l'écran",
     "OnScreenTip": "Montre cette tâche dans le panneau « à faire » quand elle n'est pas faite.",

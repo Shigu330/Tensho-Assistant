@@ -29,9 +29,9 @@ internal sealed partial class MainWindow
                 var done=PersonalTasks.IsDone(task,now);
                 if(task.Period==TaskPeriod.Counter)
                 {
-                    if(ImGui.SmallButton("-")){PersonalTasks.Mark(task,false,now);changed=true;}
+                    if(ToolButton(Dalamud.Interface.FontAwesomeIcon.Minus,"PersonalTasks.CountDownTip",true)){PersonalTasks.Mark(task,false,now);changed=true;}
                     ImGui.SameLine();
-                    if(ImGui.SmallButton("+")){PersonalTasks.Mark(task,true,now);changed=true;}
+                    if(ToolButton(Dalamud.Interface.FontAwesomeIcon.Plus,"PersonalTasks.CountUpTip",true)){PersonalTasks.Mark(task,true,now);changed=true;}
                     ImGui.SameLine();
                     ImGui.TextColored(done ? Success:Accent,$"{task.Count}/{PersonalTasks.ClampTarget(task.Target)}");
                 }
@@ -166,8 +166,7 @@ internal sealed partial class MainWindow
             {
                 if(task.Period==TaskPeriod.Counter)
                 {
-                    if(ImGui.SmallButton("+")){PersonalTasks.Mark(task,true,now);SaveReminders();}
-                    Tip("PersonalTasks.DoneTip");
+                    if(ToolButton(Dalamud.Interface.FontAwesomeIcon.Plus,"PersonalTasks.CountUpTip",true)){PersonalTasks.Mark(task,true,now);SaveReminders();}
                     ImGui.SameLine();ImGui.TextUnformatted($"{task.Name} ({task.Count}/{PersonalTasks.ClampTarget(task.Target)})");
                 }
                 else
