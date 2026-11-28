@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (933 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (936 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -667,6 +667,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-555 | Review of block 0.1516 to 0.1520 (review 0.1520, 17/11), I2: finding in… | Done in 0.1521 |
 | X-556 | Review of block 0.1516 to 0.1520 (review 0.1520, 17/11), minor M1, M2, M3, M4… | Done in 0.1585 |
 | X-557 | User request of 17/11 around 11:20 (sold a few things; check the parsers to see… | Done in 0.1774.0 |
+| X-558 | User request of 17/11 around 11:25: review how chat lines load: newest first… | Done in 0.1858.0 |
 | X-559 | Gap to DEC-053 found by relay 104 (17/11 around 12:10): combat lines still… | Done in 0.1528 |
 | X-560 | Bug seen by the user on 17/11 around 12:20 (capture of the chat settings… | Done in 0.1565 |
 | X-561 | Review of block 0.1521 to 0.1526 (review 0.1526, 17/11), I1: finding in… | Done in 0.1527 |
@@ -1001,12 +1002,14 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-903 | Review  (review 0.1923, 27/11), I1: finding in plan.jsonl:607 (agent file) et… | Done in 0.1923.0 |
 | X-904 | Review  (review 0.1923, 27/11), minor M1: M1 in… | Done in 0.1923.0 |
 | X-905 | Review of block 0.1924 to 0.1934 (review 0.1934, 28/11), pre-existing before… | Done in 0.1935.0 |
+| X-906 | The next-relay choice still offers a point whose code is done and that only… | Done in 0.1935.0 |
+| X-907 | The next-relay choice wrongly skips a point whose code is not finished because… | Done in 0.1935.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (933 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (936 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1671,6 +1674,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-555 | Relecture du bloc 0.1516 à 0.1520 (relecture 0.1520, 17/11), I2 : X-484… | Fait en 0.1521 |
 | X-556 | Relecture du bloc 0.1516 à 0.1520 (relecture 0.1520, 17/11), mineurs M1, M2… | Fait en 0.1585 |
 | X-557 | Demande de l'utilisateur du 17/11 vers 11 h 20 (« j'ai vendu quelques trucs… | Fait en 0.1774.0 |
+| X-558 | Demande de l'utilisateur du 17/11 vers 11 h 25 : « revoir aussi le chargement… | Fait en 0.1858.0 |
 | X-559 | Écart à DEC-053 relevé par le relais 104 (passage-104, 17/11 vers 12 h 10)… | Fait en 0.1528 |
 | X-560 | Bug vu par l'utilisateur le 17/11 vers 12 h 20 (capture des « Réglages du chat… | Fait en 0.1565 |
 | X-561 | Relecture du bloc 0.1521 à 0.1526 (relecture 0.1526, 17/11), I1 : X-549… | Fait en 0.1527 |
@@ -2005,3 +2009,5 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-903 | Relecture  (relecture 0.1923, 27/11), I1 : X-459 et X-818 sont marqués « | Fait en 0.1923.0 |
 | X-904 | Relecture  (relecture 0.1923, 27/11), mineurs M1 : M1 : Le cliquet « toute… | Fait en 0.1923.0 |
 | X-905 | Relecture du bloc 0.1924 à 0.1934 (relecture 0.1934, 28/11), déjà là avant le… | Fait en 0.1935.0 |
+| X-906 | Le choix du relais suivant propose encore un point dont le code est fait et qui… | Fait en 0.1935.0 |
+| X-907 | Le choix du relais suivant saute à tort un point dont le code n'est pas fini… | Fait en 0.1935.0 |

@@ -72,9 +72,9 @@ N'importe où, sans activité de jeu : réglages, langues, caches, crédits, aid
 - [x] **0.999** Paramètres : sept onglets, recherche d'un réglage (TESTING l. 1190)
 - [x] **0.514** Guide et carte : croix ferme du premier coup (TESTING l. 2928)
 - [x] **0.505** Accueil : proposition du guide, Non merci (TESTING l. 2948)
-- [ ] **0.502** Le « ? » à côté du titre de la fenêtre Tensho explique la page ouverte, sur toutes les p… (TESTING l. 2955)
+- [x] **0.502** Le « ? » à côté du titre de la fenêtre Tensho explique la page ouverte, sur toutes les p… (TESTING l. 2955)
 - [x] **0.502** Page Aide : recherche, ouvrir la page, FAQ (TESTING l. 2956)
-- [ ] **0.503** Bandeau première ouverture, Compris (TESTING l. 2957)
+- [x] **0.503** Bandeau première ouverture, Compris (TESTING l. 2957)
 - [x] **0.498** Tensho replié se déplie quand demandé (TESTING l. 2972)
 - [x] **0.494** /tensho selftest et Diagnostics (TESTING l. 2979)
 - [x] **0.496** Fenêtre vue : OK_SEEN après rechargement (TESTING l. 2980)
@@ -92,28 +92,28 @@ N'importe où, sans activité de jeu : réglages, langues, caches, crédits, aid
 
 *Il faut : mode développeur*
 
-- [ ] **0.406** Messages développeur dans la langue du plugin (TESTING l. 3382)
+- [x] **0.406** Messages développeur dans la langue du plugin (TESTING l. 3382)
 
 *Il faut : prochaine release*
 
 
 *Il faut : release*
 
-- [ ] **0.506** Aide (ou le « ? » d'une page) : cliquer « Vidéos et guides » : « Pas encore de vidéo ni… (TESTING l. 2944)
-- [ ] **0.475** Tensho › Mes outils › Galerie : cliquez « Charger la liste », puis « Voir » sur un outil… (TESTING l. 3069)
+- [x] **0.506** Aide (ou le « ? » d'une page) : cliquer « Vidéos et guides » : « Pas encore de vidéo ni… (TESTING l. 2944)
+- [x] **0.475** Tensho › Mes outils › Galerie : cliquez « Charger la liste », puis « Voir » sur un outil… (TESTING l. 3069)
 
 ## Étape 2 : Objets, inventaire, servants, marché (125)
 
 En ville, près d'une sonnette de servant et d'un tableau des ventes.
 
 - [x] **0.235–0.237** Capture auto : Banque montre l'Arsenal sous 2 min (TESTING l. 82)
-- [ ] **0.247–0.250** Listes : infobulles d'objets dans butin, sources, usages (TESTING l. 110)
+- [x] **0.247–0.250** Listes : infobulles d'objets dans butin, sources, usages (TESTING l. 110)
 - [x] **0.251** Clic droit objet : sources en sous-menus par type (TESTING l. 113)
 - [x] **0.257** Survol objet inventaire : « Comment l'obtenir » affiché (TESTING l. 118)
 - [x] **0.272** Fiche objet complète avec onglets (TESTING l. 122)
-- [ ] **0.273** Liens vers fiche objet et prix du marché (TESTING l. 124)
-- [ ] **0.327** Survol : décocher chaque partie du panneau (TESTING l. 210)
-- [ ] **0.329** Fiche objet : stock de l'en-tête juste (TESTING l. 230)
+- [x] **0.273** Liens vers fiche objet et prix du marché (TESTING l. 124)
+- [x] **0.327** Survol : décocher chaque partie du panneau (TESTING l. 210)
+- [x] **0.329** Fiche objet : stock de l'en-tête juste (TESTING l. 230)
 - [x] **0.329** Survol rapide : pas de prix indisponibles (TESTING l. 231)
 - [ ] **0.329** Historique objets : bouton Retour (TESTING l. 232)
 - [x] **0.343** Infobulle de prix complète au survol (TESTING l. 276)

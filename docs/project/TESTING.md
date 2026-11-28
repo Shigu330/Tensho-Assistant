@@ -51,12 +51,12 @@ repris dans la ligne « Tests » de chaque entrée du [CHANGELOG](../../CHANGELO
 Contrôles de base à refaire après un changement de cycle de vie : rechargement/déchargement répété sans double callback ni commande
 orpheline ; préférence « ouvrir au chargement » respectée ; la carte du jeu (touche M) revient normale une fois le plugin déchargé.
 
-### Essais en jeu (liste produite le 2026-11-28, version 0.1935.0)
+### Essais en jeu (liste produite le 2026-11-28, version 0.1944.0)
 
 <!-- q:public -->
-_In English: this page is the author's in-game test list, in French only. Produced on 2026-11-28 for version 0.1935.0. It has 1273 boxes: 672 ticked, 601 empty. 1090 boxes follow the test source: 489 done (ticked), 592 open, 7 could not be tried, 2 failed (empty). The 183 other ticked boxes come from before the source existed (reported before it, kept as they are). Apart: 38 tests of the source have no box on this page (29 done, 8 open, 1 could not be tried, 0 failed)._
+_In English: this page is the author's in-game test list, in French only. Produced on 2026-11-28 for version 0.1944.0. It has 1273 boxes: 682 ticked, 591 empty. 1090 boxes follow the test source: 499 done (ticked), 582 open, 7 could not be tried, 2 failed (empty). The 183 other ticked boxes come from before the source existed (reported before it, kept as they are). Apart: 39 tests of the source have no box on this page (29 done, 9 open, 1 could not be tried, 0 failed)._
 
-Liste produite le 2026-11-28 (version 0.1935.0) : 1273 cases, 672 cochées, 601 vides. 1090 cases suivent la source des essais : 489 faits (cochées), 592 ouverts, 7 pas pu, 2 en échec (vides). Les 183 autres cases cochées viennent d'avant la source (essais rapportés avant qu'elle existe, gardés tels quels). À part : 38 essais de la source n'ont pas de case sur cette page (29 faits, 8 ouverts, 1 pas pu, 0 en échec).
+Liste produite le 2026-11-28 (version 0.1944.0) : 1273 cases, 682 cochées, 591 vides. 1090 cases suivent la source des essais : 499 faits (cochées), 582 ouverts, 7 pas pu, 2 en échec (vides). Les 183 autres cases cochées viennent d'avant la source (essais rapportés avant qu'elle existe, gardés tels quels). À part : 39 essais de la source n'ont pas de case sur cette page (29 faits, 9 ouverts, 1 pas pu, 0 en échec).
 <!-- /q:public -->
 
 Parcours de la campagne de la phase 6, les mêmes essais rangés par activité : [TESTING-ROUTE.md](TESTING-ROUTE.md) (2026-11-09).
@@ -107,7 +107,7 @@ Une étape impossible (pas de compagnie, pas de sous-marin…) se rapporte « no
 
 **Infobulles, menus et fiche objet (0.247–0.251, 0.255–0.257, 0.263, 0.272–0.273, 0.282, 0.292)**
 
-- [ ] 0.247–0.250 — Dans plusieurs listes (butin des monstres, coût de préparation, sources de pêche et de récolte, usages,
+- [x] 0.247–0.250 — Dans plusieurs listes (butin des monstres, coût de préparation, sources de pêche et de récolte, usages,
   orchestrion, hauts faits, résultats de recherche, monnaie d'un marchand) : icône et nom d'un objet donnent la même infobulle complète,
   une seule à la fois ; clic = objet en contexte ; clic droit = outils. Mode dev : ID de l'objet dans l'infobulle.
 - [x] 0.251 — Clic droit sur un objet : sources en sous-menus par type avec leur nombre (Hauts faits, Contenus, À partir d'autres
@@ -121,7 +121,7 @@ Une étape impossible (pas de compagnie, pas de sous-marin…) se rapporte « no
   chaque position : drapeau, « Voir sur la carte Tensho », météo de la zone).
 - [x] 0.272 — Objets : choisir un objet = fiche complète (icône, stock total, dernier prix connu et sa date ; onglets Aperçu, Stocks,
   Craft lié, Usages, Récolte, Marché).
-- [ ] 0.273 — Liens : objet d'une alarme, « Comment l'obtenir (fiche) », monnaie d'un échange → fiche sur Aperçu ; « Prix du marché » →
+- [x] 0.273 — Liens : objet d'une alarme, « Comment l'obtenir (fiche) », monnaie d'un échange → fiche sur Aperçu ; « Prix du marché » →
   Marché › Résumé ; « Ouvrir l'outil Triple Triade » depuis un PNJ → « PNJ et cartes » ; bouton « Deck » des réglages → « Mon deck ».
 
 **Paramètres, caches et langues (0.246, 0.248, 0.258, 0.260–0.261, 0.264, 0.281)**
@@ -207,7 +207,7 @@ Une étape impossible (pas de compagnie, pas de sous-marin…) se rapporte « no
 
 - [x] Paramètres › Interface : nombre de résultats à 50 → la recherche d'objets en liste 50 et l'avis dit 50 ; ↺ remet 30.
 - [x] Paramètres › Général : « dernière page » coché, aller sur Carte, fermer, recharger le plugin → s'ouvre sur Carte ; décoché → Accueil.
-- [ ] Survol : décocher chaque partie (collection, stock, usages, comment l'obtenir) → elle disparaît du panneau sous l'infobulle du jeu
+- [x] Survol : décocher chaque partie (collection, stock, usages, comment l'obtenir) → elle disparaît du panneau sous l'infobulle du jeu
   seulement ; « masquer en mission » coché → pas de panneau dans un donjon.
 - [x] Triple Triad (observation activée) : chacun des trois interrupteurs coupe son aide (cadre du match, défi d'un PNJ, éditeur de decks).
 - [ ] Carnet d'artisanat : « calcul automatique » décoché → bouton « Calculer » ; le décocher pendant un calcul garde « Calcul… ».
@@ -227,7 +227,7 @@ Une étape impossible (pas de compagnie, pas de sous-marin…) se rapporte « no
 **Étape e) — 0.329 : objets, banque, tri, marché** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Coffre à apparence très rempli : l'import s'enregistre et se recharge après un rechargement du plugin.
-- [ ] Fiche d'un objet ouverte directement (onglet Aperçu) : le stock de l'en-tête est juste ; pour un cristal, les servants montrent « ≥ ».
+- [x] Fiche d'un objet ouverte directement (onglet Aperçu) : le stock de l'en-tête est juste ; pour un cristal, les servants montrent « ≥ ».
 - [x] Survoler vite plusieurs objets avec prix au survol : pas de « prix indisponibles » pendant la pause de 3 s.
 - [ ] Historique des objets : « Retour » revient à l'objet précédent ; le fil d'Ariane reste court.
 
@@ -2692,7 +2692,7 @@ Une étape impossible (pas de compagnie, pas de sous-marin…) se rapporte « no
 
 - [ ] (0.1774) Mode développeur actif, faites un gain ou une dépense que Tensho classe « Autre » : 3 s après, dalamud.log a une ligne « Gil other context: … » avec les messages et fenêtres autour, sans aucun nom de personnage, de servant, de monde ni de compagnie.
 
-- [ ] (0.1775) Pendant que vous jouez, fenêtre de chat Tensho ouverte avec un long historique, rechargez Tensho : le chat montre ses lignes en moins de 3 s ; une minute après, dalamud.log a la ligne « Chat window in the first minute after the load (X-558): … » (combien d'images de 16 ms ou plus) et « Chat window: lines first drawn … ms after the load » (à rapporter si plus de 3000 ms ou des images de 16 ms ou plus).
+- [x] (0.1775) Pendant que vous jouez, fenêtre de chat Tensho ouverte avec un long historique, rechargez Tensho : le chat montre ses lignes en moins de 3 s ; une minute après, dalamud.log a la ligne « Chat window in the first minute after the load (X-558): … » (combien d'images de 16 ms ou plus) et « Chat window: lines first drawn … ms after the load » (à rapporter si plus de 3000 ms ou des images de 16 ms ou plus).
 
 - [ ] (0.1776) Chat Tensho, historique gardé : rechargez Tensho avec un autre onglet affiché, et faites-vous envoyer un message (ou dites un mot d'alerte) dans les secondes qui suivent : l'onglet qui le montre garde son non-lu et son « ! ».
 
@@ -2941,7 +2941,7 @@ Une étape impossible (pas de compagnie, pas de sous-marin…) se rapporte « no
 
 **0.506 : vidéos et guides de la communauté (ONBOARD-001, lots 7 et 8)** — après une release
 
-- [ ] (0.506) Aide (ou le « ? » d'une page) : cliquer « Vidéos et guides » : « Pas encore de vidéo ni de guide pour cette page ». Quand une ligne sera ajoutée à la liste et publiée : son titre, l'adresse au survol, la question de confirmation, puis le navigateur s'ouvre.
+- [x] (0.506) Aide (ou le « ? » d'une page) : cliquer « Vidéos et guides » : « Pas encore de vidéo ni de guide pour cette page ». Quand une ligne sera ajoutée à la liste et publiée : son titre, l'adresse au survol, la question de confirmation, puis le navigateur s'ouvre.
 
 **0.505 : guide des premiers pas (ONBOARD-001, lots 4 à 6)** — à voir en jouant
 
@@ -2952,9 +2952,9 @@ Une étape impossible (pas de compagnie, pas de sous-marin…) se rapporte « no
 
 **0.502 : aide (ONBOARD-001, lot 1)** — à voir en jouant
 
-- [ ] (0.502) Le « ? » à côté du titre de la fenêtre Tensho explique la page ouverte, sur toutes les pages ; « Toute l'aide » ouvre la page Aide.
+- [x] (0.502) Le « ? » à côté du titre de la fenêtre Tensho explique la page ouverte, sur toutes les pages ; « Toute l'aide » ouvre la page Aide.
 - [x] Page Aide : la recherche trouve une page d'après ce qu'elle fait ; « Ouvrir cette page » y mène ; questions fréquentes.
-- [ ] 0.503 : première ouverture d'une page, un bandeau de deux lignes ; « Compris » le retire pour de bon ; « En savoir plus » ouvre l'aide. Réglage dans Paramètres › Général. Le « ? » dit ce qui est lu ou non sur ce personnage.
+- [x] 0.503 : première ouverture d'une page, un bandeau de deux lignes ; « Compris » le retire pour de bon ; « En savoir plus » ouvre l'aide. Réglage dans Paramètres › Général. Le « ? » dit ce qui est lu ou non sur ce personnage.
 
 **0.501 : sonde des fenêtres du dresseur** — à faire en jeu, mode développeur
 
@@ -3066,7 +3066,7 @@ Une étape impossible (pas de compagnie, pas de sous-marin…) se rapporte « no
 
 **0.475 : galerie de Mes outils** — TEMPLATES-001
 
-- [ ] (0.475) Tensho › Mes outils › Galerie : cliquez « Charger la liste », puis « Voir » sur un outil : son contenu s'affiche en entier ; « Installer » l'ajoute à vos outils.
+- [x] (0.475) Tensho › Mes outils › Galerie : cliquez « Charger la liste », puis « Voir » sur un outil : son contenu s'affiche en entier ; « Installer » l'ajoute à vos outils.
 
 **0.474 : éditeur de Mes outils** — TEMPLATES-001
 
@@ -3379,7 +3379,7 @@ Une étape impossible (pas de compagnie, pas de sous-marin…) se rapporte « no
 
 **0.406 : règle des langues** — pendant la campagne de tests en jeu de la fin (phase 6)
 
-- [ ] Plugin en anglais, mode développeur coché : les messages et libellés de développeur sont en anglais ; plugin en français : en français.
+- [x] Plugin en anglais, mode développeur coché : les messages et libellés de développeur sont en anglais ; plugin en français : en français.
 
 **0.405 : carnets du jeu** — pendant la campagne de tests en jeu de la fin (phase 6)
 
