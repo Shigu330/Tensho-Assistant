@@ -51,12 +51,12 @@ repris dans la ligne « Tests » de chaque entrée du [CHANGELOG](../../CHANGELO
 Contrôles de base à refaire après un changement de cycle de vie : rechargement/déchargement répété sans double callback ni commande
 orpheline ; préférence « ouvrir au chargement » respectée ; la carte du jeu (touche M) revient normale une fois le plugin déchargé.
 
-### Essais en jeu (liste produite le 2026-11-28, version 0.1950.0)
+### Essais en jeu (liste produite le 2026-11-28, version 0.1951.0)
 
 <!-- q:public -->
-_In English: this page is the author's in-game test list, in French only. Produced on 2026-11-28 for version 0.1950.0. It has 1274 boxes: 682 ticked, 592 empty. 1091 boxes follow the test source: 499 done (ticked), 583 open, 7 could not be tried, 2 failed (empty). The 183 other ticked boxes come from before the source existed (reported before it, kept as they are). Apart: 39 tests of the source have no box on this page (29 done, 9 open, 1 could not be tried, 0 failed)._
+_In English: this page is the author's in-game test list, in French only. Produced on 2026-11-28 for version 0.1951.0. It has 1275 boxes: 692 ticked, 583 empty. 1092 boxes follow the test source: 509 done (ticked), 574 open, 7 could not be tried, 2 failed (empty). The 183 other ticked boxes come from before the source existed (reported before it, kept as they are). Apart: 39 tests of the source have no box on this page (29 done, 9 open, 1 could not be tried, 0 failed)._
 
-Liste produite le 2026-11-28 (version 0.1950.0) : 1274 cases, 682 cochées, 592 vides. 1091 cases suivent la source des essais : 499 faits (cochées), 583 ouverts, 7 pas pu, 2 en échec (vides). Les 183 autres cases cochées viennent d'avant la source (essais rapportés avant qu'elle existe, gardés tels quels). À part : 39 essais de la source n'ont pas de case sur cette page (29 faits, 9 ouverts, 1 pas pu, 0 en échec).
+Liste produite le 2026-11-28 (version 0.1951.0) : 1275 cases, 692 cochées, 583 vides. 1092 cases suivent la source des essais : 509 faits (cochées), 574 ouverts, 7 pas pu, 2 en échec (vides). Les 183 autres cases cochées viennent d'avant la source (essais rapportés avant qu'elle existe, gardés tels quels). À part : 39 essais de la source n'ont pas de case sur cette page (29 faits, 9 ouverts, 1 pas pu, 0 en échec).
 <!-- /q:public -->
 
 Parcours de la campagne de la phase 6, les mêmes essais rangés par activité : [TESTING-ROUTE.md](TESTING-ROUTE.md) (2026-11-09).
@@ -229,7 +229,7 @@ Une étape impossible (pas de compagnie, pas de sous-marin…) se rapporte « no
 - [ ] Coffre à apparence très rempli : l'import s'enregistre et se recharge après un rechargement du plugin.
 - [x] Fiche d'un objet ouverte directement (onglet Aperçu) : le stock de l'en-tête est juste ; pour un cristal, les servants montrent « ≥ ».
 - [x] Survoler vite plusieurs objets avec prix au survol : pas de « prix indisponibles » pendant la pause de 3 s.
-- [ ] Historique des objets : « Retour » revient à l'objet précédent ; le fil d'Ariane reste court.
+- [x] Historique des objets : « Retour » revient à l'objet précédent ; le fil d'Ariane reste court.
 
 **Étape e) — 0.332 : cadre du jeu** — retiré en 0.510 (DEC-033), plus rien à tester
 
@@ -276,11 +276,11 @@ Une étape impossible (pas de compagnie, pas de sous-marin…) se rapporte « no
 - [x] Survol d'un objet vendable : sous chaque prix, « Dernière vente · moyenne · ventes par jour » ; les mêmes que la page de l'objet
   sur universalis.app pour votre monde.
 - [x] Survol d'une pile de l'inventaire : « Pile de N : ~X » (N = la quantité de la case) ; pas de ligne pour un objet hors de vos sacs.
-- [ ] (0.343) Survoler un objet vendable et garder Ctrl+Alt enfoncés : une seule nouvelle demande (« Consulté » ne change qu'une fois). Paramètres › Données et sources › Sources communautaires : décocher « Ctrl+Alt actualise le prix survolé » : Ctrl+Alt ne change plus rien.
+- [x] (0.343) Survoler un objet vendable et garder Ctrl+Alt enfoncés : une seule nouvelle demande (« Consulté » ne change qu'une fois). Paramètres › Données et sources › Sources communautaires : décocher « Ctrl+Alt actualise le prix survolé » : Ctrl+Alt ne change plus rien.
 
 **Étape g) — 0.344 : I-02 monnaies et alertes de plafond** — pendant la campagne de tests en jeu de la fin (phase 6)
 
-- [ ] (0.344) Objets › Rangements, onglet « Devises » : soldes et plafonds identiques à la fenêtre Monnaies du jeu (sceaux de votre compagnie au plafond de votre rang, Centurio, gemmes bicolores, assignats, mémoquartz) ; « Mémoquartz limités cette semaine » égal au jeu.
+- [x] (0.344) Objets › Rangements, onglet « Devises » : soldes et plafonds identiques à la fenêtre Monnaies du jeu (sceaux de votre compagnie au plafond de votre rang, Centurio, gemmes bicolores, assignats, mémoquartz) ; « Mémoquartz limités cette semaine » égal au jeu.
   rang, Centurio, gemmes bicolores, assignats, mémoquartz) ; « Mémoquartz limités cette semaine » égal au jeu.
 - [ ] (0.344) Avec deux personnages : connectez-vous sur l'un, puis changez de personnage. À l'arrivée, aucun message d'alerte de plafond de devise dans le chat ; Tensho › Rangements › Devises montre les devises du nouveau personnage, pas celles du premier.
 
@@ -290,16 +290,16 @@ Une étape impossible (pas de compagnie, pas de sous-marin…) se rapporte « no
 
 **Étape g) — 0.346 : I-06 prix PNJ, I-07 sous-cotation** — pendant la campagne de tests en jeu de la fin (phase 6)
 
-- [ ] Survol d'une pile vendable au PNJ : « Vente au PNJ (NQ) : X gils l'unité, pile de N : Y » ; comparer avec la vente à un PNJ.
-- [ ] Paramètres › Avancé › « Copier l'offre la plus basse moins 1 » activé : ouvrir les offres d'un objet au tableau des ventes ; le
+- [x] Survol d'une pile vendable au PNJ : « Vente au PNJ (NQ) : X gils l'unité, pile de N : Y » ; comparer avec la vente à un PNJ.
+- [x] Paramètres › Avancé › « Copier l'offre la plus basse moins 1 » activé : ouvrir les offres d'un objet au tableau des ventes ; le
   chat dit « offre la plus basse … prix copié … » et Ctrl+V colle ce prix ; une offre de vos servants n'est pas prise ; désactivé :
   rien n'est copié.
 
 **Étape g) — 0.347 : I-08 notes et étiquettes d'objets** — pendant la campagne de tests en jeu de la fin (phase 6)
 
-- [ ] Fiche d'un objet › onglet « Note » : écrire une note, cocher « Important » et « À vendre au PNJ » ; la note s'affiche au survol
+- [x] Fiche d'un objet › onglet « Note » : écrire une note, cocher « Important » et « À vendre au PNJ » ; la note s'affiche au survol
   de l'objet dans le jeu.
-- [ ] Ouvrir une boutique de PNJ avec ces objets dans les sacs : une ligne « À vendre au PNJ … ×n » et une ligne « Attention, objets
+- [x] Ouvrir une boutique de PNJ avec ces objets dans les sacs : une ligne « À vendre au PNJ … ×n » et une ligne « Attention, objets
   importants … » dans le chat ; une seule fois par ouverture ; avec « Son pour les objets importants », le son des alarmes.
 
 **Étape g) — 0.348 : I-10 rapport de rangement** — pendant la campagne de tests en jeu de la fin (phase 6)
@@ -308,7 +308,7 @@ Une étape impossible (pas de compagnie, pas de sous-marin…) se rapporte « no
 
 **Étape g) — 0.349 : X-07 liens wiki et Lodestone** — pendant la campagne de tests en jeu de la fin (phase 6)
 
-- [ ] Clic droit sur un objet › Tensho : « Wiki (anglais) » et « Lodestone » ouvrent la bonne page dans le navigateur.
+- [x] Clic droit sur un objet › Tensho : « Wiki (anglais) » et « Lodestone » ouvrent la bonne page dans le navigateur.
 
 **Étape g) — 0.350 : I-09 coffre de compagnie** — pendant la campagne de tests en jeu de la fin (phase 6)
 
@@ -325,7 +325,7 @@ Une étape impossible (pas de compagnie, pas de sous-marin…) se rapporte « no
 
 **Étape g) — 0.352 : I-11 conditions des articles de boutique** — pendant la campagne de tests en jeu de la fin (phase 6)
 
-- [ ] (0.352) Page PNJ marchands, un marchand dont un article demande une quête : après le prix, « Après la quête « … » (fait) » ou « (à faire) », comme dans votre journal de quêtes ; un article lié à un haut fait affiche « Après le haut fait « … » ».
+- [x] (0.352) Page PNJ marchands, un marchand dont un article demande une quête : après le prix, « Après la quête « … » (fait) » ou « (à faire) », comme dans votre journal de quêtes ; un article lié à un haut fait affiche « Après le haut fait « … » ».
   selon votre journal ; un article lié à un haut fait affiche son nom.
 
 **Étape g) — 0.353 : I-12 recherche d'objets avec filtres** — pendant la campagne de tests en jeu de la fin (phase 6)
@@ -2850,7 +2850,9 @@ Une étape impossible (pas de compagnie, pas de sous-marin…) se rapporte « no
 
 - [x] (0.1904) Découvertes avec GitHub connecté : lancer un échange (Monde › Découvertes) puis désactiver Tensho aussitôt dans /xlplugins : aucune erreur dans le journal ; réactiver Tensho : toujours connecté à GitHub, l'échange suivant se fait.
 
-- [ ] (0.1950) Ouvrir deux pages vides (par exemple une liste sans résultat dans Objets, et Alarmes sans alarme) : la ligne « rien ici » est grise atténuée, comme sur les autres pages, et passe à la ligne si la fenêtre est étroite.
+- [x] (0.1950) Ouvrir deux pages vides (par exemple une liste sans résultat dans Objets, et Alarmes sans alarme) : la ligne « rien ici » est grise atténuée, comme sur les autres pages, et passe à la ligne si la fenêtre est étroite.
+
+- [ ] (0.1951) Fenêtre de suivi ouverte sans aucune alarme activée : sa phrase « rien à suivre » tient sur une ligne, la fenêtre n'est pas une colonne étroite.
 
 **0.535 : interfaces** — à voir en jouant
 
