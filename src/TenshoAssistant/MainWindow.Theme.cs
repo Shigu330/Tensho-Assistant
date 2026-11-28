@@ -30,7 +30,7 @@ internal sealed partial class MainWindow
         var follow=localization.Format("Settings.ThemeFollow",detected is { } value
             ? localization.Format("Settings.ThemeDetected",localization.Get("Theme."+ThemePalettes.FromGame(value)),value):localization.Get("Settings.ThemeUnknown"));
         var mode=Math.Clamp(configuration.ThemeMode,0,Enum.GetValues<PluginTheme>().Length);
-        ImGui.SetNextItemWidth(320);
+        ImGui.SetNextItemWidth(Widths.Wide);
         if(ImGui.BeginCombo(localization.Get("Settings.Theme"),mode==0 ? follow:localization.Get("Theme."+(PluginTheme)(mode-1))))
         {
             try

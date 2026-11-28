@@ -71,14 +71,14 @@ internal sealed partial class MainWindow
         DrawPlannerStats(VesselKind.Submarine);
         // X-718 (0.1722): speed and range unknown (said above): nothing to search with.
         if(inputs.StatsFrom==VesselStatsSource.Unknown)return;
-        ImGui.SetNextItemWidth(220);
+        ImGui.SetNextItemWidth(Widths.Medium);
         if(ImGui.BeginCombo(localization.Get("RoutePlanner.Goal")+"##PlannerGoal",localization.Get(RouteGoalKey(plannerGoal))))
         {
             try{foreach(var goal in Enum.GetValues<RouteGoal>())if(ImGui.Selectable(localization.Get(RouteGoalKey(goal)),goal==plannerGoal))plannerGoal=goal;}
             finally{ImGui.EndCombo();}
         }
         Tip("RoutePlanner.GoalTip");
-        ImGui.SameLine();ImGui.SetNextItemWidth(220);
+        ImGui.SameLine();ImGui.SetNextItemWidth(Widths.Medium);
         if(ImGui.BeginCombo(localization.Get("RoutePlanner.Price")+"##PlannerPrice",localization.Get(plannerMarket ? "RoutePlanner.PriceMarket":"RoutePlanner.PriceNpc")))
         {
             try
@@ -332,7 +332,7 @@ internal sealed partial class MainWindow
     {
         string Step(uint id)=>catalog.Sectors.TryGetValue(id,out var sector) ? localization.Format("RoutePlanner.UnlockStep",sector.Name,sector.RankReq):id.ToString(System.Globalization.CultureInfo.InvariantCulture);
         if(plannerUnlockTarget!=0 && (!catalog.Sectors.TryGetValue(plannerUnlockTarget,out var aimed) || aimed.Map!=plannerMap))plannerUnlockTarget=0;
-        ImGui.SetNextItemWidth(260);
+        ImGui.SetNextItemWidth(Widths.Long);
         if(ImGui.BeginCombo(localization.Get("RoutePlanner.UnlockTarget")+"##PlannerUnlock",plannerUnlockTarget!=0 && catalog.Sectors.TryGetValue(plannerUnlockTarget,out var shown) ? shown.Name:"—"))
         {
             try

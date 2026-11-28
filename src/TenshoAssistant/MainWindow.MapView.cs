@@ -646,15 +646,15 @@ internal sealed partial class MainWindow
         ImGui.BeginDisabled(!settings.ShowPlaceNames && !(settings.ShowIconNames && settings.ShowFixedIcons));
         try
         {
-            var names=Math.Clamp(float.IsFinite(settings.PlaceNameScale) ? settings.PlaceNameScale:1,0.5f,1.5f)*100;ImGui.SetNextItemWidth(160);
+            var names=Math.Clamp(float.IsFinite(settings.PlaceNameScale) ? settings.PlaceNameScale:1,0.5f,1.5f)*100;ImGui.SetNextItemWidth(Widths.Short);
             if(ImGui.SliderFloat(localization.Get("MapView.PlaceNameScale"),ref names,50,150,"%.0f %%")){settings.PlaceNameScale=names/100;changed=true;}
             Tip("SettingTips.PlaceNameScale");
             if(DefaultButton("PlaceNameScale",settings.PlaceNameScale!=MapDefaults.PlaceNameScale)){settings.PlaceNameScale=MapDefaults.PlaceNameScale;changed=true;}
-            var nameFollow=MapViewSettings.ClampFollow(settings.NameZoomFollow ?? settings.ZoomFollow)*100;ImGui.SetNextItemWidth(160);
+            var nameFollow=MapViewSettings.ClampFollow(settings.NameZoomFollow ?? settings.ZoomFollow)*100;ImGui.SetNextItemWidth(Widths.Short);
             if(ImGui.SliderFloat(localization.Get("MapView.NameZoomFollow"),ref nameFollow,0,100,"%.0f %%")){settings.NameZoomFollow=nameFollow/100;changed=true;}
             Tip("MapView.NameZoomFollowHelp");
             if(DefaultButton("NameZoomFollow",settings.NameZoomFollow is not null)){settings.NameZoomFollow=null;changed=true;}
-            var nameMinimum=Math.Clamp(settings.NameMinZoom,0,4)*100;ImGui.SetNextItemWidth(160);
+            var nameMinimum=Math.Clamp(settings.NameMinZoom,0,4)*100;ImGui.SetNextItemWidth(Widths.Short);
             if(ImGui.SliderFloat(localization.Get("MapView.NameMinZoom"),ref nameMinimum,0,200,"%.0f %%")){settings.NameMinZoom=nameMinimum/100;changed=true;}
             Tip("MapView.NameMinZoomHelp");
             if(DefaultButton("NameMinZoom",settings.NameMinZoom!=MapDefaults.NameMinZoom)){settings.NameMinZoom=MapDefaults.NameMinZoom;changed=true;}
@@ -711,11 +711,11 @@ internal sealed partial class MainWindow
             ImGui.BeginDisabled(!settings.GatheringLabels);
             try
             {
-                var labelMinimum=Math.Clamp(settings.GatheringLabelMinZoom,0,4)*100;ImGui.SetNextItemWidth(160);
+                var labelMinimum=Math.Clamp(settings.GatheringLabelMinZoom,0,4)*100;ImGui.SetNextItemWidth(Widths.Short);
                 if(ImGui.SliderFloat(localization.Get("MapView.GatheringLabelMinZoom"),ref labelMinimum,0,200,"%.0f %%")){settings.GatheringLabelMinZoom=labelMinimum/100;changed=true;}
                 Tip("MapView.GatheringLabelMinZoomHelp");
                 if(DefaultButton("GatheringLabelMinZoom",settings.GatheringLabelMinZoom!=MapDefaults.GatheringLabelMinZoom)){settings.GatheringLabelMinZoom=MapDefaults.GatheringLabelMinZoom;changed=true;}
-                var labelScale=Math.Clamp(settings.GatheringLabelScale,0.5f,2f)*100;ImGui.SetNextItemWidth(160);
+                var labelScale=Math.Clamp(settings.GatheringLabelScale,0.5f,2f)*100;ImGui.SetNextItemWidth(Widths.Short);
                 if(ImGui.SliderFloat(localization.Get("MapView.GatheringLabelScale"),ref labelScale,50,200,"%.0f %%")){settings.GatheringLabelScale=labelScale/100;changed=true;}
                 Tip("MapView.GatheringLabelScaleHelp");
                 if(DefaultButton("GatheringLabelScale",settings.GatheringLabelScale!=MapDefaults.GatheringLabelScale)){settings.GatheringLabelScale=MapDefaults.GatheringLabelScale;changed=true;}
@@ -781,10 +781,10 @@ internal sealed partial class MainWindow
             try{changed|=SettingBox("MapView.AboveWish",settings.AboveWish,value=>settings.AboveWish=value,MapDefaults.AboveWish);}
             finally{ImGui.EndDisabled();}
             changed|=SettingBox("MapView.MonsterIconsHideInCombat",settings.MonsterIconsHideInCombat,value=>settings.MonsterIconsHideInCombat=value,MapDefaults.MonsterIconsHideInCombat);
-            var iconSize=Math.Clamp(settings.MonsterIconSize,16,96);ImGui.SetNextItemWidth(160);
+            var iconSize=Math.Clamp(settings.MonsterIconSize,16,96);ImGui.SetNextItemWidth(Widths.Short);
             if(ImGui.SliderInt(localization.Get("MapView.MonsterIconSize"),ref iconSize,16,96)){settings.MonsterIconSize=iconSize;changed=true;}
             Tip("MapView.MonsterIconSizeTip");
-            var iconDistance=Math.Clamp(settings.MonsterIconDistance,5,150);ImGui.SetNextItemWidth(160);
+            var iconDistance=Math.Clamp(settings.MonsterIconDistance,5,150);ImGui.SetNextItemWidth(Widths.Short);
             if(ImGui.SliderFloat(localization.Get("MapView.MonsterIconDistance"),ref iconDistance,5,150,"%.0f")){settings.MonsterIconDistance=iconDistance;changed=true;}
             Tip("MapView.MonsterIconDistanceTip");
             ImGui.Unindent();
@@ -793,7 +793,7 @@ internal sealed partial class MainWindow
         changed|=SettingBox("MapView.HeightArrows",settings.HeightArrows,value=>settings.HeightArrows=value,MapDefaults.HeightArrows);
         if(settings.HeightArrows)
         {
-            var heightYalms=Math.Clamp(settings.HeightArrowYalms,2,50);ImGui.SetNextItemWidth(160);
+            var heightYalms=Math.Clamp(settings.HeightArrowYalms,2,50);ImGui.SetNextItemWidth(Widths.Short);
             if(ImGui.SliderFloat(localization.Get("MapView.HeightArrowYalms"),ref heightYalms,2,50,"%.0f")){settings.HeightArrowYalms=heightYalms;changed=true;}
             Tip("MapView.HeightArrowYalmsTip");
             if(DefaultButton("HeightArrowYalms",settings.HeightArrowYalms!=MapDefaults.HeightArrowYalms)){settings.HeightArrowYalms=MapDefaults.HeightArrowYalms;changed=true;}
@@ -851,18 +851,18 @@ internal sealed partial class MainWindow
         }
         finally{ImGui.EndDisabled();}
         // 0.288 (user request): marker size, cone length and cone opacity, each with its tooltip and « ↺ ».
-        var marker=MapViewSettings.ClampMarker(settings.PlayerIconScale)*100;ImGui.SetNextItemWidth(160);
+        var marker=MapViewSettings.ClampMarker(settings.PlayerIconScale)*100;ImGui.SetNextItemWidth(Widths.Short);
         if(ImGui.SliderFloat(localization.Get("MapView.PlayerIconScale"),ref marker,50,300,"%.0f %%")){settings.PlayerIconScale=marker/100;changed=true;}
         Tip("SettingTips.PlayerIconScale");
         if(DefaultButton("PlayerIconScale",settings.PlayerIconScale!=MapDefaults.PlayerIconScale)){settings.PlayerIconScale=MapDefaults.PlayerIconScale;changed=true;}
         ImGui.BeginDisabled(!settings.ShowViewCone);
         try
         {
-            var cone=MapViewSettings.ClampMarker(settings.ViewConeScale)*100;ImGui.SetNextItemWidth(160);
+            var cone=MapViewSettings.ClampMarker(settings.ViewConeScale)*100;ImGui.SetNextItemWidth(Widths.Short);
             if(ImGui.SliderFloat(localization.Get("MapView.ViewConeScale"),ref cone,50,300,"%.0f %%")){settings.ViewConeScale=cone/100;changed=true;}
             Tip("SettingTips.ViewConeScale");
             if(DefaultButton("ViewConeScale",settings.ViewConeScale!=MapDefaults.ViewConeScale)){settings.ViewConeScale=MapDefaults.ViewConeScale;changed=true;}
-            var coneOpacity=MapViewSettings.ClampConeOpacity(settings.ViewConeOpacity)*100;ImGui.SetNextItemWidth(160);
+            var coneOpacity=MapViewSettings.ClampConeOpacity(settings.ViewConeOpacity)*100;ImGui.SetNextItemWidth(Widths.Short);
             if(ImGui.SliderFloat(localization.Get("MapView.ViewConeOpacity"),ref coneOpacity,0,100,"%.0f %%")){settings.ViewConeOpacity=coneOpacity/100;changed=true;}
             Tip("SettingTips.ViewConeOpacity");
             if(DefaultButton("ViewConeOpacity",settings.ViewConeOpacity!=MapDefaults.ViewConeOpacity)){settings.ViewConeOpacity=MapDefaults.ViewConeOpacity;changed=true;}
@@ -883,12 +883,12 @@ internal sealed partial class MainWindow
         ImGui.BeginDisabled(!settings.OverlayControls);
         try{ImGui.Indent();changed|=SettingBox("MapView.OverlayZoneName",settings.OverlayZoneName,value=>settings.OverlayZoneName=value,MapDefaults.OverlayZoneName);ImGui.Unindent();}
         finally{ImGui.EndDisabled();}
-        var scale=MapViewSettings.ClampScale(settings.IconScale)*100;ImGui.SetNextItemWidth(160);
+        var scale=MapViewSettings.ClampScale(settings.IconScale)*100;ImGui.SetNextItemWidth(Widths.Short);
         if(ImGui.SliderFloat(localization.Get("MapView.IconScale"),ref scale,50,200,"%.0f %%")){settings.IconScale=scale/100;changed=true;}
         Tip("SettingTips.IconScale");
         if(DefaultButton("IconScale",settings.IconScale!=MapDefaults.IconScale)){settings.IconScale=MapDefaults.IconScale;changed=true;}
         // 0.542 (P1).
-        ImGui.SetNextItemWidth(160);
+        ImGui.SetNextItemWidth(Widths.Short);
         if(ImGui.BeginCombo(localization.Get("MapView.OpenZoom")+"###MapOpenZoom",localization.Get("MapView.OpenZoom"+settings.OpenZoom)))
         {
             foreach(var mode in Enum.GetValues<MapOpenZoom>())
@@ -899,25 +899,25 @@ internal sealed partial class MainWindow
         if(DefaultButton("OpenZoom",settings.OpenZoom!=MapDefaults.OpenZoom)){settings.OpenZoom=MapDefaults.OpenZoom;changed=true;}
         if(settings.OpenZoom==MapOpenZoom.Fixed)
         {
-            var opening=MapProjection.ClampZoom(settings.OpenZoomValue)*100;ImGui.SetNextItemWidth(160);
+            var opening=MapProjection.ClampZoom(settings.OpenZoomValue)*100;ImGui.SetNextItemWidth(Widths.Short);
             if(ImGui.SliderFloat(localization.Get("MapView.OpenZoomValue"),ref opening,15,400,"%.0f %%")){settings.OpenZoomValue=opening/100;changed=true;}
             Tip("MapView.OpenZoomValueHelp");
             if(DefaultButton("OpenZoomValue",settings.OpenZoomValue!=MapDefaults.OpenZoomValue)){settings.OpenZoomValue=MapDefaults.OpenZoomValue;changed=true;}
         }
-        var focus=MapFocusZoom*100;ImGui.SetNextItemWidth(160);
+        var focus=MapFocusZoom*100;ImGui.SetNextItemWidth(Widths.Short);
         if(ImGui.SliderFloat(localization.Get("MapView.FocusZoom"),ref focus,15,400,"%.0f %%")){settings.FocusZoom=focus/100;changed=true;}
         Tip("MapView.FocusZoomHelp");
         if(DefaultButton("FocusZoom",settings.FocusZoom!=MapDefaults.FocusZoom)){settings.FocusZoom=MapDefaults.FocusZoom;changed=true;}
-        var wheel=(Math.Clamp(float.IsFinite(settings.WheelStep) ? settings.WheelStep:1.15f,1.02f,1.5f)-1)*100;ImGui.SetNextItemWidth(160);
+        var wheel=(Math.Clamp(float.IsFinite(settings.WheelStep) ? settings.WheelStep:1.15f,1.02f,1.5f)-1)*100;ImGui.SetNextItemWidth(Widths.Short);
         if(ImGui.SliderFloat(localization.Get("MapView.WheelStep"),ref wheel,2,50,"%.0f %%")){settings.WheelStep=1+wheel/100;changed=true;}
         Tip("MapView.WheelStepHelp");
         if(DefaultButton("WheelStep",settings.WheelStep!=MapDefaults.WheelStep)){settings.WheelStep=MapDefaults.WheelStep;changed=true;}
         changed|=SettingBox("MapView.WheelInvert",settings.WheelInvert,value=>settings.WheelInvert=value,MapDefaults.WheelInvert);
-        var follow=MapViewSettings.ClampFollow(settings.ZoomFollow)*100;ImGui.SetNextItemWidth(160);
+        var follow=MapViewSettings.ClampFollow(settings.ZoomFollow)*100;ImGui.SetNextItemWidth(Widths.Short);
         if(ImGui.SliderFloat(localization.Get("MapView.ZoomFollow"),ref follow,0,100,"%.0f %%")){settings.ZoomFollow=follow/100;changed=true;}
         Tip("MapView.ZoomFollowHelp");
         if(DefaultButton("ZoomFollow",settings.ZoomFollow!=MapDefaults.ZoomFollow)){settings.ZoomFollow=MapDefaults.ZoomFollow;changed=true;}
-        var opacity=MapViewSettings.ClampOpacity(settings.Opacity)*100;ImGui.SetNextItemWidth(160);
+        var opacity=MapViewSettings.ClampOpacity(settings.Opacity)*100;ImGui.SetNextItemWidth(Widths.Short);
         if(ImGui.SliderFloat(localization.Get("MapView.Opacity"),ref opacity,20,100,"%.0f %%")){settings.Opacity=opacity/100;changed=true;}
         Tip("SettingTips.Opacity");
         if(DefaultButton("Opacity",settings.Opacity!=MapDefaults.Opacity)){settings.Opacity=MapDefaults.Opacity;changed=true;}
@@ -1101,7 +1101,7 @@ internal sealed partial class MainWindow
                 ImGui.SameLine();
                 var percent=(visible ? own:1)*100;
                 ImGui.BeginDisabled(!visible);
-                ImGui.SetNextItemWidth(110);
+                ImGui.SetNextItemWidth(Widths.NumberWide);
                 if(ImGui.SliderFloat("##Size",ref percent,50,200,"%.0f %%")){settings.SetSize(icon,scope,percent/100);changed=true;}
                 ImGui.EndDisabled();
                 Tip("MapView.IconSizeTip");
@@ -1111,7 +1111,7 @@ internal sealed partial class MainWindow
                 var layer=TenshoGlyph(icon) is not null || icon is TreasureIcon or FlagIcon;
                 var priority=scope==0 ? settings.PriorityOf(icon,0):settings.PriorityOf(icon,map.MapId);
                 ImGui.BeginDisabled(layer);
-                try{ImGui.SetNextItemWidth(70);if(ImGui.InputInt("##Priority",ref priority,1)){settings.SetPriority(icon,scope,priority);changed=true;}}
+                try{ImGui.SetNextItemWidth(Widths.Tiny);if(ImGui.InputInt("##Priority",ref priority,1)){settings.SetPriority(icon,scope,priority);changed=true;}}
                 finally{ImGui.EndDisabled();}
                 if(layer)Tip("MapView.IconsLayerFixed");
                 else Tip("MapView.IconsPriority");

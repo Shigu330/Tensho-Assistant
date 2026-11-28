@@ -79,7 +79,7 @@ internal sealed partial class MainWindow
         var plan=PlannedBuild(catalog,buildVesselKey,vessel);
         var read=ReadBuild(vessel);
         var ranks=kind==VesselKind.Submarine ? catalog.SubmarineRanks:catalog.AirshipRanks;
-        ImGui.SameLine();ImGui.SetNextItemWidth(110);
+        ImGui.SameLine();ImGui.SetNextItemWidth(Widths.NumberWide);
         // 0.331 (audit): no disk write per key press or +/- step: the edited rank drives the page at once and is saved when the field is left.
         var rank=buildRankEdit is { } pending && pending.Key==buildVesselKey ? pending.Rank:plan.Rank;
         if(ImGui.InputInt(localization.Get("VesselBuilds.Rank")+"##BuildRank",ref rank))buildRankEdit=(buildVesselKey,Math.Clamp(rank,1,VesselBuilds.MaxRank(ranks)));

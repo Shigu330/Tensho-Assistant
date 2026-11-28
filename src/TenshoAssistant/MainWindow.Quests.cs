@@ -85,7 +85,7 @@ internal sealed partial class MainWindow
         ImGui.SetNextItemWidth(-1);
         InputWithHint("##QuestSearch", "QuestsBrowser.Search", ref questQuery, 128);
         Tip("QuestsBrowser.SearchTip");
-        ImGui.SetNextItemWidth(260);
+        ImGui.SetNextItemWidth(Widths.Long);
         if (ImGui.BeginCombo(localization.Get("QuestsBrowser.Section")+"###QuestSection", questSection.Length == 0 ? localization.Get("QuestsBrowser.All") : QuestStatLabel(questSection, questSectionStats)))
         {
             try
@@ -98,7 +98,7 @@ internal sealed partial class MainWindow
         }
         Tip("QuestsBrowser.SectionTip");
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(260);
+        ImGui.SetNextItemWidth(Widths.Long);
         if (ImGui.BeginCombo(localization.Get("QuestsBrowser.Category")+"###QuestCategory", string.IsNullOrWhiteSpace(questCategory) ? localization.Get("QuestsBrowser.All") : QuestStatLabel(questCategory, questGenreStats)))
         {
             try
@@ -128,10 +128,10 @@ internal sealed partial class MainWindow
         }
         // 0.550 (T3).
         var levelFrom = configuration.QuestList.LevelFrom; var levelTo = configuration.QuestList.LevelTo;
-        ImGui.SetNextItemWidth(90);
+        ImGui.SetNextItemWidth(Widths.Number);
         var levelsChanged = ImGui.InputInt(localization.Get("QuestsBrowser.LevelFrom") + "###QuestLevelFrom", ref levelFrom);
         Tip("QuestsBrowser.LevelFromTip");
-        ImGui.SameLine(); ImGui.SetNextItemWidth(90);
+        ImGui.SameLine(); ImGui.SetNextItemWidth(Widths.Number);
         levelsChanged |= ImGui.InputInt(localization.Get("QuestsBrowser.LevelTo") + "###QuestLevelTo", ref levelTo);
         Tip("QuestsBrowser.LevelToTip");
         if (levelsChanged)

@@ -46,17 +46,17 @@ internal sealed partial class MainWindow
         ImGui.SetNextItemWidth(180);InputWithHint("###PlaceName","Places.Name",ref placeName,PlaceDirectory.TextLimit);Tip("Places.NameTip");
         ImGui.SameLine();ImGui.SetNextItemWidth(120);InputWithHint("###PlaceWorld","Places.World",ref placeWorld,PlaceDirectory.TextLimit);Tip("Places.WorldTip");
         placeDistrict=Math.Clamp(placeDistrict,0,districts.Count-1);
-        ImGui.SetNextItemWidth(160);
+        ImGui.SetNextItemWidth(Widths.Short);
         if(ImGui.BeginCombo(localization.Get("Places.District")+"###PlaceDistrict",districts[placeDistrict].Name))
         {
             try{for(var index=0;index<districts.Count;index++)if(ImGui.Selectable($"{districts[index].Name}##District{index}",index==placeDistrict))placeDistrict=index;}
             finally{ImGui.EndCombo();}
         }
         Tip("Places.DistrictTip");
-        ImGui.SetNextItemWidth(90);ImGui.InputInt(localization.Get("Places.Ward")+"###PlaceWard",ref placeWard,0);Tip("Places.WardTip");
-        ImGui.SameLine();ImGui.SetNextItemWidth(90);ImGui.InputInt((placeApartment ? localization.Get("Places.ApartmentRoom"):localization.Get("Places.Plot"))+"###PlacePlot",ref placePlot,0);Tip("Places.PlotTip");
+        ImGui.SetNextItemWidth(Widths.Number);ImGui.InputInt(localization.Get("Places.Ward")+"###PlaceWard",ref placeWard,0);Tip("Places.WardTip");
+        ImGui.SameLine();ImGui.SetNextItemWidth(Widths.Number);ImGui.InputInt((placeApartment ? localization.Get("Places.ApartmentRoom"):localization.Get("Places.Plot"))+"###PlacePlot",ref placePlot,0);Tip("Places.PlotTip");
         ImGui.SameLine();ImGui.Checkbox(localization.Get("Places.Apartment")+"###PlaceApartment",ref placeApartment);Tip("Places.ApartmentTip");
-        ImGui.SetNextItemWidth(320);InputWithHint("###PlaceNote","Places.Note",ref placeNote,PlaceDirectory.TextLimit);Tip("Places.NoteTip");
+        ImGui.SetNextItemWidth(Widths.Wide);InputWithHint("###PlaceNote","Places.Note",ref placeNote,PlaceDirectory.TextLimit);Tip("Places.NoteTip");
         if(ImGui.SmallButton(localization.Get("Places.Add")))
         {
             var added=PlaceDirectory.Add(places,new(Guid.Empty,placeName,placeWorld,districts[placeDistrict].Territory,placeWard,placePlot,placeApartment,placeNote));

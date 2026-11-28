@@ -38,7 +38,7 @@ internal sealed partial class MainWindow
         var inputs=airshipInputs;
         // X-718 (0.1722): speed and range unknown (said above): nothing to search with.
         if(inputs.StatsFrom==VesselStatsSource.Unknown)return;
-        ImGui.SetNextItemWidth(220);
+        ImGui.SetNextItemWidth(Widths.Medium);
         if(ImGui.BeginCombo(localization.Get("RoutePlanner.Goal")+"##AirshipGoal",localization.Get("AirshipPlanner.Goal"+airshipGoal)))
         {
             try{foreach(var goal in Enum.GetValues<AirshipGoal>())if(ImGui.Selectable(localization.Get("AirshipPlanner.Goal"+goal),goal==airshipGoal))airshipGoal=goal;}

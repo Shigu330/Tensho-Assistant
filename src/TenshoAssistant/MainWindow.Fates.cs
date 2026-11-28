@@ -40,14 +40,14 @@ internal sealed partial class MainWindow
         // Once, on first showing: the zone you are in; afterwards, the one you chose.
         if(!fatesPlaced){fatesPlaced=true;fateZone=FieldBoard.ZoneOf(zones,CurrentTerritory?.Invoke() ?? 0);}
         fateZone=Math.Clamp(fateZone,0,zones.Count-1);
-        ImGui.SetNextItemWidth(260);
+        ImGui.SetNextItemWidth(Widths.Long);
         if(ImGui.BeginCombo("###FateZone",zones[fateZone].Name))
         {
             try{for(var index=0;index<zones.Count;index++)if(ImGui.Selectable($"{zones[index].Name} ({zones[index].Events.Count})##FateZone{index}",index==fateZone))fateZone=index;}
             finally{ImGui.EndCombo();}
         }
         Tip("Fates.ZoneTip");
-        ImGui.SameLine();ImGui.SetNextItemWidth(260);
+        ImGui.SameLine();ImGui.SetNextItemWidth(Widths.Long);
         InputWithHint("###FateQuery","Fates.Search",ref fateQuery,100);
         Tip("Fates.SearchTip");
         ImGui.TextDisabled(localization.Get("Fates.Hint"));

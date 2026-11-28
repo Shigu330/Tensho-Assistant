@@ -53,7 +53,7 @@ internal sealed partial class MainWindow
         var origins=choices.DistinctBy(value=>value.Key).ToArray();
         if(sortPreviewOrigin is { } selected && !origins.Any(origin=>origin.Key==selected)){sortPreviewOrigin=null;sortApplyError=null;}
         var chosenName=sortPreviewOrigin is { } chosenKey ? origins.First(origin=>origin.Key==chosenKey).Name:localization.Get("SortUi.Personal");
-        ImGui.SetNextItemWidth(260);
+        ImGui.SetNextItemWidth(Widths.Long);
         if (ImGui.BeginCombo(localization.Get("SortUi.Storage"), chosenName))
         {
             try

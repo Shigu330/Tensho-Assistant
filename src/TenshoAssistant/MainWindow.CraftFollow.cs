@@ -61,7 +61,7 @@ internal sealed partial class MainWindow
         if(!ReferenceEquals(craftFollowFrame,frame))UpdateCraftFollow(frame,recipe);
         if(craftFollowSources.Length==0)return;
         var current=craftFollowSources.FirstOrDefault(row=>row.Key==craftFollowChoice) ?? craftFollowSources[0];
-        ImGui.SetNextItemWidth(260);
+        ImGui.SetNextItemWidth(Widths.Long);
         if(ImGui.BeginCombo(localization.Get("CraftProjectionUi.FollowPick")+"###CraftFollowPick",current.Label))
         {
             try

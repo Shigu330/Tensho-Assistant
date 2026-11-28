@@ -23,7 +23,7 @@ internal sealed partial class MainWindow
         }
         else
         {
-            ImGui.SetNextItemWidth(320);
+            ImGui.SetNextItemWidth(Widths.Wide);
             edited=ImGui.InputText(localization.Get(labelKey)+"###"+labelKey,ref value,maximum);
             Tip(tipKey);
         }
@@ -37,7 +37,7 @@ internal sealed partial class MainWindow
         ImGui.TextDisabled(localization.Get("MyToolsEditor.Language"));
         if(DrawTextField("MyToolsEditor.Name","MyToolsEditor.NameTip",draft.Name,ToolTemplateFormat.MaxLabel,out var name))draft.Name=name;
         var author=draft.Author;
-        ImGui.SetNextItemWidth(320);
+        ImGui.SetNextItemWidth(Widths.Wide);
         if(ImGui.InputText(localization.Get("MyToolsEditor.Author")+"###MyToolAuthor",ref author,ToolTemplateFormat.MaxAuthor))draft.Author=author;
         Tip("MyToolsEditor.AuthorTip");
         var free=draft.FreeToShare;
@@ -45,7 +45,7 @@ internal sealed partial class MainWindow
         Tip("MyToolsEditor.FreeTip");
         var themes=new[]{localization.Get("MyToolsEditor.ThemeNone")}.Concat(Enum.GetValues<UI.PluginTheme>().Select(value=>localization.Get("Theme."+value))).ToArray();
         var theme=draft.Theme is null ? 0:ToolTemplateFormat.ThemeMode(draft.Theme);
-        ImGui.SetNextItemWidth(320);
+        ImGui.SetNextItemWidth(Widths.Wide);
         if(ImGui.Combo(localization.Get("MyToolsEditor.Theme")+"###MyToolTheme",ref theme,themes))draft.Theme=theme==0 ? null:ToolTemplateFormat.Themes[theme-1];
         Tip("MyToolsEditor.ThemeTip");
         for(var index=0;index<draft.Blocks.Count;index++)
@@ -125,7 +125,7 @@ internal sealed partial class MainWindow
                 if(DrawTextField("MyToolsEditor.Label","MyToolsEditor.LabelTip",timer.Label,ToolTemplateFormat.MaxLabel,out var label))timer=timer with {Label=label};
                 var at=(int)timer.Timer;
                 var names=Enum.GetValues<TemplateTimer>().Select(value=>localization.Get($"MyToolsEditor.Timer{value}")).ToArray();
-                ImGui.SetNextItemWidth(320);
+                ImGui.SetNextItemWidth(Widths.Wide);
                 if(ImGui.Combo(localization.Get("MyToolsEditor.TimerAt")+"###MyToolTimer",ref at,names))timer=timer with {Timer=(TemplateTimer)at};
                 Tip("MyToolsEditor.TimerAtTip");
                 if(timer.Timer==TemplateTimer.Hour)
@@ -142,7 +142,7 @@ internal sealed partial class MainWindow
             {
                 if(DrawTextField("MyToolsEditor.Label","MyToolsEditor.LabelTip",link.Label,ToolTemplateFormat.MaxLabel,out var label))link=link with {Label=label};
                 var url=link.Url;
-                ImGui.SetNextItemWidth(320);
+                ImGui.SetNextItemWidth(Widths.Wide);
                 if(ImGui.InputText(localization.Get("MyToolsEditor.Url")+"###MyToolUrl",ref url,ToolTemplateFormat.MaxLink))link=link with {Url=url};
                 Tip("MyToolsEditor.UrlTip");
                 return link;
@@ -155,7 +155,7 @@ internal sealed partial class MainWindow
     {
         var reset=(int)list.Reset;
         var names=Enum.GetValues<TemplateReset>().Select(value=>localization.Get($"MyToolsEditor.Reset{value}")).ToArray();
-        ImGui.SetNextItemWidth(320);
+        ImGui.SetNextItemWidth(Widths.Wide);
         if(ImGui.Combo(localization.Get("MyToolsEditor.Reset")+"###MyToolReset",ref reset,names))list=list with {Reset=(TemplateReset)reset};
         Tip("MyToolsEditor.ResetTip");
         var entries=list.Entries.ToList();
@@ -189,7 +189,7 @@ internal sealed partial class MainWindow
                 ImGui.TextUnformatted(item?.Name ?? localization.Format("MyToolsUi.UnknownItem",rows[index].Id));
                 ImGui.SameLine();
                 var wanted=rows[index].Wanted;
-                ImGui.SetNextItemWidth(90);
+                ImGui.SetNextItemWidth(Widths.Number);
                 if(ImGui.InputInt(localization.Get("MyToolsUi.ColumnWanted")+"###MyToolWanted",ref wanted,0))rows[index]=rows[index] with {Wanted=Math.Clamp(wanted,1,ToolTemplateFormat.MaxWanted)};
                 Tip("MyToolsEditor.WantedTip");
                 ImGui.SameLine();

@@ -144,7 +144,7 @@ internal sealed partial class MainWindow
     // Any zone with a weather table, by name (maps of the game, one entry per territory).
     private void DrawWeatherZonePicker(WeatherCatalog catalog)
     {
-        ImGui.SetNextItemWidth(260);
+        ImGui.SetNextItemWidth(Widths.Long);
         var open=ImGui.BeginCombo(localization.Get("Weather.Zone")+"##WeatherZone",weatherZone.Length>0 ? weatherZone:localization.Get("Weather.ChooseZone"));Tip("Weather.ZoneTip");if(!open)return;
         try
         {

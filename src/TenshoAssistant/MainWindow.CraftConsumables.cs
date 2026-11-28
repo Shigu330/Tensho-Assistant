@@ -70,7 +70,7 @@ internal sealed partial class MainWindow
 
     private bool CraftInput(string label,ref int value,bool? ok,string tip)
     {
-        ImGui.SetNextItemWidth(110);
+        ImGui.SetNextItemWidth(Widths.NumberWide);
         if(ok is { } good)ImGui.PushStyleColor(ImGuiCol.Text,good ? UI.FfxivTheme.Success:UI.FfxivTheme.Error);
         bool changed;
         try{changed=ImGui.InputInt(label,ref value,0);}
@@ -104,7 +104,7 @@ internal sealed partial class MainWindow
     private bool ConsumableCombo(string labelKey,string tipKey,IReadOnlyList<CraftConsumable> items,ref CraftConsumable? selected,ref bool hq)
     {
         var changed=false;
-        ImGui.SetNextItemWidth(260);
+        ImGui.SetNextItemWidth(Widths.Long);
         if(ImGui.BeginCombo(localization.Get(labelKey)+"###"+labelKey,selected?.Name ?? localization.Get("CraftSimulation.NoConsumable")))
         {
             try

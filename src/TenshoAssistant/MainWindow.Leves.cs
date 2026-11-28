@@ -76,7 +76,7 @@ internal sealed partial class MainWindow
         }
         if(progress is null)ImGui.TextDisabled(localization.Get(LeveProgressUnavailable?.Invoke()==true ? "Leves.Unavailable":"Leves.Unknown"));
         else ImGui.TextDisabled(localization.Format("Leves.State",progress.Allowances?.ToString() ?? "?",progress.Accepted.Count));
-        ImGui.SetNextItemWidth(220);
+        ImGui.SetNextItemWidth(Widths.Medium);
         InputWithHint("##LeveSearch","Leves.Search",ref leveQuery,64);
         Tip("Leves.SearchTip");
         ImGui.SameLine();ImGui.SetNextItemWidth(200);
@@ -93,10 +93,10 @@ internal sealed partial class MainWindow
         ImGui.SameLine();ImGui.SetNextItemWidth(200);
         FilterCombo("##LeveClient","Leves.AllClients",ref leveClient,leveClients);
         Tip("Leves.ClientTip");
-        ImGui.SetNextItemWidth(90);
+        ImGui.SetNextItemWidth(Widths.Number);
         if(ImGui.InputInt(localization.Get("Leves.MinLevel")+"##LeveMin",ref leveMinLevel))leveMinLevel=Math.Clamp(leveMinLevel,0,100);
         Tip("Leves.MinLevelTip");
-        ImGui.SameLine();ImGui.SetNextItemWidth(90);
+        ImGui.SameLine();ImGui.SetNextItemWidth(Widths.Number);
         if(ImGui.InputInt(localization.Get("Leves.MaxLevel")+"##LeveMax",ref leveMaxLevel))leveMaxLevel=Math.Clamp(leveMaxLevel,0,100);
         Tip("Leves.MaxLevelTip");
         foreach(var filter in Enum.GetValues<LeveStateFilter>())

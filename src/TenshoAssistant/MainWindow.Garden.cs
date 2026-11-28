@@ -300,20 +300,20 @@ internal sealed partial class MainWindow
 
     private void DrawNewBedCore(List<GardenBed> beds)
     {
-        ImGui.SetNextItemWidth(160);
+        ImGui.SetNextItemWidth(Widths.Short);
         InputWithHint("##NewBedPlace","Garden.PlaceHint",ref newBedPlace,GardenJournal.MaximumText);
         Tip("Garden.PlaceTip");
         ImGui.SameLine();
         DrawSeedPicker();
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(160);
+        ImGui.SetNextItemWidth(Widths.Short);
         if(InputWithHint("##NewBedSeed","Garden.SeedHint",ref newBedSeed,GardenJournal.MaximumText))newBedSeedId=0;
         Tip("Garden.SeedTip");
-        ImGui.SetNextItemWidth(110);
+        ImGui.SetNextItemWidth(Widths.NumberWide);
         if(ImGui.InputInt(localization.Get("Garden.Grow")+"##NewBedGrow",ref newBedGrow))newBedGrow=GardenJournal.ClampGrow(newBedGrow);
         Tip("Garden.GrowTip");
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(110);
+        ImGui.SetNextItemWidth(Widths.NumberWide);
         if(ImGui.InputInt(localization.Get("Garden.TendHours")+"##NewBedTend",ref newBedTend))newBedTend=GardenJournal.ClampTend(newBedTend);
         Tip("Garden.TendHoursTip");
         ImGui.SameLine();
@@ -337,7 +337,7 @@ internal sealed partial class MainWindow
         ImGui.BeginDisabled(seeds.Count==0);
         try
         {
-            ImGui.SetNextItemWidth(160);
+            ImGui.SetNextItemWidth(Widths.Short);
             var open=ImGui.BeginCombo("##NewBedSeedPick",localization.Get("Garden.SeedPick"));
             Tip(seeds.Count==0 ? "Garden.SeedPickNone":"Garden.SeedPickTip");
             if(open)

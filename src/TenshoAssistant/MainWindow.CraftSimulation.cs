@@ -115,7 +115,7 @@ internal sealed partial class MainWindow
     private string simulationRecipeQuery="",simulationRecipeShown="";private RecipeDefinition[] simulationRecipeHits=[];
     private void DrawSimulationRecipeSearch()
     {
-        ImGui.SetNextItemWidth(260);
+        ImGui.SetNextItemWidth(Widths.Long);
         InputWithHint("##SimulationRecipeSearch","CraftSimulation.RecipeSearch",ref simulationRecipeQuery,60);
         Tip("CraftSimulation.RecipeSearchTip");
         if(simulationRecipeQuery!=simulationRecipeShown)
@@ -229,8 +229,8 @@ internal sealed partial class MainWindow
             changed|=CraftInput(localization.Get("CraftSimulation.Level")+"###SimLevel",ref simulationLevel,simulationLevel>=recipe.Level,"CraftSimulation.LevelTip");
             changed|=CraftInput(localization.Get("CraftSimulation.Craftsmanship")+"###SimCraftsmanship",ref simulationCs,p.RequiredCraftsmanship>0 ? simulationCs>=p.RequiredCraftsmanship:null,"CraftSimulation.CraftsmanshipTip");
             changed|=CraftInput(localization.Get("CraftSimulation.Control")+"###SimControl",ref simulationControl,p.RequiredControl>0 ? simulationControl>=p.RequiredControl:null,"CraftSimulation.ControlTip");
-            ImGui.SetNextItemWidth(110); changed|=ImGui.InputInt(localization.Get("CraftSimulation.Cp")+"###SimCp",ref simulationCp,0); Tip("CraftSimulation.CpTip");
-            ImGui.SetNextItemWidth(110); changed|=ImGui.InputInt(localization.Format("CraftSimulation.StartingQuality",p.MaxStartingQuality)+"###SimQuality",ref simulationQuality,0); Tip("CraftSimulation.StartingQualityTip");
+            ImGui.SetNextItemWidth(Widths.NumberWide); changed|=ImGui.InputInt(localization.Get("CraftSimulation.Cp")+"###SimCp",ref simulationCp,0); Tip("CraftSimulation.CpTip");
+            ImGui.SetNextItemWidth(Widths.NumberWide); changed|=ImGui.InputInt(localization.Format("CraftSimulation.StartingQuality",p.MaxStartingQuality)+"###SimQuality",ref simulationQuality,0); Tip("CraftSimulation.StartingQualityTip");
             // C12 (0.669): from the HQ ingredients chosen.
             var hqIngredients=recipe.Ingredients.Select(ingredient=>(Ingredient:ingredient,Item:itemCatalog.State.Catalog?.Find(ingredient.ItemId))).Where(entry=>entry.Item is { CanBeHq:true }).ToArray();
             if(hqIngredients.Length>0 && p.MaxStartingQuality>0 && UI.UiComponents.TreeNode(localization.Get("CraftSimulation.HqIngredients")+"###SimHq"))
@@ -240,7 +240,7 @@ internal sealed partial class MainWindow
                     foreach(var (ingredient,item) in hqIngredients)
                     {
                         var hq=simulationHq.GetValueOrDefault(ingredient.ItemId);
-                        ImGui.SetNextItemWidth(110);
+                        ImGui.SetNextItemWidth(Widths.NumberWide);
                         if(ImGui.SliderInt($"{item!.Name}###SimHq{ingredient.ItemId}",ref hq,0,ingredient.Amount))
                         {
                             simulationHq[ingredient.ItemId]=hq;

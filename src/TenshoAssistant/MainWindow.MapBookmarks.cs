@@ -196,7 +196,7 @@ internal sealed partial class MainWindow
         Tip("MapsUi.BookmarkNameTip");
         string Name() => string.IsNullOrWhiteSpace(bookmarkName) ? MapBookmarks.DefaultName(selected.Zone, mapX, mapY) : bookmarkName;
         // 0.378 (g, M-08): optional group and note.
-        ImGui.SetNextItemWidth(160);
+        ImGui.SetNextItemWidth(Widths.Short);
         if (InputWithHint("##BookmarkGroup", "MapsUi.Group", ref bookmarkGroup, MapBookmarks.GroupLimit * 4 + 1)) bookmarkSaved = false;
         Tip("MapsUi.GroupTip");
         ImGui.SetNextItemWidth(-1);

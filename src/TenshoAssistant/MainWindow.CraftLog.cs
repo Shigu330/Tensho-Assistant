@@ -320,7 +320,7 @@ internal sealed partial class MainWindow
     {
         var target=CraftLogTarget(recipe);var maximum=recipe.Simulation!.Quality;
         if(!craftLogTargetEditing)craftLogTargetDraft=target;
-        ImGui.SetNextItemWidth(90);
+        ImGui.SetNextItemWidth(Widths.Number);
         ImGui.InputInt(localization.Get("CraftSearch.Target")+"###CraftLogTarget",ref craftLogTargetDraft,0);
         craftLogTargetEditing=ImGui.IsItemActive();
         Tip("CraftLogUi.TargetTip");

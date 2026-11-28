@@ -29,7 +29,7 @@ internal sealed partial class MainWindow
 
     private void DrawLootKindFilter(string id)
     {
-        ImGui.SetNextItemWidth(160);
+        ImGui.SetNextItemWidth(Widths.Short);
         if(ImGui.BeginCombo("##LootKind"+id,localization.Get("LootKind."+LootKinds[lootKind])))
         {
             try{for(var index=0;index<LootKinds.Length;index++)if(ImGui.Selectable(localization.Get("LootKind."+LootKinds[index]),lootKind==index))lootKind=index;}

@@ -94,7 +94,7 @@ internal sealed partial class MainWindow
             else log.Warning(localizing.Exception,"Island animal names could not be put in the game's language.");
         }
         ImGui.TextDisabled(localization.Format("Island.AnimalListSource",document.FetchedAt.ToLocalTime().ToString("g")));
-        ImGui.SetNextItemWidth(260);
+        ImGui.SetNextItemWidth(Widths.Long);
         InputWithHint("##IslandAnimalSearch","Island.AnimalSearch",ref islandAnimalSearch,100);
         Tip("Island.AnimalSearchTip");
         var map=maps.State.Catalog?.Find(IslandMapRow);

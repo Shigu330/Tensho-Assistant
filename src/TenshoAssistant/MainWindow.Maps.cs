@@ -91,8 +91,8 @@ internal sealed partial class MainWindow
         UI.UiComponents.SubTitle(selected.Zone);
         if(ImGui.SmallButton(localization.Get("MapsUi.Weather"))) OpenWeather(selected.TerritoryId,selected.Zone);
         ImGui.TextUnformatted($"{selected.Region} · {selected.Subzone}");
-        ImGui.SetNextItemWidth(110); var changedX = ImGui.InputFloat("X##MapX", ref mapX, 0, 0, "%.1f"); Tip("MapsUi.CoordinatesTip");
-        ImGui.SameLine(); ImGui.SetNextItemWidth(110); var changedY = ImGui.InputFloat("Y##MapY", ref mapY, 0, 0, "%.1f"); Tip("MapsUi.CoordinatesTip");
+        ImGui.SetNextItemWidth(Widths.NumberWide); var changedX = ImGui.InputFloat("X##MapX", ref mapX, 0, 0, "%.1f"); Tip("MapsUi.CoordinatesTip");
+        ImGui.SameLine(); ImGui.SetNextItemWidth(Widths.NumberWide); var changedY = ImGui.InputFloat("Y##MapY", ref mapY, 0, 0, "%.1f"); Tip("MapsUi.CoordinatesTip");
         if (changedX || changedY) bookmarkSaved = false;
         var valid = MapCatalog.CoordinatesValid(mapX, mapY);
         ImGui.BeginDisabled(!valid);

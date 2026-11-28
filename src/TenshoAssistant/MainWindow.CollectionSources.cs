@@ -30,7 +30,7 @@ internal sealed partial class MainWindow
             (object?)gatheringCatalog.State.Catalog,(object?)recipeCatalog.State.Catalog,(object?)quests.State.RewardIndex,(object?)collections.State);
         if(!Equals(catalogs,collectionSourceCatalogs)){collectionSourceCatalogs=catalogs;collectionSourceMasks.Clear();collectionSourceRevision++;}
         if(!HasSourceFilter(kind))return;
-        ImGui.SetNextItemWidth(260);
+        ImGui.SetNextItemWidth(Widths.Long);
         if(ImGui.BeginCombo(localization.Get("CollectionSources.Filter")+"##CollectionSource",SourceFilterLabel(collectionSourceFilter)))
         {
             try

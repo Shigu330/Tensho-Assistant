@@ -67,7 +67,7 @@ internal sealed partial class MainWindow
                 ItemTip(entry.ItemId);
                 ImGui.SameLine();
                 var quantity=(int)Math.Min(entry.Quantity,int.MaxValue);
-                ImGui.SetNextItemWidth(110);
+                ImGui.SetNextItemWidth(Widths.NumberWide);
                 if(ImGui.InputInt("###CraftListQuantity",ref quantity,0))store.Set(craftListIndex,CraftLists.SetQuantity(list,entry.ItemId,quantity));
                 Tip("CraftLists.QuantityTip");
                 ImGui.SameLine();

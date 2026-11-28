@@ -180,7 +180,7 @@ internal sealed partial class MainWindow
     {
         if (ImGui.SmallButton(localization.Get("Guide.Start"))) StartGuide();
         Tip("Guide.StartTip");
-        ImGui.SetNextItemWidth(320); InputWithHint("##HelpQuery", "Help.Search", ref helpQuery, 64); Tip("Help.SearchTip");
+        ImGui.SetNextItemWidth(Widths.Wide); InputWithHint("##HelpQuery", "Help.Search", ref helpQuery, 64); Tip("Help.SearchTip");
         DrawFaq();
         if (TenshoAssistant.UI.UiComponents.Header(localization.Get("Help.Pages"), ImGuiTreeNodeFlags.DefaultOpen))
         {

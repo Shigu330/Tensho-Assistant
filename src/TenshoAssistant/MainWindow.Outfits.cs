@@ -57,7 +57,7 @@ internal sealed partial class MainWindow
         var character=bankBridge.State.CharacterId;
         if(character==0){ImGui.TextDisabled(localization.Get("BankUi.LoginBank"));return;}
         var definitions=OutfitDefinitions?.Invoke() ?? [];
-        ImGui.SetNextItemWidth(260);
+        ImGui.SetNextItemWidth(Widths.Long);
         InputWithHint("##OutfitSearch","Outfits.Search",ref outfitQuery,64);
         Tip("Outfits.SearchTip");
         var filters=new[]{"All","Missing","Ready","Stored"};

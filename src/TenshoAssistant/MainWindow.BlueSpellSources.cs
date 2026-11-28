@@ -73,7 +73,7 @@ internal sealed partial class MainWindow
     {
         if(BlueSpellIndex is not { } index)return;
         index.Ensure();
-        ImGui.SetNextItemWidth(260);
+        ImGui.SetNextItemWidth(Widths.Long);
         if(ImGui.BeginCombo("##BlueSpellOrder",localization.Get("BlueSpellSources.SpellOrder"+blueSpellOrder)))
         {
             try

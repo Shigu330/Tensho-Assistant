@@ -260,9 +260,9 @@ internal sealed partial class MainWindow
         try
         {
             var changed=false;
-            ImGui.SetNextItemWidth(90);changed|=ImGui.InputInt("##Min",ref min,0);Tip("MarketBoard.MinHelp");
+            ImGui.SetNextItemWidth(Widths.Number);changed|=ImGui.InputInt("##Min",ref min,0);Tip("MarketBoard.MinHelp");
             ImGui.SameLine();ImGui.TextUnformatted("–");ImGui.SameLine();
-            ImGui.SetNextItemWidth(90);changed|=ImGui.InputInt("##Max",ref max,0);Tip("MarketBoard.MaxHelp");
+            ImGui.SetNextItemWidth(Widths.Number);changed|=ImGui.InputInt("##Max",ref max,0);Tip("MarketBoard.MaxHelp");
             ImGui.SameLine();ImGui.TextUnformatted(localization.Get(key));
             min=Math.Clamp(min,0,limit);max=Math.Clamp(max,0,limit);
             return changed;

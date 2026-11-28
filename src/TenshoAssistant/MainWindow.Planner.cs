@@ -62,7 +62,7 @@ internal sealed partial class MainWindow
         else if(inputs.StatsFrom==VesselStatsSource.Unknown && VesselBuilds.PlannerStats(chosen,VesselParts?.Invoke()) is { Source:not VesselStatsSource.Unknown } known)
         {inputs.Speed=known.Speed;inputs.Range=known.Range;inputs.StatsFrom=known.Source;}
         var airship=kind==VesselKind.Airship;
-        ImGui.SetNextItemWidth(220);
+        ImGui.SetNextItemWidth(Widths.Medium);
         if(ImGui.BeginCombo(localization.Get(airship ? "AirshipPlanner.Vessel":"RoutePlanner.Vessel")+"##PlannerVessel",chosen?.Name ?? localization.Get("RoutePlanner.Manual")))
         {
             try
@@ -104,12 +104,12 @@ internal sealed partial class MainWindow
     /// </summary>
     private uint DrawPlannerTarget(string labelKey,string tipKey,uint chosen,string shown,IEnumerable<(uint Id,string Name)> rows)
     {
-        ImGui.SetNextItemWidth(260);
+        ImGui.SetNextItemWidth(Widths.Long);
         if(ImGui.BeginCombo(localization.Get(labelKey)+"##PlannerTarget",chosen==0 ? "—":shown))
         {
             try
             {
-                ImGui.SetNextItemWidth(220);InputWithHint("##PlannerTargetSearch","AirshipPlanner.TargetSearch",ref plannerTargetSearch,60);Tip("AirshipPlanner.TargetSearchTip");
+                ImGui.SetNextItemWidth(Widths.Medium);InputWithHint("##PlannerTargetSearch","AirshipPlanner.TargetSearch",ref plannerTargetSearch,60);Tip("AirshipPlanner.TargetSearchTip");
                 var search=plannerTargetSearch.Trim();
                 foreach(var (id,name) in rows.Where(row=>search.Length==0 || SearchText.Contains(row.Name,search,StringComparison.CurrentCultureIgnoreCase))
                             .OrderBy(row=>row.Name,StringComparer.CurrentCultureIgnoreCase))
@@ -135,9 +135,9 @@ internal sealed partial class MainWindow
     {
         var inputs=Inputs(kind);
         var airship=kind==VesselKind.Airship;
-        ImGui.SetNextItemWidth(90);ImGui.InputInt(localization.Get("RoutePlanner.Rank")+"##PlannerRank",ref inputs.Rank);Tip(airship ? "AirshipPlanner.RankTip":"RoutePlanner.RankTip");
-        ImGui.SameLine();ImGui.SetNextItemWidth(90);if(ImGui.InputInt(localization.Get("RoutePlanner.Speed")+"##PlannerSpeed",ref inputs.Speed)){inputs.SpeedTyped=true;inputs.StatsFrom=VesselBuilds.AfterTyping(inputs.StatsFrom,inputs.SpeedTyped,inputs.RangeTyped);}Tip(airship ? "AirshipPlanner.SpeedTip":"RoutePlanner.SpeedTip");
-        ImGui.SameLine();ImGui.SetNextItemWidth(90);if(ImGui.InputInt(localization.Get("RoutePlanner.Range")+"##PlannerRange",ref inputs.Range)){inputs.RangeTyped=true;inputs.StatsFrom=VesselBuilds.AfterTyping(inputs.StatsFrom,inputs.SpeedTyped,inputs.RangeTyped);}Tip(airship ? "AirshipPlanner.RangeTip":"RoutePlanner.RangeTip");
+        ImGui.SetNextItemWidth(Widths.Number);ImGui.InputInt(localization.Get("RoutePlanner.Rank")+"##PlannerRank",ref inputs.Rank);Tip(airship ? "AirshipPlanner.RankTip":"RoutePlanner.RankTip");
+        ImGui.SameLine();ImGui.SetNextItemWidth(Widths.Number);if(ImGui.InputInt(localization.Get("RoutePlanner.Speed")+"##PlannerSpeed",ref inputs.Speed)){inputs.SpeedTyped=true;inputs.StatsFrom=VesselBuilds.AfterTyping(inputs.StatsFrom,inputs.SpeedTyped,inputs.RangeTyped);}Tip(airship ? "AirshipPlanner.SpeedTip":"RoutePlanner.SpeedTip");
+        ImGui.SameLine();ImGui.SetNextItemWidth(Widths.Number);if(ImGui.InputInt(localization.Get("RoutePlanner.Range")+"##PlannerRange",ref inputs.Range)){inputs.RangeTyped=true;inputs.StatsFrom=VesselBuilds.AfterTyping(inputs.StatsFrom,inputs.SpeedTyped,inputs.RangeTyped);}Tip(airship ? "AirshipPlanner.RangeTip":"RoutePlanner.RangeTip");
         inputs.Rank=Math.Clamp(inputs.Rank,airship ? 0:1,200);inputs.Speed=Math.Clamp(inputs.Speed,1,1000);inputs.Range=Math.Clamp(inputs.Range,1,1000);
         if(inputs.StatsFrom==VesselStatsSource.Unknown)StateLine(UI.UiState.Waiting,localization.Get("RoutePlanner.StatsUnknown"));
         else if(inputs.StatsFrom==VesselStatsSource.Parts)OriginLine(UI.UiOrigin.Estimated,localization.Get("RoutePlanner.StatsFromParts"));

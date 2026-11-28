@@ -172,10 +172,10 @@ internal sealed partial class MainWindow
         void Bound(string key,string id,ref int minimum,ref int maximum,int limit)
         {
             ImGui.TextUnformatted(localization.Get(key));ImGui.SameLine();
-            ImGui.SetNextItemWidth(90);ImGui.InputInt("##Min"+id,ref minimum,0);minimum=Math.Clamp(minimum,0,limit);
+            ImGui.SetNextItemWidth(Widths.Number);ImGui.InputInt("##Min"+id,ref minimum,0);minimum=Math.Clamp(minimum,0,limit);
             Tip("MarketBoard.MinHelp");
             ImGui.SameLine();ImGui.TextUnformatted("–");ImGui.SameLine();
-            ImGui.SetNextItemWidth(90);ImGui.InputInt("##Max"+id,ref maximum,0);maximum=Math.Clamp(maximum,0,limit);
+            ImGui.SetNextItemWidth(Widths.Number);ImGui.InputInt("##Max"+id,ref maximum,0);maximum=Math.Clamp(maximum,0,limit);
             Tip("MarketBoard.MaxHelp");
         }
     }
@@ -185,7 +185,7 @@ internal sealed partial class MainWindow
         if(DrawMarketBoardHeader() is not { } board)return;
         DrawMarketFilters(board,true);
         ImGui.TextUnformatted(localization.Get("MarketBoard.Wanted"));ImGui.SameLine();
-        ImGui.SetNextItemWidth(90);ImGui.InputInt("##Wanted",ref marketWanted,0);marketWanted=Math.Clamp(marketWanted,0,MarketBoardMath.MaximumWanted);
+        ImGui.SetNextItemWidth(Widths.Number);ImGui.InputInt("##Wanted",ref marketWanted,0);marketWanted=Math.Clamp(marketWanted,0,MarketBoardMath.MaximumWanted);
         Tip("MarketBoard.WantedHelp");
         var filter=CurrentMarketFilter();
         if(!ReferenceEquals(marketViewKey.Board,board) || marketViewKey.Filter!=filter || marketViewKey.Wanted!=marketWanted)

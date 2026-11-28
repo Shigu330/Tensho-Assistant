@@ -39,7 +39,7 @@ internal sealed partial class MainWindow
     {
         if(ImGui.SmallButton(localization.Get("CraftPresets.Browse")))page=Page.CraftPresets;
         if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("CraftPresets.SaveSection")+"###SaveCraftPreset"))return;
-        ImGui.SetNextItemWidth(260);if(ImGui.InputText(localization.Get("CraftPresets.Name")+"###CraftPresetName",ref craftPresetName,160))craftPresetSaved=false;Tip("CraftPresets.NameTip");
+        ImGui.SetNextItemWidth(Widths.Long);if(ImGui.InputText(localization.Get("CraftPresets.Name")+"###CraftPresetName",ref craftPresetName,160))craftPresetSaved=false;Tip("CraftPresets.NameTip");
         DesktopEditBegin();
         try{if(ImGui.Button(localization.Get("CraftPresets.Save")))SaveCraftPreset();}
         finally{DesktopEditEnd();}
@@ -52,7 +52,7 @@ internal sealed partial class MainWindow
         var rows=configuration.CraftPresets ?? [];var catalog=recipeCatalog.State.Catalog;
         ImGui.TextDisabled(localization.Format("CraftPresetMessages.Count", rows.Count, CraftPresets.Capacity));
         if(craftPresetError is { } error)ImGui.TextWrapped(localization.Get(error));
-        ImGui.SetNextItemWidth(260);InputWithHint("###CraftPresetSearch","CraftPresets.Search",ref craftPresetSearch,80);Tip("CraftPresets.SearchTip");
+        ImGui.SetNextItemWidth(Widths.Long);InputWithHint("###CraftPresetSearch","CraftPresets.Search",ref craftPresetSearch,80);Tip("CraftPresets.SearchTip");
         ImGui.SameLine();ImGui.SetNextItemWidth(170);
         ImGui.Combo(localization.Get("CraftPresets.Sort")+"###CraftPresetSort",ref craftPresetSort,[localization.Get("CraftPresets.SortSaved"),localization.Get("CraftPresets.SortName"),localization.Get("CraftPresets.SortItem"),localization.Get("CraftPresets.SortJob"),localization.Get("CraftPresets.SortNewest")]);Tip("CraftPresets.SortTip");
         var view=CraftPresetRows(rows,catalog);
@@ -105,7 +105,7 @@ internal sealed partial class MainWindow
                 ImGui.SameLine();DesktopEditBegin();try{if(DeleteButton("CraftPresets.Remove"))remove=index;}finally{DesktopEditEnd();}Tip("CraftPresets.RemoveTip");
                 if(preset is not null && craftPresetRenaming==preset.Id)
                 {
-                    ImGui.SetNextItemWidth(260);
+                    ImGui.SetNextItemWidth(Widths.Long);
                     var confirmed=ImGui.InputText("###CraftPresetRename",ref craftPresetRenameText,80,ImGuiInputTextFlags.EnterReturnsTrue);Tip("CraftPresets.NameTip");
                     ImGui.SameLine();if(ImGui.SmallButton(localization.Get("CraftPresets.RenameOk")) || confirmed)rename=index;
                     ImGui.SameLine();if(ImGui.SmallButton(localization.Get("CraftPresets.RenameCancel")))craftPresetRenaming=null;

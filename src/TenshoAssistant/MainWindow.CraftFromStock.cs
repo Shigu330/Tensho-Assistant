@@ -176,9 +176,9 @@ internal sealed partial class MainWindow
         ImGui.SetNextItemWidth(170);
         FilterCombo(localization.Get("CraftStock.Job")+"###CraftStockJob","RecipeUi.AllJobs",ref fromStockJob,result.Rows.Select(row=>row.Recipe.CraftType).Distinct().Order(StringComparer.CurrentCulture));
         Tip("CraftStock.JobIconTip");
-        ImGui.SameLine();ImGui.SetNextItemWidth(90);
+        ImGui.SameLine();ImGui.SetNextItemWidth(Widths.Number);
         ImGui.InputInt(localization.Get("CraftStock.MinLevel")+"###CraftStockMin",ref fromStockMin,0);Tip("CraftStock.LevelTip");
-        ImGui.SameLine();ImGui.SetNextItemWidth(90);
+        ImGui.SameLine();ImGui.SetNextItemWidth(Widths.Number);
         ImGui.InputInt(localization.Get("CraftStock.MaxLevel")+"###CraftStockMax",ref fromStockMax,0);Tip("CraftStock.LevelTip");
         fromStockMin=Math.Clamp(fromStockMin,1,200);fromStockMax=Math.Clamp(fromStockMax,1,200);
         ImGui.SetNextItemWidth(230);

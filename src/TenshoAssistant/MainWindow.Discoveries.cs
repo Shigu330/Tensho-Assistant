@@ -509,7 +509,7 @@ internal sealed partial class MainWindow
     // The places of the monsters whose name holds the search, most seen first, 200 at most; right click on the place: the nearest aetheryte.
     private void DrawDiscoveryPlaces(DiscoveryStore store)
     {
-        ImGui.SetNextItemWidth(260);
+        ImGui.SetNextItemWidth(Widths.Long);
         InputWithHint("##DiscoverySearch","DiscoveriesUi.Search",ref discoverySearch,64);
         Tip("DiscoveriesUi.SearchTip");
         if(discoverySearch.Trim().Length<2){ImGui.TextDisabled(localization.Get("DiscoveriesUi.SearchFirst"));return;}

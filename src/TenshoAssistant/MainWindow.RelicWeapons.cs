@@ -59,7 +59,7 @@ internal sealed partial class MainWindow
     private readonly Dictionary<string,int> relicStageChosen=[];
     private void DrawRelicViewChoice()
     {
-        ImGui.SetNextItemWidth(220);
+        ImGui.SetNextItemWidth(Widths.Medium);
         if(ImGui.BeginCombo(localization.Get("Relics.View")+"###RelicView",localization.Get(relicByStage ? "Relics.ViewStage":"Relics.ViewJob")))
         {
             try
@@ -156,7 +156,7 @@ internal sealed partial class MainWindow
         var items=itemCatalog.State.Catalog;
         string Name(uint id)=>items?.Find(id)?.Name ?? $"#{id}";
         var chosen=Math.Clamp(relicArmourSets.GetValueOrDefault(family),0,sets.Count-1);
-        ImGui.SetNextItemWidth(320);
+        ImGui.SetNextItemWidth(Widths.Wide);
         if(ImGui.BeginCombo(localization.Get("Relics.ArmourSet")+$"###RelicArmourSet{family}",sets[chosen].Name))
         {
             try{for(var index=0;index<sets.Count;index++)if(ImGui.Selectable($"{sets[index].Name}##RelicArmourSet{family}{index}",index==chosen))relicArmourSets[family]=index;}

@@ -54,7 +54,7 @@ internal sealed partial class MainWindow
         ImGui.TextUnformatted(localization.Format("Squadron.Bonus",squadron.Bonus.Physical,squadron.Bonus.Mental,squadron.Bonus.Tactical));
         var missions=sheets.Missions;
         var mission=missions.FirstOrDefault(row=>row.Id==squadronMission);
-        ImGui.SetNextItemWidth(320);
+        ImGui.SetNextItemWidth(Widths.Wide);
         var open=ImGui.BeginCombo("##SquadronMission",mission is null ? localization.Get("Squadron.PickMission"):localization.Format("Squadron.MissionRow",mission.Name,mission.Level));
         Tip("Squadron.PickMissionTip");
         if(open)

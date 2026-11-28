@@ -125,7 +125,7 @@ internal sealed partial class MainWindow
         if(projectionResult is not { } result)return;
         if(frame.Recipe is { } recipe && projectionRecipe!=recipe.RecipeId)
         {projectionRecipe=recipe.RecipeId;projectionTarget=recipe.Simulation?.Quality ?? 0;}
-        ImGui.SetNextItemWidth(110);ImGui.InputInt(localization.Get("CraftProjectionUi.Target"),ref projectionTarget,0);Tip("CraftProjectionUi.TargetTip");
+        ImGui.SetNextItemWidth(Widths.NumberWide);ImGui.InputInt(localization.Get("CraftProjectionUi.Target"),ref projectionTarget,0);Tip("CraftProjectionUi.TargetTip");
         if(projectionTarget<0 || projectionTarget>(frame.Recipe?.Simulation?.Quality ?? 0)){ImGui.TextWrapped(localization.Get("CraftProjectionUi.Invalid"));return;}
         if(ImGui.RadioButton(localization.Get("CraftProjectionUi.Quality"),projectionSort==0))projectionSort=0;Tip("CraftProjectionUi.SortTip");ImGui.SameLine();
         if(ImGui.RadioButton(localization.Get("CraftProjectionUi.Progress"),projectionSort==1))projectionSort=1;Tip("CraftProjectionUi.SortTip");ImGui.SameLine();

@@ -32,7 +32,7 @@ internal sealed partial class MainWindow
         ImGui.BeginDisabled(zones.Count>=WorldClocks.Capacity);
         try
         {
-            ImGui.SetNextItemWidth(320);
+            ImGui.SetNextItemWidth(Widths.Wide);
             if(ImGui.BeginCombo("##ClockZone",localization.Get("WorldClocks.Add")))
             {
                 try
@@ -69,7 +69,7 @@ internal sealed partial class MainWindow
         var chosenRepeat=ManualRepeats[Math.Clamp(alarmManualRepeat,0,ManualRepeats.Length-1)];
         var byReset=chosenRepeat is AlarmRepeat.DailyReset or AlarmRepeat.WeeklyReset;
         ImGui.BeginDisabled(byReset);
-        ImGui.SetNextItemWidth(160);
+        ImGui.SetNextItemWidth(Widths.Short);
         InputWithHint("##AlarmDate","WorldClocks.DateHint",ref alarmManualDate,16);
         Tip("WorldClocks.DateTip");
         ImGui.EndDisabled();

@@ -24,7 +24,7 @@ internal sealed partial class MainWindow
         try
         {
             var current=FontSettings.Family(family(),defaultFamily,dalamudAllowed);
-            ImGui.SetNextItemWidth(160);
+            ImGui.SetNextItemWidth(Widths.Short);
             if(ImGui.BeginCombo(localization.Get("FontSettings."+key)+"##Family",FamilyName(current)))
             {
                 try

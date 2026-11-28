@@ -65,7 +65,7 @@ internal sealed partial class MainWindow
                 }
                 else ImGui.TextDisabled("—");
                 ImGui.TableNextColumn();
-                ImGui.SetNextItemWidth(90);
+                ImGui.SetNextItemWidth(Widths.Number);
                 var edited=currencyEdits.TryGetValue(id,out var typing) ? typing:percent;
                 if(ImGui.InputInt($"%##Threshold{id}",ref edited,0))currencyEdits[id]=Math.Clamp(edited,0,100);
                 if(ImGui.IsItemDeactivatedAfterEdit() && currencyEdits.Remove(id,out var done))SetCurrencyThreshold(id,done);

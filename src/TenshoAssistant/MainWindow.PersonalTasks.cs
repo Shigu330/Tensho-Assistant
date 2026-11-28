@@ -75,7 +75,7 @@ internal sealed partial class MainWindow
     private void DrawNewTask()
     {
         var tasks=configuration.PersonalTasks ?? [];
-        ImGui.SetNextItemWidth(220);
+        ImGui.SetNextItemWidth(Widths.Medium);
         InputWithHint("##NewTaskName","PersonalTasks.NameHint",ref newTaskName,PersonalTasks.MaximumName);
         Tip("PersonalTasks.NameTip");
         ImGui.SameLine();ImGui.SetNextItemWidth(170);
@@ -91,13 +91,13 @@ internal sealed partial class MainWindow
         Tip("PersonalTasks.PeriodTip");
         if(newTaskPeriod==TaskPeriod.EveryHours)
         {
-            ImGui.SameLine();ImGui.SetNextItemWidth(90);
+            ImGui.SameLine();ImGui.SetNextItemWidth(Widths.Number);
             if(ImGui.InputInt(localization.Get("PersonalTasks.Hours")+"##NewTaskHours",ref newTaskHours))newTaskHours=PersonalTasks.ClampHours(newTaskHours);
             Tip("PersonalTasks.HoursTip");
         }
         else if(newTaskPeriod==TaskPeriod.Counter)
         {
-            ImGui.SameLine();ImGui.SetNextItemWidth(90);
+            ImGui.SameLine();ImGui.SetNextItemWidth(Widths.Number);
             if(ImGui.InputInt(localization.Get("PersonalTasks.Target")+"##NewTaskTarget",ref newTaskTarget))newTaskTarget=PersonalTasks.ClampTarget(newTaskTarget);
             Tip("PersonalTasks.TargetTip");
         }

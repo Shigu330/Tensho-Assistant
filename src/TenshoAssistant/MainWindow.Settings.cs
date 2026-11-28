@@ -278,7 +278,7 @@ internal sealed partial class MainWindow
         ImGui.SetNextItemWidth(100);copyChanged|=ImGui.InputInt(localization.Get("ModuleSettings.MacroEnd"),ref end,0);
         Tip("SettingTips.MacroEnd");
         if(DefaultButton("MacroEnd",end!=macroDefaults.End)){end=macroDefaults.End;if(start>end)start=macroDefaults.Start;copyChanged=true;}
-        ImGui.SetNextItemWidth(160);copyChanged|=ImGui.InputText(localization.Get("ModuleSettings.MacroPrefix"),ref prefix,12);
+        ImGui.SetNextItemWidth(Widths.Short);copyChanged|=ImGui.InputText(localization.Get("ModuleSettings.MacroPrefix"),ref prefix,12);
         Tip("SettingTips.MacroPrefix");
         if(DefaultButton("MacroPrefix",prefix!=macroDefaults.Prefix)){prefix=macroDefaults.Prefix;copyChanged=true;}
         BoolSetting("ModuleSettings.MacroOverwrite","SettingTips.MacroOverwrite",()=>copy.OverwriteAny,value=>copy.OverwriteAny=value,c=>c.MacroCopy.OverwriteAny);

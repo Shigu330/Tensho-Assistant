@@ -36,7 +36,7 @@ internal sealed partial class MainWindow
         var slots=HuntSlots?.Invoke();
         var slot=slots is not null && HuntingLog.MemorySlot(huntLog) is { } index && index<slots.Count ? slots[index]:null;
         if(slots is null)ImGui.TextDisabled(localization.Get(HuntUnavailable?.Invoke()==true ? "HuntingLog.Unavailable":"HuntingLog.Unknown"));
-        ImGui.SetNextItemWidth(220);
+        ImGui.SetNextItemWidth(Widths.Medium);
         if(ImGui.BeginCombo("##HuntLog",huntLogs.FirstOrDefault(log=>log.Key==huntLog).Name ?? ""))
         {
             try{foreach(var (key,name) in huntLogs)if(ImGui.Selectable($"{name}##HuntLog{key}",key==huntLog)){huntLog=key;huntRank=-1;}}

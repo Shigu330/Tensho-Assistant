@@ -133,7 +133,7 @@ internal sealed partial class MainWindow
         void DrawMissing()
         {
             if(entries.Count==0){ImGui.TextDisabled(localization.Get(collections.State.Loading ? "TriadRequest.NoOwned":"ServiceErrors.Collection"));return;}
-            ImGui.SetNextItemWidth(260);InputWithHint("##TriadMissingQuery","TriadNpcs.Search",ref triadMissingQuery,64);Tip("TriadNpcs.SearchTip");
+            ImGui.SetNextItemWidth(Widths.Long);InputWithHint("##TriadMissingQuery","TriadNpcs.Search",ref triadMissingQuery,64);Tip("TriadNpcs.SearchTip");
             var missingKey=((object?)entries,triadMissingQuery);
             if(missingKey!=triadMissingKey)
             {

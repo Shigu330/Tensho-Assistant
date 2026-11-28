@@ -28,7 +28,7 @@ internal sealed partial class MainWindow
         var filter=itemSearchFilter;
         try
         {
-            ImGui.SetNextItemWidth(220);
+            ImGui.SetNextItemWidth(Widths.Medium);
             var categoryName=filter.Category==0 ? localization.Get("ItemFilters.Any"):catalog.Categories.FirstOrDefault(category=>category.Id==filter.Category)?.Name ?? $"#{filter.Category}";
             if(ImGui.BeginCombo(localization.Get("ItemFilters.Category")+"##FilterCategory",categoryName))
             {
@@ -42,16 +42,16 @@ internal sealed partial class MainWindow
             }
             Tip("ItemFilters.CategoryTip");
             int min=filter.MinEquipLevel,max=filter.MaxEquipLevel;
-            ImGui.SetNextItemWidth(70);if(ImGui.InputInt("##FilterMinLevel",ref min,0))filter=filter with{MinEquipLevel=Math.Clamp(min,0,100)};
+            ImGui.SetNextItemWidth(Widths.Tiny);if(ImGui.InputInt("##FilterMinLevel",ref min,0))filter=filter with{MinEquipLevel=Math.Clamp(min,0,100)};
             Tip("ItemFilters.EquipLevelTip");
-            ImGui.SameLine();ImGui.SetNextItemWidth(70);if(ImGui.InputInt(localization.Get("ItemFilters.EquipLevel")+"##FilterMaxLevel",ref max,0))filter=filter with{MaxEquipLevel=Math.Clamp(max,0,100)};
+            ImGui.SameLine();ImGui.SetNextItemWidth(Widths.Tiny);if(ImGui.InputInt(localization.Get("ItemFilters.EquipLevel")+"##FilterMaxLevel",ref max,0))filter=filter with{MaxEquipLevel=Math.Clamp(max,0,100)};
             Tip("ItemFilters.EquipLevelTip");
             int minIl=(int)filter.MinItemLevel,maxIl=(int)filter.MaxItemLevel;
-            ImGui.SetNextItemWidth(70);if(ImGui.InputInt("##FilterMinIl",ref minIl,0))filter=filter with{MinItemLevel=(uint)Math.Clamp(minIl,0,9999)};
+            ImGui.SetNextItemWidth(Widths.Tiny);if(ImGui.InputInt("##FilterMinIl",ref minIl,0))filter=filter with{MinItemLevel=(uint)Math.Clamp(minIl,0,9999)};
             Tip("ItemFilters.ItemLevelTip");
-            ImGui.SameLine();ImGui.SetNextItemWidth(70);if(ImGui.InputInt(localization.Get("ItemFilters.ItemLevel")+"##FilterMaxIl",ref maxIl,0))filter=filter with{MaxItemLevel=(uint)Math.Clamp(maxIl,0,9999)};
+            ImGui.SameLine();ImGui.SetNextItemWidth(Widths.Tiny);if(ImGui.InputInt(localization.Get("ItemFilters.ItemLevel")+"##FilterMaxIl",ref maxIl,0))filter=filter with{MaxItemLevel=(uint)Math.Clamp(maxIl,0,9999)};
             Tip("ItemFilters.ItemLevelTip");
-            ImGui.SetNextItemWidth(220);
+            ImGui.SetNextItemWidth(Widths.Medium);
             if(ImGui.BeginCombo(localization.Get("ItemFilters.Slot")+"##FilterSlot",filter.Slot==EquipmentSlots.None ? localization.Get("ItemFilters.Any"):localization.Get("ItemFilters.Slot"+filter.Slot)))
             {
                 try
@@ -66,7 +66,7 @@ internal sealed partial class MainWindow
             if(JobList is not null && JobCategoriesOf is not null)
             {
                 jobList??=JobList();
-                ImGui.SetNextItemWidth(220);
+                ImGui.SetNextItemWidth(Widths.Medium);
                 var jobName=filter.Job==0 ? localization.Get("ItemFilters.Any"):jobList.FirstOrDefault(job=>job.Id==filter.Job).Name ?? $"#{filter.Job}";
                 if(ImGui.BeginCombo(localization.Get("ItemFilters.Job")+"##FilterJob",jobName))
                 {

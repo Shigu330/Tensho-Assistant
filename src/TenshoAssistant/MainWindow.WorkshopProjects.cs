@@ -47,7 +47,7 @@ internal sealed partial class MainWindow
         RefreshRecipeHoldingsCache();
         var projects=workshopProjects.Result;
         if(workshopSelected==0)workshopSelected=configuration.WorkshopPanelProject;
-        ImGui.SetNextItemWidth(260);
+        ImGui.SetNextItemWidth(Widths.Long);
         InputWithHint("##WorkshopSearch","FreeCompany.WorkshopSearch",ref workshopSearch,100);
         Tip("FreeCompany.WorkshopSearchTip");
         if(workshopSearched!=workshopSearch)

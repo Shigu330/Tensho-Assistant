@@ -158,7 +158,7 @@ internal sealed partial class MainWindow
         var others=bankSnapshot.Entries.Select(entry=>entry.Key.CharacterId).Where(id=>id!=loggedIn).Distinct().ToArray();
         if(others.Length>0)
         {
-            ImGui.SetNextItemWidth(260);
+            ImGui.SetNextItemWidth(Widths.Long);
             var shownName=characterId==loggedIn && loggedIn!=0 ? localization.Get("BankUi.LoggedIn"):CharacterName(bankSnapshot.Entries,characterId);
             if(ImGui.BeginCombo(localization.Get("BankUi.CharacterChoice")+"##BankCharacter",shownName))
             {

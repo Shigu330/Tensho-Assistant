@@ -24,7 +24,7 @@ internal sealed partial class MainWindow
         var defaultName=localization.Get("Gear.PlanDefault");
         var sets=configuration.GearPlanSets;
         var set=sets?.GetValueOrDefault(job);
-        ImGui.SetNextItemWidth(220);
+        ImGui.SetNextItemWidth(Widths.Medium);
         if(ImGui.BeginCombo(localization.Get("Gear.PlanPick")+"###GearPlanPick",set?.Active ?? defaultName))
         {
             try
@@ -53,7 +53,7 @@ internal sealed partial class MainWindow
         ImGui.EndDisabled();
         Tip("Gear.PlanDeleteTip");
         if(gearPlanEdit==GearPlanEdit.None)return;
-        ImGui.SetNextItemWidth(220);
+        ImGui.SetNextItemWidth(Widths.Medium);
         var confirmed=ImGui.InputText(localization.Get("Gear.PlanName")+"###GearPlanName",ref gearPlanName,GearPlanSets.MaxName,ImGuiInputTextFlags.EnterReturnsTrue);Tip("Gear.PlanNameTip");
         ImGui.SameLine();
         if(ImGui.SmallButton(localization.Get("Gear.PlanOk")) || confirmed)

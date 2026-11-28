@@ -101,7 +101,7 @@ internal sealed partial class MainWindow
         }
         Tip("BeastUi.FamilyTip");
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(90); if (ImGui.InputInt(localization.Get("BeastUi.Rank") + "##BeastRank", ref beastRank)) beastRank = Math.Clamp(beastRank, 1, Math.Max(1, catalog.Beasts.Max(beast => beast.Ranks.Count))); Tip("BeastUi.RankTip");
+        ImGui.SetNextItemWidth(Widths.Number); if (ImGui.InputInt(localization.Get("BeastUi.Rank") + "##BeastRank", ref beastRank)) beastRank = Math.Clamp(beastRank, 1, Math.Max(1, catalog.Beasts.Max(beast => beast.Ranks.Count))); Tip("BeastUi.RankTip");
         ImGui.SameLine();
         ImGui.Checkbox(localization.Get("BeastUi.OnlyObtained"), ref beastOnlyObtained); Tip("BeastUi.OnlyObtainedTip");
         // X-746 (0.1766): the family chosen: the action Borrow gives with its beasts, its icon, name and effect (the game's texts).
@@ -158,7 +158,7 @@ internal sealed partial class MainWindow
     {
         beastBoard = Math.Clamp(beastBoard, 0, catalog.Boards.Count - 1);
         var board = catalog.Boards[beastBoard];
-        ImGui.SetNextItemWidth(320);
+        ImGui.SetNextItemWidth(Widths.Wide);
         if (ImGui.BeginCombo("##BeastBoard", board.Name))
         {
             try { for (var index = 0; index < catalog.Boards.Count; index++) if (ImGui.Selectable(catalog.Boards[index].Name + $"##Board{index}", index == beastBoard)) beastBoard = index; }
@@ -626,7 +626,7 @@ internal sealed partial class MainWindow
             beastItemLists = new[] { BeastItems.Gear, BeastItems.CrucibleItem, BeastItems.Feed }.ToDictionary(kind => kind, kind => BeastItems.Of(catalog.Items, kind, beastItemFamily, beastItemQuery));
         }
         ImGui.SetNextItemWidth(200); InputWithHint("##BeastItemQuery", "BeastUi.Search", ref beastItemQuery, 64); Tip("BeastUi.ItemSearchTip");
-        ImGui.SameLine(); ImGui.SetNextItemWidth(220);
+        ImGui.SameLine(); ImGui.SetNextItemWidth(Widths.Medium);
         var chosen = beastItemFamilies.FirstOrDefault(family => family.Id == beastItemFamily).Name;
         if (ImGui.BeginCombo("##BeastItemFamily", chosen ?? localization.Get("BeastUi.ItemAllFamilies")))
         {

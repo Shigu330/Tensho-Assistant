@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1948.0
+- Plan global, X-607 : Code plus facile à entretenir (X-607, demande du 18/11) : geste des largeurs nommées. Les sept largeurs que les pages donnent le plus souvent à un contrôle par un nombre écrit à la main (70, 90, 110, 160, 220, 260, 320) ont un nom à un seul endroit, UI/Components/Widths.cs (`Widths.Number`, `Widths.Short`…), avec la même valeur : aucune page ne change, et une largeur se change désormais une seule fois. Nouveau test `UiWidths1948Tests` : ces sept valeurs sont refusées en nombre nu dans les pages, les autres nombres nus ne croissent plus (cliquet), les noms gardent les valeurs d'avant.
+- Tests : UiWidths1948Tests. Verify.ps1 (agent) : 4329/4329, 0 avertissement, 0 erreur ; DLL 0.1948.0.0. Rien à essayer en jeu.
+### English
+- Code easier to maintain (X-607, request of 18/11): the gesture of the named widths. The seven widths the pages give most often to a control by a number written by hand (70, 90, 110, 160, 220, 260, 320) have a name in one place, UI/Components/Widths.cs (`Widths.Number`, `Widths.Short`…), with the same value: no page changes, and a width is now changed once. New test `UiWidths1948Tests`: these seven values are refused as bare numbers in the pages, the other bare numbers no longer grow (ratchet), the names keep the values of before.
+
 ## 0.1947.0
 - Plan global, X-607 : Code plus facile à entretenir (X-607, demande du 18/11) : geste des cadres de liste. Les vingt-deux régions encadrées des pages (listes, volets) écrites à la main passent par le nouveau composant `BeginFramed(id, taille)` de UI/Components/Framed.cs, le même appel qu'avant, toujours fermé par `EndChild` : aucune page ne change. Nouveau test `UiFramed1947Tests` : la forme écrite à la main est refusée, le composant garde le même appel, chaque région ouverte est fermée.
 - Tests : UiFramed1947Tests. Verify.ps1 (agent) : 4326/4326, 0 avertissement, 0 erreur ; DLL 0.1947.0.0. Rien à essayer en jeu.

@@ -79,7 +79,7 @@ internal sealed partial class MainWindow
         ImGui.SameLine();
         if(ImGui.RadioButton(localization.Get("Garden.CrossesUses"),gardenCrossUses))gardenCrossUses=true;
         Tip("Garden.CrossesUsesTip");
-        ImGui.SetNextItemWidth(260);
+        ImGui.SetNextItemWidth(Widths.Long);
         var open=ImGui.BeginCombo("##GardenCrossSeed",gardenCrossSeed==0 ? localization.Get("Garden.CrossesPick"):Name(gardenCrossSeed));
         Tip("Garden.CrossesPickTip");
         if(open)

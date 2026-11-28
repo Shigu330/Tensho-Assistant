@@ -45,7 +45,7 @@ internal sealed partial class MainWindow
     private void DrawAlarmEdit(TenshoAlarm alarm,DateTimeOffset now,ref bool changed)
     {
         ImGui.Indent();
-        var label=alarm.Label;ImGui.SetNextItemWidth(220);
+        var label=alarm.Label;ImGui.SetNextItemWidth(Widths.Medium);
         if(ImGui.InputText(localization.Get("Alarms.EditName")+"##AlarmEditName",ref label,100) && label.Trim().Length>0)alarm.Label=label;
         if(ImGui.IsItemDeactivatedAfterEdit())changed=true;
         Tip("Alarms.EditNameTip");
@@ -53,7 +53,7 @@ internal sealed partial class MainWindow
         if(AlarmSchedule.DateEditable(alarm.Repeat))
         {
             if(alarmEditDateFor!=alarm.Id){alarmEditDateFor=alarm.Id;alarmEditDate=AlarmSchedule.EditShown(alarm,now).ToLocalTime().ToString("yyyy-MM-dd HH:mm",System.Globalization.CultureInfo.InvariantCulture);}
-            ImGui.SetNextItemWidth(160);
+            ImGui.SetNextItemWidth(Widths.Short);
             ImGui.InputText(localization.Get("Alarms.EditDate")+"##AlarmEditDate",ref alarmEditDate,20);
             Tip("Alarms.EditDateTip");
             if(WorldClocks.ParseLocal(alarmEditDate,now) is { } moved)
@@ -284,11 +284,11 @@ internal sealed partial class MainWindow
         DesktopEditBegin();
         try
         {
-            ImGui.SetNextItemWidth(160);InputWithHint("##AlarmLabel","Alarms.ManualLabel",ref alarmManualLabel,40);
+            ImGui.SetNextItemWidth(Widths.Short);InputWithHint("##AlarmLabel","Alarms.ManualLabel",ref alarmManualLabel,40);
             Tip("Alarms.ManualLabelTip");
-            ImGui.SameLine();ImGui.SetNextItemWidth(70);ImGui.InputInt("##AlarmHour",ref alarmManualHour,0);
+            ImGui.SameLine();ImGui.SetNextItemWidth(Widths.Tiny);ImGui.InputInt("##AlarmHour",ref alarmManualHour,0);
             Tip("Alarms.ManualHourTip");
-            ImGui.SameLine();ImGui.TextUnformatted(":");ImGui.SameLine();ImGui.SetNextItemWidth(70);ImGui.InputInt("ET##AlarmMinute",ref alarmManualMinute,0);
+            ImGui.SameLine();ImGui.TextUnformatted(":");ImGui.SameLine();ImGui.SetNextItemWidth(Widths.Tiny);ImGui.InputInt("ET##AlarmMinute",ref alarmManualMinute,0);
             Tip("Alarms.ManualMinuteTip");
             alarmManualHour=Math.Clamp(alarmManualHour,0,23);alarmManualMinute=Math.Clamp(alarmManualMinute,0,59);
             ImGui.SameLine();
@@ -359,7 +359,7 @@ internal sealed partial class MainWindow
                         var all=members.All(alarm=>alarm.Enabled);
                         if(ImGui.Checkbox(localization.Get("Alarms.GroupOn")+"##GroupOn",ref all)){foreach(var alarm in members)alarm.Enabled=all;changed=true;NoteGameCopy(members);}
                         Tip("SettingTips.AlarmGroupOn");
-                        ImGui.SameLine();ImGui.SetNextItemWidth(90);
+                        ImGui.SameLine();ImGui.SetNextItemWidth(Widths.Number);
                         var groupLead=first.LeadMinutes;
                         if(ImGui.InputInt(localization.Get("Alarms.Lead")+"##GroupLead",ref groupLead,1)){foreach(var alarm in members)alarm.LeadMinutes=AlarmSchedule.ClampLead(alarm.Repeat,groupLead);changed=true;NoteGameCopy(members);}
                         Tip("SettingTips.AlarmLead");
@@ -436,7 +436,7 @@ internal sealed partial class MainWindow
                                         var at=NextAlarm(alarm,now);
                                         ImGui.TextColored(alarm.Enabled ? Success:Muted,AlarmWhen(alarm)+(at is { } when ? " · "+AlarmNextText(when,now):""));
                                         if(TipHovered())TipText(alarm.Label+"\n"+string.Join("\n",AlarmSchedule.Occurrences(alarm,now,5).Select(time=>time.ToLocalTime().ToString("g"))));
-                                        ImGui.SameLine();ImGui.SetNextItemWidth(90);
+                                        ImGui.SameLine();ImGui.SetNextItemWidth(Widths.Number);
                                         var lead=alarm.LeadMinutes;
                                         if(ImGui.InputInt(localization.Get("Alarms.Lead")+"##Lead",ref lead,1)){alarm.LeadMinutes=AlarmSchedule.ClampLead(alarm.Repeat,lead);changed=true;NoteGameCopy([alarm]);}
                                         Tip("SettingTips.AlarmLead");
@@ -540,7 +540,7 @@ internal sealed partial class MainWindow
         if(DefaultButton("AlarmLead",lead!=defaults.LeadMinutes)){lead=defaults.LeadMinutes;changed=true;}
         changed|=ImGui.Checkbox(localization.Get("Alarms.PlaySound"),ref play);Tip("Advanced.PlaySoundTip");
         if(DefaultButton("AlarmPlaySound",play!=defaults.PlaySound)){play=defaults.PlaySound;changed=true;}
-        ImGui.SetNextItemWidth(160);
+        ImGui.SetNextItemWidth(Widths.Short);
         if(ImGui.BeginCombo(localization.Get("Alarms.Sound"),localization.Get("Alarms.Sound"+Math.Clamp(sound,0,5))))
         {
             try{for(var index=0;index<6;index++)if(ImGui.Selectable(localization.Get("Alarms.Sound"+index),sound==index)){sound=index;changed=true;}}

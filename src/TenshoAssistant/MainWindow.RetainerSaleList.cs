@@ -28,7 +28,7 @@ internal sealed partial class MainWindow
             .OrderByDescending(entry => entry.Snapshot.ObservedAt).ToArray();
         if (retainers.Length == 0) { EmptyState("RetainerSales.SaleListNone"); ImGui.Separator(); return; }
         var shown = retainers.FirstOrDefault(entry => entry.Key == retainerSaleListChosen) ?? retainers[0];
-        ImGui.SetNextItemWidth(220);
+        ImGui.SetNextItemWidth(Widths.Medium);
         if (ImGui.BeginCombo(localization.Get("RetainerSales.SaleListRetainer") + "###RetainerSaleListRetainer", BankEntryName(shown)))
         {
             try

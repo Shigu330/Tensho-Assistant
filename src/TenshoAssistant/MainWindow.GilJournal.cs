@@ -50,7 +50,7 @@ internal sealed partial class MainWindow
         DrawItemIcon(itemCatalog.State.Catalog?.Find(1),new Vector2(ImGui.GetTextLineHeight()+2),false);ImGui.SameLine();
         ImGui.TextUnformatted(localization.Format("GilJournal.Balances",Amount(state.Gil),Amount(state.RetainersGil),Amount(state.CompanyGil)));
         Tip("GilJournal.BalancesTip");
-        ImGui.SetNextItemWidth(160);
+        ImGui.SetNextItemWidth(Widths.Short);
         if(ImGui.BeginCombo(localization.Get("GilJournal.Period")+"##GilPeriod",localization.Format("GilJournal.Days",GilPeriods[gilPeriod])))
         {
             try{for(var index=0;index<GilPeriods.Length;index++)if(ImGui.Selectable(localization.Format("GilJournal.Days",GilPeriods[index]),index==gilPeriod))gilPeriod=index;}

@@ -23,7 +23,7 @@ internal sealed partial class MainWindow
         DrawOceanPortState("OceanFishing.ColumnIndigo",states.Aldenard);
         DrawOceanPortState("OceanFishing.ColumnRuby",states.Othard);
         var now=DateTimeOffset.UtcNow;
-        ImGui.SetNextItemWidth(320);
+        ImGui.SetNextItemWidth(Widths.Wide);
         var selected=schedule.Routes.FirstOrDefault(route=>route.Id==oceanRouteFilter);
         if(ImGui.BeginCombo("##OceanRoute",selected is null ? localization.Get("OceanFishing.AllRoutes"):RouteLabel(selected)))
         {

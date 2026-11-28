@@ -92,7 +92,7 @@ internal sealed partial class MainWindow
             ImGui.SameLine();
             if (ImGui.RadioButton(localization.Get("TriadSim.AddRed"), triadAddHand == 1)) triadAddHand = 1;
             Tip("TriadSim.AddHandTip");
-            ImGui.SetNextItemWidth(320);
+            ImGui.SetNextItemWidth(Widths.Wide);
             if (ImGui.BeginCombo("##AddSimulationCard", localization.Get("TriadSim.Choose")))
             {
                 try

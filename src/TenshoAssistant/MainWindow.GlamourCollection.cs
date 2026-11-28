@@ -35,7 +35,7 @@ internal sealed partial class MainWindow
         InputWithHint("##GlamourSearch","GlamourCollection.Search",ref glamourQuery,64);
         Tip("GlamourCollection.SearchTip");
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(160);
+        ImGui.SetNextItemWidth(Widths.Short);
         if(ImGui.BeginCombo("##GlamourSlot",glamourSlot==EquipmentSlots.None ? localization.Get("ItemFilters.Any"):localization.Get("ItemFilters.Slot"+glamourSlot)))
         {
             try

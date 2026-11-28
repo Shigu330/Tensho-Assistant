@@ -69,22 +69,22 @@ internal sealed partial class MainWindow
             {
                 try
                 {
-                    ImGui.TableNextRow(); ImGui.TableNextColumn(); ImGui.SetNextItemWidth(110);
+                    ImGui.TableNextRow(); ImGui.TableNextColumn(); ImGui.SetNextItemWidth(Widths.NumberWide);
                     resourceChanged|=ImGui.InputInt(localization.Get("GpUi.Level"),ref gpLevel,0);
                     Tip("GpUi.LevelTip");
-                    ImGui.TableNextColumn(); ImGui.SetNextItemWidth(110); resourceChanged|=ImGui.InputInt(localization.Get("GpUi.Budget"),ref gpBudget,0);
+                    ImGui.TableNextColumn(); ImGui.SetNextItemWidth(Widths.NumberWide); resourceChanged|=ImGui.InputInt(localization.Get("GpUi.Budget"),ref gpBudget,0);
                     Tip("GpUi.BudgetTip");
-                    ImGui.TableNextRow(); ImGui.TableNextColumn(); ImGui.SetNextItemWidth(110);
+                    ImGui.TableNextRow(); ImGui.TableNextColumn(); ImGui.SetNextItemWidth(Widths.NumberWide);
                     changed|=ImGui.InputInt(localization.Get("GpUi.Attempts"),ref gpAttempts,0);
                     Tip("GpUi.AttemptsTip");
-                    ImGui.TableNextColumn(); ImGui.SetNextItemWidth(110); changed|=ImGui.InputInt(localization.Get("GpUi.Yield"),ref gpBaseYield,0);
+                    ImGui.TableNextColumn(); ImGui.SetNextItemWidth(Widths.NumberWide); changed|=ImGui.InputInt(localization.Get("GpUi.Yield"),ref gpBaseYield,0);
                     Tip("GpUi.YieldHelp");
-                    ImGui.TableNextRow(); ImGui.TableNextColumn(); ImGui.SetNextItemWidth(110);
+                    ImGui.TableNextRow(); ImGui.TableNextColumn(); ImGui.SetNextItemWidth(Widths.NumberWide);
                     changed|=ImGui.InputInt(localization.Get("GpUi.Success"),ref gpSuccess,0);
                     Tip("GpUi.SuccessTip");
-                    ImGui.TableNextColumn(); ImGui.SetNextItemWidth(110); changed|=ImGui.InputInt(localization.Get("GpUi.Boon"),ref gpBoon,0);
+                    ImGui.TableNextColumn(); ImGui.SetNextItemWidth(Widths.NumberWide); changed|=ImGui.InputInt(localization.Get("GpUi.Boon"),ref gpBoon,0);
                     Tip("GpUi.BoonTip");
-                    ImGui.TableNextRow(); ImGui.TableNextColumn(); ImGui.SetNextItemWidth(110);
+                    ImGui.TableNextRow(); ImGui.TableNextColumn(); ImGui.SetNextItemWidth(Widths.NumberWide);
                     changed|=ImGui.InputInt(localization.Get("GpUi.Bountiful"),ref gpBountiful,0);
                     Tip("GpUi.BountifulHelp");
                     ImGui.TableNextColumn();
@@ -100,7 +100,7 @@ internal sealed partial class MainWindow
             changed|=DrawGpDeclaredEffect(catalog,GpEffect.BoonChance1,localization.Get("GpUi.Gift1"),ref gpGift1Active);
             changed|=DrawGpDeclaredEffect(catalog,GpEffect.BoonChance2,localization.Get("GpUi.Gift2"),ref gpGift2Active);
             changed|=DrawGpDeclaredEffect(catalog,GpEffect.BoonYield,localization.Get("GpUi.Tidings"),ref gpTidingsActive);
-            ImGui.SetNextItemWidth(110);changed|=ImGui.InputInt(localization.Get("GpUi.FirstBonus"),ref gpFirstAttemptBonus,0);
+            ImGui.SetNextItemWidth(Widths.NumberWide);changed|=ImGui.InputInt(localization.Get("GpUi.FirstBonus"),ref gpFirstAttemptBonus,0);
             // X-76 H6 (0.915): the help is the field's tooltip only (it was also written under the field).
             Tip("GpUi.FirstHelp");
             changed|=ImGui.Checkbox(localization.Get("GpUi.OtherEffect"),ref gpOtherEffects);

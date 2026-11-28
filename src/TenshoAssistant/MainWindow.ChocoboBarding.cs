@@ -80,7 +80,7 @@ internal sealed partial class MainWindow
         if(ChocoboBarding.Progress(catalog.Bardings,unlocked) is { } progress)
             ImGui.TextDisabled(localization.Format("ChocoboBarding.Progress",progress.Unlocked,progress.Total));
 
-        ImGui.SetNextItemWidth(220);
+        ImGui.SetNextItemWidth(Widths.Medium);
         InputWithHint("##BardingSearch","ChocoboBarding.Search",ref bardingSearch,64);
         Tip("ChocoboBarding.SearchTip");
         ImGui.SameLine();
