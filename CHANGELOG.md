@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1951.0
+- Plan global, X-908 : Fenêtre de suivi (X-908, relecture de 0.1950, I1) : sans alarme suivie, sa phrase passait à la ligne dans une fenêtre qui se règle sur son contenu sans largeur, et la fenêtre se resserrait en une colonne étroite. Nouveau composant `EmptyStateLine` : la même ligne atténuée, sur une seule ligne, pour une fenêtre auto-redimensionnée sans largeur ; `EmptyState` reste à la ligne ailleurs. Nouveau test `UiEmptyStateAutoSize1951Tests` : une ligne vide à la ligne seule dans un panneau auto-redimensionné sans taille est refusée.
+- Pour les joueurs : la fenêtre de suivi vide garde de nouveau sa phrase sur une ligne au lieu d'une colonne étroite.
+- Tests : UiEmptyStateAutoSize1951Tests. Verify.ps1 (agent) : 4337/4337, 0 avertissement, 0 erreur ; DLL 0.1951.0.0. Non validé en jeu.
+### English
+- Tracker window (X-908, review of 0.1950, I1): with no alarm followed, its sentence wrapped in a window that sizes itself on its content without a width, and the window shrank to a narrow column. New component `EmptyStateLine`: the same muted line, on one line, for an auto-sized window without a width; `EmptyState` stays wrapped elsewhere. New test `UiEmptyStateAutoSize1951Tests`: a wrapped empty line alone in an auto-sized panel without a size is refused.
+- For players: The empty tracker window keeps its sentence on one line again instead of a narrow column.
+
 ## 0.1950.0
 - Plan global, X-607 : Pages plus homogènes (X-607, demande du 18/11, accord de l'utilisateur du 28/11) : les lignes « rien ici » des pages (liste vide, aucun résultat, aucune donnée) écrites à la main passent par le composant commun `EmptyState` : la même couleur atténuée du thème partout (au lieu de la couleur « désactivé » d'ImGui) et un texte qui passe à la ligne. Nouveau test `UiEmptyStates1950Tests` : la forme écrite à la main est refusée, le composant reste atténué et à la ligne, les pages s'en servent.
 - Pour les joueurs : les lignes « rien ici » des pages (liste vide, aucun résultat) ont maintenant toutes la même couleur atténuée et passent à la ligne dans une fenêtre étroite.

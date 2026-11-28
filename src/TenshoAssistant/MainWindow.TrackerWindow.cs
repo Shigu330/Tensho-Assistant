@@ -32,7 +32,8 @@ internal sealed partial class MainWindow
         var now=DateTimeOffset.UtcNow;
         // X-727 (0.1733): an alarm made without an icon shows its item's (Item sheet).
         if(now>=trackerRefresh){trackerRows=TrackedAlarms.Rows(configuration.Alarms,now,itemIcon:id=>itemCatalog.State.Catalog?.Find(id)?.IconId ?? 0);trackerRefresh=now.AddSeconds(1);}
-        if(trackerRows.Count==0){EmptyState("Tracker.Empty");return;}
+        // X-908 (0.1951): one line, the window has no width of its own (AlwaysAutoResize): a wrapped text would shrink it to a column.
+        if(trackerRows.Count==0){EmptyStateLine("Tracker.Empty");return;}
         foreach(var row in trackerRows)
         {
             ImGui.PushID(row.Id.ToString());

@@ -19,6 +19,18 @@ internal sealed partial class MainWindow
     }
 
     /// <summary>
+    /// X-908 (0.1951): the same muted « nothing here » line, on one line, for a window that sizes itself on its content
+    /// (AlwaysAutoResize) without a width: there a wrapped text wraps on the window's width, which follows the text, and the window shrinks
+    /// to a narrow column.
+    /// </summary>
+    private void EmptyStateLine(string key)
+    {
+        ImGui.PushStyleColor(ImGuiCol.Text,Muted);
+        try{ImGui.TextUnformatted(localization.Get(key));}
+        finally{ImGui.PopStyleColor();}
+    }
+
+    /// <summary>
     /// X-154 (0.1253): one of the four states of a page (waiting, source turned off, old data, failed), the same everywhere: its glyph and
     /// its short word in the state's colour, then the page's own sentence (muted, wrapped). The glyph and the word tell the state, never
     /// the colour alone (UI/UiStates.cs).
