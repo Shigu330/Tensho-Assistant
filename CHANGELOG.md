@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1955.0
+- Plan global, X-607 : Code plus simple à entretenir (X-607, demande du 18/11) : la barre de pages d'une longue liste (« < Page n / m > »), écrite à la main dans Fabriquer depuis le stock et le Lexique, passe par un seul composant, `Pager` (`UI/Components/Pager.cs`) : mêmes boutons, mêmes identifiants, mêmes info-bulles, même ligne de page ; rien ne change à l'écran. CONTRIBUTING le nomme dans ses deux moitiés. Nouveau test `UiPager1955Tests` : un bouton de page écrit à la main est refusé, le composant garde les bouts grisés et les info-bulles, les deux pages s'en servent.
+- Tests : UiPager1955Tests. Verify.ps1 (agent) : 4347/4347, 0 avertissement, 0 erreur ; DLL 0.1955.0.0. Rien à essayer en jeu.
+### English
+- Simpler code to maintain (X-607, request of 18/11): the page bar of a long list (« < Page n / m > »), written by hand in Craft from stock and the Lexicon, goes through one component, `Pager` (`UI/Components/Pager.cs`): the same buttons, ids, tooltips and page line; nothing changes on screen. CONTRIBUTING names it in both halves. New test `UiPager1955Tests`: a page button written by hand is refused, the component keeps the greyed ends and the tooltips, both pages use it.
+
 ## 0.1954.0
 - Plan global, X-607 : Pages plus homogènes (X-607, demande du 18/11, accord de l'utilisateur du 28/11) : les boutons « + » et « - » des compteurs, écrits à la main en texte, passent par le bouton à icône commun de Tensho (`ToolButton`, icônes Plus et Moins, centrées, avec leur info-bulle) : compteur d'un outil de Mes outils (grisé dans l'aperçu), compteur d'une tâche perso et son « + » dans la liste des tâches à faire. Info-bulles nouvelles en anglais et en français. CONTRIBUTING le dit dans ses deux moitiés. Nouveau test `UiCounterButtons1954Tests` : un bouton « + » ou « - » en texte est refusé, les compteurs passent par les icônes, les info-bulles existent dans les deux langues.
 - Pour les joueurs : les boutons « + » et « - » des compteurs (Mes outils, tâches perso) sont maintenant des icônes avec une info-bulle.

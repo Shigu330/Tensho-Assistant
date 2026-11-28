@@ -65,16 +65,7 @@ internal sealed partial class MainWindow
         lexiconPage=page;
         ImGui.TextColored(Accent,localization.Format(lexiconFound.Total>lexiconFound.Rows.Count ? "Lexicon.CountMore":"Lexicon.Count",lexiconFound.Total.ToString("N0",Numbers),lexiconFound.Rows.Count.ToString("N0",Numbers)));
         ImGui.SameLine();
-        ImGui.BeginDisabled(lexiconPage<=0);
-        try{if(ImGui.SmallButton("<###LexiconPrevious"))lexiconPage--;}
-        finally{ImGui.EndDisabled();}
-        Tip("Lexicon.PreviousTip");
-        ImGui.SameLine();ImGui.TextUnformatted(localization.Format("Lexicon.Page",lexiconPage+1,pages));
-        ImGui.SameLine();
-        ImGui.BeginDisabled(lexiconPage>=pages-1);
-        try{if(ImGui.SmallButton(">###LexiconNext"))lexiconPage++;}
-        finally{ImGui.EndDisabled();}
-        Tip("Lexicon.NextTip");
+        Pager("Lexicon",ref lexiconPage,pages,"Lexicon.Page","Lexicon.PreviousTip","Lexicon.NextTip");
         if(!ImGui.BeginTable("###LexiconRows",3,ImGuiTableFlags.RowBg|ImGuiTableFlags.BordersInnerV|ImGuiTableFlags.Resizable))return;
         try
         {

@@ -213,16 +213,7 @@ internal sealed partial class MainWindow
         if(fromStockSort!=0)ImGui.TextDisabled(localization.Get("CraftStock.ValueHelp"));
         ImGui.TextColored(Accent,localization.Format("CraftStock.Count",known.Rows.Length.ToString("N0",Numbers),result.Rows.Count.ToString("N0",Numbers)));
         ImGui.SameLine();
-        ImGui.BeginDisabled(fromStockPage<=0);
-        try{if(ImGui.SmallButton("<###CraftStockPrevious"))fromStockPage--;}
-        finally{ImGui.EndDisabled();}
-        Tip("CraftStock.PreviousTip");
-        ImGui.SameLine();ImGui.TextUnformatted(localization.Format("CraftStock.Page",fromStockPage+1,known.Pages));
-        ImGui.SameLine();
-        ImGui.BeginDisabled(fromStockPage>=known.Pages-1);
-        try{if(ImGui.SmallButton(">###CraftStockNext"))fromStockPage++;}
-        finally{ImGui.EndDisabled();}
-        Tip("CraftStock.NextTip");
+        Pager("CraftStock",ref fromStockPage,known.Pages,"CraftStock.Page","CraftStock.PreviousTip","CraftStock.NextTip");
         if(result.Undecided>0)ImGui.TextDisabled(localization.Format("CraftStock.Undecided",result.Undecided.ToString("N0",Numbers)));
         if(rows.Length==0){EmptyState("CraftStock.Empty");return;}
         DrawChainList("CraftStockList",rows.Length,index=>
