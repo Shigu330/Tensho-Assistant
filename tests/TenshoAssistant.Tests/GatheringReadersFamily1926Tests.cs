@@ -50,7 +50,7 @@ internal static class GatheringReadersFamily1926Tests
             var readers = At("RegisterGatheringReaders(data,framework,player,client,gameGui,objects,targets);");
             var knowledge = At("RegisterGatherKnowledge(data,framework,client,player);");
             Check(Count(plugin, @"RegisterGatheringReaders\(") == 1 && Count(plugin, @"RegisterGatherKnowledge\(") == 1, "each called once");
-            Check(At("RegisterQuests(configuration,") < readers && readers < At("gameWindows=new UI.GameWindowsReader(") && At("gameWindowFollower=new UI.GameWindowFollower(") < knowledge
+            Check(At("RegisterQuests(configuration,") < readers && readers < At("RegisterGameWindows(framework,client,gameGui);") && At("RegisterGameWindows(framework,client,gameGui);") < knowledge
                 && knowledge < At("mainWindow.ItemUnlockState="), "around the game windows' readers, as before");
         }),
         ("Gathering readers family 1926: each service's install and its release are given to one same registration of Plugin.GatheringReaders.cs (its own release, never another's)", () =>

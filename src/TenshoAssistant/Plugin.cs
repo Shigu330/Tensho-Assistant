@@ -259,9 +259,8 @@ public sealed partial class Plugin : IDalamudPlugin
             registrations.Register(() => { }, mainWindow.Dispose);
             mainWindow.TenshoData=tenshoData;   // X-789 (0.1802): its « json » mode said by a banner
             mainWindow.ConfigureDataCache(dataCache);
-            UI.GameThemeReader? themeReader=null;
-            registrations.Register(()=>themeReader=new UI.GameThemeReader(gameConfig,log),()=>themeReader?.Dispose());
-            mainWindow.ConfigureTheme(()=>themeReader?.GameValue);
+            // X-153 (0.1934): the game's theme reader in Plugin.GameUi.cs.
+            RegisterGameTheme(gameConfig);
             // X-155 (0.1260): Dalamud's « reduced motion » preference, for Tensho's brief highlights.
             mainWindow.ConfigureMotion(()=>pluginInterface.UiBuilder.ShouldUseReducedMotion);
             var wikiSources=new WikiMonsterSources(id=>itemCatalog.State.Catalog?.Find(id)?.EnglishName,()=>configuration.Cache.Duration(CacheArea.Sources),dataCache){Enabled=()=>CommunitySources.Allowed(configuration,SourceUse.WikiMonsters)};
@@ -1024,11 +1023,8 @@ public sealed partial class Plugin : IDalamudPlugin
             RegisterQuests(configuration,data,framework,player,client,unlocks,tenshoData);
             // X-153 (0.1926): the gathering readers (gathering window, spearfishing, collectables, action bar, gathering actions) in Plugin.GatheringReaders.cs.
             RegisterGatheringReaders(data,framework,player,client,gameGui,objects,targets);
-            UI.GameWindowsReader? gameWindows=null;
-            registrations.Register(()=>{gameWindows=new UI.GameWindowsReader(framework,client,gameGui,log,()=>mainWindow.DeveloperMode);mainWindow.GameWindowSource=()=>gameWindows.Windows;},()=>{mainWindow.GameWindowSource=null;gameWindows?.Dispose();});
-            mainWindow.ItemLinkToChat=id=>chatGui.Print(new Dalamud.Game.Text.SeStringHandling.SeStringBuilder().AddItemLink(id,false).BuiltString);
-            UI.GameWindowFollower? gameWindowFollower=null;
-            registrations.Register(()=>{gameWindowFollower=new UI.GameWindowFollower(framework,gameGui,log);mainWindow.GameWindowFollow=gameWindowFollower.At;bankOverlay.Follow=gameWindowFollower.At;},()=>{mainWindow.GameWindowFollow=null;bankOverlay.Follow=null;gameWindowFollower?.Dispose();});
+            // X-153 (0.1934): the game's open windows and the window follower in Plugin.GameUi.cs.
+            RegisterGameWindows(framework,client,gameGui);
             // X-153 (0.1926): what the player may gather, read from the game, in Plugin.GatheringReaders.cs.
             RegisterGatherKnowledge(data,framework,client,player);
             // X-76 P4 (0.927): the game's own unlock state of an item (null when it teaches nothing, when nobody is logged in, or in PvP).

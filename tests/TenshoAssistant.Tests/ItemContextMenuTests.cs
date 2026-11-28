@@ -93,7 +93,7 @@ internal static class ItemContextMenuTests
         {
             var menu=ReadLf("MainWindow.DutyFinder.cs");
             foreach(var entry in new[]{"ItemMenu.CopyName","ItemMenu.LinkChat","ItemMenu.OpenOn","ExternalLinks.Universalis(item.Id)","ExternalLinks.Garland(item.Id)","ExternalLinks.Teamcraft("})Check(menu.Contains(entry),entry);
-            Check(ReadLf("Plugin.cs").Contains("chatGui.Print(new Dalamud.Game.Text.SeStringHandling.SeStringBuilder().AddItemLink(id,false).BuiltString)"),"printed locally, nothing sent");
+            Check(ReadLf("Plugin.GameUi.cs").Contains("chatGui.Print(new Dalamud.Game.Text.SeStringHandling.SeStringBuilder().AddItemLink(id,false).BuiltString)"),"printed locally, nothing sent");
         }),
     ];
 }
