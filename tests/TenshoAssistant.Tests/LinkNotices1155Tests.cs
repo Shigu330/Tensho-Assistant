@@ -89,7 +89,9 @@ internal static class LinkNotices1155Tests
             // X-153 (0.1898): the currencies' alert rings from the inventory family.
             var plugin=Read("src/TenshoAssistant/Plugin.cs")+Read("src/TenshoAssistant/Plugin.Inventory.cs")+Read("src/TenshoAssistant/Plugin.Items.cs")
                 // X-153 (0.1938): the GP alert rings from the GP tick's family.
-                +Read("src/TenshoAssistant/Plugin.GpTick.cs");
+                +Read("src/TenshoAssistant/Plugin.GpTick.cs")
+                // X-153 (0.1939): the gear wear alert rings from the gear wear's family.
+                +Read("src/TenshoAssistant/Plugin.GearWear.cs");
             Check(plugin.Split("if(options.ChatAllowed(inDuty) || options.SoundAllowed(inDuty))linkNotices.Add(message);").Length==4,"currencies, duty ready, GP");
             Check(plugin.Contains("if(repairText is not null)linkNotices.Add(repairText);") && plugin.Contains("if(extractText is not null)linkNotices.Add(extractText);"),"gear wear");
             Check(plugin.Contains("if(configuration.ItemNoteImportantSound){Alarms.AlarmService.PlaySound((configuration.AlarmOptions ?? new()).Sound,log);linkNotices.Add(message);}"),"important items, when they ring");

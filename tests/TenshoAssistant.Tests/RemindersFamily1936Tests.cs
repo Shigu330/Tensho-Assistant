@@ -47,7 +47,7 @@ internal static class RemindersFamily1936Tests
             var prep = At("RegisterPrepReminders(configuration,data,framework,client,objects,condition,chat);");
             var garden = At("RegisterGardenWatcher(configuration,data,framework,client,targets,gameGui,()=>itemWatcher);");
             Check(Count(plugin, @"RegisterPrepReminders\(") == 1 && Count(plugin, @"RegisterGardenWatcher\(") == 1, "each called once");
-            Check(At("()=>gearWear?.Dispose());") < prep && prep < At("mainWindow.GearCatalog=()=>"), "the preparation reminder: after the gear wear, before the gear catalogue, as before");
+            Check(At("RegisterGearWear(configuration,framework,client,condition,chat,()=>gear?.Equipped ?? []);") < prep && prep < At("mainWindow.GearCatalog=()=>"), "the preparation reminder: after the gear wear, before the gear catalogue, as before");
             Check(At("Discoveries.ItemDiscoveryWatcher? itemWatcher=null;") < garden && At("mainWindow.SquadronMemberName=") < garden && garden < At("mainWindow.SquadronTrainingName="), "the garden: between the squadron's names, after the item watcher, as before");
         }),
         ("Reminders family 1936: each service's install and its release are given to one same registration of Plugin.Reminders.cs (its own release, never another's)", () =>

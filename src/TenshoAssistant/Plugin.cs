@@ -577,26 +577,8 @@ public sealed partial class Plugin : IDalamudPlugin
             // X-153 (0.1417, ninth slice): the ocean fishing family (Plugin.Ocean.cs), at the same place as before.
             RegisterOcean(pluginInterface,configuration,data,framework,client,condition);
             RegisterInventoryWindow(configuration,framework,gameGui);
-            // g, M-06 (0.376): repair and materia extraction alert (chat and sound with the alarm options), once per crossing.
-            Gear.GearWearWatcher? gearWear=null;
-            registrations.Register(()=>gearWear=new Gear.GearWearWatcher(framework,client,()=>gear?.Equipped ?? [],()=>configuration.GearWear ?? new(),log){Crossed=(repair,extract,state)=>
-            {
-                var options=configuration.AlarmOptions ?? new();
-                var inDuty=options.MuteInDuties && condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty];
-                var repairText=repair ? localization.Format("GearWear.AlertRepair",state.ToRepair,state.LowestCondition ?? 0):null;
-                var extractText=extract ? localization.Format("GearWear.AlertExtract",state.ToExtract):null;
-                if(options.ChatAllowed(inDuty))
-                {
-                    if(repairText is not null)chat.Print("[Tensho] "+repairText);
-                    if(extractText is not null)chat.Print("[Tensho] "+extractText);
-                }
-                if(options.SoundAllowed(inDuty))Alarms.AlarmService.PlaySound(options.Sound,log);
-                if(options.ChatAllowed(inDuty) || options.SoundAllowed(inDuty))
-                {
-                    if(repairText is not null)linkNotices.Add(repairText);
-                    if(extractText is not null)linkNotices.Add(extractText);
-                }
-            }},()=>gearWear?.Dispose());
+            // X-153 (0.1939): the repair and materia extraction alert in Plugin.GearWear.cs; the worn gear read when it is checked, as before.
+            RegisterGearWear(configuration,framework,client,condition,chat,()=>gear?.Equipped ?? []);
             // X-153 (0.1936): the preparation reminder (meal, chocobo companion) in Plugin.Reminders.cs.
             RegisterPrepReminders(configuration,data,framework,client,objects,condition,chat);
             mainWindow.GearCatalog=()=>gear?.Catalog;

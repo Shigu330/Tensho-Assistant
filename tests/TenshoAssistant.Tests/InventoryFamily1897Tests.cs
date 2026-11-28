@@ -51,7 +51,7 @@ internal static class InventoryFamily1897Tests
             Check(Paths.All(path => plugin.Split(path.Call).Length == 2), "each called once");
             Check(calls.SequenceEqual(calls.Order()), "in the order of before");
             Check(At("mainWindow.BeastWiki=beastWiki;") < calls[0] && calls[0] < At("var (discoveries,discoveryFolder)=RegisterDiscoveries(pluginInterface);"), "the highlight after the beast wiki, before the discoveries, as before");
-            Check(At("RegisterOcean(pluginInterface,configuration,data,framework,client,condition);") < calls[1] && calls[1] < At("Gear.GearWearWatcher? gearWear=null;"), "the inventory window after the ocean fishing, before the gear wear, as before");
+            Check(At("RegisterOcean(pluginInterface,configuration,data,framework,client,condition);") < calls[1] && calls[1] < At("RegisterGearWear(configuration,framework,client,condition,chat,()=>gear?.Equipped ?? []);"), "the inventory window after the ocean fishing, before the gear wear, as before");
             Check(At("mainWindow.Festivals=()=>festivals;") < calls[2] && calls[2] < At("(uint Id,string Name,uint Icon)[]? keyItems=null;"), "the gear sets after the festivals, before the key items, as before");
         }),
         // X-885 M2 (0.1906): this case replaced « behaviour », the same RegistrationScope test copied in each family test, which touched nothing

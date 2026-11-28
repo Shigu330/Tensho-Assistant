@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1939.0
+- Plan global, X-153 : Branchement des services de Plugin.cs par famille (X-153, revue GPT du 11/11) : famille de l'usure de l'équipement. L'alerte de réparation et d'extraction de matérias (chat et son avec les options des alarmes, une fois par franchissement) passe de Plugin.cs au nouveau Plugin.GearWear.cs : bloc déplacé tel quel, appelé là où il était, l'ordre des branchements gardé ; l'équipement porté est toujours lu au moment du contrôle. Nouveau test `GearWearFamily1939Tests` : un seul chemin d'installation et un seul de libération, dans Plugin.GearWear.cs, donnés au même branchement ; Plugin.cs n'en crée aucun et l'appelle une fois, à sa place d'avant. Rien de visible ne change.
+- Tests : GearWearFamily1939Tests. Verify.ps1 (agent) : 4302/4302, 0 avertissement, 0 erreur ; DLL 0.1939.0.0. Rien à essayer en jeu.
+### English
+- Wiring of Plugin.cs's services by family (X-153, GPT review of 11/11): the gear wear's family. The repair and materia extraction alert (chat and sound with the alarm options, once per crossing) moves from Plugin.cs to the new Plugin.GearWear.cs: the block moved as it was, called where it stood, the order of the registrations kept; the worn gear is still read when it is checked. New test `GearWearFamily1939Tests`: one install path and one release path, in Plugin.GearWear.cs, given to the same registration; Plugin.cs creates none and calls it once, at its place of before. Nothing visible changes.
+
 ## 0.1938.0
 - Plan global, X-153 : Branchement des services de Plugin.cs par famille (X-153, revue GPT du 11/11) : famille du tic de PR. Le lecteur du tic de régénération des PR (barre à l'écran) et l'alerte de PR au seuil (chat et son avec les options des alarmes) passent de Plugin.cs au nouveau Plugin.GpTick.cs : bloc déplacé tel quel, appelé là où il était, l'ordre des branchements gardé ; le lecteur est rendu aux pages de récolte. Nouveau test `GpTickFamily1938Tests` : un seul chemin d'installation et un seul de libération, dans Plugin.GpTick.cs, donnés au même branchement ; Plugin.cs n'en crée aucun et l'appelle une fois, à sa place d'avant. Rien de visible ne change.
 - Tests : GpTickFamily1938Tests. Verify.ps1 (agent) : 4299/4299, 0 avertissement, 0 erreur ; DLL 0.1938.0.0. Rien à essayer en jeu.
