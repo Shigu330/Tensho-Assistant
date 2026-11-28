@@ -40,7 +40,8 @@ internal static class DiscoveriesFamily1250Tests
         {
             var plugin = PluginFiles().Single(file => file.Name == "Plugin.cs").Text;
             var store = plugin.IndexOf("var (discoveries,discoveryFolder)=RegisterDiscoveries(pluginInterface);",StringComparison.Ordinal);
-            var watcher = plugin.IndexOf("itemWatcher=new Discoveries.ItemDiscoveryWatcher(",StringComparison.Ordinal);
+            // X-153 (0.1941): the item watcher is made by its own family (Plugin.ItemWatcher.cs), called at the same place.
+            var watcher = plugin.IndexOf("var itemWatcher=RegisterItemWatcher(",StringComparison.Ordinal);
             // X-153 (0.1893): the seen prices' reader is made by its market family, called at the same place.
             var reader = plugin.IndexOf("RegisterSeenPrices(configuration,marketBoardEvents,seenPrices,bankBridge);",StringComparison.Ordinal);
             var load = plugin.IndexOf("LoadDiscoveries(discoveryFolder,discoveries,seenPrices,framework,chat);",StringComparison.Ordinal);

@@ -368,14 +368,8 @@ public sealed partial class Plugin : IDalamudPlugin
                 return rows;
             },error=>log.Warning(error,"Venture sheets unreadable (game update?)."));
             mainWindow.VentureRowOf=id=>ventures.TryGet(id,out var row) ? row:null;
-            // X-74 (0.860): where the items got come from, and the fish caught (Discoveries/ItemDiscoveryWatcher).
-            HashSet<uint>? fishItems=null;var territoryDuties=new Dictionary<uint,uint>();
-            Discoveries.ItemDiscoveryWatcher? itemWatcher=null;
-            registrations.Register(()=>itemWatcher=new Discoveries.ItemDiscoveryWatcher(framework,client,gameGui,objects,targets,condition,inventory,discoveries,log,
-                ()=>configuration.Discovery,()=>configuration.DeveloperMode && configuration.Discovery.DebugLog,
-                territory=>territoryDuties.TryGetValue(territory,out var duty) ? duty:territoryDuties[territory]=data.GetExcelSheet<Lumina.Excel.Sheets.TerritoryType>().GetRowOrDefault(territory)?.ContentFinderCondition.RowId ?? 0,
-                item=>(fishItems??=data.GetExcelSheet<Lumina.Excel.Sheets.FishParameter>().Where(row=>row.Item.RowType==typeof(Lumina.Excel.Sheets.Item)).Select(row=>row.Item.RowId).ToHashSet()).Contains(item),
-                item=>data.GetExcelSheet<Lumina.Excel.Sheets.Item>().GetRowOrDefault(item)?.ItemAction.RowId is > 0,chat),()=>itemWatcher?.Dispose());
+            // X-153 (0.1941): the discoveries' item watcher (where the items got come from, the fish caught) in Plugin.ItemWatcher.cs; handed back.
+            var itemWatcher=RegisterItemWatcher(configuration,data,framework,client,gameGui,objects,targets,condition,inventory,discoveries,chat);
             // X-52 (0.817): the prices seen at the market board, in place of Universalis' when newer.
             var seenPrices=new Market.SeenPriceStore();
             mainWindow.SeenPrices=seenPrices;
