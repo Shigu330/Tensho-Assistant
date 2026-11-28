@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (939 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (942 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -1006,13 +1006,16 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-906 | The next-relay choice still offers a point whose code is done and that only… | Done in 0.1935.0 |
 | X-907 | The next-relay choice wrongly skips a point whose code is not finished because… | Done in 0.1935.0 |
 | X-908 | Review of block 0.1945 to 0.1950 (review 0.1950, 28/11), I1: finding in… | Done in 0.1951.0 |
+| X-909 | Publication tool: after a failed Verify, its rerun without argument replays a… | Done in 0.1952.0 |
 | X-910 | Review  (review 0.1951, 28/11), minor M1: M1 in… | Done in 0.1952.0 |
+| X-911 | A relay's return wrongly says « CI not green » when more than 33 commits… | Done in 0.1952.0 |
+| X-912 | Review  (review 0.1952, 28/11), minor M1, M2, M3: M1 in… | Done in 0.1952.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (939 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (942 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -2016,4 +2019,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-906 | Le choix du relais suivant propose encore un point dont le code est fait et qui… | Fait en 0.1935.0 |
 | X-907 | Le choix du relais suivant saute à tort un point dont le code n'est pas fini… | Fait en 0.1935.0 |
 | X-908 | Relecture du bloc 0.1945 à 0.1950 (relecture 0.1950, 28/11), I1 : La fenêtre de… | Fait en 0.1951.0 |
+| X-909 | Outil de publication : après un échec de Verify, sa relance sans argument… | Fait en 0.1952.0 |
 | X-910 | Relecture  (relecture 0.1951, 28/11), mineurs M1 : M1 : Le garde-fou ne voit… | Fait en 0.1952.0 |
+| X-911 | Le retour d'un relais dit « CI pas verte » à tort quand plus de 33 commits… | Fait en 0.1952.0 |
+| X-912 | Relecture  (relecture 0.1952, 28/11), mineurs M1, M2, M3 : M1 : L'exemption des… | Fait en 0.1952.0 |
