@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (936 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (937 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -345,6 +345,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-149 | GPT review of 11/11, checked in the code by the master, accepted by the user… | Done in 0.1119 |
 | X-150 | GPT review of 11/11, checked in the code by the master, accepted by the user… | Done in 0.1120 |
 | X-151 | GPT review of 11/11, checked in the code by the master, accepted by the user… | Done in 0.1238 |
+| X-153 | GPT review of 11/11, checked in the code by the master, accepted by the user… | Done in 0.1941.0 |
 | X-154 | GPT visual plan of 12/11, checked by the master, place accepted by the user… | Done in 0.1255 |
 | X-155 | GPT visual plan of 12/11, checked by the master, place accepted by the user… | Done in 0.1261 |
 | X-156 | GPT visual plan of 12/11, checked by the master, place accepted by the user… | Done in 0.1267 |
@@ -1009,7 +1010,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (936 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (937 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1352,6 +1353,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-149 | revue GPT du 11/11 (C:\Plugins-ff14-plan-2026-11-11-2dddccb), vérifiée dans le… | Fait en 0.1119 |
 | X-150 | revue GPT du 11/11 (C:\Plugins-ff14-plan-2026-11-11-2dddccb), vérifiée dans le… | Fait en 0.1120 |
 | X-151 | revue GPT du 11/11 (C:\Plugins-ff14-plan-2026-11-11-2dddccb), vérifiée dans le… | Fait en 0.1238 |
+| X-153 | revue GPT du 11/11 (C:\Plugins-ff14-plan-2026-11-11-2dddccb), vérifiée dans le… | Fait en 0.1941.0 |
 | X-154 | plan visuel GPT du 12/11 (C:\Plugins-ff14-plan-visuel-2026-11-12-3b1d717)… | Fait en 0.1255 |
 | X-155 | plan visuel GPT du 12/11 (C:\Plugins-ff14-plan-visuel-2026-11-12-3b1d717)… | Fait en 0.1261 |
 | X-156 | plan visuel GPT du 12/11 (C:\Plugins-ff14-plan-visuel-2026-11-12-3b1d717)… | Fait en 0.1267 |
