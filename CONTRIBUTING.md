@@ -161,7 +161,10 @@ follow the list below: the tests refuse a page that misses one of its places.
    (`if(TipHovered())TipText(text)` builds a computed text only on hover). Sections: `UiComponents.Header`, folds inside them: `UiComponents.TreeNode` (both
    open while the Settings search looks for a setting). Settings: `BoolSetting`, `IntSetting`, `SliderSetting`,
    `ComboSetting` (a default, a « Default: » line and a « ↺ » button). Icon buttons `ToolButton` or `GlyphButton`, game icons `DrawGameIcon`, colours from
-   the theme (`Accent`, `Muted`, `Success`, `Warning`, `Error`). Tests refuse the forms these replace, and the number of tab bars and
+   the theme (`Accent`, `Muted`, `Success`, `Warning`, `Error`). An item's tooltip: `ItemTip(id)`; a text field with a hint:
+   `InputWithHint(id, hintKey, ref text, maximum)`; a text filter whose empty value means « all »: `FilterCombo(id, allKey, ref value,
+   choices)`; a copy button: `CopyButton(label, () => text)`; a framed list or pane: `BeginFramed(id, size)` (closed by
+   `ImGui.EndChild()`); a control's width: `Widths.Number`, `Widths.Short`, `Widths.Long`… rather than a bare number. Tests refuse the forms these replace, and the number of tab bars and
    tables still written by hand can only go down, as can the headers, glyph fonts and tooltips drawn by hand.
 3. **Its texts.** English and French in `Localization/Languages/en.json` and `fr.json` (English is the original; French says « vous »;
    a word of the game is taken from the French client). The help of its « ? »: `PageHelp.<Name>Title`, `Purpose`, `Start` and `Empty`.
@@ -430,7 +433,11 @@ Suivez ensuite la liste ci-dessous : les tests refusent une page à qui manque l
    `UiComponents.Header`, replis dedans : `UiComponents.TreeNode` (les deux s'ouvrent pendant que la recherche des Paramètres cherche un
    réglage). Réglages : `BoolSetting`, `IntSetting`, `SliderSetting`, `ComboSetting` (un défaut, une ligne « Par
    défaut : » et un bouton « ↺ »). Boutons à icône `ToolButton` ou `GlyphButton`, icônes du jeu `DrawGameIcon`, couleurs du thème (`Accent`, `Muted`,
-   `Success`, `Warning`, `Error`). Des tests refusent les formes qu'ils remplacent, et le nombre de barres d'onglets et de tableaux encore
+   `Success`, `Warning`, `Error`). L'infobulle d'un objet : `ItemTip(id)` ; un champ de texte avec indice :
+   `InputWithHint(id, cléIndice, ref texte, maximum)` ; un filtre sur un texte dont la valeur vide veut dire « tous » :
+   `FilterCombo(id, cléTous, ref valeur, choix)` ; un bouton de copie : `CopyButton(libellé, () => texte)` ; une liste ou un volet
+   encadré : `BeginFramed(id, taille)` (fermé par `ImGui.EndChild()`) ; la largeur d'un contrôle : `Widths.Number`, `Widths.Short`,
+   `Widths.Long`… plutôt qu'un nombre nu. Des tests refusent les formes qu'ils remplacent, et le nombre de barres d'onglets et de tableaux encore
    écrits à la main ne peut que baisser, comme celui des en-têtes, des polices de glyphes et des infobulles dessinés à la main.
 3. **Ses textes.** Anglais et français dans `Localization/Languages/en.json` et `fr.json` (l'anglais est l'original ; le français dit
    « vous » ; un mot du jeu se prend dans le client français). L'aide de son « ? » : `PageHelp.<Name>Title`, `Purpose`, `Start` et

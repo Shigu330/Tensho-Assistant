@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1949.0
+- Plan global, X-607 : Code plus facile à entretenir (X-607, demande du 18/11) : la page « Ajouter une page » de CONTRIBUTING (deux moitiés) nomme les composants communs ajoutés depuis 0.1942 : `ItemTip`, `InputWithHint`, `FilterCombo`, `CopyButton`, `BeginFramed`, `Widths`. Nouveau test `ContributingComponents1949Tests` : chaque composant demandé aux pages est nommé dans les deux moitiés.
+- Tests : ContributingComponents1949Tests. Verify.ps1 (agent) : 4330/4330, 0 avertissement, 0 erreur ; DLL 0.1949.0.0. Rien à essayer en jeu.
+### English
+- Code easier to maintain (X-607, request of 18/11): CONTRIBUTING's « Adding a page » (both halves) names the shared components added since 0.1942: `ItemTip`, `InputWithHint`, `FilterCombo`, `CopyButton`, `BeginFramed`, `Widths`. New test `ContributingComponents1949Tests`: each component asked of the pages is named in both halves.
+
 ## 0.1948.0
 - Plan global, X-607 : Code plus facile à entretenir (X-607, demande du 18/11) : geste des largeurs nommées. Les sept largeurs que les pages donnent le plus souvent à un contrôle par un nombre écrit à la main (70, 90, 110, 160, 220, 260, 320) ont un nom à un seul endroit, UI/Components/Widths.cs (`Widths.Number`, `Widths.Short`…), avec la même valeur : aucune page ne change, et une largeur se change désormais une seule fois. Nouveau test `UiWidths1948Tests` : ces sept valeurs sont refusées en nombre nu dans les pages, les autres nombres nus ne croissent plus (cliquet), les noms gardent les valeurs d'avant.
 - Tests : UiWidths1948Tests. Verify.ps1 (agent) : 4329/4329, 0 avertissement, 0 erreur ; DLL 0.1948.0.0. Rien à essayer en jeu.
