@@ -429,16 +429,8 @@ public sealed partial class Plugin : IDalamudPlugin
             mainWindow.IslandAnimalBookSource=islandAnimalBook;
             // X-153 (0.1900): the rest of the map family (game map replacement, housing probe, treasure map) in Plugin.Maps.cs.
             RegisterGameMap(configuration,framework,gameGui,client,condition);
-            Macros.MacroWriter? macroWriter=null;
-            registrations.Register(()=>macroWriter=new Macros.MacroWriter(framework,log,outcome=>
-            {
-                var parts=outcome.Split(':');
-                // 0.330 (audit): the exact slot list (« Done:first:last:book:list »); occupied slots are skipped, so « first to last » could
-                // suggest they were overwritten.
-                var text=parts[0]=="Done" ? localization.Format("CraftMacro.Written",parts[4].Replace(",",", ")):localization.Get("CraftMacro.Write"+parts[0]);
-                if(parts[0]=="Done")chat.Print("[Tensho] "+text);else chat.PrintError("[Tensho] "+text);
-            }),()=>macroWriter?.Dispose());
-            mainWindow.ConfigureMacroWriter(macroWriter!);
+            // X-153 (0.1933): the macro writer in Plugin.Macros.cs.
+            RegisterMacroWriter(framework,chat);
             // X-153 (0.1932): the alarm service and its Discord notifier in Plugin.Alarms.cs; the notifier is handed back (currencies, duty pop).
             var discord=RegisterAlarms(configuration,framework,condition,chat,objects,()=>SaveTimed("alarms"));
             // X-153 (0.1412, eighth slice): the gathering and fishing family (Plugin.Gathering.cs), at the same place as before.
@@ -951,10 +943,8 @@ public sealed partial class Plugin : IDalamudPlugin
             registrations.Register(()=>{ },itemContextMenu.Dispose);
             InventoryVisualSortBridge? sortBridge=null;
             registrations.Register(()=>sortBridge=new InventoryVisualSortBridge(visualSort,inventory,player,client,framework,log,bankBridge),()=>sortBridge?.Dispose());
-            MacroChainBridge? macroBridge = null;
-            registrations.Register(() => macroBridge = new MacroChainBridge(macroChain, framework, player, client, commands, interop, log), () => macroBridge?.Dispose());
-            MacroObservationReader? macroObserver = null;
-            registrations.Register(() => macroObserver = new MacroObservationReader(macroObservations, framework, player, client, log), () => macroObserver?.Dispose());
+            // X-153 (0.1933): the Macro Chain bridge and the macros' observation in Plugin.Macros.cs.
+            RegisterMacroReaders(framework,player,client,commands,interop);
             ItemHoverReader? hoverReader = null;
             registrations.Register(() => hoverReader = new ItemHoverReader(configuration, market, itemHover, itemCatalog, gameGui, player, client, framework, log) { InDuty = () => mapLive?.State is { InDuty: true }, Keys = keyState, Developer=()=>configuration.DeveloperMode, },
                 () => hoverReader?.Dispose());

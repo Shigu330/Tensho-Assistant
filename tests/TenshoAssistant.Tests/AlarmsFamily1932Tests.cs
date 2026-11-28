@@ -50,7 +50,7 @@ internal static class AlarmsFamily1932Tests
             var alarms = At("var discord=RegisterAlarms(configuration,framework,condition,chat,objects,()=>SaveTimed(\"alarms\"));");
             var auto = At("RegisterAutoAlarms(framework,client,configuration,()=>SaveTimed(\"automatic alarms\"));");
             Check(Count(plugin, @"RegisterAlarms\(") == 1 && Count(plugin, @"RegisterAutoAlarms\(") == 1, "each called once");
-            Check(At("mainWindow.ConfigureMacroWriter(") < alarms && alarms < At("RegisterGathering(") && alarms < At("RegisterCurrencies("), "the alarms: after the macro writer, before the gathering family and the currencies that post through the notifier");
+            Check(At("RegisterMacroWriter(framework,chat);") < alarms && alarms < At("RegisterGathering(") && alarms < At("RegisterCurrencies("), "the alarms: after the macro writer, before the gathering family and the currencies that post through the notifier");
             Check(At("RegisterAetherialWheels(") < auto && auto < At("RegisterCollections("), "the automatic alarms: after the wheels they follow, before the collections, as before");
         }),
         ("Alarms family 1932: each service's install and its release are given to one same registration of Plugin.Alarms.cs (its own release, never another's)", () =>

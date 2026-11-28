@@ -49,7 +49,7 @@ internal static class MapsFamily1900Tests
             var housing = At("RegisterHousingProbe(configuration,framework,client,objects);");
             var treasure = At("var treasureMap=RegisterTreasureMap(framework,client,data);");
             Check(new[] { "RegisterGameMap", "RegisterHousingProbe", "RegisterTreasureMap" }.All(name => Count(plugin, name + @"\(") == 1), "each called once");
-            Check(At("mainWindow.IslandAnimalBookSource=islandAnimalBook;") < game && game < At("Macros.MacroWriter? macroWriter=null;"), "the game map after the island's animal book, before the macro writer, as before");
+            Check(At("mainWindow.IslandAnimalBookSource=islandAnimalBook;") < game && game < At("RegisterMacroWriter(framework,chat);"), "the game map after the island's animal book, before the macro writer, as before");
             Check(At("communityHelp=new Help.CommunityHelpIndex()") < housing && housing < At("RegisterBeastBoard(configuration,data,framework,gameGui,objects);"), "the housing probe after the community help, before the beast board, as before");
             Check(At("mainWindow.LeveDefinitions=LeveList;") < treasure && treasure < At("if(itemWatcher is not null)itemWatcher.TreasureMapItem=()=>treasureMap?.Spot"), "the treasure map after the leves' list, before the item watcher reads it");
         }),
