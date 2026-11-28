@@ -30,7 +30,7 @@ internal sealed partial class MainWindow
         if(catalog is null){ImGui.TextDisabled(localization.Get(reader.CatalogFailed ? "CollectablePanel.Unavailable":"CollectablePanel.Loading"));return;}
         DrawHeldCollectables(reader,catalog);
         ImGui.SetNextItemWidth(280);
-        ImGui.InputTextWithHint("###CollectableQuery",localization.Get("CollectableTable.Search"),ref collectableQuery,80);
+        InputWithHint("###CollectableQuery","CollectableTable.Search",ref collectableQuery,80);
         Tip("CollectableTable.SearchTip");
         if(collectableViewKey is not { } key || !ReferenceEquals(key.Catalog,catalog) || key.Query!=collectableQuery)
         {

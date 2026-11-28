@@ -284,7 +284,7 @@ internal sealed partial class MainWindow
         DesktopEditBegin();
         try
         {
-            ImGui.SetNextItemWidth(160);ImGui.InputTextWithHint("##AlarmLabel",localization.Get("Alarms.ManualLabel"),ref alarmManualLabel,40);
+            ImGui.SetNextItemWidth(160);InputWithHint("##AlarmLabel","Alarms.ManualLabel",ref alarmManualLabel,40);
             Tip("Alarms.ManualLabelTip");
             ImGui.SameLine();ImGui.SetNextItemWidth(70);ImGui.InputInt("##AlarmHour",ref alarmManualHour,0);
             Tip("Alarms.ManualHourTip");

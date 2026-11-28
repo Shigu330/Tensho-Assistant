@@ -81,7 +81,7 @@ internal sealed partial class MainWindow
             ImGui.TextDisabled(localization.Format("ChocoboBarding.Progress",progress.Unlocked,progress.Total));
 
         ImGui.SetNextItemWidth(220);
-        ImGui.InputTextWithHint("##BardingSearch",localization.Get("ChocoboBarding.Search"),ref bardingSearch,64);
+        InputWithHint("##BardingSearch","ChocoboBarding.Search",ref bardingSearch,64);
         Tip("ChocoboBarding.SearchTip");
         ImGui.SameLine();
         ImGui.Checkbox(localization.Get("ChocoboBarding.MissingOnly")+"##BardingMissing",ref bardingMissingOnly);

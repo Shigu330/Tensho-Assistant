@@ -36,7 +36,7 @@ internal sealed partial class MainWindow
     private void DrawQuickSearch()
     {
         ImGui.SetNextItemWidth(-1);
-        ImGui.InputTextWithHint("##QuickSearch",localization.Get("QuickSearch.Hint"),ref quickQuery,QuickSearch.MaxLength);
+        InputWithHint("##QuickSearch","QuickSearch.Hint",ref quickQuery,QuickSearch.MaxLength);
         Tip("QuickSearch.Tip");
         var query=quickQuery.Trim();
         var tokens=QuickSearch.Tokens(query);

@@ -486,7 +486,7 @@ internal sealed partial class MainWindow
         }
         ImGui.TextColored(Accent, string.IsNullOrWhiteSpace(craftBookFilter) ? localization.Get("RecipeUi.AllJobs") : craftBookFilter);
         ImGui.SetNextItemWidth(-1);
-        ImGui.InputTextWithHint("##CraftBookQuery", localization.Get("RecipeUi.Query"), ref craftBookQuery, 128);
+        InputWithHint("##CraftBookQuery", "RecipeUi.Query", ref craftBookQuery, 128);
         Tip("RecipeUi.QueryTip");
         var items = itemCatalog.State.Catalog;
         var neverOnly = craftBookNeverCrafted && recipeLog is not null;
@@ -751,7 +751,7 @@ internal sealed partial class MainWindow
     {
         var state = itemCatalog.State;
         ImGui.SetNextItemWidth(-1);
-        var changed = ImGui.InputTextWithHint("##ItemQuery", localization.Get("ItemsUi.Query"), ref itemQuery, 128);
+        var changed = InputWithHint("##ItemQuery", "ItemsUi.Query", ref itemQuery, 128);
         if(TipHovered())TipText(localization.Format("ItemsUi.QueryTip", ItemSearchLimit));
         if (state.Catalog is not { } catalog)
         {

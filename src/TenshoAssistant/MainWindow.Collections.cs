@@ -98,7 +98,7 @@ internal sealed partial class MainWindow
             ? localization.Format("CollectionsBrowser.TitlesFromReading",titlesRead.ToLocalTime().ToString("g",Numbers)):localization.Get("CollectionsBrowser.TitlesNotLoaded"));
         if(kind==CollectionKind.Achievement && collections.AchievementListLoaded==false)ImGui.TextColored(UI.FfxivTheme.Error,collections.AchievementsReadAt is { } achievementsRead
             ? localization.Format("CollectionsBrowser.AchievementsFromReading",achievementsRead.ToLocalTime().ToString("g",Numbers)):localization.Get("CollectionsBrowser.AchievementsNotLoaded"));
-        ImGui.InputTextWithHint("##CollectionSearch", localization.Get("CollectionsBrowser.Search"), ref collectionQuery, 128);
+        InputWithHint("##CollectionSearch", "CollectionsBrowser.Search", ref collectionQuery, 128);
         Tip("CollectionsBrowser.SearchTip");
         var completion=kind is CollectionKind.Title or CollectionKind.Achievement;
         if(!completion && collectionFilter==3)collectionFilter=0;

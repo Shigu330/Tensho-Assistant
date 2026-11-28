@@ -58,7 +58,7 @@ internal sealed partial class MainWindow
         // P10 (0.597): search everything on every map, from here rather than from the map.
         DrawMapFind();
         ImGui.SetNextItemWidth(-1);
-        ImGui.InputTextWithHint("##MapSearch", localization.Get("MapsUi.Search"), ref mapQuery, 128);
+        InputWithHint("##MapSearch", "MapsUi.Search", ref mapQuery, 128);
         Tip("MapsUi.SearchTip");
         if (!ReferenceEquals(mapViewCatalog, catalog) || mapViewQuery != mapQuery)
         { mapMatches = catalog.Search(mapQuery); mapViewCatalog = catalog; mapViewQuery = mapQuery; }

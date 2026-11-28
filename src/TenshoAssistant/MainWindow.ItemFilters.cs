@@ -107,7 +107,7 @@ internal sealed partial class MainWindow
         try
         {
             ImGui.SetNextItemWidth(-1);
-            if(ImGui.InputTextWithHint("##KeyItemQuery",localization.Get("ItemsUi.Query"),ref keyItemQuery,64))keyItemResults=KeyItemSearch(keyItemQuery);
+            if(InputWithHint("##KeyItemQuery","ItemsUi.Query",ref keyItemQuery,64))keyItemResults=KeyItemSearch(keyItemQuery);
             Tip("ItemFilters.KeyItemsTip");
             if(keyItemQuery.Trim().Length>0 && keyItemResults.Count==0)ImGui.TextDisabled(localization.Get("ItemFilters.KeyItemsNone"));
             foreach(var (id,name,icon) in keyItemResults)

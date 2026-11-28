@@ -83,7 +83,7 @@ internal sealed partial class MainWindow
         }
         if (questShowDetails && selectedQuestId != 0) { DrawQuestDetails(); return; }
         ImGui.SetNextItemWidth(-1);
-        ImGui.InputTextWithHint("##QuestSearch", localization.Get("QuestsBrowser.Search"), ref questQuery, 128);
+        InputWithHint("##QuestSearch", "QuestsBrowser.Search", ref questQuery, 128);
         Tip("QuestsBrowser.SearchTip");
         ImGui.SetNextItemWidth(260);
         if (ImGui.BeginCombo(localization.Get("QuestsBrowser.Section")+"###QuestSection", questSection.Length == 0 ? localization.Get("QuestsBrowser.All") : QuestStatLabel(questSection, questSectionStats)))

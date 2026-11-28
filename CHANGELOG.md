@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1944.0
+- Plan global, X-607 : Code plus facile à entretenir (X-607, demande du 18/11) : geste des champs de texte avec indice. Les champs écrits à la main avec un indice traduit (recherches, noms à taper) passent par le nouveau composant `InputWithHint(id, clé de l'indice, texte, taille)` de UI/Components/InputWithHint.cs, le même appel qu'avant : aucune page ne change. Nouveau test `UiInputs1944Tests` : la forme écrite à la main est refusée, le composant garde le même appel, les pages s'en servent et gardent leur info-bulle.
+- Tests : UiInputs1944Tests. Verify.ps1 (agent) : 4317/4317, 0 avertissement, 0 erreur ; DLL 0.1944.0.0. Rien à essayer en jeu.
+### English
+- Code easier to maintain (X-607, request of 18/11): the gesture of the text fields with a hint. The fields written by hand with a translated hint (searches, names to type) go through the new component `InputWithHint(id, hint key, text, size)` of UI/Components/InputWithHint.cs, the same call as before: no page changes. New test `UiInputs1944Tests`: the form written by hand is refused, the component keeps the same call, the pages use it and keep their tooltip.
+
 ## 0.1943.0
 - Plan global, X-607 : Code plus facile à entretenir (X-607, demande du 18/11) : geste des info-bulles d'objet. Les vingt-huit info-bulles d'objet écrites à la main (« si survolé, dessiner la bulle de l'objet ») passent par le nouveau composant `ItemTip(objet, apparence seule, HQ)` de UI/Components/Tooltip.cs, avec la même condition de survol et la même bulle. Nouveau test `UiItemTips1943Tests` : la forme écrite à la main est refusée hors du composant, le composant garde la condition et l'ordre des arguments, les arguments nommés des pages sont gardés. Rien de visible ne change.
 - Tests : UiItemTips1943Tests. Verify.ps1 (agent) : 4314/4314, 0 avertissement, 0 erreur ; DLL 0.1943.0.0. Rien à essayer en jeu.

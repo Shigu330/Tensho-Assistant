@@ -102,7 +102,7 @@ internal sealed partial class MainWindow
         ImGui.Checkbox(localization.Get("GrandCompany.MyRank")+"###GcMyRank",ref gcMyRank);
         Tip("GrandCompany.MyRankTip");
         ImGui.SameLine();ImGui.SetNextItemWidth(220);
-        ImGui.InputTextWithHint("###GcQuery",localization.Get("GrandCompany.Search"),ref gcQuery,100);
+        InputWithHint("###GcQuery","GrandCompany.Search",ref gcQuery,100);
         Tip("GrandCompany.SearchTip");
         var items=itemCatalog.State.Catalog;
         var rank=gcMyRank && current.Ranks.Count>=gcShopCompany ? current.Ranks[gcShopCompany-1]:(int?)null;

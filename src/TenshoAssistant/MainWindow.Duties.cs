@@ -50,7 +50,7 @@ internal sealed partial class MainWindow
         }
         if (dutyLoot.State.Duty is not null && ImGui.SmallButton(localization.Get("DutyUi.Selected"))) showDutyDetails = true;
         ImGui.SetNextItemWidth(-1);
-        ImGui.InputTextWithHint("##DutySearch",localization.Get("DutyUi.Search"),ref dutyQuery,128);
+        InputWithHint("##DutySearch","DutyUi.Search",ref dutyQuery,128);
         Tip("DutyUi.SearchTip");
         if (!ReferenceEquals(dutyViewCatalog,catalog))
             dutyCategories = catalog.Entries.Select(duty => duty.Category).Where(name => !string.IsNullOrWhiteSpace(name))
@@ -295,7 +295,7 @@ internal sealed partial class MainWindow
             ImGui.SameLine(); if (ImGui.SmallButton(localization.Get("DutyUi.Prices"))) OpenContextTool("Price Insight");
         }
         ImGui.SetNextItemWidth(-1);
-        ImGui.InputTextWithHint("##DutyItemSearch",localization.Get("DutyUi.ItemQuery"),ref dutyItemQuery,128);
+        InputWithHint("##DutyItemSearch","DutyUi.ItemQuery",ref dutyItemQuery,128);
         Tip("DutyUi.ItemQueryTip");
         var labels = new[] { localization.Get("DutyUi.AllSources"), localization.Get("DutyUi.Rewards"), localization.Get("DutyUi.FightCoffers"), localization.Get("DutyUi.ZoneCoffers") };
         for (var index = 0; index < labels.Length; index++)

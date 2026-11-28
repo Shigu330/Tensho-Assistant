@@ -86,7 +86,7 @@ internal sealed partial class MainWindow
             if (ImGui.SmallButton(localization.Get("TriadSim.Clear")))
             { triadBlueHand.Clear(); triadRedHand.Clear(); InvalidateTriadSimulation(true); }
             ImGui.SetNextItemWidth(240);
-            ImGui.InputTextWithHint("##SimulationCardSearch", localization.Get("TriadSim.Search"), ref triadSimulationQuery, 128); Tip("TriadSim.SearchTip");
+            InputWithHint("##SimulationCardSearch", "TriadSim.Search", ref triadSimulationQuery, 128); Tip("TriadSim.SearchTip");
             if (ImGui.RadioButton(localization.Get("TriadSim.AddBlue"), triadAddHand == 0)) triadAddHand = 0;
             Tip("TriadSim.AddHandTip");
             ImGui.SameLine();

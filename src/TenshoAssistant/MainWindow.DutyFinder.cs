@@ -96,7 +96,7 @@ internal sealed partial class MainWindow
         }
         Tip("DutyUi.SourceFilterTip");
         ImGui.SameLine();ImGui.SetNextItemWidth(-1);
-        ImGui.InputTextWithHint("##DutyFinderQuery",localization.Get("DutyUi.ItemQuery"),ref dutyFinderQuery,64);
+        InputWithHint("##DutyFinderQuery","DutyUi.ItemQuery",ref dutyFinderQuery,64);
         Tip("DutyUi.ItemQueryTip");
         var items=itemCatalog.State.Catalog;
         DrawLootKindFilter("DutyFinder");

@@ -116,7 +116,7 @@ internal sealed partial class MainWindow
     private void DrawSimulationRecipeSearch()
     {
         ImGui.SetNextItemWidth(260);
-        ImGui.InputTextWithHint("##SimulationRecipeSearch",localization.Get("CraftSimulation.RecipeSearch"),ref simulationRecipeQuery,60);
+        InputWithHint("##SimulationRecipeSearch","CraftSimulation.RecipeSearch",ref simulationRecipeQuery,60);
         Tip("CraftSimulation.RecipeSearchTip");
         if(simulationRecipeQuery!=simulationRecipeShown)
         {

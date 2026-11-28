@@ -36,7 +36,7 @@ internal sealed partial class MainWindow
             Tip("CraftLists.DeleteTip");
         }
         ImGui.SetNextItemWidth(200);
-        ImGui.InputTextWithHint("###CraftListName",localization.Get("CraftLists.NewName"),ref craftListName,CraftLists.MaxName);
+        InputWithHint("###CraftListName","CraftLists.NewName",ref craftListName,CraftLists.MaxName);
         Tip("CraftLists.NewNameTip");
         ImGui.SameLine();
         if(ImGui.SmallButton(localization.Get("CraftLists.Create")))

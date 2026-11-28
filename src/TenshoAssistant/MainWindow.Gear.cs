@@ -317,7 +317,7 @@ internal sealed partial class MainWindow
             var (min,max)=GearRules.LevelWindow(state.Level,filter);
             // 0.331: « All jobs (glamour) » lists armor and accessories of every level: no level window shown for them.
             ImGui.SameLine();ImGui.TextDisabled(GearRules.AnyJobAndLevel(slot,filter) ? localization.Get("Gear.WindowAll"):localization.Format("Gear.Window",min,max));
-            ImGui.SetNextItemWidth(220);ImGui.InputTextWithHint("##GearSearch",localization.Get("Gear.Search"),ref gearSearch,80);Tip("Gear.SearchTip");
+            ImGui.SetNextItemWidth(220);InputWithHint("##GearSearch","Gear.Search",ref gearSearch,80);Tip("Gear.SearchTip");
             ImGui.SameLine();
             if(ImGui.SmallButton(localization.Get("Gear.Filters")))ImGui.OpenPopup("GearFiltersInPick");
             Tip("Gear.FiltersTip");

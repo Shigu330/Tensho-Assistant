@@ -1037,7 +1037,7 @@ internal sealed partial class MainWindow
         if(mapIconScopeThisMap)Tip("MapView.IconsBackToGlobalTip");else Tip("MapView.IconsResetTip");
         ImGui.TextDisabled(localization.Get("MapView.IconsPriorityHelp"));
         ImGui.SetNextItemWidth(-1);
-        ImGui.InputTextWithHint("##IconFilter",localization.Get("MapView.IconsFilter"),ref mapIconFilter,64);
+        InputWithHint("##IconFilter","MapView.IconsFilter",ref mapIconFilter,64);
         Tip("MapView.IconsFilterTip");
         // Categories (0.212): Tensho layers, quests, objectives and events, FATEs, gathering, shops, flag and target, places of the game, other.
         int Category(uint icon)=>TenshoGlyph(icon) is not null || icon==TreasureIcon ? 0
@@ -1922,7 +1922,7 @@ internal sealed partial class MainWindow
                 if(map.TerritoryId!=0)
                 {
                     ImGui.SetNextItemWidth(180);
-                    ImGui.InputTextWithHint("##ContextBookmark",localization.Get("MapsUi.Name"),ref mapContextBookmarkName,MapBookmarks.NameLimit*4+1);
+                    InputWithHint("##ContextBookmark","MapsUi.Name",ref mapContextBookmarkName,MapBookmarks.NameLimit*4+1);
                     Tip("MapView.AddBookmarkTip");
                     ImGui.SameLine();
                     if(ImGui.SmallButton(localization.Get("MapView.AddBookmark")))

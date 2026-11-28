@@ -192,12 +192,12 @@ internal sealed partial class MainWindow
     private void DrawBookmarkEditor(MapDefinition selected)
     {
         ImGui.SetNextItemWidth(-1);
-        if (ImGui.InputTextWithHint("##BookmarkName", localization.Get("MapsUi.Name"), ref bookmarkName, MapBookmarks.NameLimit * 4 + 1)) bookmarkSaved = false;
+        if (InputWithHint("##BookmarkName", "MapsUi.Name", ref bookmarkName, MapBookmarks.NameLimit * 4 + 1)) bookmarkSaved = false;
         Tip("MapsUi.BookmarkNameTip");
         string Name() => string.IsNullOrWhiteSpace(bookmarkName) ? MapBookmarks.DefaultName(selected.Zone, mapX, mapY) : bookmarkName;
         // 0.378 (g, M-08): optional group and note.
         ImGui.SetNextItemWidth(160);
-        if (ImGui.InputTextWithHint("##BookmarkGroup", localization.Get("MapsUi.Group"), ref bookmarkGroup, MapBookmarks.GroupLimit * 4 + 1)) bookmarkSaved = false;
+        if (InputWithHint("##BookmarkGroup", "MapsUi.Group", ref bookmarkGroup, MapBookmarks.GroupLimit * 4 + 1)) bookmarkSaved = false;
         Tip("MapsUi.GroupTip");
         ImGui.SetNextItemWidth(-1);
         if (ImGui.InputTextMultiline("##BookmarkNote", ref bookmarkNote, MapBookmarks.NoteLimit * 4 + 1, new System.Numerics.Vector2(-1, 48))) bookmarkSaved = false;

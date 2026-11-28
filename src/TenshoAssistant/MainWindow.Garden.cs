@@ -301,13 +301,13 @@ internal sealed partial class MainWindow
     private void DrawNewBedCore(List<GardenBed> beds)
     {
         ImGui.SetNextItemWidth(160);
-        ImGui.InputTextWithHint("##NewBedPlace",localization.Get("Garden.PlaceHint"),ref newBedPlace,GardenJournal.MaximumText);
+        InputWithHint("##NewBedPlace","Garden.PlaceHint",ref newBedPlace,GardenJournal.MaximumText);
         Tip("Garden.PlaceTip");
         ImGui.SameLine();
         DrawSeedPicker();
         ImGui.SameLine();
         ImGui.SetNextItemWidth(160);
-        if(ImGui.InputTextWithHint("##NewBedSeed",localization.Get("Garden.SeedHint"),ref newBedSeed,GardenJournal.MaximumText))newBedSeedId=0;
+        if(InputWithHint("##NewBedSeed","Garden.SeedHint",ref newBedSeed,GardenJournal.MaximumText))newBedSeedId=0;
         Tip("Garden.SeedTip");
         ImGui.SetNextItemWidth(110);
         if(ImGui.InputInt(localization.Get("Garden.Grow")+"##NewBedGrow",ref newBedGrow))newBedGrow=GardenJournal.ClampGrow(newBedGrow);
@@ -345,7 +345,7 @@ internal sealed partial class MainWindow
                 try
                 {
                     ImGui.SetNextItemWidth(-1);
-                    ImGui.InputTextWithHint("##GardenSeedSearch",localization.Get("Garden.SeedSearch"),ref gardenSeedSearch,40);
+                    InputWithHint("##GardenSeedSearch","Garden.SeedSearch",ref gardenSeedSearch,40);
                     Tip("Garden.SeedSearchTip");
                     foreach(var (seed,name) in seeds)
                     {

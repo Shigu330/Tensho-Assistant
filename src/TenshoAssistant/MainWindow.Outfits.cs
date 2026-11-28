@@ -58,7 +58,7 @@ internal sealed partial class MainWindow
         if(character==0){ImGui.TextDisabled(localization.Get("BankUi.LoginBank"));return;}
         var definitions=OutfitDefinitions?.Invoke() ?? [];
         ImGui.SetNextItemWidth(260);
-        ImGui.InputTextWithHint("##OutfitSearch",localization.Get("Outfits.Search"),ref outfitQuery,64);
+        InputWithHint("##OutfitSearch","Outfits.Search",ref outfitQuery,64);
         Tip("Outfits.SearchTip");
         var filters=new[]{"All","Missing","Ready","Stored"};
         for(var index=0;index<filters.Length;index++)

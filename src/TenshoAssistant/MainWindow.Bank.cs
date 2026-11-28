@@ -267,7 +267,7 @@ internal sealed partial class MainWindow
         Tip("BankUi.ResetTip");
         ImGui.SameLine();
         ImGui.SetNextItemWidth(-1);
-        ImGui.InputTextWithHint("##BankQuery", localization.Get("BankUi.Search"), ref bankQuery, 128);
+        InputWithHint("##BankQuery", "BankUi.Search", ref bankQuery, 128);
         Tip("BankUi.SearchTip");
         BoolSetting("BankUi.ListView","BankUi.ListViewTip",()=>configuration.BankListView,value=>configuration.BankListView=value,c=>c.BankListView);
 

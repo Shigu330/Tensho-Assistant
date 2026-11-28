@@ -52,7 +52,7 @@ internal sealed partial class MainWindow
         var rows=configuration.CraftPresets ?? [];var catalog=recipeCatalog.State.Catalog;
         ImGui.TextDisabled(localization.Format("CraftPresetMessages.Count", rows.Count, CraftPresets.Capacity));
         if(craftPresetError is { } error)ImGui.TextWrapped(localization.Get(error));
-        ImGui.SetNextItemWidth(260);ImGui.InputTextWithHint("###CraftPresetSearch",localization.Get("CraftPresets.Search"),ref craftPresetSearch,80);Tip("CraftPresets.SearchTip");
+        ImGui.SetNextItemWidth(260);InputWithHint("###CraftPresetSearch","CraftPresets.Search",ref craftPresetSearch,80);Tip("CraftPresets.SearchTip");
         ImGui.SameLine();ImGui.SetNextItemWidth(170);
         ImGui.Combo(localization.Get("CraftPresets.Sort")+"###CraftPresetSort",ref craftPresetSort,[localization.Get("CraftPresets.SortSaved"),localization.Get("CraftPresets.SortName"),localization.Get("CraftPresets.SortItem"),localization.Get("CraftPresets.SortJob"),localization.Get("CraftPresets.SortNewest")]);Tip("CraftPresets.SortTip");
         var view=CraftPresetRows(rows,catalog);

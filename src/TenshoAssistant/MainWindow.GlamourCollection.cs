@@ -32,7 +32,7 @@ internal sealed partial class MainWindow
         if(!bank.State.Entries.Any(entry=>entry.Key.CharacterId==character && entry.Key.Kind==BankStorageKind.GlamourDresser))
             ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("StorageReport.NoDresser"));
         ImGui.SetNextItemWidth(240);
-        ImGui.InputTextWithHint("##GlamourSearch",localization.Get("GlamourCollection.Search"),ref glamourQuery,64);
+        InputWithHint("##GlamourSearch","GlamourCollection.Search",ref glamourQuery,64);
         Tip("GlamourCollection.SearchTip");
         ImGui.SameLine();
         ImGui.SetNextItemWidth(160);

@@ -95,7 +95,7 @@ internal sealed partial class MainWindow
         }
         ImGui.TextDisabled(localization.Format("Island.AnimalListSource",document.FetchedAt.ToLocalTime().ToString("g")));
         ImGui.SetNextItemWidth(260);
-        ImGui.InputTextWithHint("##IslandAnimalSearch",localization.Get("Island.AnimalSearch"),ref islandAnimalSearch,100);
+        InputWithHint("##IslandAnimalSearch","Island.AnimalSearch",ref islandAnimalSearch,100);
         Tip("Island.AnimalSearchTip");
         var map=maps.State.Catalog?.Find(IslandMapRow);
         if(!ImGui.BeginTable("###IslandAnimalTable",7,ImGuiTableFlags.RowBg|ImGuiTableFlags.BordersInnerV|ImGuiTableFlags.Resizable))return;

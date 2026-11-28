@@ -112,7 +112,7 @@ internal sealed partial class MainWindow
     private void DrawTriadNotebook(CollectionState state)
     {
         ImGui.SetNextItemWidth(-1);
-        ImGui.InputTextWithHint("##TriadSearch", localization.Get("TriadUi.Query"), ref triadQuery, 128); Tip("TriadUi.QueryTip");
+        InputWithHint("##TriadSearch", "TriadUi.Query", ref triadQuery, 128); Tip("TriadUi.QueryTip");
         ImGui.SetNextItemWidth(150);
         ImGui.Combo(localization.Get("TriadUi.Rarity"), ref triadStars, new[] { localization.Get("TriadUi.All"), localization.Get("TriadUi.One"), localization.Get("TriadUi.Two"), localization.Get("TriadUi.Three"), localization.Get("TriadUi.Four"), localization.Get("TriadUi.Five") }, 6); Tip("TriadUi.RarityTip");
         ImGui.SameLine(); ImGui.SetNextItemWidth(170);

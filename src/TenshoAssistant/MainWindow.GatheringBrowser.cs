@@ -84,10 +84,10 @@ internal sealed partial class MainWindow
         if (!ReferenceEquals(sourceViewCatalog, sources))
             sourceTypes = sources.Sources.DistinctBy(source => source.TypeId).OrderBy(source => source.TypeId).ToArray();
         ImGui.SetNextItemWidth(-1);
-        ImGui.InputTextWithHint("##SourceSearch", localization.Get("GatheringBrowser.Search"), ref sourceQuery, 128);
+        InputWithHint("##SourceSearch", "GatheringBrowser.Search", ref sourceQuery, 128);
         Tip("GatheringBrowser.SearchTip");
         ImGui.SetNextItemWidth(-1);
-        ImGui.InputTextWithHint("##SourceZoneSearch", localization.Get("GatheringBrowser.ZoneSearch"), ref sourceZoneQuery, 128);
+        InputWithHint("##SourceZoneSearch", "GatheringBrowser.ZoneSearch", ref sourceZoneQuery, 128);
         Tip("GatheringBrowser.ZoneSearchTip");
         if (ImGui.SmallButton(localization.Get("GatheringBrowser.AllJobs")+"###SourceAllJobs")) sourceTypeFilter = null;
         Tip("GatheringBrowser.AllJobsTip");

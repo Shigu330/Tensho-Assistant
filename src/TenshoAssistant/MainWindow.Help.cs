@@ -180,7 +180,7 @@ internal sealed partial class MainWindow
     {
         if (ImGui.SmallButton(localization.Get("Guide.Start"))) StartGuide();
         Tip("Guide.StartTip");
-        ImGui.SetNextItemWidth(320); ImGui.InputTextWithHint("##HelpQuery", localization.Get("Help.Search"), ref helpQuery, 64); Tip("Help.SearchTip");
+        ImGui.SetNextItemWidth(320); InputWithHint("##HelpQuery", "Help.Search", ref helpQuery, 64); Tip("Help.SearchTip");
         DrawFaq();
         if (TenshoAssistant.UI.UiComponents.Header(localization.Get("Help.Pages"), ImGuiTreeNodeFlags.DefaultOpen))
         {
@@ -278,7 +278,7 @@ internal sealed partial class MainWindow
         }
         var kind = (ProblemKind)problemKind;
         ImGui.SetNextItemWidth(Math.Min(520, ImGui.GetContentRegionAvail().X));
-        ImGui.InputTextWithHint("##ProblemTitle", localization.Get("Help.FormTitle"), ref problemTitle, 200); Tip("Help.FormTitleTip");
+        InputWithHint("##ProblemTitle", "Help.FormTitle", ref problemTitle, 200); Tip("Help.FormTitleTip");
         var size = new Vector2(Math.Min(520, ImGui.GetContentRegionAvail().X), 70);
         ImGui.TextUnformatted(localization.Get(kind == ProblemKind.Bug ? "Help.FormWhat" : kind == ProblemKind.Idea ? "Help.FormNeed" : "Help.FormTexts"));
         ImGui.InputTextMultiline("##ProblemWhat", ref problemWhat, 3000, size); Tip("Help.FormWhatTip");

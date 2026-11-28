@@ -48,7 +48,7 @@ internal sealed partial class MainWindow
         var projects=workshopProjects.Result;
         if(workshopSelected==0)workshopSelected=configuration.WorkshopPanelProject;
         ImGui.SetNextItemWidth(260);
-        ImGui.InputTextWithHint("##WorkshopSearch",localization.Get("FreeCompany.WorkshopSearch"),ref workshopSearch,100);
+        InputWithHint("##WorkshopSearch","FreeCompany.WorkshopSearch",ref workshopSearch,100);
         Tip("FreeCompany.WorkshopSearchTip");
         if(workshopSearched!=workshopSearch)
         {

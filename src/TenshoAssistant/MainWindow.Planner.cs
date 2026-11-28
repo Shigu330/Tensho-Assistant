@@ -109,7 +109,7 @@ internal sealed partial class MainWindow
         {
             try
             {
-                ImGui.SetNextItemWidth(220);ImGui.InputTextWithHint("##PlannerTargetSearch",localization.Get("AirshipPlanner.TargetSearch"),ref plannerTargetSearch,60);Tip("AirshipPlanner.TargetSearchTip");
+                ImGui.SetNextItemWidth(220);InputWithHint("##PlannerTargetSearch","AirshipPlanner.TargetSearch",ref plannerTargetSearch,60);Tip("AirshipPlanner.TargetSearchTip");
                 var search=plannerTargetSearch.Trim();
                 foreach(var (id,name) in rows.Where(row=>search.Length==0 || SearchText.Contains(row.Name,search,StringComparison.CurrentCultureIgnoreCase))
                             .OrderBy(row=>row.Name,StringComparer.CurrentCultureIgnoreCase))

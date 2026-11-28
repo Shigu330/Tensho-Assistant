@@ -510,7 +510,7 @@ internal sealed partial class MainWindow
     private void DrawDiscoveryPlaces(DiscoveryStore store)
     {
         ImGui.SetNextItemWidth(260);
-        ImGui.InputTextWithHint("##DiscoverySearch",localization.Get("DiscoveriesUi.Search"),ref discoverySearch,64);
+        InputWithHint("##DiscoverySearch","DiscoveriesUi.Search",ref discoverySearch,64);
         Tip("DiscoveriesUi.SearchTip");
         if(discoverySearch.Trim().Length<2){ImGui.TextDisabled(localization.Get("DiscoveriesUi.SearchFirst"));return;}
         if(discoverySearched!=discoverySearch || discoveryShownRevision!=store.Revision)

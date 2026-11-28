@@ -70,7 +70,7 @@ internal sealed partial class MainWindow
     private void DrawMapFind()
     {
         ImGui.SetNextItemWidth(-1);
-        ImGui.InputTextWithHint("###MapFind",localization.Get("MapsUi.FindHint"),ref mapFindQuery,80);
+        InputWithHint("###MapFind","MapsUi.FindHint",ref mapFindQuery,80);
         Tip("MapsUi.FindTip");
         var words=mapFindQuery.Trim();
         if(words.Length<MapSearch.MinimumLetters)return;

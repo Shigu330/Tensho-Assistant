@@ -101,7 +101,7 @@ internal sealed partial class MainWindow
     {
         Heading(localization.Get("Plugin.AllTools"), localization.Get("Plugin.AllToolsDescription"));
         ImGui.SetNextItemWidth(-1);
-        ImGui.InputTextWithHint("##ToolFilter", localization.Get("Plugin.ToolFilterHint"), ref toolQuery, 128); Tip("Plugin.ToolFilterTip");
+        InputWithHint("##ToolFilter", "Plugin.ToolFilterHint", ref toolQuery, 128); Tip("Plugin.ToolFilterTip");
         var found=false;var openDetails=false;string? previousGroup=null;
         foreach(var tool in DirectoryTools)
         {

@@ -38,7 +38,7 @@ internal sealed partial class MainWindow
         if(fieldFailed){ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("FieldContent.Unavailable"));return;}
         if(fieldCatalog is not { } catalog){ImGui.TextDisabled(localization.Get("FieldContent.Loading"));return;}
         ImGui.SetNextItemWidth(240);
-        ImGui.InputTextWithHint("###FieldQuery",localization.Get("FieldContent.Search"),ref fieldQuery,100);
+        InputWithHint("###FieldQuery","FieldContent.Search",ref fieldQuery,100);
         Tip("FieldContent.SearchTip");
         var tabs=new List<(string,string,Action)>
         {

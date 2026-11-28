@@ -30,7 +30,7 @@ internal sealed partial class MainWindow
         if(airshipChosen.Count>0){ImGui.SameLine();ImGui.TextDisabled(localization.Format("AirshipSectors.ChosenCount",airshipChosen.Count));}
         ImGui.Separator();
         ImGui.SetNextItemWidth(220);
-        ImGui.InputTextWithHint("##AirshipFilter",localization.Get("AirshipSectors.Filter"),ref airshipFilter,64);
+        InputWithHint("##AirshipFilter","AirshipSectors.Filter",ref airshipFilter,64);
         Tip("AirshipSectors.FilterTip");
         ImGui.SameLine();ImGui.SetNextItemWidth(90);
         ImGui.InputInt(localization.Get("AirshipSectors.Rank")+"##AirshipRank",ref airshipRank);

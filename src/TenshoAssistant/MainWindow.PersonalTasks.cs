@@ -76,7 +76,7 @@ internal sealed partial class MainWindow
     {
         var tasks=configuration.PersonalTasks ?? [];
         ImGui.SetNextItemWidth(220);
-        ImGui.InputTextWithHint("##NewTaskName",localization.Get("PersonalTasks.NameHint"),ref newTaskName,PersonalTasks.MaximumName);
+        InputWithHint("##NewTaskName","PersonalTasks.NameHint",ref newTaskName,PersonalTasks.MaximumName);
         Tip("PersonalTasks.NameTip");
         ImGui.SameLine();ImGui.SetNextItemWidth(170);
         if(ImGui.BeginCombo("##NewTaskPeriod",localization.Get("PersonalTasks.Period"+newTaskPeriod)))

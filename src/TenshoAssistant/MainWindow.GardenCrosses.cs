@@ -87,7 +87,7 @@ internal sealed partial class MainWindow
             try
             {
                 ImGui.SetNextItemWidth(-1);
-                ImGui.InputTextWithHint("##GardenCrossSearch",localization.Get("Garden.SeedSearch"),ref gardenCrossSearch,40);
+                InputWithHint("##GardenCrossSearch","Garden.SeedSearch",ref gardenCrossSearch,40);
                 Tip("Garden.SeedSearchTip");
                 var seeds=gardenCrossUses ? data.Seeds:data.Crosses.Select(cross=>cross.Target).Distinct();
                 foreach(var seed in seeds.OrderBy(Name,StringComparer.CurrentCultureIgnoreCase))

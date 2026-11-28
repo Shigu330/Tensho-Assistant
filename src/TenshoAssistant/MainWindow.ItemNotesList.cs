@@ -18,7 +18,7 @@ internal sealed partial class MainWindow
         ImGui.SetNextItemWidth(170);
         ImGui.Combo(localization.Get("ItemNotes.ListFilter")+"###AnnotatedFilter",ref annotatedFilter,[localization.Get("ItemNotes.ListAll"),localization.Get("ItemNotes.Important"),localization.Get("ItemNotes.ToSell")]);Tip("ItemNotes.ListFilterTip");
         ImGui.SameLine();ImGui.SetNextItemWidth(-1);
-        ImGui.InputTextWithHint("###AnnotatedQuery",localization.Get("ItemNotes.ListSearch"),ref annotatedQuery,80);Tip("ItemNotes.ListSearchTip");
+        InputWithHint("###AnnotatedQuery","ItemNotes.ListSearch",ref annotatedQuery,80);Tip("ItemNotes.ListSearchTip");
         var items=itemCatalog.State.Catalog;
         if(annotatedView is not { } view || !ReferenceEquals(view.Notes,notes) || !ReferenceEquals(view.Items,items) || view.Filter!=annotatedFilter || view.Query!=annotatedQuery)
             annotatedView=view=(notes,items,annotatedFilter,annotatedQuery,ItemNotes.Annotated(notes,(AnnotatedFilter)annotatedFilter,annotatedQuery,id=>items?.Find(id)?.Name ?? localization.Format("BankUi.Item",id)));

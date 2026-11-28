@@ -38,7 +38,7 @@ internal sealed partial class MainWindow
             return;
         }
         ImGui.SetNextItemWidth(-1);
-        ImGui.InputTextWithHint("##QuestSourceSearch",localization.Get("QuestSources.Search"),ref questSourceQuery,128);
+        InputWithHint("##QuestSourceSearch","QuestSources.Search",ref questSourceQuery,128);
         Tip("QuestSources.SearchTip");
         if(!string.IsNullOrEmpty(questSourceQuery) && ImGui.SmallButton(localization.Get("QuestSources.Clear")))questSourceQuery="";
         for(var position=0;position<QuestSourceFilters.Length;position++)

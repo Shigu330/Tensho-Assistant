@@ -131,7 +131,7 @@ internal sealed partial class MainWindow
                                     {
                                         if(ImGui.IsWindowAppearing()){sortCategoryFilter="";ImGui.SetKeyboardFocusHere();}
                                         ImGui.SetNextItemWidth(-1);
-                                        ImGui.InputTextWithHint("##CategoryFilter",localization.Get("SortUi.CategoryFilterHint"),ref sortCategoryFilter,64);Tip("SortUi.CategoryFilterTip");
+                                        InputWithHint("##CategoryFilter","SortUi.CategoryFilterHint",ref sortCategoryFilter,64);Tip("SortUi.CategoryFilterTip");
                                         var filter=sortCategoryFilter.Trim();var shown=0;
                                         // X-88 (0.969, user request: « add sorts more easily by groups »): the game's own groups of item categories
                                         // (ItemUICategory.OrderMajor) added in one click; a group is named by its first categories (the game gives no name).
@@ -164,7 +164,7 @@ internal sealed partial class MainWindow
                             if(itemIds is not { Count:>0 })ImGui.TextDisabled(localization.Get("SortUi.NoItems"));
                             else if(DrawSortChips(itemIds.Select(id=>(id,localization.Format("SortUi.ItemChip",catalog.Find(id)?.Name ?? localization.Format("BankUi.Item",id),id))).ToArray()).Removed is { } removedItem)
                             {itemIds=SortIds(itemIds.Where(id=>id!=removedItem));changed=true;}
-                            changed|=ImGui.InputTextWithHint("##ZoneQuery",localization.Get("SortUi.QueryHint"),ref query,128);Tip("SortUi.SelectionHelp");
+                            changed|=InputWithHint("##ZoneQuery","SortUi.QueryHint",ref query,128);Tip("SortUi.SelectionHelp");
                             ImGui.TextDisabled(localization.Get("SortUi.SelectionHelp"));
                             ImGui.SetNextItemWidth(170);changed|=ImGui.Combo(localization.Get("SortUi.Marketable"),ref marketable,localization.Get("SortUi.BooleanChoices"));Tip("SortUi.PropertyFilterTip");
                             ImGui.SetNextItemWidth(170);changed|=ImGui.Combo(localization.Get("SortUi.CanHq"),ref potentialHq,localization.Get("SortUi.BooleanChoices"));Tip("SortUi.PropertyFilterTip");

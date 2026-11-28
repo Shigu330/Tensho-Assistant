@@ -67,7 +67,7 @@ internal sealed partial class MainWindow
     private void DrawDeepDungeonItems(DeepDungeonEntry dungeon)
     {
         ImGui.SetNextItemWidth(240);
-        ImGui.InputTextWithHint("###DeepDungeonQuery",localization.Get("DeepDungeon.Search"),ref deepDungeonQuery,100);
+        InputWithHint("###DeepDungeonQuery","DeepDungeon.Search",ref deepDungeonQuery,100);
         Tip("DeepDungeon.SearchTip");
         DrawDeepDungeonThings(dungeon.Id,"Pomanders",dungeon.Pomanders);
         if(dungeon.Others.Count>0){ImGui.Spacing();DrawDeepDungeonThings(dungeon.Id,"Others",dungeon.Others);}

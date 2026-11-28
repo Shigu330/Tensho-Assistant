@@ -21,7 +21,7 @@ internal sealed partial class MainWindow
             try
             {
                 ImGui.SetNextItemWidth(200*Dalamud.Interface.Utility.ImGuiHelpers.GlobalScale);
-                ImGui.InputTextWithHint("###GearMealQuery",localization.Get("Gear.MealSearch"),ref gearMealQuery,60);
+                InputWithHint("###GearMealQuery","Gear.MealSearch",ref gearMealQuery,60);
                 Tip("Gear.MealSearchTip");
                 if(ImGui.Selectable(localization.Get("Gear.MealNone")+"##GearMealNone",chosen is null) && configuration.GearMeals?.Remove(job)==true)SaveGearPlan();
                 if(meals is { Count:>0 })

@@ -31,7 +31,7 @@ internal sealed partial class MainWindow
         if(lexiconFailed){ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("Lexicon.Unavailable"));return;}
         if(lexiconWords is not { } words){ImGui.TextDisabled(localization.Get("Lexicon.Loading"));return;}
         ImGui.SetNextItemWidth(280);
-        ImGui.InputTextWithHint("###LexiconQuery",localization.Get("Lexicon.Search"),ref lexiconQuery,100);
+        InputWithHint("###LexiconQuery","Lexicon.Search",ref lexiconQuery,100);
         Tip("Lexicon.SearchTip");
         ImGui.SameLine();ImGui.SetNextItemWidth(200);
         if(ImGui.BeginCombo("###LexiconKind",lexiconKind is { } chosen ? localization.Get("Lexicon.Kind"+chosen):localization.Get("Lexicon.KindAll")))

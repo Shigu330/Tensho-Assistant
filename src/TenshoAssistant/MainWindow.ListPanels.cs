@@ -167,7 +167,7 @@ internal sealed partial class MainWindow
             try
             {
                 ImGui.SetNextItemWidth(-1);
-                ImGui.InputTextWithHint("###ListPanelCurrencySearch",localization.Get("ListPanels.CurrencySearch"),ref listPanelCurrencySearch,60);
+                InputWithHint("###ListPanelCurrencySearch","ListPanels.CurrencySearch",ref listPanelCurrencySearch,60);
                 Tip("ListPanels.CurrencySearchTip");
                 var shown=ready.Result.Concat(on.Where(id=>ready.Result.All(row=>row.Id!=id)).Select(id=>(Id:id,Name:itemCatalog.State.Catalog?.Find(id)?.Name ?? $"#{id}"))).Where(row=>listPanelCurrencySearch.Length==0 || SearchText.Contains(row.Name,listPanelCurrencySearch,StringComparison.CurrentCultureIgnoreCase)).ToArray();
                 if(ImGui.SmallButton(localization.Get("ListPanels.CurrencyNone")))

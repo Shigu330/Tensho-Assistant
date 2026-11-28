@@ -21,7 +21,7 @@ internal sealed partial class MainWindow
         if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("SRank.Title")+"###SRankConditions",ImGuiTreeNodeFlags.DefaultOpen))return;
         ImGui.TextWrapped(localization.Get("SRank.Help"));
         ImGui.SetNextItemWidth(-1);
-        ImGui.InputTextWithHint("##SRankQuery",localization.Get("SRank.Search"),ref srankQuery,64);
+        InputWithHint("##SRankQuery","SRank.Search",ref srankQuery,64);
         Tip("SRank.SearchTip");
         // Built once per language: the rows do not change.
         var language=localization.Get("SRank.Kill");

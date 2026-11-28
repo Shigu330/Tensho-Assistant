@@ -1584,7 +1584,7 @@ internal sealed partial class MainWindow
     {
         ImGui.SetNextItemWidth(Math.Min(ImGui.GetContentRegionAvail().X*0.6f,260*Dalamud.Interface.Utility.ImGuiHelpers.GlobalScale));
         if(chatSearchFocus){ImGui.SetKeyboardFocusHere();chatSearchFocus=false;}
-        ImGui.InputTextWithHint("###ChatSearchText",localization.Get("ChatWindow.SearchHint"),ref chatSearchText,ChatSearch.MaximumText);
+        InputWithHint("###ChatSearchText","ChatWindow.SearchHint",ref chatSearchText,ChatSearch.MaximumText);
         Tip("ChatWindow.SearchBoxTip");
         var query=ChatSearch.Query(chatSearchText);
         if(query.Length==0)return view;

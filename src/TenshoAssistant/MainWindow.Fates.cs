@@ -48,7 +48,7 @@ internal sealed partial class MainWindow
         }
         Tip("Fates.ZoneTip");
         ImGui.SameLine();ImGui.SetNextItemWidth(260);
-        ImGui.InputTextWithHint("###FateQuery",localization.Get("Fates.Search"),ref fateQuery,100);
+        InputWithHint("###FateQuery","Fates.Search",ref fateQuery,100);
         Tip("Fates.SearchTip");
         ImGui.TextDisabled(localization.Get("Fates.Hint"));
         var rows=FieldBoard.Find(zones,fateZone,fateQuery);

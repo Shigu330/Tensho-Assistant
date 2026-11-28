@@ -171,7 +171,7 @@ internal sealed partial class MainWindow
         Tip("CurrencyValue.FilterTip");
         ImGui.SameLine();
         ImGui.SetNextItemWidth(220);
-        ImGui.InputTextWithHint("###CurrencyValueSearch",localization.Get("CurrencyValue.Search"),ref currencyValueSearch,100);
+        InputWithHint("###CurrencyValueSearch","CurrencyValue.Search",ref currencyValueSearch,100);
         Tip("CurrencyValue.SearchTip");
         var shownRows=currencyValueRows.Where(row=>
         {

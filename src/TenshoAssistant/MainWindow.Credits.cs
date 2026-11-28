@@ -19,7 +19,7 @@ internal sealed partial class MainWindow
     {
         ImGui.TextWrapped(localization.Get("Credits.Intro"));
         ImGui.SetNextItemWidth(Math.Min(320,ImGui.GetContentRegionAvail().X));
-        ImGui.InputTextWithHint("###CreditsFilter",localization.Get("Credits.Filter"),ref creditsFilter,60);
+        InputWithHint("###CreditsFilter","Credits.Filter",ref creditsFilter,60);
         Tip("Credits.FilterTip");
         var filter=creditsFilter.Trim();
         if(creditsView is not { } view || view.Filter!=filter || view.Language!=localization.CurrentCode)

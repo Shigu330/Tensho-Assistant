@@ -69,7 +69,7 @@ internal sealed partial class MainWindow
             if(ImGui.SmallButton(localization.Get("FashionUi.Back"))) fashionShowItems=false;
             DrawFashionItems(dataset); return;
         }
-        ImGui.SetNextItemWidth(-1); ImGui.InputTextWithHint("##FashionHintSearch",localization.Get("FashionUi.HintQuery"),ref fashionHintQuery,128); Tip("FashionUi.HintQueryTip");
+        ImGui.SetNextItemWidth(-1); InputWithHint("##FashionHintSearch","FashionUi.HintQuery",ref fashionHintQuery,128); Tip("FashionUi.HintQueryTip");
         if(fashionHintsNeedFilter || fashionHintQueryView!=fashionHintQuery)
         {
             var query=fashionHintQuery.Trim();
@@ -111,7 +111,7 @@ internal sealed partial class MainWindow
             finally { ImGui.EndCombo(); }
         }
         Tip("FashionUi.SlotTip");
-        ImGui.SetNextItemWidth(-1); ImGui.InputTextWithHint("##FashionItemSearch",localization.Get("FashionUi.ItemQuery"),ref fashionItemQuery,128); Tip("FashionUi.ItemQueryTip");
+        ImGui.SetNextItemWidth(-1); InputWithHint("##FashionItemSearch","FashionUi.ItemQuery",ref fashionItemQuery,128); Tip("FashionUi.ItemQueryTip");
         if(dataset is null) { ImGui.TextWrapped(localization.Get(fashionData.Disabled ? "FashionUi.SourceOff":"FashionUi.NeedFetch")); return; }
         var items=itemCatalog.State.Catalog;
         if(items is null) { DrawCatalogStatus(); return; }

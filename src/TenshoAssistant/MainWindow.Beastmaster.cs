@@ -82,7 +82,7 @@ internal sealed partial class MainWindow
         else ImGui.TextDisabled(localization.Format("BeastUi.ObtainedCount", obtained.Count, catalog.Beasts.Count));
         // X-764 M3 (review of 0.1751): the effects' columns no longer hold flags (a game update): said once here, no beast shows « none ».
         if (catalog.EffectsUnavailable) ImGui.TextDisabled(localization.Get("BeastUi.EffectsUnavailable"));
-        ImGui.SetNextItemWidth(200); ImGui.InputTextWithHint("##BeastQuery", localization.Get("BeastUi.Search"), ref beastQuery, 64); Tip("BeastUi.SearchTip");
+        ImGui.SetNextItemWidth(200); InputWithHint("##BeastQuery", "BeastUi.Search", ref beastQuery, 64); Tip("BeastUi.SearchTip");
         ImGui.SameLine();
         ImGui.SetNextItemWidth(150);
         if (ImGui.BeginCombo("##BeastFamily", beastFamily ?? localization.Get("BeastUi.AllFamilies")))
@@ -625,7 +625,7 @@ internal sealed partial class MainWindow
             beastItemFamilies = catalog.Beasts.Where(beast => beast.FamilyId > 0 && beast.Family.Length > 0).GroupBy(beast => beast.FamilyId).OrderBy(group => group.Key).Select(group => (group.Key, group.First().Family)).ToArray();
             beastItemLists = new[] { BeastItems.Gear, BeastItems.CrucibleItem, BeastItems.Feed }.ToDictionary(kind => kind, kind => BeastItems.Of(catalog.Items, kind, beastItemFamily, beastItemQuery));
         }
-        ImGui.SetNextItemWidth(200); ImGui.InputTextWithHint("##BeastItemQuery", localization.Get("BeastUi.Search"), ref beastItemQuery, 64); Tip("BeastUi.ItemSearchTip");
+        ImGui.SetNextItemWidth(200); InputWithHint("##BeastItemQuery", "BeastUi.Search", ref beastItemQuery, 64); Tip("BeastUi.ItemSearchTip");
         ImGui.SameLine(); ImGui.SetNextItemWidth(220);
         var chosen = beastItemFamilies.FirstOrDefault(family => family.Id == beastItemFamily).Name;
         if (ImGui.BeginCombo("##BeastItemFamily", chosen ?? localization.Get("BeastUi.ItemAllFamilies")))

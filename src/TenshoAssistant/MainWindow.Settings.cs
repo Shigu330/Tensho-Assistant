@@ -182,7 +182,7 @@ internal sealed partial class MainWindow
     private void DrawSettingsSearch()
     {
         ImGui.SetNextItemWidth(280);
-        ImGui.InputTextWithHint("##SettingsSearch",localization.Get("Settings.SearchHint"),ref settingsQuery,64);
+        InputWithHint("##SettingsSearch","Settings.SearchHint",ref settingsQuery,64);
         Tip("Settings.SearchTip");
         var query=settingsQuery.Trim();
         if(query.Length<2)return;

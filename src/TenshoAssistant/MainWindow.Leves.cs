@@ -77,7 +77,7 @@ internal sealed partial class MainWindow
         if(progress is null)ImGui.TextDisabled(localization.Get(LeveProgressUnavailable?.Invoke()==true ? "Leves.Unavailable":"Leves.Unknown"));
         else ImGui.TextDisabled(localization.Format("Leves.State",progress.Allowances?.ToString() ?? "?",progress.Accepted.Count));
         ImGui.SetNextItemWidth(220);
-        ImGui.InputTextWithHint("##LeveSearch",localization.Get("Leves.Search"),ref leveQuery,64);
+        InputWithHint("##LeveSearch","Leves.Search",ref leveQuery,64);
         Tip("Leves.SearchTip");
         ImGui.SameLine();ImGui.SetNextItemWidth(200);
         if(ImGui.BeginCombo("##LeveType",leveType==0 ? localization.Get("Leves.AllTypes"):leveTypes.FirstOrDefault(type=>type.Id==leveType).Name ?? ""))

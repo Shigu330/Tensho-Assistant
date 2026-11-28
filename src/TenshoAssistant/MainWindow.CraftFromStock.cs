@@ -195,7 +195,7 @@ internal sealed partial class MainWindow
         ImGui.Combo(localization.Get("CraftStock.Sort")+"###CraftStockSort",ref fromStockSort,sorts,sorts.Length);
         Tip("CraftStock.SortTip");
         ImGui.SameLine();ImGui.SetNextItemWidth(240);
-        ImGui.InputTextWithHint("###CraftStockName",localization.Get("CraftStock.NameSearch"),ref fromStockQuery,100);
+        InputWithHint("###CraftStockName","CraftStock.NameSearch",ref fromStockQuery,100);
         Tip("CraftStock.NameSearchTip");
         var priceState=fromStockPrices.State;
         // 0.712 (user report): the collectables' sheets load on first asking: the list is worked out again when they arrive, or no scrip would ever show.

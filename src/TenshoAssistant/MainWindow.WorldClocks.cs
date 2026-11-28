@@ -38,7 +38,7 @@ internal sealed partial class MainWindow
                 try
                 {
                     ImGui.SetNextItemWidth(-1);
-                    ImGui.InputTextWithHint("##ClockSearch",localization.Get("WorldClocks.Search"),ref clockSearch,64);
+                    InputWithHint("##ClockSearch","WorldClocks.Search",ref clockSearch,64);
                     Tip("WorldClocks.SearchTip");
                     foreach(var zone in TimeZoneInfo.GetSystemTimeZones().Where(zone=>clockSearch.Length==0 || SearchText.Contains(zone.DisplayName,clockSearch,StringComparison.CurrentCultureIgnoreCase)).Take(80))
                         if(ImGui.Selectable(zone.DisplayName+"##"+zone.Id))
@@ -70,7 +70,7 @@ internal sealed partial class MainWindow
         var byReset=chosenRepeat is AlarmRepeat.DailyReset or AlarmRepeat.WeeklyReset;
         ImGui.BeginDisabled(byReset);
         ImGui.SetNextItemWidth(160);
-        ImGui.InputTextWithHint("##AlarmDate",localization.Get("WorldClocks.DateHint"),ref alarmManualDate,16);
+        InputWithHint("##AlarmDate","WorldClocks.DateHint",ref alarmManualDate,16);
         Tip("WorldClocks.DateTip");
         ImGui.EndDisabled();
         ImGui.SameLine();
