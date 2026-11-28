@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1952.0
+- Plan global, X-910 : Garde-fou des lignes vides (X-910, relecture de 0.1951, M1) : le contrôle de X-908 voit maintenant les panneaux dont les drapeaux viennent d'une constante (les trois panneaux de listes, `ListPanelFlags`), les fenêtres ouvertes par `Panels?.Show` sans taille ni contrainte de largeur (pêche, voyage en mer, personnage…) et les aides appelées par leur contenu, à toute profondeur ; les menus, info-bulles et fenêtres enfants ouverts dedans sont des fenêtres à part et sont laissés. Un `PushTextWrapPos` n'exempte plus que l'`EmptyState` dessiné après lui et avant son `PopTextWrapPos`. Aucune fenêtre ne change : aucun de ces endroits n'appelait `EmptyState` seul. Test `UiEmptyStateAutoSize1951Tests` élargi (7 cas au lieu de 4).
+- Tests : UiEmptyStateAutoSize1951Tests. Verify.ps1 (agent) : 4340/4340, 0 avertissement, 0 erreur ; DLL 0.1952.0.0. Rien à essayer en jeu.
+### English
+- Empty-line check (X-910, review of 0.1951, M1): the X-908 check now sees panels whose flags come from a constant (the three list panels, `ListPanelFlags`), windows opened by `Panels?.Show` without a size or width constraint (fishing, ocean voyage, character…) and the helpers their contents call, at any depth; popups, menus, tooltips and child windows opened inside are windows of their own and are left out. A `PushTextWrapPos` now exempts only an `EmptyState` drawn after it and before its `PopTextWrapPos`. No window changes: none of these places drew `EmptyState` alone. Test `UiEmptyStateAutoSize1951Tests` widened (7 cases instead of 4).
+
 ## 0.1951.0
 - Plan global, X-908 : Fenêtre de suivi (X-908, relecture de 0.1950, I1) : sans alarme suivie, sa phrase passait à la ligne dans une fenêtre qui se règle sur son contenu sans largeur, et la fenêtre se resserrait en une colonne étroite. Nouveau composant `EmptyStateLine` : la même ligne atténuée, sur une seule ligne, pour une fenêtre auto-redimensionnée sans largeur ; `EmptyState` reste à la ligne ailleurs. Nouveau test `UiEmptyStateAutoSize1951Tests` : une ligne vide à la ligne seule dans un panneau auto-redimensionné sans taille est refusée.
 - Pour les joueurs : la fenêtre de suivi vide garde de nouveau sa phrase sur une ligne au lieu d'une colonne étroite.
