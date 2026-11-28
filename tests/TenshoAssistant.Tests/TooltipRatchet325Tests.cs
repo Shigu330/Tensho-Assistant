@@ -13,7 +13,8 @@ internal static class TooltipRatchet325Tests
     private static readonly string Source = Path.GetFullPath("src/TenshoAssistant");
     private static readonly string Baseline = Path.GetFullPath("tests/TenshoAssistant.Tests/tooltip-baseline.txt");
     // X-607 (0.1944): a text field drawn by InputWithHint(…) is a control too, scanned at its call (the component itself is left out of the scan).
-    private static readonly Regex Control = new(@"ImGui\.(Checkbox|Combo|BeginCombo|Input\w+|V?Slider\w+|Drag\w+|RadioButton|ColorEdit\d)\(|\bInputWithHint\(""");
+    private static readonly Regex Control = new(@"ImGui\.(Checkbox|Combo|BeginCombo|Input\w+|V?Slider\w+|Drag\w+|RadioButton|ColorEdit\d)\(|\bInputWithHint\(""|\bFilterCombo\(");
+    // X-607 (0.1946): a filter drawn by FilterCombo(…) is a control too, scanned at its call (the component itself is left out of the scan).
     // #28 (review 0.326): another drawn item ends the search too, so a later widget's tooltip never covers the control.
     private static readonly Regex OtherItem = new(@"ImGui\.(Button|SmallButton|ArrowButton|Selectable|ImageButton|InvisibleButton)\(|\bToolButton\(|\bDefaultButton\(|\bSourceButton\(");
     // « Tip( » also matches the page helpers named …Tip( (QuestFilterTip, …).
@@ -24,7 +25,7 @@ internal static class TooltipRatchet325Tests
     private static IEnumerable<(string File,string[] Lines)> Files() =>
         Directory.EnumerateFiles(Source,"*.cs",SearchOption.AllDirectories)
             .Where(path => !Path.GetRelativePath(Source,path).Split(Path.DirectorySeparatorChar,Path.AltDirectorySeparatorChar).Any(part => part is "obj" or "bin"))
-            .Where(path => Path.GetRelativePath(Source,path).Replace('\\','/')!="UI/Components/InputWithHint.cs")
+            .Where(path => Path.GetRelativePath(Source,path).Replace('\\','/') is not ("UI/Components/InputWithHint.cs" or "UI/Components/FilterCombo.cs"))
             .OrderBy(path => path,StringComparer.Ordinal)
             .Select(path => (Path.GetRelativePath(Source,path).Replace('\\','/'),File.ReadAllLines(path)));
 

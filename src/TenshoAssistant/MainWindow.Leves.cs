@@ -91,15 +91,7 @@ internal sealed partial class MainWindow
         }
         Tip("Leves.TypeTip");
         ImGui.SameLine();ImGui.SetNextItemWidth(200);
-        if(ImGui.BeginCombo("##LeveClient",leveClient.Length==0 ? localization.Get("Leves.AllClients"):leveClient))
-        {
-            try
-            {
-                if(ImGui.Selectable(localization.Get("Leves.AllClients"),leveClient.Length==0))leveClient="";
-                foreach(var name in leveClients)if(ImGui.Selectable(name,leveClient==name))leveClient=name;
-            }
-            finally{ImGui.EndCombo();}
-        }
+        FilterCombo("##LeveClient","Leves.AllClients",ref leveClient,leveClients);
         Tip("Leves.ClientTip");
         ImGui.SetNextItemWidth(90);
         if(ImGui.InputInt(localization.Get("Leves.MinLevel")+"##LeveMin",ref leveMinLevel))leveMinLevel=Math.Clamp(leveMinLevel,0,100);

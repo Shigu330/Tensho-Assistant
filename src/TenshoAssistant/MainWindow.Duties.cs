@@ -56,16 +56,7 @@ internal sealed partial class MainWindow
             dutyCategories = catalog.Entries.Select(duty => duty.Category).Where(name => !string.IsNullOrWhiteSpace(name))
                 .Distinct(StringComparer.Ordinal).OrderBy(name => name,StringComparer.CurrentCultureIgnoreCase).ToArray();
         ImGui.SetNextItemWidth(240);
-        if (ImGui.BeginCombo(localization.Get("DutyUi.Category"),dutyCategory.Length == 0 ? localization.Get("DutyUi.All") : dutyCategory))
-        {
-            try
-            {
-                if (ImGui.Selectable(localization.Get("DutyUi.All"),dutyCategory.Length == 0)) dutyCategory = "";
-                foreach (var category in dutyCategories)
-                    if (ImGui.Selectable(category,dutyCategory == category)) dutyCategory = category;
-            }
-            finally { ImGui.EndCombo(); }
-        }
+        FilterCombo(localization.Get("DutyUi.Category"),"DutyUi.All",ref dutyCategory,dutyCategories);
         Tip("DutyUi.CategoryTip");
         var progress = DutyProgressSource?.Invoke();
         // Without a status read the filter does nothing (unknown is never « not completed »).

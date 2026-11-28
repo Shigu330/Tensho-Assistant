@@ -174,16 +174,7 @@ internal sealed partial class MainWindow
         if(!task.IsCompletedSuccessfully || task.Result is not { } result){ImGui.TextWrapped(localization.Get("CraftStock.Failed"));return;}
         if(!ReferenceEquals(fromStockLive,inventory.Current) || !ReferenceEquals(fromStockBank,bank.State)){ImGui.SameLine();StateLine(UI.UiState.Stale,localization.Get("CraftStock.Stale"));}
         ImGui.SetNextItemWidth(170);
-        if(ImGui.BeginCombo(localization.Get("CraftStock.Job")+"###CraftStockJob",fromStockJob.Length>0 ? fromStockJob:localization.Get("RecipeUi.AllJobs")))
-        {
-            try
-            {
-                if(ImGui.Selectable(localization.Get("RecipeUi.AllJobs"),fromStockJob.Length==0))fromStockJob="";
-                foreach(var job in result.Rows.Select(row=>row.Recipe.CraftType).Distinct().Order(StringComparer.CurrentCulture))
-                    if(ImGui.Selectable(job,job==fromStockJob))fromStockJob=job;
-            }
-            finally{ImGui.EndCombo();}
-        }
+        FilterCombo(localization.Get("CraftStock.Job")+"###CraftStockJob","RecipeUi.AllJobs",ref fromStockJob,result.Rows.Select(row=>row.Recipe.CraftType).Distinct().Order(StringComparer.CurrentCulture));
         Tip("CraftStock.JobIconTip");
         ImGui.SameLine();ImGui.SetNextItemWidth(90);
         ImGui.InputInt(localization.Get("CraftStock.MinLevel")+"###CraftStockMin",ref fromStockMin,0);Tip("CraftStock.LevelTip");

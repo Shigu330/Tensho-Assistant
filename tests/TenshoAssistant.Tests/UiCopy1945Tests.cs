@@ -9,7 +9,7 @@ internal static class UiCopy1945Tests
 {
     private static void Check(bool value,string message){if(!value)throw new Exception(message);}
     private static readonly string Root=Path.GetFullPath("src/TenshoAssistant");
-    private const int Ceiling=20;
+    private const int Ceiling=18;
 
     private static IEnumerable<(string Name,string Text)> Pages()
         =>Directory.EnumerateFiles(Root,"MainWindow*.cs",SearchOption.TopDirectoryOnly)

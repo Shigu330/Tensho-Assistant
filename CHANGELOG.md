@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1946.0
+- Plan global, X-607 : Code plus facile à entretenir (X-607, demande du 18/11) : geste des filtres « Tous ». Les quatre listes de filtre sur un texte où « vide » veut dire « tous » (métier de « Fabriquer avec le stock », catégorie des missions, client des mandats, monde du tableau des ventes) passent par le nouveau composant `FilterCombo(id, clé de « Tous », valeur, choix)` de UI/Components/FilterCombo.cs, les mêmes appels qu'avant : aucune page ne change. Nouveau test `UiFilters1946Tests` : cliquet sur les premières lignes « Tous… » écrites à la main, le composant garde les mêmes appels, les quatre pages s'en servent. Le cliquet du presse-papiers de 0.1945 est resserré à son compte réel (18).
+- Tests : UiFilters1946Tests. Verify.ps1 (agent) : 4323/4323, 0 avertissement, 0 erreur ; DLL 0.1946.0.0. Rien à essayer en jeu.
+### English
+- Code easier to maintain (X-607, request of 18/11): the gesture of the « All » filters. The four filter lists on a text where « empty » means « all » (the job of « Craft from stock », the duty category, the levequest client, the market board world) go through the new component `FilterCombo(id, « All » key, value, choices)` of UI/Components/FilterCombo.cs, the same calls as before: no page changes. New test `UiFilters1946Tests`: a ratchet on the « All… » first lines written by hand, the component keeps the same calls, the four pages use it. The clipboard ratchet of 0.1945 is tightened to its real count (18).
+
 ## 0.1945.0
 - Plan global, X-607 : Code plus facile à entretenir (X-607, demande du 18/11) : geste des boutons de copie. Les cinq petits boutons de copie écrits à la main sans message à eux (coût de la préparation, carte et partie observée de Triple Triade, alarmes du jeu en brut, commande de sonde des contributeurs) passent par le composant commun `CopyButton` : même petit bouton, même libellé ; il ajoute la marque « Copié » deux secondes après le clic et rattrape une copie qui échoue. Nouveau test `UiCopy1945Tests` : cliquet sur le presse-papiers écrit à la main hors d'une ligne de menu, forme sur deux lignes refusée, les cinq pages s'en servent.
 - Tests : UiCopy1945Tests. Verify.ps1 (agent) : 4320/4320, 0 avertissement, 0 erreur ; DLL 0.1945.0.0. Rien à essayer en jeu.

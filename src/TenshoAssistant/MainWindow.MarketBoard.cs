@@ -161,15 +161,7 @@ internal sealed partial class MainWindow
         if(worlds.Length>1)
         {
             ImGui.SetNextItemWidth(150);
-            if(ImGui.BeginCombo(localization.Get("MarketBoard.World")+"##BoardWorld",marketWorld.Length==0 ? localization.Get("MarketBoard.AllWorlds"):marketWorld))
-            {
-                try
-                {
-                    if(ImGui.Selectable(localization.Get("MarketBoard.AllWorlds"),marketWorld.Length==0))marketWorld="";
-                    foreach(var world in worlds)if(ImGui.Selectable(world,marketWorld==world))marketWorld=world;
-                }
-                finally{ImGui.EndCombo();}
-            }
+            FilterCombo(localization.Get("MarketBoard.World")+"##BoardWorld","MarketBoard.AllWorlds",ref marketWorld,worlds);
             Tip("MarketBoard.WorldTip");
         }
         else marketWorld="";
