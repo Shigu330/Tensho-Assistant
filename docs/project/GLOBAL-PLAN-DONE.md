@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (942 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (944 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -1010,12 +1010,14 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-910 | Review  (review 0.1951, 28/11), minor M1: M1 in… | Done in 0.1952.0 |
 | X-911 | A relay's return wrongly says « CI not green » when more than 33 commits… | Done in 0.1952.0 |
 | X-912 | Review  (review 0.1952, 28/11), minor M1, M2, M3: M1 in… | Done in 0.1952.0 |
+| X-913 | Review of block 0.1953 to 0.1956 (review 0.1956, 28/11), minor M1: M1 in… | Done in 0.1957.0 |
+| X-914 | Review of block 0.1953 to 0.1956 (review 0.1956, 28/11), pre-existing before… | Done in 0.1958.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (942 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (944 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -2023,3 +2025,5 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-910 | Relecture  (relecture 0.1951, 28/11), mineurs M1 : M1 : Le garde-fou ne voit… | Fait en 0.1952.0 |
 | X-911 | Le retour d'un relais dit « CI pas verte » à tort quand plus de 33 commits… | Fait en 0.1952.0 |
 | X-912 | Relecture  (relecture 0.1952, 28/11), mineurs M1, M2, M3 : M1 : L'exemption des… | Fait en 0.1952.0 |
+| X-913 | Relecture du bloc 0.1953 à 0.1956 (relecture 0.1956, 28/11), mineurs M1 : M1… | Fait en 0.1957.0 |
+| X-914 | Relecture du bloc 0.1953 à 0.1956 (relecture 0.1956, 28/11), déjà là avant le… | Fait en 0.1958.0 |

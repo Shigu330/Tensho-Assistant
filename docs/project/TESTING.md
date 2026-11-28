@@ -51,12 +51,12 @@ repris dans la ligne « Tests » de chaque entrée du [CHANGELOG](../../CHANGELO
 Contrôles de base à refaire après un changement de cycle de vie : rechargement/déchargement répété sans double callback ni commande
 orpheline ; préférence « ouvrir au chargement » respectée ; la carte du jeu (touche M) revient normale une fois le plugin déchargé.
 
-### Essais en jeu (liste produite le 2026-11-28, version 0.1956.0)
+### Essais en jeu (liste produite le 2026-11-28, version 0.1958.0)
 
 <!-- q:public -->
-_In English: this page is the author's in-game test list, in French only. Produced on 2026-11-28 for version 0.1956.0. It has 1277 boxes: 692 ticked, 585 empty. 1094 boxes follow the test source: 509 done (ticked), 576 open, 7 could not be tried, 2 failed (empty). The 183 other ticked boxes come from before the source existed (reported before it, kept as they are). Apart: 39 tests of the source have no box on this page (29 done, 9 open, 1 could not be tried, 0 failed)._
+_In English: this page is the author's in-game test list, in French only. Produced on 2026-11-28 for version 0.1958.0. It has 1279 boxes: 692 ticked, 587 empty. 1096 boxes follow the test source: 509 done (ticked), 578 open, 7 could not be tried, 2 failed (empty). The 183 other ticked boxes come from before the source existed (reported before it, kept as they are). Apart: 39 tests of the source have no box on this page (29 done, 9 open, 1 could not be tried, 0 failed)._
 
-Liste produite le 2026-11-28 (version 0.1956.0) : 1277 cases, 692 cochées, 585 vides. 1094 cases suivent la source des essais : 509 faits (cochées), 576 ouverts, 7 pas pu, 2 en échec (vides). Les 183 autres cases cochées viennent d'avant la source (essais rapportés avant qu'elle existe, gardés tels quels). À part : 39 essais de la source n'ont pas de case sur cette page (29 faits, 9 ouverts, 1 pas pu, 0 en échec).
+Liste produite le 2026-11-28 (version 0.1958.0) : 1279 cases, 692 cochées, 587 vides. 1096 cases suivent la source des essais : 509 faits (cochées), 578 ouverts, 7 pas pu, 2 en échec (vides). Les 183 autres cases cochées viennent d'avant la source (essais rapportés avant qu'elle existe, gardés tels quels). À part : 39 essais de la source n'ont pas de case sur cette page (29 faits, 9 ouverts, 1 pas pu, 0 en échec).
 <!-- /q:public -->
 
 Parcours de la campagne de la phase 6, les mêmes essais rangés par activité : [TESTING-ROUTE.md](TESTING-ROUTE.md) (2026-11-09).
@@ -2857,6 +2857,10 @@ Une étape impossible (pas de compagnie, pas de sous-marin…) se rapporte « no
 - [ ] (0.1953) Ouvrir Aide (une rubrique), Diagnostic et l'info-bulle d'un objet au marché : les sous-titres (« Comment commencer », « Catalogue des objets », « Comment l'obtenir ») sont dans la police de section du jeu, dorés, comme les autres sous-titres de Tensho.
 
 - [ ] (0.1954) Mes outils : un outil avec un compteur ; Tâches perso : une tâche « compteur » : les boutons « + » et « − » sont des icônes carrées centrées, avec une info-bulle au survol ; un clic ajoute ou retire un, comme avant.
+
+- [ ] (0.1958) Sous-titres de section (0.1953) : ouvrir Rappels, Mes outils et Paramètres : les sous-titres de section sont dans la police de section du jeu, plus grande que le texte, dorés ; seule la vue en jeu le vérifie (l'application de bureau les dessine dans la police de base).
+
+- [ ] (0.1958) Boutons de compteur (0.1954) : Rappels › Tâches, une tâche « compteur » : les boutons « - » et « + » sont des icônes centrées avec leur info-bulle, ils changent le compte ; même chose pour un compteur d'outil dans Mes outils.
 
 **0.535 : interfaces** — à voir en jouant
 
