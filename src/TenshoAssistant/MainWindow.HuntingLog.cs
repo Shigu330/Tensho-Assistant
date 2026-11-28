@@ -65,7 +65,7 @@ internal sealed partial class MainWindow
         var rankEntries=logEntries.Where(entry=>entry.Rank==huntRank).ToArray();
         if(slot is not null)ImGui.TextDisabled(localization.Format("HuntingLog.Count",rankEntries.Count(entry=>HuntingLog.Done(entry,slot)==true),rankEntries.Length));
         if(shown.Length==0){ImGui.TextDisabled(localization.Get("HuntingLog.None"));return;}
-        if(!ImGui.BeginTable("HuntingLog",4,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))return;
+        if(!UI.UiComponents.BeginDataTable("HuntingLog",4))return;
         try
         {
             foreach(var column in new[]{"Entry","Monster","Kills","Zones"})ImGui.TableSetupColumn(localization.Get("HuntingLog.Column"+column));

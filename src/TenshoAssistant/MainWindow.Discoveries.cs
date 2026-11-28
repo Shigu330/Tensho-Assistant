@@ -526,7 +526,7 @@ internal sealed partial class MainWindow
                 ..ItemSourceKinds.Concat(OtherSeenKinds).SelectMany(kind=>store.Find(kind,_=>true,20_000)).Where(fact=>SearchText.Contains(DiscoveryFactName(fact),wanted,StringComparison.CurrentCultureIgnoreCase)).Take(200)];
         }
         if(discoveryRows.Count==0){ImGui.TextDisabled(localization.Get("DiscoveriesUi.NoneFound"));return;}
-        if(!ImGui.BeginTable("Discoveries",6,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))return;
+        if(!UI.UiComponents.BeginDataTable("Discoveries",6))return;
         try
         {
             foreach(var column in new[]{"Monster","Zone","Place","Level","Seen","Imported"})ImGui.TableSetupColumn(localization.Get("DiscoveriesUi.Column"+column));

@@ -31,7 +31,7 @@ internal sealed partial class MainWindow
             ImGui.Spacing();
             if(!TenshoAssistant.UI.UiComponents.Header($"{localization.Get("Credits.Kind."+kind)} ({entries.Length})###CreditKind{kind}",ImGuiTreeNodeFlags.DefaultOpen))continue;
             ImGui.TextDisabled(localization.Get("Credits.KindHelp."+kind));
-            if(!ImGui.BeginTable("###CreditTable"+kind,3,ImGuiTableFlags.RowBg|ImGuiTableFlags.BordersInnerH|ImGuiTableFlags.SizingStretchProp))continue;
+            if(!UI.UiComponents.BeginDataTable("###CreditTable"+kind,3))continue;
             try
             {
                 ImGui.TableSetupColumn(localization.Get("Credits.Column.Name"),ImGuiTableColumnFlags.WidthStretch,0.9f);

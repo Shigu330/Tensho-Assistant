@@ -56,7 +56,7 @@ internal sealed partial class MainWindow
             at.ToLocalTime().ToString(TenshoAssistant.UI.TimeLeft.SameDay(at,now,TimeZoneInfo.Local) ? "t":"g"));
     private void DrawReminderTimers(GameTimerSnapshot? timers,DateTimeOffset now)
     {
-        if(!ImGui.BeginTable("Reminders",7,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))return;
+        if(!UI.UiComponents.BeginDataTable("Reminders",7))return;
         try
         {
             foreach(var key in new[]{"Task","State","Next","Done","Bar","Discord",""})ImGui.TableSetupColumn(key.Length==0 ? "":localization.Get("Reminders.Column"+key),key.Length==0 ? ImGuiTableColumnFlags.WidthFixed:ImGuiTableColumnFlags.None,key.Length==0 ? 28:0);

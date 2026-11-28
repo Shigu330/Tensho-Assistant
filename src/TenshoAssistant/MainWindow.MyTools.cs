@@ -272,7 +272,7 @@ internal sealed partial class MainWindow
     private void DrawMyToolItems(ItemListBlock block)
     {
         var worldId=market.State.WorldId;var costRows=new List<(int? Missing,decimal? Price)>();var unpriced=new List<uint>();
-        if(!ImGui.BeginTable("###MyToolItems",5,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))return;
+        if(!UI.UiComponents.BeginDataTable("###MyToolItems",5))return;
         try
         {
             foreach(var column in new[]{"ColumnItem","ColumnWanted","ColumnHeld","ColumnMissing","ColumnPrice"})ImGui.TableSetupColumn(localization.Get("MyToolsUi."+column));

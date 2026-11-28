@@ -27,7 +27,7 @@ internal sealed partial class MainWindow
         Tip("VoyageHistory.CopyTip");
         if(voyageHistoryMessage is { } message){ImGui.SameLine();ImGui.TextDisabled(message);}
         if(TenshoAssistant.UI.UiComponents.Header(localization.Format("VoyageHistory.Routes",records.Count)+"###VoyageRoutes",ImGuiTreeNodeFlags.DefaultOpen)
-           && ImGui.BeginTable("VoyageRoutes",3,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))
+           && UI.UiComponents.BeginDataTable("VoyageRoutes",3))
         {
             try
             {
@@ -46,7 +46,7 @@ internal sealed partial class MainWindow
             finally{ImGui.EndTable();}
         }
         if(TenshoAssistant.UI.UiComponents.Header(localization.Get("VoyageHistory.Last")+"###VoyageLast")
-           && ImGui.BeginTable("VoyageLast",4,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))
+           && UI.UiComponents.BeginDataTable("VoyageLast",4))
         {
             try
             {

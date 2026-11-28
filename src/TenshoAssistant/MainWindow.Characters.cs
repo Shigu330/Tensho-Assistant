@@ -61,7 +61,7 @@ internal sealed partial class MainWindow
         if(characterSummaries.Length==0){ImGui.TextDisabled(localization.Get("CharactersUi.None"));return;}
         var current=bankBridge.State.CharacterId;
         if(characterEraseMessage is { } message)ImGui.TextColored(Accent,message);
-        if(!ImGui.BeginTable("Characters",8,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))return;
+        if(!UI.UiComponents.BeginDataTable("Characters",8))return;
         try
         {
             foreach(var column in new[]{"Name","Seen","Gil","Bags","Crystals","Retainers","Jobs"})ImGui.TableSetupColumn(localization.Get("CharactersUi.Column"+column));

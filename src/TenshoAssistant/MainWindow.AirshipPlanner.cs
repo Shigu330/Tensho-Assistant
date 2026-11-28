@@ -97,7 +97,7 @@ internal sealed partial class MainWindow
         if(airshipSearch.Searching){ImGui.TextDisabled(localization.Get("RoutePlanner.Searching"));return;}
         if(airshipGoal!=AirshipGoal.Shortest)ImGui.TextDisabled(localization.Get("AirshipPlanner.ExpUnknownNote"));
         if(airshipRoutes.Count==0){ImGui.TextDisabled(localization.Get("RoutePlanner.None"));return;}
-        if(!ImGui.BeginTable("AirshipRoutes",6,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))return;
+        if(!UI.UiComponents.BeginDataTable("AirshipRoutes",6))return;
         try
         {
             foreach(var column in new[]{"Route","Distance","Duration","Exp","PerDay"})ImGui.TableSetupColumn(localization.Get("AirshipPlanner.Column"+column));

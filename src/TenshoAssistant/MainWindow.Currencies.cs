@@ -34,7 +34,7 @@ internal sealed partial class MainWindow
             :reading.WeeklyTomestones is { } got && reading.WeeklyLimit is { } limit
             ? localization.Format("Currencies.Weekly",got.ToString("N0",Numbers),limit.ToString("N0",Numbers)):localization.Get("Currencies.WeeklyUnknown"));
         if(!reading.Balances.Any(balance=>balance.Currency.Kind==CurrencyKind.Seals))ImGui.TextDisabled(localization.Get("Currencies.NoSeals"));
-        if(!ImGui.BeginTable("Currencies",4,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))return;
+        if(!UI.UiComponents.BeginDataTable("Currencies",4))return;
         try
         {
             foreach(var column in new[]{"Name","Amount","Percent","Threshold"})ImGui.TableSetupColumn(localization.Get("Currencies.Column"+column));

@@ -24,7 +24,8 @@ internal static class UiRatchets1612Tests
         ("MainWindow.ChatWindow.cs","###TenshoChatTabs"),
     ];
     // The tables written by hand on 20/11, outside UI/: lower these numbers when a table moves to BeginDataTable / HeadersRow.
-    private const int HandTables=96,HandHeaderRows=82;
+    // X-607 (0.1942): fifteen tables with exactly BeginDataTable's flags moved to it (UiTables1942Tests keeps that form out).
+    private const int HandTables=81,HandHeaderRows=82;
 
     private static int Count(string text,string piece)=>Regex.Matches(text,Regex.Escape(piece)).Count;
 

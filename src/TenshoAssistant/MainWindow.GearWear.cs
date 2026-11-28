@@ -22,7 +22,7 @@ internal sealed partial class MainWindow
         SliderSetting("GearWear.SpiritbondAt","GearWear.SpiritbondAtTip",()=>WearSettings.Spiritbond,value=>WearSettings.SpiritbondAt=value,50,100,defaults.Spiritbond,"%d %%");
         var pieces=EquippedGear?.Invoke() ?? [];
         if(pieces.Count==0){ImGui.TextDisabled(localization.Get("GearWear.Unknown"));return;}
-        if(!ImGui.BeginTable("GearWearTable",3,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))return;
+        if(!UI.UiComponents.BeginDataTable("GearWearTable",3))return;
         try
         {
             ImGui.TableSetupColumn(localization.Get("GearWear.ColumnPiece"));

@@ -60,7 +60,7 @@ internal sealed partial class MainWindow
             var list=vessels.Where(vessel=>vessel.Kind==kind).ToArray();
             if(list.Length==0)continue;
             if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("FreeCompany."+kind),ImGuiTreeNodeFlags.DefaultOpen))continue;
-            if(!ImGui.BeginTable("Voyages"+kind,5,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))continue;
+            if(!UI.UiComponents.BeginDataTable("Voyages"+kind,5))continue;
             try
             {
                 foreach(var key in new[]{"Vessel","Rank","Route","Return",""})

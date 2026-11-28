@@ -23,7 +23,7 @@ internal sealed partial class MainWindow
         var reset=ResetSchedule.NextDaily(DateTimeOffset.UtcNow,ResetSchedule.DailyHour);
         ImGui.TextDisabled(known==0 ? localization.Get("Roulettes.Unknown")
             :localization.Format("Roulettes.Count",done,known,reset.ToLocalTime().ToString("t")));
-        if(!ImGui.BeginTable("DailyRoulettes",3,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))return;
+        if(!UI.UiComponents.BeginDataTable("DailyRoulettes",3))return;
         try
         {
             foreach(var key in new[]{"Roulette","Done","Bonus"})ImGui.TableSetupColumn(localization.Get("Roulettes.Column"+key));

@@ -330,7 +330,7 @@ internal sealed partial class MainWindow
         }
         if(buildSearch is not null){ImGui.TextDisabled(localization.Get("VesselBuilds.Searching"));return;}
         if(buildCandidates.Count==0){ImGui.TextDisabled(localization.Get("VesselBuilds.NoBuild"));return;}
-        if(!ImGui.BeginTable("BestBuilds",9,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))return;
+        if(!UI.UiComponents.BeginDataTable("BestBuilds",9))return;
         try
         {
             ImGui.TableSetupColumn(localization.Get("VesselBuilds.Identifier"));
