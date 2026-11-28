@@ -44,7 +44,7 @@ internal static class DiagnosticsFamily1901Tests
             var capture = At("RegisterReadingCapture(configuration,framework,objects,condition,gameGui,chat);");
             Check(Count(plugin, @"RegisterSelfCheck\(") == 1 && Count(plugin, @"RegisterReadingCapture\(") == 1, "each called once");
             Check(At("RegisterGameChat(configuration,framework,gameGui);") < check && check < At("mainWindow.ConfigureMarketBoard(marketBoard);"), "the self-check after the game chat, before the market board, as before");
-            Check(At("var currencies=RegisterCurrencies(") < capture && capture < At("Gathering.RegenTickReader? regenTick=null;"), "the reading capture after the currencies, before the GP tick, as before");
+            Check(At("var currencies=RegisterCurrencies(") < capture && capture < At("var regenTick=RegisterGpTick(configuration,framework,objects,condition,chat);"), "the reading capture after the currencies, before the GP tick, as before");
         }),
         // X-885 M2 (0.1906): this case replaced « behaviour », the same RegistrationScope test copied in each family test, which touched nothing
         // of the family; each service's install and its release are now checked given to one same registration of Plugin.Diagnostics.cs.

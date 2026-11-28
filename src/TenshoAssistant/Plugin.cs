@@ -568,23 +568,8 @@ public sealed partial class Plugin : IDalamudPlugin
             };
             // 0.650 (phase 5): the in-game readings, in developer mode only. Temporary.
             RegisterReadingCapture(configuration,framework,objects,condition,gameGui,chat);
-            // g, X-06 (0.391): gatherer GP regeneration tick (on-screen bar, off by default).
-            Gathering.RegenTickReader? regenTick=null;
-            // g, R-08 (0.403): GP alert at the threshold (chat line and sound with the alarm options), once per rise.
-            registrations.Register(()=>regenTick=new Gathering.RegenTickReader(framework,objects,condition,()=>configuration.GpTickBar || configuration.GatheringPanel,log)
-            {
-                Alert=()=>configuration.GpAlert ? configuration.GpAlertThreshold:null,
-                Reached=(gp,max)=>
-                {
-                    log.Information("GP alert: {0} / {1}.",gp,max);
-                    var options=configuration.AlarmOptions ?? new();
-                    var inDuty=options.MuteInDuties && condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty];
-                    var message=localization.Format("GpTick.Alert",gp,max);
-                    if(options.ChatAllowed(inDuty))chat.Print("[Tensho] "+message);
-                    if(options.SoundAllowed(inDuty))Alarms.AlarmService.PlaySound(options.Sound,log);
-                    if(options.ChatAllowed(inDuty) || options.SoundAllowed(inDuty))linkNotices.Add(message);
-                },
-            },()=>regenTick?.Dispose());
+            // X-153 (0.1938): the GP tick (tick bar, GP alert) in Plugin.GpTick.cs; the gathering pages read the reader handed back.
+            var regenTick=RegisterGpTick(configuration,framework,objects,condition,chat);
             mainWindow.RegenTick=()=>regenTick?.State;
             // g, R-01 (0.392): ocean fishing timetable from the game's loop (IKDRouteTable) and voyages (IKDRoute), built on first use.
             // X-285 (0.1300): the page loaders that read only the game's sheets, given by one method to the game and the desktop application.

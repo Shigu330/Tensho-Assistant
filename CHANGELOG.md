@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1938.0
+- Plan global, X-153 : Branchement des services de Plugin.cs par famille (X-153, revue GPT du 11/11) : famille du tic de PR. Le lecteur du tic de régénération des PR (barre à l'écran) et l'alerte de PR au seuil (chat et son avec les options des alarmes) passent de Plugin.cs au nouveau Plugin.GpTick.cs : bloc déplacé tel quel, appelé là où il était, l'ordre des branchements gardé ; le lecteur est rendu aux pages de récolte. Nouveau test `GpTickFamily1938Tests` : un seul chemin d'installation et un seul de libération, dans Plugin.GpTick.cs, donnés au même branchement ; Plugin.cs n'en crée aucun et l'appelle une fois, à sa place d'avant. Rien de visible ne change.
+- Tests : GpTickFamily1938Tests. Verify.ps1 (agent) : 4299/4299, 0 avertissement, 0 erreur ; DLL 0.1938.0.0. Rien à essayer en jeu.
+### English
+- Wiring of Plugin.cs's services by family (X-153, GPT review of 11/11): the GP tick's family. The GP regeneration tick's reader (on-screen bar) and the GP alert at the threshold (chat and sound with the alarm options) move from Plugin.cs to the new Plugin.GpTick.cs: the block moved as it was, called where it stood, the order of the registrations kept; the reader is handed back to the gathering pages. New test `GpTickFamily1938Tests`: one install path and one release path, in Plugin.GpTick.cs, given to the same registration; Plugin.cs creates none and calls it once, at its place of before. Nothing visible changes.
+
 ## 0.1937.0
 - Plan global, X-153 : Branchement des services de Plugin.cs par famille (X-153, revue GPT du 11/11) : famille des événements. Le lecteur des fêtes en cours (leurs quêtes et leurs noms anglais) passe de Plugin.cs au nouveau Plugin.Events.cs : bloc déplacé tel quel, appelé là où il était, l'ordre des branchements gardé ; le lecteur est rendu à la page Événements. Nouveau test `EventsFamily1937Tests` : un seul chemin d'installation et un seul de libération, dans Plugin.Events.cs, donnés au même branchement ; Plugin.cs n'en crée aucun et l'appelle une fois, à sa place d'avant. Rien de visible ne change.
 - Tests : EventsFamily1937Tests. Verify.ps1 (agent) : 4296/4296, 0 avertissement, 0 erreur ; DLL 0.1937.0.0. Rien à essayer en jeu.

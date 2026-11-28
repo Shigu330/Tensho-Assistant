@@ -8,7 +8,8 @@ internal static class SettingsFixes944Tests
         ("Settings fixes 944: regen reader gate, buff wait reset, crystal tip, one quest area control, inventory written",() =>
         {
             string Read(string file)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+file));
-            Check(Read("Plugin.cs").Contains("()=>configuration.GpTickBar || configuration.GatheringPanel,log)"),"regen reader follows the gathering help");
+            // X-153 (0.1938): the GP tick's reader is created in the GP tick's family.
+            Check(Read("Plugin.GpTick.cs").Contains("()=>configuration.GpTickBar || configuration.GatheringPanel,log)"),"regen reader follows the gathering help");
             Check(Read("MainWindow.Settings.cs").Contains("value=>search.BuffExtraWait=value==search.ExtraWait ? null:value,0,3,search.ExtraWait);"),"buff wait reset");
             Check(Read("MainWindow.ListPanels.cs").Contains("BoolSetting(\"ListPanels.Crystal\",\"ListPanels.CrystalTip\","),"crystal tip");
             Check(!Read("MainWindow.MapView.cs").Contains("SettingBox(\"MapView.ShowQuestAreas\""),"one control");
