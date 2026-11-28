@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (928 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (932 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -579,6 +579,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-456 | Tool: STATUS's « 0) Reprise » line piles up leftovers at each version… | Done in 0.1461.0 |
 | X-457 | Bug seen by the user on 11/15 around 8:50 pm (0.1454, two screenshots): the… | Done in 0.1462.0 |
 | X-458 | User request of 11/15 around 9 pm: on the private test page (X-450), a full… | Done in 0.1461.0 |
+| X-459 | User request of 11/15 around 9:05 pm: on the private test page (X-450), also… | Done in 0.1923.0 |
 | X-460 | Bug seen by the user on 11/15 around 9 pm (test T-0.1130-1, test page… | Done in 0.1500.0 |
 | X-461 | Bug seen by the user on 11/15 around 9:20 pm (test T-0.1441-3, test page)… | Done in 0.1463 |
 | X-462 | Bug seen by the user on 11/15 around 9:30 pm (three screenshots, game map left… | Done in 0.1464 |
@@ -912,6 +913,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-815 | Bug seen by the user on 11/22 around 17:15 (capture read: Free company › Best… | Done in 0.1847.0 |
 | X-816 | Dead code found by the user's analysis (local AI specialised in Dalamud, 11/22… | Done in 0.1883.0 |
 | X-817 | Tool: the version publishing tool (and Verify.ps1) do not run the merge tool's… | Done in 0.1868.0 |
+| X-818 | User's request of 11/22 around 17:50: rework the interface of the private test… | Done in 0.1923.0 |
 | X-819 | Review of block 0.1813 to 0.1819 (review 0.1819, 22/11), I1: finding in… | Done in 0.1820.0 |
 | X-820 | Review of block 0.1813 to 0.1819 (review 0.1819, 22/11), minor M1, M2, M3: M1… | Done in 0.1822.0 |
 | X-821 | Tool: the next-relay proposal (plan tool view, X-812) puts a read-only review… | Done in 0.1868.0 |
@@ -996,12 +998,14 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-900 | The test runner's trace stops with « There is not enough space on the disk »… | Done in 0.1923.0 |
 | X-901 | Review of block 0.1920 to 0.1921 (review 0.1921, 27/11), minor M1: M1 in… | Done in 0.1922.0 |
 | X-902 | Review of block 0.1920 to 0.1921 (review 0.1921, 27/11), pre-existing before… | Done in 0.1922.0 |
+| X-903 | Review  (review 0.1923, 27/11), I1: finding in plan.jsonl:607 (agent file) et… | Done in 0.1923.0 |
+| X-904 | Review  (review 0.1923, 27/11), minor M1: M1 in… | Done in 0.1923.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (928 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (932 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1578,6 +1582,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-456 | Outil : la ligne « 0) Reprise » de STATUS accumule des restes à chaque version… | Fait en 0.1461.0 |
 | X-457 | Bug vu par l'utilisateur le 15/11 vers 20 h 50 (0.1454, deux captures) : la… | Fait en 0.1462.0 |
 | X-458 | Demande de l'utilisateur du 15/11 vers 21 h : sur la page privée des essais… | Fait en 0.1461.0 |
+| X-459 | Demande de l'utilisateur du 15/11 vers 21 h 05 : sur la page privée des essais… | Fait en 0.1923.0 |
 | X-460 | Bug vu par l'utilisateur le 15/11 vers 21 h (essai T-0.1130-1, page des essais… | Fait en 0.1500.0 |
 | X-461 | Bug vu par l'utilisateur le 15/11 vers 21 h 20 (essai T-0.1441-3, page des… | Fait en 0.1463 |
 | X-462 | Bug vu par l'utilisateur le 15/11 vers 21 h 30 (trois captures, carte du jeu à… | Fait en 0.1464 |
@@ -1911,6 +1916,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-815 | Bug vu par l'utilisateur le 22/11 vers 17 h 15 (capture lue : Compagnie libre ›… | Fait en 0.1847.0 |
 | X-816 | Code mort relevé par l'analyse de l'utilisateur (IA locale spécialisée Dalamud… | Fait en 0.1883.0 |
 | X-817 | Outil : l'outil de publication des versions (et Verify.ps1) ne lance pas… | Fait en 0.1868.0 |
+| X-818 | Demande de l'utilisateur du 22/11 vers 17 h 50 : revoir l'interface de la page… | Fait en 0.1923.0 |
 | X-819 | Relecture du bloc 0.1813 à 0.1819 (relecture 0.1819, 22/11), I1 : Un gist créé… | Fait en 0.1820.0 |
 | X-820 | Relecture du bloc 0.1813 à 0.1819 (relecture 0.1819, 22/11), mineurs M1, M2, M3… | Fait en 0.1822.0 |
 | X-821 | Outil : la proposition du relais suivant (vue de l'outil du plan, X-812) met… | Fait en 0.1868.0 |
@@ -1995,3 +2001,5 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-900 | La trace du lanceur de tests s'arrête avec « There is not enough space on the… | Fait en 0.1923.0 |
 | X-901 | Relecture du bloc 0.1920 à 0.1921 (relecture 0.1921, 27/11), mineurs M1 : M1… | Fait en 0.1922.0 |
 | X-902 | Relecture du bloc 0.1920 à 0.1921 (relecture 0.1921, 27/11), déjà là avant le… | Fait en 0.1922.0 |
+| X-903 | Relecture  (relecture 0.1923, 27/11), I1 : X-459 et X-818 sont marqués « | Fait en 0.1923.0 |
+| X-904 | Relecture  (relecture 0.1923, 27/11), mineurs M1 : M1 : Le cliquet « toute… | Fait en 0.1923.0 |
