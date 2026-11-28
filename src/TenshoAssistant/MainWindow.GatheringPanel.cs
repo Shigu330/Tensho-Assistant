@@ -199,7 +199,7 @@ internal sealed partial class MainWindow
                         +(stock.HasObservation ? " · ×"+stock.Total.ToString("N0",Numbers):"");
                     ImGui.BeginGroup();
                     if(ImGui.Selectable((item?.Name ?? slot.ItemId.ToString())+"##Slot",ReferenceEquals(slot,chosen)) || clicked)SelectItem(slot.ItemId);
-                    if(ImGui.IsItemHovered())DrawItemInfoTooltip(slot.ItemId);
+                    ItemTip(slot.ItemId);
                     ItemLinksMenu($"GatheringSlot{slot.ItemId}",item);
                     if(needed is { } need)ImGui.TextColored(Accent,need);
                     // 0.751 (X-04, user request): what the tracking lists (crafting list, workshop, preparation) still need of this item; framed on the game's window too.
@@ -209,7 +209,7 @@ internal sealed partial class MainWindow
                         if(configuration.GatheringListHighlight && GatheringSlotRects?.Invoke() is { } rects && slot.Index<rects.Count && rects[slot.Index] is { } rect)
                             DrawGatheringSlotFrame(rect);
                     }
-                    if(ImGui.IsItemHovered())DrawItemInfoTooltip(slot.ItemId);
+                    ItemTip(slot.ItemId);
                     ImGui.TextDisabled(rates);
                     if(scripRules.FirstOrDefault(rule=>rule.ItemId==slot.ItemId) is { } paid)
                     {

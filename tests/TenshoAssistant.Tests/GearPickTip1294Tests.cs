@@ -21,7 +21,7 @@ internal static class GearPickTip1294Tests
             // X-413 (0.1385): line ends normalised first, so that both parts are always checked (the 0.1380 « LF || CRLF && tooltip » skipped the tooltip).
             var lines = pick.Replace("\r\n", "\n");
             Check(lines.Contains("ImGui.SameLine();\n                        ImGui.TextDisabled(localization.Format(\"Gear.LevelLine\""), "the level line on the piece's row (one line per row, X-336 M7)");
-            Check(lines.Contains("DrawItemInfoTooltip(candidate.Id,glamourOnly:glamourOnly)"), "the piece's tooltip on hover");
+            Check(lines.Contains("ItemTip(candidate.Id,glamourOnly:glamourOnly)"), "the piece's tooltip on hover");
             Check(!gear.Contains("PickDifferences"), "the old three differences are gone");
         }),
         ("X-290: one way to draw stats: the comparator and the list's tooltip share DrawStatPairs and the comparison", () =>

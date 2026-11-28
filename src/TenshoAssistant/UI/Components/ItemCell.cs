@@ -36,7 +36,7 @@ internal sealed partial class MainWindow
         if(!interactive || item is not { Id:>0 })return;
         // 0.275: the ✓/✗ collection badge on every collectible item icon (mount, minion, card, roll), not only in a few lists.
         DrawCollectionMark(item);
-        if(ImGui.IsItemHovered())DrawItemInfoTooltip(item.Id);
+        ItemTip(item.Id);
         ItemLinksMenu(UniqueMenuId($"ItemCell{item.Id}"),item);
     }
 
@@ -48,7 +48,7 @@ internal sealed partial class MainWindow
         var iconClicked=ImGui.IsItemClicked();
         ImGui.SameLine();
         var clicked=iconClicked | ImGui.Selectable($"{label ?? item?.Name ?? localization.Format("BankUi.Item",id)}##ItemCellName{id}",itemId==(int)id,ImGuiSelectableFlags.None,new Vector2(0,side));
-        if(ImGui.IsItemHovered())DrawItemInfoTooltip(id);
+        ItemTip(id);
         ItemLinksMenu($"ItemCellName{id}",item);
         if(clicked)SelectItem(id);
         return clicked;

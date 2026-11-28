@@ -124,7 +124,7 @@ internal sealed partial class MainWindow
                 try{open=UI.UiComponents.TreeNode($"{set?.Name ?? $"#{row.Outfit.SetItemId}"}  {row.Owned}/{row.Outfit.Pieces.Count}  · {localization.Get("Outfits.State"+row.State)}##Outfit{row.Outfit.SetItemId}");}
                 finally{ImGui.PopStyleColor();}
                 // 0.387 (user report): the outfit item's tooltip (how to obtain it), as for a piece.
-                if(ImGui.IsItemHovered())DrawItemInfoTooltip(row.Outfit.SetItemId);
+                ItemTip(row.Outfit.SetItemId);
                 if(!open)continue;
                 try
                 {
@@ -135,7 +135,7 @@ internal sealed partial class MainWindow
                         var where=row.Stored || outfitDresser.Contains(piece) ? localization.Get("Outfits.InDresser")
                             :outfitOwned.Contains(piece) ? localization.Get("Outfits.Elsewhere"):localization.Get("Outfits.NotOwned");
                         ImGui.Selectable($"{definition?.Name ?? $"#{piece}"}  · {where}##OutfitPiece{row.Outfit.SetItemId}/{piece}");
-                        if(ImGui.IsItemHovered())DrawItemInfoTooltip(piece);
+                        ItemTip(piece);
                         ItemLinksMenu($"OutfitPieceMenu{row.Outfit.SetItemId}/{piece}",definition);
                     }
                     DrawOutfitMissingActions(row);

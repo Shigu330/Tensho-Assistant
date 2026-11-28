@@ -799,7 +799,7 @@ internal sealed partial class MainWindow
                         ImGui.SameLine();
                         if (ImGui.Selectable($"{item.Name}##Result", itemId == (int)item.Id,
                                 ImGuiSelectableFlags.None, new Vector2(0, 32))) { RememberItem(item.Id); itemId = (int)item.Id; }
-                        if (ImGui.IsItemHovered()) DrawItemInfoTooltip(item.Id);
+                        ItemTip(item.Id);
                         ItemLinksMenu($"SearchResult{item.Id}",item);
                     }
                     finally { ImGui.PopID(); }

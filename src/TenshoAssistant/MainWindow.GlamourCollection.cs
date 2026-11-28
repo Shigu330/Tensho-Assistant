@@ -74,7 +74,7 @@ internal sealed partial class MainWindow
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();ImGui.TextDisabled(slot==EquipmentSlots.None ? "—":localization.Get("ItemFilters.Slot"+slot));
                 ImGui.TableNextColumn();ImGui.TextUnformatted(name);
-                if(ImGui.IsItemHovered())DrawItemInfoTooltip(piece.Item);
+                ItemTip(piece.Item);
                 ImGui.TableNextColumn();ImGui.TextUnformatted(piece.Places.Count<=3 ? string.Join(", ",piece.Places):string.Join(", ",piece.Places.Take(3))+" …");
                 if(piece.Places.Count>3)if(TipHovered())TipText(string.Join(", ",piece.Places));
                 ImGui.TableNextColumn();

@@ -1989,7 +1989,7 @@ internal sealed partial class MainWindow
                     var found=itemCatalog.State.Catalog?.Find(resource);
                     DrawSmallGameIcon(found?.IconId ?? 0);
                     if(ImGui.Selectable($"{found?.Name ?? $"#{resource}"}##IconMenu{resource}")){itemId=(int)resource;page=Page.Gathering;IsOpen=true;}
-                    if(ImGui.IsItemHovered())DrawItemInfoTooltip(resource);
+                    ItemTip(resource);
                 }
             }
             if(item.Layer==4 && mapGameTarget is not null && ImGui.Selectable(localization.Get("MapView.RemoveGameTarget")))mapGameTarget=null;

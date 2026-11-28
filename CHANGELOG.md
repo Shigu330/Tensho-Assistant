@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1943.0
+- Plan global, X-607 : Code plus facile à entretenir (X-607, demande du 18/11) : geste des info-bulles d'objet. Les vingt-huit info-bulles d'objet écrites à la main (« si survolé, dessiner la bulle de l'objet ») passent par le nouveau composant `ItemTip(objet, apparence seule, HQ)` de UI/Components/Tooltip.cs, avec la même condition de survol et la même bulle. Nouveau test `UiItemTips1943Tests` : la forme écrite à la main est refusée hors du composant, le composant garde la condition et l'ordre des arguments, les arguments nommés des pages sont gardés. Rien de visible ne change.
+- Tests : UiItemTips1943Tests. Verify.ps1 (agent) : 4314/4314, 0 avertissement, 0 erreur ; DLL 0.1943.0.0. Rien à essayer en jeu.
+### English
+- Code easier to maintain (X-607, request of 18/11): the item tooltips' gesture. The twenty-eight item tooltips written by hand (« if hovered, draw the item's tooltip ») go through the new component `ItemTip(item, glamour only, HQ)` of UI/Components/Tooltip.cs, with the same hover condition and the same tooltip. New test `UiItemTips1943Tests`: the form written by hand is refused outside the component, the component keeps the condition and the order of the arguments, the pages' named arguments are kept. Nothing visible changes.
+
 ## 0.1942.0
 - Plan global, X-607 : Code plus facile à entretenir (X-607, demande du 18/11) : geste des tableaux. Les quinze tableaux encore ouverts à la main avec exactement les drapeaux du composant commun (fond des lignes alterné, traits horizontaux, colonnes étirées ; sans défilement ni taille) passent par `UiComponents.BeginDataTable` : itinéraires des dirigeables, personnages, crédits, monnaies, découvertes, voyages de la compagnie, usure, carnet de chasse, mes outils, pêche océanique, rappels, missions quotidiennes, meilleures constructions, historique des voyages (deux). Même rendu (mêmes drapeaux, aucune taille). Le cliquet des tableaux écrits à la main passe de 96 à 81 ; nouveau test `UiTables1942Tests` : cette forme est refusée hors des composants, le composant garde les mêmes drapeaux, chaque tableau converti est vérifié par son identifiant.
 - Tests : UiTables1942Tests. Verify.ps1 (agent) : 4311/4311, 0 avertissement, 0 erreur ; DLL 0.1942.0.0. Rien à essayer en jeu.

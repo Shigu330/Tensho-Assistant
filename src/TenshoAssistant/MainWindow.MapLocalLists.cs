@@ -371,7 +371,7 @@ internal sealed partial class MainWindow
                 var item=itemCatalog.State.Catalog?.Find(resource);
                 DrawSmallGameIcon(item?.IconId ?? 0);
                 if(ImGui.Selectable($"{item?.Name ?? $"#{resource}"}##{id}/{resource}")){itemId=(int)resource;page=Page.Gathering;IsOpen=true;mapLocalCloseMenu=true;}
-                if(ImGui.IsItemHovered())DrawItemInfoTooltip(resource);
+                ItemTip(resource);
             }
             if(place is { } spot){ImGui.Separator();PlaceEntries(spot.Map,spot.At,"EntityMenu.Here");}
         }

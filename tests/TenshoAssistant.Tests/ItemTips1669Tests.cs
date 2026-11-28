@@ -13,7 +13,7 @@ internal static class ItemTips1669Tests
             Check(Read("MainWindow.SortPreview.cs").Contains("DrawItemInfoTooltip(stack.Item.Id.Value,hq:stack.Item.IsHighQuality);\n                                        WrappedTooltip("),"sort preview: common, then the slot");
             Check(!Read("MainWindow.Events.cs").Contains("WrappedTooltip(definition?.Name"),"events: the name not written again");
             Check(!Read("MainWindow.FishingPanel.cs").Contains("WrappedTooltip((bait?.Name") && !Read("MainWindow.OceanVoyagePanel.cs").Contains("WrappedTooltip((bait?.Name"),"baits: the name not written again");
-            Check(Read("MainWindow.RetainerSales.cs").Contains("DrawItemInfoTooltip(listing.ItemId, hq: listing.Hq);") && Read("MainWindow.RetainerSaleList.cs").Contains("DrawItemInfoTooltip(row.Item, hq: row.Hq);"),"retainer lists: the quality");
+            Check(Read("MainWindow.RetainerSales.cs").Contains("ItemTip(listing.ItemId, hq: listing.Hq);") && Read("MainWindow.RetainerSaleList.cs").Contains("ItemTip(row.Item, hq: row.Hq);"),"retainer lists: the quality");
         }),
     ];
 }

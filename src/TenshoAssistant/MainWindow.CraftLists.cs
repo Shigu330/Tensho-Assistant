@@ -61,10 +61,10 @@ internal sealed partial class MainWindow
             {
                 var item=items?.Find(entry.ItemId);
                 DrawItemIcon(item,new Vector2(22));
-                if(ImGui.IsItemHovered())DrawItemInfoTooltip(entry.ItemId);
+                ItemTip(entry.ItemId);
                 ImGui.SameLine();
                 if(ImGui.SmallButton(item?.Name ?? $"ID {entry.ItemId}") && recipes?.ForResult(entry.ItemId) is { Count:>0 } own)OpenCraftPreparation(PreferredRecipe(own));
-                if(ImGui.IsItemHovered())DrawItemInfoTooltip(entry.ItemId);
+                ItemTip(entry.ItemId);
                 ImGui.SameLine();
                 var quantity=(int)Math.Min(entry.Quantity,int.MaxValue);
                 ImGui.SetNextItemWidth(110);
@@ -93,9 +93,9 @@ internal sealed partial class MainWindow
                     var ingredient=items?.Find(itemId);
                     ImGui.TableNextRow();ImGui.TableNextColumn();
                     DrawItemIcon(ingredient,new Vector2(24));
-                    if(ImGui.IsItemHovered())DrawItemInfoTooltip(itemId);
+                    ItemTip(itemId);
                     ImGui.SameLine();ImGui.TextUnformatted(ingredient?.Name ?? $"ID {itemId}");
-                    if(ImGui.IsItemHovered())DrawItemInfoTooltip(itemId);
+                    ItemTip(itemId);
                     ImGui.TableNextColumn();ImGui.TextUnformatted(required.ToString("N0",Numbers));
                     ImGui.TableNextColumn();ImGui.TextUnformatted(held.HasObservation ? held.Total.ToString("N0",Numbers):"?");
                     ImGui.TableNextColumn();

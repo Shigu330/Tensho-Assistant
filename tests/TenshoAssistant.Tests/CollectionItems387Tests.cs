@@ -20,7 +20,7 @@ internal static class CollectionItems387Tests
             Check(Read("MainWindow.SourceLinks.cs").Contains("_ when entry.ItemId!=0",StringComparison.Ordinal),"sources menu");
             Check(Read("MainWindow.MarketHover.cs").Contains("HoverUi.CollectionHowUnknown",StringComparison.Ordinal),"unknown said");
             var outfits = Read("MainWindow.Outfits.cs");
-            Check(outfits.Contains("DrawItemInfoTooltip(row.Outfit.SetItemId)",StringComparison.Ordinal) && outfits.Contains("DrawItemInfoTooltip(piece)",StringComparison.Ordinal),"outfits");
+            Check(outfits.Contains("ItemTip(row.Outfit.SetItemId)",StringComparison.Ordinal) && outfits.Contains("ItemTip(piece)",StringComparison.Ordinal),"outfits");
         }),
     ];
 }

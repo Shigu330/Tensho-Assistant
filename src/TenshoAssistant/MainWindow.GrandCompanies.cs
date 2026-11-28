@@ -121,7 +121,7 @@ internal sealed partial class MainWindow
                 var item=items?.Find(row.Item);
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();DrawItemIcon(item,size);
-                if(ImGui.IsItemHovered())DrawItemInfoTooltip(row.Item);
+                ItemTip(row.Item);
                 ImGui.SameLine();ImGui.TextUnformatted(item?.Name ?? $"#{row.Item}");
                 ImGui.TableNextColumn();
                 if(row.Cost<=held)ImGui.TextUnformatted(row.Cost.ToString("N0",Numbers));else ImGui.TextColored(UI.FfxivTheme.Warning,row.Cost.ToString("N0",Numbers));

@@ -290,7 +290,7 @@ internal sealed partial class MainWindow
                 ImGui.PopStyleColor();
                 if(clicked){gearSearch="";ImGui.OpenPopup("GearPick");}
                 // X-294 (0.1295): the slot's piece shows its stats too (the common item tooltip), with its known HQ state.
-                if(ImGui.IsItemHovered())DrawItemInfoTooltip(shown.Id,glamourOnly:look is not null,hq:hq);
+                ItemTip(shown.Id,glamourOnly:look is not null,hq:hq);
                 ItemLinksMenu("GearSlotMenu",definition);
                 ImGui.TextDisabled(localization.Format("Gear.LevelLine",shown.Level,shown.ItemLevel));
                 if(changed || look is not null){ImGui.SameLine();DrawOwnedMark(shown.Id);}
@@ -351,7 +351,7 @@ internal sealed partial class MainWindow
                         }
                         // X-290 (0.1294, user request of 13/11 about 23:30): the stat differences written at the end of the line went past the list and
                         // were cut (« +4 I », « -5 Détermination »): they are in the piece's tooltip, with its stats, as the hover comparator shows them.
-                        if(ImGui.IsItemHovered())DrawItemInfoTooltip(candidate.Id,glamourOnly:glamourOnly);
+                        ItemTip(candidate.Id,glamourOnly:glamourOnly);
                         ItemLinksMenu($"GearPickMenu{candidate.Id}",definition);
                         // X-336 M7 (0.1380): one line per row inside the clipper (rows of one height, or the scrolling goes wrong).
                         ImGui.SameLine();

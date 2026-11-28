@@ -95,7 +95,7 @@ internal sealed partial class MainWindow
             {
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();ImGui.TextUnformatted((items?.Find(line.ItemId)?.Name ?? $"#{line.ItemId}")+(line.Hq ? " HQ":""));
-                if(ImGui.IsItemHovered())DrawItemInfoTooltip(line.ItemId);
+                ItemTip(line.ItemId);
                 ImGui.TableNextColumn();TenshoAssistant.UI.UiComponents.NumberCell(line.Quantity.ToString("N0",Numbers));
                 ImGui.TableNextColumn();ImGui.TextUnformatted(line.Places.Count<=3 ? string.Join(", ",line.Places):string.Join(", ",line.Places.Take(3))+" …");
                 if(line.Places.Count>3)if(TipHovered())TipText(string.Join(", ",line.Places));

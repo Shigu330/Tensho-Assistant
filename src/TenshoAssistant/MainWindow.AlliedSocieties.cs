@@ -85,7 +85,7 @@ internal sealed partial class MainWindow
                 if(items?.Find(society.Currency) is { } currency)
                 {
                     DrawItemIcon(currency,size);
-                    if(ImGui.IsItemHovered())DrawItemInfoTooltip(currency.Id);
+                    ItemTip(currency.Id);
                     ImGui.SameLine();
                     var held=GetRecipeHoldings(currency.Id);
                     ImGui.TextUnformatted(held.HasObservation ? held.Total.ToString("N0",Numbers):"?");

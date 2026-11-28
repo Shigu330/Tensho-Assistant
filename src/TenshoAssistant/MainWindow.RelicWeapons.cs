@@ -101,7 +101,7 @@ internal sealed partial class MainWindow
             {
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();DrawItemIcon(items.Find(id),size);
-                if(ImGui.IsItemHovered())DrawItemInfoTooltip(id);
+                ItemTip(id);
                 ImGui.SameLine();ImGui.TextUnformatted(items.Find(id)?.Name ?? $"#{id}");
                 ImGui.TableNextColumn();
                 if(Held(id) is not { } held)ImGui.TextDisabled("?");
@@ -220,7 +220,7 @@ internal sealed partial class MainWindow
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();ImGui.TextUnformatted((index+1).ToString());
                 ImGui.TableNextColumn();DrawItemIcon(items?.Find(line[index]),size);
-                if(ImGui.IsItemHovered())DrawItemInfoTooltip(line[index]);
+                ItemTip(line[index]);
                 ImGui.SameLine();ImGui.TextUnformatted(Name(line[index]));
                 ImGui.TableNextColumn();
                 if(Held(line[index]) is not { } held)ImGui.TextDisabled("?");

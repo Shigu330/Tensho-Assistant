@@ -63,7 +63,7 @@ internal sealed partial class MainWindow
         ImGui.AlignTextToFramePadding();ImGui.TextUnformatted(localization.Get(labelKey));ImGui.SameLine();
         if(consumable is not { } known){ImGui.TextDisabled(localization.Get("CraftSimulation.DetectedNone"));return;}
         DrawItemIcon(itemCatalog.State.Catalog?.Find(known.Item.ItemId),new System.Numerics.Vector2(28));
-        if(ImGui.IsItemHovered())DrawItemInfoTooltip(known.Item.ItemId);
+        ItemTip(known.Item.ItemId);
         if(known.Hq){ImGui.SameLine();ImGui.TextDisabled("HQ");}
     }
     private string CraftYesNo(bool? value)=>localization.Get(value switch{true=>"CraftSimulation.DetectedYes",false=>"CraftSimulation.DetectedNo",null=>"CraftSimulation.DetectedUnknown"});

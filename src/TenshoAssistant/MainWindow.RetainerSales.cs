@@ -81,7 +81,7 @@ internal sealed partial class MainWindow
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();
                 ImGui.TextUnformatted((catalog?.Find(listing.ItemId)?.Name ?? $"#{listing.ItemId}") + (listing.Hq ? " HQ" : ""));
-                if (ImGui.IsItemHovered()) DrawItemInfoTooltip(listing.ItemId, hq: listing.Hq);
+                ItemTip(listing.ItemId, hq: listing.Hq);
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(listing.Quantity.ToString());
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(listing.UnitPrice?.ToString("N0",Numbers) ?? "?");
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(verdict.Lowest?.ToString("N0",Numbers) ?? "—");

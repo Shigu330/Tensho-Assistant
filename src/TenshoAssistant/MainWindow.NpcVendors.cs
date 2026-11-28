@@ -123,7 +123,7 @@ internal sealed partial class MainWindow
                     var item=items?.Find(sale.ItemId);
                     DrawItemIcon(item,new Vector2(ImGui.GetTextLineHeight()));ImGui.SameLine();
                     if(ImGui.Selectable($"{item?.Name ?? localization.Format("BankUi.Item",sale.ItemId)}##Sale{shopKey}/{sale.ItemId}/{sale.Quantity}")){itemId=(int)sale.ItemId;npcVendorFocus=0;}
-                    if(ImGui.IsItemHovered())DrawItemInfoTooltip(sale.ItemId);
+                    ItemTip(sale.ItemId);
                     ItemCollectionMenu($"SaleCollection{shopKey}/{sale.ItemId}",item);
                     ImGui.TableNextColumn();DrawNpcCosts(sale,16,true);
                 }

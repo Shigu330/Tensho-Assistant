@@ -124,7 +124,7 @@ internal sealed partial class MainWindow
                 rank++;
                 var color=lacking.Length==0 ? Muted:rank==1 ? Success:Accent;
                 ImGui.TextColored(color,localization.Format("TriadNpcs.PackLine",rank,pack.PackName,lacking.Length,total,(100.0*lacking.Length/total).ToString("0")));
-                if(ImGui.IsItemHovered())DrawItemInfoTooltip(pack.PackItemId);
+                ItemTip(pack.PackItemId);
                 foreach(var card in lacking.Take(20))
                     if(TriadCard(card) is { } definition){DrawSmallGameIcon(definition.IconId);TriadCardTooltip(card);ImGui.SameLine();}
                 if(lacking.Length>0)ImGui.NewLine();

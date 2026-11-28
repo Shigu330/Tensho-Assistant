@@ -244,7 +244,7 @@ internal sealed partial class MainWindow
     {
         var item=itemCatalog.State.Catalog?.Find(recipe.ResultItemId);
         DrawItemIcon(item,new Vector2(40));
-        if(ImGui.IsItemHovered())DrawItemInfoTooltip(recipe.ResultItemId);
+        ItemTip(recipe.ResultItemId);
         ImGui.SameLine();
         ImGui.BeginGroup();
         try

@@ -50,7 +50,7 @@ internal static class GcSupply469Tests
             var panel=Read("MainWindow.CraftLog.cs");
             Check(panel.Contains("ImGui.Checkbox(\"###CraftLogManipulation\"") && panel.Contains("Find(job,CraftActionKind.Manipulation)") && panel.Contains("DrawDetectedConsumables(craftLogDetected)"),"panel");
             var consumables=Read("MainWindow.CraftConsumables.cs");
-            Check(consumables.Contains("DrawItemInfoTooltip(known.Item.ItemId)") && !consumables.Contains("DetectedOther"),"icon and tooltip; no other food is named");
+            Check(consumables.Contains("ItemTip(known.Item.ItemId)") && !consumables.Contains("DetectedOther"),"icon and tooltip; no other food is named");
         }),
         ("Crafting log panel: in sections, a quality bar, the explanations in a tooltip; nothing says Manipulation is excluded when the box allows it",() =>
         {

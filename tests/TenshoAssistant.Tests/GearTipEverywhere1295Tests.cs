@@ -44,7 +44,7 @@ internal static class GearTipEverywhere1295Tests
         ("X-294: the worn piece of a Gear slot shows its stats with its own HQ state", () =>
         {
             var gear = Read("MainWindow.Gear.cs");
-            Check(gear.Contains("DrawItemInfoTooltip(shown.Id,glamourOnly:look is not null,hq:hq)"), "slot piece: known HQ, glamour mark");
+            Check(gear.Contains("ItemTip(shown.Id,glamourOnly:look is not null,hq:hq)"), "slot piece: known HQ, glamour mark");
         }),
         ("X-294: base stats: NQ or HQ values (base plus the HQ extras), in the stats' order, zeros left out; HQ only when the piece can be HQ", () =>
         {

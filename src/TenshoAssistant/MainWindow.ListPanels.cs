@@ -535,7 +535,7 @@ internal sealed partial class MainWindow
         }
         var item=itemCatalog.State.Catalog?.Find(itemId);
         DrawItemIcon(item,new Vector2(ImGui.GetTextLineHeight()));
-        if(ImGui.IsItemHovered())DrawItemInfoTooltip(itemId);
+        ItemTip(itemId);
         ImGui.SameLine();
         ImGui.TextUnformatted(item?.Name ?? itemId.ToString());
         ImGui.SameLine();
