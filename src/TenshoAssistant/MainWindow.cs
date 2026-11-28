@@ -336,13 +336,13 @@ internal sealed partial class MainWindow : Window, IDisposable
                 if (!folded)
                 {
                     ImGui.TableSetColumnIndex(0);
-                    var showNavigation = ImGui.BeginChild("NavigationPane", new Vector2(0, height), true);
+                    var showNavigation = BeginFramed("NavigationPane", new Vector2(0, height));
                     try { if (showNavigation) DrawNavigation(); }
                     finally { ImGui.EndChild(); }
                 }
 
                 ImGui.TableSetColumnIndex(folded ? 0 : 1);
-                var showContent = ImGui.BeginChild("ContentPane", new Vector2(0, height), true);
+                var showContent = BeginFramed("ContentPane", new Vector2(0, height));
                 try
                 {
                     if (showContent)

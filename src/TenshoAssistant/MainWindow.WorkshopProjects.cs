@@ -56,7 +56,7 @@ internal sealed partial class MainWindow
             workshopShown=projects.Where(project=>workshopSearch.Length==0 || SearchText.Contains(WorkshopName(project),workshopSearch,StringComparison.CurrentCultureIgnoreCase) || SearchText.Contains(project.Type,workshopSearch,StringComparison.CurrentCultureIgnoreCase))
                 .OrderBy(project=>project.Type,StringComparer.CurrentCulture).ThenBy(WorkshopName,StringComparer.CurrentCulture).ToArray();
         }
-        if(ImGui.BeginChild("WorkshopList",new Vector2(0,170),true))
+        if(BeginFramed("WorkshopList",new Vector2(0,170)))
             foreach(var project in workshopShown)
                 if(ImGui.Selectable($"{WorkshopName(project)}  ·  {project.Type}##Workshop{project.Id}",workshopSelected==project.Id))workshopSelected=project.Id;
         ImGui.EndChild();

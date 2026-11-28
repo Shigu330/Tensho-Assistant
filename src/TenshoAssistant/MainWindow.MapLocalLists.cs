@@ -45,7 +45,7 @@ internal sealed partial class MainWindow
         ];
         var needed=tabs.Sum(tab=>ImGui.CalcTextSize(tab.Label).X+style.FramePadding.X*2+style.ItemInnerSpacing.X)+style.WindowPadding.X*2+8;
         var width=Math.Clamp(needed,640,Math.Max(640,ImGui.GetMainViewport().WorkSize.X*0.9f));
-        var open=ImGui.BeginChild("MapLocalLists",new Vector2(width,360),true);
+        var open=BeginFramed("MapLocalLists",new Vector2(width,360));
         try
         {
             if(open)OrderedTabs("MapLocalTabs",tabs,ImGuiTabBarFlags.FittingPolicyScroll);
@@ -174,7 +174,7 @@ internal sealed partial class MainWindow
         var chosen=selected;
         var current=groups.FirstOrDefault(group=>group.Key==chosen);
         if(current.Rows is null)current=groups[0];
-        if(ImGui.BeginChild(id+"Keys",new Vector2(190,0),true))
+        if(BeginFramed(id+"Keys",new Vector2(190,0)))
         {
             try{foreach(var (key,rows) in groups)if(ImGui.Selectable($"{key} ({rows.Count})##{id}{key}",key==current.Key))current=(key,rows);}
             finally{ImGui.EndChild();}
@@ -182,7 +182,7 @@ internal sealed partial class MainWindow
         else ImGui.EndChild();
         selected=current.Key;
         ImGui.SameLine();
-        if(ImGui.BeginChild(id+"Rows",Vector2.Zero,true))
+        if(BeginFramed(id+"Rows",Vector2.Zero))
         {
             try{foreach(var row in current.Rows)drawRow(row);}
             finally{ImGui.EndChild();}

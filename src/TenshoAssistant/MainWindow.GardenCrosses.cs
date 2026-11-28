@@ -128,7 +128,7 @@ internal sealed partial class MainWindow
         if(gardenBestPairs is not { } best || best.Seed!=gardenCrossSeed){best=(gardenCrossSeed,data.BestPairsFor(gardenCrossSeed));gardenBestPairs=best;gardenPair=null;}
         ImGui.TextUnformatted(localization.Format("Garden.CrossesGivesCount",best.Pairs.Count));
         ImGui.TextDisabled(localization.Get("Garden.PairsHelp"));
-        var visible=ImGui.BeginChild("GardenPairs",new Vector2(0,Math.Clamp(best.Pairs.Count*ImGui.GetTextLineHeightWithSpacing()+8,40,180)),true);
+        var visible=BeginFramed("GardenPairs",new Vector2(0,Math.Clamp(best.Pairs.Count*ImGui.GetTextLineHeightWithSpacing()+8,40,180)));
         try
         {
             if(visible)

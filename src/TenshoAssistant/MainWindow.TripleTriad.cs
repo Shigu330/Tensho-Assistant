@@ -172,7 +172,7 @@ internal sealed partial class MainWindow
             ImGui.TableSetupColumn(localization.Get("TriadUi.Details"), ImGuiTableColumnFlags.WidthStretch, 1.4f);
             ImGui.TableNextRow(); ImGui.TableNextColumn();
             var height = Math.Max(160, ImGui.GetContentRegionAvail().Y - 90);
-            var visible = ImGui.BeginChild("TriadCardList", new Vector2(0, height), true);
+            var visible = BeginFramed("TriadCardList", new Vector2(0, height));
             try
             {
                 if (visible)
@@ -214,7 +214,7 @@ internal sealed partial class MainWindow
             }
             finally { ImGui.EndChild(); }
             ImGui.TableNextColumn();
-            var detailsVisible = ImGui.BeginChild("TriadCardDetail", new Vector2(0, height), true);
+            var detailsVisible = BeginFramed("TriadCardDetail", new Vector2(0, height));
             try
             {
                 if (detailsVisible && triadCards.FirstOrDefault(entry => entry.Id == selectedTriad) is { } selected)

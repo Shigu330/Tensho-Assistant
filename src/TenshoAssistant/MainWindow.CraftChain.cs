@@ -172,7 +172,7 @@ internal sealed partial class MainWindow
     {
         if (count == 0) return;
         var rowHeight = 24 + ImGui.GetStyle().ItemSpacing.Y;
-        var visible = ImGui.BeginChild(id, new Vector2(0, Math.Clamp(count * rowHeight + 8, 40, maxHeight)), true);
+        var visible = BeginFramed(id, new Vector2(0, Math.Clamp(count * rowHeight + 8, 40, maxHeight)));
         try
         {
             if (!visible) return;

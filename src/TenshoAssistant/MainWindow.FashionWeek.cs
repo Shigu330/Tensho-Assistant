@@ -126,7 +126,7 @@ internal sealed partial class MainWindow
                 // The owned mark right after the row's text, drawn over the full-width row (it does not take the click).
                 if(ownedCount>0){ImGui.SameLine(slotStart+ImGui.CalcTextSize(slotText).X+ImGui.GetStyle().ItemSpacing.X);DrawStateMark(true);}
                 if(!open)continue;
-                var childVisible=ImGui.BeginChild("FashionSlotList",new Vector2(0,compact ? 200:260),true);
+                var childVisible=BeginFramed("FashionSlotList",new Vector2(0,compact ? 200:260));
                 try{if(childVisible)DrawFashionSlotBody(frame,slot,compact);}
                 finally{ImGui.EndChild();}
             }

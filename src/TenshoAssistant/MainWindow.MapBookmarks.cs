@@ -52,7 +52,7 @@ internal sealed partial class MainWindow
         ImGui.TextDisabled(localization.Get("MapsUi.BookmarkHelp"));
         if (points.Count > 0)
         {
-            var visible = ImGui.BeginChild("MapBookmarkList", new Vector2(0, 150), true);
+            var visible = BeginFramed("MapBookmarkList", new Vector2(0, 150));
             try
             {
                 if (visible)

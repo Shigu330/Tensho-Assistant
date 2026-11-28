@@ -432,7 +432,7 @@ internal sealed partial class MainWindow
             else
             {
                 uint? remove = null;
-                var visible = ImGui.BeginChild("FollowedQuestList", new Vector2(0, 140), true);
+                var visible = BeginFramed("FollowedQuestList", new Vector2(0, 140));
                 try
                 {
                     if (visible)

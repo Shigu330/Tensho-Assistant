@@ -132,7 +132,7 @@ internal sealed partial class MainWindow
             ImGui.TableSetupColumn(localization.Get("GatheringBrowser.Locations"), ImGuiTableColumnFlags.WidthStretch, 2);
             ImGui.TableNextRow(); ImGui.TableNextColumn();
             var height = Math.Max(120, ImGui.GetContentRegionAvail().Y);
-            var showList = ImGui.BeginChild("SourceItems", new Vector2(0, height), true);
+            var showList = BeginFramed("SourceItems", new Vector2(0, height));
             try
             {
                 if (showList)
@@ -168,7 +168,7 @@ internal sealed partial class MainWindow
             }
             finally { ImGui.EndChild(); }
             ImGui.TableNextColumn();
-            var showDetails = ImGui.BeginChild("SourceDetails", new Vector2(0, height), true);
+            var showDetails = BeginFramed("SourceDetails", new Vector2(0, height));
             try
             {
                 if (showDetails)

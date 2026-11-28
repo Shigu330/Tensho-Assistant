@@ -43,7 +43,7 @@ internal sealed partial class MainWindow
             Tip("MacroUi.BookTip");
             ImGui.SameLine(); if (ImGui.RadioButton(localization.Get("MacroUi.Shared"), macroBook == 1)) macroBook = 1;
             Tip("MacroUi.BookTip");
-            var visible = ImGui.BeginChild("MacroCatalog", new Vector2(0, Math.Clamp(ImGui.GetContentRegionAvail().Y*.35f,90,190)), true);
+            var visible = BeginFramed("MacroCatalog", new Vector2(0, Math.Clamp(ImGui.GetContentRegionAvail().Y*.35f,90,190)));
             try
             {
                 if (visible)
@@ -65,7 +65,7 @@ internal sealed partial class MainWindow
             }
             finally { ImGui.EndChild(); }
             ImGui.TextColored(Accent,localization.Format("MacroCounts.Plan",macroPlan.Count));
-            var showPlan = ImGui.BeginChild("MacroPlan", new Vector2(0, 160), true);
+            var showPlan = BeginFramed("MacroPlan", new Vector2(0, 160));
             try
             {
                 if (showPlan)

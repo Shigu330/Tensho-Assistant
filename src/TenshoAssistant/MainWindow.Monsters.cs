@@ -105,7 +105,7 @@ internal sealed partial class MainWindow
         if (itemDocument.Monsters.Count == 0) { ImGui.TextDisabled(localization.Get("MonsterSource.EmptyDrops")); return; }
         ImGui.TextDisabled(localization.Format("MonsterUi.Count",itemDocument.Monsters.Count));
         var height = Math.Clamp(itemDocument.Monsters.Count*30+30,90,210);
-        var showList = ImGui.BeginChild("MonsterReferences",new Vector2(0,height),true);
+        var showList = BeginFramed("MonsterReferences",new Vector2(0,height));
         try
         {
             if (showList && ImGui.BeginTable("MonsterReferencesTable",3,ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchProp))
@@ -173,7 +173,7 @@ internal sealed partial class MainWindow
         if (TenshoAssistant.UI.UiComponents.Header(localization.Format("MonsterUi.OtherItems",detail.DropItemIds.Count)+"##Monster"))
         {
             if (!detail.HasDrops) ImGui.TextDisabled(localization.Get("MonsterUi.NoDrops"));
-            var showItems=ImGui.BeginChild("MonsterDropItems",new Vector2(0,155),true);
+            var showItems=BeginFramed("MonsterDropItems",new Vector2(0,155));
             try
             {
                 if (showItems)

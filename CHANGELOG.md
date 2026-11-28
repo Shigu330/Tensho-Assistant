@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1947.0
+- Plan global, X-607 : Code plus facile à entretenir (X-607, demande du 18/11) : geste des cadres de liste. Les vingt-deux régions encadrées des pages (listes, volets) écrites à la main passent par le nouveau composant `BeginFramed(id, taille)` de UI/Components/Framed.cs, le même appel qu'avant, toujours fermé par `EndChild` : aucune page ne change. Nouveau test `UiFramed1947Tests` : la forme écrite à la main est refusée, le composant garde le même appel, chaque région ouverte est fermée.
+- Tests : UiFramed1947Tests. Verify.ps1 (agent) : 4326/4326, 0 avertissement, 0 erreur ; DLL 0.1947.0.0. Rien à essayer en jeu.
+### English
+- Code easier to maintain (X-607, request of 18/11): the gesture of the framed lists. The twenty-two framed regions of the pages (lists, panes) written by hand go through the new component `BeginFramed(id, size)` of UI/Components/Framed.cs, the same call as before, still closed by `EndChild`: no page changes. New test `UiFramed1947Tests`: the form written by hand is refused, the component keeps the same call, each opened region is closed.
+
 ## 0.1946.0
 - Plan global, X-607 : Code plus facile à entretenir (X-607, demande du 18/11) : geste des filtres « Tous ». Les quatre listes de filtre sur un texte où « vide » veut dire « tous » (métier de « Fabriquer avec le stock », catégorie des missions, client des mandats, monde du tableau des ventes) passent par le nouveau composant `FilterCombo(id, clé de « Tous », valeur, choix)` de UI/Components/FilterCombo.cs, les mêmes appels qu'avant : aucune page ne change. Nouveau test `UiFilters1946Tests` : cliquet sur les premières lignes « Tous… » écrites à la main, le composant garde les mêmes appels, les quatre pages s'en servent. Le cliquet du presse-papiers de 0.1945 est resserré à son compte réel (18).
 - Tests : UiFilters1946Tests. Verify.ps1 (agent) : 4323/4323, 0 avertissement, 0 erreur ; DLL 0.1946.0.0. Rien à essayer en jeu.

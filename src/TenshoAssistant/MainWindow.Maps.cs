@@ -63,7 +63,7 @@ internal sealed partial class MainWindow
         if (!ReferenceEquals(mapViewCatalog, catalog) || mapViewQuery != mapQuery)
         { mapMatches = catalog.Search(mapQuery); mapViewCatalog = catalog; mapViewQuery = mapQuery; }
         ImGui.TextDisabled(localization.Format("MapCounts.Count",mapMatches.Count));
-        var showList = ImGui.BeginChild("MapList", new Vector2(0, Math.Clamp(ImGui.GetContentRegionAvail().Y*.4f,100,210)), true);
+        var showList = BeginFramed("MapList", new Vector2(0, Math.Clamp(ImGui.GetContentRegionAvail().Y*.4f,100,210)));
         try
         {
             if (showList)

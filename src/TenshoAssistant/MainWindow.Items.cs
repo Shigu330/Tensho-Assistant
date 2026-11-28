@@ -234,7 +234,7 @@ internal sealed partial class MainWindow
         // 0.292: shown inside the sheet's « Related crafting » tab (ItemsUi.Craft); the header that repeated the tab name is gone.
         ImGui.PushStyleColor(ImGuiCol.ChildBg, TenshoAssistant.UI.FfxivTheme.Panel);
         ImGui.PushStyleColor(ImGuiCol.Border, TenshoAssistant.UI.FfxivTheme.Border);
-        var visible = ImGui.BeginChild("RecipePanel", new Vector2(-1, 0), true);
+        var visible = BeginFramed("RecipePanel", new Vector2(-1, 0));
         try
         {
             if (!visible) return;
