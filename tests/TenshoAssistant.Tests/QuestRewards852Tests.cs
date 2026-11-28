@@ -12,7 +12,8 @@ internal static class QuestRewards852Tests
             Check(new[]{"JournalAccept","JournalResult","JournalDetail"}.All(name=>windows.Contains("\""+name+"\"",StringComparison.Ordinal)),"quest windows");
             var reader=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Items/ItemHoverReader.Dalamud.cs"));
             Check(reader.Contains("log.Information(\"Item hover without panel: item {0}, {1}.\",seen,why);") && reader.Contains("if(blockedLogged!=(seen,why))"),"logged once");
-            Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs")).Contains("Developer=()=>configuration.DeveloperMode,"),"wired");
+            // X-153 (0.1940): the item hover is wired in Plugin.InventoryReaders.cs.
+            Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.InventoryReaders.cs")).Contains("Developer=()=>configuration.DeveloperMode,"),"wired");
         }),
     ];
 }

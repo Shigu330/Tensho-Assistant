@@ -879,13 +879,12 @@ public sealed partial class Plugin : IDalamudPlugin
                 // 0.826 (X-58): the crafting lists first, then the item's pages.
                 Links=id=>[..mainWindow.CraftListAdds(id),..(mainWindow.ExternalLinksFor(id) ?? [])]};
             registrations.Register(()=>{ },itemContextMenu.Dispose);
-            InventoryVisualSortBridge? sortBridge=null;
-            registrations.Register(()=>sortBridge=new InventoryVisualSortBridge(visualSort,inventory,player,client,framework,log,bankBridge),()=>sortBridge?.Dispose());
+            // X-153 (0.1940): the inventory's visual sort in Plugin.InventoryReaders.cs.
+            RegisterVisualSort(inventory,player,client,framework,bankBridge);
             // X-153 (0.1933): the Macro Chain bridge and the macros' observation in Plugin.Macros.cs.
             RegisterMacroReaders(framework,player,client,commands,interop);
-            ItemHoverReader? hoverReader = null;
-            registrations.Register(() => hoverReader = new ItemHoverReader(configuration, market, itemHover, itemCatalog, gameGui, player, client, framework, log) { InDuty = () => mapLive?.State is { InDuty: true }, Keys = keyState, Developer=()=>configuration.DeveloperMode, },
-                () => hoverReader?.Dispose());
+            // X-153 (0.1940): the item under the mouse in Plugin.InventoryReaders.cs.
+            RegisterItemHover(configuration,gameGui,player,client,framework,keyState);
             // X-153 (0.1929): the maps' catalogue in Plugin.Catalogs.cs.
             RegisterMapCatalog(data,framework);
             RegisterDutyCatalog(pluginInterface,data,framework,client,unlocks,player);
@@ -1020,9 +1019,8 @@ public sealed partial class Plugin : IDalamudPlugin
             RegisterItemCatalog(configuration,data,framework,gameGui,client,player,saver);
             // X-153 (0.1929): the recipes' and gathering points' catalogues in Plugin.Catalogs.cs.
             RegisterRecipeAndGatheringCatalogs(data,framework);
-            DalamudInventoryReader? inventoryReader = null;
-            registrations.Register(() => inventoryReader = new DalamudInventoryReader(inventoryService, inventory, player, client, framework, log),
-                () => inventoryReader?.Dispose());
+            // X-153 (0.1940): the inventory's reader in Plugin.InventoryReaders.cs.
+            RegisterInventoryReader(inventory,player,client,framework);
             craftLive.SetEnabled(MainWindow.CraftLiveWanted(configuration));
             gatheringObservation.SetEnabled(MainWindow.GatheringObservationWanted(configuration));
             cactpotObservation.SetEnabled(configuration.Observations?.GetValueOrDefault("Cactpot") == true);

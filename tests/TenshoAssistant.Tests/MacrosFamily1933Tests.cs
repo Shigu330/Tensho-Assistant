@@ -48,7 +48,7 @@ internal static class MacrosFamily1933Tests
             var readers = At("RegisterMacroReaders(framework,player,client,commands,interop);");
             Check(Count(plugin, @"RegisterMacroWriter\(") == 1 && Count(plugin, @"RegisterMacroReaders\(") == 1, "each called once");
             Check(At("RegisterGameMap(") < writer && writer < At("var discord=RegisterAlarms("), "the writer: after the game map, before the alarms, as before");
-            Check(At("sortBridge=new InventoryVisualSortBridge(") < readers && readers < At("hoverReader = new ItemHoverReader("), "the readers: after the visual sort, before the item hover, as before");
+            Check(At("RegisterVisualSort(inventory,player,client,framework,bankBridge);") < readers && readers < At("RegisterItemHover(configuration,gameGui,player,client,framework,keyState);"), "the readers: after the visual sort, before the item hover, as before");
         }),
         ("Macros family 1933: each service's install and its release are given to one same registration of Plugin.Macros.cs (its own release, never another's)", () =>
             FamilyRegistrations.Paired("Macros family 1933", PluginFiles().Single(file => file.Name == "Plugin.Macros.cs").Text, Paths.Select(path => (path.Service, path.Install, path.Release)))),

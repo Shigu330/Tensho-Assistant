@@ -181,7 +181,7 @@ internal static class ItemHoverTests
             var reader = Read("Items/ItemHoverReader.Dalamud.cs");
             Check(reader.Contains("var hidden=configuration.HoverHideInDuty && InDuty();",StringComparison.Ordinal)
                 && reader.Contains("owner!=0 && !hidden && !gui.GameUiHidden ? gui.HoveredItem:0;",StringComparison.Ordinal),"the reader stops in a duty");
-            Check(Read("Plugin.cs").Contains("{ InDuty = () => mapLive?.State is { InDuty: true },",StringComparison.Ordinal),"same detection as the map's « Hide in duties »");
+            Check(Read("Plugin.InventoryReaders.cs").Contains("{ InDuty = () => mapLive?.State is { InDuty: true },",StringComparison.Ordinal),"same detection as the map's « Hide in duties »");
             Check(Read("MainWindow.Settings.cs").Contains("BoolSetting(\"Settings.HoverHideInDuty\",\"Settings.HoverHideInDutyTip\",",StringComparison.Ordinal),"shared row (tooltip and ↺)");
             // Managed half of the reader in a duty: « nothing hovered » clears the item, so the panel is not drawn and nothing is asked.
             using var http = new HttpClient(new MarketTestHandler((_,_) => throw new Exception("unexpected HTTP")));
