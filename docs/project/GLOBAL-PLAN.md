@@ -20,7 +20,7 @@ Plan first written on 2026-11-05 (then at 0.539) from the review done with the u
 | 7 | Just before 1.0.0: tool lists, documents, help |  | No | Mostly done before phase 6, at the user's request; last review just before 1.0.0 |
 | Then | Version 1.0.0, on the custom repository (no submission, DEC-039) |  |  | When the user decides |
 
-Open before 1.0.0: 88 points (938 done), phases 1 to 6, W and X; a count produced by a script from the plan's source.
+Open before 1.0.0: 89 points (939 done), phases 1 to 6, W and X; a count produced by a script from the plan's source.
 <!-- /gen:plan:phases-en -->
 
 **Nothing is planned after 1.0.0 (user's request, 2026-11-09)**: C10, the only point that was there, moved to phase 5. Porting to Dalamud API 16 is not a point of the plan: it is done as soon as Dalamud publishes it, whatever the Tensho version (https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/evidence/0.1009-dalamud-api16-watch.md). The button to show or hide icons on the map already exists (user's report): the request is withdrawn.
@@ -345,8 +345,9 @@ Noted in the order the user made them; to be done after the current task, one ve
 | X-749 | Idea I-031 chosen by the user on 21/11 around 16:00 (idea box): Macros: command list and macro check. Done when: general macro workshop: list of text commands with English and French aliases, description and usage from the TextCommand sheet; check of a written macro (15 lines, unknown command, /micon, /wait over 60); nothing sent to the game (R03.3); game or compatibly licensed sources cited (R05, R06; never EorzeaWorld); what already exists checked first (R11.2); behaviour test; en and fr; in-game test | open |
 | X-791 | Idea I-056: Beastmaster's Crucible, board merchant window: read its offers and their token prices (sales included) to advise which food or item to buy for the team taken; no game sheet gives them. Done when: developer-mode probe, read only, evidence in docs/evidence; then under each merchant, the offers useful to the team (satiety, foods of each family); nothing bought for the player (R03.3); tests; in-game test | Nice-to-have (idea I-056 put in the plan by the user on 11/22) |
 | X-792 | Idea I-055 (follows X-766, D-211): another player's meal: also apply the full duration to medicine (Medicated status, 15 s to 3 h per item, ItemAction) and read in game the meal extension level (+5 to +15 min). Before coding: user's R04 agreement (other players' data). Done when: R04 agreement given by the user on 11/22 around 11:35 (reading other players' Medicated status, visible in game, nothing kept on disk); medicine duration from ItemAction; extension read in game or « unknown » (R06); no other player's data kept on disk; tests | Nice-to-have (idea I-055 put in the plan by the user on 11/22) |
+| X-909 | Publication tool: after a failed Verify, its rerun without argument replays a patch whose code is already applied; an edit that stays unique is applied twice (relay 232: duplicate member, CS0111). Done when: the rerun does not replay an applied patch, or the edit helper refuses a new text already present, with a test. | Tool (R13.3) |
 
-828 done points of this table: [the done points](GLOBAL-PLAN-DONE.md#requests-of-2026-11-07-while-playing).
+829 done points of this table: [the done points](GLOBAL-PLAN-DONE.md#requests-of-2026-11-07-while-playing).
 <!-- /gen:plan:x-en -->
 
 ## In-game survey reminders, by moment
@@ -499,7 +500,7 @@ Plan écrit d'abord le 2026-11-05 (alors en 0.539), issu de la revue faite avec 
 | 7 | Juste avant la 1.0.0 : listes d'outils, documents, aide |  | Non | Faite en grande partie avant la phase 6, à la demande de l'utilisateur ; dernière relecture juste avant la 1.0.0 |
 | Ensuite | Version 1.0.0, sur le dépôt personnalisé (pas de soumission, DEC-039) |  |  | Quand l'utilisateur le décide |
 
-Ouverts avant la 1.0.0 : 88 points (938 faits), phases 1 à 6, W et X ; compte produit par script depuis la source du plan.
+Ouverts avant la 1.0.0 : 89 points (939 faits), phases 1 à 6, W et X ; compte produit par script depuis la source du plan.
 <!-- /gen:plan:phases -->
 
 **Rien n'est prévu après la 1.0.0 (demande de l'utilisateur, 2026-11-09)** : C10, seul point qui y était, est passé en phase 5. Le portage à l'API 16 de Dalamud n'est pas un point du plan : il se fait dès que Dalamud la publie, quelle que soit la version de Tensho (https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/evidence/0.1009-dalamud-api16-watch.md). Le bouton pour afficher ou cacher des icônes sur la carte existe déjà (rapport de l'utilisateur) : la demande est retirée.
@@ -824,8 +825,9 @@ Notées dans l'ordre où l'utilisateur les a faites ; à faire après la tâche 
 | X-749 | Idée I-031 choisie par l'utilisateur le 21/11 vers 16 h (boîte à idées) : Macros et commandes texte (guide collé par l'utilisateur le 18/11, source externe : sujets seulement, R05) : Tensho enchaîne et écrit déjà des macros (page Enchaînement de macros, MacroWriter) et lit l'aide des commandes du chat dans la feuille TextCommand. Idée : un atelier de macros général (pas seulement d'artisanat) : liste de toutes les commandes texte avec leurs alias anglais et français, description et usage tirés de la feuille TextCommand dans la langue du client ; arguments de ciblage … Fait quand : atelier de macros général : liste des commandes texte avec alias anglais et français, description et usage tirés de la feuille TextCommand ; contrôle d'une macro écrite (15 lignes, commande inconnue, /micon, /wait au-delà de 60) ; rien n'est envoyé au jeu (R03.3) ; sources du jeu ou de licence compatible citées (R05, R06 ; jamais EorzeaWorld) ; ce qui existe déjà vérifié d'abord (R11.2) ; test de comportement ; en et fr ; essai en jeu | ouvert |
 | X-791 | Idée I-056 : Dédale bestial, fenêtre du marchand du plateau : lire ses offres et leurs prix en jetons (soldes comprises) pour conseiller quel aliment ou objet acheter pour l'équipe prise ; aucune feuille du jeu ne les donne. Fait quand : sonde en mode développeur, lecture seule, preuve dans docs/evidence ; puis sous chaque marchand, les offres utiles à l'équipe (satiété, aliments de chaque famille) ; rien n'est acheté pour le joueur (R03.3) ; tests ; essai en jeu | Souhaitable (idée I-056 mise au plan par l'utilisateur le 22/11) |
 | X-792 | Idée I-055 (suite de X-766, D-211) : repas d'un autre joueur : appliquer aussi la durée pleine aux remèdes (statut Médicamenté, 15 s à 3 h selon l'objet, ItemAction) et lire en jeu le niveau de l'allongement des repas (À boire et à manger I à III, Rationnement : +5 à +15 min). Avant de coder : accord R04 de l'utilisateur (données d'autres joueurs). Fait quand : accord R04 donné par l'utilisateur le 22/11 vers 11 h 35 (« Tout en A, R04 ok » : lecture du statut Médicamenté des autres joueurs, visible en jeu, rien gardé sur disque) ; durée des remèdes tirée d'ItemAction ; allongement lu en jeu ou « inconnu » (R06) ; aucune donnée d'un autre joueur gardée sur disque ; tests | Souhaitable (idée I-055 mise au plan par l'utilisateur le 22/11) |
+| X-909 | Outil de publication : après un échec de Verify, sa relance sans argument rejoue le patch dont le code est déjà appliqué ; une modification restée unique s'applique deux fois (relais 232 : membre en double, CS0111). Fait quand : la relance ne rejoue pas un patch déjà appliqué, ou l'aide de modification refuse un nouveau texte déjà présent, avec un test. | Outil (R13.3) |
 
-828 points faits de ce tableau : [les points faits](GLOBAL-PLAN-DONE.md#demandes-du-2026-11-07-en-jouant).
+829 points faits de ce tableau : [les points faits](GLOBAL-PLAN-DONE.md#demandes-du-2026-11-07-en-jouant).
 <!-- /gen:plan:x -->
 
 ## Rappels de relevés en jeu, par moment
