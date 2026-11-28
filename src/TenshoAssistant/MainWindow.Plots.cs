@@ -66,7 +66,7 @@ internal sealed partial class MainWindow
         if(state.WorldId!=world.WorldId || state.Plots is not { } plots)return;
         if(state.ReadAt is { } at)ImGui.TextDisabled(localization.Format("Plots.ReadAt",at.ToLocalTime().ToString("t")));
         var shown=plots.Where(PlotMatches).ToArray();
-        if(shown.Length==0){ImGui.TextDisabled(localization.Get("Plots.None"));return;}
+        if(shown.Length==0){EmptyState("Plots.None");return;}
         foreach(var plot in shown.Take(80))
             ImGui.TextUnformatted(localization.Format("Plots.Row",PlotDistrict(plot),plot.Ward,plot.Plot,PlotSize(plot.Size),plot.Price.ToString("N0",Numbers),
                 localization.Get(plot.Lottery ? "Plots.Lottery":"Plots.FirstCome"),plot.LottoEntries?.ToString() ?? "?"));

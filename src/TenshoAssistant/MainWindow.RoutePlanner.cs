@@ -148,7 +148,7 @@ internal sealed partial class MainWindow
         DrawSubmarineChosen(catalog,inputs);
         DrawSubmarineFleet(catalog,targets,useUnlocked);
         if(submarineSearch.Searching){ImGui.TextDisabled(localization.Get("RoutePlanner.Searching"));return;}
-        if(plannerRoutes.Count==0){ImGui.TextDisabled(localization.Get("RoutePlanner.None"));return;}
+        if(plannerRoutes.Count==0){EmptyState("RoutePlanner.None");return;}
         if(!ImGui.BeginTable("PlannerRoutes",7,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH|ImGuiTableFlags.ScrollY,new Vector2(0,Math.Max(ImGui.GetTextLineHeightWithSpacing()*10,ImGui.GetContentRegionAvail().Y-ImGui.GetTextLineHeightWithSpacing()*2))))return;
         try
         {
@@ -279,7 +279,7 @@ internal sealed partial class MainWindow
         Tip("RoutePlanner.FleetTip");
         if(!shown)return;
         var subs=(configuration.Voyages ?? []).Where(vessel=>vessel.Kind==VesselKind.Submarine).ToArray();
-        if(subs.Length==0){ImGui.TextDisabled(localization.Get("RoutePlanner.FleetNone"));return;}
+        if(subs.Length==0){EmptyState("RoutePlanner.FleetNone");return;}
         if(plannerValues is not { } values)return;
         var (map,goal,band)=(plannerMap,plannerGoal,plannerBand);
         ISet<uint>? Excluded(VoyageVessel sub)=>!useUnlocked || Voyages.UnlockedFor(configuration.SubmarineUnlocked,sub.HouseId) is not { } unlocked ? null

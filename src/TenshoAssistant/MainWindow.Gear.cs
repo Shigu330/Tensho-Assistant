@@ -713,7 +713,7 @@ internal sealed partial class MainWindow
             {
                 ItemCell(items?.Find(item.Id),item.Id,24,$"{item.Name} · {localization.Get("Gear.Slot"+slot)}");
                 var groups=GearSources(item.Id);
-                if(groups.Count==0){ImGui.SameLine();ImGui.TextDisabled(localization.Get("SourceLinks.None"));continue;}
+                if(groups.Count==0){ImGui.SameLine();EmptyState("SourceLinks.None");continue;}
                 foreach(var (label,lines) in groups)
                 {
                     ImGui.SameLine();

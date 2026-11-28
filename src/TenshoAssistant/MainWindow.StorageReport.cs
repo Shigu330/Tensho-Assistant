@@ -73,7 +73,7 @@ internal sealed partial class MainWindow
         var items=itemCatalog.State.Catalog;var size=new Vector2(ImGui.GetTextLineHeight());
         if(TenshoAssistant.UI.UiComponents.Header(localization.Format("StorageReport.Merge",storageMergeable.Sum(entry=>entry.Freed)),ImGuiTreeNodeFlags.DefaultOpen))
         {
-            if(storageMergeable.Count==0)ImGui.TextDisabled(localization.Get("StorageReport.MergeNone"));
+            if(storageMergeable.Count==0)EmptyState("StorageReport.MergeNone");
             foreach(var entry in storageMergeable.Take(100))
             {
                 DrawItemIcon(items?.Find(entry.ItemId),size);ImGui.SameLine();
@@ -90,7 +90,7 @@ internal sealed partial class MainWindow
             else
             {
                 ImGui.TextDisabled(localization.Format("StorageReport.OutsideHelp",sets.Sets,storageArmouryAt.Value.ToLocalTime().ToString("g")));
-                if(storageOutside.Count==0)ImGui.TextDisabled(localization.Get("StorageReport.OutsideNone"));
+                if(storageOutside.Count==0)EmptyState("StorageReport.OutsideNone");
                 foreach(var stack in storageOutside.Take(150))
                 {
                     var definition=items?.Find(stack.Item.Id.Value);
@@ -105,7 +105,7 @@ internal sealed partial class MainWindow
         {
             ImGui.TextDisabled(storageArmoireAt is { } armoireAt ? localization.Format("StorageReport.ArmoireHelp",armoireAt.ToLocalTime().ToString("g"))
                 :localization.Get("StorageReport.ArmoireNotRead"));
-            if(storageArmoire.Count==0)ImGui.TextDisabled(localization.Get("StorageReport.ArmoireNone"));
+            if(storageArmoire.Count==0)EmptyState("StorageReport.ArmoireNone");
             foreach(var entry in storageArmoire.Take(150))
             {
                 var definition=items?.Find(entry.ItemId);
@@ -119,7 +119,7 @@ internal sealed partial class MainWindow
         {
             ImGui.TextDisabled(storageDresserAt is { } dresserAt ? localization.Format("StorageReport.SameLookHelp",dresserAt.ToLocalTime().ToString("g"))
                 :localization.Get("StorageReport.NoDresser"));
-            if(storageDresserAt is not null && storageSameLook.Count==0)ImGui.TextDisabled(localization.Get("StorageReport.SameLookNone"));
+            if(storageDresserAt is not null && storageSameLook.Count==0)EmptyState("StorageReport.SameLookNone");
             foreach(var group in storageSameLook.Take(100))
             {
                 DrawItemIcon(items?.Find(group[0].Id),size);ImGui.SameLine();
@@ -130,6 +130,6 @@ internal sealed partial class MainWindow
         }
         // X-207 (0.1782): the estimated value of the stocks, on a click.
         DrawStockValue();
-        ImGui.TextDisabled(localization.Get("StorageReport.Nothing"));
+        EmptyState("StorageReport.Nothing");
     }
 }

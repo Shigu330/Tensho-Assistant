@@ -57,7 +57,7 @@ internal sealed partial class MainWindow
                 if(hit.Detail.Length>0)TipText(hit.Detail);
             }
         }
-        if(quickShown==query && quickPages.Length==0 && quickHits.Length==0)ImGui.TextDisabled(localization.Get("QuickSearch.None"));
+        if(quickShown==query && quickPages.Length==0 && quickHits.Length==0)EmptyState("QuickSearch.None");
         else if(quickShown!=query)ImGui.TextDisabled(localization.Get("QuickSearch.Searching"));
         ImGui.Separator();
     }

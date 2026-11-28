@@ -41,7 +41,7 @@ internal sealed partial class MainWindow
         try
         {
             ImGui.TextColored(Accent,entry.Name);
-            if(!DrawSourceLinks(unlocking))ImGui.TextDisabled(localization.Get("SourceLinks.None"));
+            if(!DrawSourceLinks(unlocking))EmptyState("SourceLinks.None");
             ImGui.Separator();
             ImGui.TextDisabled(localization.Get("SourceLinks.WikiNote"));
         }

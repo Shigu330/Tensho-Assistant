@@ -37,7 +37,7 @@ internal sealed partial class MainWindow
         }
         Tip("OceanFishing.RouteTip");
         var departures=schedule.Next(now,oceanRouteFilter==0 ? 12:8,oceanRouteFilter==0 ? null:oceanRouteFilter);
-        if(departures.Count==0){ImGui.TextDisabled(localization.Get("OceanFishing.None"));return;}
+        if(departures.Count==0){EmptyState("OceanFishing.None");return;}
         if(!UI.UiComponents.BeginDataTable("OceanDepartures",5))return;
         try
         {

@@ -102,7 +102,7 @@ internal sealed partial class MainWindow
         ImGui.TextDisabled(localization.Get("MonsterSource.NoSourceDate"));
         DrawCacheStamp(TenshoAssistant.Caching.CacheArea.Sources,itemDocument.FetchedAt);
         if (!itemDocument.HasDrops) { ImGui.TextWrapped(localization.Get("MonsterSource.MissingDrops")); return; }
-        if (itemDocument.Monsters.Count == 0) { ImGui.TextDisabled(localization.Get("MonsterSource.EmptyDrops")); return; }
+        if (itemDocument.Monsters.Count == 0) { EmptyState("MonsterSource.EmptyDrops"); return; }
         ImGui.TextDisabled(localization.Format("MonsterUi.Count",itemDocument.Monsters.Count));
         var height = Math.Clamp(itemDocument.Monsters.Count*30+30,90,210);
         var showList = BeginFramed("MonsterReferences",new Vector2(0,height));

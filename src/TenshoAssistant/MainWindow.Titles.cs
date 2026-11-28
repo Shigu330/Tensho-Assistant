@@ -45,7 +45,7 @@ internal sealed partial class MainWindow
         if(ImGui.SmallButton(localization.Get("Titles.None")))changer.Wear(0);
         Tip("Titles.NoneTip");
         BoolSetting("Titles.ByJob","Titles.ByJobTip",()=>configuration.JobTitlesEnabled,value=>configuration.JobTitlesEnabled=value,c=>c.JobTitlesEnabled);
-        if(configuration.JobTitles is not { Count:>0 } map){ImGui.TextDisabled(localization.Get("Titles.ByJobEmpty"));return;}
+        if(configuration.JobTitles is not { Count:>0 } map){EmptyState("Titles.ByJobEmpty");return;}
         foreach(var (job,title) in map.OrderBy(pair=>pair.Key).ToArray())
         {
             var name=state.Entries.FirstOrDefault(entry=>entry.Kind==CollectionKind.Title && entry.Id==title)?.Name ?? $"#{title}";

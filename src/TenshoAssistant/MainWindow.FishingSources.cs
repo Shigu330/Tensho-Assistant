@@ -57,7 +57,7 @@ internal sealed partial class MainWindow
                 }
                 UI.UiComponents.SubTitle(localization.Get("FishingSources.Baits"));
                 if(spot.BaitChains is null)ImGui.TextDisabled(localization.Get("FishingSources.MissingBait"));
-                else if(spot.BaitChains.Count==0)ImGui.TextDisabled(localization.Get("FishingSources.EmptyBait"));
+                else if(spot.BaitChains.Count==0)EmptyState("FishingSources.EmptyBait");
                 else for(var route=0;route<spot.BaitChains.Count;route++)
                 {
                     ImGui.PushID(route);

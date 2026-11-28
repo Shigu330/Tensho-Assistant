@@ -56,7 +56,7 @@ internal sealed partial class MainWindow
         ImGui.SameLine();ImGui.SetNextItemWidth(170);
         ImGui.Combo(localization.Get("CraftPresets.Sort")+"###CraftPresetSort",ref craftPresetSort,[localization.Get("CraftPresets.SortSaved"),localization.Get("CraftPresets.SortName"),localization.Get("CraftPresets.SortItem"),localization.Get("CraftPresets.SortJob"),localization.Get("CraftPresets.SortNewest")]);Tip("CraftPresets.SortTip");
         var view=CraftPresetRows(rows,catalog);
-        if(view.Length==0 && rows.Count>0)ImGui.TextDisabled(localization.Get("CraftPresets.NoMatch"));
+        if(view.Length==0 && rows.Count>0)EmptyState("CraftPresets.NoMatch");
         var remove=-1;var rename=-1;var duplicate=-1;
         foreach(var index in view.Take(1000))
         {

@@ -224,7 +224,7 @@ internal sealed partial class MainWindow
         finally{ImGui.EndDisabled();}
         Tip("CraftStock.NextTip");
         if(result.Undecided>0)ImGui.TextDisabled(localization.Format("CraftStock.Undecided",result.Undecided.ToString("N0",Numbers)));
-        if(rows.Length==0){ImGui.TextDisabled(localization.Get("CraftStock.Empty"));return;}
+        if(rows.Length==0){EmptyState("CraftStock.Empty");return;}
         DrawChainList("CraftStockList",rows.Length,index=>
         {
             var line=rows[index];

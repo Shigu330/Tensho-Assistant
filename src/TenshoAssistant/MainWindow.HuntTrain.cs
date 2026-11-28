@@ -64,7 +64,7 @@ internal sealed partial class MainWindow
         ImGui.Checkbox(localization.Get("HuntTrain.RankB")+"###HuntTrainB",ref huntTrainRankB);
         Tip("HuntTrain.RankBTip");
         BoolSetting("HuntTrain.MarkAlertSetting","HuntTrain.MarkAlertSettingTip",()=>configuration.HuntMarkAlert,value=>configuration.HuntMarkAlert=value,c=>c.HuntMarkAlert);
-        if(huntTrain.Count==0){ImGui.TextDisabled(localization.Get("HuntTrain.Empty"));return;}
+        if(huntTrain.Count==0){EmptyState("HuntTrain.Empty");return;}
         if(huntTrainCalled>=huntTrain.Count)huntTrainCalled=null;
         if(HuntTrain.Next(huntTrain) is { } next && ImGui.SmallButton(localization.Get("HuntTrain.NextFlag")) && catalog.Find(huntTrain[next].MapId) is { } nextMap)
         {

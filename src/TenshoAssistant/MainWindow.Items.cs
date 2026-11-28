@@ -70,7 +70,7 @@ internal sealed partial class MainWindow
         }
         if (container.Quantities.Count == 0)
         {
-            ImGui.TextDisabled(localization.Get("ItemsUi.CrystalEmpty"));
+            EmptyState("ItemsUi.CrystalEmpty");
             return;
         }
         if (container.Coverage != InventoryCoverage.Complete)
@@ -504,7 +504,7 @@ internal sealed partial class MainWindow
         var matches = craftBookMatches;
         if (matches.Length == 0)
         {
-            ImGui.TextDisabled(localization.Get("RecipeUi.NoMatch"));
+            EmptyState("RecipeUi.NoMatch");
             return;
         }
         var selectedIndex = Array.FindIndex(matches, recipe => recipe.RecipeId == craftBookRecipe);

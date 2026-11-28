@@ -47,7 +47,7 @@ internal sealed partial class MainWindow
         }
         ImGui.TextDisabled(vistaLogCount.Read==0 ? localization.Format("VistaLog.CountUnknown",vistaLogCount.Total)
             :localization.Format("VistaLog.Count",vistaLogCount.Done,vistaLogCount.Total));
-        if(vistaLogGroups.Count==0){ImGui.TextDisabled(localization.Get("VistaLog.None"));return;}
+        if(vistaLogGroups.Count==0){EmptyState("VistaLog.None");return;}
         DrawSplitView("VistaLog",vistaLogGroups,ref vistaLogZone,row=>
         {
             var (vista,done,possible)=row;

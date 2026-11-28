@@ -102,7 +102,7 @@ internal sealed partial class MainWindow
         DrawLootKindFilter("DutyFinder");
         // The filters drawn above may have changed this frame: the view follows on the next one.
         var groups=view.Groups;
-        if(groups.Length==0){ImGui.TextDisabled(localization.Get("DutyUi.Empty"));return;}
+        if(groups.Length==0){EmptyState("DutyUi.Empty");return;}
         var childVisible=ImGui.BeginChild("DutyFinderList",Vector2.Zero);
         try
         {
@@ -227,7 +227,7 @@ internal sealed partial class MainWindow
             // 0.405 (user request): the game's crafting / gathering log, opened on this item.
             DrawGameLogEntries(item);
             ImGui.Separator();
-            if(!DrawSourceLinks([item]))ImGui.TextDisabled(localization.Get("SourceLinks.None"));
+            if(!DrawSourceLinks([item]))EmptyState("SourceLinks.None");
         }
         finally{ImGui.EndPopup();}
     }

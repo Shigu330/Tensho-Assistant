@@ -230,7 +230,7 @@ internal sealed partial class MainWindow
         var map=maps.State.Catalog?.Find(zone.Map);
         ImGui.TextDisabled(localization.Get("FieldContent.ZoneHint"));
         var rows=zone.Events.Where(row=>FieldBoard.Matches(fieldQuery,row.Name,row.Description)).ToArray();
-        if(rows.Length==0){ImGui.TextDisabled(localization.Get("FieldContent.NoMatch"));return;}
+        if(rows.Length==0){EmptyState("FieldContent.NoMatch");return;}
         if(!ImGui.BeginTable($"###FieldZone{zone.Territory}",4,ImGuiTableFlags.RowBg|ImGuiTableFlags.BordersInnerV|ImGuiTableFlags.Resizable))return;
         try
         {
@@ -261,7 +261,7 @@ internal sealed partial class MainWindow
     {
         ImGui.TextDisabled(localization.Get("FieldContent.RecordsHint"));
         var rows=catalog.Records.Where(row=>FieldBoard.Matches(fieldQuery,row.Name,row.Description,row.Quest)).ToArray();
-        if(rows.Length==0){ImGui.TextDisabled(localization.Get("FieldContent.NoMatch"));return;}
+        if(rows.Length==0){EmptyState("FieldContent.NoMatch");return;}
         if(!ImGui.BeginTable("###FieldRecords",4,ImGuiTableFlags.RowBg|ImGuiTableFlags.BordersInnerV|ImGuiTableFlags.Resizable))return;
         try
         {
@@ -284,7 +284,7 @@ internal sealed partial class MainWindow
     {
         ImGui.TextDisabled(localization.Get("FieldContent.ActionsHint"));
         var rows=catalog.Actions.Where(row=>FieldBoard.Matches(fieldQuery,row.Name,row.Description,row.Category)).ToArray();
-        if(rows.Length==0){ImGui.TextDisabled(localization.Get("FieldContent.NoMatch"));return;}
+        if(rows.Length==0){EmptyState("FieldContent.NoMatch");return;}
         if(!ImGui.BeginTable("###FieldActions",3,ImGuiTableFlags.RowBg|ImGuiTableFlags.BordersInnerV|ImGuiTableFlags.Resizable))return;
         try
         {

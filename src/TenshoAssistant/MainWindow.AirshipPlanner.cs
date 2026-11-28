@@ -96,7 +96,7 @@ internal sealed partial class MainWindow
         if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("AirshipPlanner.Best")))return;
         if(airshipSearch.Searching){ImGui.TextDisabled(localization.Get("RoutePlanner.Searching"));return;}
         if(airshipGoal!=AirshipGoal.Shortest)ImGui.TextDisabled(localization.Get("AirshipPlanner.ExpUnknownNote"));
-        if(airshipRoutes.Count==0){ImGui.TextDisabled(localization.Get("RoutePlanner.None"));return;}
+        if(airshipRoutes.Count==0){EmptyState("RoutePlanner.None");return;}
         if(!UI.UiComponents.BeginDataTable("AirshipRoutes",6))return;
         try
         {
@@ -164,7 +164,7 @@ internal sealed partial class MainWindow
         var open=TenshoAssistant.UI.UiComponents.Header(localization.Get("AirshipPlanner.Fleet"));
         Tip("AirshipPlanner.FleetTip");
         if(!open){RequestAirshipSpeeds?.Invoke([]);return;}
-        if(ships.Length==0){ImGui.TextDisabled(localization.Get("AirshipPlanner.FleetNone"));return;}
+        if(ships.Length==0){EmptyState("AirshipPlanner.FleetNone");return;}
         RequestAirshipSpeeds?.Invoke(ships.Select(ship=>Math.Max(1,ship.Speed)));
         var inputs=ships.Select(ship=>(Key:VesselKey(ship),ship.Name,Rank:ship.Rank,Speed:Math.Max(1,ship.Speed),Range:Math.Max(1,ship.Range),
             Table:AirshipTableFor?.Invoke(Math.Max(1,ship.Speed)))).ToArray();

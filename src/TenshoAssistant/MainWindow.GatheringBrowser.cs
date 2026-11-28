@@ -44,7 +44,7 @@ internal sealed partial class MainWindow
             var all=sources.Sources;
             gatheringNowTask=Task.Run(()=>GatheringNow.Rows(all,now,TimeSpan.FromHours(1),60));
         }
-        if(gatheringNowRows.Count==0){ImGui.TextDisabled(localization.Get("GatheringBrowser.NowEmpty"));return;}
+        if(gatheringNowRows.Count==0){EmptyState("GatheringBrowser.NowEmpty");return;}
         if(!UI.UiComponents.BeginDataTable("GatheringNowRows",4))return;
         try
         {

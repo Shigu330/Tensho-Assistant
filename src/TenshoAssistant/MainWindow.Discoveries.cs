@@ -409,7 +409,7 @@ internal sealed partial class MainWindow
         var sharedHeld=summary.Count==0 ? 0:summary.Max(row=>row.ImportedOnly);
         if(store.LeftOut>0)ImGui.TextColored(Warning,localization.Format("DiscoveriesUi.SharedFull",store.LeftOut.ToString("N0",Numbers),Discoveries.DiscoveryStore.MaxFacts.ToString("N0",Numbers)));
         else if(sharedHeld>=Discoveries.DiscoveryStore.MaxFacts*9/10)ImGui.TextColored(Warning,localization.Format("DiscoveriesUi.SharedNearlyFull",sharedHeld.ToString("N0",Numbers),Discoveries.DiscoveryStore.MaxFacts.ToString("N0",Numbers)));
-        if(summary.Count==0)ImGui.TextDisabled(localization.Get("DiscoveriesUi.Empty"));
+        if(summary.Count==0)EmptyState("DiscoveriesUi.Empty");
         if(SeenPrices is { Count:>0 } prices)ImGui.TextUnformatted(localization.Format("DiscoveriesUi.SummaryPrices",prices.Count.ToString("N0",Numbers)));
         foreach(var (kind,total,seen,importedOnly) in summary)ImGui.TextUnformatted(localization.Format("DiscoveriesUi.Summary"+kind,total.ToString("N0",Numbers),seen.ToString("N0",Numbers),importedOnly.ToString("N0",Numbers)));
         DrawDiscoveryFiles(store,folder);
@@ -525,7 +525,7 @@ internal sealed partial class MainWindow
                 // 0.911 (X-76): and every other kind (OtherSeenKinds).
                 ..ItemSourceKinds.Concat(OtherSeenKinds).SelectMany(kind=>store.Find(kind,_=>true,20_000)).Where(fact=>SearchText.Contains(DiscoveryFactName(fact),wanted,StringComparison.CurrentCultureIgnoreCase)).Take(200)];
         }
-        if(discoveryRows.Count==0){ImGui.TextDisabled(localization.Get("DiscoveriesUi.NoneFound"));return;}
+        if(discoveryRows.Count==0){EmptyState("DiscoveriesUi.NoneFound");return;}
         if(!UI.UiComponents.BeginDataTable("Discoveries",6))return;
         try
         {

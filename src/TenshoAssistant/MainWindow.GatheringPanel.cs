@@ -382,7 +382,7 @@ internal sealed partial class MainWindow
         // 0.522 (user report): an action still recasting is not advised, and its GP stays for the other; it says when it comes back.
         var cooling=GpCrystals.WithRecast(start.JobId).Select(id=>(Id:id,Left:GatheringRecastLeft?.Invoke(id))).Where(row=>row.Left>0).ToArray();
         var actions=GpCrystals.For(start.JobId,start.Level,(int)start.Gp,cooling.Select(row=>row.Id).ToArray());
-        if(actions.Count==0 && cooling.Length==0){ImGui.TextDisabled(localization.Get("GatheringPanel.CrystalNone"));return;}
+        if(actions.Count==0 && cooling.Length==0){EmptyState("GatheringPanel.CrystalNone");return;}
         foreach(var action in actions)
         {
             if(GatheringActionRow?.Invoke(action.Id) is not { } row)continue;

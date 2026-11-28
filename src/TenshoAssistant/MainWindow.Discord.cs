@@ -73,7 +73,7 @@ internal sealed partial class MainWindow
         if(settings.WebhookUrl!=before)discordNotifier?.Clear();
         if(discordUrlEdit is null)
         {
-            if(settings.WebhookUrl.Length==0)ImGui.TextDisabled(localization.Get("Discord.UrlEmpty"));
+            if(settings.WebhookUrl.Length==0)EmptyState("Discord.UrlEmpty");
             else ImGui.TextColored(Success,localization.Format("Discord.UrlSaved",DiscordWebhook.Redact(settings.WebhookUrl)));
         }
         // X-76 step 3 (0.952): every post goes through ShouldSend, which needs « Post alarms to Discord »: what shapes a post is indented

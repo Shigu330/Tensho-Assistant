@@ -66,7 +66,7 @@ internal sealed partial class MainWindow
     private void DrawFashionOutfit(DateTimeOffset now)
     {
         var slots=TenshoAssistant.Fashion.FashionOutfit.Current(configuration.FashionOutfit,FashionWeek.Bounds(now).Start);
-        if(slots.Count==0){ImGui.TextDisabled(localization.Get("FashionWeek.OutfitEmpty"));return;}
+        if(slots.Count==0){EmptyState("FashionWeek.OutfitEmpty");return;}
         if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("FashionWeek.Outfit")+"###FashionOutfit",ImGuiTreeNodeFlags.DefaultOpen))return;
         ImGui.BeginDisabled(TryOnItem is null);
         try{if(ImGui.Button(localization.Get("FashionWeek.OutfitTry")))foreach(var id in slots.Values)TryOnItem?.Invoke(id);}
@@ -147,7 +147,7 @@ internal sealed partial class MainWindow
     private void DrawFashionSlotItems(IReadOnlyList<FashionCandidate> candidates,bool compact,uint hint,int slot)
     {
         if(hint==0){ImGui.TextDisabled(localization.Get("FashionWeek.UnknownCategory"));return;}
-        if(candidates.Count==0){ImGui.TextDisabled(localization.Get("FashionWeek.NoData"));return;}
+        if(candidates.Count==0){EmptyState("FashionWeek.NoData");return;}
         var options=configuration.FashionOptions ?? new();
         IEnumerable<FashionCandidate> ordered=options.ByPopularity ? candidates.OrderByDescending(entry=>entry.Match.Reports):candidates.OrderBy(entry=>entry.Match.ItemId);
         if(options.OwnedFirst)ordered=ordered.OrderByDescending(entry=>FashionOwned(entry.Match.ItemId)==true);

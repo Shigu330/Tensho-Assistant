@@ -16,7 +16,7 @@ internal sealed partial class MainWindow
         if(VoyageHistorySource is not { } source)return;
         if(source.Unavailable){ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("VoyageHistory.Unavailable"));return;}
         var records=source.Records;
-        if(records.Count==0){ImGui.TextDisabled(localization.Get("VoyageHistory.Empty"));return;}
+        if(records.Count==0){EmptyState("VoyageHistory.Empty");return;}
         var items=itemCatalog.State.Catalog;
         string Name(uint id)=>items?.Find(id)?.Name ?? $"#{id}";
         if(ImGui.SmallButton(localization.Get("VoyageHistory.Copy")))

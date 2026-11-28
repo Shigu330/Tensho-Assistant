@@ -192,7 +192,7 @@ internal sealed partial class MainWindow
     // X-158 (0.1128): the vista's next window is VistaWindow's (MainWindow.VistaLog.cs, NextVistaWindow), the same calculation as « possible now ».
     private void DrawVistaAlarmEntry(MapLocalPosition vista,uint territory)
     {
-        if(VistaAlarm(vista,territory,out var weatherNote) is not { } alarm){ImGui.TextDisabled(localization.Get("Alarms.VistaNone"));return;}
+        if(VistaAlarm(vista,territory,out var weatherNote) is not { } alarm){EmptyState("Alarms.VistaNone");return;}
         var starts=alarm.Weathers.Count>0 && vista.MinTime==0 && vista.MaxTime==0 ? new[]{0,480,960}:new[]{alarm.EtMinute};
         if(ImGui.Selectable(localization.Format(weatherNote is null ? "Alarms.VistaAdd":"Alarms.VistaAddWindow",vista.Name)+"##VistaAlarm"))
             AddAlarms(AlarmSchedule.ForWindows(alarm.Label,starts,alarm.LeadMinutes,territory,0,alarm.Weathers).Select(created=>{created.Group=alarm.Group;return created;}).ToArray());
@@ -273,7 +273,7 @@ internal sealed partial class MainWindow
     /// <summary>X-602 (0.1608): a tab's list of alarms, or the empty line; the « Other alarms » tab draws no second header of its own name.</summary>
     private bool DrawAlarmList(List<TenshoAlarm> alarms,DateTimeOffset now,List<TenshoAlarm> remove,List<TenshoAlarm> added,bool otherHeader)
     {
-        if(alarms.Count==0){ImGui.TextDisabled(localization.Get("Alarms.Empty"));return false;}
+        if(alarms.Count==0){EmptyState("Alarms.Empty");return false;}
         return DrawAlarmGroups(alarms,now,remove,added,otherHeader);
     }
 
@@ -491,7 +491,7 @@ internal sealed partial class MainWindow
         ImGui.TextWrapped(localization.Get("Reminders.AlarmsHelp"));
         if(alarmStatus.Length>0)ImGui.TextColored(Accent,alarmStatus);
         if(alarmGroupDeleteArmed is not null && ImGui.GetFrameCount()>alarmGroupDeleteSeenFrame+1)alarmGroupDeleteArmed=null;
-        if(shown.Count==0)ImGui.TextDisabled(localization.Get("Reminders.AlarmsEmpty"));
+        if(shown.Count==0)EmptyState("Reminders.AlarmsEmpty");
         var now=DateTimeOffset.UtcNow;var remove=new List<TenshoAlarm>();var added=new List<TenshoAlarm>();
         var changed=DrawAlarmGroups(shown,now,remove,added);
         if(remove.Any(alarm=>alarm.GameName.Length>0))alarmStatus=localization.Get("Alarms.DeleteInGame");
@@ -517,7 +517,7 @@ internal sealed partial class MainWindow
             ImGui.TextWrapped(localization.Get("Alarms.GameHelp"));
             if(ImGui.SmallButton(localization.Get("Alarms.OpenGame")))alarmService?.OpenGameWindow();
             if(alarmService?.GameAlarms is not { } game){ImGui.TextDisabled(localization.Get("Alarms.GameUnavailable"));return;}
-            if(game.Count==0)ImGui.TextDisabled(localization.Get("Alarms.GameNone"));
+            if(game.Count==0)EmptyState("Alarms.GameNone");
             foreach(var alarm in game)
                 ImGui.TextUnformatted($"{alarm.Name} · {alarm.Hour:00}:{alarm.Minute:00} {localization.Get("Alarms.Clock"+Math.Clamp(alarm.ClockTime,0,2))}"
                     +(alarm.Repeat ? " · "+localization.Get("Alarms.Repeat"):"")+(alarm.Reminder>0 ? " · "+localization.Format("Alarms.Reminder",MinutesText(alarm.Reminder)):""));

@@ -187,7 +187,7 @@ internal sealed partial class MainWindow
         var query=settingsQuery.Trim();
         if(query.Length<2)return;
         var hits=SettingsIndex.Entries.Where(entry=>SearchText.Contains(localization.Get(entry.Key),query,StringComparison.CurrentCultureIgnoreCase)).Take(15).ToArray();
-        if(hits.Length==0){ImGui.TextDisabled(localization.Get("Settings.SearchNone"));return;}
+        if(hits.Length==0){EmptyState("Settings.SearchNone");return;}
         foreach(var (key,tab) in hits)
         {
             var category=SettingsIndex.Categories[key];

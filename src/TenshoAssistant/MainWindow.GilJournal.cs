@@ -104,7 +104,7 @@ internal sealed partial class MainWindow
             }
             finally{ImGui.EndTable();}
         }
-        if(gilTotals.All(totals=>totals.Count==0))ImGui.TextDisabled(localization.Get("GilJournal.Empty"));
+        if(gilTotals.All(totals=>totals.Count==0))EmptyState("GilJournal.Empty");
         if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("GilJournal.Latest")))return;
         if(!UI.UiComponents.BeginDataTable("GilLatest",5))return;
         try

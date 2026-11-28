@@ -45,7 +45,7 @@ internal sealed partial class MainWindow
         }
         finally{DesktopEditEnd();}
         var tools=store.Tools;
-        if(tools.Count==0){ImGui.Spacing();ImGui.TextDisabled(localization.Get("MyToolsUi.Empty"));return;}
+        if(tools.Count==0){ImGui.Spacing();EmptyState("MyToolsUi.Empty");return;}
         ImGui.Spacing();
         var language=localization.CurrentCode;
         foreach(var entry in tools)
@@ -147,7 +147,7 @@ internal sealed partial class MainWindow
         }
         if(state.Entries is { } entries)
         {
-            if(entries.Count==0)ImGui.TextDisabled(localization.Get("MyToolsUi.GalleryEmpty"));
+            if(entries.Count==0)EmptyState("MyToolsUi.GalleryEmpty");
             var language=localization.CurrentCode;
             foreach(var entry in entries)
             {

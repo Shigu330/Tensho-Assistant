@@ -54,7 +54,7 @@ internal sealed partial class MainWindow
                 var wanted=forecast.Outcomes.Where(seed=>configuration.Wishlist?.Contains(seed)==true || GetRecipeHoldings(seed) is { HasObservation:true,Total:0 }).Select(Name).ToArray();
                 if(wanted.Length>0)ImGui.TextColored(Accent,localization.Format("Garden.ForecastWanted",string.Join(", ",wanted)));
                 break;
-            case GardenForecastKind.NoPartner:ImGui.TextDisabled(localization.Get("Garden.ForecastNone"));break;
+            case GardenForecastKind.NoPartner:EmptyState("Garden.ForecastNone");break;
             case GardenForecastKind.UnknownSeed:ImGui.TextDisabled(localization.Get("Garden.ForecastUnknownSeed"));break;
             case GardenForecastKind.UnknownNeighbour:ImGui.TextDisabled(localization.Format("Garden.ForecastUnknownNeighbour",forecast.Partner ?? 0,BedSeed(forecast.Partner)));break;
             case GardenForecastKind.NotKept:ImGui.TextDisabled(localization.Get("Garden.ForecastNotKept"));break;

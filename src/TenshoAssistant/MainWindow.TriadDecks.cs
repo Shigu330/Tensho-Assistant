@@ -50,7 +50,7 @@ internal sealed partial class MainWindow
     {
         ImGui.TextColored(Accent,localization.Get("TriadDecks.Title"));
         var decks=configuration.TripleTriadDecks ?? [];
-        if(decks.Count==0){ImGui.TextDisabled(localization.Get("TriadDecks.Empty"));ImGui.Separator();return;}
+        if(decks.Count==0){EmptyState("TriadDecks.Empty");ImGui.Separator();return;}
         string? remove=null;
         foreach(var deck in decks)
         {

@@ -36,7 +36,7 @@ internal sealed partial class MainWindow
         ImGui.TextWrapped(localization.Format("GatheringObservation.Attempts",frame.Attempts?.ToString() ?? localization.Get("GatheringObservation.Unknown"),frame.TotalAttempts?.ToString() ?? localization.Get("GatheringObservation.Unknown")));
         if(frame.NativeStatus==2)ImGui.TextDisabled(localization.Get("GatheringObservation.Quick"));
         ImGui.TextWrapped(localization.Get("GatheringObservation.Help"));
-        if(frame.Slots.Count==0)ImGui.TextDisabled(localization.Get("GatheringObservation.Empty"));
+        if(frame.Slots.Count==0)EmptyState("GatheringObservation.Empty");
         if(frame.Slots.Count>0 && UI.UiComponents.BeginDataTable("ObservedGatheringRows",4))
         {
             try

@@ -92,7 +92,7 @@ internal sealed partial class MainWindow
     // Text form for the « Observed match » tab.
     private void DrawTriadAdviceText()
     {
-        if(FreshTriadFrame() is not { } frame){ImGui.TextDisabled(localization.Get("TriadAdvice.NoMatch"));return;}
+        if(FreshTriadFrame() is not { } frame){EmptyState("TriadAdvice.NoMatch");return;}
         var advice=TriadAdviceFor(frame,out var loading);
         if(loading){ImGui.TextDisabled(localization.Get("TriadAdvice.Calculating"));return;}
         if(advice is null){StateLine(UI.UiState.Waiting,localization.Get("TriadAdvice.Waiting"));return;}

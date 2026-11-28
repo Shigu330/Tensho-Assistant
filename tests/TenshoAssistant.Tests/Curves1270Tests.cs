@@ -24,7 +24,7 @@ internal static class Curves1270Tests
             gauges=gauges[..gauges.IndexOf("// X-165 (0.1246, slice 3): the floating panel",StringComparison.Ordinal)];
             Check(gauges.Contains("if(allCurves ? curve.Values.Any(value=>value is not null):curve.Name==dashboardCurve)CurvePlot(") && gauges.Split("CurvePlot(").Length==2,"in game one curve at most, the chosen one (0.1271: all of them in the application)");
             Check(gauges.Contains("if(!allCurves && dashboardCurve is null)ImGui.TextDisabled(localization.Get(\"Dashboard.CurveHint\"));"),"the way to the curves is said");
-            Check(gauges.Contains("else if(history.Count<2)ImGui.TextDisabled(localization.Get(\"Dashboard.CurveEmpty\"));"),"no curve from a single point");
+            Check(gauges.Contains("else if(history.Count<2)EmptyState(\"Dashboard.CurveEmpty\");"),"no curve from a single point");
             Check(gauges.Contains("void Pick(string name,bool clicked){if(clicked && !allCurves)dashboardCurve=dashboardCurve==name ? null:name;}"),"a click shows, a second click hides");
             foreach(var name in new[]{"Memory","Page","Frame","Requests"})
                 Check(gauges.Contains($"Pick(\"{name}\",Gauge(\"{name}\",") && gauges.Contains($"Chosen(\"{name}\")"),name+": its gauge picks its curve");

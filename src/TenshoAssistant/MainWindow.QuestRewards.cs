@@ -69,7 +69,7 @@ internal sealed partial class MainWindow
             if(developerMode)ImGui.TextWrapped(RawMessage(unresolved.Reason));
         }
         if(rewards.HasAdditionalRewards)ImGui.TextWrapped(localization.Get("QuestRewards.Additional"));
-        if(rewards.Items.Count==0 && rewards.Gil==0 && rewards.Unresolved.Count==0)ImGui.TextDisabled(localization.Get("QuestRewards.Empty"));
+        if(rewards.Items.Count==0 && rewards.Gil==0 && rewards.Unresolved.Count==0)EmptyState("QuestRewards.Empty");
         ImGui.TextDisabled(localization.Get("QuestRewards.Source"));
     }
 }

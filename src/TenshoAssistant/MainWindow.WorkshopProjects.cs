@@ -65,7 +65,7 @@ internal sealed partial class MainWindow
         var delivered=WorkshopDelivered(selected.ResultItem);
         var applies=WorkshopStock.Applies(selected,delivered);
         if(WorkshopDeliveredNote(selected) is { } note)ImGui.TextDisabled(note);
-        else ImGui.TextDisabled(localization.Get("FreeCompany.WorkshopDeliveredNone"));
+        else EmptyState("FreeCompany.WorkshopDeliveredNone");
         if(configuration.WorkshopPanelProject!=selected.Id){configuration.WorkshopPanelProject=selected.Id;SaveReminders();}
         BoolSetting("FreeCompany.WorkshopPanel","FreeCompany.WorkshopPanelTip",()=>configuration.WorkshopPanel,value=>configuration.WorkshopPanel=value,c=>c.WorkshopPanel);
         if(configuration.WorkshopPanel)DrawListPanelOptions();

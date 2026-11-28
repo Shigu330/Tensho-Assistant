@@ -315,8 +315,8 @@ internal sealed partial class MainWindow
         }
         if(!bankHasVisibleItems)
         {
-            if(BankFiltering)ImGui.TextDisabled(localization.Get("BankUi.Empty"));
-            else if(bankPersonalNotice is null)ImGui.TextDisabled(localization.Get("BankUi.EmptyStorage"));
+            if(BankFiltering)EmptyState("BankUi.Empty");
+            else if(bankPersonalNotice is null)EmptyState("BankUi.EmptyStorage");
             return;
         }
         DrawBankCsvCopy(sourceKey,selectedEntries);

@@ -105,7 +105,7 @@ internal sealed partial class MainWindow
         }
         // X-76 (0.955): the shops' sales come from the catalogue's index (built once), not from a scan of every sale on each frame.
         var sales=catalog.ShopsOf(vendor.NpcId);
-        if(sales.Count==0){ImGui.TextDisabled(localization.Get("MapLocal.ShopsNone"));return;}
+        if(sales.Count==0){EmptyState("MapLocal.ShopsNone");return;}
         var items=itemCatalog.State.Catalog;
         foreach(var shop in sales)
         {

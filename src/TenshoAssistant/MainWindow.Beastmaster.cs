@@ -308,7 +308,7 @@ internal sealed partial class MainWindow
     /// <summary>X-135 (0.1163): the last board's result: score, then each beast's rank and experience before and after.</summary>
     private void DrawBeastResult(BeastCatalog catalog)
     {
-        if (LoadBeastPlans().Result is not { } result) { ImGui.TextDisabled(localization.Get("BeastUi.ResultNone")); return; }
+        if (LoadBeastPlans().Result is not { } result) { EmptyState("BeastUi.ResultNone"); return; }
         // X-481 (0.1470): the window's bonus and total, when they were read.
         var totals = result.Total is { } total ? " · " + localization.Format("BeastUi.ResultTotal", result.Bonus ?? 0, result.Bonuses ?? 0, total) : "";
         if (!TenshoAssistant.UI.UiComponents.Header(localization.Format("BeastUi.ResultTitle", result.At.ToLocalTime().ToString("g"), result.Score) + totals + "###BeastResult", ImGuiTreeNodeFlags.None)) return;
@@ -821,7 +821,7 @@ internal sealed partial class MainWindow
                     if (team is not { Count: > 0 }) { ImGui.TextDisabled(localization.Get("BeastUi.RestNoTeam")); continue; }
                     var advice = BeastSpaces.Rest(team, places);
                     if (advice.Rest.Count > 0) ImGui.TextColored(Success, localization.Format("BeastUi.RestAdvice", Names(advice.Rest)));
-                    else ImGui.TextDisabled(localization.Get("BeastUi.RestNone"));
+                    else EmptyState("BeastUi.RestNone");
                     if (advice.Full.Count > 0) ImGui.TextDisabled(localization.Format("BeastUi.RestFull", Names(advice.Full)));
                     if (advice.Down.Count > 0)
                         ImGui.TextColored(Warning, localization.Format("BeastUi.RestDown", Names(advice.Down), catalog.Items.FirstOrDefault(item => item.Row == BeastSpaces.ReviveItem)?.Name ?? localization.Get("BeastUi.ReviveItem")));

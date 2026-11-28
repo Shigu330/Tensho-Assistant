@@ -92,7 +92,7 @@ internal sealed partial class MainWindow
             return;
         }
         var shown = CommunityHelpIndex.For(guides, key, localization.CurrentCode);
-        if (shown.Count == 0) { ImGui.TextDisabled(localization.Get("Help.GuidesNone")); return; }
+        if (shown.Count == 0) { EmptyState("Help.GuidesNone"); return; }
         ImGui.TextColored(Accent, localization.Get("Help.GuidesTitle"));
         foreach (var guide in shown)
         {
@@ -162,7 +162,7 @@ internal sealed partial class MainWindow
             faqView = HelpIndex.Search(Faq.Entries.Select(entry => new HelpTopic(entry.Key, localization.Get($"Help.Question{entry.Key}"), localization.Get($"Help.Answer{entry.Key}"), "", "")), helpQuery);
         }
         if (!TenshoAssistant.UI.UiComponents.Header(localization.Get("Help.Faq"), ImGuiTreeNodeFlags.DefaultOpen)) return;
-        if (faqView.Count == 0) ImGui.TextDisabled(localization.Get("Help.FaqNoResult"));
+        if (faqView.Count == 0) EmptyState("Help.FaqNoResult");
         foreach (var topic in faqView)
         {
             if (!UI.UiComponents.TreeNode(topic.Title + $"###HelpQuestion{topic.Key}")) continue;
@@ -192,7 +192,7 @@ internal sealed partial class MainWindow
                 helpTopics = PageEntries.Select(entry => TopicOf(entry.Page)).ToArray();
                 helpView = HelpIndex.Search(helpTopics, helpQuery);
             }
-            if (helpView.Count == 0) ImGui.TextDisabled(localization.Get("Help.NoResult"));
+            if (helpView.Count == 0) EmptyState("Help.NoResult");
             foreach (var topic in helpView)
             {
                 if (!UI.UiComponents.TreeNode(topic.Title + "###HelpTopic" + topic.Key)) continue;

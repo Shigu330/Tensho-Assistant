@@ -93,7 +93,7 @@ internal sealed partial class MainWindow
         finally{ImGui.EndDisabled();}
         Tip("ChatLinks.ClearTip");
         var links=ChatMapLinkHistory.Filter(all,chatLinkChannels);
-        if(links.Count==0){ImGui.TextDisabled(localization.Get("ChatLinks.Empty"));return;}
+        if(links.Count==0){EmptyState("ChatLinks.Empty");return;}
         var visible=BeginFramed("ChatMapLinkList",new Vector2(0,Math.Min(180,links.Count*ImGui.GetFrameHeightWithSpacing()+8)));
         try
         {

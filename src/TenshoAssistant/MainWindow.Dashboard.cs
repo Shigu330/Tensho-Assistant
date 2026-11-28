@@ -192,7 +192,7 @@ internal sealed partial class MainWindow
             ("Requests",localization.Get("Dashboard.GaugeRequests"),rates,rateTop,value=>Number(value,"0.#")),
         };
         if(!allCurves && dashboardCurve is null)ImGui.TextDisabled(localization.Get("Dashboard.CurveHint"));
-        else if(history.Count<2)ImGui.TextDisabled(localization.Get("Dashboard.CurveEmpty"));
+        else if(history.Count<2)EmptyState("Dashboard.CurveEmpty");
         else
         {
             var left=localization.Format("Dashboard.CurveAgo",Math.Max(1,(int)Math.Round(history.SpanMs/60_000.0)));var right=localization.Get("Dashboard.CurveNow");

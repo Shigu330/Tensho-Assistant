@@ -109,7 +109,7 @@ internal sealed partial class MainWindow
             ImGui.SetNextItemWidth(-1);
             if(InputWithHint("##KeyItemQuery","ItemsUi.Query",ref keyItemQuery,64))keyItemResults=KeyItemSearch(keyItemQuery);
             Tip("ItemFilters.KeyItemsTip");
-            if(keyItemQuery.Trim().Length>0 && keyItemResults.Count==0)ImGui.TextDisabled(localization.Get("ItemFilters.KeyItemsNone"));
+            if(keyItemQuery.Trim().Length>0 && keyItemResults.Count==0)EmptyState("ItemFilters.KeyItemsNone");
             foreach(var (id,name,icon) in keyItemResults)
             {
                 if(DrawGameIcon(icon,new Vector2(ImGui.GetTextLineHeight()),false))ImGui.SameLine();

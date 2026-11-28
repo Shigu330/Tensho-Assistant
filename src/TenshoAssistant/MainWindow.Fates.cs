@@ -52,7 +52,7 @@ internal sealed partial class MainWindow
         Tip("Fates.SearchTip");
         ImGui.TextDisabled(localization.Get("Fates.Hint"));
         var rows=FieldBoard.Find(zones,fateZone,fateQuery);
-        if(rows.Count==0){ImGui.TextDisabled(localization.Get("Fates.None"));return;}
+        if(rows.Count==0){EmptyState("Fates.None");return;}
         if(!ImGui.BeginTable("###FateRows",4,ImGuiTableFlags.RowBg|ImGuiTableFlags.BordersInnerV|ImGuiTableFlags.Resizable|ImGuiTableFlags.ScrollY,new Vector2(0,Math.Max(160,ImGui.GetContentRegionAvail().Y-8))))return;
         try
         {

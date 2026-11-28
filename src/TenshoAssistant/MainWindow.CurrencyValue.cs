@@ -164,7 +164,7 @@ internal sealed partial class MainWindow
                 catch(Exception error){currencyPricesWanted=false;log.Warning(error,"Currency value prices could not be started.");}
             else if(missing.Length==0)currencyPricesWanted=false;
         }
-        if(currencyValueRows.Count==0){ImGui.TextDisabled(localization.Get("CurrencyValue.None"));return;}
+        if(currencyValueRows.Count==0){EmptyState("CurrencyValue.None");return;}
         ImGui.SetNextItemWidth(Widths.Medium);
         string[] filters=[localization.Get("CurrencyValue.FilterAll"),localization.Get("CurrencyValue.FilterCollection"),localization.Get("CurrencyValue.FilterMissing"),localization.Get("CurrencyValue.FilterMarket")];
         ImGui.Combo("###CurrencyValueFilter",ref currencyValueFilter,filters,filters.Length);

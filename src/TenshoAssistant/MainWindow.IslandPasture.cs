@@ -46,7 +46,7 @@ internal sealed partial class MainWindow
             case PastureReadStatus.NotOnIsland:ImGui.TextColored(UI.FfxivTheme.Warning,localization.Get("Island.NotOnIsland"));return;
             case PastureReadStatus.NotLoaded:ImGui.TextColored(UI.FfxivTheme.Warning,localization.Get("Island.PastureNotLoaded"));return;
         }
-        if(current.Animals.Count==0){ImGui.TextDisabled(localization.Get("Island.PastureEmpty"));return;}
+        if(current.Animals.Count==0){EmptyState("Island.PastureEmpty");return;}
         if(!ImGui.BeginTable("###IslandPastureTable",6,ImGuiTableFlags.RowBg|ImGuiTableFlags.BordersInnerV))return;
         try
         {

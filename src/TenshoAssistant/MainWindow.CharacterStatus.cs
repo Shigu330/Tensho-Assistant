@@ -27,7 +27,7 @@ internal sealed partial class MainWindow
         ImGui.PushTextWrapPos(0);
         ImGui.TextDisabled(localization.Get("CharacterStatus.Help"));
         ImGui.PopTextWrapPos();
-        if(all.Count==0){ImGui.TextDisabled(localization.Get("CharacterStatus.Empty"));return;}
+        if(all.Count==0){EmptyState("CharacterStatus.Empty");return;}
         var now=DateTimeOffset.UtcNow;var lastDaily=ResetSchedule.PreviousDaily(now,ResetSchedule.DailyHour);var current=source?.Current ?? 0;
         var lastWeekly=ResetSchedule.PreviousWeekly(now,ResetSchedule.WeeklyDay,ResetSchedule.WeeklyHour);
         if(!ImGui.BeginTable("CharacterStatuses",8,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH|ImGuiTableFlags.ScrollX,
@@ -74,7 +74,7 @@ internal sealed partial class MainWindow
                     else ImGui.TextUnformatted(map.ToLocalTime().ToString("g"));
                     ImGui.TableNextColumn();
                     if(status.BingoHeld is null)ImGui.TextDisabled(localization.Get("CharacterStatus.Unknown"));
-                    else if(status.BingoHeld==false || status.BingoExpires<=now)ImGui.TextDisabled(localization.Get("Reminders.BingoNone"));
+                    else if(status.BingoHeld==false || status.BingoExpires<=now)EmptyState("Reminders.BingoNone");
                     else
                     {
                         ImGui.TextUnformatted(localization.Format("CharacterStatus.BingoState",status.BingoStickers ?? 0));
@@ -142,7 +142,7 @@ internal sealed partial class MainWindow
                         :localization.Get("CharacterStatus.RetainerStockUnknown"));
                     ImGui.TableNextColumn();DrawRetainerSale(retainer,now);
                     ImGui.TableNextColumn();
-                    if(retainer.Venture==0)ImGui.TextDisabled(localization.Get("CharacterStatus.RetainerNone"));
+                    if(retainer.Venture==0)EmptyState("CharacterStatus.RetainerNone");
                     else if(retainer.VentureDone is not { } done)ImGui.TextUnformatted(localization.Get("CharacterStatus.RetainerVentureRunning"));
                     else if(done<=now)ImGui.TextColored(Success,localization.Get("CharacterStatus.OtherDone"));
                     else ImGui.TextUnformatted(done.ToLocalTime().ToString("g"));
@@ -186,7 +186,7 @@ internal sealed partial class MainWindow
     private void DrawRetainerSale(RetainerState retainer,DateTimeOffset now)
     {
         var sale=RetainerStates.Sale(retainer,now);
-        if(sale==RetainerSale.None){ImGui.TextDisabled(localization.Get("CharacterStatus.RetainerNone"));return;}
+        if(sale==RetainerSale.None){EmptyState("CharacterStatus.RetainerNone");return;}
         var end=retainer.MarketEnds?.ToLocalTime().ToString("g");
         var text=end is null ? localization.Format("CharacterStatus.RetainerMarketCount",retainer.MarketItems)
             :localization.Format(sale==RetainerSale.Ended ? "CharacterStatus.RetainerMarketEnded":"CharacterStatus.RetainerMarket",retainer.MarketItems,end);

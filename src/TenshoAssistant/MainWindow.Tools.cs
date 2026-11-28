@@ -303,7 +303,7 @@ internal sealed partial class MainWindow
         ImGui.TextDisabled(localization.Get("UsePreviewUi.Help"));
         if (uses.Length == 0)
         {
-            ImGui.TextDisabled(localization.Get("UsePreviewUi.Empty"));
+            EmptyState("UsePreviewUi.Empty");
             return;
         }
 

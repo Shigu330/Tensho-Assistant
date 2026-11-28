@@ -23,7 +23,7 @@ internal sealed partial class MainWindow
     private void DrawHuntingLog()
     {
         var entries=HuntEntries?.Invoke() ?? [];
-        if(entries.Count==0){ImGui.TextDisabled(localization.Get("HuntingLog.NoData"));return;}
+        if(entries.Count==0){EmptyState("HuntingLog.NoData");return;}
         var company=HuntGrandCompany?.Invoke();
         if(!ReferenceEquals(huntLogsFor,entries) || huntLogsCompany!=company)
         {
@@ -64,7 +64,7 @@ internal sealed partial class MainWindow
         var shown=logEntries.Where(entry=>entry.Rank==huntRank && (!huntMissingOnly || HuntingLog.Done(entry,slot)!=true)).OrderBy(entry=>entry.RowId).ToArray();
         var rankEntries=logEntries.Where(entry=>entry.Rank==huntRank).ToArray();
         if(slot is not null)ImGui.TextDisabled(localization.Format("HuntingLog.Count",rankEntries.Count(entry=>HuntingLog.Done(entry,slot)==true),rankEntries.Length));
-        if(shown.Length==0){ImGui.TextDisabled(localization.Get("HuntingLog.None"));return;}
+        if(shown.Length==0){EmptyState("HuntingLog.None");return;}
         if(!UI.UiComponents.BeginDataTable("HuntingLog",4))return;
         try
         {

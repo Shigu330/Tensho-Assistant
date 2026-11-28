@@ -182,7 +182,7 @@ internal sealed partial class MainWindow
         var rating=stats.JobId is 16 or 17 && stats.Values.TryGetValue("Gathering",out var gathering) ? gathering:0;
         if(baseValue is not { } valueBase || rating<=0 || BountifulEstimate.Bonus(rating,valueBase) is not { } bonus)
         {
-            ImGui.TextDisabled(localization.Get("GpUi.BountifulEstimateNone"));
+            EmptyState("GpUi.BountifulEstimateNone");
             Tip("GpUi.BountifulEstimateNoneHelp");
             return null;
         }

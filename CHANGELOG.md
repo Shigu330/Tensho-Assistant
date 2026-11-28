@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1950.0
+- Plan global, X-607 : Pages plus homogènes (X-607, demande du 18/11, accord de l'utilisateur du 28/11) : les lignes « rien ici » des pages (liste vide, aucun résultat, aucune donnée) écrites à la main passent par le composant commun `EmptyState` : la même couleur atténuée du thème partout (au lieu de la couleur « désactivé » d'ImGui) et un texte qui passe à la ligne. Nouveau test `UiEmptyStates1950Tests` : la forme écrite à la main est refusée, le composant reste atténué et à la ligne, les pages s'en servent.
+- Pour les joueurs : les lignes « rien ici » des pages (liste vide, aucun résultat) ont maintenant toutes la même couleur atténuée et passent à la ligne dans une fenêtre étroite.
+- Tests : UiEmptyStates1950Tests. Verify.ps1 (agent) : 4333/4333, 0 avertissement, 0 erreur ; DLL 0.1950.0.0. Non validé en jeu.
+### English
+- More consistent pages (X-607, request of 18/11, the user's approval of 28/11): the « nothing here » lines of the pages (empty list, no result, no data) written by hand go through the shared component `EmptyState`: the same muted colour of the theme everywhere (instead of ImGui's « disabled » colour) and a text that wraps. New test `UiEmptyStates1950Tests`: the form written by hand is refused, the component stays muted and wrapped, the pages use it.
+- For players: The « nothing here » lines of the pages (empty list, no result) now share one muted colour and wrap in a narrow window.
+
 ## 0.1949.0
 - Plan global, X-607 : Code plus facile à entretenir (X-607, demande du 18/11) : la page « Ajouter une page » de CONTRIBUTING (deux moitiés) nomme les composants communs ajoutés depuis 0.1942 : `ItemTip`, `InputWithHint`, `FilterCombo`, `CopyButton`, `BeginFramed`, `Widths`. Nouveau test `ContributingComponents1949Tests` : chaque composant demandé aux pages est nommé dans les deux moitiés.
 - Tests : ContributingComponents1949Tests. Verify.ps1 (agent) : 4330/4330, 0 avertissement, 0 erreur ; DLL 0.1949.0.0. Rien à essayer en jeu.

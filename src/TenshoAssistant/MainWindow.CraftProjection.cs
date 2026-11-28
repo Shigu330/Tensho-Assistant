@@ -55,7 +55,7 @@ internal sealed partial class MainWindow
         CraftSuggestion? found;bool loading;
         lock(suggestGate){found=suggestion;loading=suggestLoading;}
         if(loading){StateLine(UI.UiState.Waiting,localization.Get("CraftProjectionUi.SuggestLoading"));return;}
-        if(found is null){ImGui.TextDisabled(localization.Get("CraftProjectionUi.SuggestNone"));return;}
+        if(found is null){EmptyState("CraftProjectionUi.SuggestNone");return;}
         string Name(CraftActionKind kind)=>catalog.Find(job,kind)?.Name ?? kind.ToString();
         ImGui.PushStyleColor(ImGuiCol.Text,found.TargetReached ? Success:Accent);
         try{ImGui.TextWrapped(localization.Format(found.TargetReached ? "CraftProjectionUi.SuggestReached":"CraftProjectionUi.SuggestBelow",Name(found.Move),found.FinalQuality,projectionTarget));}
@@ -134,7 +134,7 @@ internal sealed partial class MainWindow
         UpdateCraftSuggestion(result,craftForbidden);
         DrawCraftSuggestion(result,catalog,frame.Raw.JobId);
         foreach(var issue in result.Issues)DrawCraftIssue(issue);
-        if(result.Actions.Count==0){ImGui.TextDisabled(localization.Get("CraftProjectionUi.Empty"));return;}
+        if(result.Actions.Count==0){EmptyState("CraftProjectionUi.Empty");return;}
         // X-156 (0.1265): the table is computed by Tensho from the state read in game: an estimate, said as everywhere.
         OriginLine(UI.UiOrigin.Estimated,localization.Get("CraftProjectionUi.SortHelp"));
         if(UI.UiComponents.BeginDataTable("LiveCraftProjection",7))

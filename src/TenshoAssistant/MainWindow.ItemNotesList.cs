@@ -23,7 +23,7 @@ internal sealed partial class MainWindow
         if(annotatedView is not { } view || !ReferenceEquals(view.Notes,notes) || !ReferenceEquals(view.Items,items) || view.Filter!=annotatedFilter || view.Query!=annotatedQuery)
             annotatedView=view=(notes,items,annotatedFilter,annotatedQuery,ItemNotes.Annotated(notes,(AnnotatedFilter)annotatedFilter,annotatedQuery,id=>items?.Find(id)?.Name ?? localization.Format("BankUi.Item",id)));
         var rows=view.Rows;
-        if(rows.Length==0){ImGui.TextDisabled(localization.Get("ItemNotes.ListEmpty"));return;}
+        if(rows.Length==0){EmptyState("ItemNotes.ListEmpty");return;}
         DrawChainList("AnnotatedList",rows.Length,index=>
         {
             var row=rows[index];

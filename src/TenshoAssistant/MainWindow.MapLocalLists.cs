@@ -104,7 +104,7 @@ internal sealed partial class MainWindow
             mapLocalQuestCache=(state.Entries,index,map.MapId,mapLocalShowComplete,locked,season,offeredKey,
                 MapLocalLists.Quests(state.Entries,index,map.MapId,mapLocalShowComplete,locked,MapLocalLists.OutOfSeason(festivals?.Quests,running),offered));
         var groups=mapLocalQuestCache.Groups;
-        if(groups.Count==0){ImGui.TextDisabled(localization.Get("MapLocal.Empty"));return;}
+        if(groups.Count==0){EmptyState("MapLocal.Empty");return;}
         DrawSplitView("Quest",groups,ref mapLocalQuestCategory,item=>
         {
             var world=new Vector3(item.Position.X,0,item.Position.Z);
@@ -120,7 +120,7 @@ internal sealed partial class MainWindow
     {
         // The game only lists the FATEs of the current zone; no static FATE position exists in the game data.
         if(live is null || live.MapId!=map.MapId){ImGui.TextDisabled(localization.Get("MapLocal.FatesOtherZone"));return;}
-        if(live.Fates is not { Count:>0 } fates){ImGui.TextDisabled(localization.Get("MapLocal.FatesNone"));return;}
+        if(live.Fates is not { Count:>0 } fates){EmptyState("MapLocal.FatesNone");return;}
         foreach(var fate in fates.OrderBy(fate=>fate.Level).ThenBy(fate=>fate.Name,StringComparer.CurrentCultureIgnoreCase))
         {
             DrawSmallGameIcon(fate.Icon);
@@ -145,7 +145,7 @@ internal sealed partial class MainWindow
         if(mapLocalGatheringCache.MapId!=map.MapId || !ReferenceEquals(mapLocalGatheringCache.Catalog,catalog) || !ReferenceEquals(mapLocalGatheringCache.Index,index))
             mapLocalGatheringCache=(map.MapId,catalog,index,MapLocalLists.Gathering(catalog.Sources,index,map.MapId));
         var groups=mapLocalGatheringCache.Groups;
-        if(groups.Count==0){ImGui.TextDisabled(localization.Get("MapLocal.Empty"));return;}
+        if(groups.Count==0){EmptyState("MapLocal.Empty");return;}
         DrawSplitView("Gathering",groups,ref mapLocalGatheringType,point=>
         {
             var label=$"{localization.Format("MapLocal.Level",point.Level)}  {point.Place}{(point.Hidden ? " "+localization.Get("MapLocal.Hidden"):"")}";
@@ -199,7 +199,7 @@ internal sealed partial class MainWindow
         if(!ReferenceEquals(mapLocalCollectibleCache.Maps,mapIds) || !ReferenceEquals(mapLocalCollectibleCache.Index,index) || mapLocalCollectibleCache.Kind!=kind)
             mapLocalCollectibleCache=(mapIds,index,kind,mapIds.SelectMany(id=>index.OnMap(kind,id)).OrderBy(row=>row.Id).ToArray());
         var rows=mapLocalCollectibleCache.Rows;
-        if(rows.Length==0){ImGui.TextDisabled(localization.Get("MapLocal.Empty"));return;}
+        if(rows.Length==0){EmptyState("MapLocal.Empty");return;}
         var collected=kind==MapLocalKind.Sightseeing ? live?.Sightseen:live?.UnlockedCurrents;
         var done=collected is null ? 0:rows.Count(row=>collected.Contains(row.Id));
         ImGui.TextDisabled(collected is null ? localization.Get("MapView.CollectedUnknown"):localization.Format("MapLocal.CollectedCount",done,rows.Length));
@@ -256,7 +256,7 @@ internal sealed partial class MainWindow
         if(npcVendors?.State.Catalog is null){StateLine(UI.UiState.Waiting,localization.Get("MapLocal.VendorsLoading"));return;}
         var rows=MapVendors(map);
         var vendorMarkers=VendorCandidates(VisibleFixed(map.MapId,mapMarkers?.For(map.MarkerRange) ?? []));
-        if(rows.Count==0){ImGui.TextDisabled(localization.Get("MapLocal.Empty"));return;}
+        if(rows.Count==0){EmptyState("MapLocal.Empty");return;}
         ImGui.TextDisabled(localization.Format("MapLocal.VendorCount",rows.Count));
         foreach(var (vendor,spot) in rows.OrderBy(row=>row.Vendor.Name,StringComparer.CurrentCultureIgnoreCase))
         {
@@ -280,7 +280,7 @@ internal sealed partial class MainWindow
         bool? Beaten(uint match)=>state.Beaten is { } beaten ? beaten.Contains(match):null;
         var questsDone=state.QuestsDone;
         var rows=catalog.ToFace(Beaten,id=>entries.TryGetValue(id,out var entry) && entry.ConfirmedUnlocked,false,npc=>npc.Available(questsDone)).Where(row=>mapIds.Contains(row.Npc.MapId)).ToArray();
-        if(rows.Length==0){ImGui.TextDisabled(localization.Get("MapLocal.Empty"));return;}
+        if(rows.Length==0){EmptyState("MapLocal.Empty");return;}
         if(state.Beaten is null)ImGui.TextDisabled(localization.Get(state.BeatenUnavailable ? "TriadNpcs.BeatenUnavailable":"TriadNpcs.BeatenUnknown"));
         foreach(var (npc,beaten,missing) in rows)
         {
@@ -300,7 +300,7 @@ internal sealed partial class MainWindow
     private void DrawLocalFavorites(MapDefinition map)
     {
         var points=configuration.MapBookmarks ?? [];
-        if(points.Count==0){ImGui.TextDisabled(localization.Get("MapLocal.FavoritesEmpty"));return;}
+        if(points.Count==0){EmptyState("MapLocal.FavoritesEmpty");return;}
         var catalog=maps.State.Catalog;
         var remove=-1;
         void Rows(bool here)
@@ -334,7 +334,7 @@ internal sealed partial class MainWindow
             }
         }
         if(points.Any(point=>point is not null && point.MapId==map.MapId))Rows(true);
-        else ImGui.TextDisabled(localization.Get("MapLocal.FavoritesNoneHere"));
+        else EmptyState("MapLocal.FavoritesNoneHere");
         if(points.Any(point=>point is not null && point.MapId!=map.MapId))
         {
             ImGui.Spacing();
@@ -348,7 +348,7 @@ internal sealed partial class MainWindow
     private void DrawLocalAetherytes(MapDefinition map)
     {
         var aetherytes=(mapMarkers?.For(map.MarkerRange) ?? []).Where(marker=>marker.AetheryteId!=0).ToArray();
-        if(aetherytes.Length==0){ImGui.TextDisabled(localization.Get("MapLocal.Empty"));return;}
+        if(aetherytes.Length==0){EmptyState("MapLocal.Empty");return;}
         foreach(var marker in aetherytes)
         {
             DrawSmallGameIcon(marker.Icon);

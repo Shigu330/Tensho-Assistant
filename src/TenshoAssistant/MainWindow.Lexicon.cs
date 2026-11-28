@@ -60,7 +60,7 @@ internal sealed partial class MainWindow
         }
         if(lexiconQuery.Trim().Length<LexiconBoard.MinimumQuery){ImGui.TextDisabled(localization.Format("Lexicon.Hint",words.Count.ToString("N0",Numbers)));return;}
         if(lexiconSearch is not null && lexiconFound.Rows.Count==0){ImGui.TextDisabled(localization.Get("Lexicon.Searching"));return;}
-        if(lexiconFound.Total==0){ImGui.TextDisabled(localization.Get("Lexicon.None"));return;}
+        if(lexiconFound.Total==0){EmptyState("Lexicon.None");return;}
         var (rows,page,pages)=CraftFromStock.Paged(lexiconFound.Rows,lexiconPage,LexiconPageSize);
         lexiconPage=page;
         ImGui.TextColored(Accent,localization.Format(lexiconFound.Total>lexiconFound.Rows.Count ? "Lexicon.CountMore":"Lexicon.Count",lexiconFound.Total.ToString("N0",Numbers),lexiconFound.Rows.Count.ToString("N0",Numbers)));

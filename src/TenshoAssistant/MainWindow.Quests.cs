@@ -168,7 +168,7 @@ internal sealed partial class MainWindow
             questViewCategory = questCategory; questViewFilter = questFilter;
         }
         var matches = questMatches;
-        if (matches.Length == 0) { ImGui.TextDisabled(localization.Get("QuestsBrowser.Empty")); return; }
+        if (matches.Length == 0) { EmptyState("QuestsBrowser.Empty"); return; }
         if (!ImGui.BeginTable("QuestEntries", 5, ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchProp | ImGuiTableFlags.Sortable)) return;
         try
         {
@@ -326,7 +326,7 @@ internal sealed partial class MainWindow
         var points = mapLive?.State?.QuestPoints?.Select(point => (point.Quest, point.MapId, point.X, point.Z));
         if (QuestPlaces.Step(points, entry.Id) is not { } step || maps.State.Catalog?.Find(step.MapId) is not { } map)
         {
-            ImGui.TextDisabled(localization.Get("QuestDetails.StepNone"));
+            EmptyState("QuestDetails.StepNone");
             return;
         }
         var world = new Vector3(step.X, 0, step.Z);

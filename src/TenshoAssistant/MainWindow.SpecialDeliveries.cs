@@ -26,7 +26,7 @@ internal sealed partial class MainWindow
             var name=state.Entries.First(entry=>entry.GenreId==genre).Category;
             tabs.Add((genre.ToString(),$"{name} ({done}/{total})",()=>DrawSpecialDeliveryList(state.Entries,genre)));
         }
-        if(tabs.Count==0){ImGui.TextDisabled(localization.Get("SpecialDeliveries.None"));return;}
+        if(tabs.Count==0){EmptyState("SpecialDeliveries.None");return;}
         DetailTabs("SpecialDeliveryTabs",tabs,ref specialDeliveryFocus);
     }
 

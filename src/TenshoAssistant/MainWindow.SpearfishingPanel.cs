@@ -124,7 +124,7 @@ internal sealed partial class MainWindow
                 }
             }
             if(developerMode)ImGui.TextDisabled($"node base {frame.BaseId} · {fishHere.Length} fish · slots "+string.Join(" ",frame.Slots.Select(slot=>$"{(slot.Available ? 1:0)}/{slot.Size}/{slot.Speed}")));
-            if(data is null)ImGui.TextDisabled(localization.Get("Spearfishing.NoData"));
+            if(data is null)EmptyState("Spearfishing.NoData");
             ImGui.TextDisabled(localization.Get("Spearfishing.Credit"));
             Tip("Spearfishing.Legend");
         });

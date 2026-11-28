@@ -172,7 +172,7 @@ internal sealed partial class MainWindow
         try{BoolSetting("Wishlist.SaleAlert","Wishlist.SaleAlertTip",()=>configuration.WishlistSaleAlert,value=>configuration.WishlistSaleAlert=value,c=>c.WishlistSaleAlert);}
         finally{ImGui.EndDisabled();}
         var list=configuration.Wishlist;
-        if(list is not { Count:>0 }){ImGui.TextDisabled(localization.Get("Wishlist.Empty"));return;}
+        if(list is not { Count:>0 }){EmptyState("Wishlist.Empty");return;}
         var items=itemCatalog.State.Catalog;
         RefreshRecipeHoldingsCache();
         ImGui.TextDisabled(localization.Format("Wishlist.Count",list.Count,Wishlist.MaximumItems));

@@ -108,7 +108,7 @@ internal sealed partial class MainWindow
         }
         ImGui.TextDisabled(localization.Format("Outfits.Count",outfitCount.Stored,outfitCount.Total,outfitCount.Ready));
         if(!outfitDresserKnown)ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("StorageReport.NoDresser"));
-        if(outfitRows.Count==0){ImGui.TextDisabled(localization.Get("Outfits.None"));return;}
+        if(outfitRows.Count==0){EmptyState("Outfits.None");return;}
         var size=new Vector2(ImGui.GetTextLineHeight()*1.4f);
         var shown=ImGui.BeginChild("OutfitRows",new Vector2(0,ImGui.GetContentRegionAvail().Y),false);
         try

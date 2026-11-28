@@ -36,7 +36,7 @@ internal sealed partial class MainWindow
             srankShownQuery=srankQuery;
             srankShown=srankRows.Where(row=>SRankConditions.Matches(row,srankQuery)).ToArray();
         }
-        if(srankShown.Length==0){ImGui.TextDisabled(localization.Get("SRank.Empty"));return;}
+        if(srankShown.Length==0){EmptyState("SRank.Empty");return;}
         var here=mapLive?.State is { } live ? catalog.Find(live.MapId)?.TerritoryId ?? 0:0;
         foreach(var row in srankShown.Where(row=>row.Mark.Territory==here && here!=0))
         {

@@ -61,7 +61,7 @@ internal sealed partial class MainWindow
     private void DrawDetectedConsumable(string labelKey,(CraftConsumable Item,bool Hq)? consumable)
     {
         ImGui.AlignTextToFramePadding();ImGui.TextUnformatted(localization.Get(labelKey));ImGui.SameLine();
-        if(consumable is not { } known){ImGui.TextDisabled(localization.Get("CraftSimulation.DetectedNone"));return;}
+        if(consumable is not { } known){EmptyState("CraftSimulation.DetectedNone");return;}
         DrawItemIcon(itemCatalog.State.Catalog?.Find(known.Item.ItemId),new System.Numerics.Vector2(28));
         ItemTip(known.Item.ItemId);
         if(known.Hq){ImGui.SameLine();ImGui.TextDisabled("HQ");}

@@ -219,7 +219,7 @@ internal sealed partial class MainWindow
             if(TipHovered())TipText(localization.Format("MarketBoard.CopyUndercutTip",lowest.Lowest.ToString("N0",Numbers),board.FetchedAt.ToLocalTime().ToString("g")));
         }
         ImGui.TextDisabled(localization.Format("MarketBoard.Count",marketShown.Length,board.Offers.Count));
-        if(marketShown.Length==0){ImGui.TextDisabled(localization.Get("MarketBoard.Empty"));return;}
+        if(marketShown.Length==0){EmptyState("MarketBoard.Empty");return;}
         ImGui.TextDisabled(localization.Get("MarketBoard.SortHelp"));
         if(!UI.UiComponents.BeginDataTable("MarketListings",7,sortable:true,scrollHeight:Math.Max(160,ImGui.GetContentRegionAvail().Y)))return;
         try

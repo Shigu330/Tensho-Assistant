@@ -60,7 +60,7 @@ internal sealed partial class MainWindow
 
     private void DrawGcGrades(GcCatalog catalog,GcSnapshot current)
     {
-        if(current.Company==0)ImGui.TextDisabled(localization.Get("GrandCompany.None"));
+        if(current.Company==0)EmptyState("GrandCompany.None");
         else ImGui.TextColored(Accent,localization.Format("GrandCompany.Current",catalog.Companies.ElementAtOrDefault(current.Company) ?? ""));
         if(!ImGui.BeginTable("###GcCompanies",4,ImGuiTableFlags.RowBg|ImGuiTableFlags.BordersInnerV))return;
         try

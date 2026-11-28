@@ -44,7 +44,7 @@ internal sealed partial class MainWindow
         ImGui.Combo(localization.Get("CustomDeliveries.ColumnClient")+"###DeliveryRewardClient",ref deliveryRewardClient,names,names.Length);
         Tip("CustomDeliveries.RewardClientTip");
         var client=clients[deliveryRewardClient];
-        if(client.Rewards is not { Count:>0 } rewards){ImGui.TextDisabled(localization.Get("CustomDeliveries.RewardsNone"));return;}
+        if(client.Rewards is not { Count:>0 } rewards){EmptyState("CustomDeliveries.RewardsNone");return;}
         static string Tiers(DeliveryTiers tiers)=>$"{(tiers.Low).ToString("N0",Numbers)} / {(tiers.Mid).ToString("N0",Numbers)} / {(tiers.High).ToString("N0",Numbers)}";
         if(ImGui.BeginTable("###DeliveryRewardsTable",5,ImGuiTableFlags.RowBg|ImGuiTableFlags.BordersInnerV|ImGuiTableFlags.Resizable))
         {

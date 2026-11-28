@@ -80,7 +80,7 @@ internal sealed partial class MainWindow
                         ? string.Join(" › ",unlockPath.Select(id=>catalog.Find(id)?.ShortName ?? id.ToString())):localization.Get("AirshipSectors.PathUnknown")));
                 ImGui.TableNextColumn();
                 var drops=catalog.Drops.GetValueOrDefault(sector.Id);
-                if(drops is not { Count:>0 }){ImGui.TextDisabled(localization.Get("AirshipSectors.LootNone"));continue;}
+                if(drops is not { Count:>0 }){EmptyState("AirshipSectors.LootNone");continue;}
                 ImGui.TextUnformatted(localization.Format("AirshipSectors.LootCount",drops.Count));
                 if(ImGui.IsItemHovered())DrawAirshipLootTooltip(drops,items);
             }
